@@ -10,6 +10,7 @@ declare module "next-auth" {
       isStaff: boolean
       isPortalUser: boolean
       estudanteId: string | null
+      escolaId: string
     } & DefaultSession["user"]
   }
 
@@ -21,6 +22,7 @@ declare module "next-auth" {
     isStaff: boolean
     isPortalUser: boolean
     estudanteId: string | null
+    escolaId: string
   }
 }
 
@@ -33,5 +35,6 @@ declare module "next-auth/jwt" {
     isStaff: boolean
     isPortalUser: boolean
     estudanteId: string | null
+    escolaId: string
   }
 }

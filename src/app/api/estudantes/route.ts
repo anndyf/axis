@@ -8,10 +8,11 @@ export const runtime = 'nodejs'
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    
-    if (!session) {
+
+    if (!session?.user?.escolaId) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
+    const escolaId = session.user.escolaId
 
     const { nome, turmaId, matricula } = await request.json()
 
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     // Verificar se já existe estudante com esta matrícula
     const existingEstudante = await prisma.estudante.findUnique({
-      where: { matricula }
+      where: { escolaId_matricula: { escolaId, matricula } }
     })
 
     if (existingEstudante) {
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
 
     // Verificar se já existe usuário com este username (matricula)
     const existingUser = await prisma.user.findUnique({
-      where: { username: matricula }
+      where: { escolaId_username: { escolaId, username: matricula } }
     })
 
     if (existingUser) {
@@ -57,7 +58,8 @@ export async function POST(request: NextRequest) {
       data: {
         nome: nome.trim(),
         turmaId,
-        matricula
+        matricula,
+        escolaId
       }
     })
 
@@ -74,7 +76,8 @@ export async function POST(request: NextRequest) {
               password: hashedPassword,
               name: nome.trim(),
               isPortalUser: true,
-              estudanteId: estudante.matricula,
+              estudanteId: estudante.id,
+              escolaId,
               isApproved: true,
               isActive: true
             }
@@ -109,8 +112,8 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const session = await auth()
-    
-    if (!session) {
+
+    if (!session?.user?.escolaId) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 
@@ -118,8 +121,8 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search')
     const turmaId = searchParams.get('turmaId')
 
-    const where: any = {}
-    
+    const where: any = { escolaId: session.user.escolaId }
+
     if (search) {
       where.OR = [
         { nome: { contains: search, mode: 'insensitive' } },

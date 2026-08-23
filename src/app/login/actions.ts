@@ -7,7 +7,9 @@ import crypto from "crypto"
 
 export async function resetPassword(email: string) {
   try {
-    const user = await prisma.user.findUnique({
+    // findFirst (não findUnique): email não é mais globalmente único, e esse fluxo
+    // roda antes da resolução de tenant por subdomínio (Fase 4), sem escolaId disponível.
+    const user = await prisma.user.findFirst({
       where: {
         email: email,
       },

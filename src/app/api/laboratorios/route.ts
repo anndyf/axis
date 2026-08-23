@@ -5,9 +5,10 @@ import { NextResponse } from "next/server"
 export async function GET() {
   try {
     const session = await auth()
-    if (!session) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
+    if (!session?.user?.escolaId) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
 
     const labs = await prisma.laboratorio.findMany({
+      where: { escolaId: session.user.escolaId },
       orderBy: { nome: 'asc' }
     })
 
@@ -26,7 +27,7 @@ export async function POST(request: Request) {
 
     const { nome, descricao } = await request.json()
     const lab = await prisma.laboratorio.create({
-      data: { nome, descricao }
+      data: { nome, descricao, escolaId: session.user.escolaId }
     })
 
     return NextResponse.json(lab)

@@ -8,10 +8,11 @@ export const runtime = 'nodejs'
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    
-    if (!session) {
+
+    if (!session?.user?.escolaId) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
+    const escolaId = session.user.escolaId
 
     const formData = await request.formData()
     const file = formData.get('file') as File
@@ -65,7 +66,7 @@ export async function POST(request: NextRequest) {
 
     // Buscar todos os existentes de uma vez
     const existingInDb = await prisma.estudante.findMany({
-        where: { matricula: { in: matriculasToQuery } },
+        where: { escolaId, matricula: { in: matriculasToQuery } },
         select: { matricula: true, nome: true }
     })
 
@@ -99,14 +100,15 @@ export async function POST(request: NextRequest) {
     for (const data of toCreate) {
         // Buscar ou criar turma
         let turma = await prisma.turma.findFirst({
-          where: { nome: data.turmaNome }
+          where: { nome: data.turmaNome, escolaId }
         })
 
         if (!turma) {
           turma = await prisma.turma.create({
-            data: { 
+            data: {
               nome: data.turmaNome,
-              anoLetivo: currentYear
+              anoLetivo: currentYear,
+              escolaId
             }
           })
         }
@@ -116,7 +118,8 @@ export async function POST(request: NextRequest) {
           data: {
             nome: data.nome,
             matricula: data.matricula,
-            turmaId: turma.id
+            turmaId: turma.id,
+            escolaId
           }
         })
 

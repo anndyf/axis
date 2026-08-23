@@ -13,7 +13,7 @@ export async function getStudentPortalData() {
 
   try {
     const estudante = await prisma.estudante.findUnique({
-      where: { matricula: session.user.estudanteId },
+      where: { id: session.user.estudanteId },
       include: {
         turma: {
           include: {

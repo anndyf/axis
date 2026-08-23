@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
 
     try {
       const turma = await prisma.turma.create({
-        data: { 
+        data: {
           nome: nome.trim(),
           curso: curso?.trim(),
           turno: turno?.trim(),
@@ -60,7 +60,8 @@ export async function POST(request: NextRequest) {
           serie: serie?.toString(),
           numero: numero ? parseInt(numero.toString()) : null,
           anoLetivo: currentYear,
-          cursoId: cursoId || null
+          cursoId: cursoId || null,
+          escolaId: session.user.escolaId
         }
       })
 
@@ -96,9 +97,9 @@ export async function POST(request: NextRequest) {
       const numVal = numero ? parseInt(numero.toString()) : null
       
       await prisma.$executeRawUnsafe(`
-        INSERT INTO "turmas" (id, nome, curso, turno, modalidade, serie, numero, ano_letivo, created_at, updated_at, curso_id)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-      `, id, nome.trim(), curso?.trim(), turno?.trim(), modalidade?.trim(), serie?.toString(), numVal, currentYear, now, now, cursoId || null)
+        INSERT INTO "turmas" (id, nome, curso, turno, modalidade, serie, numero, ano_letivo, created_at, updated_at, curso_id, escola_id)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      `, id, nome.trim(), curso?.trim(), turno?.trim(), modalidade?.trim(), serie?.toString(), numVal, currentYear, now, now, cursoId || null, session.user.escolaId)
 
       revalidatePath('/dashboard/turmas')
       return NextResponse.json({ id, nome, message: 'Turma criada via SQL' }, { status: 201 })

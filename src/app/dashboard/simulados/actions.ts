@@ -31,7 +31,8 @@ export async function reportarEstudanteFaltante(turmaId: string, nomeEstudante: 
         content,
         category: "SUPORTE" as any,
         senderId: user.id,
-        isRead: false
+        isRead: false,
+        escolaId: turma.escolaId
       }
     })
 

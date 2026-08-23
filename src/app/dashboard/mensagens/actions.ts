@@ -153,7 +153,8 @@ export async function sendMessage(formData: FormData) {
         receiverId: targetReceiverId || undefined,
         isRead: false,
         parentId: finalParentId || undefined,
-        allowReplies
+        allowReplies,
+        escolaId: user.escolaId
       }
     })
 

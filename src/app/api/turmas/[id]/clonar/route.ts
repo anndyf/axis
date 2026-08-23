@@ -40,6 +40,7 @@ export async function POST(
         serie: originalTurma.serie,
         numero: numero !== undefined ? parseInt(numero.toString()) : originalTurma.numero,
         anoLetivo: anoLetivo || originalTurma.anoLetivo,
+        escolaId: originalTurma.escolaId,
       }
     })
 

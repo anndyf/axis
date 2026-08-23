@@ -34,7 +34,7 @@ export async function PUT(req: Request) {
     const { currentPassword, newPassword } = result.data
 
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email }
+      where: { id: session.user.id }
     })
 
     if (!user) {

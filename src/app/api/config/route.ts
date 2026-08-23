@@ -7,10 +7,14 @@ export const runtime = 'nodejs'
 
 export async function GET() {
   try {
+  const session = await auth()
+  if (!session?.user?.escolaId) {
+    return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+  }
   const config = await prisma.globalConfig.upsert({
     where: { id: 'global' },
     update: {},
-    create: { id: 'global', isBancoQuestoesAtivo: true, anoLetivoAtual: new Date().getFullYear() }
+    create: { id: 'global', escolaId: session.user.escolaId, isBancoQuestoesAtivo: true, anoLetivoAtual: new Date().getFullYear() }
   })
     // Buscar anos com dados cadastrados
     const turmas = await prisma.turma.groupBy({
@@ -59,8 +63,9 @@ export async function PUT(request: NextRequest) {
     const config = await prisma.globalConfig.upsert({
       where: { id: 'global' },
       update: data,
-      create: { 
-        id: 'global', 
+      create: {
+        id: 'global',
+        escolaId: session.user.escolaId,
         isBancoQuestoesAtivo: isBancoQuestoesAtivo ?? true,
         anoLetivoAtual: anoLetivoAtual ?? new Date().getFullYear()
       }

@@ -41,6 +41,7 @@ export async function POST(
         serie: serie || originalTurma.serie,
         numero: originalTurma.numero,
         anoLetivo: anoLetivo || originalTurma.anoLetivo,
+        escolaId: originalTurma.escolaId,
       }
     })
 
@@ -70,7 +71,7 @@ export async function POST(
     if (originalTurma.estudantes.length > 0) {
       await prisma.estudante.updateMany({
         where: {
-          matricula: { in: originalTurma.estudantes.map(e => e.matricula) }
+          id: { in: originalTurma.estudantes.map(e => e.id) }
         },
         data: {
           turmaId: newTurma.id

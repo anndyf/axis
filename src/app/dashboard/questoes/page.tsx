@@ -21,7 +21,7 @@ export default async function QuestoesPage() {
   const config = await prisma.globalConfig.upsert({
     where: { id: 'global' },
     update: {},
-    create: { id: 'global', isBancoQuestoesAtivo: true }
+    create: { id: 'global', escolaId: session.user.escolaId, isBancoQuestoesAtivo: true }
   })
 
   // Se professor e banco estiver desativado, bloqueia acesso

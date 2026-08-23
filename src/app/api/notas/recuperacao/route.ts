@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
         }
 
         const [student, discipline] = await Promise.all([
-          prisma.estudante.findUnique({ where: { matricula: notaOriginal.estudanteId }, select: { nome: true } }),
+          prisma.estudante.findUnique({ where: { id: notaOriginal.estudanteId }, select: { nome: true } }),
           prisma.disciplina.findUnique({ where: { id: notaOriginal.disciplinaId }, select: { nome: true } })
         ])
 

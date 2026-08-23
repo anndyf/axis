@@ -53,7 +53,8 @@ export async function createPortalUser(matricula: string) {
         password: hashedPassword,
         name: estudante.nome,
         isPortalUser: true,
-        estudanteId: estudante.matricula,
+        estudanteId: estudante.id,
+        escolaId: estudante.escolaId,
         isApproved: true,
         isActive: true
       }
@@ -101,6 +102,7 @@ export async function activateAllPortals() {
         // Buscar estudantes do ano atual que não possuem usuário de portal
         const estudantesSemAcesso = await prisma.estudante.findMany({
             where: {
+                escolaId: session.user.escolaId,
                 turma: {
                     anoLetivo: currentYear
                 },
@@ -128,7 +130,8 @@ export async function activateAllPortals() {
                     password: hashedPassword,
                     name: estudante.nome,
                     isPortalUser: true,
-                    estudanteId: estudante.matricula,
+                    estudanteId: estudante.id,
+                    escolaId: estudante.escolaId,
                     isApproved: true,
                     isActive: true
                 }

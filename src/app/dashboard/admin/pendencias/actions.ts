@@ -44,7 +44,8 @@ export async function resolvePendencia(messageId: string) {
         senderId: user.id,
         receiverId: originalMessage.senderId,
         parentId: messageId,
-        isRead: false
+        isRead: false,
+        escolaId: user.escolaId
       }
     })
 
@@ -145,7 +146,8 @@ export async function enviarComunicadoGeral(subject: string, content: string, pr
         category: "COMUNICADO",
         senderId: user.id,
         isGlobal: true,
-        priority
+        priority,
+        escolaId: user.escolaId
       }
     })
     revalidatePath("/dashboard")
@@ -181,7 +183,8 @@ export async function responderPendencia(parentId: string, content: string) {
         senderId: user.id,
         receiverId: originalMessage.senderId,
         parentId: parentId,
-        isRead: false
+        isRead: false,
+        escolaId: user.escolaId
       }
     })
 

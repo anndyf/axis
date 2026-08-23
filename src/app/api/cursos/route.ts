@@ -1,8 +1,15 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { auth } from "@/lib/auth"
 
 export async function POST(req: Request) {
   try {
+    const session = await auth()
+    if (!session?.user?.escolaId) {
+      return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
+    }
+    const escolaId = session.user.escolaId
+
     const { nome, sigla, modalidade, modalidades, turnos } = await req.json()
 
     if (!nome || !sigla) {
@@ -38,6 +45,7 @@ export async function POST(req: Request) {
       // Verifica se já existe
       const existingCurso = await prisma.curso.findFirst({
         where: {
+          escolaId,
           OR: [
             { id: cursoId },
             { nome, modalidade: mod }
@@ -51,7 +59,7 @@ export async function POST(req: Request) {
       }
 
       // Verifica sigla única
-      const existingSigla = await prisma.curso.findUnique({ where: { sigla: siglaFinal } })
+      const existingSigla = await prisma.curso.findUnique({ where: { escolaId_sigla: { escolaId, sigla: siglaFinal } } })
       if (existingSigla) {
         erros.push(`Sigla "${siglaFinal}" já está em uso.`)
         continue
@@ -61,6 +69,7 @@ export async function POST(req: Request) {
         const curso = await prisma.curso.create({
           data: {
             id: cursoId,
+            escolaId,
             nome,
             sigla: siglaFinal,
             modalidade: mod,
