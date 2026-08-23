@@ -8,12 +8,44 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+model Escola {
+  id            String    @id @default(cuid())
+  nome          String
+  slug          String    @unique
+  plano         PlanoTipo @default(BASICO)
+  status        String    @default("TRIAL")
+  logoUrl       String?   @map("logo_url")
+  corPrimaria   String?   @map("cor_primaria")
+  corSecundaria String?   @map("cor_secundaria")
+  emailDominio  String?   @map("email_dominio")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  users             User[]
+  turmas            Turma[]
+  cursos            Curso[]
+  areasConhecimento AreaConhecimento[]
+  laboratorios      Laboratorio[]
+  messages          Message[]
+  globalConfigs     GlobalConfig[]
+
+  @@map("escolas")
+}
+
+enum PlanoTipo {
+  BASICO
+  PRO
+  ENTERPRISE
+}
+
 model User {
   id                    String                @id @default(cuid())
   email                 String                @unique
   username              String                @unique
   password              String
   name                  String?
+  escolaId              String?               @map("escola_id")
+  escola                Escola?               @relation(fields: [escolaId], references: [id])
   isSuperuser           Boolean               @default(false) @map("is_superuser")
   isStaff               Boolean               @default(false) @map("is_staff")
   isActive              Boolean               @default(true) @map("is_active")
@@ -46,15 +78,19 @@ model User {
   disciplinasPermitidas Disciplina[]          @relation("DisciplinaUsuarios")
   turmasPermitidas      Turma[]               @relation("TurmaUsuarios")
 
+  @@index([escolaId])
   @@map("users")
 }
 
 model GlobalConfig {
   id                   String   @id @default("global")
+  escolaId             String?  @map("escola_id")
+  escola               Escola?  @relation(fields: [escolaId], references: [id])
   isBancoQuestoesAtivo Boolean  @default(true) @map("is_banco_questoes_ativo")
   anoLetivoAtual       Int      @default(2026) @map("ano_letivo_atual")
   updatedAt            DateTime @updatedAt @map("updated_at")
 
+  @@index([escolaId])
   @@map("configs")
 }
 
@@ -63,6 +99,8 @@ model Message {
   ticketNumber   Int             @default(autoincrement()) @map("ticket_number")
   subject        String
   content        String
+  escolaId       String?         @map("escola_id")
+  escola         Escola?         @relation(fields: [escolaId], references: [id])
   category       MessageCategory @default(GERAL)
   senderId       String          @map("sender_id")
   receiverId     String?         @map("receiver_id")
@@ -91,6 +129,7 @@ model Message {
   @@index([isGlobal, createdAt])
   @@index([createdAt])
   @@index([updatedAt])
+  @@index([escolaId])
   @@map("messages")
 }
 
@@ -199,6 +238,8 @@ model Prova {
 model Turma {
   id                   String                @id @default(cuid())
   nome                 String
+  escolaId             String?               @map("escola_id")
+  escola               Escola?               @relation(fields: [escolaId], references: [id])
   cursoId              String?               @map("curso_id")
   curso                String?
   turno                String?
@@ -218,6 +259,7 @@ model Turma {
   questoes             Questao[]             @relation("QuestaoTurmas")
   usuariosPermitidos   User[]                @relation("TurmaUsuarios")
   @@index([anoLetivo])
+  @@index([escolaId])
   @@map("turmas")
 }
 
@@ -241,10 +283,13 @@ model Curso {
   sigla      String   @unique
   modalidade String
   turnos     String[]
+  escolaId   String?  @map("escola_id")
+  escola     Escola?  @relation(fields: [escolaId], references: [id])
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
   @@unique([nome, modalidade])
+  @@index([escolaId])
   @@map("cursos")
 }
 
@@ -385,12 +430,15 @@ model PlanoEnsino {
 model AreaConhecimento {
   id           String                @id @default(cuid())
   nome         String                @unique
+  escolaId     String?               @map("escola_id")
+  escola       Escola?               @relation(fields: [escolaId], references: [id])
   disciplinas  Disciplina[]
   matrices     MatrizCurricular[]
   notas        NotaSimulado[]
   responsaveis ResponsavelSimulado[]
   provas       Prova[]
 
+  @@index([escolaId])
   @@map("areas_conhecimento")
 }
 
@@ -451,9 +499,12 @@ model ResponsavelSimulado {
 model Laboratorio {
   id        String               @id @default(cuid())
   nome      String               @unique
+  escolaId  String?              @map("escola_id")
+  escola    Escola?              @relation(fields: [escolaId], references: [id])
   descricao String?
   reservas  ReservaLaboratorio[]
 
+  @@index([escolaId])
   @@map("laboratorios")
 }
 
