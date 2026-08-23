@@ -314,7 +314,7 @@ model Estudante {
   notasSimulado  NotaSimulado[]
   teamMembers    TeamMember[]
   portalAccess   User[]         @relation("UserEstudante")
-  ocorrencias    Ocorrencia[]   @relation("OcorrenciaEstudantes")
+  ocorrencias    OcorrenciaEstudante[]
 
   @@index([nome])
   @@index([turmaId])
@@ -331,10 +331,21 @@ model Ocorrencia {
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @updatedAt @map("updated_at")
   autor           User        @relation("OcorrenciaAutor", fields: [registradoPorId], references: [id])
-  estudantes      Estudante[] @relation("OcorrenciaEstudantes")
+  estudantes      OcorrenciaEstudante[]
 
   @@index([data])
   @@map("ocorrencias")
+}
+
+model OcorrenciaEstudante {
+  id           String     @id @default(cuid())
+  ocorrenciaId String     @map("ocorrencia_id")
+  estudanteId  String     @map("estudante_id")
+  ocorrencia   Ocorrencia @relation(fields: [ocorrenciaId], references: [id], onDelete: Cascade)
+  estudante    Estudante  @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+
+  @@unique([ocorrenciaId, estudanteId])
+  @@map("ocorrencia_estudantes")
 }
 
 model Disciplina {
