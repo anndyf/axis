@@ -28,6 +28,7 @@ model Escola {
   laboratorios      Laboratorio[]
   messages          Message[]
   globalConfigs     GlobalConfig[]
+  estudantes        Estudante[]
 
   @@map("escolas")
 }
@@ -297,10 +298,11 @@ model Curso {
 }
 
 model Estudante {
-  id             String         @unique @default(cuid())
-  matricula      String         @id
+  id             String         @id @default(cuid())
+  matricula      String
   nome           String
   turmaId        String         @map("turma_id")
+  escolaId       String         @map("escola_id")
   status         String?        @default("ATIVO")
   turmaAnteriorId String?       @map("turma_anterior_id")
   createdAt      DateTime       @default(now()) @map("created_at")
@@ -308,6 +310,7 @@ model Estudante {
   dataNascimento DateTime?      @map("data_nascimento")
   sexo           String?        @map("sexo")
   aeeProfile     AEEProfile?    @relation("EstudanteAEE")
+  escola         Escola         @relation(fields: [escolaId], references: [id])
   turma          Turma          @relation(fields: [turmaId], references: [id], onDelete: Cascade)
   turmaAnterior  Turma?         @relation("TurmaAnteriorEstudante", fields: [turmaAnteriorId], references: [id])
   notas          NotaFinal[]
@@ -316,8 +319,10 @@ model Estudante {
   portalAccess   User[]         @relation("UserEstudante")
   ocorrencias    OcorrenciaEstudante[]
 
+  @@unique([escolaId, matricula])
   @@index([nome])
   @@index([turmaId])
+  @@index([escolaId])
   @@map("estudantes")
 }
 
