@@ -74,7 +74,7 @@ model User {
   questoes              Questao[]             @relation("ProfessorQuestoes")
   reservasLaboratorio   ReservaLaboratorio[]
   responsavelSimulados  ResponsavelSimulado[]
-  estudante             Estudante?            @relation("UserEstudante", fields: [estudanteId], references: [matricula])
+  estudante             Estudante?            @relation("UserEstudante", fields: [estudanteId], references: [id])
   disciplinasPermitidas Disciplina[]          @relation("DisciplinaUsuarios")
   turmasPermitidas      Turma[]               @relation("TurmaUsuarios")
 
@@ -371,7 +371,7 @@ model NotaFinal {
   isDesistenteUnid2 Boolean          @default(false) @map("is_desistente_unid2")
   isDesistenteUnid3 Boolean          @default(false) @map("is_desistente_unid3")
   disciplina        Disciplina       @relation(fields: [disciplinaId], references: [id], onDelete: Cascade)
-  estudante         Estudante        @relation(fields: [estudanteId], references: [matricula], onDelete: Cascade)
+  estudante         Estudante        @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
   modifiedBy        User?            @relation("NotaModificador", fields: [modifiedById], references: [id])
   auditorias        NotaFinalAudit[]
 
@@ -462,7 +462,7 @@ model NotaSimulado {
   updatedAt          DateTime         @updatedAt @map("updated_at")
   area               AreaConhecimento? @relation(fields: [areaId], references: [id])
   prova              Prova?            @relation(fields: [provaId], references: [id])
-  estudante          Estudante        @relation(fields: [estudanteId], references: [matricula], onDelete: Cascade)
+  estudante          Estudante        @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
   lancadoBy          User             @relation("SimuladoLancador", fields: [lancadoById], references: [id])
 
   // Removida a constraint de UNIQUE anterior que dependia de areaId, 
@@ -546,7 +546,7 @@ model AEEProfile {
   contatoNome              String?              @map("contato_nome")
   contatoTelefone          String?              @map("contato_telefone")
   acknowledgements         AEEAcknowledgement[]
-  estudante                Estudante            @relation("EstudanteAEE", fields: [estudanteId], references: [matricula], onDelete: Cascade)
+  estudante                Estudante            @relation("EstudanteAEE", fields: [estudanteId], references: [id], onDelete: Cascade)
 
   @@map("aee_profiles")
 }
@@ -614,7 +614,7 @@ model TeamMember {
   isLeader   Boolean    @default(false) @map("is_leader")
   idBackUrl  String?    @map("id_back_url")
   idFrontUrl String?    @map("id_front_url")
-  student    Estudante  @relation(fields: [studentId], references: [matricula], onDelete: Cascade)
+  student    Estudante  @relation(fields: [studentId], references: [id], onDelete: Cascade)
   team       SportsTeam @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   @@unique([teamId, studentId])
