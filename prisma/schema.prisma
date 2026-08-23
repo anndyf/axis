@@ -86,7 +86,7 @@ model User {
 }
 
 model GlobalConfig {
-  id                   String   @id @default("global")
+  id                   String   @id
   escolaId             String   @map("escola_id")
   escola               Escola   @relation(fields: [escolaId], references: [id])
   isBancoQuestoesAtivo Boolean  @default(true) @map("is_banco_questoes_ativo")

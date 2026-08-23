@@ -8,13 +8,19 @@ export const metadata: Metadata = {
 
 import { prisma } from "@/lib/prisma"
 import { getGlobalConfig } from "@/lib/data-fetching"
+import { auth } from "@/lib/auth"
+import { redirect } from "next/navigation"
 
 export default async function OcorrenciasPage() {
-  const config = await getGlobalConfig()
+  const session = await auth()
+  if (!session?.user?.escolaId) redirect("/login")
+
+  const config = await getGlobalConfig(session.user.escolaId)
   const currentYear = config?.anoLetivoAtual || new Date().getFullYear()
 
   const turmas = await prisma.turma.findMany({
     where: {
+      escolaId: session.user.escolaId,
       anoLetivo: currentYear
     },
     select: {

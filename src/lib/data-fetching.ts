@@ -2,8 +2,8 @@ import { prisma } from "@/lib/prisma"
 import { Session } from "next-auth"
 import { cache } from "react"
 
-export const getGlobalConfig = cache(async () => {
-  return await prisma.globalConfig.findUnique({ where: { id: 'global' } })
+export const getGlobalConfig = cache(async (escolaId: string) => {
+  return await prisma.globalConfig.findUnique({ where: { id: escolaId } })
 })
 
 /**
@@ -21,7 +21,7 @@ export async function getDisciplinasPermitidas(session: Session) {
     }
   }
 
-  const config = await getGlobalConfig()
+  const config = await getGlobalConfig(session.user.escolaId)
   const currentYear = config?.anoLetivoAtual || new Date().getFullYear()
 
   console.log(`[getDisciplinasPermitidas] Config loaded: ${JSON.stringify(config)}, Resolved Year: ${currentYear}`)
@@ -58,7 +58,7 @@ export async function getDisciplinasPermitidas(session: Session) {
  * Se for staff, retorna turmas das disciplinas permitidas ou turmasPermitidas explicitamente.
  */
 export async function getTurmasPermitidas(session: Session) {
-  const config = await getGlobalConfig()
+  const config = await getGlobalConfig(session.user.escolaId)
   const currentYear = config?.anoLetivoAtual || new Date().getFullYear()
 
   // Se for admin, ignora filtros e traz tudo

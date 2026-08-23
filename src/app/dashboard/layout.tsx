@@ -26,13 +26,13 @@ export default async function DashboardLayout({
     redirect("/portal")
   }
 
-  let config = await getGlobalConfig()
+  let config = await getGlobalConfig(session.user.escolaId)
 
   if (!config) {
-    // Caso raro onde o banco está zerado, cria a config inicial
+    // Caso raro onde a escola ainda não tem config, cria a inicial
     config = await prisma.globalConfig.create({
       data: {
-        id: 'global',
+        id: session.user.escolaId,
         escolaId: session.user.escolaId,
         isBancoQuestoesAtivo: true,
         anoLetivoAtual: new Date().getFullYear()

@@ -12,9 +12,9 @@ export async function GET() {
     return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
   }
   const config = await prisma.globalConfig.upsert({
-    where: { id: 'global' },
+    where: { id: session.user.escolaId },
     update: {},
-    create: { id: 'global', escolaId: session.user.escolaId, isBancoQuestoesAtivo: true, anoLetivoAtual: new Date().getFullYear() }
+    create: { id: session.user.escolaId, escolaId: session.user.escolaId, isBancoQuestoesAtivo: true, anoLetivoAtual: new Date().getFullYear() }
   })
     // Buscar anos com dados cadastrados
     const turmas = await prisma.turma.groupBy({
@@ -61,10 +61,10 @@ export async function PUT(request: NextRequest) {
     if (anoLetivoAtual !== undefined) data.anoLetivoAtual = anoLetivoAtual
 
     const config = await prisma.globalConfig.upsert({
-      where: { id: 'global' },
+      where: { id: session.user.escolaId },
       update: data,
       create: {
-        id: 'global',
+        id: session.user.escolaId,
         escolaId: session.user.escolaId,
         isBancoQuestoesAtivo: isBancoQuestoesAtivo ?? true,
         anoLetivoAtual: anoLetivoAtual ?? new Date().getFullYear()

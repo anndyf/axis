@@ -102,7 +102,7 @@ async function getDashboardStats(session: Session) {
   const isManagement = session.user.isSuperuser || session.user.isDirecao
 
   if (isManagement) {
-    const config = await getGlobalConfig()
+    const config = await getGlobalConfig(session.user.escolaId)
     const currentYear = config?.anoLetivoAtual || new Date().getFullYear()
 
     // Buscas cacheadas (5 min) para otimizar Vercel Fluid CPU
