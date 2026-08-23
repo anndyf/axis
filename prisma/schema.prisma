@@ -40,12 +40,12 @@ enum PlanoTipo {
 
 model User {
   id                    String                @id @default(cuid())
-  email                 String                @unique
-  username              String                @unique
+  email                 String
+  username              String
   password              String
   name                  String?
-  escolaId              String?               @map("escola_id")
-  escola                Escola?               @relation(fields: [escolaId], references: [id])
+  escolaId              String                @map("escola_id")
+  escola                Escola                @relation(fields: [escolaId], references: [id])
   isSuperuser           Boolean               @default(false) @map("is_superuser")
   isStaff               Boolean               @default(false) @map("is_staff")
   isActive              Boolean               @default(true) @map("is_active")
@@ -78,14 +78,16 @@ model User {
   disciplinasPermitidas Disciplina[]          @relation("DisciplinaUsuarios")
   turmasPermitidas      Turma[]               @relation("TurmaUsuarios")
 
+  @@unique([escolaId, email])
+  @@unique([escolaId, username])
   @@index([escolaId])
   @@map("users")
 }
 
 model GlobalConfig {
   id                   String   @id @default("global")
-  escolaId             String?  @map("escola_id")
-  escola               Escola?  @relation(fields: [escolaId], references: [id])
+  escolaId             String   @map("escola_id")
+  escola               Escola   @relation(fields: [escolaId], references: [id])
   isBancoQuestoesAtivo Boolean  @default(true) @map("is_banco_questoes_ativo")
   anoLetivoAtual       Int      @default(2026) @map("ano_letivo_atual")
   updatedAt            DateTime @updatedAt @map("updated_at")
@@ -99,8 +101,8 @@ model Message {
   ticketNumber   Int             @default(autoincrement()) @map("ticket_number")
   subject        String
   content        String
-  escolaId       String?         @map("escola_id")
-  escola         Escola?         @relation(fields: [escolaId], references: [id])
+  escolaId       String          @map("escola_id")
+  escola         Escola          @relation(fields: [escolaId], references: [id])
   category       MessageCategory @default(GERAL)
   senderId       String          @map("sender_id")
   receiverId     String?         @map("receiver_id")
@@ -238,8 +240,8 @@ model Prova {
 model Turma {
   id                   String                @id @default(cuid())
   nome                 String
-  escolaId             String?               @map("escola_id")
-  escola               Escola?               @relation(fields: [escolaId], references: [id])
+  escolaId             String                @map("escola_id")
+  escola               Escola                @relation(fields: [escolaId], references: [id])
   cursoId              String?               @map("curso_id")
   curso                String?
   turno                String?
@@ -280,20 +282,22 @@ model HorarioAula {
 model Curso {
   id         String   @id @default(cuid())
   nome       String
-  sigla      String   @unique
+  sigla      String
   modalidade String
   turnos     String[]
-  escolaId   String?  @map("escola_id")
-  escola     Escola?  @relation(fields: [escolaId], references: [id])
+  escolaId   String   @map("escola_id")
+  escola     Escola   @relation(fields: [escolaId], references: [id])
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
-  @@unique([nome, modalidade])
+  @@unique([escolaId, sigla])
+  @@unique([escolaId, nome, modalidade])
   @@index([escolaId])
   @@map("cursos")
 }
 
 model Estudante {
+  id             String         @unique @default(cuid())
   matricula      String         @id
   nome           String
   turmaId        String         @map("turma_id")
@@ -429,15 +433,16 @@ model PlanoEnsino {
 
 model AreaConhecimento {
   id           String                @id @default(cuid())
-  nome         String                @unique
-  escolaId     String?               @map("escola_id")
-  escola       Escola?               @relation(fields: [escolaId], references: [id])
+  nome         String
+  escolaId     String                @map("escola_id")
+  escola       Escola                @relation(fields: [escolaId], references: [id])
   disciplinas  Disciplina[]
   matrices     MatrizCurricular[]
   notas        NotaSimulado[]
   responsaveis ResponsavelSimulado[]
   provas       Prova[]
 
+  @@unique([escolaId, nome])
   @@index([escolaId])
   @@map("areas_conhecimento")
 }
@@ -498,12 +503,13 @@ model ResponsavelSimulado {
 
 model Laboratorio {
   id        String               @id @default(cuid())
-  nome      String               @unique
-  escolaId  String?              @map("escola_id")
-  escola    Escola?              @relation(fields: [escolaId], references: [id])
+  nome      String
+  escolaId  String               @map("escola_id")
+  escola    Escola               @relation(fields: [escolaId], references: [id])
   descricao String?
   reservas  ReservaLaboratorio[]
 
+  @@unique([escolaId, nome])
   @@index([escolaId])
   @@map("laboratorios")
 }
