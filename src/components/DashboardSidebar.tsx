@@ -12,7 +12,6 @@ import {
   TrendingUp, 
   Shield, 
   Menu,
-  Trophy,
   X,
   LogOut,
   Award,
@@ -28,8 +27,7 @@ import {
   ClipboardList,
   FileWarning,
   Accessibility,
-  Target,
-  Calendar
+  Target
 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { signOut } from "next-auth/react"
@@ -122,8 +120,6 @@ export default function DashboardSidebar({
       links: [
         (user.isSuperuser || user.isDirecao || (user.isStaff && isBancoQuestoesAtivo)) && { name: "Banco de Questões", href: "/dashboard/questoes", icon: Database },
         (user.isSuperuser || user.isDirecao) && { name: "Gerador de Provas", href: "/dashboard/provas", icon: Scissors },
-        (user.isSuperuser || user.isDirecao) && { name: "Jogos Escolares", href: "/dashboard/jogos", icon: Trophy },
-        (user.isSuperuser || user.isDirecao) && { name: "Agenda de Jogos", href: "/dashboard/jogos/calendario", icon: Calendar },
       ].filter(Boolean) as any[]
     },
     !user.isAEE && {

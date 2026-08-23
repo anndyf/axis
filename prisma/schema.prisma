@@ -315,7 +315,6 @@ model Estudante {
   turmaAnterior  Turma?         @relation("TurmaAnteriorEstudante", fields: [turmaAnteriorId], references: [id])
   notas          NotaFinal[]
   notasSimulado  NotaSimulado[]
-  teamMembers    TeamMember[]
   portalAccess   User[]         @relation("UserEstudante")
   ocorrencias    OcorrenciaEstudante[]
 
@@ -577,85 +576,6 @@ model AEEAcknowledgement {
 
   @@unique([profileId, userId])
   @@map("aee_acknowledgements")
-}
-
-model SportsSettings {
-  id                   String   @id @default("global_config")
-  minGrade             Float    @default(6.0) @map("min_grade")
-  minAttendance        Float    @default(75.0) @map("min_attendance")
-  maxInfrequentPercent Float    @default(20.0) @map("max_infrequent_percent")
-  termsContent         String   @default("") @map("terms_content")
-  isOpen               Boolean  @default(true) @map("is_open")
-  updatedAt            DateTime @updatedAt @map("updated_at")
-
-  @@map("sports_settings")
-}
-
-model SportModality {
-  id         String       @id @default(cuid())
-  nome       String       @unique
-  minPlayers Int          @default(5) @map("min_players")
-  maxPlayers Int          @default(12) @map("max_players")
-  isActive   Boolean      @default(true) @map("is_active")
-  isMisto    Boolean      @default(false) @map("is_misto")
-  matches    GameMatch[]
-  teams      SportsTeam[]
-
-  @@map("sport_modalities")
-}
-
-model SportsTeam {
-  id           String        @id @default(cuid())
-  nome         String
-  contactEmail String        @map("contact_email")
-  modalityId   String        @map("modality_id")
-  status       String        @default("Pendente")
-  feedback     String?
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
-  contactPhone String?       @map("contact_phone")
-  matches1     GameMatch[]   @relation("Team1")
-  matches2     GameMatch[]   @relation("Team2")
-  wins         GameMatch[]   @relation("Winner")
-  members      TeamMember[]
-  modality     SportModality @relation(fields: [modalityId], references: [id], onDelete: Cascade)
-
-  @@map("sports_teams")
-}
-
-model TeamMember {
-  id         String     @id @default(cuid())
-  teamId     String     @map("team_id")
-  studentId  String     @map("student_id")
-  isLeader   Boolean    @default(false) @map("is_leader")
-  idBackUrl  String?    @map("id_back_url")
-  idFrontUrl String?    @map("id_front_url")
-  student    Estudante  @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  team       SportsTeam @relation(fields: [teamId], references: [id], onDelete: Cascade)
-
-  @@unique([teamId, studentId])
-  @@map("sports_team_members")
-}
-
-model GameMatch {
-  id         String        @id @default(cuid())
-  team1Id    String?       @map("team1_id")
-  team2Id    String?       @map("team2_id")
-  modalityId String        @map("modality_id")
-  round      Int           @default(1)
-  score1     Int           @default(0)
-  score2     Int           @default(0)
-  winnerId   String?       @map("winner_id")
-  matchDate  DateTime?     @map("match_date")
-  matchDay   Int?          @map("match_day")
-  status     String        @default("PENDIENTE")
-  groupId    String?       @map("group_id")
-  modality   SportModality @relation(fields: [modalityId], references: [id], onDelete: Cascade)
-  team1      SportsTeam?   @relation("Team1", fields: [team1Id], references: [id])
-  team2      SportsTeam?   @relation("Team2", fields: [team2Id], references: [id])
-  winner     SportsTeam?   @relation("Winner", fields: [winnerId], references: [id])
-
-  @@map("game_matches")
 }
 
 enum QuestaoStatus {

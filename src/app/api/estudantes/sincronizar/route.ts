@@ -8,9 +8,10 @@ export const runtime = 'nodejs'
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session) {
+    if (!session?.user?.escolaId) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
+    const escolaId = session.user.escolaId
 
     const formData = await request.formData()
     const file = formData.get('file') as File
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
 
     // Identificar a turma alvo
     const turmaAlvo = await prisma.turma.findFirst({
-      where: { nome: manualTurma }
+      where: { nome: manualTurma, escolaId }
     })
     if (!turmaAlvo) {
       return NextResponse.json({ message: 'Turma não encontrada' }, { status: 404 })
@@ -36,13 +37,13 @@ export async function POST(request: NextRequest) {
 
     // Identificar/Criar turma de Evasão
     let turmaEvasao = await prisma.turma.findFirst({
-      where: { nome: 'Transferidos / Evasão' }
+      where: { nome: 'Transferidos / Evasão', escolaId }
     })
     if (!turmaEvasao) {
-      const config = await prisma.globalConfig.findUnique({ where: { id: 'global' } })
+      const config = await prisma.globalConfig.findUnique({ where: { id: escolaId } })
       const currentYear = config?.anoLetivoAtual || new Date().getFullYear()
       turmaEvasao = await prisma.turma.create({
-        data: { nome: 'Transferidos / Evasão', anoLetivo: currentYear }
+        data: { nome: 'Transferidos / Evasão', anoLetivo: currentYear, escolaId }
       })
     }
 
@@ -69,7 +70,7 @@ export async function POST(request: NextRequest) {
 
     // Buscar todos os estudantes que estão no PDF para ver se existem no sistema (mesmo em outras turmas)
     const estudantesNoSistema = await prisma.estudante.findMany({
-        where: { matricula: { in: Array.from(matriculasNoPdf) } }
+        where: { escolaId, matricula: { in: Array.from(matriculasNoPdf) } }
     })
     const mapSistema = new Map(estudantesNoSistema.map((e: any) => [e.matricula, e]))
 
@@ -88,14 +89,15 @@ export async function POST(request: NextRequest) {
                     matricula: item.matricula,
                     nome: item.nome,
                     turmaId: turmaAlvo.id,
-                    status: 'ATIVO'
+                    status: 'ATIVO',
+                    escolaId
                 }
             })
             createdCount++
         } else if (existente.turmaId !== turmaAlvo.id) {
             // Aluno estava em outra turma, trazer para esta
             await prisma.estudante.update({
-                where: { matricula: item.matricula },
+                where: { id: existente.id },
                 data: {
                     turmaId: turmaAlvo.id,
                     turmaAnteriorId: existente.turmaId,
@@ -111,7 +113,7 @@ export async function POST(request: NextRequest) {
     for (const e of estudantesNaTurmaAtualmente) {
         if (!matriculasNoPdf.has(e.matricula)) {
             await prisma.estudante.update({
-                where: { matricula: e.matricula },
+                where: { id: e.id },
                 data: {
                     turmaId: turmaEvasao.id,
                     turmaAnteriorId: turmaAlvo.id,
