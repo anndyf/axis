@@ -4,13 +4,20 @@ import { prisma } from "@/lib/prisma"
 import { enviarSenhaPorEmail } from "@/lib/mail"
 import bcrypt from "bcryptjs"
 import crypto from "crypto"
+import { headers } from "next/headers"
 
 export async function resetPassword(email: string) {
   try {
-    // findFirst (não findUnique): email não é mais globalmente único, e esse fluxo
-    // roda antes da resolução de tenant por subdomínio (Fase 4), sem escolaId disponível.
+    // escolaId vem do header injetado pelo middleware (Fase 4) - agora existe
+    // um jeito real de identificar a escola antes do login.
+    const escolaId = (await headers()).get('x-escola-id')
+    if (!escolaId) {
+      return { success: false, message: "Não foi possível identificar a escola." }
+    }
+
     const user = await prisma.user.findFirst({
       where: {
+        escolaId,
         email: email,
       },
     })

@@ -3,6 +3,7 @@ import type { NextAuthConfig } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
+import { headers } from "next/headers"
 
 // Force Node.js runtime (not Edge)
 export const runtime = 'nodejs'
@@ -19,9 +20,17 @@ export const authConfig: NextAuthConfig = {
           return null
         }
 
+        // escolaId vem do header injetado pelo middleware (resolvido pelo subdominio,
+        // nunca de input do client) - sem ele, não sabemos em qual escola autenticar.
+        const escolaId = (await headers()).get('x-escola-id')
+        if (!escolaId) {
+          throw new Error('ESCOLA_NAO_IDENTIFICADA')
+        }
+
         const loginUsername = (credentials.username as string).trim()
         const user = await prisma.user.findFirst({
           where: {
+            escolaId,
             OR: [
               { username: { equals: loginUsername, mode: 'insensitive' } },
               { email: { equals: loginUsername, mode: 'insensitive' } }
