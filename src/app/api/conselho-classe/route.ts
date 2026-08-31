@@ -3,16 +3,18 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { StatusNota } from '@prisma/client'
 import { logAudit } from '@/lib/audit'
+import { can } from '@/lib/rbac'
 
 export const runtime = 'nodejs'
 
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    
-    if (!session) {
+
+    if (!session?.user?.escolaId || !can(session.user, 'gestao')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
+    const escolaId = session.user.escolaId
 
     const { decisoes } = await request.json()
 
@@ -20,10 +22,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Dados inválidos' }, { status: 400 })
     }
 
-    // Verificar se o usuário da sessão ainda existe no banco
+    // Verificar se o usuário da sessão ainda existe no banco (na mesma escola -
+    // email/username deixaram de ser globalmente unicos na migracao multi-tenant,
+    // entao o fallback por email/username precisa ficar restrito a escola do
+    // proprio usuario logado, senao pode resolver para um usuario de outra escola)
     let userId = session.user.id
     const dbUser = await prisma.user.findFirst({
         where: {
+            escolaId,
             OR: [
                 { id: userId },
                 { email: session.user.email || "" },
@@ -48,9 +54,9 @@ export async function POST(request: NextRequest) {
         }
 
         const status = novoStatus as StatusNota
-        // Buscar nota original
-        const notaOriginal = await prisma.notaFinal.findUnique({
-          where: { id: notaId }
+        // Buscar nota original, escopada a escola do chamador
+        const notaOriginal = await prisma.notaFinal.findFirst({
+          where: { id: notaId, estudante: { escolaId } }
         })
 
         if (!notaOriginal) {
