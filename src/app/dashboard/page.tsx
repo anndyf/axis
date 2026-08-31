@@ -40,14 +40,21 @@ import { Session } from "next-auth"
 
 import { unstable_cache } from "next/cache"
 
+// escolaId como argumento (nao so no keyParts) e proposital: o unstable_cache do
+// Next.js deriva a chave de cache dos argumentos serializaveis da funcao, entao
+// isso garante que cada escola tenha sua propria entrada de cache - sem isso, a
+// primeira escola a popular o cache "vazaria" seus numeros pras outras por 5min.
 const getCachedStaticStatsManagement = unstable_cache(
-  async (currentYear: number) => {
+  async (escolaId: string, currentYear: number) => {
     const [turmasCount, disciplinasCount, estudantesCount, novasQuestoesCount] = await Promise.all([
-      prisma.turma.count({ where: { anoLetivo: currentYear } }),
-      prisma.disciplina.count({ where: { turma: { anoLetivo: currentYear } } }),
-      prisma.estudante.count({ where: { turma: { anoLetivo: currentYear } } }),
+      prisma.turma.count({ where: { escolaId, anoLetivo: currentYear } }),
+      prisma.disciplina.count({ where: { turma: { escolaId, anoLetivo: currentYear } } }),
+      prisma.estudante.count({ where: { escolaId, turma: { anoLetivo: currentYear } } }),
       prisma.questao.count({
-        where: { createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } }
+        where: {
+          professor: { escolaId },
+          createdAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
+        }
       })
     ])
     return { turmasCount, disciplinasCount, estudantesCount, novasQuestoesCount }
@@ -57,9 +64,10 @@ const getCachedStaticStatsManagement = unstable_cache(
 )
 
 const getCachedAnnouncementsManagement = unstable_cache(
-  async () => {
+  async (escolaId: string) => {
     return await prisma.message.findMany({
-      where: { 
+      where: {
+        escolaId,
         category: 'COMUNICADO',
         OR: [
           { isGlobal: true },
@@ -79,9 +87,10 @@ const getCachedAnnouncementsManagement = unstable_cache(
 )
 
 const getCachedAnnouncementsTeacher = unstable_cache(
-  async () => {
+  async (escolaId: string) => {
     return await prisma.message.findMany({
-      where: { 
+      where: {
+        escolaId,
         category: 'COMUNICADO',
         OR: [
           { isGlobal: true },
@@ -100,26 +109,28 @@ const getCachedAnnouncementsTeacher = unstable_cache(
 
 async function getDashboardStats(session: Session) {
   const isManagement = session.user.isSuperuser || session.user.isDirecao
+  const escolaId = session.user.escolaId
 
   if (isManagement) {
-    const config = await getGlobalConfig(session.user.escolaId)
+    const config = await getGlobalConfig(escolaId)
     const currentYear = config?.anoLetivoAtual || new Date().getFullYear()
 
     // Buscas cacheadas (5 min) para otimizar Vercel Fluid CPU
-    const staticStats = await getCachedStaticStatsManagement(currentYear)
-    const announcements = await getCachedAnnouncementsManagement()
+    const staticStats = await getCachedStaticStatsManagement(escolaId, currentYear)
+    const announcements = await getCachedAnnouncementsManagement(escolaId)
 
     // Buscas em tempo real (Notas, Adesão e Recuperação)
     const [notasCount, disciplinasComNotasCount, recuperacaoCount] = await Promise.all([
-      prisma.notaFinal.count({ where: { disciplina: { turma: { anoLetivo: currentYear } } } }),
+      prisma.notaFinal.count({ where: { disciplina: { turma: { escolaId, anoLetivo: currentYear } } } }),
       prisma.disciplina.count({
         where: {
-          turma: { anoLetivo: currentYear },
+          turma: { escolaId, anoLetivo: currentYear },
           notas: { some: {} }
         }
       }),
       prisma.estudante.count({
         where: {
+          escolaId,
           turma: { anoLetivo: currentYear },
           notas: {
             some: { status: 'RECUPERACAO' }
@@ -165,7 +176,7 @@ async function getDashboardStats(session: Session) {
     prisma.notaFinal.count({
       where: { disciplinaId: { in: disciplinasIds } }
     }),
-    getCachedAnnouncementsTeacher()
+    getCachedAnnouncementsTeacher(escolaId)
   ])
 
   return {
@@ -179,12 +190,16 @@ async function getDashboardStats(session: Session) {
 
 export default async function DashboardPage() {
   const session = await auth()
-  
+
   if (!session) {
     redirect("/login")
   }
 
   const stats = await getDashboardStats(session)
+  const escola = await prisma.escola.findUnique({
+    where: { id: session.user.escolaId },
+    select: { nome: true }
+  })
 
   const supportTips = [
     {
@@ -358,7 +373,7 @@ export default async function DashboardPage() {
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-blue-200 text-[10px] font-medium uppercase tracking-[0.2em] mb-1">
               <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></div>
-              <span>Painel de Controle Áxis - CETEP/LNAB</span>
+              <span>Painel de Controle Áxis{escola?.nome ? ` - ${escola.nome}` : ''}</span>
             </div>
             <h1 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
               Olá, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-white">{session.user.name?.split(' ')[0]}</span>.
