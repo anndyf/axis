@@ -10,9 +10,10 @@ interface ProvaPrintViewProps {
     comGabarito?: boolean;
   }
   nomeEscola?: string;
+  logoUrl?: string | null;
 }
 
-export default function ProvaPrintView({ prova, options, nomeEscola = 'Áxis' }: ProvaPrintViewProps) {
+export default function ProvaPrintView({ prova, options, nomeEscola = 'Áxis', logoUrl }: ProvaPrintViewProps) {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -96,7 +97,7 @@ export default function ProvaPrintView({ prova, options, nomeEscola = 'Áxis' }:
       <div className="prova-pages w-full">
                   {/* Cabeçalho principal da primeira página */}
                   <div className="print-header flex items-center justify-between pb-3 mb-4 mt-2 border-b-2 border-black">
-                    <img src="/logo-cetep-pdf.png" alt="CETEP Logo" className="w-16 h-16 object-contain" />
+                    <img src={logoUrl || "/images/logo_axis.png"} alt={`${nomeEscola} Logo`} className="w-16 h-16 object-contain" />
                     <div className="flex flex-col items-center flex-1">
                       <h1 className="font-bold text-[15pt] leading-tight text-center" style={{ fontFamily: 'Arial, sans-serif' }}>CENTRO TERRITORIAL DE EDUCAÇÃO PROFISSIONAL</h1>
                       <h2 className="text-[12pt] tracking-wide mt-1 text-center" style={{ fontFamily: 'Arial, sans-serif' }}>{nomeEscola.toUpperCase()}</h2>

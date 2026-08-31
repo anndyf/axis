@@ -46,7 +46,7 @@ export default async function ProvasPage() {
 
   const escola = await prisma.escola.findUnique({
     where: { id: session.user.escolaId },
-    select: { nome: true }
+    select: { nome: true, logoUrl: true }
   })
 
   return (
@@ -54,6 +54,7 @@ export default async function ProvasPage() {
       user={session.user}
       turmas={turmas}
       nomeEscola={escola?.nome || 'Áxis'}
+      logoUrl={escola?.logoUrl}
     />
   )
 }
