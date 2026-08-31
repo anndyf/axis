@@ -11,6 +11,19 @@ async function main() {
 
   const hashedPassword = await bcrypt.hash('admin123', 10)
 
+  // 0. Escola de demonstração (mesmo padrão do backfill-escola-cetep.ts)
+  const escola = await prisma.escola.upsert({
+    where: { slug: 'cetep' },
+    update: {},
+    create: {
+      nome: 'CETEP/LNAB',
+      slug: 'cetep',
+      plano: 'ENTERPRISE',
+      status: 'ATIVA',
+    },
+  })
+  const escolaId = escola.id
+
   // 1. Criar Áreas de Conhecimento Padrão
   console.log('🌱 Criando áreas de conhecimento...')
   const areasPadrao = [
@@ -23,15 +36,15 @@ async function main() {
 
   for (const nome of areasPadrao) {
     await prisma.areaConhecimento.upsert({
-      where: { nome },
+      where: { escolaId_nome: { escolaId, nome } },
       update: {},
-      create: { nome }
+      create: { nome, escolaId }
     })
   }
 
   // 1. Criar ou Atualizar Admin
   const admin = await prisma.user.upsert({
-    where: { username: 'admin' },
+    where: { escolaId_username: { escolaId, username: 'admin' } },
     update: {},
     create: {
       username: 'admin',
@@ -42,7 +55,8 @@ async function main() {
       isStaff: true,
       isActive: true,
       isApproved: true,
-      isDirecao: true
+      isDirecao: true,
+      escolaId
     }
   })
 
@@ -59,14 +73,15 @@ async function main() {
   const professores = []
   for (const p of professoresData) {
     const user = await prisma.user.upsert({
-      where: { username: p.username },
+      where: { escolaId_username: { escolaId, username: p.username } },
       update: {},
       create: {
         ...p,
         password: hashedPassword,
         isStaff: true,
         isActive: true,
-        isApproved: true
+        isApproved: true,
+        escolaId
       }
     })
     professores.push(user)
@@ -83,9 +98,9 @@ async function main() {
   const cursos = []
   for (const c of cursosData) {
     const curso = await prisma.curso.upsert({
-      where: { sigla: c.sigla }, // Usar sigla como chave única para evitar conflito
+      where: { escolaId_sigla: { escolaId, sigla: c.sigla } }, // Usar sigla como chave única para evitar conflito
       update: { nome: c.nome, modalidade: c.modalidade, turnos: c.turnos },
-      create: c
+      create: { ...c, escolaId }
     })
     cursos.push(curso)
   }
@@ -100,8 +115,8 @@ async function main() {
       const turnoChar = curso.turnos[0].charAt(0) // M, V ou N
       const nomeTurma = `${serie}T${siglaCurso}${turnoChar}1` // Ex: 1TIM1, 1TEM1, 1TAN1
       
-      let turma = await prisma.turma.findFirst({ where: { nome: nomeTurma } })
-      
+      let turma = await prisma.turma.findFirst({ where: { nome: nomeTurma, escolaId } })
+
       if (!turma) {
         turma = await prisma.turma.create({
           data: {
@@ -110,7 +125,8 @@ async function main() {
             serie: serie,
             turno: curso.turnos[0],
             anoLetivo: 2026,
-            curso: curso.nome
+            curso: curso.nome,
+            escolaId
           }
         })
       }
@@ -192,12 +208,13 @@ async function main() {
       const matricula = `${turma.nome.split(' ').join('')}-${i.toString().padStart(3, '0')}`
 
       const estudante = await prisma.estudante.upsert({
-        where: { matricula },
+        where: { escolaId_matricula: { escolaId, matricula } },
         update: { nome: nomeCompleto, turmaId: turma.id },
         create: {
           matricula,
           nome: nomeCompleto,
-          turmaId: turma.id
+          turmaId: turma.id,
+          escolaId
         }
       })
 
@@ -205,17 +222,17 @@ async function main() {
       for (const disc of turmaDisciplinas) {
         const notaRand = Math.random() * 10
         const status = notaRand >= 6 ? 'APROVADO' : (notaRand >= 3 ? 'RECUPERACAO' : 'DESISTENTE')
-        
+
         await prisma.notaFinal.upsert({
           where: {
             estudanteId_disciplinaId: {
-                estudanteId: estudante.matricula,
+                estudanteId: estudante.id,
                 disciplinaId: disc.id
             }
           },
           update: {}, // Não sobrescrever notas existentes se houver
           create: {
-            estudanteId: estudante.matricula,
+            estudanteId: estudante.id,
             disciplinaId: disc.id,
             nota: parseFloat(notaRand.toFixed(1)),
             nota1: parseFloat((notaRand * 0.5 + Math.random() * 3).toFixed(1)),

@@ -7,8 +7,12 @@ export async function GET() {
   if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
     return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
   }
+  if (!session.user.escolaId) {
+    return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+  }
 
   const turmas = await prisma.turma.findMany({
+    where: { escolaId: session.user.escolaId },
     include: {
       _count: {
         select: {
@@ -43,11 +47,25 @@ export async function POST(request: Request) {
   if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
     return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
   }
+  if (!session.user.escolaId) {
+    return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+  }
+  const escolaId = session.user.escolaId
 
   const { fromId, toId } = await request.json()
 
   if (!fromId || !toId) {
     return NextResponse.json({ message: 'IDs de origem e destino são obrigatórios' }, { status: 400 })
+  }
+
+  // Garante que as duas turmas pertencem a escola do usuario logado - sem isso, um
+  // superuser poderia informar o id de uma turma de outra escola e misturar dados.
+  const turmasValidas = await prisma.turma.findMany({
+    where: { id: { in: [fromId, toId] }, escolaId },
+    select: { id: true }
+  })
+  if (turmasValidas.length !== 2) {
+    return NextResponse.json({ message: 'Turma de origem ou destino não encontrada nesta escola' }, { status: 404 })
   }
 
   try {

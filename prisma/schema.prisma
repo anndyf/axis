@@ -29,6 +29,7 @@ model Escola {
   messages          Message[]
   globalConfigs     GlobalConfig[]
   estudantes        Estudante[]
+  ocorrencias       Ocorrencia[]
 
   @@map("escolas")
 }
@@ -332,12 +333,15 @@ model Ocorrencia {
   tipo            String
   data            DateTime    @default(now())
   registradoPorId String      @map("registrado_por_id")
+  escolaId        String      @map("escola_id")
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @updatedAt @map("updated_at")
   autor           User        @relation("OcorrenciaAutor", fields: [registradoPorId], references: [id])
+  escola          Escola      @relation(fields: [escolaId], references: [id])
   estudantes      OcorrenciaEstudante[]
 
   @@index([data])
+  @@index([escolaId])
   @@map("ocorrencias")
 }
 

@@ -9,8 +9,7 @@
     "lint": "eslint",
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
-    "db:seed": "tsx prisma/seed.ts",
-    "db:migrate": "tsx prisma/migrate-from-django.ts"
+    "db:seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
