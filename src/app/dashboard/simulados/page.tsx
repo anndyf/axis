@@ -12,12 +12,13 @@ export default async function SimuladosPage() {
   if (!session) redirect("/login")
 
   const user = session.user as any
-  
+  const escolaId = session.user.escolaId
+
   // Buscar turmas que o professor tem acesso ou todas para gestão
   let turmas = []
   if (user.isSuperuser || user.isDirecao) {
     turmas = await prisma.turma.findMany({
-      where: { anoLetivo: 2026 },
+      where: { escolaId, anoLetivo: 2026 },
       orderBy: { nome: 'asc' }
     })
   } else {
@@ -43,8 +44,17 @@ export default async function SimuladosPage() {
   // Buscar Provas de Simulado
   let provas = []
   if (user.isSuperuser || user.isDirecao) {
+    // Prova nao tem escolaId proprio (turmaId e professorCriadorId sao ambos
+    // opcionais, entao nao ha um caminho garantido) - filtra pelo que existir.
+    // TODO: adicionar escolaId denormalizado em Prova para fechar isso de vez.
     provas = await prisma.prova.findMany({
-      where: { tipo: 'SIMULADO' },
+      where: {
+        tipo: 'SIMULADO',
+        OR: [
+          { turma: { escolaId } },
+          { professorCriador: { escolaId } }
+        ]
+      },
       select: { id: true, titulo: true, codigo: true, turmaId: true, createdAt: true, unidade: true, _count: { select: { questoes: true } } },
       orderBy: { createdAt: 'desc' }
     })
@@ -81,15 +91,22 @@ export default async function SimuladosPage() {
   turmas = turmas.filter((t: any) => t.modalidade?.toUpperCase().includes('EPTM'))
 
   const areas = await prisma.areaConhecimento.findMany({
+    where: { escolaId },
     orderBy: { nome: 'asc' }
   })
 
+  const escola = await prisma.escola.findUnique({
+    where: { id: escolaId },
+    select: { nome: true }
+  })
+
   return (
-    <SimuladosClient 
-      turmas={turmas} 
-      provas={provas} 
+    <SimuladosClient
+      turmas={turmas}
+      provas={provas}
       areas={areas}
       user={user}
+      nomeEscola={escola?.nome || 'Áxis'}
     />
   )
 }

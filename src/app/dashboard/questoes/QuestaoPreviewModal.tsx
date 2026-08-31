@@ -5,9 +5,10 @@ import { X } from "lucide-react"
 interface QuestaoPreviewModalProps {
   questao: any
   onClose: () => void
+  nomeEscola?: string
 }
 
-export default function QuestaoPreviewModal({ questao, onClose }: QuestaoPreviewModalProps) {
+export default function QuestaoPreviewModal({ questao, onClose, nomeEscola = 'Áxis' }: QuestaoPreviewModalProps) {
   if (!questao) return null
 
   return (
@@ -40,7 +41,7 @@ export default function QuestaoPreviewModal({ questao, onClose }: QuestaoPreview
 
           {/* Cabeçalho Fictício da Prova */}
           <div className="text-center border-b-2 border-black pb-4 mb-6">
-            <h3 className="font-bold text-lg uppercase">CETEP/LNAB - Avaliação</h3>
+            <h3 className="font-bold text-lg uppercase">{nomeEscola} - Avaliação</h3>
             <p className="text-sm">Professor: {questao.professor?.name || '____________________'}</p>
           </div>
 

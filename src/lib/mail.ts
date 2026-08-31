@@ -1,6 +1,7 @@
 
 import nodemailer from 'nodemailer';
 import { Resend } from 'resend';
+import { prisma } from '@/lib/prisma';
 
 // Configuração do Resend
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -16,9 +17,14 @@ const transporter = process.env.SMTP_HOST ? nodemailer.createTransport({
   },
 }) : null;
 
-export async function enviarSenhaPorEmail(email: string, nome: string, senhaGerada: string) {
+export async function enviarSenhaPorEmail(email: string, nome: string, senhaGerada: string, escolaId?: string) {
+  const escola = escolaId
+    ? await prisma.escola.findUnique({ where: { id: escolaId }, select: { nome: true } })
+    : null;
+  const nomeEscola = escola?.nome || 'Áxis';
+
   const baseUrl = process.env.NEXTAUTH_URL || 'https://ceteplnab.com.br';
-  const subject = 'Seu acesso ao Sistema de Notas CETEP/LNAB';
+  const subject = `Seu acesso ao Sistema de Notas ${nomeEscola}`;
   const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
       <h1 style="color: #0f172a;">Olá, ${nome}!</h1>

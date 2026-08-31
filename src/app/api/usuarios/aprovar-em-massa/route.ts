@@ -9,7 +9,7 @@ export const runtime = 'nodejs'
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session || !session.user.isSuperuser) {
+    if (!session?.user?.escolaId || !session.user.isSuperuser) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 403 })
     }
 
@@ -18,9 +18,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Nenhum ID fornecido' }, { status: 400 })
     }
 
-    // Busca apenas os que ainda não foram aprovados
+    // Busca apenas os que ainda não foram aprovados, restrito a escola do superuser logado
     const usuarios = await prisma.user.findMany({
-      where: { id: { in: ids }, isApproved: false }
+      where: { id: { in: ids }, isApproved: false, escolaId: session.user.escolaId }
     })
 
     if (usuarios.length === 0) {
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
         })
 
         try {
-          await enviarSenhaPorEmail(user.email, user.name || 'Professor', senhaGerada)
+          await enviarSenhaPorEmail(user.email, user.name || 'Professor', senhaGerada, user.escolaId)
         } catch (mailErr) {
           console.error(`Email falhou para ${user.email}:`, mailErr)
         }

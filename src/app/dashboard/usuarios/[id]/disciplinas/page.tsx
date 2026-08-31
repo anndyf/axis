@@ -10,9 +10,9 @@ export const metadata = {
 
 export const runtime = 'nodejs'
 
-async function getUsuarioEDisciplinas(id: string) {
+async function getUsuarioEDisciplinas(id: string, escolaId: string) {
   const usuario = await prisma.user.findUnique({
-    where: { id },
+    where: { id, escolaId },
     include: {
       disciplinasPermitidas: { select: { id: true } }
     }
@@ -21,6 +21,7 @@ async function getUsuarioEDisciplinas(id: string) {
   if (!usuario) return null
 
   const todasDisciplinas = await prisma.disciplina.findMany({
+    where: { turma: { escolaId } },
     include: {
       turma: { select: { id: true, nome: true, modalidade: true } },
       usuariosPermitidos: { select: { id: true, name: true } }
@@ -41,13 +42,13 @@ export default async function VincularDisciplinasPage({
   params: Promise<{ id: string }>
 }) {
   const session = await auth()
-  
-  if (!session || !session.user.isSuperuser) {
+
+  if (!session?.user?.escolaId || !session.user.isSuperuser) {
     redirect("/dashboard")
   }
 
   const { id } = await params
-  const data = await getUsuarioEDisciplinas(id)
+  const data = await getUsuarioEDisciplinas(id, session.user.escolaId)
 
   if (!data) {
     redirect("/dashboard/usuarios")

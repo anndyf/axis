@@ -40,6 +40,11 @@ export async function GET(
       return NextResponse.json({ message: 'Estudante não encontrado' }, { status: 404 })
     }
 
+    const escola = await prisma.escola.findUnique({
+      where: { id: session.user.escolaId },
+      select: { nome: true }
+    })
+
     // Criar PDF
     const doc = new jsPDF()
 
@@ -47,10 +52,10 @@ export async function GET(
     doc.setFontSize(20)
     doc.setFont('helvetica', 'bold')
     doc.text('BOLETIM ESCOLAR', 105, 20, { align: 'center' })
-    
+
     doc.setFontSize(12)
     doc.setFont('helvetica', 'normal')
-    doc.text('Áxis - CETEP/LNAB', 105, 28, { align: 'right' })
+    doc.text(`Áxis - ${escola?.nome || 'Sistema'}`, 105, 28, { align: 'right' })
 
     // Linha separadora
     doc.setLineWidth(0.5)

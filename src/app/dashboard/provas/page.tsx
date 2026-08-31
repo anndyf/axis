@@ -13,8 +13,9 @@ export default async function ProvasPage() {
   }
 
   const turmas = await prisma.turma.findMany({
+    where: { escolaId: session.user.escolaId },
     orderBy: { nome: 'asc' },
-    select: { 
+    select: {
       id: true, 
       nome: true,
       serie: true,
@@ -43,10 +44,16 @@ export default async function ProvasPage() {
     }
   })
 
+  const escola = await prisma.escola.findUnique({
+    where: { id: session.user.escolaId },
+    select: { nome: true }
+  })
+
   return (
-    <GeradorProvasClient 
-      user={session.user} 
+    <GeradorProvasClient
+      user={session.user}
       turmas={turmas}
+      nomeEscola={escola?.nome || 'Áxis'}
     />
   )
 }

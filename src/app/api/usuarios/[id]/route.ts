@@ -13,33 +13,35 @@ export async function PUT(
   const { id } = await params
   try {
     const session = await auth()
-    
-    if (!session || !session.user.isSuperuser) {
+
+    if (!session?.user?.escolaId || !session.user.isSuperuser) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 403 })
     }
 
+    // Verificar se o usuário existe E pertence à escola do superuser logado -
+    // checado antes de qualquer mutação, para não editar/vincular disciplinas
+    // de um usuário de outra escola.
+    const existingUser = await prisma.user.findUnique({
+      where: { id, escolaId: session.user.escolaId }
+    })
+
+    if (!existingUser) {
+      return NextResponse.json({ message: 'Usuário não encontrado' }, { status: 404 })
+    }
+
     const data = await request.json()
-    const { 
-      name, email, username, password, 
-      isSuperuser, isDirecao, isStaff, isAEE, isActive, disciplinasIds 
+    const {
+      name, email, username, password,
+      isSuperuser, isDirecao, isStaff, isAEE, isActive, disciplinasIds
     } = data
 
     // Regra de Exclusividade: Se houver novas disciplinas, remover de outros professores
     if (disciplinasIds && Array.isArray(disciplinasIds) && disciplinasIds.length > 0) {
       const placeholders = disciplinasIds.map((_, i) => `$${i + 1}`).join(',')
       await prisma.$executeRawUnsafe(`
-        DELETE FROM "_DisciplinaUsuarios" 
+        DELETE FROM "_DisciplinaUsuarios"
         WHERE "A" IN (${placeholders}) AND "B" != $${disciplinasIds.length + 1}
       `, ...disciplinasIds, id)
-    }
-
-    // Verificar se usuário existe
-    const existingUser = await prisma.user.findUnique({
-      where: { id }
-    })
-
-    if (!existingUser) {
-      return NextResponse.json({ message: 'Usuário não encontrado' }, { status: 404 })
     }
 
     const updateData: any = {}
@@ -142,8 +144,8 @@ export async function DELETE(
   const { id } = await params
   try {
     const session = await auth()
-    
-    if (!session || !session.user.isSuperuser) {
+
+    if (!session?.user?.escolaId || !session.user.isSuperuser) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 403 })
     }
 
@@ -152,7 +154,7 @@ export async function DELETE(
       return NextResponse.json({ message: 'Você não pode excluir seu próprio usuário' }, { status: 400 })
     }
 
-    const userToDelete = await prisma.user.findUnique({ where: { id } })
+    const userToDelete = await prisma.user.findUnique({ where: { id, escolaId: session.user.escolaId } })
     if (!userToDelete) {
       return NextResponse.json({ message: 'Usuário não encontrado' }, { status: 404 })
     }

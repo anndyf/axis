@@ -12,8 +12,8 @@ export async function GET(
 ) {
   try {
     const session = await auth()
-    
-    if (!session) {
+
+    if (!session?.user?.escolaId) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 
@@ -25,7 +25,7 @@ export async function GET(
     }
 
     const turma = await prisma.turma.findUnique({
-      where: { id },
+      where: { id, escolaId: session.user.escolaId },
       include: {
         estudantes: {
           include: {
@@ -51,6 +51,11 @@ export async function GET(
       return NextResponse.json({ message: 'Turma não encontrada' }, { status: 404 })
     }
 
+    const escola = await prisma.escola.findUnique({
+      where: { id: session.user.escolaId },
+      select: { nome: true }
+    })
+
     // Criar PDF
     const doc = new jsPDF()
 
@@ -58,10 +63,10 @@ export async function GET(
     doc.setFontSize(20)
     doc.setFont('helvetica', 'bold')
     doc.text('RELATÓRIO DA TURMA', 105, 20, { align: 'center' })
-    
+
     doc.setFontSize(12)
     doc.setFont('helvetica', 'normal')
-    doc.text('Áxis - CETEP/LNAB', 105, 28, { align: 'center' })
+    doc.text(`Áxis - ${escola?.nome || 'Sistema'}`, 105, 28, { align: 'center' })
 
     // Linha separadora
     doc.setLineWidth(0.5)

@@ -226,7 +226,7 @@ export default function LaboratoriosClient({
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-1">
             <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Reserva de Laboratórios</h1>
-            <p className="text-slate-500 font-medium">Gerencie o uso compartilhado dos espaços tecnológicos do CETEP.</p>
+            <p className="text-slate-500 font-medium">Gerencie o uso compartilhado dos espaços tecnológicos.</p>
           </div>
 
           <div className="flex flex-wrap gap-3">

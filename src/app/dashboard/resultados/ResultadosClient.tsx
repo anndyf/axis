@@ -61,7 +61,7 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
           <div className="flex-1">
             <h3 className="text-sm font-bold text-slate-800 mb-1">Dica de Monitoramento</h3>
             <p className="text-sm text-slate-600 font-medium leading-relaxed">
-              Acesse aqui a visão consolidada de todas as turmas do CETEP. Esta seção é responsável por gerar os mapas de desempenho, detalhando as notas por unidades e o status acadêmico completo das turmas. Utilize os filtros para localizar a turma desejada e acesse o cartão correspondente para explorar os dados ou gerar relatórios em PDF.
+              Acesse aqui a visão consolidada de todas as turmas. Esta seção é responsável por gerar os mapas de desempenho, detalhando as notas por unidades e o status acadêmico completo das turmas. Utilize os filtros para localizar a turma desejada e acesse o cartão correspondente para explorar os dados ou gerar relatórios em PDF.
             </p>
           </div>
         </div>

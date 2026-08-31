@@ -54,16 +54,18 @@ interface Estudante {
   }>
 }
 
-export default function SimuladosClient({ 
-  turmas, 
-  provas, 
+export default function SimuladosClient({
+  turmas,
+  provas,
   areas,
-  user 
-}: { 
-  turmas: Turma[], 
-  provas: {id: string, titulo: string, codigo: number, turmaId: string | null, createdAt: Date, unidade: number | null, _count?: { questoes: number }}[], 
+  user,
+  nomeEscola = 'Áxis'
+}: {
+  turmas: Turma[],
+  provas: {id: string, titulo: string, codigo: number, turmaId: string | null, createdAt: Date, unidade: number | null, _count?: { questoes: number }}[],
   areas: Area[],
-  user: any 
+  user: any,
+  nomeEscola?: string
 }) {
   const [selectedTurma, setSelectedTurma] = useState("")
   const [selectedProva, setSelectedProva] = useState("")
@@ -820,10 +822,11 @@ export default function SimuladosClient({
             </button>
             
             <div className="print:m-0 print:p-0">
-               <GabaritoProfessor 
+               <GabaritoProfessor
                   titulo={provas.find((p: any) => p.id === selectedProva)?.titulo || 'Simulado'}
-                  questoes={gabarito || []} 
-                  maxNota={4.0} 
+                  questoes={gabarito || []}
+                  maxNota={4.0}
+                  nomeEscola={nomeEscola}
                 />
             </div>
           </div>

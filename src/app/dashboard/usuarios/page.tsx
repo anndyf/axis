@@ -11,9 +11,9 @@ export const metadata = {
 
 export const runtime = 'nodejs'
 
-async function getUsuarios() {
+async function getUsuarios(escolaId: string) {
   const users = await prisma.$queryRaw<any[]>`
-    SELECT 
+    SELECT
       u.id, u.name, u.email, u.username,
       u.is_superuser as "isSuperuser",
       u.is_staff as "isStaff",
@@ -22,7 +22,7 @@ async function getUsuarios() {
       u.is_aee as "isAEE",
       (SELECT COUNT(*)::int FROM "_DisciplinaUsuarios" du WHERE du."B" = u.id) as "disciplinasCount"
     FROM users u
-    WHERE u.estudante_id IS NULL AND u.is_portal_user = false AND u.id NOT LIKE 'GROUP_%'
+    WHERE u.escola_id = ${escolaId} AND u.estudante_id IS NULL AND u.is_portal_user = false AND u.id NOT LIKE 'GROUP_%'
     ORDER BY u.is_approved ASC, u.name ASC
   `
 
@@ -37,9 +37,9 @@ async function getUsuarios() {
 
 export default async function UsuariosPage() {
   const session = await auth()
-  if (!session || !session.user.isSuperuser) redirect("/dashboard")
+  if (!session?.user?.escolaId || !session.user.isSuperuser) redirect("/dashboard")
 
-  const usuarios = await getUsuarios()
+  const usuarios = await getUsuarios(session.user.escolaId)
   const pendentes = usuarios.filter(u => !u.isApproved).length
 
   return (

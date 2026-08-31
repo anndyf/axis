@@ -23,7 +23,7 @@ import { signOut } from "next-auth/react"
 import { analyzeRisk } from "@/lib/risk-analysis"
 import MarkdownContent from "@/components/MarkdownContent"
 
-export default function PortalClient({ initialData, user }: { initialData: any, user: any }) {
+export default function PortalClient({ initialData, user, nomeEscola }: { initialData: any, user: any, nomeEscola: string }) {
   const { estudante, mensagens = [], error } = initialData
   const [selectedMessage, setSelectedMessage] = useState<any>(null)
   const [readMessageIds, setReadMessageIds] = useState<Set<string>>(new Set())
@@ -96,7 +96,7 @@ export default function PortalClient({ initialData, user }: { initialData: any, 
                 activeTab === 'grades' ? 'Boletim' : 'Meu Perfil'}
             </h1>
             <span className="text-[9px] font-semibold text-blue-600 uppercase tracking-widest opacity-70">
-              {activeTab === 'home' ? `Olá, ${estudante.nome.split(' ')[0]} • CETEP/LNAB` : 'Portal do Aluno • CETEP/LNAB'}
+              {activeTab === 'home' ? `Olá, ${estudante.nome.split(' ')[0]} • ${nomeEscola}` : `Portal do Aluno • ${nomeEscola}`}
             </span>
           </div>
         </div>
@@ -386,7 +386,7 @@ export default function PortalClient({ initialData, user }: { initialData: any, 
           <div className="flex flex-col items-center gap-2">
             <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.2em]">Áxis v2.0 • {estudante.turma.anoLetivo}</span>
             <span className="text-[9px] font-semibold text-slate-300 uppercase tracking-widest">
-              © {new Date().getFullYear()} CETEP Litoral Norte e Agreste Baiano
+              © {new Date().getFullYear()} {nomeEscola}
             </span>
           </div>
 

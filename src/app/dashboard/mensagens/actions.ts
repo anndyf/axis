@@ -23,8 +23,14 @@ async function sendNotificationEmail(
   subject: string,
   content: string,
   senderName: string,
-  tipo: 'mensagem' | 'comunicado' = 'mensagem'
+  tipo: 'mensagem' | 'comunicado' = 'mensagem',
+  escolaId?: string
 ) {
+    const escola = escolaId
+      ? await prisma.escola.findUnique({ where: { id: escolaId }, select: { nome: true } })
+      : null
+    const nomeEscola = escola?.nome || 'Áxis'
+
     const isComunicado = tipo === 'comunicado'
     const emailSubject = isComunicado ? `📢 Comunicado: ${subject}` : `Nova Mensagem: ${subject}`
     const accentColor = isComunicado ? '#ea580c' : '#2563eb'
@@ -60,7 +66,7 @@ async function sendNotificationEmail(
              style="display: inline-block; background-color: ${accentColor}; color: white; padding: 14px 32px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 14px; letter-spacing: 0.02em;">
             ${isComunicado ? 'Ver Comunicado na Plataforma →' : 'Ler Mensagem Completa →'}
           </a>
-          <p style="margin: 16px 0 0 0; color: #94a3b8; font-size: 11px;">Sistema de Notas CETEP/LNAB — Esta é uma notificação automática.</p>
+          <p style="margin: 16px 0 0 0; color: #94a3b8; font-size: 11px;">Sistema de Notas ${nomeEscola} — Esta é uma notificação automática.</p>
         </div>
       </div>
     `;
@@ -169,13 +175,14 @@ export async function sendMessage(formData: FormData) {
     if (category === "GERAL" && targetReceiverId) {
         const receiver = await prisma.user.findUnique({ where: { id: targetReceiverId } });
         if (receiver && receiver.email) {
-            sendNotificationEmail(receiver.email, subject, content, user.name || user.username);
+            sendNotificationEmail(receiver.email, subject, content, user.name || user.username, 'mensagem', user.escolaId);
         }
     }
-    
+
     if (category === "SUPORTE" || category === "DIRECAO") {
         const admins = await prisma.user.findMany({
             where: {
+                escolaId: user.escolaId,
                 OR: [
                     { isSuperuser: true },
                     ...(category === "DIRECAO" ? [{ isDirecao: true }] : [])
@@ -184,9 +191,9 @@ export async function sendMessage(formData: FormData) {
             },
             select: { email: true }
         });
-        
+
         for (const admin of admins) {
-            if (admin.email) sendNotificationEmail(admin.email, subject, content, user.name || user.username);
+            if (admin.email) sendNotificationEmail(admin.email, subject, content, user.name || user.username, 'mensagem', user.escolaId);
         }
     }
 
@@ -212,7 +219,7 @@ export async function sendMessage(formData: FormData) {
       } else if (targetReceiverId === 'GROUP_TEACHERS') {
         // Comunicado Professores
         const profs = await prisma.user.findMany({
-          where: { isStaff: true, isActive: true, isApproved: true, id: { not: user.id } },
+          where: { escolaId: user.escolaId, isStaff: true, isActive: true, isApproved: true, id: { not: user.id } },
           select: { email: true }
         })
         emailTargets = profs.map(u => u.email).filter(Boolean) as string[]
@@ -220,7 +227,7 @@ export async function sendMessage(formData: FormData) {
       } else if (targetReceiverId === 'GROUP_STUDENTS') {
         // Comunicado Estudantes
         const estudantes = await prisma.user.findMany({
-          where: { estudanteId: { not: null }, isActive: true, id: { not: user.id } },
+          where: { escolaId: user.escolaId, estudanteId: { not: null }, isActive: true, id: { not: user.id } },
           select: { email: true }
         })
         emailTargets = estudantes.map(u => u.email).filter(Boolean) as string[]
@@ -244,7 +251,7 @@ export async function sendMessage(formData: FormData) {
         const senderName = user.name || user.username || 'Sistema'
         console.log(`📧 Disparando e-mail de comunicado para ${emailTargets.length} destinatário(s)`)
         Promise.all(
-          emailTargets.map(email => sendNotificationEmail(email, subject, content, senderName, 'comunicado'))
+          emailTargets.map(email => sendNotificationEmail(email, subject, content, senderName, 'comunicado', user.escolaId))
         ).catch(err => console.error('Erro no disparo de e-mails de comunicado:', err))
       }
     }

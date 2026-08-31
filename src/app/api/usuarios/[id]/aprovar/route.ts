@@ -14,12 +14,12 @@ export async function POST(
   try {
     const session = await auth()
 
-    if (!session || !session.user.isSuperuser) {
+    if (!session?.user?.escolaId || !session.user.isSuperuser) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 403 })
     }
 
     const user = await prisma.user.findUnique({
-      where: { id }
+      where: { id, escolaId: session.user.escolaId }
     })
 
     if (!user) {
@@ -47,7 +47,7 @@ export async function POST(
 
     // Enviar e-mail de acesso
     try {
-      await enviarSenhaPorEmail(user.email, user.name || 'Professor', senhaGerada)
+      await enviarSenhaPorEmail(user.email, user.name || 'Professor', senhaGerada, user.escolaId)
     } catch (mailError) {
       console.error('Erro ao enviar e-mail de acesso:', mailError)
     }

@@ -25,7 +25,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: "Áxis – Sistema de Gestão Escolar",
-  description: "Sistema de Gestão Escolar CETEP – Lançamento de notas, laboratórios e relatórios.",
+  description: "Sistema de Gestão Escolar Áxis – Lançamento de notas, laboratórios e relatórios.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,

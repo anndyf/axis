@@ -9,9 +9,10 @@ interface GabaritoProfessorProps {
   titulo: string;
   questoes: QuestaoGabarito[];
   maxNota?: number;
+  nomeEscola?: string;
 }
 
-export default function GabaritoProfessor({ titulo, questoes, maxNota = 4.0 }: GabaritoProfessorProps) {
+export default function GabaritoProfessor({ titulo, questoes, maxNota = 4.0, nomeEscola = 'Áxis' }: GabaritoProfessorProps) {
   const options = ['A', 'B', 'C', 'D', 'E'];
   const totalQuestoes = questoes.length || 1;
   const valorPorQuestao = maxNota / totalQuestoes;
@@ -40,7 +41,7 @@ export default function GabaritoProfessor({ titulo, questoes, maxNota = 4.0 }: G
       {/* Header */}
       <div className="text-center border-b-[3px] border-black pb-4 mb-6">
         <h1 className="text-xl font-bold uppercase tracking-wide m-0">Centro Territorial de Educação Profissional</h1>
-        <h2 className="text-sm uppercase text-gray-700 mt-1 m-0">Litoral Norte e Agreste Baiano - CETEP/LNAB</h2>
+        <h2 className="text-sm uppercase text-gray-700 mt-1 m-0">{nomeEscola}</h2>
       </div>
 
       {/* Titulo */}

@@ -29,7 +29,7 @@ import QuestaoForm from "./QuestaoForm"
 import QuestaoPreviewModal from "./QuestaoPreviewModal"
 import TeacherTipsModal from "@/components/TeacherTipsModal"
 
-export default function QuestoesClient({ user, turmas, disciplinas, metrics, questoesPorTurma, professores = [], areas = [] }: any) {
+export default function QuestoesClient({ user, turmas, disciplinas, metrics, questoesPorTurma, professores = [], areas = [], nomeEscola = 'Áxis' }: any) {
   const router = useRouter()
   const [questoes, setQuestoes] = useState<any[]>([])
   const [totalResultados, setTotalResultados] = useState(0)
@@ -610,9 +610,10 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
           />
         )}
 
-        <QuestaoPreviewModal 
+        <QuestaoPreviewModal
           questao={previewQuestao}
           onClose={() => setPreviewQuestao(null)}
+          nomeEscola={nomeEscola}
         />
       </div>
     </div>

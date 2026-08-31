@@ -11,9 +11,9 @@ export async function PUT(
 ) {
   try {
     const session = await auth()
-    
+
     // Apenas superusuários podem alterar status
-    if (!session || !session.user.isSuperuser) {
+    if (!session?.user?.escolaId || !session.user.isSuperuser) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 403 })
     }
 
@@ -24,9 +24,14 @@ export async function PUT(
     // Verifica se está tentando manipular o próprio admin
     if (session.user.id === id && isActive === false) {
       return NextResponse.json(
-        { message: 'Você não pode pausar seu próprio acesso.' }, 
+        { message: 'Você não pode pausar seu próprio acesso.' },
         { status: 400 }
       )
+    }
+
+    const existing = await prisma.user.findUnique({ where: { id, escolaId: session.user.escolaId } })
+    if (!existing) {
+      return NextResponse.json({ message: 'Usuário não encontrado' }, { status: 404 })
     }
 
     const user = await prisma.user.update({

@@ -17,6 +17,11 @@ export default async function QuestoesPage() {
   const isManagement = session.user.isSuperuser || session.user.isDirecao
   const userId = session.user.id
 
+  const escola = await prisma.escola.findUnique({
+    where: { id: session.user.escolaId },
+    select: { nome: true }
+  })
+
   // Buscar configurações
   const config = await prisma.globalConfig.upsert({
     where: { id: session.user.escolaId },
@@ -146,6 +151,7 @@ export default async function QuestoesPage() {
       questoesPorTurma={questoesPorTurma}
       professores={professores}
       areas={areas}
+      nomeEscola={escola?.nome || 'Áxis'}
     />
   )
 }

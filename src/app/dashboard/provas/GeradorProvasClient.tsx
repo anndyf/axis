@@ -351,7 +351,7 @@ const ManualSelectorModal = ({ isOpen, onClose, onSelect, questions, selectedIds
   )
 }
 
-export default function GeradorProvasClient({ user, turmas }: any) {
+export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis' }: any) {
   const [selectedTurma, setSelectedTurma] = useState<any>(null)
   const [config, setConfig] = useState<any[]>([]) // { disciplinaId, qtd }
   const [loading, setLoading] = useState(false)
@@ -872,7 +872,7 @@ export default function GeradorProvasClient({ user, turmas }: any) {
   return (
     <>
       {isPrinting && (
-        <ProvaPrintView prova={printingProva} options={printingOptions} />
+        <ProvaPrintView prova={printingProva} options={printingOptions} nomeEscola={nomeEscola} />
       )}
       <div className="max-w-6xl mx-auto space-y-8 px-4 sm:px-0">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">

@@ -70,9 +70,10 @@ export async function POST(
   const { id } = await params
   try {
     const session = await auth()
-    if (!session?.user.isSuperuser) {
+    if (!session?.user?.escolaId || !session.user.isSuperuser) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 403 })
     }
+    const escolaId = session.user.escolaId
 
     const { texto } = await request.json() as { texto: string }
     if (!texto?.trim()) {
@@ -106,7 +107,7 @@ export async function POST(
     // ── 2. Buscar as turmas correspondentes no banco ─────────────────────────
     const codigosTurma = [...new Set(pares.map(p => p.turmaCode))]
     const turmasBanco = await prisma.turma.findMany({
-      where: { nome: { in: codigosTurma } },
+      where: { nome: { in: codigosTurma }, escolaId },
       include: {
         disciplinas: { select: { id: true, nome: true } }
       }
@@ -116,7 +117,7 @@ export async function POST(
 
     // ── 3. Buscar disciplinas já vinculadas ao professor ──────────────────────
     const usuarioAtual = await prisma.user.findUnique({
-      where: { id },
+      where: { id, escolaId },
       select: { disciplinasPermitidas: { select: { id: true } } }
     })
     const jaVinculadasIds = new Set(usuarioAtual?.disciplinasPermitidas.map(d => d.id) ?? [])

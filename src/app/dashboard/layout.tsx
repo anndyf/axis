@@ -26,6 +26,11 @@ export default async function DashboardLayout({
     redirect("/portal")
   }
 
+  const escola = await prisma.escola.findUnique({
+    where: { id: session.user.escolaId },
+    select: { nome: true }
+  })
+
   let config = await getGlobalConfig(session.user.escolaId)
 
   if (!config) {
@@ -66,7 +71,7 @@ export default async function DashboardLayout({
             </div>
             
             <div className="flex items-center gap-2 md:gap-4 flex-1 justify-center">
-              <span>© {new Date().getFullYear()} CETEP Litoral Norte e Agreste Baiano</span>
+              <span>© {new Date().getFullYear()} {escola?.nome || 'Áxis'}</span>
               <span className="hidden md:inline opacity-10">•</span>
               <span className="text-slate-400">Todos os direitos reservados</span>
             </div>

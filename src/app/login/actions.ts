@@ -43,7 +43,7 @@ export async function resetPassword(email: string) {
     })
 
     // Enviar senha por email
-    const emailSent = await enviarSenhaPorEmail(email, user.name || user.username, newPassword)
+    const emailSent = await enviarSenhaPorEmail(email, user.name || user.username, newPassword, escolaId)
 
     if (emailSent) {
       return { success: true, message: "Nova senha enviada para seu e-mail." }

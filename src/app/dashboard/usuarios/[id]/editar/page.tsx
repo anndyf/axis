@@ -9,19 +9,19 @@ export const metadata = {
 
 export const runtime = 'nodejs'
 
-async function getUsuario(id: string) {
+async function getUsuario(id: string, escolaId: string) {
   try {
     // Fallback para SQL Bruto para evitar erro de cache do Prisma Client (isDirecao, lastLogin)
     const users = await prisma.$queryRaw<any[]>`
-      SELECT 
+      SELECT
         id, email, username, name,
         is_superuser as "isSuperuser",
         is_staff as "isStaff",
         is_direcao as "isDirecao",
         is_aee as "isAEE",
         last_login as "lastLogin"
-      FROM users 
-      WHERE id = ${id}
+      FROM users
+      WHERE id = ${id} AND escola_id = ${escolaId}
       LIMIT 1
     `
     
@@ -49,13 +49,13 @@ export default async function EditarUsuarioPage({
   params: Promise<{ id: string }>
 }) {
   const session = await auth()
-  
-  if (!session || !session.user.isSuperuser) {
+
+  if (!session?.user?.escolaId || !session.user.isSuperuser) {
     redirect("/dashboard")
   }
 
   const { id } = await params
-  const usuario = await getUsuario(id)
+  const usuario = await getUsuario(id, session.user.escolaId)
 
   if (!usuario) {
     redirect("/dashboard/usuarios")

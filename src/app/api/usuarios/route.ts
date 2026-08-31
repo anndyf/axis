@@ -10,14 +10,14 @@ export const runtime = 'nodejs'
 export async function GET(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
+    if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 403 })
     }
 
     const { searchParams } = new URL(request.url)
     const role = searchParams.get('role')
 
-    const where: any = {}
+    const where: any = { escolaId: session.user.escolaId }
     if (role === 'professor') {
       where.isSuperuser = false
       where.isDirecao = false
@@ -47,9 +47,10 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session || !session.user.isSuperuser) {
+    if (!session?.user?.escolaId || !session.user.isSuperuser) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 403 })
     }
+    const escolaId = session.user.escolaId
 
     const { name, email, isSuperuser, isDirecao, isStaff, isAEE } = await request.json()
 
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest) {
     }
 
     const existingUser = await prisma.user.findFirst({
-      where: { OR: [{ email }, { username: email }] }
+      where: { escolaId, OR: [{ email }, { username: email }] }
     })
 
     if (existingUser) {
@@ -83,12 +84,13 @@ export async function POST(request: NextRequest) {
           isDirecao: !!isDirecao,
           isStaff: !!isStaff,
           isAEE: !!isAEE,
-        } as any
+          escolaId,
+        }
       })
 
       // Enviar email com a senha (não trava se falhar)
       try {
-        await enviarSenhaPorEmail(email, name || 'Professor', senhaGerada);
+        await enviarSenhaPorEmail(email, name || 'Professor', senhaGerada, escolaId);
       } catch (mailError) {
         console.error('Falha ao enviar e-mail:', mailError);
       }
@@ -103,14 +105,14 @@ export async function POST(request: NextRequest) {
       console.warn('Prisma Client falhou, tentando fallback via SQL bruto...', prismaError.message)
       
       const id = `u_${Math.random().toString(36).substring(2, 11)}`
-      
+
       await prisma.$executeRawUnsafe(`
-        INSERT INTO "users" (id, email, username, password, name, is_superuser, is_direcao, is_staff, is_aee, is_active, created_at, updated_at)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, true, NOW(), NOW())
-      `, id, email, email, hashedPassword, name || '', !!isSuperuser, !!isDirecao, !!isStaff, !!isAEE)
+        INSERT INTO "users" (id, email, username, password, name, is_superuser, is_direcao, is_staff, is_aee, is_active, escola_id, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, true, $10, NOW(), NOW())
+      `, id, email, email, hashedPassword, name || '', !!isSuperuser, !!isDirecao, !!isStaff, !!isAEE, escolaId)
 
       try {
-        await enviarSenhaPorEmail(email, name || 'Professor', senhaGerada);
+        await enviarSenhaPorEmail(email, name || 'Professor', senhaGerada, escolaId);
       } catch (mailError) {}
 
       return NextResponse.json({ 

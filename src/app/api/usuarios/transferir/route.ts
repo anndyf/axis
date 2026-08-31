@@ -7,10 +7,11 @@ export const runtime = 'nodejs'
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    
-    if (!session || !session.user.isSuperuser) {
+
+    if (!session?.user?.escolaId || !session.user.isSuperuser) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 403 })
     }
+    const escolaId = session.user.escolaId
 
     const { fromUserId, toUserId } = await request.json()
 
@@ -22,10 +23,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Os usuários de origem e destino devem ser diferentes' }, { status: 400 })
     }
 
-    // Verificar se ambos os usuários existem
+    // Verificar se ambos os usuários existem E pertencem a escola do superuser logado
     const [fromUser, toUser] = await Promise.all([
-      prisma.user.findUnique({ where: { id: fromUserId }, include: { disciplinasPermitidas: true, turmasPermitidas: true } }),
-      prisma.user.findUnique({ where: { id: toUserId } })
+      prisma.user.findUnique({ where: { id: fromUserId, escolaId }, include: { disciplinasPermitidas: true, turmasPermitidas: true } }),
+      prisma.user.findUnique({ where: { id: toUserId, escolaId } })
     ])
 
     if (!fromUser || !toUser) {
