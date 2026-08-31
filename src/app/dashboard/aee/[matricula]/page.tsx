@@ -8,13 +8,13 @@ export const runtime = 'nodejs'
 
 export default async function AEEPage({ params }: { params: Promise<{ matricula: string }> }) {
   const session = await auth()
-  if (!session) redirect("/login")
+  if (!session?.user?.escolaId) redirect("/login")
 
   const { matricula } = await params
-  
+
   // Busca estudante e perfil AEE
   const estudante = await prisma.estudante.findUnique({
-    where: { matricula },
+    where: { escolaId_matricula: { escolaId: session.user.escolaId, matricula } },
     include: {
       turma: {
         include: { 

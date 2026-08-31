@@ -11,11 +11,13 @@ export async function updateMatricula(oldMatricula: string, newMatricula: string
   if (!session?.user?.isSuperuser && !session?.user?.isDirecao) {
     return { error: "Sem permissão" }
   }
+  if (!session.user.escolaId) {
+    return { error: "Sem permissão" }
+  }
 
   try {
-    // Como a matrícula é a PK, precisamos usar update na PK
     await prisma.estudante.update({
-      where: { matricula: oldMatricula },
+      where: { escolaId_matricula: { escolaId: session.user.escolaId, matricula: oldMatricula } },
       data: { matricula: newMatricula }
     })
     revalidatePath("/dashboard/estudantes")
@@ -33,10 +35,13 @@ export async function createPortalUser(matricula: string) {
   if (!session?.user?.isSuperuser && !session?.user?.isDirecao) {
     return { error: "Sem permissão" }
   }
+  if (!session.user.escolaId) {
+    return { error: "Sem permissão" }
+  }
 
   try {
     const estudante = await prisma.estudante.findUnique({
-      where: { matricula },
+      where: { escolaId_matricula: { escolaId: session.user.escolaId, matricula } },
       include: { portalAccess: true }
     })
 

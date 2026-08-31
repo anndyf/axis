@@ -14,11 +14,14 @@ export async function DELETE(
     if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
+    if (!session.user.escolaId) {
+      return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+    }
 
     const { id } = await context.params
 
     const ocorrencia = await prisma.ocorrencia.delete({
-      where: { id }
+      where: { id, escolaId: session.user.escolaId }
     })
 
     await logAudit(
@@ -46,19 +49,38 @@ export async function PUT(
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 
+    if (!session.user.escolaId) {
+      return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+    }
+    const escolaId = session.user.escolaId
+
     const { id } = await context.params
     const { titulo, descricao, tipo, data, estudantesIds } = await request.json()
 
+    // estudantesIds vem como matriculas reais (mesmo formulario do POST) - precisa
+    // resolver para o id tecnico antes de vincular via OcorrenciaEstudante.
+    // "set" nao existe mais como troca direta: substitui a lista inteira apagando
+    // os vinculos atuais e recriando com os estudantes resolvidos.
+    let estudantesUpdate: any = undefined
+    if (estudantesIds) {
+      const estudantesResolvidos = await prisma.estudante.findMany({
+        where: { escolaId, matricula: { in: estudantesIds } },
+        select: { id: true }
+      })
+      estudantesUpdate = {
+        deleteMany: {},
+        create: estudantesResolvidos.map(e => ({ estudanteId: e.id }))
+      }
+    }
+
     const ocorrencia = await prisma.ocorrencia.update({
-      where: { id },
+      where: { id, escolaId },
       data: {
         titulo,
         descricao,
         tipo,
         data: data ? new Date(data) : undefined,
-        estudantes: {
-          set: estudantesIds?.map((id: string) => ({ matricula: id }))
-        }
+        ...(estudantesUpdate && { estudantes: estudantesUpdate })
       }
     })
 

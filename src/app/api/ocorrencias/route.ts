@@ -12,6 +12,9 @@ export async function GET(request: NextRequest) {
     if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
+    if (!session.user.escolaId) {
+      return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+    }
 
     const { searchParams } = new URL(request.url)
     const startDate = searchParams.get('startDate')
@@ -20,7 +23,7 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get('type')
     const turmaId = searchParams.get('turmaId')
 
-    const where: any = {}
+    const where: any = { escolaId: session.user.escolaId }
 
     if (startDate || endDate) {
       where.data = {}
@@ -33,28 +36,36 @@ export async function GET(request: NextRequest) {
     }
 
     if (studentName || turmaId) {
+      // Ocorrencia.estudantes agora e OcorrenciaEstudante[] (modelo explicito, Fase 3
+      // Migration 4) - o filtro precisa navegar por .estudante em vez de campos diretos.
       where.estudantes = {
         some: {
-          ...(studentName && {
-            nome: {
-              contains: studentName,
-              mode: 'insensitive'
-            }
-          }),
-          ...(turmaId && {
-            turmaId: turmaId
-          })
+          estudante: {
+            ...(studentName && {
+              nome: {
+                contains: studentName,
+                mode: 'insensitive'
+              }
+            }),
+            ...(turmaId && {
+              turmaId: turmaId
+            })
+          }
         }
       }
     }
 
-    const ocorrencias = await prisma.ocorrencia.findMany({
+    const ocorrenciasRaw = await prisma.ocorrencia.findMany({
       where,
       include: {
         estudantes: {
           include: {
-            turma: {
-              select: { nome: true }
+            estudante: {
+              include: {
+                turma: {
+                  select: { nome: true }
+                }
+              }
             }
           }
         },
@@ -64,6 +75,13 @@ export async function GET(request: NextRequest) {
       },
       orderBy: { data: 'desc' }
     })
+
+    // Achata OcorrenciaEstudante[] de volta para Estudante[], preservando o formato
+    // que o frontend (OcorrenciasClient.tsx) espera (est.matricula, est.nome, est.turma.nome).
+    const ocorrencias = ocorrenciasRaw.map(o => ({
+      ...o,
+      estudantes: o.estudantes.map(oe => oe.estudante)
+    }))
 
     return NextResponse.json(ocorrencias)
   } catch (error) {
@@ -79,11 +97,26 @@ export async function POST(request: NextRequest) {
     if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
+    if (!session.user.escolaId) {
+      return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+    }
+    const escolaId = session.user.escolaId
 
     const { titulo, descricao, tipo, data, estudantesIds } = await request.json()
 
     if (!titulo || !descricao || !tipo || !estudantesIds || estudantesIds.length === 0) {
       return NextResponse.json({ message: 'Dados incompletos' }, { status: 400 })
+    }
+
+    // estudantesIds vem do formulário como matriculas reais (OcorrenciaForm.tsx),
+    // não ids tecnicos - precisa resolver para o id antes de criar os vinculos.
+    const estudantesResolvidos = await prisma.estudante.findMany({
+      where: { escolaId, matricula: { in: estudantesIds } },
+      select: { id: true }
+    })
+
+    if (estudantesResolvidos.length === 0) {
+      return NextResponse.json({ message: 'Nenhum estudante válido encontrado' }, { status: 400 })
     }
 
     const ocorrencia = await prisma.ocorrencia.create({
@@ -93,13 +126,18 @@ export async function POST(request: NextRequest) {
         tipo,
         data: data ? new Date(data) : new Date(),
         registradoPorId: session.user.id,
+        escolaId,
         estudantes: {
-          connect: estudantesIds.map((id: string) => ({ matricula: id }))
+          create: estudantesResolvidos.map(e => ({ estudanteId: e.id }))
         }
       },
       include: {
         estudantes: {
-          select: { nome: true }
+          include: {
+            estudante: {
+              select: { nome: true }
+            }
+          }
         }
       }
     })
@@ -109,9 +147,9 @@ export async function POST(request: NextRequest) {
       'OCORRENCIA',
       ocorrencia.id,
       'CREATE',
-      { 
-        titulo: ocorrencia.titulo, 
-        estudantes: ocorrencia.estudantes.map(e => e.nome).join(', ') 
+      {
+        titulo: ocorrencia.titulo,
+        estudantes: ocorrencia.estudantes.map(oe => oe.estudante.nome).join(', ')
       }
     )
 

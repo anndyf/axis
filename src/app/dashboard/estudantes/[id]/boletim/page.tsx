@@ -10,9 +10,9 @@ export const metadata = {
 
 export const runtime = 'nodejs'
 
-async function getEstudanteBoletim(matricula: string) {
+async function getEstudanteBoletim(escolaId: string, matricula: string) {
   return await prisma.estudante.findUnique({
-    where: { matricula },
+    where: { escolaId_matricula: { escolaId, matricula } },
     include: {
       turma: true,
       notas: {
@@ -79,13 +79,13 @@ export default async function BoletimPage({
   params: Promise<{ id: string }>
 }) {
   const session = await auth()
-  
-  if (!session) {
+
+  if (!session?.user?.escolaId) {
     redirect("/login")
   }
 
   const { id } = await params
-  const estudante = await getEstudanteBoletim(id)
+  const estudante = await getEstudanteBoletim(session.user.escolaId, id)
 
   if (!estudante) {
     redirect("/dashboard/estudantes")

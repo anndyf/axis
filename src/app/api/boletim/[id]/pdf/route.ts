@@ -12,15 +12,15 @@ export async function GET(
 ) {
   try {
     const session = await auth()
-    
-    if (!session) {
+
+    if (!session?.user?.escolaId) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 
     const { id } = await params
 
     const estudante = await prisma.estudante.findUnique({
-      where: { matricula: id },
+      where: { escolaId_matricula: { escolaId: session.user.escolaId, matricula: id } },
       include: {
         turma: true,
         notas: {

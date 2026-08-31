@@ -12,8 +12,8 @@ export async function PUT(
 ) {
   try {
     const session = await auth()
-    
-    if (!session) {
+
+    if (!session?.user?.escolaId) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 
@@ -36,7 +36,7 @@ export async function PUT(
     const { id } = await context.params
 
     const estudante = await prisma.estudante.update({
-      where: { matricula: id },
+      where: { escolaId_matricula: { escolaId: session.user.escolaId, matricula: id } },
       data: {
         nome: nome.trim(),
         turmaId,
@@ -69,8 +69,8 @@ export async function DELETE(
 ) {
   try {
     const session = await auth()
-    
-    if (!session) {
+
+    if (!session?.user?.escolaId) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 
@@ -78,7 +78,7 @@ export async function DELETE(
 
     // Verificar se há notas vinculadas
     const estudante = await prisma.estudante.findUnique({
-      where: { matricula: id },
+      where: { escolaId_matricula: { escolaId: session.user.escolaId, matricula: id } },
       include: {
         _count: {
           select: {
@@ -100,7 +100,7 @@ export async function DELETE(
     }
 
     await prisma.estudante.delete({
-      where: { matricula: id }
+      where: { escolaId_matricula: { escolaId: session.user.escolaId, matricula: id } }
     })
 
     await logAudit(
