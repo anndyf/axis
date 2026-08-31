@@ -16,7 +16,7 @@ export default function ConfiguracoesPage() {
     fetch('/api/config')
       .then(res => res.json())
       .then(data => {
-        setIsBancoAtivo(data.isBancoQuestoesAtivo)
+        setIsBancoAtivo(data.bancoQuestoesAtivo)
         setAnoLetivo(data.anoLetivoAtual || new Date().getFullYear())
         setAvailableYears(data.availableYears || [new Date().getFullYear()])
         setLoading(false)

@@ -2,10 +2,10 @@
 import { useState, useEffect } from "react"
 import DashboardSidebar from "./DashboardSidebar"
 
-export default function DashboardLayoutWrapper({ 
+export default function DashboardLayoutWrapper({
   children,
   user,
-  isBancoQuestoesAtivo,
+  modulosAtivos,
   anoLetivo
 }: any) {
   const [isCollapsed, setIsCollapsed] = useState(true)
@@ -27,9 +27,9 @@ export default function DashboardLayoutWrapper({
 
   return (
     <>
-      <DashboardSidebar 
-        user={user} 
-        isBancoQuestoesAtivo={isBancoQuestoesAtivo} 
+      <DashboardSidebar
+        user={user}
+        modulosAtivos={modulosAtivos}
         anoLetivo={anoLetivo}
         isCollapsed={isCollapsed}
         toggleCollapse={toggleCollapse}

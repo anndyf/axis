@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { logAudit } from '@/lib/audit'
+import { getModulosAtivos } from '@/lib/modules-server'
 
 export const runtime = 'nodejs'
 
@@ -130,12 +131,13 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+    if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
 
-    // Verificar se a funcionalidade está ativa para professores
+    // Verificar se a funcionalidade está ativa para professores (por plano ou toggle da direção)
     if (!session.user.isSuperuser && !session.user.isDirecao) {
-      const config = await prisma.globalConfig.findUnique({ where: { id: 'global' } })
-      if (config && !config.isBancoQuestoesAtivo) {
+      const escola = await prisma.escola.findUnique({ where: { id: session.user.escolaId }, select: { plano: true } })
+      const modulosAtivos = await getModulosAtivos(session.user.escolaId, escola?.plano || 'BASICO')
+      if (!modulosAtivos.includes('banco-questoes')) {
         return NextResponse.json({ message: 'Funcionalidade temporariamente desativada' }, { status: 403 })
       }
     }

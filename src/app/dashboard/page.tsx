@@ -2,6 +2,8 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { getGlobalConfig } from "@/lib/data-fetching"
+import { can } from "@/lib/rbac"
+import { getModulosAtivos } from "@/lib/modules-server"
 
 export const metadata = {
   title: 'Áxis - Painel'
@@ -198,8 +200,10 @@ export default async function DashboardPage() {
   const stats = await getDashboardStats(session)
   const escola = await prisma.escola.findUnique({
     where: { id: session.user.escolaId },
-    select: { nome: true }
+    select: { nome: true, plano: true }
   })
+  const isGestao = can(session.user, 'gestao')
+  const modulosAtivos = await getModulosAtivos(session.user.escolaId, escola?.plano || 'BASICO')
 
   const supportTips = [
     {
@@ -212,7 +216,7 @@ export default async function DashboardPage() {
 
   const allCards = [
     {
-      title: session.user.isSuperuser || session.user.isDirecao ? "Total de Turmas" : "Minhas Turmas",
+      title: isGestao ? "Total de Turmas" : "Minhas Turmas",
       value: stats.turmas,
       icon: Users,
       color: "from-slate-500 to-slate-700",
@@ -220,11 +224,11 @@ export default async function DashboardPage() {
       visible: true
     },
     {
-      title: session.user.isSuperuser || session.user.isDirecao ? "Disciplinas" : "Minhas Disciplinas",
+      title: isGestao ? "Disciplinas" : "Minhas Disciplinas",
       value: stats.disciplinas,
       icon: BookOpen,
       color: "from-purple-500 to-purple-600",
-      href: session.user.isSuperuser || session.user.isDirecao ? "/dashboard/disciplinas" : "/dashboard/notas",
+      href: isGestao ? "/dashboard/disciplinas" : "/dashboard/notas",
       visible: true
     },
     {
@@ -233,7 +237,7 @@ export default async function DashboardPage() {
       icon: GraduationCap,
       color: "from-emerald-500 to-emerald-600",
       href: "/dashboard/estudantes",
-      visible: session.user.isSuperuser || session.user.isDirecao
+      visible: isGestao
     },
     {
       title: "Notas Lançadas",
@@ -270,7 +274,7 @@ export default async function DashboardPage() {
       icon: Users,
       href: "/dashboard/resultados",
       color: "bg-slate-600 hover:bg-slate-700",
-      visible: session.user.isDirecao || session.user.isSuperuser
+      visible: isGestao
     },
     {
       title: "Ocorrências",
@@ -278,7 +282,7 @@ export default async function DashboardPage() {
       icon: FileWarning,
       href: "/dashboard/ocorrencias",
       color: "bg-rose-600 hover:bg-rose-700",
-      visible: session.user.isDirecao || session.user.isSuperuser
+      visible: isGestao
     },
     {
       title: "Conselho de Classe",
@@ -286,15 +290,15 @@ export default async function DashboardPage() {
       icon: Award,
       href: "/dashboard/conselho-classe",
       color: "bg-pink-600 hover:bg-pink-700",
-      visible: session.user.isDirecao || session.user.isSuperuser
+      visible: isGestao
     },
     {
-      title: session.user.isSuperuser || session.user.isDirecao ? "Gerenciar Turmas" : "Minhas Turmas",
-      description: session.user.isSuperuser || session.user.isDirecao ? "Visualizar e organizar turmas" : "Visualizar turmas e disciplinas",
+      title: isGestao ? "Gerenciar Turmas" : "Minhas Turmas",
+      description: isGestao ? "Visualizar e organizar turmas" : "Visualizar turmas e disciplinas",
       icon: Users,
       href: "/dashboard/turmas",
       color: "bg-emerald-600 hover:bg-emerald-700",
-      visible: session.user.isDirecao || session.user.isSuperuser || session.user.isStaff
+      visible: can(session.user, 'staff')
     },
     {
       title: "Gerenciar Estudantes",
@@ -302,7 +306,7 @@ export default async function DashboardPage() {
       icon: GraduationCap,
       href: "/dashboard/estudantes",
       color: "bg-orange-600 hover:bg-orange-700",
-      visible: session.user.isDirecao || session.user.isSuperuser
+      visible: isGestao
     },
     {
       title: "Gerador de Provas",
@@ -310,7 +314,7 @@ export default async function DashboardPage() {
       icon: Scissors,
       href: "/dashboard/provas",
       color: "bg-slate-800 hover:bg-blue-800",
-      visible: session.user.isDirecao || session.user.isSuperuser
+      visible: isGestao && modulosAtivos.includes('provas')
     },
     {
       title: "Planos de Ensino",
@@ -318,7 +322,7 @@ export default async function DashboardPage() {
       icon: ClipboardList,
       href: "/dashboard/planos",
       color: "bg-emerald-700 hover:bg-emerald-800",
-      visible: session.user.isStaff || session.user.isDirecao || session.user.isSuperuser
+      visible: can(session.user, 'staff')
     },
     {
       title: "Reserva de Labs",
@@ -342,7 +346,7 @@ export default async function DashboardPage() {
       icon: History,
       href: "/dashboard/auditoria",
       color: "bg-slate-900 hover:bg-slate-800",
-      visible: session.user.isSuperuser
+      visible: can(session.user, 'superuser')
     },
     {
       title: "Aluno Ausente?",
@@ -406,7 +410,7 @@ export default async function DashboardPage() {
       </section>
 
       {/* System Highlights Bar - Visible only for Management */}
-      {(session.user.isSuperuser || session.user.isDirecao) && (
+      {isGestao && (
         <section className="bg-slate-50 border border-slate-300 rounded-[2rem] p-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 divide-y md:divide-y-0 md:divide-x divide-slate-300">
             <div className="flex items-center gap-4 px-4 py-2">
@@ -519,7 +523,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Stats Grid - Symmetric Columns */}
-      <div className={`grid grid-cols-1 md:grid-cols-2 ${session.user.isSuperuser || session.user.isDirecao ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-6`}>
+      <div className={`grid grid-cols-1 md:grid-cols-2 ${isGestao ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-6`}>
         {cards.map((card) => {
           const Icon = card.icon
           return (
@@ -553,7 +557,7 @@ export default async function DashboardPage() {
             <div className="h-px bg-slate-300 flex-1 mx-6"></div>
           </div>
           
-          <div className={`grid grid-cols-1 sm:grid-cols-2 ${session.user.isSuperuser || session.user.isDirecao ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-4`}>
+          <div className={`grid grid-cols-1 sm:grid-cols-2 ${isGestao ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-4`}>
             {quickActions.map((action) => {
               const Icon = action.icon
               return (

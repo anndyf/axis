@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import QuestoesClient from "./QuestoesClient"
 import { getTurmasPermitidas } from "@/lib/data-fetching"
+import { getModulosAtivos } from "@/lib/modules-server"
 
 export const metadata = {
   title: 'Áxis - Questoes'
@@ -19,18 +20,20 @@ export default async function QuestoesPage() {
 
   const escola = await prisma.escola.findUnique({
     where: { id: session.user.escolaId },
-    select: { nome: true }
+    select: { nome: true, plano: true }
   })
 
   // Buscar configurações
-  const config = await prisma.globalConfig.upsert({
+  await prisma.globalConfig.upsert({
     where: { id: session.user.escolaId },
     update: {},
-    create: { id: session.user.escolaId, escolaId: session.user.escolaId, isBancoQuestoesAtivo: true }
+    create: { id: session.user.escolaId, escolaId: session.user.escolaId }
   })
 
-  // Se professor e banco estiver desativado, bloqueia acesso
-  if (!session.user.isSuperuser && !session.user.isDirecao && !config.isBancoQuestoesAtivo) {
+  const modulosAtivos = await getModulosAtivos(session.user.escolaId, escola?.plano || 'BASICO')
+
+  // Se professor e banco estiver desativado (por plano ou toggle da direção), bloqueia acesso
+  if (!session.user.isSuperuser && !session.user.isDirecao && !modulosAtivos.includes('banco-questoes')) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
         <div className="w-20 h-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mb-6">

@@ -30,8 +30,23 @@ model Escola {
   globalConfigs     GlobalConfig[]
   estudantes        Estudante[]
   ocorrencias       Ocorrencia[]
+  escolaModulos     EscolaModulo[]
 
   @@map("escolas")
+}
+
+model EscolaModulo {
+  id        String   @id @default(cuid())
+  escolaId  String   @map("escola_id")
+  escola    Escola   @relation(fields: [escolaId], references: [id])
+  moduloId  String   @map("modulo_id")
+  ativo     Boolean
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([escolaId, moduloId])
+  @@index([escolaId])
+  @@map("escola_modulos")
 }
 
 enum PlanoTipo {
@@ -87,12 +102,11 @@ model User {
 }
 
 model GlobalConfig {
-  id                   String   @id
-  escolaId             String   @map("escola_id")
-  escola               Escola   @relation(fields: [escolaId], references: [id])
-  isBancoQuestoesAtivo Boolean  @default(true) @map("is_banco_questoes_ativo")
-  anoLetivoAtual       Int      @default(2026) @map("ano_letivo_atual")
-  updatedAt            DateTime @updatedAt @map("updated_at")
+  id             String   @id
+  escolaId       String   @map("escola_id")
+  escola         Escola   @relation(fields: [escolaId], references: [id])
+  anoLetivoAtual Int      @default(2026) @map("ano_letivo_atual")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
   @@index([escolaId])
   @@map("configs")

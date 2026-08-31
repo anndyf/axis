@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
+import { getModulosAtivos } from '@/lib/modules-server'
 
 export const runtime = 'nodejs'
 
@@ -14,8 +15,13 @@ export async function GET() {
   const config = await prisma.globalConfig.upsert({
     where: { id: session.user.escolaId },
     update: {},
-    create: { id: session.user.escolaId, escolaId: session.user.escolaId, isBancoQuestoesAtivo: true, anoLetivoAtual: new Date().getFullYear() }
+    create: { id: session.user.escolaId, escolaId: session.user.escolaId, anoLetivoAtual: new Date().getFullYear() }
   })
+
+  const escola = await prisma.escola.findUnique({ where: { id: session.user.escolaId }, select: { plano: true } })
+  const modulosAtivos = await getModulosAtivos(session.user.escolaId, escola?.plano || 'BASICO')
+  const bancoQuestoesAtivo = modulosAtivos.includes('banco-questoes')
+
     // Buscar anos com dados cadastrados
     const turmas = await prisma.turma.groupBy({
       by: ['anoLetivo'],
@@ -39,7 +45,7 @@ export async function GET() {
     
     availableYears.sort((a, b) => b - a)
 
-    return NextResponse.json({ ...config, availableYears })
+    return NextResponse.json({ ...config, availableYears, bancoQuestoesAtivo })
   } catch (error) {
     return NextResponse.json({ message: 'Erro ao buscar config' }, { status: 500 })
   }
@@ -54,10 +60,16 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json()
     const { isBancoQuestoesAtivo, anoLetivoAtual } = body
-    
-    // Filtra apenas campos definidos
+
+    if (isBancoQuestoesAtivo !== undefined) {
+      await prisma.escolaModulo.upsert({
+        where: { escolaId_moduloId: { escolaId: session.user.escolaId, moduloId: 'banco-questoes' } },
+        update: { ativo: isBancoQuestoesAtivo },
+        create: { escolaId: session.user.escolaId, moduloId: 'banco-questoes', ativo: isBancoQuestoesAtivo }
+      })
+    }
+
     const data: any = {}
-    if (isBancoQuestoesAtivo !== undefined) data.isBancoQuestoesAtivo = isBancoQuestoesAtivo
     if (anoLetivoAtual !== undefined) data.anoLetivoAtual = anoLetivoAtual
 
     const config = await prisma.globalConfig.upsert({
@@ -66,11 +78,10 @@ export async function PUT(request: NextRequest) {
       create: {
         id: session.user.escolaId,
         escolaId: session.user.escolaId,
-        isBancoQuestoesAtivo: isBancoQuestoesAtivo ?? true,
         anoLetivoAtual: anoLetivoAtual ?? new Date().getFullYear()
       }
     })
-    
+
     // Invalidar caches
     revalidatePath('/dashboard', 'layout')
     revalidatePath('/portal', 'layout')

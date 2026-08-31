@@ -6,6 +6,7 @@ import MessageNotification from "@/components/MessageNotification"
 import { Code } from "lucide-react"
 import DashboardLayoutWrapper from "@/components/DashboardLayoutWrapper"
 import { getGlobalConfig } from "@/lib/data-fetching"
+import { getModulosAtivos } from "@/lib/modules-server"
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -28,7 +29,7 @@ export default async function DashboardLayout({
 
   const escola = await prisma.escola.findUnique({
     where: { id: session.user.escolaId },
-    select: { nome: true }
+    select: { nome: true, plano: true }
   })
 
   let config = await getGlobalConfig(session.user.escolaId)
@@ -39,19 +40,20 @@ export default async function DashboardLayout({
       data: {
         id: session.user.escolaId,
         escolaId: session.user.escolaId,
-        isBancoQuestoesAtivo: true,
         anoLetivoAtual: new Date().getFullYear()
       }
     })
   }
 
+  const modulosAtivos = await getModulosAtivos(session.user.escolaId, escola?.plano || 'BASICO')
+
   return (
     <div className="flex min-h-screen bg-slate-50 font-sans antialiased text-slate-800 print:min-h-0 print:bg-slate-50 print:block">
       <SessionTimer />
       <MessageNotification />
-      <DashboardLayoutWrapper 
-        user={session.user} 
-        isBancoQuestoesAtivo={config.isBancoQuestoesAtivo} 
+      <DashboardLayoutWrapper
+        user={session.user}
+        modulosAtivos={modulosAtivos}
         anoLetivo={config.anoLetivoAtual}
       >
         {/* Mobile Header Spacer */}

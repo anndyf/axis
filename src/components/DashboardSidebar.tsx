@@ -35,6 +35,7 @@ import { useSessionTimer } from "@/contexts/SessionTimerContext"
 import { Clock } from "lucide-react"
 import { getUnreadCount } from "@/app/dashboard/mensagens/actions"
 import { getPendingUsersCount } from "@/app/dashboard/usuarios/actions"
+import { MODULOS } from "@/lib/modules"
 
 interface User {
   name?: string | null
@@ -45,15 +46,17 @@ interface User {
   isAEE?: boolean
 }
 
-export default function DashboardSidebar({ 
-  user, 
-  isBancoQuestoesAtivo = true,
+const GRUPOS_ORDENADOS = ["Início", "Gestão Acadêmica", "Diário e Avaliações", "Ferramentas", "Configurações"]
+
+export default function DashboardSidebar({
+  user,
+  modulosAtivos = [],
   anoLetivo,
   isCollapsed,
   toggleCollapse
-}: { 
-  user: User, 
-  isBancoQuestoesAtivo?: boolean,
+}: {
+  user: User,
+  modulosAtivos?: string[],
   anoLetivo?: number,
   isCollapsed: boolean,
   toggleCollapse: () => void
@@ -84,53 +87,27 @@ export default function DashboardSidebar({
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
   }
 
-  // Estrutura de Categorias e Links
-  const menuGroups = [
-    {
-      title: "Início",
-      links: [
-        { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-        { name: "Mensagens", href: "/dashboard/mensagens", icon: MessageSquare, badge: unreadCount },
-        !user.isAEE && { name: "Reserva de Laboratórios", href: "/dashboard/laboratorios", icon: FlaskConical },
-      ].filter(Boolean) as any[]
-    },
-    {
-      title: "Gestão Acadêmica",
-      links: [
-        !user.isAEE && (user.isSuperuser || user.isDirecao || user.isStaff) && { name: "Turmas", href: "/dashboard/turmas", icon: Users },
-        !user.isAEE && user.isSuperuser && { name: "Disciplinas", href: "/dashboard/disciplinas", icon: BookOpen },
-        !user.isAEE && (user.isSuperuser || user.isDirecao) && { name: "Estudantes", href: "/dashboard/estudantes", icon: GraduationCap },
-        !user.isAEE && (user.isSuperuser || user.isDirecao) && { name: "Ocorrências", href: "/dashboard/ocorrencias", icon: FileWarning },
-        (user.isSuperuser || user.isDirecao || user.isStaff || user.isAEE) && { name: "Atendimento AEE", href: "/dashboard/aee", icon: Accessibility },
-      ].filter(Boolean) as any[]
-    },
-    !user.isAEE && {
-      title: "Diário e Avaliações",
-      links: [
-        (user.isStaff || user.isDirecao || user.isSuperuser) && { name: "Simulados", href: "/dashboard/simulados", icon: Target },
-        (user.isStaff || user.isSuperuser) && { name: "Lançar Notas", href: "/dashboard/notas", icon: FileText },
-        (user.isStaff || user.isSuperuser) && { name: "Recuperação Final", href: "/dashboard/notas/recuperacao", icon: TrendingUp },
-        (user.isStaff || user.isDirecao || user.isSuperuser) && { name: "Planos de Ensino", href: "/dashboard/planos", icon: ClipboardList },
-        (user.isDirecao || user.isSuperuser) && { name: "Resultados", href: "/dashboard/resultados", icon: Award },
-        (user.isDirecao || user.isSuperuser) && { name: "Conselho de Classe", href: "/dashboard/conselho-classe", icon: Users },
-      ].filter(Boolean) as any[]
-    },
-    !user.isAEE && {
-      title: "Ferramentas",
-      links: [
-        (user.isSuperuser || user.isDirecao || (user.isStaff && isBancoQuestoesAtivo)) && { name: "Banco de Questões", href: "/dashboard/questoes", icon: Database },
-        (user.isSuperuser || user.isDirecao) && { name: "Gerador de Provas", href: "/dashboard/provas", icon: Scissors },
-      ].filter(Boolean) as any[]
-    },
-    !user.isAEE && {
-      title: "Configurações",
-      links: [
-        (user.isSuperuser || user.isDirecao) && { name: "Matriz Curricular", href: "/dashboard/matriz", icon: LayoutGrid },
-        user.isSuperuser && { name: "Usuários", href: "/dashboard/usuarios", icon: Shield, badge: pendingUsersCount },
-        user.isSuperuser && { name: "Configurações", href: "/dashboard/configuracoes", icon: Settings },
-      ].filter(Boolean) as any[]
-    }
-  ].filter(group => group && group.links && group.links.length > 0) as any[]
+  // Estrutura de Categorias e Links, derivada do catálogo central de módulos
+  // (src/lib/modules.ts) — cada item aparece se o papel do usuário tem
+  // permissão E (sem exigência de plano OU o módulo está ativo pra escola).
+  const badgesPorModulo: Record<string, number> = {
+    mensagens: unreadCount,
+    usuarios: pendingUsersCount,
+  }
+
+  const menuGroups = GRUPOS_ORDENADOS.map((title) => ({
+    title,
+    links: MODULOS
+      .filter((m) => m.grupo === title)
+      .filter((m) => m.permissao(user as any))
+      .filter((m) => !m.planoMinimo || modulosAtivos.includes(m.id))
+      .map((m) => ({
+        name: m.nome,
+        href: m.rota,
+        icon: m.icone,
+        badge: badgesPorModulo[m.id],
+      }))
+  })).filter((group) => group.links.length > 0)
 
   const isActive = (href: string) => {
     if (href === "/dashboard") {
