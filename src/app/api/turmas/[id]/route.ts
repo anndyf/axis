@@ -13,13 +13,13 @@ export async function GET(
   const { id } = await params
   try {
     const session = await auth()
-    
-    if (!session) {
+
+    if (!session?.user?.escolaId) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 
     const turma = await prisma.turma.findUnique({
-      where: { id }
+      where: { id, escolaId: session.user.escolaId }
     })
 
     if (!turma) {
@@ -44,9 +44,14 @@ export async function PUT(
   const { id } = await params
   try {
     const session = await auth()
-    
-    if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
+
+    if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+    }
+
+    const turmaExistente = await prisma.turma.findUnique({ where: { id, escolaId: session.user.escolaId } })
+    if (!turmaExistente) {
+      return NextResponse.json({ message: 'Turma não encontrada' }, { status: 404 })
     }
 
     const { nome, curso, turno, modalidade, serie, numero } = await request.json()
@@ -61,7 +66,7 @@ export async function PUT(
     try {
       const turma = await prisma.turma.update({
         where: { id },
-        data: { 
+        data: {
           nome: nome.trim(),
           curso: curso?.trim(),
           turno: turno?.trim(),
@@ -110,14 +115,15 @@ export async function DELETE(
   }
   try {
     const session = await auth()
-    
-    if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
+
+    if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 
-    // Verificar se há estudantes ou disciplinas vinculados
+    // Verificar se a turma existe, pertence a escola do usuario logado, e ver
+    // se ha estudantes ou disciplinas vinculados
     const turma = await prisma.turma.findUnique({
-      where: { id },
+      where: { id, escolaId: session.user.escolaId },
       include: {
         _count: {
           select: {
@@ -127,6 +133,10 @@ export async function DELETE(
         }
       }
     })
+
+    if (!turma) {
+      return NextResponse.json({ message: 'Turma não encontrada' }, { status: 404 })
+    }
 
     console.log('API DELETE: Iniciando exclusão da turma ID:', id)
 

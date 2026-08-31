@@ -143,6 +143,19 @@ export async function sendMessage(formData: FormData) {
     let finalParentId = parentId;
     let targetReceiverId = receiverId;
 
+    // parentId vem direto do formulário: validar que a mensagem-pai pertence
+    // a mesma escola antes de usa-la, evitando que uma resposta seja
+    // vinculada (ou atualize updatedAt) de uma mensagem de outro tenant.
+    if (finalParentId) {
+      const parentMessage = await prisma.message.findUnique({
+        where: { id: finalParentId },
+        select: { escolaId: true }
+      })
+      if (!parentMessage || parentMessage.escolaId !== user.escolaId) {
+        return { error: "Mensagem de origem inválida." }
+      }
+    }
+
     if (category === "SUPORTE" || category === "DIRECAO") {
        targetReceiverId = null;
     }

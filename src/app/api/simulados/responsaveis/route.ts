@@ -8,18 +8,22 @@ export const revalidate = 0
 export async function GET(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session?.user?.isSuperuser && ! (session as any)?.user?.isDirecao) {
+    if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
       return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
     }
+    const escolaId = session.user.escolaId
 
     const { searchParams } = new URL(request.url)
     const turmaId = searchParams.get("turmaId") || undefined
     const anoLetivo = searchParams.get("anoLetivo") ? parseInt(searchParams.get("anoLetivo")!) : 2026
 
+    // ResponsavelSimulado nao tem escolaId proprio - o escopo e feito via
+    // relacao com a turma, que sempre pertence a uma unica escola.
     const responsaveis = await (prisma as any).responsavelSimulado.findMany({
       where: {
         turmaId,
-        anoLetivo
+        anoLetivo,
+        turma: { escolaId }
       },
       include: {
         user: { select: { id: true, name: true, email: true } },
@@ -40,14 +44,25 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session?.user?.isSuperuser && ! (session as any)?.user?.isDirecao) {
+    if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
       return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
     }
+    const escolaId = session.user.escolaId
 
     const { userId, turmaId, areaId, provaId, unidade, anoLetivo = 2026 } = await request.json()
 
     if (!userId || !turmaId || (!areaId && !provaId)) {
       return NextResponse.json({ message: "Preencha os campos obrigatórios (Usuário, Turma, Prova/Área)" }, { status: 400 })
+    }
+
+    // Valida que a turma e o usuario designado pertencem a escola do chamador
+    // antes de qualquer escrita, ja que ResponsavelSimulado nao tem escolaId proprio.
+    const [turma, usuarioDesignado] = await Promise.all([
+      prisma.turma.findUnique({ where: { id: turmaId, escolaId } }),
+      prisma.user.findUnique({ where: { id: userId, escolaId } })
+    ])
+    if (!turma || !usuarioDesignado) {
+      return NextResponse.json({ message: "Turma ou usuário inválido para esta escola" }, { status: 404 })
     }
 
     const modelName = Object.keys(prisma).find(k => k.toLowerCase() === "responsavelsimulado") || "responsavelSimulado"
@@ -62,7 +77,7 @@ export async function POST(request: NextRequest) {
     }
 
     let responsavel = await (prisma as any)[modelName].findFirst({
-      where: whereClause
+      where: { ...whereClause, turma: { escolaId } }
     })
 
     if (responsavel) {
@@ -93,17 +108,25 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
     try {
       const session = await auth()
-      if (!session?.user?.isSuperuser && ! (session as any)?.user?.isDirecao) {
+      if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
         return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
       }
-  
+      const escolaId = session.user.escolaId
+
       const { searchParams } = new URL(request.url)
       const id = searchParams.get("id")
-      
+
       if (!id) return NextResponse.json({ message: "ID obrigatório" }, { status: 400 })
-  
+
+      const existente = await (prisma as any).responsavelSimulado.findFirst({
+        where: { id, turma: { escolaId } }
+      })
+      if (!existente) {
+        return NextResponse.json({ message: "Responsável não encontrado" }, { status: 404 })
+      }
+
       await (prisma as any).responsavelSimulado.delete({ where: { id } })
-  
+
       return NextResponse.json({ message: "Responsável removido" })
     } catch (error) {
       return NextResponse.json({ message: "Erro ao remover" }, { status: 500 })

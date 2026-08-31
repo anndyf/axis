@@ -30,7 +30,8 @@ export async function getDisciplinasPermitidas(session: Session) {
     return await prisma.disciplina.findMany({
       where: {
         turma: {
-          anoLetivo: currentYear
+          anoLetivo: currentYear,
+          escolaId: session.user.escolaId
         }
       },
       orderBy: { nome: 'asc' },
@@ -61,11 +62,12 @@ export async function getTurmasPermitidas(session: Session) {
   const config = await getGlobalConfig(session.user.escolaId)
   const currentYear = config?.anoLetivoAtual || new Date().getFullYear()
 
-  // Se for admin, ignora filtros e traz tudo
+  // Se for admin, ignora filtros de disciplina mas continua restrito a escola
   if (session.user.isSuperuser || session.user.isDirecao) {
     const all = await prisma.turma.findMany({
       where: {
-        anoLetivo: currentYear
+        anoLetivo: currentYear,
+        escolaId: session.user.escolaId
       },
       orderBy: { nome: 'asc' },
       include: {

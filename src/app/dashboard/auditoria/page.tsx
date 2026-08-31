@@ -18,11 +18,12 @@ export default async function AuditoriaPage({
   searchParams: { q?: string, entity?: string, page?: string, user?: string } 
 }) {
   const session = await auth()
-  
+
   // Apenas Superuser pode acessar auditoria
-  if (!session || !session.user.isSuperuser) {
+  if (!session?.user?.escolaId || !session.user.isSuperuser) {
     redirect("/dashboard")
   }
+  const escolaId = session.user.escolaId
 
   const query = searchParams.q || ""
   const entityFilter = searchParams.entity || ""
@@ -35,13 +36,16 @@ export default async function AuditoriaPage({
   let usersList: any[] = []
   try {
     usersList = await prisma.user.findMany({
+      where: { escolaId },
       select: { id: true, name: true },
       orderBy: { name: 'asc' }
     })
 
     // Construção condicional da query com Prisma.sql para evitar erros de cast no Postgres
-    const whereConditions = []
-    
+    // audit_logs nao tem escola_id proprio - o escopo e feito via JOIN em users.escola_id,
+    // ja que todo log tem um autor (user_id) e todo usuario pertence a uma unica escola.
+    const whereConditions = [Prisma.sql`u.escola_id = ${escolaId}`]
+
     if (query) {
       whereConditions.push(Prisma.sql`(
         u.name ILIKE ${'%' + query + '%'} 

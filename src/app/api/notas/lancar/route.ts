@@ -10,10 +10,11 @@ export const runtime = 'nodejs'
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    
-    if (!session) {
+
+    if (!session?.user?.escolaId) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
+    const escolaId = session.user.escolaId
 
     const { notas } = await request.json()
 
@@ -27,8 +28,8 @@ export async function POST(request: NextRequest) {
     const disciplinaId = firstNota.disciplinaId
 
     const disciplina = await prisma.disciplina.findUnique({
-      where: { id: disciplinaId },
-      include: { 
+      where: { id: disciplinaId, turma: { escolaId } },
+      include: {
         turma: { select: { modalidade: true } }
       }
     })
@@ -41,24 +42,36 @@ export async function POST(request: NextRequest) {
     const isSemestral = modalidade === 'PROEJA' || modalidade === 'SUBSEQUENTE'
     const disciplineName = disciplina?.nome || 'Disciplina desconhecida'
 
-    // Otimização: Buscar todos os estudantes do lote de uma vez para os logs de auditoria
+    // Otimização: Buscar todos os estudantes do lote de uma vez para os logs de auditoria.
+    // O frontend envia a matricula (LancarNotasClient.tsx usa estudante.matricula como chave),
+    // mas "notas_finais.estudante_id" guarda o id tecnico desde a Migration 3b - precisa
+    // resolver matricula -> id antes de qualquer SELECT/UPDATE/INSERT na tabela.
     const matriculas = notas.map(n => n.estudanteId)
     const estudantes = await prisma.estudante.findMany({
-      where: { matricula: { in: matriculas } },
-      select: { matricula: true, nome: true }
+      where: { escolaId, matricula: { in: matriculas } },
+      select: { id: true, matricula: true, nome: true }
     })
     const studentNamesMap = new Map(estudantes.map(e => [e.matricula, e.nome]))
+    const matriculaToIdMap = new Map(estudantes.map(e => [e.matricula, e.id]))
 
     const results = []
 
     // Processar sequencialmente para evitar exaustão do pool de conexões
     for (const notaData of notas) {
-      const { 
-        estudanteId, 
-        nota1, nota2, nota3, 
-        isDesistente, 
-        isDesistenteUnid1, isDesistenteUnid2, isDesistenteUnid3 
+      const {
+        estudanteId,
+        nota1, nota2, nota3,
+        isDesistente,
+        isDesistenteUnid1, isDesistenteUnid2, isDesistenteUnid3
       } = notaData
+
+      // estudanteId aqui e a matricula (nome mantido por compatibilidade com o
+      // payload do frontend) - resolve para o id tecnico real da tabela estudantes.
+      const estudanteRealId = matriculaToIdMap.get(estudanteId)
+      if (!estudanteRealId) {
+        results.push({ skipped: true, estudanteId, error: 'Estudante não encontrado nesta escola' })
+        continue
+      }
 
       // Se todos os campos estiverem vazios e não houver marcação de desistência, ignorar
       const isAllEmpty = (nota1 === '' || nota1 === null || nota1 === undefined) && 
@@ -120,7 +133,7 @@ export async function POST(request: NextRequest) {
       const existing = await prisma.$queryRaw<any[]>`
         SELECT id, nota_1 as "nota1", nota_2 as "nota2", nota_3 as "nota3", status 
         FROM "notas_finais" 
-        WHERE "estudante_id" = ${estudanteId} AND "disciplina_id" = ${disciplinaId}
+        WHERE "estudante_id" = ${estudanteRealId} AND "disciplina_id" = ${disciplinaId}
         LIMIT 1
       `
 
@@ -203,7 +216,7 @@ export async function POST(request: NextRequest) {
             "modified_by_id", "created_at", "updated_at", "modified_at"
           )
           VALUES (
-            ${newId}, ${estudanteId}, ${disciplinaId}, ${n1}, ${n2}, ${n3}, ${notaCalculada}, ${statusEnum}::"status_nota", 
+            ${newId}, ${estudanteRealId}, ${disciplinaId}, ${n1}, ${n2}, ${n3}, ${notaCalculada}, ${statusEnum}::"status_nota",
             ${!!isDesistenteUnid1}, ${!!isDesistenteUnid2}, ${!!isDesistenteUnid3},
             ${session.user.id}, NOW(), NOW(), NOW()
           )
