@@ -472,7 +472,7 @@ model EsquemaAvaliacao {
   recuperacaoUnidadeAtiva Boolean                 @default(false) @map("recuperacao_unidade_ativa")
   modoRecuperacaoUnidade  ModoRecuperacaoUnidade? @map("modo_recuperacao_unidade")
   recuperacaoFinalAtiva   Boolean                 @default(true) @map("recuperacao_final_ativa")
-  modoRecuperacaoFinal    ModoRecuperacaoFinal?   @default(SUBSTITUI_MENOR_UNIDADE) @map("modo_recuperacao_final")
+  modoRecuperacaoFinal    ModoRecuperacaoFinal?   @default(NOTA_MINIMA_ISOLADA) @map("modo_recuperacao_final")
   createdAt               DateTime                @default(now()) @map("created_at")
   updatedAt               DateTime                @updatedAt @map("updated_at")
   unidades                EsquemaUnidade[]
