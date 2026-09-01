@@ -298,11 +298,24 @@ model HorarioAula {
   @@map("horarios_aula")
 }
 
+// Classificação livre do nível de ensino (rótulo, sem efeito automático
+// no esquema de avaliação por enquanto) - uma escola pode ter cursos em
+// vários níveis ao mesmo tempo, ou só um (escola regular de nível único).
+enum NivelEnsino {
+  FUNDAMENTAL_I
+  FUNDAMENTAL_II
+  ENSINO_MEDIO
+  TECNICO
+  EJA
+  OUTRO
+}
+
 model Curso {
   id                 String            @id @default(cuid())
   nome               String
   sigla              String
   modalidade         String
+  nivelEnsino        NivelEnsino?      @map("nivel_ensino")
   turnos             String[]
   escolaId           String            @map("escola_id")
   escola             Escola            @relation(fields: [escolaId], references: [id])

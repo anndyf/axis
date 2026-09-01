@@ -8,6 +8,7 @@ export interface CursoParaEditar {
   nome: string
   sigla: string
   modalidade: string
+  nivelEnsino?: string | null
   turnos: string[]
 }
 
@@ -28,6 +29,19 @@ const labelModalidade: Record<string, string> = {
   SUBSEQUENTE: "Subsequente",
 }
 
+// Rótulo livre de nível de ensino - não afeta o esquema de avaliação
+// automaticamente, é só classificação (útil pra relatórios/filtros).
+const NIVEIS_ENSINO = ["FUNDAMENTAL_I", "FUNDAMENTAL_II", "ENSINO_MEDIO", "TECNICO", "EJA", "OUTRO"]
+
+const labelNivelEnsino: Record<string, string> = {
+  FUNDAMENTAL_I: "Ensino Fundamental I",
+  FUNDAMENTAL_II: "Ensino Fundamental II",
+  ENSINO_MEDIO: "Ensino Médio",
+  TECNICO: "Técnico",
+  EJA: "EJA",
+  OUTRO: "Outro",
+}
+
 export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar }: CursoModalProps) {
   const isEdit = !!cursoParaEditar
   const [loading, setLoading] = useState(false)
@@ -38,6 +52,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
     nome: "",
     sigla: "",
     modalidades: ["EPTM"] as string[],
+    nivelEnsino: "" as string,
     turnos: [] as string[]
   })
 
@@ -48,10 +63,11 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
         nome: cursoParaEditar.nome,
         sigla: cursoParaEditar.sigla,
         modalidades: [cursoParaEditar.modalidade],
+        nivelEnsino: cursoParaEditar.nivelEnsino || "",
         turnos: cursoParaEditar.turnos || []
       })
     } else {
-      setFormData({ nome: "", sigla: "", modalidades: ["EPTM"], turnos: [] })
+      setFormData({ nome: "", sigla: "", modalidades: ["EPTM"], nivelEnsino: "", turnos: [] })
     }
     setError("")
   }, [isOpen, cursoParaEditar, isEdit])
@@ -101,6 +117,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
             nome: formData.nome,
             sigla: formData.sigla,
             turnos: formData.turnos,
+            nivelEnsino: formData.nivelEnsino || null,
           })
         })
 
@@ -122,6 +139,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
             sigla: formData.sigla,
             modalidades: formData.modalidades,
             turnos: formData.turnos,
+            nivelEnsino: formData.nivelEnsino || null,
           })
         })
 
@@ -269,6 +287,28 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
                   ))}
                 </div>
               )}
+            </div>
+
+            {/* Nível de Ensino */}
+            <div className="space-y-2">
+              <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2 ml-1">
+                Nível de Ensino <span className="normal-case font-medium text-slate-300">(opcional)</span>
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {NIVEIS_ENSINO.map(n => (
+                  <button
+                    key={n} type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, nivelEnsino: prev.nivelEnsino === n ? "" : n }))}
+                    className={`px-4 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wide transition-all border ${
+                      formData.nivelEnsino === n
+                        ? 'bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-200'
+                        : 'bg-slate-50 text-slate-400 border-slate-200 hover:border-slate-300 hover:text-slate-600'
+                    }`}
+                  >
+                    {labelNivelEnsino[n]}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Turnos */}

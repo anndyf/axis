@@ -1,10 +1,17 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { auth } from "@/lib/auth"
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const session = await auth()
+    if (!session?.user?.escolaId) {
+      return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
+    }
+    const escolaId = session.user.escolaId
+
     const { id } = await params
-    const { nome, sigla, turnos } = await req.json()
+    const { nome, sigla, turnos, nivelEnsino } = await req.json()
 
     if (!nome || !sigla) {
       return NextResponse.json(
@@ -13,9 +20,15 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       )
     }
 
-    // Verifica se a sigla já é usada por outro curso
+    // Verifica se o curso existe e pertence a escola do chamador
+    const current = await prisma.curso.findUnique({ where: { id, escolaId } })
+    if (!current) {
+      return NextResponse.json({ message: "Curso não encontrado." }, { status: 404 })
+    }
+
+    // Verifica se a sigla já é usada por outro curso DA MESMA ESCOLA
     const existingSigla = await prisma.curso.findFirst({
-      where: { sigla, NOT: { id } }
+      where: { escolaId, sigla, NOT: { id } }
     })
     if (existingSigla) {
       return NextResponse.json(
@@ -24,14 +37,9 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       )
     }
 
-    // Verifica se nome+modalidade já existe em outro curso
-    const current = await prisma.curso.findUnique({ where: { id } })
-    if (!current) {
-      return NextResponse.json({ message: "Curso não encontrado." }, { status: 404 })
-    }
-
+    // Verifica se nome+modalidade já existe em outro curso DA MESMA ESCOLA
     const duplicateNome = await prisma.curso.findFirst({
-      where: { nome, modalidade: current.modalidade, NOT: { id } }
+      where: { escolaId, nome, modalidade: current.modalidade, NOT: { id } }
     })
     if (duplicateNome) {
       return NextResponse.json(
@@ -42,7 +50,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
     const curso = await prisma.curso.update({
       where: { id },
-      data: { nome, sigla, turnos: turnos || [] }
+      data: { nome, sigla, turnos: turnos || [], nivelEnsino: nivelEnsino ?? current.nivelEnsino }
     })
 
     return NextResponse.json(curso)
@@ -63,7 +71,18 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const session = await auth()
+    if (!session?.user?.escolaId) {
+      return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
+    }
+    const escolaId = session.user.escolaId
+
     const { id } = await params
+
+    const existente = await prisma.curso.findUnique({ where: { id, escolaId } })
+    if (!existente) {
+      return NextResponse.json({ message: "Curso não encontrado." }, { status: 404 })
+    }
 
     await prisma.curso.delete({ where: { id } })
 

@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     }
     const escolaId = session.user.escolaId
 
-    const { nome, sigla, modalidade, modalidades, turnos } = await req.json()
+    const { nome, sigla, modalidade, modalidades, turnos, nivelEnsino } = await req.json()
 
     if (!nome || !sigla) {
       return NextResponse.json(
@@ -73,6 +73,7 @@ export async function POST(req: Request) {
             nome,
             sigla: siglaFinal,
             modalidade: mod,
+            nivelEnsino: nivelEnsino || null,
             turnos: turnos || []
           }
         })
