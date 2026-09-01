@@ -4,6 +4,14 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { v4 as uuidv4 } from 'uuid'
 import { logAudit } from '@/lib/audit'
+import {
+  calcularMediaFinal,
+  calcularStatus,
+  resolverEsquemaAvaliacaoId,
+  type EsquemaConfig,
+  type StatusNota,
+  type UnidadeInput,
+} from '@/lib/services/notas'
 
 export const runtime = 'nodejs'
 
@@ -30,7 +38,7 @@ export async function POST(request: NextRequest) {
     const disciplina = await prisma.disciplina.findUnique({
       where: { id: disciplinaId, turma: { escolaId } },
       include: {
-        turma: { select: { modalidade: true } }
+        turma: { select: { cursoId: true, esquemaAvaliacaoId: true } }
       }
     })
 
@@ -38,9 +46,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Disciplina não encontrada' }, { status: 404 })
     }
 
-    const modalidade = disciplina?.turma?.modalidade
-    const isSemestral = modalidade === 'PROEJA' || modalidade === 'SUBSEQUENTE'
     const disciplineName = disciplina?.nome || 'Disciplina desconhecida'
+
+    // Resolve o esquema de avaliação da turma (override) ou do curso (padrão),
+    // populado desde a Fase 2 do modelo de avaliação configurável.
+    const curso = disciplina.turma.cursoId
+      ? await prisma.curso.findUnique({ where: { id: disciplina.turma.cursoId }, select: { esquemaAvaliacaoId: true } })
+      : null
+    const esquemaId = resolverEsquemaAvaliacaoId(disciplina.turma, curso)
+    if (!esquemaId) {
+      return NextResponse.json({ message: 'Esquema de avaliação não configurado para esta turma' }, { status: 400 })
+    }
+    const esquema = await prisma.esquemaAvaliacao.findUnique({
+      where: { id: esquemaId },
+      include: { unidades: { orderBy: { ordem: 'asc' }, include: { atividades: { orderBy: { ordem: 'asc' } } } } }
+    })
+    if (!esquema) {
+      return NextResponse.json({ message: 'Esquema de avaliação inválido' }, { status: 400 })
+    }
+    const esquemaConfig: EsquemaConfig = {
+      numUnidades: esquema.numUnidades,
+      notaMinimaAprovacao: esquema.notaMinimaAprovacao,
+      recuperacaoUnidadeAtiva: esquema.recuperacaoUnidadeAtiva,
+      modoRecuperacaoUnidade: esquema.modoRecuperacaoUnidade,
+      recuperacaoFinalAtiva: esquema.recuperacaoFinalAtiva,
+      modoRecuperacaoFinal: esquema.modoRecuperacaoFinal,
+    }
+    const isSemestral = esquema.numUnidades < 3
 
     // Otimização: Buscar todos os estudantes do lote de uma vez para os logs de auditoria.
     // O frontend envia a matricula (LancarNotasClient.tsx usa estudante.matricula como chave),
@@ -106,83 +138,48 @@ export async function POST(request: NextRequest) {
         throw new Error(`Nota 3 inválida para estudante ${estudanteId}: deve estar entre 0 e 10`)
       }
 
-      const val1 = n1 ?? 0
-      const val2 = n2 ?? 0
-      const val3 = n3 ?? 0
-
-      let notaCalculada = 0
-      if (isSemestral) {
-          notaCalculada = (val1 + val2) / 2
-      } else {
-          notaCalculada = (val1 + val2 + val3) / 3
-      }
-      
-      notaCalculada = Math.round(notaCalculada * 10) / 10
-
-      let status = 'RECUPERACAO'
-      const allNotesLaunched = isSemestral ? (n1 !== null && n2 !== null) : (n1 !== null && n2 !== null && n3 !== null)
-      
-      if (notaCalculada >= 5 && allNotesLaunched) {
-        status = 'APROVADO'
-      }
-
-      const statusEnum = status as any
       const targetName = studentNamesMap.get(estudanteId) || 'Estudante desconhecido'
 
       // Verificar se já existe nota
       const existing = await prisma.$queryRaw<any[]>`
-        SELECT id, nota_1 as "nota1", nota_2 as "nota2", nota_3 as "nota3", status 
-        FROM "notas_finais" 
+        SELECT id, nota_1 as "nota1", nota_2 as "nota2", nota_3 as "nota3", status
+        FROM "notas_finais"
         WHERE "estudante_id" = ${estudanteRealId} AND "disciplina_id" = ${disciplinaId}
         LIMIT 1
       `
+      const existingRow = existing[0]
 
-      if (existing.length > 0) {
-        const notaId = existing[0].id
-        
-        // Proteção contra exclusão acidental: Preservar notas já salvas se vierem vazias/nulas na requisição atual
-        const finalN1 = n1 !== null ? n1 : (existing[0].nota1 !== null && existing[0].nota1 !== undefined ? Number(existing[0].nota1) : null)
-        const finalN2 = n2 !== null ? n2 : (existing[0].nota2 !== null && existing[0].nota2 !== undefined ? Number(existing[0].nota2) : null)
-        const finalN3 = n3 !== null ? n3 : (existing[0].nota3 !== null && existing[0].nota3 !== undefined ? Number(existing[0].nota3) : null)
+      // Preserva notas já salvas se vierem vazias/nulas na requisição atual
+      const finalN1 = n1 !== null ? n1 : (existingRow?.nota1 != null ? Number(existingRow.nota1) : null)
+      const finalN2 = n2 !== null ? n2 : (existingRow?.nota2 != null ? Number(existingRow.nota2) : null)
+      const finalN3 = n3 !== null ? n3 : (existingRow?.nota3 != null ? Number(existingRow.nota3) : null)
+      const finalPorOrdem: Record<number, number | null> = { 1: finalN1, 2: finalN2, 3: finalN3 }
+      const desistentePorOrdem: Record<number, boolean> = {
+        1: !!isDesistenteUnid1,
+        2: !!isDesistenteUnid2,
+        3: !!isDesistenteUnid3,
+      }
 
-        // Recalcular a média final com base nas notas preservadas reais
-        const val1 = finalN1 ?? 0
-        const val2 = finalN2 ?? 0
-        const val3 = finalN3 ?? 0
+      const unidadesInput: UnidadeInput[] = esquema.unidades.map((eu) => ({
+        esquemaUnidadeId: eu.id,
+        atividades: [{ peso: eu.atividades[0]?.peso ?? 10, valor: finalPorOrdem[eu.ordem] ?? null }],
+      }))
+      const resultado = calcularMediaFinal(unidadesInput, esquemaConfig)
+      const currentStatus = existingRow?.status as StatusNota | undefined
+      const finalStatus = calcularStatus(resultado, esquemaConfig, null, currentStatus)
+      const notaCalculadaFinal = resultado.media ?? 0
 
-        let notaCalculadaPreservada = 0
-        if (isSemestral) {
-            notaCalculadaPreservada = (val1 + val2) / 2
-        } else {
-            notaCalculadaPreservada = (val1 + val2 + val3) / 3
-        }
-        notaCalculadaPreservada = Math.round(notaCalculadaPreservada * 10) / 10
-
-        // Recalcular status baseado nas notas finais preservadas
-        let status = 'RECUPERACAO'
-        const allNotesLaunched = isSemestral ? (finalN1 !== null && finalN2 !== null) : (finalN1 !== null && finalN2 !== null && finalN3 !== null)
-        
-        if (notaCalculadaPreservada >= 5 && allNotesLaunched) {
-          status = 'APROVADO'
-        }
-
-        let finalStatus = status as any
-        const currentStatus = existing[0].status
-        
-        // Proteção de Status: Preservar status especiais de aprovação (Conselho, Recuperação, Dependência, Conservado)
-        // se a média das notas regulares continuar menor que 5
-        const isSpecialStatus = ['APROVADO_RECUPERACAO', 'APROVADO_CONSELHO', 'DEPENDENCIA', 'CONSERVADO'].includes(currentStatus)
-        if (isSpecialStatus && status === 'RECUPERACAO') {
-          finalStatus = currentStatus
-        }
+      let notaId: string
+      if (existingRow) {
+        notaId = existingRow.id
 
         await prisma.$executeRaw`
           UPDATE "notas_finais"
-          SET 
+          SET
             "nota_1" = ${finalN1},
             "nota_2" = ${finalN2},
             "nota_3" = ${finalN3},
-            "nota" = ${notaCalculadaPreservada},
+            "nota" = ${notaCalculadaFinal},
             "status" = ${finalStatus}::"status_nota",
             "is_desistente_unid1" = ${!!isDesistenteUnid1},
             "is_desistente_unid2" = ${!!isDesistenteUnid2},
@@ -192,52 +189,77 @@ export async function POST(request: NextRequest) {
             "modified_at" = NOW()
           WHERE "id" = ${notaId}
         `
-        
+
         await logAudit(
           session.user.id,
           'NOTA',
           notaId,
           'UPDATE',
-          { 
-            alvo: targetName, 
+          {
+            alvo: targetName,
             disciplina: disciplineName,
-            anterior: { n1: existing[0].nota1, n2: existing[0].nota2, n3: existing[0].nota3, st: existing[0].status },
+            anterior: { n1: existingRow.nota1, n2: existingRow.nota2, n3: existingRow.nota3, st: existingRow.status },
             atual: { n1: finalN1, n2: finalN2, n3: finalN3, st: finalStatus }
           }
         )
-        
+
         results.push({ id: notaId, updated: true })
       } else {
-        const newId = uuidv4()
+        notaId = uuidv4()
         await prisma.$executeRaw`
           INSERT INTO "notas_finais" (
-            "id", "estudante_id", "disciplina_id", "nota_1", "nota_2", "nota_3", "nota", "status", 
+            "id", "estudante_id", "disciplina_id", "nota_1", "nota_2", "nota_3", "nota", "status",
             "is_desistente_unid1", "is_desistente_unid2", "is_desistente_unid3",
             "modified_by_id", "created_at", "updated_at", "modified_at"
           )
           VALUES (
-            ${newId}, ${estudanteRealId}, ${disciplinaId}, ${n1}, ${n2}, ${n3}, ${notaCalculada}, ${statusEnum}::"status_nota",
+            ${notaId}, ${estudanteRealId}, ${disciplinaId}, ${finalN1}, ${finalN2}, ${finalN3}, ${notaCalculadaFinal}, ${finalStatus}::"status_nota",
             ${!!isDesistenteUnid1}, ${!!isDesistenteUnid2}, ${!!isDesistenteUnid3},
             ${session.user.id}, NOW(), NOW(), NOW()
           )
         `
-        
+
         await logAudit(
           session.user.id,
           'NOTA',
-          newId,
+          notaId,
           'INSERT',
-          { 
-            alvo: targetName, 
+          {
+            alvo: targetName,
             disciplina: disciplineName,
-            nota1: n1, 
-            nota2: n2, 
-            nota3: n3, 
-            status: statusEnum 
+            nota1: finalN1,
+            nota2: finalN2,
+            nota3: finalN3,
+            status: finalStatus
           }
         )
-        
-        results.push({ id: newId, created: true })
+
+        results.push({ id: notaId, created: true })
+      }
+
+      // Dual-write: popula NotaUnidade/NotaAtividade em paralelo às colunas
+      // legadas (nota_1/2/3), enquanto os consumidores de leitura não migram
+      // pro modelo novo (Fase 4/5 do rollout do modelo de avaliação).
+      for (const eu of esquema.unidades) {
+        const valor = finalPorOrdem[eu.ordem] ?? null
+        const notaUnidade = await prisma.notaUnidade.upsert({
+          where: { notaFinalId_esquemaUnidadeId: { notaFinalId: notaId, esquemaUnidadeId: eu.id } },
+          update: { notaCalculada: valor, isDesistente: desistentePorOrdem[eu.ordem] ?? false },
+          create: {
+            notaFinalId: notaId,
+            esquemaUnidadeId: eu.id,
+            notaCalculada: valor,
+            isDesistente: desistentePorOrdem[eu.ordem] ?? false
+          }
+        })
+        const atividade = eu.atividades[0]
+        if (atividade) {
+          await prisma.notaAtividade.upsert({
+            where: { notaUnidadeId_esquemaAtividadeId: { notaUnidadeId: notaUnidade.id, esquemaAtividadeId: atividade.id } },
+            update: { valor },
+            create: { notaUnidadeId: notaUnidade.id, esquemaAtividadeId: atividade.id, valor }
+          })
+        }
       }
     }
 
