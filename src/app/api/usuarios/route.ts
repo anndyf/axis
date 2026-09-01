@@ -4,6 +4,8 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { hash } from 'bcryptjs'
 import { enviarSenhaPorEmail } from '@/lib/mail'
+import { podeAdicionarUsuarioStaff } from '@/lib/modules-server'
+import { LIMITE_USUARIOS } from '@/lib/modules'
 
 export const runtime = 'nodejs'
 
@@ -64,6 +66,15 @@ export async function POST(request: NextRequest) {
 
     if (existingUser) {
       return NextResponse.json({ message: 'Este email já está cadastrado' }, { status: 400 })
+    }
+
+    const escola = await prisma.escola.findUnique({ where: { id: escolaId }, select: { plano: true } })
+    const plano = escola?.plano || 'BASICO'
+    if (!(await podeAdicionarUsuarioStaff(escolaId, plano))) {
+      const limite = LIMITE_USUARIOS[plano]
+      return NextResponse.json({
+        message: `Limite de usuários do plano ${plano} atingido (${limite}). Faça upgrade de plano ou remova um usuário existente.`
+      }, { status: 403 })
     }
 
     // Geração de senha aleatória (Django Style)

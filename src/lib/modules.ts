@@ -65,3 +65,14 @@ export const MODULOS: Modulo[] = [
 ]
 
 export const ORDEM_PLANO: Record<PlanoTipo, number> = { BASICO: 0, PRO: 1, ENTERPRISE: 2 }
+
+/**
+ * Limite de usuários STAFF (professor/direção/admin) por plano - seção 5 do
+ * plano comercial. Não conta usuários de portal (aluno/responsável), esses
+ * não têm limite aqui.
+ */
+export const LIMITE_USUARIOS: Record<PlanoTipo, number> = {
+  BASICO: 15,
+  PRO: 50,
+  ENTERPRISE: Infinity,
+}

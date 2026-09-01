@@ -96,12 +96,12 @@ export async function deactivateAllPortals() {
 
 export async function activateAllPortals() {
     const session = await auth()
-    if (!session?.user?.isSuperuser && !session?.user?.isDirecao) {
+    if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
         return { error: "Sem permissão" }
     }
 
     try {
-        const config = await prisma.globalConfig.findUnique({ where: { id: 'global' } })
+        const config = await prisma.globalConfig.findUnique({ where: { id: session.user.escolaId } })
         const currentYear = config?.anoLetivoAtual || new Date().getFullYear()
 
         // Buscar estudantes do ano atual que não possuem usuário de portal
