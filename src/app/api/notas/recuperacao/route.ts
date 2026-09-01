@@ -3,6 +3,13 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { StatusNota } from '@prisma/client'
 import { logAudit } from '@/lib/audit'
+import {
+  calcularMediaFinal,
+  calcularStatus,
+  resolverEsquemaAvaliacaoId,
+  type EsquemaConfig,
+  type UnidadeInput,
+} from '@/lib/services/notas'
 
 export const runtime = 'nodejs'
 
@@ -58,7 +65,8 @@ export async function POST(request: NextRequest) {
 
         // Buscar nota original, escopada a escola do chamador
         const notaOriginal = await prisma.notaFinal.findFirst({
-          where: { id: notaId, estudante: { escolaId } }
+          where: { id: notaId, estudante: { escolaId } },
+          include: { estudante: { select: { turma: { select: { cursoId: true, esquemaAvaliacaoId: true } } } } }
         })
 
         if (!notaOriginal) {
@@ -73,16 +81,60 @@ export async function POST(request: NextRequest) {
         const targetName = student?.nome || 'Estudante desconhecido'
         const disciplineName = discipline?.nome || 'Disciplina desconhecida'
 
-        // Lógica do Python: Apenas verifica se a nota da recuperação é >= 5
-        // Não calcula média, e não altera a nota original.
-        
-        let novoStatus: StatusNota = 'RECUPERACAO'
-        
-        if (notaRecuperacao >= 5) {
-          novoStatus = 'APROVADO_RECUPERACAO'
-        } else {
-          novoStatus = 'RECUPERACAO'
+        // Resolve o esquema de avaliação (turma ?? curso) pra decidir COMO a
+        // recuperação final afeta o resultado - configurável por escola
+        // (isolada por padrão no esquema legado, igual ao comportamento de
+        // sempre desta rota; SUBSTITUI_MENOR_UNIDADE fica disponível quando
+        // a escola configurar isso no painel).
+        const turma = notaOriginal.estudante.turma
+        const curso = turma.cursoId
+          ? await prisma.curso.findUnique({ where: { id: turma.cursoId }, select: { esquemaAvaliacaoId: true } })
+          : null
+        const esquemaId = resolverEsquemaAvaliacaoId(turma, curso)
+        const esquema = esquemaId
+          ? await prisma.esquemaAvaliacao.findUnique({
+              where: { id: esquemaId },
+              include: { unidades: { orderBy: { ordem: 'asc' }, include: { atividades: { orderBy: { ordem: 'asc' } } } } }
+            })
+          : null
+
+        if (!esquema) {
+          throw new Error(`Esquema de avaliação não configurado para a turma desta nota (${notaId})`)
         }
+
+        const esquemaConfig: EsquemaConfig = {
+          numUnidades: esquema.numUnidades,
+          notaMinimaAprovacao: esquema.notaMinimaAprovacao,
+          recuperacaoUnidadeAtiva: esquema.recuperacaoUnidadeAtiva,
+          modoRecuperacaoUnidade: esquema.modoRecuperacaoUnidade,
+          recuperacaoFinalAtiva: esquema.recuperacaoFinalAtiva,
+          modoRecuperacaoFinal: esquema.modoRecuperacaoFinal,
+        }
+        const notasPorOrdem: Record<number, number | null> = {
+          1: notaOriginal.nota1,
+          2: notaOriginal.nota2,
+          3: notaOriginal.nota3,
+        }
+        const unidadesInput: UnidadeInput[] = esquema.unidades.map((eu) => ({
+          esquemaUnidadeId: eu.id,
+          atividades: [{ peso: eu.atividades[0]?.peso ?? 10, valor: notasPorOrdem[eu.ordem] ?? null }],
+        }))
+        const resultado = calcularMediaFinal(unidadesInput, esquemaConfig)
+        // A proteção de status "especial" do motor existe pra não deixar uma
+        // edição de nota normal desfazer uma aprovação por recuperação já
+        // decidida (ver api/notas/lancar). Aqui é o contrário: esta rota É o
+        // mecanismo de recuperação sendo reavaliado, então um reenvio precisa
+        // poder regredir seu próprio resultado anterior - só continuam
+        // protegidos status genuinamente administrativos/discricionários
+        // (Conselho, Dependência, Conservado).
+        const statusParaProtecao =
+          notaOriginal.status === 'APROVADO_RECUPERACAO' ? undefined : (notaOriginal.status as StatusNota)
+        const novoStatus: StatusNota = calcularStatus(
+          resultado,
+          esquemaConfig,
+          notaRecuperacao,
+          statusParaProtecao
+        )
 
         // Criar auditoria
         await prisma.notaFinalAudit.create({
