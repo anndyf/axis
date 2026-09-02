@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { ArrowLeft, Download, FileText } from "lucide-react"
+import { calcularMediaFinal, resolverEsquemaAvaliacaoId, type EsquemaConfig, type UnidadeInput } from "@/lib/services/notas"
 
 export const metadata = {
   title: 'Áxis - Estudantes'
@@ -14,10 +15,14 @@ async function getEstudanteBoletim(escolaId: string, matricula: string) {
   return await prisma.estudante.findUnique({
     where: { escolaId_matricula: { escolaId, matricula } },
     include: {
-      turma: true,
+      turma: { select: { id: true, nome: true, cursoId: true, esquemaAvaliacaoId: true } },
       notas: {
         include: {
-          disciplina: true
+          disciplina: true,
+          unidades: {
+            orderBy: { esquemaUnidade: { ordem: 'asc' } },
+            select: { esquemaUnidadeId: true, notaCalculada: true, notaRecuperacao: true }
+          }
         },
         orderBy: {
           disciplina: {
@@ -27,6 +32,25 @@ async function getEstudanteBoletim(escolaId: string, matricula: string) {
       }
     }
   })
+}
+
+/** Resolve o EsquemaConfig da turma do estudante (override) ou do seu curso (padrão). */
+async function getEsquemaConfigDaTurma(turma: { cursoId: string | null; esquemaAvaliacaoId: string | null }): Promise<EsquemaConfig | null> {
+  const curso = turma.cursoId
+    ? await prisma.curso.findUnique({ where: { id: turma.cursoId }, select: { esquemaAvaliacaoId: true } })
+    : null
+  const esquemaId = resolverEsquemaAvaliacaoId(turma, curso)
+  if (!esquemaId) return null
+  const esquema = await prisma.esquemaAvaliacao.findUnique({ where: { id: esquemaId } })
+  if (!esquema) return null
+  return {
+    numUnidades: esquema.numUnidades,
+    notaMinimaAprovacao: esquema.notaMinimaAprovacao,
+    recuperacaoUnidadeAtiva: esquema.recuperacaoUnidadeAtiva,
+    modoRecuperacaoUnidade: esquema.modoRecuperacaoUnidade,
+    recuperacaoFinalAtiva: esquema.recuperacaoFinalAtiva,
+    modoRecuperacaoFinal: esquema.modoRecuperacaoFinal,
+  }
 }
 
 function getStatusColor(status: string) {
@@ -91,28 +115,25 @@ export default async function BoletimPage({
     redirect("/dashboard/estudantes")
   }
 
-  // Função para calcular a média real baseada nas unidades
-  const calcularMediaReal = (n: any) => {
-    if (n.nota === -1) return 0;
-    
-    // Se houver nota de recuperação, ela substitui a menor nota (entre n1, n2, n3)? 
-    // Ou é média aritmética simples? Geralmente CETEP usa (N1+N2+N3)/3
-    const n1 = n.nota1 || 0;
-    const n2 = n.nota2 || 0;
-    const n3 = n.nota3 || 0;
-    
-    let media = (n1 + n2 + n3) / 3;
-    
-    // Se houver recuperação e a média for < 5, a recuperação pode ajudar
-    if (n.notaRecuperacao !== null && media < 5) {
-      // Regra comum: Recuperação substitui a menor
-      const notas = [n1, n2, n3].sort((a, b) => a - b);
-      if (n.notaRecuperacao > notas[0]) {
-        media = (n.notaRecuperacao + notas[1] + notas[2]) / 3;
-      }
-    }
-    
-    return Math.round(media * 10) / 10;
+  // Motor de cálculo único (src/lib/services/notas.ts) - substitui a
+  // reimplementação antiga que tinha um bug real: sempre dividia por 3,
+  // mesmo pra turmas semestrais (2 unidades), porque nunca soube ler o
+  // esquema de avaliação da turma (que na prática nem existia antes desta
+  // frente). Lê de NotaUnidade (populado desde a Fase 3 do backfill),
+  // não mais das colunas fixas nota1/nota2/nota3.
+  const esquemaConfig = await getEsquemaConfigDaTurma(estudante.turma)
+
+  const calcularMediaReal = (n: (typeof estudante.notas)[number]) => {
+    if (n.nota === -1) return 0
+    if (!esquemaConfig) return n.nota
+
+    const unidadesInput: UnidadeInput[] = n.unidades.map((u) => ({
+      esquemaUnidadeId: u.esquemaUnidadeId,
+      atividades: [{ peso: 10, valor: u.notaCalculada }],
+      notaRecuperacao: u.notaRecuperacao,
+    }))
+    const resultado = calcularMediaFinal(unidadesInput, esquemaConfig)
+    return resultado.media ?? 0
   }
 
   const aprovadas = estudante.notas.filter(n => 
