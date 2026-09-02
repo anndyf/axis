@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import ResultadosClient from "./ResultadosClient"
+import { resolverEsquemaAvaliacaoId } from "@/lib/services/notas"
 
 export const metadata = {
   title: 'Áxis - Resultados'
@@ -55,11 +56,27 @@ async function getNotasResultados(turmaId: string, escolaId: string) {
 
     if (!turma) return null
 
+    // Resolve o esquema de avaliação (turma ?? curso) só pra saber numUnidades/
+    // notaMinimaAprovacao - usado pela análise de risco no client, que hoje
+    // hardcoda "3 unidades" (bug conhecido, ver src/lib/risk-analysis.ts).
+    const curso = turma.cursoId
+      ? await prisma.curso.findUnique({ where: { id: turma.cursoId }, select: { esquemaAvaliacaoId: true } })
+      : null
+    const esquemaId = resolverEsquemaAvaliacaoId(turma, curso)
+    const esquema = esquemaId
+      ? await prisma.esquemaAvaliacao.findUnique({
+          where: { id: esquemaId },
+          select: { numUnidades: true, notaMinimaAprovacao: true }
+        })
+      : null
+
     return {
       turma,
       disciplinas: turma.disciplinas,
       estudantes: turma.estudantes,
-      notasResultados: rawNotas
+      notasResultados: rawNotas,
+      numUnidades: esquema?.numUnidades ?? 3,
+      notaMinimaAprovacao: esquema?.notaMinimaAprovacao ?? 5,
     }
   } catch (error) {
     console.error("Erro ao buscar notas via SQL na página de resultados:", error)
@@ -92,6 +109,8 @@ export default async function ResultadosTurmaPage({
       disciplinas={data.disciplinas}
       initialNotas={data.notasResultados}
       initialEstudantes={data.estudantes}
+      numUnidades={data.numUnidades}
+      notaMinimaAprovacao={data.notaMinimaAprovacao}
     />
   )
 }

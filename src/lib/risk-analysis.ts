@@ -1,7 +1,10 @@
 
 /**
  * Lógica de Predição de Risco (IA Simples)
- * Baseada no acúmulo de pontos necessários para atingir a média 5.0 (Total 15.0 em 3 unidades)
+ * Baseada no acúmulo de pontos necessários para atingir a meta de aprovação
+ * (notaMinimaAprovacao * numUnidades), conforme o esquema de avaliação da
+ * turma - generalizado a partir do hardcode original (média 5.0 * 3
+ * unidades fixas), que dava resultado errado pra turmas semestrais.
  */
 
 export type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' | 'NONE';
@@ -13,22 +16,26 @@ export interface RiskAnalysis {
   color: string;
 }
 
-export function analyzeRisk(nota1: number | null, nota2: number | null, nota3: number | null): RiskAnalysis {
-  const GOAL = 15.0; // Média 5.0 * 3 unidades
+export function analyzeRisk(
+  notas: Array<number | null>,
+  numUnidades: number = 3,
+  notaMinimaAprovacao: number = 5
+): RiskAnalysis {
+  const GOAL = notaMinimaAprovacao * numUnidades;
   let currentTotal = 0;
   let unitsCount = 0;
 
-  if (nota1 !== null) { currentTotal += nota1; unitsCount++; }
-  if (nota2 !== null) { currentTotal += nota2; unitsCount++; }
-  if (nota3 !== null) { currentTotal += nota3; unitsCount++; }
+  for (const nota of notas.slice(0, numUnidades)) {
+    if (nota !== null) { currentTotal += nota; unitsCount++; }
+  }
 
   // Se não tem nenhuma nota, não há risco calculado
   if (unitsCount === 0) {
-    return { level: 'NONE', pointsNeeded: 15.0, message: 'Sem dados', color: 'text-slate-400' };
+    return { level: 'NONE', pointsNeeded: GOAL, message: 'Sem dados', color: 'text-slate-400' };
   }
 
   const remainingPoints = GOAL - currentTotal;
-  const remainingUnits = 3 - unitsCount;
+  const remainingUnits = numUnidades - unitsCount;
 
   // Se já atingiu a meta
   if (remainingPoints <= 0) {

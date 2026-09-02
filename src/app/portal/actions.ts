@@ -3,17 +3,19 @@
 
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { resolverEsquemaAvaliacaoId } from "@/lib/services/notas"
 
 export async function getStudentPortalData() {
   const session = await auth()
-  
-  if (!session?.user?.estudanteId) {
+
+  if (!session?.user?.escolaId || !session?.user?.estudanteId) {
     return { error: "Estudante não vinculado a este usuário." }
   }
+  const escolaId = session.user.escolaId
 
   try {
     const estudante = await prisma.estudante.findUnique({
-      where: { id: session.user.estudanteId },
+      where: { id: session.user.estudanteId, escolaId },
       include: {
         turma: {
           include: {
@@ -48,6 +50,7 @@ export async function getStudentPortalData() {
     // Buscar comunicados gerais ou para este estudante (futuro)
     const mensagens = await prisma.message.findMany({
       where: {
+        escolaId,
         category: 'COMUNICADO',
         OR: [
           { receiverId: 'GROUP_STUDENTS' },
@@ -63,7 +66,26 @@ export async function getStudentPortalData() {
       }
     })
 
-    return { estudante, mensagens }
+    // Resolve o esquema de avaliação (turma ?? curso) só pra saber
+    // numUnidades/notaMinimaAprovacao - usado pela análise de risco no
+    // client, que hoje hardcoda "3 unidades" (bug conhecido).
+    const curso = estudante.turma.cursoId
+      ? await prisma.curso.findUnique({ where: { id: estudante.turma.cursoId }, select: { esquemaAvaliacaoId: true } })
+      : null
+    const esquemaId = resolverEsquemaAvaliacaoId(estudante.turma, curso)
+    const esquema = esquemaId
+      ? await prisma.esquemaAvaliacao.findUnique({
+          where: { id: esquemaId },
+          select: { numUnidades: true, notaMinimaAprovacao: true }
+        })
+      : null
+
+    return {
+      estudante,
+      mensagens,
+      numUnidades: esquema?.numUnidades ?? 3,
+      notaMinimaAprovacao: esquema?.notaMinimaAprovacao ?? 5,
+    }
   } catch (error) {
     console.error("Erro ao buscar dados do portal:", error)
     return { error: "Erro interno no servidor." }

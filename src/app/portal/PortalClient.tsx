@@ -24,7 +24,7 @@ import { analyzeRisk } from "@/lib/risk-analysis"
 import MarkdownContent from "@/components/MarkdownContent"
 
 export default function PortalClient({ initialData, user, nomeEscola }: { initialData: any, user: any, nomeEscola: string }) {
-  const { estudante, mensagens = [], error } = initialData
+  const { estudante, mensagens = [], error, numUnidades = 3, notaMinimaAprovacao = 5 } = initialData
   const [selectedMessage, setSelectedMessage] = useState<any>(null)
   const [readMessageIds, setReadMessageIds] = useState<Set<string>>(new Set())
   const [isScheduleOpen, setIsScheduleOpen] = useState(false)
@@ -282,7 +282,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
                     </thead>
               <tbody className="divide-y divide-slate-50">
                 {estudante.notas.map((nota: any) => {
-                  const risk = analyzeRisk(nota.nota1, nota.nota2, nota.nota3)
+                  const risk = analyzeRisk([nota.nota1, nota.nota2, nota.nota3], numUnidades, notaMinimaAprovacao)
                   return (
                     <tr key={nota.id} className="hover:bg-slate-50/50 transition-colors">
                       <td className="px-6 py-4">

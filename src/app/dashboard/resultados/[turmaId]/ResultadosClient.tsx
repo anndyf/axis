@@ -35,13 +35,17 @@ export default function ResultadosTurmaClient({
   turmaNome,
   disciplinas,
   initialNotas,
-  initialEstudantes
+  initialEstudantes,
+  numUnidades = 3,
+  notaMinimaAprovacao = 5
 }: {
   turmaId: string
   turmaNome: string
   disciplinas: Disciplina[]
   initialNotas: NotaResultado[]
   initialEstudantes?: { matricula: string, nome: string }[]
+  numUnidades?: number
+  notaMinimaAprovacao?: number
 }) {
   const [selectedUnit, setSelectedUnit] = useState<UnitOption>('FINAL')
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null)
@@ -380,7 +384,7 @@ export default function ResultadosTurmaClient({
                     let worstRisk: any = { level: 'NONE' };
                     for (const n of notasDoAluno) {
                         if (n) {
-                            const analysis = analyzeRisk(n.nota1 ?? null, n.nota2 ?? null, n.nota3 ?? null);
+                            const analysis = analyzeRisk([n.nota1 ?? null, n.nota2 ?? null, n.nota3 ?? null], numUnidades, notaMinimaAprovacao);
                             if (worstRisk.level === 'NONE' || 
                                (analysis.level === 'CRITICAL') || 
                                (analysis.level === 'HIGH' && worstRisk.level !== 'CRITICAL') ||
