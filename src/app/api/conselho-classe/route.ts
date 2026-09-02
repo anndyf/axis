@@ -4,8 +4,21 @@ import { prisma } from '@/lib/prisma'
 import { StatusNota } from '@prisma/client'
 import { logAudit } from '@/lib/audit'
 import { can } from '@/lib/rbac'
+import { calcularMediaFinal, resolverEsquemaAvaliacaoId, type EsquemaConfig, type UnidadeInput } from '@/lib/services/notas'
 
 export const runtime = 'nodejs'
+
+// Decisões que o Conselho de Classe pode tomar (mesmo conjunto oferecido
+// pela UI em ConselhoClasseClient.tsx) - são decisões administrativas/
+// discricionárias do comitê, por isso esta rota não recalcula o status
+// automaticamente a partir da média (diferente de notas/lancar e
+// notas/recuperacao); só valida que o valor recebido é um dos permitidos.
+const DECISOES_CONSELHO_VALIDAS: StatusNota[] = [
+  'APROVADO_RECUPERACAO',
+  'APROVADO_CONSELHO',
+  'DEPENDENCIA',
+  'CONSERVADO',
+]
 
 export async function POST(request: NextRequest) {
   try {
@@ -54,6 +67,10 @@ export async function POST(request: NextRequest) {
         }
 
         const status = novoStatus as StatusNota
+        if (!DECISOES_CONSELHO_VALIDAS.includes(status)) {
+          throw new Error(`Decisão de conselho inválida: ${novoStatus}`)
+        }
+
         // Buscar nota original, escopada a escola do chamador
         const notaOriginal = await prisma.notaFinal.findFirst({
           where: { id: notaId, estudante: { escolaId } }
@@ -64,12 +81,56 @@ export async function POST(request: NextRequest) {
         }
 
         const [student, discipline] = await Promise.all([
-          prisma.estudante.findUnique({ where: { id: notaOriginal.estudanteId }, select: { nome: true } }),
+          prisma.estudante.findUnique({
+            where: { id: notaOriginal.estudanteId },
+            select: { nome: true, turma: { select: { cursoId: true, esquemaAvaliacaoId: true } } }
+          }),
           prisma.disciplina.findUnique({ where: { id: notaOriginal.disciplinaId }, select: { nome: true } })
         ])
 
         const targetName = student?.nome || 'Estudante desconhecido'
         const disciplineName = discipline?.nome || 'Disciplina desconhecida'
+
+        // Calcula o que o motor sugeriria a partir da média das unidades,
+        // só pra registro/transparência no log de auditoria - o Conselho é
+        // um processo discricionário do comitê, então a decisão recebida
+        // (`status`) sempre prevalece, nunca é sobrescrita automaticamente.
+        let sugestaoAutomatica: string | null = null
+        if (student?.turma) {
+          const curso = student.turma.cursoId
+            ? await prisma.curso.findUnique({ where: { id: student.turma.cursoId }, select: { esquemaAvaliacaoId: true } })
+            : null
+          const esquemaId = resolverEsquemaAvaliacaoId(student.turma, curso)
+          const esquema = esquemaId
+            ? await prisma.esquemaAvaliacao.findUnique({
+                where: { id: esquemaId },
+                include: { unidades: { orderBy: { ordem: 'asc' } } }
+              })
+            : null
+          if (esquema) {
+            const esquemaConfig: EsquemaConfig = {
+              numUnidades: esquema.numUnidades,
+              notaMinimaAprovacao: esquema.notaMinimaAprovacao,
+              recuperacaoUnidadeAtiva: esquema.recuperacaoUnidadeAtiva,
+              modoRecuperacaoUnidade: esquema.modoRecuperacaoUnidade,
+              recuperacaoFinalAtiva: esquema.recuperacaoFinalAtiva,
+              modoRecuperacaoFinal: esquema.modoRecuperacaoFinal,
+            }
+            const notasPorOrdem: Record<number, number | null> = {
+              1: notaOriginal.nota1,
+              2: notaOriginal.nota2,
+              3: notaOriginal.nota3,
+            }
+            const unidadesInput: UnidadeInput[] = esquema.unidades.map((eu) => ({
+              esquemaUnidadeId: eu.id,
+              atividades: [{ peso: 10, valor: notasPorOrdem[eu.ordem] ?? null }],
+            }))
+            const resultado = calcularMediaFinal(unidadesInput, esquemaConfig)
+            sugestaoAutomatica = resultado.completo
+              ? (resultado.media !== null && resultado.media >= esquemaConfig.notaMinimaAprovacao ? 'APROVADO' : 'RECUPERACAO')
+              : 'incompleto'
+          }
+        }
 
         // Criar auditoria
         await prisma.notaFinalAudit.create({
@@ -99,11 +160,12 @@ export async function POST(request: NextRequest) {
           notaId,
           'UPDATE',
           { 
-            alvo: targetName, 
-            disciplina: disciplineName, 
+            alvo: targetName,
+            disciplina: disciplineName,
             anterior: { st: notaOriginal.status, rec: notaOriginal.notaRecuperacao },
             atual: { st: status, rec: novaNotaRec },
-            context: 'CONSELHO' 
+            sugestaoAutomatica,
+            context: 'CONSELHO'
           }
         )
         
@@ -119,6 +181,9 @@ export async function POST(request: NextRequest) {
     console.error('Erro ao salvar conselho:', error)
     
     // Mensagens mais específicas para erros de validação
+    if (error.message.includes('Decisão de conselho inválida')) {
+      return NextResponse.json({ message: error.message }, { status: 400 })
+    }
     if (error.message.includes('deve estar entre 0 e 10')) {
       return NextResponse.json({ message: error.message }, { status: 400 })
     }
