@@ -68,6 +68,7 @@ export const authConfig: NextAuthConfig = {
             isDirecao: true,
             isAEE: true,
             isPortalUser: true,
+            isPlatformAdmin: true,
             estudanteId: true,
             escolaId: true
           }
@@ -122,6 +123,7 @@ export const authConfig: NextAuthConfig = {
           isStaff: user.isStaff,
           isPortalUser: user.isPortalUser,
           isAEE: (user as any).isAEE || false,
+          isPlatformAdmin: user.isPlatformAdmin,
           estudanteId: user.estudanteId,
           escolaId: user.escolaId
         }
@@ -138,6 +140,7 @@ export const authConfig: NextAuthConfig = {
         token.isStaff = (user as any).isStaff
         token.isPortalUser = (user as any).isPortalUser
         token.isAEE = (user as any).isAEE
+        token.isPlatformAdmin = (user as any).isPlatformAdmin
         token.estudanteId = (user as any).estudanteId
         token.escolaId = (user as any).escolaId
       }
@@ -152,6 +155,7 @@ export const authConfig: NextAuthConfig = {
         session.user.isStaff = token.isStaff as boolean
         session.user.isPortalUser = token.isPortalUser as boolean
         ;(session.user as any).isAEE = token.isAEE as boolean
+        session.user.isPlatformAdmin = token.isPlatformAdmin as boolean
         session.user.estudanteId = token.estudanteId as string
         session.user.escolaId = token.escolaId as string
       }

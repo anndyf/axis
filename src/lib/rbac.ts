@@ -3,6 +3,7 @@ export type RbacUser = {
   isDirecao: boolean
   isStaff: boolean
   isAEE?: boolean
+  isPlatformAdmin?: boolean
 }
 
 export type Acao = 'gestao' | 'staff' | 'superuser' | 'aee' | 'staffPuro'
