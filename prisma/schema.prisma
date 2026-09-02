@@ -9,17 +9,17 @@ datasource db {
 }
 
 model Escola {
-  id            String    @id @default(cuid())
+  id            String       @id @default(cuid())
   nome          String
-  slug          String    @unique
-  plano         PlanoTipo @default(BASICO)
-  status        String    @default("TRIAL")
-  logoUrl       String?   @map("logo_url")
-  corPrimaria   String?   @map("cor_primaria")
-  corSecundaria String?   @map("cor_secundaria")
-  emailDominio  String?   @map("email_dominio")
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
+  slug          String       @unique
+  plano         PlanoTipo    @default(BASICO)
+  status        StatusEscola @default(TRIAL)
+  logoUrl       String?      @map("logo_url")
+  corPrimaria   String?      @map("cor_primaria")
+  corSecundaria String?      @map("cor_secundaria")
+  emailDominio  String?      @map("email_dominio")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
 
   users             User[]
   turmas            Turma[]
@@ -56,6 +56,13 @@ enum PlanoTipo {
   ENTERPRISE
 }
 
+enum StatusEscola {
+  TRIAL
+  ATIVA
+  SUSPENSA
+  CANCELADA
+}
+
 model User {
   id                    String                @id @default(cuid())
   email                 String
@@ -75,6 +82,7 @@ model User {
   isPortalUser          Boolean               @default(false) @map("is_portal_user")
   estudanteId           String?               @map("estudante_id")
   isAEE                 Boolean               @default(false) @map("is_aee")
+  isPlatformAdmin       Boolean               @default(false) @map("is_platform_admin")
   aeeAcknowledgements   AEEAcknowledgement[]
   assignedTickets       Message[]             @relation("AssignedTickets")
   auditLogs             AuditLog[]
@@ -231,24 +239,24 @@ model Questao {
 }
 
 model Prova {
-  id                 String    @id @default(cuid())
-  codigo             Int       @default(autoincrement())
-  titulo             String
-  turmaId            String?   @map("turma_id")
-  professorCriadorId String?   @map("professor_criador_id")
-  savedByUserId      String?   @map("saved_by_user_id")
-  createdAt          DateTime  @default(now()) @map("created_at")
-  observacao         String?
-  questoesSnapshot   Json?     @map("questoes_snapshot")
-  unidade            Int?
-  tipo               String?   @default("BIMESTRAL")
-  areaId             String?   @map("area_id")
-  professorCriador   User?     @relation("ProfessorProvas", fields: [professorCriadorId], references: [id])
-  savedByUser        User?     @relation("ProvasSalvas", fields: [savedByUserId], references: [id])
-  turma              Turma?    @relation(fields: [turmaId], references: [id])
-  area               AreaConhecimento? @relation(fields: [areaId], references: [id])
-  questoes           Questao[] @relation("ProvaQuestoes")
-  notasSimulado      NotaSimulado[]
+  id                   String                @id @default(cuid())
+  codigo               Int                   @default(autoincrement())
+  titulo               String
+  turmaId              String?               @map("turma_id")
+  professorCriadorId   String?               @map("professor_criador_id")
+  savedByUserId        String?               @map("saved_by_user_id")
+  createdAt            DateTime              @default(now()) @map("created_at")
+  observacao           String?
+  questoesSnapshot     Json?                 @map("questoes_snapshot")
+  unidade              Int?
+  tipo                 String?               @default("BIMESTRAL")
+  areaId               String?               @map("area_id")
+  professorCriador     User?                 @relation("ProfessorProvas", fields: [professorCriadorId], references: [id])
+  savedByUser          User?                 @relation("ProvasSalvas", fields: [savedByUserId], references: [id])
+  turma                Turma?                @relation(fields: [turmaId], references: [id])
+  area                 AreaConhecimento?     @relation(fields: [areaId], references: [id])
+  questoes             Questao[]             @relation("ProvaQuestoes")
+  notasSimulado        NotaSimulado[]
   responsaveisSimulado ResponsavelSimulado[]
 
   @@map("provas")
@@ -279,6 +287,7 @@ model Turma {
   planosEnsino         PlanoEnsino[]         @relation("PlanoTurmas")
   questoes             Questao[]             @relation("QuestaoTurmas")
   usuariosPermitidos   User[]                @relation("TurmaUsuarios")
+
   @@index([anoLetivo])
   @@index([escolaId])
   @@map("turmas")
@@ -331,25 +340,25 @@ model Curso {
 }
 
 model Estudante {
-  id             String         @id @default(cuid())
-  matricula      String
-  nome           String
-  turmaId        String         @map("turma_id")
-  escolaId       String         @map("escola_id")
-  status         String?        @default("ATIVO")
-  turmaAnteriorId String?       @map("turma_anterior_id")
-  createdAt      DateTime       @default(now()) @map("created_at")
-  updatedAt      DateTime       @updatedAt @map("updated_at")
-  dataNascimento DateTime?      @map("data_nascimento")
-  sexo           String?        @map("sexo")
-  aeeProfile     AEEProfile?    @relation("EstudanteAEE")
-  escola         Escola         @relation(fields: [escolaId], references: [id])
-  turma          Turma          @relation(fields: [turmaId], references: [id], onDelete: Cascade)
-  turmaAnterior  Turma?         @relation("TurmaAnteriorEstudante", fields: [turmaAnteriorId], references: [id])
-  notas          NotaFinal[]
-  notasSimulado  NotaSimulado[]
-  portalAccess   User[]         @relation("UserEstudante")
-  ocorrencias    OcorrenciaEstudante[]
+  id              String                @id @default(cuid())
+  matricula       String
+  nome            String
+  turmaId         String                @map("turma_id")
+  escolaId        String                @map("escola_id")
+  status          String?               @default("ATIVO")
+  turmaAnteriorId String?               @map("turma_anterior_id")
+  createdAt       DateTime              @default(now()) @map("created_at")
+  updatedAt       DateTime              @updatedAt @map("updated_at")
+  dataNascimento  DateTime?             @map("data_nascimento")
+  sexo            String?               @map("sexo")
+  aeeProfile      AEEProfile?           @relation("EstudanteAEE")
+  escola          Escola                @relation(fields: [escolaId], references: [id])
+  turma           Turma                 @relation(fields: [turmaId], references: [id], onDelete: Cascade)
+  turmaAnterior   Turma?                @relation("TurmaAnteriorEstudante", fields: [turmaAnteriorId], references: [id])
+  notas           NotaFinal[]
+  notasSimulado   NotaSimulado[]
+  portalAccess    User[]                @relation("UserEstudante")
+  ocorrencias     OcorrenciaEstudante[]
 
   @@unique([escolaId, matricula])
   @@index([nome])
@@ -359,17 +368,17 @@ model Estudante {
 }
 
 model Ocorrencia {
-  id              String      @id @default(cuid())
+  id              String                @id @default(cuid())
   titulo          String
   descricao       String
   tipo            String
-  data            DateTime    @default(now())
-  registradoPorId String      @map("registrado_por_id")
-  escolaId        String      @map("escola_id")
-  createdAt       DateTime    @default(now()) @map("created_at")
-  updatedAt       DateTime    @updatedAt @map("updated_at")
-  autor           User        @relation("OcorrenciaAutor", fields: [registradoPorId], references: [id])
-  escola          Escola      @relation(fields: [escolaId], references: [id])
+  data            DateTime              @default(now())
+  registradoPorId String                @map("registrado_por_id")
+  escolaId        String                @map("escola_id")
+  createdAt       DateTime              @default(now()) @map("created_at")
+  updatedAt       DateTime              @updatedAt @map("updated_at")
+  autor           User                  @relation("OcorrenciaAutor", fields: [registradoPorId], references: [id])
+  escola          Escola                @relation(fields: [escolaId], references: [id])
   estudantes      OcorrenciaEstudante[]
 
   @@index([data])
@@ -400,6 +409,7 @@ model Disciplina {
   notas              NotaFinal[]
   usuariosPermitidos User[]            @relation("DisciplinaUsuarios")
   questoes           Questao[]         @relation("QuestaoDisciplinas")
+
   @@index([turmaId])
   @@map("disciplinas")
 }
@@ -497,9 +507,9 @@ model EsquemaUnidade {
 }
 
 model EsquemaAtividade {
-  id               String         @id @default(cuid())
-  esquemaUnidadeId String         @map("esquema_unidade_id")
-  esquemaUnidade   EsquemaUnidade @relation(fields: [esquemaUnidadeId], references: [id], onDelete: Cascade)
+  id               String          @id @default(cuid())
+  esquemaUnidadeId String          @map("esquema_unidade_id")
+  esquemaUnidade   EsquemaUnidade  @relation(fields: [esquemaUnidadeId], references: [id], onDelete: Cascade)
   nome             String
   peso             Float
   ordem            Int
@@ -591,22 +601,22 @@ model AreaConhecimento {
 }
 
 model NotaSimulado {
-  id                 String           @id @default(cuid())
-  estudanteId        String           @map("estudante_id")
-  areaId             String?          @map("area_id")
-  provaId            String?          @map("prova_id")
+  id                 String            @id @default(cuid())
+  estudanteId        String            @map("estudante_id")
+  areaId             String?           @map("area_id")
+  provaId            String?           @map("prova_id")
   unidade            Int
   nota               Float?
-  ausente            Boolean          @default(false)
-  notaSegundaChamada Float?           @map("nota_segunda_chamada")
-  anoLetivo          Int              @default(2026) @map("ano_letivo")
-  lancadoById        String           @map("lancado_by_id")
-  createdAt          DateTime         @default(now()) @map("created_at")
-  updatedAt          DateTime         @updatedAt @map("updated_at")
+  ausente            Boolean           @default(false)
+  notaSegundaChamada Float?            @map("nota_segunda_chamada")
+  anoLetivo          Int               @default(2026) @map("ano_letivo")
+  lancadoById        String            @map("lancado_by_id")
+  createdAt          DateTime          @default(now()) @map("created_at")
+  updatedAt          DateTime          @updatedAt @map("updated_at")
   area               AreaConhecimento? @relation(fields: [areaId], references: [id])
   prova              Prova?            @relation(fields: [provaId], references: [id])
-  estudante          Estudante        @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
-  lancadoBy          User             @relation("SimuladoLancador", fields: [lancadoById], references: [id])
+  estudante          Estudante         @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  lancadoBy          User              @relation("SimuladoLancador", fields: [lancadoById], references: [id])
 
   // Removida a constraint de UNIQUE anterior que dependia de areaId, 
   // agora a aplicação precisará gerenciar a unicidade via Prova ou Área
@@ -628,18 +638,18 @@ model MatrizCurricular {
 }
 
 model ResponsavelSimulado {
-  id        String           @id @default(cuid())
-  userId    String           @map("user_id")
-  turmaId   String           @map("turma_id")
-  areaId    String?          @map("area_id")
-  provaId   String?          @map("prova_id")
+  id        String            @id @default(cuid())
+  userId    String            @map("user_id")
+  turmaId   String            @map("turma_id")
+  areaId    String?           @map("area_id")
+  provaId   String?           @map("prova_id")
   unidade   Int?
-  anoLetivo Int              @default(2026) @map("ano_letivo")
-  createdAt DateTime         @default(now()) @map("created_at")
+  anoLetivo Int               @default(2026) @map("ano_letivo")
+  createdAt DateTime          @default(now()) @map("created_at")
   area      AreaConhecimento? @relation(fields: [areaId], references: [id], onDelete: Cascade)
   prova     Prova?            @relation(fields: [provaId], references: [id], onDelete: Cascade)
-  turma     Turma            @relation(fields: [turmaId], references: [id], onDelete: Cascade)
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  turma     Turma             @relation(fields: [turmaId], references: [id], onDelete: Cascade)
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("responsaveis_simulados")
 }

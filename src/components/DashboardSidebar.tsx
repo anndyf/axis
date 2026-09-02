@@ -44,9 +44,10 @@ interface User {
   isDirecao: boolean
   isStaff: boolean
   isAEE?: boolean
+  isPlatformAdmin?: boolean
 }
 
-const GRUPOS_ORDENADOS = ["Início", "Gestão Acadêmica", "Diário e Avaliações", "Ferramentas", "Configurações"]
+const GRUPOS_ORDENADOS = ["Início", "Gestão Acadêmica", "Diário e Avaliações", "Ferramentas", "Configurações", "Plataforma"]
 
 export default function DashboardSidebar({
   user,
