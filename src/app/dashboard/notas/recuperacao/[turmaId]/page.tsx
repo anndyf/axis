@@ -28,9 +28,11 @@ async function getNotasRecuperacao(turmaId: string, session: Session) {
 
   const disciplinasIds = new Set(disciplinas.map((d: any) => d.id))
 
-  // 2. Buscar dados da turma e notas
+  // 2. Buscar dados da turma e notas (superset amplo, refinado abaixo em JS
+  // com `unidades` - não usa mais "nota1/nota2/nota3 not null", que
+  // hardcodeava 3 unidades e dava falso-negativo em turmas semestrais)
   const turma = await prisma.turma.findUnique({
-    where: { id: turmaId },
+    where: { id: turmaId, escolaId: session.user.escolaId },
     include: {
       estudantes: {
         orderBy: { nome: 'asc' },
@@ -38,20 +40,14 @@ async function getNotasRecuperacao(turmaId: string, session: Session) {
           notas: {
             where: {
               OR: [
-                {
-                  AND: [
-                    { nota: { lt: 5 } },
-                    { nota1: { not: null } },
-                    { nota2: { not: null } },
-                    { nota3: { not: null } }
-                  ]
-                },
+                { nota: { lt: 5 } },
                 { status: 'DESISTENTE' },
                 { status: 'RECUPERACAO' }
               ]
             },
             include: {
-              disciplina: true
+              disciplina: true,
+              unidades: { select: { notaCalculada: true } }
             }
           }
         }
@@ -61,10 +57,16 @@ async function getNotasRecuperacao(turmaId: string, session: Session) {
 
   if (!turma) return null
 
-  // 3. Flatten notas, filtrando apenas disciplinas permitidas
+  // 3. Flatten notas, filtrando apenas disciplinas permitidas e completas
+  // (mesmo raciocínio do superset acima: nota < 5 sozinho pode só
+  // significar "ainda não terminou de lançar").
   const notasRecuperacao = turma.estudantes.flatMap((estudante: any) =>
     estudante.notas
-      .filter((nota: any) => disciplinasIds.has(nota.disciplinaId))
+      .filter((nota: any) =>
+        disciplinasIds.has(nota.disciplinaId) &&
+        (nota.status === 'RECUPERACAO' || nota.status === 'DESISTENTE' ||
+          (nota.unidades.length > 0 && nota.unidades.every((u: any) => u.notaCalculada !== null)))
+      )
       .map((nota: any) => ({
         id: nota.id,
         nota: nota.nota,
@@ -90,8 +92,8 @@ export default async function RecuperacaoTurmaPage({
   params: Promise<{ turmaId: string }>
 }) {
   const session = await auth()
-  
-  if (!session) {
+
+  if (!session?.user?.escolaId) {
     redirect("/login")
   }
 

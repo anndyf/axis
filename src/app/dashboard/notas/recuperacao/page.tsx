@@ -18,6 +18,10 @@ async function getTurmasComRecuperacao(session: Session) {
   const turmasPermitidas = await getTurmasPermitidas(session)
   const turmasIds = turmasPermitidas.map(t => t.id)
 
+  // Busca um superset amplo (nota < 5 ou status já sinalizando recuperação),
+  // refinado em JS logo abaixo com `unidades` (NotaUnidade) - não usa mais
+  // "nota1/nota2/nota3 not null" pra decidir "completo", já que isso
+  // hardcodeava 3 unidades e dava falso-negativo em turmas semestrais.
   const turmas = await prisma.turma.findMany({
     where: {
       id: { in: turmasIds }
@@ -28,20 +32,14 @@ async function getTurmasComRecuperacao(session: Session) {
           notas: {
             where: {
               OR: [
-                {
-                  AND: [
-                    { nota: { lt: 5 } },
-                    { nota1: { not: null } },
-                    { nota2: { not: null } },
-                    { nota3: { not: null } }
-                  ]
-                },
+                { nota: { lt: 5 } },
                 { status: 'DESISTENTE' },
                 { status: 'RECUPERACAO' }
               ]
             },
             include: {
-              disciplina: true
+              disciplina: true,
+              unidades: { select: { notaCalculada: true } }
             }
           }
         }
@@ -58,8 +56,24 @@ async function getTurmasComRecuperacao(session: Session) {
     }
   })
 
+  // Refina em JS: só considera "em recuperação" quem já tem todas as
+  // unidades do esquema preenchidas (senão nota < 5 pode só significar
+  // "ainda não terminou de lançar", não reprovação de verdade) - status
+  // RECUPERACAO/DESISTENTE já são sinal suficiente por si só.
+  const turmasFiltradas = turmas.map((turma) => ({
+    ...turma,
+    estudantes: turma.estudantes.map((est) => ({
+      ...est,
+      notas: est.notas.filter((n) =>
+        n.status === 'RECUPERACAO' ||
+        n.status === 'DESISTENTE' ||
+        (n.unidades.length > 0 && n.unidades.every((u) => u.notaCalculada !== null))
+      )
+    }))
+  }))
+
   // Filtrar apenas turmas com estudantes em recuperação
-  return turmas.filter(turma => 
+  return turmasFiltradas.filter(turma =>
     turma.estudantes.some(est => est.notas.length > 0)
   ).map(turma => ({
     ...turma,

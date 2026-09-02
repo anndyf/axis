@@ -9,15 +9,16 @@ export const metadata = {
 
 export const runtime = 'nodejs'
 
-async function getNotasConselho(turmaId: string) {
+async function getNotasConselho(turmaId: string, escolaId: string) {
   const turma = await prisma.turma.findUnique({
-    where: { id: turmaId },
+    where: { id: turmaId, escolaId },
     include: {
       estudantes: {
         include: {
           notas: {
             include: {
-              disciplina: true
+              disciplina: true,
+              unidades: { select: { notaCalculada: true, isDesistente: true } }
             }
           }
         }
@@ -27,34 +28,28 @@ async function getNotasConselho(turmaId: string) {
 
   if (!turma) return null
 
-  const isSemestral = turma.modalidade === 'PROEJA' || turma.modalidade === 'SUBSEQUENTE'
-
-  // Filtrar notas que precisam de conselho
+  // Filtrar notas que precisam de conselho. Não usa mais
+  // Turma.modalidade (sempre NULL nos dados reais, regra nunca funcionou
+  // de fato) nem "3 vs 2 notas" hardcoded - `unidades` (NotaUnidade,
+  // populado desde a Fase 3 do backfill) já reflete o número certo de
+  // unidades do esquema da turma, seja lá qual for.
   const notasFiltradas = turma.estudantes.flatMap((estudante: any) =>
     estudante.notas.filter((nota: any) => {
       // 1. Status que explicitamente pedem conselho
       const statusConselho = [
-        'RECUPERACAO', 
-        'DESISTENTE', 
-        'APROVADO_CONSELHO', 
-        'DEPENDENCIA', 
-        'CONSERVADO', 
+        'RECUPERACAO',
+        'DESISTENTE',
+        'APROVADO_CONSELHO',
+        'DEPENDENCIA',
+        'CONSERVADO',
         'APROVADO_RECUPERACAO'
       ]
       if (statusConselho.includes(nota.status)) return true
 
-      // 2. Turmas anuais: precisa de 3 notas (ou flag desistente) e ainda não aprovado
-      if (!isSemestral) {
-        const hasN1 = nota.nota1 !== null || nota.isDesistenteUnid1
-        const hasN2 = nota.nota2 !== null || nota.isDesistenteUnid2
-        const hasN3 = nota.nota3 !== null || nota.isDesistenteUnid3
-        return hasN1 && hasN2 && hasN3 && nota.status !== 'APROVADO'
-      }
-
-      // 3. Turmas semestrais: precisa de 2 notas (ou flag desistente) e ainda não aprovado
-      const hasU1 = nota.nota1 !== null || nota.isDesistenteUnid1
-      const hasU2 = nota.nota2 !== null || nota.isDesistenteUnid2
-      return hasU1 && hasU2 && nota.status !== 'APROVADO'
+      // 2. Todas as unidades do esquema preenchidas (ou marcadas desistente) e ainda não aprovado
+      const completa = nota.unidades.length > 0 &&
+        nota.unidades.every((u: any) => u.notaCalculada !== null || u.isDesistente)
+      return completa && nota.status !== 'APROVADO'
     }).map((nota: any) => ({
       id: nota.id,
       nota: nota.nota,
@@ -85,13 +80,13 @@ export default async function ConselhoClasseTurmaPage({
   params: Promise<{ turmaId: string }>
 }) {
   const session = await auth()
-  
-  if (!session) {
+
+  if (!session?.user?.escolaId) {
     redirect("/login")
   }
 
   const { turmaId } = await params
-  const data = await getNotasConselho(turmaId)
+  const data = await getNotasConselho(turmaId, session.user.escolaId)
 
   if (!data) {
     redirect("/dashboard/conselho-classe")

@@ -17,6 +17,11 @@ async function getTurmasComConselho(session: any) {
   const turmasPermitidas = await getTurmasPermitidas(session)
   const turmasIds = turmasPermitidas.map(t => t.id)
 
+  // Busca notas ainda não aprovadas (superset amplo, refinado abaixo em JS) -
+  // não usa mais "nota1/nota2/nota3 not null" pra decidir "completo", já que
+  // isso hardcodeava 3 unidades e dava falso-negativo em turmas semestrais
+  // (2 unidades). `unidades` (NotaUnidade, populado desde a Fase 3 do
+  // backfill) já reflete o número certo de unidades daquele esquema.
   const turmas = await prisma.turma.findMany({
     where: {
       id: { in: turmasIds }
@@ -25,22 +30,11 @@ async function getTurmasComConselho(session: any) {
       estudantes: {
         include: {
           notas: {
-            where: {
-              OR: [
-                { status: 'RECUPERACAO' },
-                { status: 'DESISTENTE' },
-                { status: { in: ['APROVADO_CONSELHO', 'DEPENDENCIA', 'CONSERVADO', 'APROVADO_RECUPERACAO'] } },
-                { 
-                  AND: [
-                    { nota1: { not: null } },
-                    { nota2: { not: null } },
-                    { nota3: { not: null } },
-                    { status: { not: 'APROVADO' } }
-                  ]
-                }
-
-
-              ]
+            where: { status: { not: 'APROVADO' } },
+            select: {
+              id: true,
+              status: true,
+              unidades: { select: { notaCalculada: true } }
             }
           }
         }
@@ -51,14 +45,17 @@ async function getTurmasComConselho(session: any) {
     }
   })
 
-  const turmasProcessadas = turmas.filter(turma => 
+  const STATUS_RESOLVIDOS = ['APROVADO', 'APROVADO_CONSELHO', 'DEPENDENCIA', 'CONSERVADO', 'APROVADO_RECUPERACAO']
+  const notaEstaCompleta = (n: { unidades: { notaCalculada: number | null }[] }) =>
+    n.unidades.length > 0 && n.unidades.every((u) => u.notaCalculada !== null)
+
+  const turmasProcessadas = turmas.filter(turma =>
     turma.estudantes.some(est => est.notas.length > 0)
   ).map(turma => {
     const estudantesComNota = turma.estudantes.filter(e => e.notas.length > 0)
-    const pendentes = estudantesComNota.filter(e => e.notas.some(n => 
-        n.status === 'RECUPERACAO' || 
-        (n.nota1 !== null && n.nota2 !== null && n.nota3 !== null && 
-         !['APROVADO', 'APROVADO_CONSELHO', 'DEPENDENCIA', 'CONSERVADO', 'APROVADO_RECUPERACAO'].includes(n.status))
+    const pendentes = estudantesComNota.filter(e => e.notas.some(n =>
+        n.status === 'RECUPERACAO' ||
+        (notaEstaCompleta(n) && !STATUS_RESOLVIDOS.includes(n.status))
     )).length
 
     
