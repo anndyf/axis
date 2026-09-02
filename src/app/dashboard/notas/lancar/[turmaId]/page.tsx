@@ -79,7 +79,6 @@ export default async function LancarNotasTurmaPage({
     <LancarNotasClient
       turmaId={turma.id}
       turmaNome={turma.nome}
-      modalidade={turma.modalidade}
       disciplinas={turma.disciplinas}
       estudantes={turma.estudantes}
     />

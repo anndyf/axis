@@ -1,18 +1,17 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Fragment } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { 
-  ArrowLeft, 
-  Save, 
-  AlertCircle, 
-  Info, 
-  UserMinus, 
-  X, 
-  CheckCircle2, 
-  GraduationCap, 
-  Users, 
+import {
+  ArrowLeft,
+  Save,
+  AlertCircle,
+  UserMinus,
+  X,
+  CheckCircle2,
+  GraduationCap,
+  Users,
   FileText,
   BarChart2,
   TrendingUp,
@@ -21,6 +20,7 @@ import {
   Accessibility,
   Printer
 } from "lucide-react"
+import { calcularNotaUnidade, calcularMediaFinal, type EsquemaConfig, type UnidadeInput } from "@/lib/services/notas"
 
 interface Estudante {
   matricula: string
@@ -36,34 +36,63 @@ interface Disciplina {
   nome: string
 }
 
-interface NotaState {
-  nota1: string
-  nota2: string
-  nota3: string
+interface EsquemaAtividade {
+  id: string
+  ordem: number
+  nome: string
+  peso: number
+}
+
+interface EsquemaUnidade {
+  id: string
+  ordem: number
+  nome: string
+  atividades: EsquemaAtividade[]
+}
+
+interface EsquemaInfo {
+  id: string
+  notaMinimaAprovacao: number
+  recuperacaoUnidadeAtiva: boolean
+  modoRecuperacaoUnidade: string | null
+  recuperacaoFinalAtiva: boolean
+  modoRecuperacaoFinal: string | null
+  unidades: EsquemaUnidade[]
+}
+
+interface UnidadeNotaState {
   isDesistente: boolean
-  isDesistenteUnid1: boolean
-  isDesistenteUnid2: boolean
-  isDesistenteUnid3: boolean
+  atividades: Record<string, string>
+}
+
+type NotaState = Record<string, UnidadeNotaState> // chave: esquemaUnidadeId
+
+function estadoVazio(esquema: EsquemaInfo | null): NotaState {
+  if (!esquema) return {}
+  const estado: NotaState = {}
+  for (const u of esquema.unidades) {
+    const atividades: Record<string, string> = {}
+    for (const a of u.atividades) atividades[a.id] = ''
+    estado[u.id] = { isDesistente: false, atividades }
+  }
+  return estado
 }
 
 export default function LancarNotasTurmaClient({
   turmaId,
   turmaNome,
-  modalidade,
   disciplinas,
   estudantes
 }: {
   turmaId: string
   turmaNome: string
-  modalidade?: string | null
   disciplinas: Disciplina[]
   estudantes: Estudante[]
 }) {
-  const isSemestral = modalidade === 'PROEJA' || modalidade === 'SUBSEQUENTE'
-  const UNIDADES = isSemestral ? ['1', '2'] : ['1', '2', '3']
-
   const router = useRouter()
   const [disciplinaSelecionada, setDisciplinaSelecionada] = useState("")
+  const [esquema, setEsquema] = useState<EsquemaInfo | null>(null)
+  const [statusMap, setStatusMap] = useState<Record<string, string>>({})
   const [notas, setNotas] = useState<Record<string, NotaState>>({})
   const [originalNotas, setOriginalNotas] = useState<Record<string, NotaState>>({})
   const [loading, setLoading] = useState(false)
@@ -72,6 +101,20 @@ export default function LancarNotasTurmaClient({
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const [feedbackModal, setFeedbackModal] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
+
+  const esquemaConfig: EsquemaConfig | null = esquema ? {
+    numUnidades: esquema.unidades.length,
+    notaMinimaAprovacao: esquema.notaMinimaAprovacao,
+    recuperacaoUnidadeAtiva: esquema.recuperacaoUnidadeAtiva,
+    modoRecuperacaoUnidade: esquema.modoRecuperacaoUnidade as any,
+    recuperacaoFinalAtiva: esquema.recuperacaoFinalAtiva,
+    modoRecuperacaoFinal: esquema.modoRecuperacaoFinal as any,
+  } : null
+
+  // Esquema legado (1 atividade por unidade) renderiza como uma tabela
+  // simples - 1 input por unidade, sem sub-colunas de atividade nem coluna
+  // de subtotal separada (o subtotal É o próprio valor da única atividade).
+  const isSimples = esquema ? esquema.unidades.every(u => u.atividades.length === 1) : true
 
   const hasUnsavedChanges = () => {
     return JSON.stringify(notas) !== JSON.stringify(originalNotas)
@@ -85,48 +128,76 @@ export default function LancarNotasTurmaClient({
     return () => window.removeEventListener("beforeunload", handleBeforeUnload)
   }, [notas, originalNotas])
 
-  const handleNotaChange = (estudanteId: string, campo: 'nota1' | 'nota2' | 'nota3', valor: string) => {
+  const handleAtividadeChange = (estudanteId: string, unidadeId: string, atividadeId: string, valor: string, max: number = 10) => {
     if (valor !== '') {
       if (valor.includes('.')) { const parts = valor.split('.'); if (parts[1].length > 1) return; }
-      const num = parseFloat(valor); if (num > 10 || num < 0) return;
+      const num = parseFloat(valor); if (num > max || num < 0) return;
     }
-    setNotas(prev => ({
-      ...prev,
-      [estudanteId]: {
-        ...(prev[estudanteId] || { nota1: '', nota2: '', nota3: '', isDesistente: false, isDesistenteUnid1: false, isDesistenteUnid2: false, isDesistenteUnid3: false }),
-        [campo]: valor
+    setNotas(prev => {
+      const base = prev[estudanteId] || estadoVazio(esquema)
+      const unidadeBase = base[unidadeId] || { isDesistente: false, atividades: {} }
+      return {
+        ...prev,
+        [estudanteId]: {
+          ...base,
+          [unidadeId]: {
+            ...unidadeBase,
+            atividades: { ...unidadeBase.atividades, [atividadeId]: valor }
+          }
+        }
       }
-    }))
+    })
   }
 
-  const handleDesistenteChange = (estudanteId: string, field: 'isDesistente' | 'isDesistenteUnid1' | 'isDesistenteUnid2' | 'isDesistenteUnid3', checked: boolean) => {
-    setNotas(prev => ({
-      ...prev,
-      [estudanteId]: {
-        ...(prev[estudanteId] || { nota1: '', nota2: '', nota3: '', isDesistente: false, isDesistenteUnid1: false, isDesistenteUnid2: false, isDesistenteUnid3: false }),
-        [field]: checked
+  const handleDesistenteChange = (estudanteId: string, unidadeId: string, checked: boolean) => {
+    setNotas(prev => {
+      const base = prev[estudanteId] || estadoVazio(esquema)
+      const unidadeBase = base[unidadeId] || { isDesistente: false, atividades: {} }
+      return {
+        ...prev,
+        [estudanteId]: {
+          ...base,
+          [unidadeId]: { ...unidadeBase, isDesistente: checked }
+        }
       }
+    })
+  }
+
+  const calcularSubtotalUnidade = (estudanteId: string, unidade: EsquemaUnidade): number | null => {
+    const estado = notas[estudanteId]?.[unidade.id]
+    if (!estado) return null
+    return calcularNotaUnidade(unidade.atividades.map(a => ({
+      peso: a.peso,
+      valor: estado.atividades[a.id] !== '' ? parseFloat(estado.atividades[a.id]) : null
+    })))
+  }
+
+  const calcularMedia = (estudanteId: string): { texto: string, valor: number | null } => {
+    if (!esquema || !esquemaConfig) return { texto: '-', valor: null }
+    const estado = notas[estudanteId]
+    if (!estado) return { texto: '-', valor: null }
+
+    const todasDesistentes = esquema.unidades.every(u => estado[u.id]?.isDesistente)
+    if (todasDesistentes) return { texto: 'DE', valor: null }
+
+    const unidadesInput: UnidadeInput[] = esquema.unidades.map(u => ({
+      esquemaUnidadeId: u.id,
+      atividades: u.atividades.map(a => ({
+        peso: a.peso,
+        valor: estado[u.id]?.atividades[a.id] !== '' && estado[u.id]?.atividades[a.id] !== undefined
+          ? parseFloat(estado[u.id].atividades[a.id])
+          : null
+      }))
     }))
+    const resultado = calcularMediaFinal(unidadesInput, esquemaConfig)
+    if (resultado.media === null) return { texto: '-', valor: null }
+    return { texto: resultado.media.toFixed(1), valor: resultado.media }
   }
 
-  const calcularMedia = (estudanteId: string) => {
-    const nota = notas[estudanteId]; if (!nota) return '-'; 
-    const isDE = isSemestral 
-      ? (nota.isDesistenteUnid1 && nota.isDesistenteUnid2)
-      : (nota.isDesistenteUnid1 && nota.isDesistenteUnid2 && nota.isDesistenteUnid3)
-    
-    if (isDE) return 'DE';
-    
-    const n1 = parseFloat(nota.nota1 || '0')
-    const n2 = parseFloat(nota.nota2 || '0')
-    const n3 = isSemestral ? 0 : parseFloat(nota.nota3 || '0')
-    
-    return isSemestral ? ((n1 + n2) / 2).toFixed(1) : ((n1 + n2 + n3) / 3).toFixed(1)
-  }
-
-  const getStatusColor = (media: string) => {
-    if (media === 'DE') return 'text-slate-400'; if (media === '-') return 'text-slate-300';
-    return parseFloat(media) >= 5 ? 'text-emerald-600' : 'text-rose-600'
+  const getStatusColor = (media: { texto: string, valor: number | null }) => {
+    if (media.texto === 'DE') return 'text-slate-400'
+    if (media.texto === '-') return 'text-slate-300'
+    return (media.valor ?? 0) >= (esquema?.notaMinimaAprovacao ?? 5) ? 'text-emerald-600' : 'text-rose-600'
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -138,28 +209,36 @@ export default function LancarNotasTurmaClient({
     setSaving(true); setMessage(null); setShowModal(false);
     try {
       const changedEntries = Object.entries(notas).filter(([id, d]) => JSON.stringify(d) !== JSON.stringify(originalNotas[id] || {}));
-      const notasArray = changedEntries.map(([estudanteId, data]) => ({ estudanteId, disciplinaId: disciplinaSelecionada, ...data }));
+      const notasArray = changedEntries.map(([estudanteId, data]) => ({
+        estudanteId,
+        disciplinaId: disciplinaSelecionada,
+        unidades: Object.entries(data).map(([esquemaUnidadeId, u]) => ({
+          esquemaUnidadeId,
+          isDesistente: u.isDesistente,
+          atividades: Object.entries(u.atividades).map(([esquemaAtividadeId, valor]) => ({ esquemaAtividadeId, valor: valor === '' ? null : valor }))
+        }))
+      }));
       const response = await fetch('/api/notas/lancar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ notas: notasArray }) });
-      if (response.ok) { 
-        setOriginalNotas(JSON.parse(JSON.stringify(notas))); 
-        setFeedbackModal({ 
-          type: 'success', 
-          text: `As notas de ${selectedDiscName || 'disciplina'} da turma ${turmaNome} foram salvas com sucesso no banco de dados!` 
-        }); 
-        router.refresh(); 
+      if (response.ok) {
+        setOriginalNotas(JSON.parse(JSON.stringify(notas)));
+        setFeedbackModal({
+          type: 'success',
+          text: `As notas de ${selectedDiscName || 'disciplina'} da turma ${turmaNome} foram salvas com sucesso no banco de dados!`
+        });
+        router.refresh();
       }
-      else { 
-        const error = await response.json(); 
-        setFeedbackModal({ 
-          type: 'error', 
-          text: error.message || 'Ocorreu um erro ao tentar salvar as notas. Verifique as informações.' 
-        }); 
+      else {
+        const error = await response.json();
+        setFeedbackModal({
+          type: 'error',
+          text: error.message || 'Ocorreu um erro ao tentar salvar as notas. Verifique as informações.'
+        });
       }
-    } catch (error) { 
-      setFeedbackModal({ 
-        type: 'error', 
-        text: 'Erro de conexão com o servidor. Verifique sua conexão com a internet.' 
-      }); 
+    } catch (error) {
+      setFeedbackModal({
+        type: 'error',
+        text: 'Erro de conexão com o servidor. Verifique sua conexão com a internet.'
+      });
     } finally { setSaving(false) }
   }
 
@@ -168,9 +247,25 @@ export default function LancarNotasTurmaClient({
       setLoading(true)
       fetch(`/api/notas/turma/${turmaId}/disciplina/${disciplinaSelecionada}`)
         .then(res => res.json())
-        .then(data => {
+        .then((data: { esquema: EsquemaInfo, notas: any[] }) => {
+          setEsquema(data.esquema)
           const dict: Record<string, NotaState> = {}
-          if (Array.isArray(data)) data.forEach((n: any) => { dict[n.estudanteId] = { nota1: n.nota1?.toString() || '', nota2: n.nota2?.toString() || '', nota3: n.nota3?.toString() || '', isDesistente: n.status === 'DESISTENTE', isDesistenteUnid1: !!n.isDesistenteUnid1, isDesistenteUnid2: !!n.isDesistenteUnid2, isDesistenteUnid3: !!n.isDesistenteUnid3 } })
+          const status: Record<string, string> = {}
+          if (Array.isArray(data.notas)) {
+            data.notas.forEach((n) => {
+              status[n.estudanteId] = n.status
+              const estadoUnidades: NotaState = estadoVazio(data.esquema)
+              for (const u of n.unidades) {
+                if (!estadoUnidades[u.esquemaUnidadeId]) continue
+                estadoUnidades[u.esquemaUnidadeId].isDesistente = !!u.isDesistente
+                for (const a of u.atividades) {
+                  estadoUnidades[u.esquemaUnidadeId].atividades[a.esquemaAtividadeId] = a.valor !== null && a.valor !== undefined ? String(a.valor) : ''
+                }
+              }
+              dict[n.estudanteId] = estadoUnidades
+            })
+          }
+          setStatusMap(status)
           setNotas(dict); setOriginalNotas(JSON.parse(JSON.stringify(dict)))
         }).finally(() => setLoading(false))
     }
@@ -199,9 +294,13 @@ export default function LancarNotasTurmaClient({
     }
   ]
 
-  const filteredEstudantes = estudantes.filter(est => 
+  const filteredEstudantes = estudantes.filter(est =>
     est.nome.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  const totalColunas = esquema
+    ? 3 + esquema.unidades.reduce((acc, u) => acc + (isSimples ? 1 : u.atividades.length + 1), 0)
+    : 6
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -251,7 +350,7 @@ export default function LancarNotasTurmaClient({
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        
+
         {/* Dicas Estilo Simulados */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {launchTips.map((tip, index) => (
@@ -283,7 +382,7 @@ export default function LancarNotasTurmaClient({
                   </select>
                 </div>
             </div>
-            
+
             <div className="hidden lg:flex items-center gap-3 pb-1 border-l pl-5 border-slate-200 flex-1">
                <div className="bg-orange-50/50 p-2.5 rounded-xl text-orange-600 border border-orange-100/50"><UserMinus size={18}/></div>
                <p className="text-[11px] text-slate-600 leading-tight font-medium max-w-[450px]">
@@ -321,19 +420,48 @@ export default function LancarNotasTurmaClient({
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead className="bg-slate-50 border-b border-slate-300">
-                <tr>
-                  <th className="px-6 py-4 text-xs font-medium text-slate-400 uppercase tracking-widest w-12 text-center">#</th>
-                  <th className="px-6 py-4 text-xs font-medium text-slate-400 uppercase tracking-widest">Estudante</th>
-                  {UNIDADES.map(u => (
-                    <th key={u} className="px-4 py-4 text-xs font-medium text-slate-400 uppercase tracking-widest w-32 text-center">Unidade {u}</th>
-                  ))}
-                  <th className="px-6 py-4 text-xs font-medium text-slate-400 uppercase tracking-widest w-24 text-center">Média</th>
-                </tr>
+                {esquema && !isSimples ? (
+                  <>
+                    <tr>
+                      <th rowSpan={2} className="px-6 py-4 text-xs font-medium text-slate-400 uppercase tracking-widest w-12 text-center align-bottom">#</th>
+                      <th rowSpan={2} className="px-6 py-4 text-xs font-medium text-slate-400 uppercase tracking-widest align-bottom">Estudante</th>
+                      {esquema.unidades.map(u => (
+                        <th key={u.id} colSpan={u.atividades.length + 1} className="px-4 py-2 text-xs font-medium text-slate-500 uppercase tracking-widest text-center border-l border-slate-200">
+                          {u.nome}
+                        </th>
+                      ))}
+                      <th rowSpan={2} className="px-6 py-4 text-xs font-medium text-slate-400 uppercase tracking-widest w-24 text-center align-bottom">Média</th>
+                    </tr>
+                    <tr>
+                      {esquema.unidades.map(u => (
+                        <Fragment key={u.id}>
+                          {u.atividades.map(a => (
+                            <th key={a.id} className="px-2 py-2 text-[10px] font-medium text-slate-400 uppercase tracking-wide text-center border-l border-slate-100 w-20">
+                              {a.nome} <span className="text-slate-300">({a.peso})</span>
+                            </th>
+                          ))}
+                          <th key={`${u.id}-subtotal`} className="px-2 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wide text-center bg-slate-100/60 w-16">
+                            Subtotal
+                          </th>
+                        </Fragment>
+                      ))}
+                    </tr>
+                  </>
+                ) : (
+                  <tr>
+                    <th className="px-6 py-4 text-xs font-medium text-slate-400 uppercase tracking-widest w-12 text-center">#</th>
+                    <th className="px-6 py-4 text-xs font-medium text-slate-400 uppercase tracking-widest">Estudante</th>
+                    {(esquema?.unidades ?? []).map(u => (
+                      <th key={u.id} className="px-4 py-4 text-xs font-medium text-slate-400 uppercase tracking-widest w-32 text-center">{u.nome}</th>
+                    ))}
+                    <th className="px-6 py-4 text-xs font-medium text-slate-400 uppercase tracking-widest w-24 text-center">Média</th>
+                  </tr>
+                )}
               </thead>
               <tbody className="divide-y divide-slate-200/80">
                 {loading ? (
                    <tr>
-                     <td colSpan={6} className="px-6 py-16 text-center">
+                     <td colSpan={totalColunas} className="px-6 py-16 text-center">
                        <div className="flex flex-col items-center gap-2">
                          <Loader2 className="w-8 h-8 text-slate-700 animate-spin" />
                          <p className="text-slate-400 text-sm font-medium uppercase tracking-widest animate-pulse">Sincronizando...</p>
@@ -342,37 +470,37 @@ export default function LancarNotasTurmaClient({
                    </tr>
                 ) : !disciplinaSelecionada ? (
                    <tr>
-                      <td colSpan={6} className="px-6 py-16 text-center text-slate-300">
+                      <td colSpan={totalColunas} className="px-6 py-16 text-center text-slate-300">
                         <BarChart2 className="w-12 h-12 opacity-20 mx-auto mb-3" />
                         <p className="text-sm font-medium uppercase tracking-widest">Selecione uma disciplina para iniciar o lançamento</p>
                       </td>
                    </tr>
                 ) : filteredEstudantes.length === 0 ? (
                    <tr>
-                      <td colSpan={6} className="px-6 py-16 text-center text-slate-300">
+                      <td colSpan={totalColunas} className="px-6 py-16 text-center text-slate-300">
                         <Search className="w-12 h-12 opacity-20 mx-auto mb-3" />
                         <p className="text-sm font-medium uppercase tracking-widest">Nenhum estudante encontrado</p>
                       </td>
                    </tr>
                 ) : (
                   filteredEstudantes.map((estudante, index) => {
-                    const dados = notas[estudante.matricula] || { nota1: '', nota2: '', nota3: '', isDesistente: false, isDesistenteUnid1: false, isDesistenteUnid2: false, isDesistenteUnid3: false }
+                    const estado = notas[estudante.matricula] || estadoVazio(esquema)
                     const media = calcularMedia(estudante.matricula)
-                    const isDesistente = dados.isDesistente
+                    const isDesistenteGeral = statusMap[estudante.matricula] === 'DESISTENTE'
 
                     return (
-                      <tr key={estudante.matricula} className={`hover:bg-slate-50 transition-colors ${isDesistente ? 'bg-amber-50/20 grayscale-[0.5]' : ''}`}>
+                      <tr key={estudante.matricula} className={`hover:bg-slate-50 transition-colors ${isDesistenteGeral ? 'bg-amber-50/20 grayscale-[0.5]' : ''}`}>
                         <td className="px-6 py-4 text-sm text-slate-400 font-medium text-center">{index + 1}</td>
                         <td className="px-6 py-4">
                           <div className="flex flex-col relative group/name">
                              <div className="flex items-center gap-2">
-                                <span className={`text-base font-medium uppercase ${isDesistente ? 'text-amber-700' : 'text-slate-700'}`}>{estudante.nome}</span>
+                                <span className={`text-base font-medium uppercase ${isDesistenteGeral ? 'text-amber-700' : 'text-slate-700'}`}>{estudante.nome}</span>
                                 {estudante.aeeProfile && (
-                                   <Link 
+                                   <Link
                                      href={`/dashboard/aee/${estudante.matricula}`}
                                      className={`p-1.5 rounded-full border-2 transition-all flex items-center justify-center hover:scale-110 active:scale-95 ${
-                                       estudante.aeeProfile.acknowledgements.length > 0 
-                                       ? 'bg-emerald-50 border-emerald-500 text-emerald-600' 
+                                       estudante.aeeProfile.acknowledgements.length > 0
+                                       ? 'bg-emerald-50 border-emerald-500 text-emerald-600'
                                        : 'bg-amber-50 border-amber-500 text-amber-600 animate-pulse'
                                      }`}
                                      title={estudante.aeeProfile.acknowledgements.length > 0 ? "Ficha AEE: Lida" : "Ficha AEE: LEITURA PENDENTE!"}
@@ -384,42 +512,95 @@ export default function LancarNotasTurmaClient({
                             <span className="text-[11px] font-medium text-slate-400 tracking-widest uppercase">Matrícula: {estudante.matricula}</span>
                           </div>
                         </td>
-                        {UNIDADES.map((u) => {
-                          const isUnidDesistente = (dados as any)[`isDesistenteUnid${u}`]
-                          const val = (dados as any)[`nota${u}`]
-                          const isModified = val !== (originalNotas[estudante.matricula] as any)?.[`nota${u}`] && !saving
+                        {(esquema?.unidades ?? []).map((u) => {
+                          const unidadeEstado = estado[u.id] || { isDesistente: false, atividades: {} }
+
+                          if (isSimples) {
+                            const atividade = u.atividades[0]
+                            const val = atividade ? (unidadeEstado.atividades[atividade.id] ?? '') : ''
+                            const origVal = atividade ? (originalNotas[estudante.matricula]?.[u.id]?.atividades[atividade.id] ?? '') : ''
+                            const isModified = val !== origVal && !saving
+
+                            return (
+                              <td key={u.id} className="px-4 py-4 text-center">
+                                <div className="flex flex-col items-center gap-1.5 group relative">
+                                  <input
+                                    type="number" step="0.1"
+                                    value={val}
+                                    onChange={(e) => atividade && handleAtividadeChange(estudante.matricula, u.id, atividade.id, e.target.value, atividade.peso)}
+                                    className={`w-14 h-9 text-center border-2 rounded-xl text-base font-medium transition-all outline-none ${
+                                      unidadeEstado.isDesistente ? 'bg-orange-50 border-orange-200 text-orange-600' :
+                                      isModified ? 'border-slate-400 bg-white ring-4 ring-slate-500/5' : 'border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400'
+                                    }`}
+                                    placeholder="0.0"
+                                  />
+                                  <button
+                                      type="button"
+                                      onClick={() => handleDesistenteChange(estudante.matricula, u.id, !unidadeEstado.isDesistente)}
+                                      className={`absolute -right-3 -bottom-2 p-1.5 rounded-full transition-all shadow-sm flex items-center justify-center ${
+                                          unidadeEstado.isDesistente
+                                          ? 'bg-orange-100 text-orange-600 scale-100 z-10 ring-2 ring-white'
+                                          : 'bg-white text-slate-300 hover:text-orange-500 hover:bg-orange-50 scale-100 opacity-60 hover:opacity-100 group-hover:opacity-100 border border-slate-300 z-10'
+                                      }`}
+                                      title={unidadeEstado.isDesistente ? "Desmarcar infrequente" : "Marcar como Infrequente (não frequenta ou só veio fazer prova)"}
+                                  >
+                                      <UserMinus size={unidadeEstado.isDesistente ? 14 : 12}/>
+                                  </button>
+                                </div>
+                              </td>
+                            )
+                          }
+
+                          const subtotal = calcularSubtotalUnidade(estudante.matricula, u)
 
                           return (
-                            <td key={u} className="px-4 py-4 text-center">
-                              <div className="flex flex-col items-center gap-1.5 group relative">
-                                <input
-                                  type="number" step="0.1"
-                                  value={val}
-                                  onChange={(e) => handleNotaChange(estudante.matricula, `nota${u}` as any, e.target.value)}
-                                  className={`w-14 h-9 text-center border-2 rounded-xl text-base font-medium transition-all outline-none ${
-                                    isUnidDesistente ? 'bg-orange-50 border-orange-200 text-orange-600' : 
-                                    isModified ? 'border-slate-400 bg-white ring-4 ring-slate-500/5' : 'border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400'
-                                  }`}
-                                  placeholder="0.0"
-                                />
-                                <button 
-                                    type="button" 
-                                    onClick={() => handleDesistenteChange(estudante.matricula, `isDesistenteUnid${u}` as any, !isUnidDesistente)} 
-                                    className={`absolute -right-3 -bottom-2 p-1.5 rounded-full transition-all shadow-sm flex items-center justify-center ${
-                                        isUnidDesistente 
-                                        ? 'bg-orange-100 text-orange-600 scale-100 z-10 ring-2 ring-white' 
-                                        : 'bg-white text-slate-300 hover:text-orange-500 hover:bg-orange-50 scale-100 opacity-60 hover:opacity-100 group-hover:opacity-100 border border-slate-300 z-10'
-                                    }`} 
-                                    title={isUnidDesistente ? "Desmarcar infrequente" : "Marcar como Infrequente (não frequenta ou só veio fazer prova)"}
-                                >
-                                    <UserMinus size={isUnidDesistente ? 14 : 12}/>
-                                </button>
-                              </div>
-                            </td>
+                            <Fragment key={u.id}>
+                              {u.atividades.map((a, ai) => {
+                                const val = unidadeEstado.atividades[a.id] ?? ''
+                                const origVal = originalNotas[estudante.matricula]?.[u.id]?.atividades[a.id] ?? ''
+                                const isModified = val !== origVal && !saving
+
+                                return (
+                                  <td key={a.id} className="px-2 py-4 text-center border-l border-slate-100">
+                                    <div className="flex flex-col items-center gap-1.5 group relative">
+                                      <input
+                                        type="number" step="0.1"
+                                        value={val}
+                                        onChange={(e) => handleAtividadeChange(estudante.matricula, u.id, a.id, e.target.value, a.peso)}
+                                        className={`w-14 h-9 text-center border-2 rounded-xl text-sm font-medium transition-all outline-none ${
+                                          unidadeEstado.isDesistente ? 'bg-orange-50 border-orange-200 text-orange-600' :
+                                          isModified ? 'border-slate-400 bg-white ring-4 ring-slate-500/5' : 'border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400'
+                                        }`}
+                                        placeholder="0.0"
+                                      />
+                                      {ai === 0 && (
+                                        <button
+                                            type="button"
+                                            onClick={() => handleDesistenteChange(estudante.matricula, u.id, !unidadeEstado.isDesistente)}
+                                            className={`absolute -right-3 -bottom-2 p-1.5 rounded-full transition-all shadow-sm flex items-center justify-center ${
+                                                unidadeEstado.isDesistente
+                                                ? 'bg-orange-100 text-orange-600 scale-100 z-10 ring-2 ring-white'
+                                                : 'bg-white text-slate-300 hover:text-orange-500 hover:bg-orange-50 scale-100 opacity-60 hover:opacity-100 group-hover:opacity-100 border border-slate-300 z-10'
+                                            }`}
+                                            title={unidadeEstado.isDesistente ? "Desmarcar infrequente (toda a unidade)" : "Marcar unidade como Infrequente"}
+                                        >
+                                            <UserMinus size={unidadeEstado.isDesistente ? 14 : 12}/>
+                                        </button>
+                                      )}
+                                    </div>
+                                  </td>
+                                )
+                              })}
+                              <td key={`${u.id}-subtotal`} className="px-2 py-4 text-center bg-slate-50/60">
+                                <span className={`text-sm font-bold ${subtotal !== null && subtotal < 5 ? 'text-rose-500' : 'text-slate-600'}`}>
+                                  {subtotal !== null ? subtotal.toFixed(1) : '-'}
+                                </span>
+                              </td>
+                            </Fragment>
                           )
                         })}
                         <td className="px-6 py-4 text-center">
-                          <span className={`text-base font-medium ${getStatusColor(media)}`}>{media}</span>
+                          <span className={`text-base font-medium ${getStatusColor(media)}`}>{media.texto}</span>
                         </td>
                       </tr>
                     )
@@ -447,7 +628,7 @@ export default function LancarNotasTurmaClient({
         </div>
       </main>
 
-      {showModal && (
+      {showModal && esquema && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 border border-white">
             <div className="px-6 py-5 border-b border-slate-200 flex justify-between items-center bg-slate-50">
@@ -464,14 +645,17 @@ export default function LancarNotasTurmaClient({
               {estudantes.filter(e => JSON.stringify(notas[e.matricula]) !== JSON.stringify(originalNotas[e.matricula] || {})).map((est, i) => (
                  <div key={i} className="flex items-center justify-between bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
                    <span className="text-sm font-medium text-slate-700 uppercase truncate pr-4">{est.nome}</span>
-                   <div className="flex gap-2">
-                       {UNIDADES.map(u => {
-                        const val = (notas[est.matricula] as any)?.[`nota${u}`]
-                        const isNaoRealizou = (notas[est.matricula] as any)?.[`isDesistenteUnid${u}`]
-                        const origVal = (originalNotas[est.matricula] as any)?.[`nota${u}`]
-                        const origNR = (originalNotas[est.matricula] as any)?.[`isDesistenteUnid${u}`]
-                        if (val === origVal && isNaoRealizou === origNR) return null
-                        return <span key={u} className="text-[11px] font-medium bg-slate-50 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200">{u}ª: {val || '0'} {isNaoRealizou && <span className="text-amber-600 ml-1">(INF)</span>}</span>
+                   <div className="flex gap-2 flex-wrap justify-end">
+                       {esquema.unidades.map(u => {
+                        const subtotal = calcularSubtotalUnidade(est.matricula, u)
+                        const estadoAtual = notas[est.matricula]?.[u.id]
+                        const estadoOriginal = originalNotas[est.matricula]?.[u.id]
+                        if (JSON.stringify(estadoAtual) === JSON.stringify(estadoOriginal)) return null
+                        return (
+                          <span key={u.id} className="text-[11px] font-medium bg-slate-50 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200">
+                            {u.nome}: {subtotal !== null ? subtotal.toFixed(1) : '0'} {estadoAtual?.isDesistente && <span className="text-amber-600 ml-1">(INF)</span>}
+                          </span>
+                        )
                       })}
                    </div>
                 </div>
@@ -497,15 +681,15 @@ export default function LancarNotasTurmaClient({
                 <AlertCircle size={36} className="animate-pulse" />
               </div>
             )}
-            
+
             <h3 className="text-xl font-bold text-slate-800 mb-2">
               {feedbackModal.type === 'success' ? 'Salvo com Sucesso!' : 'Ocorreu um Erro'}
             </h3>
-            
+
             <p className="text-sm text-slate-500 leading-relaxed mb-6">
               {feedbackModal.text}
             </p>
-            
+
             <button
               onClick={() => setFeedbackModal(null)}
               className={`w-full py-3.5 rounded-2xl font-semibold text-sm transition-all active:scale-95 shadow-lg ${

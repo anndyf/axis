@@ -1,7 +1,7 @@
-
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { resolverEsquemaAvaliacaoId } from '@/lib/services/notas'
 
 export const runtime = 'nodejs'
 
@@ -11,43 +11,75 @@ export async function GET(
 ) {
   try {
     const session = await auth()
-
     if (!session?.user?.escolaId) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
     const escolaId = session.user.escolaId
-
     const { turmaId, disciplinaId } = await params
 
-    console.log(`Buscando notas via Raw SQL para Turma: ${turmaId}, Disc: ${disciplinaId}`)
+    const turma = await prisma.turma.findUnique({
+      where: { id: turmaId, escolaId },
+      select: { cursoId: true, esquemaAvaliacaoId: true }
+    })
+    if (!turma) {
+      return NextResponse.json({ message: 'Turma não encontrada' }, { status: 404 })
+    }
+
+    const curso = turma.cursoId
+      ? await prisma.curso.findUnique({ where: { id: turma.cursoId }, select: { esquemaAvaliacaoId: true } })
+      : null
+    const esquemaId = resolverEsquemaAvaliacaoId(turma, curso)
+    if (!esquemaId) {
+      return NextResponse.json({ message: 'Esquema de avaliação não configurado para esta turma' }, { status: 400 })
+    }
+
+    const esquema = await prisma.esquemaAvaliacao.findUnique({
+      where: { id: esquemaId },
+      include: { unidades: { orderBy: { ordem: 'asc' }, include: { atividades: { orderBy: { ordem: 'asc' } } } } }
+    })
+    if (!esquema) {
+      return NextResponse.json({ message: 'Esquema de avaliação inválido' }, { status: 400 })
+    }
 
     // "estudante_id" guarda o id tecnico do estudante desde a Migration 3b (nao mais
-    // a matricula) - o JOIN precisa ser por e.id, e o frontend (LancarNotasClient.tsx)
-    // espera a matricula de volta em "estudanteId" (usa como chave do dicionario).
-    const notas = await prisma.$queryRaw<any[]>`
-      SELECT
-        nf.id,
-        e.matricula as "estudanteId",
-        nf."disciplina_id" as "disciplinaId",
-        nf."nota_1" as "nota1",
-        nf."nota_2" as "nota2",
-        nf."nota_3" as "nota3",
-        nf.nota,
-        nf.status,
-        nf."is_desistente_unid1" as "isDesistenteUnid1",
-        nf."is_desistente_unid2" as "isDesistenteUnid2",
-        nf."is_desistente_unid3" as "isDesistenteUnid3"
-      FROM "notas_finais" nf
-      INNER JOIN "estudantes" e ON e.id = nf."estudante_id"
-      WHERE nf."disciplina_id" = ${disciplinaId} AND e."turma_id" = ${turmaId} AND e."escola_id" = ${escolaId}
-    `
+    // a matricula) - o frontend (LancarNotasClient.tsx) espera a matricula de volta
+    // em "estudanteId" (usa como chave do dicionario de estado).
+    const notasFinais = await prisma.notaFinal.findMany({
+      where: { disciplinaId, estudante: { turmaId, escolaId } },
+      include: {
+        estudante: { select: { matricula: true } },
+        unidades: { include: { atividades: true } }
+      }
+    })
 
-    return NextResponse.json(notas)
+    return NextResponse.json({
+      esquema: {
+        id: esquema.id,
+        notaMinimaAprovacao: esquema.notaMinimaAprovacao,
+        recuperacaoUnidadeAtiva: esquema.recuperacaoUnidadeAtiva,
+        modoRecuperacaoUnidade: esquema.modoRecuperacaoUnidade,
+        recuperacaoFinalAtiva: esquema.recuperacaoFinalAtiva,
+        modoRecuperacaoFinal: esquema.modoRecuperacaoFinal,
+        unidades: esquema.unidades.map((u) => ({
+          id: u.id,
+          ordem: u.ordem,
+          nome: u.nome,
+          atividades: u.atividades.map((a) => ({ id: a.id, ordem: a.ordem, nome: a.nome, peso: a.peso }))
+        }))
+      },
+      notas: notasFinais.map((nf) => ({
+        estudanteId: nf.estudante.matricula,
+        status: nf.status,
+        unidades: nf.unidades.map((u) => ({
+          esquemaUnidadeId: u.esquemaUnidadeId,
+          notaRecuperacao: u.notaRecuperacao,
+          isDesistente: u.isDesistente,
+          atividades: u.atividades.map((a) => ({ esquemaAtividadeId: a.esquemaAtividadeId, valor: a.valor }))
+        }))
+      }))
+    })
   } catch (error) {
-    console.error('Erro ao buscar notas via SQL:', error)
-    return NextResponse.json(
-      { message: 'Erro ao buscar notas' },
-      { status: 500 }
-    )
+    console.error('Erro ao buscar notas:', error)
+    return NextResponse.json({ message: 'Erro ao buscar notas' }, { status: 500 })
   }
 }

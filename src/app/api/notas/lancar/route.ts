@@ -2,9 +2,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { v4 as uuidv4 } from 'uuid'
 import { logAudit } from '@/lib/audit'
 import {
+  calcularNotaUnidade,
   calcularMediaFinal,
   calcularStatus,
   resolverEsquemaAvaliacaoId,
@@ -15,6 +15,30 @@ import {
 
 export const runtime = 'nodejs'
 
+interface AtividadeInputPayload {
+  esquemaAtividadeId: string
+  valor: number | string | null
+}
+
+interface UnidadeInputPayload {
+  esquemaUnidadeId: string
+  notaRecuperacao?: number | string | null
+  isDesistente?: boolean
+  atividades: AtividadeInputPayload[]
+}
+
+interface NotaInputPayload {
+  estudanteId: string // matrícula
+  disciplinaId: string
+  unidades: UnidadeInputPayload[]
+}
+
+function parseNota(val: any): number | null {
+  if (val === undefined || val === null || val === '') return null
+  const parsed = parseFloat(String(val).replace(',', '.'))
+  return isNaN(parsed) ? null : parsed
+}
+
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
@@ -24,7 +48,7 @@ export async function POST(request: NextRequest) {
     }
     const escolaId = session.user.escolaId
 
-    const { notas } = await request.json()
+    const { notas }: { notas: NotaInputPayload[] } = await request.json()
 
     if (!Array.isArray(notas) || notas.length === 0) {
       return NextResponse.json({ message: 'Dados inválidos' }, { status: 400 })
@@ -32,8 +56,7 @@ export async function POST(request: NextRequest) {
 
     // Otimização: Obter informações da disciplina e turma uma única vez
     // Assumindo que todas as notas no lote são da mesma disciplina (conforme o frontend envia)
-    const firstNota = notas[0]
-    const disciplinaId = firstNota.disciplinaId
+    const disciplinaId = notas[0].disciplinaId
 
     const disciplina = await prisma.disciplina.findUnique({
       where: { id: disciplinaId, turma: { escolaId } },
@@ -72,30 +95,24 @@ export async function POST(request: NextRequest) {
       recuperacaoFinalAtiva: esquema.recuperacaoFinalAtiva,
       modoRecuperacaoFinal: esquema.modoRecuperacaoFinal,
     }
-    const isSemestral = esquema.numUnidades < 3
 
     // Otimização: Buscar todos os estudantes do lote de uma vez para os logs de auditoria.
     // O frontend envia a matricula (LancarNotasClient.tsx usa estudante.matricula como chave),
     // mas "notas_finais.estudante_id" guarda o id tecnico desde a Migration 3b - precisa
     // resolver matricula -> id antes de qualquer SELECT/UPDATE/INSERT na tabela.
-    const matriculas = notas.map(n => n.estudanteId)
+    const matriculas = notas.map((n) => n.estudanteId)
     const estudantes = await prisma.estudante.findMany({
       where: { escolaId, matricula: { in: matriculas } },
       select: { id: true, matricula: true, nome: true }
     })
-    const studentNamesMap = new Map(estudantes.map(e => [e.matricula, e.nome]))
-    const matriculaToIdMap = new Map(estudantes.map(e => [e.matricula, e.id]))
+    const studentNamesMap = new Map(estudantes.map((e) => [e.matricula, e.nome]))
+    const matriculaToIdMap = new Map(estudantes.map((e) => [e.matricula, e.id]))
 
-    const results = []
+    const results: any[] = []
 
     // Processar sequencialmente para evitar exaustão do pool de conexões
     for (const notaData of notas) {
-      const {
-        estudanteId,
-        nota1, nota2, nota3,
-        isDesistente,
-        isDesistenteUnid1, isDesistenteUnid2, isDesistenteUnid3
-      } = notaData
+      const { estudanteId, unidades: unidadesPayload } = notaData
 
       // estudanteId aqui e a matricula (nome mantido por compatibilidade com o
       // payload do frontend) - resolve para o id tecnico real da tabela estudantes.
@@ -105,90 +122,116 @@ export async function POST(request: NextRequest) {
         continue
       }
 
-      // Se todos os campos estiverem vazios e não houver marcação de desistência, ignorar
-      const isAllEmpty = (nota1 === '' || nota1 === null || nota1 === undefined) && 
-                        (nota2 === '' || nota2 === null || nota2 === undefined) && 
-                        (nota3 === '' || nota3 === null || nota3 === undefined || isSemestral) && 
-                        !isDesistente && !isDesistenteUnid1 && !isDesistenteUnid2 && !isDesistenteUnid3;
+      const existing = await prisma.notaFinal.findUnique({
+        where: { estudanteId_disciplinaId: { estudanteId: estudanteRealId, disciplinaId } },
+        include: { unidades: { include: { atividades: true } } }
+      })
+      const existingUnidadeMap = new Map((existing?.unidades ?? []).map((u) => [u.esquemaUnidadeId, u]))
 
-      if (isAllEmpty) {
-        results.push({ skipped: true, estudanteId });
-        continue;
+      // Monta, pra cada unidade do esquema, o valor final de cada atividade -
+      // usa o que veio no payload, ou preserva o que já estava salvo se o
+      // campo vier vazio/ausente (mesmo comportamento do fluxo legado de
+      // nota1/nota2/nota3).
+      let algumCampoTocado = false
+      const unidadesParaSalvar: {
+        esquemaUnidadeId: string
+        ordem: number
+        isDesistente: boolean
+        notaRecuperacao: number | null
+        atividades: { esquemaAtividadeId: string; peso: number; valor: number | null }[]
+      }[] = []
+
+      for (const eu of esquema.unidades) {
+        const payloadUnidade = unidadesPayload?.find((u) => u.esquemaUnidadeId === eu.id)
+        const existingUnidade = existingUnidadeMap.get(eu.id)
+        const existingAtividadeMap = new Map((existingUnidade?.atividades ?? []).map((a) => [a.esquemaAtividadeId, a.valor]))
+
+        if (payloadUnidade) {
+          const temValor = payloadUnidade.atividades.some((a) => a.valor !== null && a.valor !== undefined && a.valor !== '')
+          if (temValor || payloadUnidade.isDesistente || payloadUnidade.notaRecuperacao !== undefined) {
+            algumCampoTocado = true
+          }
+        }
+
+        const isDesistente = payloadUnidade?.isDesistente ?? existingUnidade?.isDesistente ?? false
+        const notaRecuperacao = payloadUnidade
+          ? (parseNota(payloadUnidade.notaRecuperacao) ?? existingUnidade?.notaRecuperacao ?? null)
+          : (existingUnidade?.notaRecuperacao ?? null)
+
+        const atividadesFinal = eu.atividades.map((ea) => {
+          const payloadAtividade = payloadUnidade?.atividades.find((a) => a.esquemaAtividadeId === ea.id)
+          const valor = parseNota(payloadAtividade?.valor) ?? existingAtividadeMap.get(ea.id) ?? null
+          if (valor !== null && (valor < 0 || valor > 10)) {
+            throw new Error(`Nota inválida para estudante ${estudanteId}: deve estar entre 0 e 10`)
+          }
+          return { esquemaAtividadeId: ea.id, peso: ea.peso, valor }
+        })
+
+        unidadesParaSalvar.push({
+          esquemaUnidadeId: eu.id,
+          ordem: eu.ordem,
+          isDesistente,
+          notaRecuperacao,
+          atividades: atividadesFinal
+        })
       }
 
-      // Função auxiliar para parsing robusto
-      const parseNota = (val: any) => {
-        if (val === undefined || val === null || val === '') return null
-        const parsed = parseFloat(String(val).replace(',', '.'))
-        return isNaN(parsed) ? null : parsed
-      }
-
-      const n1 = parseNota(nota1)
-      const n2 = parseNota(nota2)
-      const n3 = !isSemestral ? parseNota(nota3) : null
-
-      // Validação de range (0-10)
-      if (n1 !== null && (n1 < 0 || n1 > 10)) {
-        throw new Error(`Nota 1 inválida para estudante ${estudanteId}: deve estar entre 0 e 10`)
-      }
-      if (n2 !== null && (n2 < 0 || n2 > 10)) {
-        throw new Error(`Nota 2 inválida para estudante ${estudanteId}: deve estar entre 0 e 10`)
-      }
-      if (n3 !== null && (n3 < 0 || n3 > 10)) {
-        throw new Error(`Nota 3 inválida para estudante ${estudanteId}: deve estar entre 0 e 10`)
+      // Se nada foi de fato tocado neste lote para este estudante, ignora -
+      // evita reescrever um registro sem nenhuma mudança real.
+      if (!algumCampoTocado) {
+        results.push({ skipped: true, estudanteId })
+        continue
       }
 
       const targetName = studentNamesMap.get(estudanteId) || 'Estudante desconhecido'
 
-      // Verificar se já existe nota
-      const existing = await prisma.$queryRaw<any[]>`
-        SELECT id, nota_1 as "nota1", nota_2 as "nota2", nota_3 as "nota3", status
-        FROM "notas_finais"
-        WHERE "estudante_id" = ${estudanteRealId} AND "disciplina_id" = ${disciplinaId}
-        LIMIT 1
-      `
-      const existingRow = existing[0]
-
-      // Preserva notas já salvas se vierem vazias/nulas na requisição atual
-      const finalN1 = n1 !== null ? n1 : (existingRow?.nota1 != null ? Number(existingRow.nota1) : null)
-      const finalN2 = n2 !== null ? n2 : (existingRow?.nota2 != null ? Number(existingRow.nota2) : null)
-      const finalN3 = n3 !== null ? n3 : (existingRow?.nota3 != null ? Number(existingRow.nota3) : null)
-      const finalPorOrdem: Record<number, number | null> = { 1: finalN1, 2: finalN2, 3: finalN3 }
-      const desistentePorOrdem: Record<number, boolean> = {
-        1: !!isDesistenteUnid1,
-        2: !!isDesistenteUnid2,
-        3: !!isDesistenteUnid3,
-      }
-
-      const unidadesInput: UnidadeInput[] = esquema.unidades.map((eu) => ({
-        esquemaUnidadeId: eu.id,
-        atividades: [{ peso: eu.atividades[0]?.peso ?? 10, valor: finalPorOrdem[eu.ordem] ?? null }],
+      const unidadesInput: UnidadeInput[] = unidadesParaSalvar.map((u) => ({
+        esquemaUnidadeId: u.esquemaUnidadeId,
+        atividades: u.atividades.map((a) => ({ peso: a.peso, valor: a.valor })),
+        notaRecuperacao: u.notaRecuperacao,
       }))
       const resultado = calcularMediaFinal(unidadesInput, esquemaConfig)
-      const currentStatus = existingRow?.status as StatusNota | undefined
+      const currentStatus = existing?.status as StatusNota | undefined
+      // Passa null pra recuperação final aqui de propósito: essa rota não
+      // mexe em recuperação final (isso é papel exclusivo de
+      // api/notas/recuperacao) - a proteção de STATUS_ESPECIAIS do motor
+      // já garante que uma aprovação por recuperação existente não regride
+      // por causa de uma edição de nota normal.
       const finalStatus = calcularStatus(resultado, esquemaConfig, null, currentStatus)
       const notaCalculadaFinal = resultado.media ?? 0
 
-      let notaId: string
-      if (existingRow) {
-        notaId = existingRow.id
+      // Dual-write nas colunas legadas (nota_1/2/3, is_desistente_unidN) por
+      // posição de ordem - só as 3 primeiras unidades tem slot legado;
+      // consumidores ainda não migrados (RelatorioClient, PDFs, etc.) leem
+      // essas colunas até serem migrados numa limpeza futura já mapeada.
+      const notaPorOrdem: Record<number, number | null> = {}
+      const desistentePorOrdem: Record<number, boolean> = {}
+      for (const u of unidadesParaSalvar) {
+        if (u.ordem <= 3) {
+          notaPorOrdem[u.ordem] = calcularNotaUnidade(u.atividades)
+          desistentePorOrdem[u.ordem] = u.isDesistente
+        }
+      }
 
-        await prisma.$executeRaw`
-          UPDATE "notas_finais"
-          SET
-            "nota_1" = ${finalN1},
-            "nota_2" = ${finalN2},
-            "nota_3" = ${finalN3},
-            "nota" = ${notaCalculadaFinal},
-            "status" = ${finalStatus}::"status_nota",
-            "is_desistente_unid1" = ${!!isDesistenteUnid1},
-            "is_desistente_unid2" = ${!!isDesistenteUnid2},
-            "is_desistente_unid3" = ${!!isDesistenteUnid3},
-            "modified_by_id" = ${session.user.id},
-            "updated_at" = NOW(),
-            "modified_at" = NOW()
-          WHERE "id" = ${notaId}
-        `
+      const dataComum = {
+        nota1: notaPorOrdem[1] ?? null,
+        nota2: notaPorOrdem[2] ?? null,
+        nota3: notaPorOrdem[3] ?? null,
+        nota: notaCalculadaFinal,
+        status: finalStatus,
+        isDesistenteUnid1: desistentePorOrdem[1] ?? false,
+        isDesistenteUnid2: desistentePorOrdem[2] ?? false,
+        isDesistenteUnid3: desistentePorOrdem[3] ?? false,
+      }
+
+      let notaId: string
+      if (existing) {
+        notaId = existing.id
+
+        await prisma.notaFinal.update({
+          where: { id: notaId },
+          data: { ...dataComum, modifiedById: session.user.id, modifiedAt: new Date() }
+        })
 
         await logAudit(
           session.user.id,
@@ -198,26 +241,17 @@ export async function POST(request: NextRequest) {
           {
             alvo: targetName,
             disciplina: disciplineName,
-            anterior: { n1: existingRow.nota1, n2: existingRow.nota2, n3: existingRow.nota3, st: existingRow.status },
-            atual: { n1: finalN1, n2: finalN2, n3: finalN3, st: finalStatus }
+            anterior: { n1: existing.nota1, n2: existing.nota2, n3: existing.nota3, st: existing.status },
+            atual: { n1: dataComum.nota1, n2: dataComum.nota2, n3: dataComum.nota3, st: finalStatus }
           }
         )
 
         results.push({ id: notaId, updated: true })
       } else {
-        notaId = uuidv4()
-        await prisma.$executeRaw`
-          INSERT INTO "notas_finais" (
-            "id", "estudante_id", "disciplina_id", "nota_1", "nota_2", "nota_3", "nota", "status",
-            "is_desistente_unid1", "is_desistente_unid2", "is_desistente_unid3",
-            "modified_by_id", "created_at", "updated_at", "modified_at"
-          )
-          VALUES (
-            ${notaId}, ${estudanteRealId}, ${disciplinaId}, ${finalN1}, ${finalN2}, ${finalN3}, ${notaCalculadaFinal}, ${finalStatus}::"status_nota",
-            ${!!isDesistenteUnid1}, ${!!isDesistenteUnid2}, ${!!isDesistenteUnid3},
-            ${session.user.id}, NOW(), NOW(), NOW()
-          )
-        `
+        const criada = await prisma.notaFinal.create({
+          data: { ...dataComum, estudanteId: estudanteRealId, disciplinaId, modifiedById: session.user.id }
+        })
+        notaId = criada.id
 
         await logAudit(
           session.user.id,
@@ -227,9 +261,9 @@ export async function POST(request: NextRequest) {
           {
             alvo: targetName,
             disciplina: disciplineName,
-            nota1: finalN1,
-            nota2: finalN2,
-            nota3: finalN3,
+            nota1: dataComum.nota1,
+            nota2: dataComum.nota2,
+            nota3: dataComum.nota3,
             status: finalStatus
           }
         )
@@ -237,27 +271,30 @@ export async function POST(request: NextRequest) {
         results.push({ id: notaId, created: true })
       }
 
-      // Dual-write: popula NotaUnidade/NotaAtividade em paralelo às colunas
-      // legadas (nota_1/2/3), enquanto os consumidores de leitura não migram
-      // pro modelo novo (Fase 4/5 do rollout do modelo de avaliação).
-      for (const eu of esquema.unidades) {
-        const valor = finalPorOrdem[eu.ordem] ?? null
+      // Dual-write: popula NotaUnidade/NotaAtividade (modelo novo, N unidades
+      // e N atividades por unidade) em paralelo às colunas legadas acima.
+      for (const u of unidadesParaSalvar) {
         const notaUnidade = await prisma.notaUnidade.upsert({
-          where: { notaFinalId_esquemaUnidadeId: { notaFinalId: notaId, esquemaUnidadeId: eu.id } },
-          update: { notaCalculada: valor, isDesistente: desistentePorOrdem[eu.ordem] ?? false },
+          where: { notaFinalId_esquemaUnidadeId: { notaFinalId: notaId, esquemaUnidadeId: u.esquemaUnidadeId } },
+          update: {
+            notaCalculada: calcularNotaUnidade(u.atividades),
+            notaRecuperacao: u.notaRecuperacao,
+            isDesistente: u.isDesistente
+          },
           create: {
             notaFinalId: notaId,
-            esquemaUnidadeId: eu.id,
-            notaCalculada: valor,
-            isDesistente: desistentePorOrdem[eu.ordem] ?? false
+            esquemaUnidadeId: u.esquemaUnidadeId,
+            notaCalculada: calcularNotaUnidade(u.atividades),
+            notaRecuperacao: u.notaRecuperacao,
+            isDesistente: u.isDesistente
           }
         })
-        const atividade = eu.atividades[0]
-        if (atividade) {
+
+        for (const a of u.atividades) {
           await prisma.notaAtividade.upsert({
-            where: { notaUnidadeId_esquemaAtividadeId: { notaUnidadeId: notaUnidade.id, esquemaAtividadeId: atividade.id } },
-            update: { valor },
-            create: { notaUnidadeId: notaUnidade.id, esquemaAtividadeId: atividade.id, valor }
+            where: { notaUnidadeId_esquemaAtividadeId: { notaUnidadeId: notaUnidade.id, esquemaAtividadeId: a.esquemaAtividadeId } },
+            update: { valor: a.valor },
+            create: { notaUnidadeId: notaUnidade.id, esquemaAtividadeId: a.esquemaAtividadeId, valor: a.valor }
           })
         }
       }
@@ -266,14 +303,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: 'Processamento concluído', count: results.length })
   } catch (error: any) {
     console.error('Erro crítico ao lançar notas:', error.message || error)
-    
+
     if (error.message?.includes('deve estar entre 0 e 10')) {
       return NextResponse.json({ message: error.message }, { status: 400 })
     }
-    
-    return NextResponse.json({ 
-      message: 'Erro ao processar notas', 
-      error: error.message 
+
+    return NextResponse.json({
+      message: 'Erro ao processar notas',
+      error: error.message
     }, { status: 500 })
   }
 }
