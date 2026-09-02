@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     }
     const escolaId = session.user.escolaId
 
-    const { nome, sigla, modalidade, modalidades, turnos, nivelEnsino } = await req.json()
+    const { nome, sigla, modalidade, modalidades, turnos, nivelEnsino, esquemaAvaliacaoId } = await req.json()
 
     if (!nome || !sigla) {
       return NextResponse.json(
@@ -29,6 +29,13 @@ export async function POST(req: Request) {
         { message: "Selecione pelo menos uma modalidade" },
         { status: 400 }
       )
+    }
+
+    if (esquemaAvaliacaoId) {
+      const esquema = await prisma.esquemaAvaliacao.findUnique({ where: { id: esquemaAvaliacaoId, escolaId } })
+      if (!esquema) {
+        return NextResponse.json({ message: "Esquema de avaliação inválido." }, { status: 400 })
+      }
     }
 
     const criados: any[] = []
@@ -74,6 +81,7 @@ export async function POST(req: Request) {
             sigla: siglaFinal,
             modalidade: mod,
             nivelEnsino: nivelEnsino || null,
+            esquemaAvaliacaoId: esquemaAvaliacaoId || null,
             turnos: turnos || []
           }
         })

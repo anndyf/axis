@@ -11,7 +11,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const escolaId = session.user.escolaId
 
     const { id } = await params
-    const { nome, sigla, turnos, nivelEnsino } = await req.json()
+    const { nome, sigla, turnos, nivelEnsino, esquemaAvaliacaoId } = await req.json()
 
     if (!nome || !sigla) {
       return NextResponse.json(
@@ -48,9 +48,22 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       )
     }
 
+    if (esquemaAvaliacaoId) {
+      const esquema = await prisma.esquemaAvaliacao.findUnique({ where: { id: esquemaAvaliacaoId, escolaId } })
+      if (!esquema) {
+        return NextResponse.json({ message: "Esquema de avaliação inválido." }, { status: 400 })
+      }
+    }
+
     const curso = await prisma.curso.update({
       where: { id },
-      data: { nome, sigla, turnos: turnos || [], nivelEnsino: nivelEnsino ?? current.nivelEnsino }
+      data: {
+        nome,
+        sigla,
+        turnos: turnos || [],
+        nivelEnsino: nivelEnsino ?? current.nivelEnsino,
+        esquemaAvaliacaoId: esquemaAvaliacaoId ?? current.esquemaAvaliacaoId
+      }
     })
 
     return NextResponse.json(curso)

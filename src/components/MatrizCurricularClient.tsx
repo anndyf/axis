@@ -29,6 +29,7 @@ interface Curso {
   nome: string
   modalidade: string
   nivelEnsino?: string | null
+  esquemaAvaliacaoId?: string | null
   sigla: string
   turnos: string[]
 }
@@ -395,7 +396,7 @@ export default function MatrizCurricularClient({
                                 onClick={(e) => {
                                   e.stopPropagation()
                                   setShowCursoDropdown(false)
-                                  setCursoParaEditar({ id: c.id, nome: c.nome, sigla: c.sigla ?? '', modalidade: c.modalidade, nivelEnsino: c.nivelEnsino, turnos: c.turnos ?? [] })
+                                  setCursoParaEditar({ id: c.id, nome: c.nome, sigla: c.sigla ?? '', modalidade: c.modalidade, nivelEnsino: c.nivelEnsino, esquemaAvaliacaoId: c.esquemaAvaliacaoId, turnos: c.turnos ?? [] })
                                   setIsModalCursoOpen(true)
                                 }}
                                 className="p-1.5 text-slate-300 hover:text-amber-500 hover:bg-amber-50 rounded-lg transition-all"

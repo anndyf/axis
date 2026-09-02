@@ -9,7 +9,13 @@ export interface CursoParaEditar {
   sigla: string
   modalidade: string
   nivelEnsino?: string | null
+  esquemaAvaliacaoId?: string | null
   turnos: string[]
+}
+
+interface EsquemaOption {
+  id: string
+  nome: string
 }
 
 interface CursoModalProps {
@@ -46,6 +52,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
   const isEdit = !!cursoParaEditar
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [esquemas, setEsquemas] = useState<EsquemaOption[]>([])
 
   // Estado do formulário
   const [formData, setFormData] = useState({
@@ -53,6 +60,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
     sigla: "",
     modalidades: ["EPTM"] as string[],
     nivelEnsino: "" as string,
+    esquemaAvaliacaoId: "" as string,
     turnos: [] as string[]
   })
 
@@ -64,13 +72,22 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
         sigla: cursoParaEditar.sigla,
         modalidades: [cursoParaEditar.modalidade],
         nivelEnsino: cursoParaEditar.nivelEnsino || "",
+        esquemaAvaliacaoId: cursoParaEditar.esquemaAvaliacaoId || "",
         turnos: cursoParaEditar.turnos || []
       })
     } else {
-      setFormData({ nome: "", sigla: "", modalidades: ["EPTM"], nivelEnsino: "", turnos: [] })
+      setFormData({ nome: "", sigla: "", modalidades: ["EPTM"], nivelEnsino: "", esquemaAvaliacaoId: "", turnos: [] })
     }
     setError("")
   }, [isOpen, cursoParaEditar, isEdit])
+
+  useEffect(() => {
+    if (!isOpen) return
+    fetch('/api/esquemas-avaliacao')
+      .then(res => res.json())
+      .then(data => setEsquemas(Array.isArray(data) ? data : []))
+      .catch(() => setEsquemas([]))
+  }, [isOpen])
 
   if (!isOpen) return null
 
@@ -118,6 +135,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
             sigla: formData.sigla,
             turnos: formData.turnos,
             nivelEnsino: formData.nivelEnsino || null,
+            esquemaAvaliacaoId: formData.esquemaAvaliacaoId || null,
           })
         })
 
@@ -140,6 +158,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
             modalidades: formData.modalidades,
             turnos: formData.turnos,
             nivelEnsino: formData.nivelEnsino || null,
+            esquemaAvaliacaoId: formData.esquemaAvaliacaoId || null,
           })
         })
 
@@ -309,6 +328,23 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Esquema de Avaliação */}
+            <div className="group">
+              <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">
+                Esquema de Avaliação <span className="normal-case font-medium text-slate-300">(opcional)</span>
+              </label>
+              <select
+                value={formData.esquemaAvaliacaoId}
+                onChange={e => setFormData({ ...formData, esquemaAvaliacaoId: e.target.value })}
+                className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-slate-700 focus:bg-white focus:border-blue-500 transition-all"
+              >
+                <option value="">Padrão da escola</option>
+                {esquemas.map(esq => (
+                  <option key={esq.id} value={esq.id}>{esq.nome}</option>
+                ))}
+              </select>
             </div>
 
             {/* Turnos */}
