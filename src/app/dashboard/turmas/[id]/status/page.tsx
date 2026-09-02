@@ -9,9 +9,9 @@ export const metadata = {
 
 export const runtime = 'nodejs'
 
-async function getRelatorioStatus(turmaId: string) {
+async function getRelatorioStatus(turmaId: string, escolaId: string) {
   return await prisma.turma.findUnique({
-    where: { id: turmaId },
+    where: { id: turmaId, escolaId },
     include: {
       disciplinas: {
         orderBy: { nome: 'asc' }
@@ -37,17 +37,13 @@ export default async function RelatorioStatusPage({
   params: Promise<{ id: string }>
 }) {
   const session = await auth()
-  
-  if (!session) {
+
+  if (!session?.user?.escolaId) {
     redirect("/login")
   }
 
   const { id } = await params
-  const turma = await getRelatorioStatus(id)
-
-  if (turma?.estudantes?.[0]?.notas) {
-    console.log('DEBUG NOTAS (First Student):', JSON.stringify(turma.estudantes[0].notas, null, 2))
-  }
+  const turma = await getRelatorioStatus(id, session.user.escolaId)
 
   if (!turma) {
     redirect("/dashboard/turmas")

@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import { resolverEsquemaAvaliacaoId } from '@/lib/services/notas'
 
 export const runtime = 'nodejs'
 
@@ -13,16 +14,17 @@ export async function GET(
 ) {
   try {
     const session = await auth()
-    
-    if (!session) {
+
+    if (!session?.user?.escolaId) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
+    const escolaId = session.user.escolaId
 
     const { id, disciplinaId } = await params
 
     const [turma, disciplina] = await Promise.all([
       prisma.turma.findUnique({
-        where: { id },
+        where: { id, escolaId },
         include: {
           estudantes: {
             include: {
@@ -38,7 +40,7 @@ export async function GET(
         }
       }),
       prisma.disciplina.findUnique({
-        where: { id: disciplinaId }
+        where: { id: disciplinaId, turma: { escolaId } }
       })
     ])
 
@@ -46,9 +48,20 @@ export async function GET(
       return NextResponse.json({ message: 'Turma ou Disciplina não encontrada' }, { status: 404 })
     }
 
+    // Resolve o esquema de avaliação (turma ?? curso) - substitui o antigo
+    // `isSemestral = turma.modalidade IN (PROEJA, SUBSEQUENTE)`, que nunca
+    // funcionou de fato pra dados reais (Turma.modalidade sempre NULL).
+    const curso = turma.cursoId
+      ? await prisma.curso.findUnique({ where: { id: turma.cursoId }, select: { esquemaAvaliacaoId: true } })
+      : null
+    const esquemaId = resolverEsquemaAvaliacaoId(turma, curso)
+    const esquema = esquemaId
+      ? await prisma.esquemaAvaliacao.findUnique({ where: { id: esquemaId }, select: { numUnidades: true } })
+      : null
+    const isSemestral = (esquema?.numUnidades ?? 3) < 3
+
     // Criar PDF
     const doc = new jsPDF()
-    const isSemestral = turma.modalidade === 'PROEJA' || turma.modalidade === 'SUBSEQUENTE'
 
     // Cabeçalho
     doc.setFontSize(18)

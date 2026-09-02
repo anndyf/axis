@@ -50,8 +50,8 @@ export async function GET(
 ) {
   try {
     const session = await auth()
-    
-    if (!session) {
+
+    if (!session?.user?.escolaId) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 
@@ -60,7 +60,7 @@ export async function GET(
     const unit = (searchParams.get('unit') || 'FINAL') as any
 
     const turma = await prisma.turma.findUnique({
-      where: { id },
+      where: { id, escolaId: session.user.escolaId },
       include: {
         disciplinas: {
           orderBy: { nome: 'asc' }

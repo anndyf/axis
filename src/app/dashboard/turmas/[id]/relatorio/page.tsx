@@ -11,9 +11,9 @@ export const metadata = {
 
 export const runtime = 'nodejs'
 
-async function getTurmaRelatorio(id: string) {
+async function getTurmaRelatorio(id: string, escolaId: string) {
   return await prisma.turma.findUnique({
-    where: { id },
+    where: { id, escolaId },
     include: {
       estudantes: {
         include: {
@@ -51,13 +51,13 @@ export default async function RelatorioTurmaPage({
   params: Promise<{ id: string }>
 }) {
   const session = await auth()
-  
-  if (!session) {
+
+  if (!session?.user?.escolaId) {
     redirect("/login")
   }
 
   const { id } = await params
-  const turma = await getTurmaRelatorio(id)
+  const turma = await getTurmaRelatorio(id, session.user.escolaId)
 
   if (!turma) {
     redirect("/dashboard/turmas")
