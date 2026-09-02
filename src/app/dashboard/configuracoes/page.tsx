@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Shield, Database, Check, AlertCircle, Save } from "lucide-react"
+import Link from "next/link"
+import { Shield, Database, Check, AlertCircle, Save, ClipboardList, ChevronRight } from "lucide-react"
 
 export default function ConfiguracoesPage() {
   const [loading, setLoading] = useState(true)
@@ -74,6 +75,22 @@ export default function ConfiguracoesPage() {
         </h1>
         <p className="text-slate-600 mt-2">Gerencie as funcionalidades globais e acessos dos professores.</p>
       </div>
+
+      <Link
+        href="/dashboard/configuracoes/avaliacao"
+        className="flex items-center justify-between bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:border-slate-300 hover:shadow-md transition-all group"
+      >
+        <div className="flex items-center gap-4">
+          <div className="p-3 rounded-xl bg-slate-100 text-slate-700 group-hover:bg-slate-700 group-hover:text-white transition-colors">
+            <ClipboardList className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="font-medium text-blue-900">Esquemas de Avaliação</p>
+            <p className="text-sm text-slate-600">Configure unidades, atividades e regras de recuperação por escola.</p>
+          </div>
+        </div>
+        <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-slate-600 transition-colors" />
+      </Link>
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="p-6 border-b border-slate-200 bg-slate-100/50">
