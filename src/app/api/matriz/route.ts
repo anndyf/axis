@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { can } from "@/lib/rbac"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(request: NextRequest) {
@@ -55,7 +56,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session?.user?.escolaId) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
+    if (!session?.user?.escolaId || !can(session.user, "gestao")) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
     const escolaId = session.user.escolaId
 
     const { nome, cursoId, serie, areaId, anoLetivo } = await request.json()
@@ -154,7 +155,7 @@ export async function POST(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session?.user?.escolaId) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
+    if (!session?.user?.escolaId || !can(session.user, "gestao")) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
     const escolaId = session.user.escolaId
 
     const { id, nome, areaId } = await request.json()
@@ -223,7 +224,7 @@ export async function PATCH(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
     try {
       const session = await auth()
-      if (!session?.user?.escolaId) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
+      if (!session?.user?.escolaId || !can(session.user, "gestao")) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
       const escolaId = session.user.escolaId
 
       const { searchParams } = new URL(request.url)

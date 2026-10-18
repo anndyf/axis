@@ -130,3 +130,21 @@ export async function getTurmasPermitidas(session: Session) {
     }
   }))
 }
+
+/**
+ * true se TODAS as turmas (ids vindos do client) pertencem à escola - usado
+ * antes de conectar turmas a planos, disciplinas etc.
+ */
+export async function turmasSaoDaEscola(turmasIds: string[], escolaId: string) {
+  const unicas = new Set(turmasIds)
+  const count = await prisma.turma.count({ where: { id: { in: [...unicas] }, escolaId } })
+  return count === unicas.size
+}
+
+/**
+ * Filtro de escopo de Prova (sem escolaId próprio): pela turma, obrigatória
+ * na criação, ou - em provas antigas sem turma - pelo professor que criou.
+ */
+export function provaDaEscola(escolaId: string) {
+  return { OR: [{ turma: { escolaId } }, { turmaId: null, professorCriador: { escolaId } }] }
+}

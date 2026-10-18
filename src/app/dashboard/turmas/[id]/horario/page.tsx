@@ -15,12 +15,12 @@ export default async function SchedulePage(props: { params: Promise<{ id: string
   const params = await props.params
   const session = await auth()
 
-  if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
+  if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
     redirect("/dashboard")
   }
 
   const turma = await prisma.turma.findUnique({
-    where: { id: params.id },
+    where: { id: params.id, escolaId: session.user.escolaId },
     include: {
 
       disciplinas: {

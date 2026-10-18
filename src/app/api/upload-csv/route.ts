@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
     const bcrypt = await import('bcryptjs')
     
     // Buscar ano letivo atual
-    const config = await prisma.globalConfig.findUnique({ where: { id: 'global' } })
+    const config = await prisma.globalConfig.findUnique({ where: { id: escolaId } })
     const currentYear = config?.anoLetivoAtual || new Date().getFullYear()
 
     for (const data of toCreate) {

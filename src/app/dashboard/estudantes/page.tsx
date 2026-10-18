@@ -25,11 +25,12 @@ async function getEstudantes(filters: {
   serie?: string;
   userId?: string;
   isDirecao?: boolean;
+  escolaId: string;
 }) {
-  const config = await prisma.globalConfig.findUnique({ where: { id: 'global' } })
+  const config = await prisma.globalConfig.findUnique({ where: { id: filters.escolaId } })
   const currentYear = config?.anoLetivoAtual || new Date().getFullYear()
 
-  const where: any = {}
+  const where: any = { escolaId: filters.escolaId }
   
   // Só aplicamos a restrição de ano letivo se NÃO houver uma busca por texto.
   // Se houver busca, queremos encontrar o aluno em qualquer ano para evitar duplicidade.
@@ -120,9 +121,10 @@ export default async function EstudantesPage({
 }) {
   const session = await auth()
   
-  if (!session) {
+  if (!session?.user?.escolaId) {
     redirect("/login")
   }
+  const escolaId = session.user.escolaId
 
   const resolvedParams = await searchParams
   const search = typeof resolvedParams.search === 'string' ? resolvedParams.search : undefined
@@ -137,12 +139,14 @@ export default async function EstudantesPage({
   // Utilizando cast 'any' para evitar erros de lint stale com o cliente Prisma gerado
   const [dbCursos, turmas] = await Promise.all([
     (prisma as any).curso.findMany({
+      where: { escolaId },
       select: { id: true, nome: true, modalidade: true },
       orderBy: { nome: 'asc' }
     }),
     (prisma as any).turma.findMany({
       where: {
-        anoLetivo: (await prisma.globalConfig.findUnique({ where: { id: 'global' } }))?.anoLetivoAtual || new Date().getFullYear(),
+        escolaId,
+        anoLetivo: (await prisma.globalConfig.findUnique({ where: { id: escolaId } }))?.anoLetivoAtual || new Date().getFullYear(),
         ...(isDirecao ? {} : {
           OR: [
             { usuariosPermitidos: { some: { id: session.user.id } } },
@@ -157,7 +161,7 @@ export default async function EstudantesPage({
 
   // Busca de estudantes apenas se houver filtros para não sobrecarregar
   const { estudantes, portalUserIds } = hasFilters 
-    ? await getEstudantes({ search, cursoId, turmaId, turno, serie, userId: session.user.id, isDirecao }) 
+    ? await getEstudantes({ search, cursoId, turmaId, turno, serie, userId: session.user.id, isDirecao, escolaId })
     : { estudantes: [], portalUserIds: new Set() }
 
   // Combinar cursos do banco (novos) com cursos legados (strings nas turmas)

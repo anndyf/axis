@@ -1,16 +1,29 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { can } from "@/lib/rbac"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session?.user) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
+    if (!session?.user?.escolaId || !can(session.user, 'gestao')) {
+      return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
+    }
+    const escolaId = session.user.escolaId
 
     const { turmaId, cursoId, serie } = await request.json()
 
     if (!turmaId || !cursoId || !serie) {
       return NextResponse.json({ message: "Turma, Curso e Série são obrigatórios" }, { status: 400 })
+    }
+
+    // MatrizCurricular não tem escolaId próprio - o escopo vem do curso
+    const [turma, curso] = await Promise.all([
+      prisma.turma.findUnique({ where: { id: turmaId, escolaId }, select: { id: true } }),
+      prisma.curso.findUnique({ where: { id: cursoId, escolaId }, select: { id: true } })
+    ])
+    if (!turma || !curso) {
+      return NextResponse.json({ message: "Turma ou curso não encontrado" }, { status: 404 })
     }
 
     // 1. Buscar disciplinas da matriz para este curso/série

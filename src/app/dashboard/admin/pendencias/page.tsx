@@ -17,7 +17,7 @@ export default async function PendenciasPage({
 }) {
   const session = await auth()
   
-  if (!session?.user) {
+  if (!session?.user?.escolaId) {
     redirect("/login")
   }
   
@@ -31,8 +31,10 @@ export default async function PendenciasPage({
   const search = typeof resolvedParams.q === 'string' ? resolvedParams.q : undefined
 
   // Buscar administradores para atribuição
+  const escolaId = session.user.escolaId
   const admins = await prisma.user.findMany({
     where: {
+      escolaId,
       OR: [
         { isSuperuser: true },
         { isDirecao: true }
@@ -49,6 +51,7 @@ export default async function PendenciasPage({
   // Buscar mensagens de "Cadastro Pendente"
   const pendencias = await prisma.message.findMany({
     where: {
+      escolaId,
       subject: { startsWith: "[Cadastro Pendente]" },
       isResolved: showResolved,
       ...(search ? {
@@ -93,12 +96,14 @@ export default async function PendenciasPage({
   const [totalPendentes, totalResolvidos] = await Promise.all([
     prisma.message.count({
       where: {
+        escolaId,
         subject: { startsWith: "[Cadastro Pendente]" },
         isResolved: false
       }
     }),
     prisma.message.count({
       where: {
+        escolaId,
         subject: { startsWith: "[Cadastro Pendente]" },
         isResolved: true
       }

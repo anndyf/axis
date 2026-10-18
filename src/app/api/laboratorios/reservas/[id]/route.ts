@@ -8,11 +8,11 @@ export async function DELETE(
 ) {
   try {
     const session = await auth()
-    if (!session) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
+    if (!session?.user?.escolaId) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
 
     const { id } = await params
-    const reserva = await prisma.reservaLaboratorio.findUnique({
-      where: { id }
+    const reserva = await prisma.reservaLaboratorio.findFirst({
+      where: { id, laboratorio: { escolaId: session.user.escolaId } }
     })
 
     if (!reserva) {

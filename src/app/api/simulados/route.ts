@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { NextRequest, NextResponse } from "next/server"
 import { logAudit } from "@/lib/audit"
+import { provaDaEscola } from "@/lib/data-fetching"
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -23,10 +24,13 @@ export async function GET(request: NextRequest) {
     if (!turmaId || (!areaId && !provaId) || !unidade) {
       return NextResponse.json({ message: "Turma, Prova/Área e Unidade são obrigatórios" }, { status: 400 })
     }
+    if (!user.escolaId || !(await prisma.turma.findUnique({ where: { id: turmaId, escolaId: user.escolaId }, select: { id: true } }))) {
+      return NextResponse.json({ message: "Turma não encontrada" }, { status: 404 })
+    }
 
     // Busca estudantes da turma com suas notas de simulado
     const estudantes = await prisma.estudante.findMany({
-      where: { turmaId },
+      where: { turmaId, escolaId: user.escolaId },
       orderBy: { nome: 'asc' },
       include: {
         notasSimulado: {
@@ -74,8 +78,8 @@ export async function GET(request: NextRequest) {
     let effectiveAreaId: string | null = areaId
 
     if (provaId) {
-      const prova = await prisma.prova.findUnique({
-        where: { id: provaId },
+      const prova = await prisma.prova.findFirst({
+        where: { id: provaId, ...provaDaEscola(user.escolaId) },
         include: {
           questoes: {
             include: {
@@ -187,6 +191,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "Dados incompletos" }, { status: 400 })
     }
 
+    // O client manda a MATRÍCULA em notas[].estudanteId; NotaSimulado.estudanteId
+    // guarda o id técnico desde a troca de PK (Fase 3 multi-tenant). Resolve só
+    // dentro da turma/escola da sessão - matrícula de fora vira 400.
+    const matriculas: string[] = notas.map((n: any) => n.estudanteId)
+    const estudantesDaTurma = user.escolaId ? await prisma.estudante.findMany({
+      where: { turmaId, escolaId: user.escolaId, matricula: { in: matriculas } },
+      select: { id: true, matricula: true }
+    }) : []
+    const idPorMatricula = new Map(estudantesDaTurma.map(e => [e.matricula, e.id]))
+    if (idPorMatricula.size !== new Set(matriculas).size) {
+      return NextResponse.json({ message: "Estudante não encontrado nesta turma" }, { status: 400 })
+    }
+
     // Verificação de permissão rigorosa
     if (!user.isSuperuser && !user.isDirecao) {
       let whereResponsavel: any = { userId: user.id, turmaId, anoLetivo: 2026 }
@@ -208,7 +225,7 @@ export async function POST(request: NextRequest) {
     const whereExisting: any = {
       unidade: parseInt(unidade),
       anoLetivo: 2026,
-      estudanteId: { in: notas.map((n: any) => n.estudanteId) }
+      estudanteId: { in: [...idPorMatricula.values()] }
     }
     if (provaId) whereExisting.provaId = provaId
     else whereExisting.areaId = areaId
@@ -222,7 +239,8 @@ export async function POST(request: NextRequest) {
     // O ID deve ser único para upset, mas nós removemos o unique para areaId_estudanteId.
     // Como a constraint unique real sumiu do schema, vamos usar update/create se baseando se já existe.
     for (const n of notas) {
-      const existing = existingNotasSimulado.find(e => e.estudanteId === n.estudanteId)
+      const estudanteId = idPorMatricula.get(n.estudanteId)!
+      const existing = existingNotasSimulado.find(e => e.estudanteId === estudanteId)
       
       const parsedNota = n.nota !== null && n.nota !== undefined && String(n.nota).trim() !== '' ? parseFloat(n.nota) : null
       const isAusente = n.ausente === true
@@ -254,7 +272,7 @@ export async function POST(request: NextRequest) {
           operations.push(
             prisma.notaSimulado.create({
               data: {
-                estudanteId: n.estudanteId,
+                estudanteId,
                 areaId: areaId || null,
                 provaId: provaId || null,
                 unidade: parseInt(unidade),

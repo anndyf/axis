@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import * as dotenv from 'dotenv'
 import bcrypt from 'bcryptjs'
+import { vincularCursosSemEsquema } from '../src/lib/services/esquemas-padrao'
 
 dotenv.config()
 
@@ -73,6 +74,9 @@ async function main() {
     },
   })
   console.log(`📚 Curso: ${curso.nome} (${curso.sigla})`)
+
+  await vincularCursosSemEsquema(prisma, escola.id)
+  console.log('📐 Esquemas de avaliação padrão garantidos')
 
   const turma = await prisma.turma.upsert({
     where: { id: `horizonte-turma-1` },

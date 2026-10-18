@@ -2,6 +2,7 @@
 
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { can } from "@/lib/rbac"
 import { revalidatePath } from "next/cache"
 import { Resend } from 'resend';
 import nodemailer from 'nodemailer';
@@ -160,7 +161,12 @@ export async function sendMessage(formData: FormData) {
        targetReceiverId = null;
     }
     if (category === "COMUNICADO" && !receiverId) {
-        targetReceiverId = null; 
+        targetReceiverId = null;
+    }
+
+    // receiverId vem do formulário - destinatário precisa ser da mesma escola
+    if (targetReceiverId && !(await prisma.user.findUnique({ where: { id: targetReceiverId, escolaId: user.escolaId }, select: { id: true } }))) {
+      return { error: "Destinatário inválido." }
     }
 
     const newMessage = await prisma.message.create({
@@ -286,11 +292,11 @@ export async function sendMessage(formData: FormData) {
 
 export async function markAsRead(id: string) {
   const session = await auth()
-  if (!session?.user?.id) return
+  if (!session?.user?.id || !session.user.escolaId) return
 
   // Pegamos a mensagem para saber se é raiz ou resposta
   const msg = await prisma.message.findUnique({
-      where: { id },
+      where: { id, escolaId: session.user.escolaId },
       select: { id: true, parentId: true }
   })
   if (!msg) return
@@ -839,11 +845,11 @@ export async function getLatestUnreadMessage() {
 
 export async function getMessageThread(messageId: string) {
     const session = await auth()
-    if (!session?.user?.id) return []
+    if (!session?.user?.id || !session.user.escolaId) return []
     const userId = session.user.id
-    
-    const target = await prisma.message.findUnique({ 
-        where: { id: messageId },
+
+    const target = await prisma.message.findUnique({
+        where: { id: messageId, escolaId: session.user.escolaId },
         select: { id: true, parentId: true }
     })
     
@@ -881,11 +887,12 @@ export async function getMessageThread(messageId: string) {
 
 export async function assignTicket(ticketId: string) {
   const session = await auth()
-  if (!session?.user?.id) return { error: "Não autorizado" }
-  
+  // Mesma regra do botão em MessagesClient: só a gestão assume chamados
+  if (!session?.user?.id || !session.user.escolaId || !can(session.user, 'gestao')) return { error: "Não autorizado" }
+
   try {
     await prisma.message.update({
-      where: { id: ticketId },
+      where: { id: ticketId, escolaId: session.user.escolaId },
       data: {
         assignedToId: session.user.id,
         status: "EM_ATENDIMENTO"
@@ -901,9 +908,18 @@ export async function assignTicket(ticketId: string) {
 
 export async function updateTicketStatus(ticketId: string, status: string) {
   const session = await auth()
-  if (!session?.user?.id) return { error: "Não autorizado" }
+  if (!session?.user?.id || !session.user.escolaId) return { error: "Não autorizado" }
 
   try {
+    // Mesma regra do botão em MessagesClient: gestão ou o próprio remetente
+    const ticket = await prisma.message.findUnique({
+      where: { id: ticketId, escolaId: session.user.escolaId },
+      select: { senderId: true }
+    })
+    if (!ticket || (!can(session.user, 'gestao') && ticket.senderId !== session.user.id)) {
+      return { error: "Não autorizado" }
+    }
+
     const isResolved = status === 'RESOLVIDO' || status === 'FECHADO'
     await prisma.message.update({
       where: { id: ticketId },
@@ -922,10 +938,10 @@ export async function updateTicketStatus(ticketId: string, status: string) {
 
 export async function getTurmaDetails(turmaId: string) {
     const session = await auth()
-    if (!session?.user?.id) return { disciplinas: [], estudantes: [] }
+    if (!session?.user?.id || !session.user.escolaId) return { disciplinas: [], estudantes: [] }
 
     const turma = await prisma.turma.findUnique({
-        where: { id: turmaId },
+        where: { id: turmaId, escolaId: session.user.escolaId },
         include: {
             disciplinas: {
                 select: { id: true, nome: true },

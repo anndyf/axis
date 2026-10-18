@@ -9,12 +9,13 @@ export async function POST(
 ) {
   const { id: matricula } = await params
   const session = await auth()
-  if (!session) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
+  if (!session?.user?.escolaId) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
 
   try {
-    // Busca o perfil AEE do aluno (inclui disciplinas da turma para autorização correta)
-    const profile = await (prisma.aEEProfile as any).findUnique({
-      where: { estudanteId: matricula },
+    // Busca o perfil AEE do aluno (inclui disciplinas da turma para autorização correta).
+    // O [id] da rota é a matrícula; AEEProfile.estudanteId é o id técnico do estudante.
+    const profile = await prisma.aEEProfile.findFirst({
+      where: { estudante: { escolaId: session.user.escolaId, matricula } },
       include: { 
         estudante: { 
           include: { 

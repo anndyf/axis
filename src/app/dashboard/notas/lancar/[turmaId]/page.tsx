@@ -14,7 +14,7 @@ import { Session } from "next-auth"
 
 async function getTurmaData(turmaId: string, session: Session) {
   const turma = await prisma.turma.findUnique({
-    where: { id: turmaId },
+    where: { id: turmaId, escolaId: session.user.escolaId },
     include: {
       estudantes: {
         orderBy: { nome: 'asc' },

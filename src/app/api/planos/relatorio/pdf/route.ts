@@ -9,9 +9,10 @@ export const runtime = 'nodejs'
 export async function GET(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session?.user) {
+    if (!session?.user?.escolaId) {
         return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
+    const escola = await prisma.escola.findUnique({ where: { id: session.user.escolaId }, select: { nome: true } })
 
     const { searchParams } = new URL(request.url)
     const professorId = searchParams.get('professorId')
@@ -20,7 +21,8 @@ export async function GET(request: NextRequest) {
     const dataInicio = searchParams.get('dataInicio')
     const dataFim = searchParams.get('dataFim')
 
-    const where: any = {}
+    // PlanoEnsino não tem escolaId próprio - o escopo vem do professor
+    const where: any = { professor: { escolaId: session.user.escolaId } }
     if (!session.user.isSuperuser && !session.user.isDirecao) {
         where.professorId = session.user.id
     } else if (professorId) {
@@ -54,7 +56,7 @@ export async function GET(request: NextRequest) {
     doc.setFontSize(8)
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(0)
-    doc.text('CENTRO TERRITORIAL DE EDUCAÇÃO PROFISSIONAL DO LITORAL NORTE E AGRESTE BAIANO', 105, 12, { align: 'center' })
+    doc.text((escola?.nome ?? '').toUpperCase(), 105, 12, { align: 'center' })
 
     doc.setFontSize(20)
     doc.setTextColor(0, 0, 0)

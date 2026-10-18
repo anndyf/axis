@@ -4,10 +4,14 @@ import { NextResponse } from "next/server"
 import { startOfWeek, endOfWeek, isAfter, startOfMonth, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
+async function laboratorioDaEscola(laboratorioId: string, escolaId: string) {
+  return prisma.laboratorio.findUnique({ where: { id: laboratorioId, escolaId }, select: { id: true } })
+}
+
 export async function GET(request: Request) {
   try {
     const session = await auth()
-    if (!session) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
+    if (!session?.user?.escolaId) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
 
     const { searchParams } = new URL(request.url)
     const labId = searchParams.get('labId')
@@ -15,6 +19,10 @@ export async function GET(request: Request) {
 
     if (!labId || !dateStr) {
       return NextResponse.json({ message: "labId e data são obrigatórios" }, { status: 400 })
+    }
+
+    if (!(await laboratorioDaEscola(labId, session.user.escolaId))) {
+      return NextResponse.json({ message: "Laboratório não encontrado" }, { status: 404 })
     }
 
     const date = new Date(dateStr)
@@ -57,9 +65,16 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const session = await auth()
-    if (!session) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
+    if (!session?.user?.escolaId) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
 
     const { laboratorioId, data: dateStr, turno, horario, disciplina, turmaId, slots } = await request.json()
+
+    if (!laboratorioId || !(await laboratorioDaEscola(laboratorioId, session.user.escolaId))) {
+      return NextResponse.json({ message: "Laboratório não encontrado" }, { status: 404 })
+    }
+    if (turmaId && !(await prisma.turma.findUnique({ where: { id: turmaId, escolaId: session.user.escolaId }, select: { id: true } }))) {
+      return NextResponse.json({ message: "Turma não encontrada" }, { status: 404 })
+    }
 
     const isAdmin = session.user.isSuperuser || session.user.isDirecao || session.user.name === 'Andressa Mirella'
     const today = new Date()

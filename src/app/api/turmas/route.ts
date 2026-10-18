@@ -34,11 +34,11 @@ export async function POST(request: NextRequest) {
   try {
     const session = await auth()
     
-    if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
+    if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 
-    const { nome, curso, turno, modalidade, serie, numero, cursoId, importarMatriz } = await request.json()
+    const { nome, curso, turno, modalidade, serie, numero, cursoId, importarMatriz, esquemaAvaliacaoId } = await request.json()
 
     if (!nome || nome.trim() === '') {
       return NextResponse.json(
@@ -47,7 +47,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const config = await prisma.globalConfig.findUnique({ where: { id: 'global' } })
+    const escolaId = session.user.escolaId
+
+    // cursoId e esquemaAvaliacaoId vêm do client - precisam ser da mesma escola
+    // (senão a turma herdaria esquema/matriz curricular de outra escola).
+    if (cursoId && !(await prisma.curso.findUnique({ where: { id: cursoId, escolaId }, select: { id: true } }))) {
+      return NextResponse.json({ message: 'Curso inválido' }, { status: 400 })
+    }
+    if (esquemaAvaliacaoId && !(await prisma.esquemaAvaliacao.findUnique({ where: { id: esquemaAvaliacaoId, escolaId }, select: { id: true } }))) {
+      return NextResponse.json({ message: 'Esquema de avaliação inválido' }, { status: 400 })
+    }
+
+    const config = await prisma.globalConfig.findUnique({ where: { id: escolaId } })
     const currentYear = config?.anoLetivoAtual || new Date().getFullYear()
 
     try {
@@ -61,15 +72,16 @@ export async function POST(request: NextRequest) {
           numero: numero ? parseInt(numero.toString()) : null,
           anoLetivo: currentYear,
           cursoId: cursoId || null,
-          escolaId: session.user.escolaId
+          esquemaAvaliacaoId: esquemaAvaliacaoId || null,
+          escolaId
         }
       })
 
       // NOVIDADE: Importar automaticamente as disciplinas da Matriz Curricular
       if (cursoId && serie && (importarMatriz === true || importarMatriz === undefined)) {
         const matrizItems = await (prisma as any).matrizCurricular.findMany({
-          where: { 
-            cursoId: cursoId, 
+          where: {
+            cursoId: cursoId,
             serie: serie.toString(),
             anoLetivo: currentYear
           }

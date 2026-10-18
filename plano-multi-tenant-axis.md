@@ -2,7 +2,29 @@
 
 **Objetivo:** transformar o sistema Áxis (hoje single-tenant, feito sob medida para o CETEP/LNAB) em um produto SaaS multi-tenant, capaz de atender múltiplas escolas com isolamento de dados, identificação por subdomínio e pacotes de assinatura (Básico/Pro/Enterprise).
 
-Este documento é apenas de planejamento — nenhuma alteração de código foi feita ainda.
+## Status de execução (atualizado em 18/10/2026)
+
+As fases 0–11 da seção 6 foram executadas (commits `cc5acc5` → `6962a03`, ago–set/2026). O que ficou em aberto:
+
+| Item | Situação |
+|---|---|
+| Fases 1–5 (Escola, backfill, constraints, subdomínio, auth) | ✅ Concluído |
+| Fase 6 (auditoria de queries por `escolaId`) | ✅ Concluído — vazamentos residuais seguem sendo achados e corrigidos de passagem (ver `git log`) |
+| Fase 7 (enforcement de plano) | ✅ Módulos PRO + limite de usuários staff (`f49436b`) |
+| Fase 8 (onboarding de 2ª escola) | ⚠️ Só via script (`prisma/onboard-escola-teste.ts`) — sem fluxo/tela de provisionamento |
+| Fase 9 (catálogo de módulos + `can()`) | ⚠️ Catálogo em uso na sidebar/dashboard; `can()` usado em 7 arquivos, ~26 ainda com checagem inline |
+| Fase 10 (SQL raw / `as any`) | ✅ Concluído (restam 9 erros de `tsc` em scripts de backfill legados) |
+| Fase 11 (módulo financeiro) | ⚠️ Só esqueleto, sem requisito de produto |
+| Seção 7.7 (eventos internos) | ⏸️ Opcional, não iniciado |
+| Branding: upload de `Escola.logoUrl` / cores | ❌ Campo existe e é lido; falta tela para a escola configurar |
+| Rota de debug `api/debug/restore-geografia` (escrevia notas sem filtro de escola nem papel) | ✅ Removida em 18/10/2026 |
+
+Depois deste plano, o trabalho seguiu num **plano pré-lançamento** (testes automatizados, limites de plano e **modelo de avaliação configurável**), registrado só nos commits. Pendências dessa frente:
+
+- Override de esquema de avaliação **por turma** (`Turma.esquemaAvaliacaoId` existe no schema, mas só o curso tem UI).
+- ~20 telas/PDFs ainda leem as colunas legadas `nota1/2/3` (relatórios, resultados, conselho, portal, boletim). O lançamento faz dual-write para não quebrá-las.
+- Após migrar esses leitores: parar o dual-write e remover `nota1/2/3` / `is_desistente_unidN`.
+- Colunas U1/U2/U3 fixas nos relatórios mesmo para turmas semestrais (cosmético).
 
 ---
 

@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { provaDaEscola } from '@/lib/data-fetching'
 
 export const runtime = 'nodejs'
 
 export async function GET(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+    if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
 
     const { searchParams } = new URL(request.url)
     const search = searchParams.get('search')
@@ -47,9 +48,12 @@ export async function GET(request: NextRequest) {
       where.areaId = areaId
     }
 
+    // Aplicado por fora pra não colidir com o OR da busca
+    const whereEscola = { AND: [where, provaDaEscola(session.user.escolaId)] }
+
     const [provas, total] = await Promise.all([
       prisma.prova.findMany({
-        where,
+        where: whereEscola,
         skip,
         take: limit,
         include: {
@@ -63,7 +67,7 @@ export async function GET(request: NextRequest) {
         },
         orderBy: { createdAt: 'desc' }
       }),
-      prisma.prova.count({ where })
+      prisma.prova.count({ where: whereEscola })
     ])
 
     return NextResponse.json({
@@ -84,7 +88,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+    if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
 
     const body = await request.json()
     console.log('Post Prova body:', body)
@@ -92,6 +96,16 @@ export async function POST(request: NextRequest) {
 
     if (!titulo || !turmaId || !questoesIds || questoesIds.length === 0) {
       return NextResponse.json({ message: 'Dados incompletos' }, { status: 400 })
+    }
+
+    const escolaId = session.user.escolaId
+    const [turma, area, questoesDaEscola] = await Promise.all([
+      prisma.turma.findUnique({ where: { id: turmaId, escolaId }, select: { id: true } }),
+      areaId ? prisma.areaConhecimento.findUnique({ where: { id: areaId, escolaId }, select: { id: true } }) : null,
+      prisma.questao.count({ where: { id: { in: questoesIds }, professor: { escolaId } } })
+    ])
+    if (!turma || (areaId && !area) || questoesDaEscola !== new Set(questoesIds).size) {
+      return NextResponse.json({ message: 'Turma, área ou questão não encontrada' }, { status: 404 })
     }
 
     // Regra de Duplicidade: Impede 2 provas da mesma unidade/tipo para a mesma turma (exceto dependência)
@@ -124,7 +138,7 @@ export async function POST(request: NextRequest) {
 
     // Mantendo fallback para títulos duplicados genéricos
     const existingTitle = await prisma.prova.findFirst({
-      where: { titulo: { equals: titulo, mode: 'insensitive' } }
+      where: { titulo: { equals: titulo, mode: 'insensitive' }, ...provaDaEscola(session.user.escolaId) }
     })
 
     if (existingTitle) {

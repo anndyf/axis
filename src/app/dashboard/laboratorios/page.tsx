@@ -9,9 +9,11 @@ export const metadata = {
 
 export default async function LaboratoriosPage() {
   const session = await auth()
-  if (!session) redirect("/login")
+  if (!session?.user?.escolaId) redirect("/login")
+  const escolaId = session.user.escolaId
 
   const laboratorios = await prisma.laboratorio.findMany({
+    where: { escolaId },
     orderBy: { nome: 'asc' }
   })
 
@@ -22,6 +24,7 @@ export default async function LaboratoriosPage() {
 
   if (isAdmin) {
     myTurmas = await prisma.turma.findMany({
+      where: { escolaId },
       include: {
         disciplinas: {
           select: { id: true, nome: true }

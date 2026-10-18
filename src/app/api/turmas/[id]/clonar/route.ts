@@ -9,7 +9,7 @@ export async function POST(
 ) {
   try {
     const session = await auth()
-    if (!session || !session.user.isSuperuser) {
+    if (!session?.user?.escolaId || !session.user.isSuperuser) {
       return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
     }
 
@@ -19,7 +19,7 @@ export async function POST(
 
     // 1. Buscar a turma original com suas disciplinas
     const originalTurma = await prisma.turma.findUnique({
-      where: { id },
+      where: { id, escolaId: session.user.escolaId },
       include: {
         disciplinas: true
       }

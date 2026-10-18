@@ -1,23 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { turmasSaoDaEscola } from '@/lib/data-fetching'
 
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session?.user || !session.user.isStaff) {
+    if (!session?.user?.escolaId || !session.user.isStaff) {
       return NextResponse.json({ message: 'Apenas professores podem criar planos' }, { status: 403 })
     }
 
     const data = await request.json()
-    const { 
+    const {
       disciplinaNome, periodoInicio, periodoFim,
       indicadores, conteudos, metodologias, recursos, avaliacao,
-      observacoes, turmasIds 
+      observacoes, turmasIds
     } = data
 
     if (!turmasIds || turmasIds.length === 0) {
       return NextResponse.json({ message: 'Selecione pelo menos uma turma' }, { status: 400 })
+    }
+    if (!(await turmasSaoDaEscola(turmasIds, session.user.escolaId))) {
+      return NextResponse.json({ message: 'Turma não encontrada' }, { status: 404 })
     }
 
     const plano = await prisma.planoEnsino.create({
@@ -51,7 +55,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session?.user) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+    if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
 
     const { searchParams } = new URL(request.url)
     const professorId = searchParams.get('professorId')
@@ -60,7 +64,8 @@ export async function GET(request: NextRequest) {
     const dataInicio = searchParams.get('dataInicio')
     const dataFim = searchParams.get('dataFim')
 
-    const where: any = {}
+    // PlanoEnsino não tem escolaId próprio - o escopo vem do professor
+    const where: any = { professor: { escolaId: session.user.escolaId } }
     
     // Filtros
     if (!session.user.isSuperuser && !session.user.isDirecao) {

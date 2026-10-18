@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { 
   ArrowLeft, Save, Loader2, School, GraduationCap, 
-  Clock, Hash, Trash2, AlertCircle, Layers, Calendar, Plus
+  Clock, Hash, Trash2, AlertCircle, Layers, Calendar, Plus, Calculator
 } from "lucide-react"
 import ConfirmModal from "./ConfirmModal"
 import ErrorModal from "./ErrorModal"
@@ -21,6 +21,8 @@ interface TurmaFormProps {
     modalidade?: string | null
     serie?: string | null
     numero?: number | null
+    cursoId?: string | null
+    esquemaAvaliacaoId?: string | null
   }
   isEdit?: boolean
   dbCursos?: any[]
@@ -55,9 +57,25 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
     modalidade: turma?.modalidade || "",
     serie: turma?.serie || "1",
     numero: turma?.numero || 1,
-    cursoId: "" // Novo campo
+    cursoId: turma?.cursoId || "",
+    // "" = herda o esquema do curso; preenchido = override só desta turma
+    esquemaAvaliacaoId: turma?.esquemaAvaliacaoId || ""
   })
   const [importarMatriz, setImportarMatriz] = useState(!isEdit)
+  const [esquemas, setEsquemas] = useState<{ id: string; nome: string }[]>([])
+
+  useEffect(() => {
+    fetch('/api/esquemas-avaliacao')
+      .then(res => res.ok ? res.json() : [])
+      .then(data => setEsquemas(Array.isArray(data) ? data : []))
+      .catch(() => setEsquemas([]))
+  }, [])
+
+  const esquemaDoCurso = useMemo(() => {
+    const cursoSelecionado = dbCursos.find(c => c.id === formData.cursoId)
+      || dbCursos.find(c => c.nome === formData.curso && c.modalidade === formData.modalidade)
+    return esquemas.find(e => e.id === cursoSelecionado?.esquemaAvaliacaoId)?.nome
+  }, [dbCursos, esquemas, formData.cursoId, formData.curso, formData.modalidade])
 
   // Removido useEffect que puxava /api/cursos, agora as constantes são síncronas.
 
@@ -425,6 +443,27 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                       </button>
                     ))}
                   </div>
+                </div>
+
+                {/* 6. Esquema de Avaliação */}
+                <div className="md:col-span-2 space-y-2">
+                  <div className="flex flex-col ml-1">
+                    <label className="flex items-center text-[10px] font-semibold text-black uppercase tracking-widest">
+                      <Calculator className="w-4 h-4 mr-2 text-violet-500" />
+                      6. Esquema de Avaliação
+                    </label>
+                    <p className="text-[9px] text-black/40 font-semibold mt-0.5 ml-6">Unidades e atividades usadas no lançamento de notas</p>
+                  </div>
+                  <select
+                    value={formData.esquemaAvaliacaoId}
+                    onChange={(e) => setFormData(prev => ({ ...prev, esquemaAvaliacaoId: e.target.value }))}
+                    className="w-full h-12 px-4 bg-slate-50 border border-slate-100 rounded-xl outline-none font-semibold text-sm text-black focus:bg-white focus:border-blue-500 transition-all appearance-none"
+                  >
+                    <option value="">Herdar do curso{esquemaDoCurso ? ` (${esquemaDoCurso})` : ""}</option>
+                    {esquemas.map(esq => (
+                      <option key={esq.id} value={esq.id}>{esq.nome}</option>
+                    ))}
+                  </select>
                 </div>
 
                 {/* Opção de Importar Matriz */}

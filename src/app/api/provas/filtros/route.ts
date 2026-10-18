@@ -7,7 +7,8 @@ export const runtime = 'nodejs'
 export async function GET(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+    if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+    const escolaId = session.user.escolaId
 
     const isAdmin = session.user.isSuperuser || session.user.isDirecao
     const userId = session.user.id
@@ -18,6 +19,7 @@ export async function GET(request: NextRequest) {
     if (isAdmin) {
       criadores = await prisma.user.findMany({
         where: {
+          escolaId,
           provasCriadas: {
             some: {}
           }
@@ -40,6 +42,7 @@ export async function GET(request: NextRequest) {
 
     // Para áreas de conhecimento, retornamos todas disponíveis
     const areas = await prisma.areaConhecimento.findMany({
+      where: { escolaId },
       select: {
         id: true,
         nome: true

@@ -10,12 +10,13 @@ export const metadata = {
 export default async function ImportarEstudantesPage() {
   const session = await auth()
   
-  if (!session) {
+  if (!session?.user?.escolaId) {
     redirect("/login")
   }
 
   // Fetch turmas for the datalist
-  const turmas = await (prisma as any).turma.findMany({
+  const turmas = await prisma.turma.findMany({
+    where: { escolaId: session.user.escolaId },
     orderBy: { nome: 'asc' },
     select: { id: true, nome: true, modalidade: true, turno: true }
   })

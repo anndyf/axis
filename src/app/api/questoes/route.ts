@@ -3,13 +3,14 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { logAudit } from '@/lib/audit'
 import { getModulosAtivos } from '@/lib/modules-server'
+import { turmasSaoDaEscola } from '@/lib/data-fetching'
 
 export const runtime = 'nodejs'
 
 export async function GET(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+    if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
 
     const { searchParams } = new URL(request.url)
     const turmaId = searchParams.get('turmaId')
@@ -111,9 +112,13 @@ export async function GET(request: NextRequest) {
     const limitParam = searchParams.get('limit')
     const limit = limitParam ? parseInt(limitParam) : undefined
 
-    const total = await prisma.questao.count({ where })
+    // Questao não tem escolaId próprio - o escopo vem do professor autor.
+    // Aplicado por fora pra não colidir com os filtros de professor/AND acima.
+    const whereEscola = { AND: [where, { professor: { escolaId: session.user.escolaId } }] }
+
+    const total = await prisma.questao.count({ where: whereEscola })
     const questoes = await prisma.questao.findMany({
-      where,
+      where: whereEscola,
       include: includeObj,
       orderBy: { createdAt: 'desc' },
       ...(limit ? { take: limit } : {})
@@ -149,6 +154,13 @@ export async function POST(request: NextRequest) {
       correta, dificuldade, muleta, imagemUrl, unidade,
       disciplinasIds, turmasIds, tipo 
     } = body
+
+    const disciplinasDaEscola = await prisma.disciplina.count({
+      where: { id: { in: disciplinasIds }, turma: { escolaId: session.user.escolaId } }
+    })
+    if (disciplinasDaEscola !== new Set(disciplinasIds).size || !(await turmasSaoDaEscola(turmasIds, session.user.escolaId))) {
+      return NextResponse.json({ message: 'Turma ou disciplina não encontrada' }, { status: 404 })
+    }
 
     const questao = await prisma.questao.create({
       data: {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { provaDaEscola } from '@/lib/data-fetching'
 import { logAudit } from '@/lib/audit'
 
 export const runtime = 'nodejs'
@@ -11,12 +12,12 @@ export async function GET(
 ) {
   try {
     const session = await auth()
-    if (!session) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+    if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
 
     const { id } = await params
 
-    const prova = await prisma.prova.findUnique({
-      where: { id },
+    const prova = await prisma.prova.findFirst({
+      where: { id, ...provaDaEscola(session.user.escolaId) },
       include: {
         turma: { 
           select: { 
@@ -49,12 +50,12 @@ export async function DELETE(
 ) {
   try {
     const session = await auth()
-    if (!session) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+    if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
 
     const { id } = await params
 
-    const prova = await prisma.prova.findUnique({
-      where: { id }
+    const prova = await prisma.prova.findFirst({
+      where: { id, ...provaDaEscola(session.user.escolaId) }
     })
 
     if (!prova) return NextResponse.json({ message: 'Prova não encontrada' }, { status: 404 })
