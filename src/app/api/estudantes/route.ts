@@ -74,6 +74,7 @@ export async function POST(request: NextRequest) {
               username: matricula,
               email: `${matricula}@axis.com`,
               password: hashedPassword,
+              deveTrocarSenha: true,
               name: nome.trim(),
               isPortalUser: true,
               estudanteId: estudante.id,

@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { hash } from 'bcryptjs'
 import { enviarSenhaPorEmail } from '@/lib/mail'
+import { gerarSenhaProvisoria } from '@/lib/senha'
 import { podeAdicionarUsuarioStaff } from '@/lib/modules-server'
 import { LIMITE_USUARIOS } from '@/lib/modules'
 
@@ -77,60 +78,35 @@ export async function POST(request: NextRequest) {
       }, { status: 403 })
     }
 
-    // Geração de senha aleatória (Django Style)
-    const charset = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789abcdefghijkmnopqrstuvwxyz"
-    const senhaGerada = Array.from({ length: 10 }, () => charset[Math.floor(Math.random() * charset.length)]).join('')
-    
+    const senhaGerada = gerarSenhaProvisoria()
     const hashedPassword = await hash(senhaGerada, 10)
 
-    try {
-      // Tentar criação normal via Prisma Client
-      const user = await prisma.user.create({
-        data: {
-          name: name || '',
-          email,
-          username: email,
-          password: hashedPassword,
-          isSuperuser: !!isSuperuser,
-          isDirecao: !!isDirecao,
-          isStaff: !!isStaff,
-          isAEE: !!isAEE,
-          escolaId,
-        }
-      })
-
-      // Enviar email com a senha (não trava se falhar)
-      try {
-        await enviarSenhaPorEmail(email, name || 'Professor', senhaGerada, escolaId);
-      } catch (mailError) {
-        console.error('Falha ao enviar e-mail:', mailError);
+    const user = await prisma.user.create({
+      data: {
+        name: name || '',
+        email,
+        username: email,
+        password: hashedPassword,
+        deveTrocarSenha: true,
+        isSuperuser: !!isSuperuser,
+        isDirecao: !!isDirecao,
+        isStaff: !!isStaff,
+        isAEE: !!isAEE,
+        escolaId,
       }
+    })
 
-      return NextResponse.json({ 
-        id: user.id, 
-        message: 'Usuário criado e senha enviada por e-mail' 
-      }, { status: 201 })
-
-    } catch (prismaError: any) {
-      // FALLBACK: Se o Prisma Client estiver "stale" (cache do dev server), usamos RAW SQL
-      console.warn('Prisma Client falhou, tentando fallback via SQL bruto...', prismaError.message)
-      
-      const id = `u_${Math.random().toString(36).substring(2, 11)}`
-
-      await prisma.$executeRawUnsafe(`
-        INSERT INTO "users" (id, email, username, password, name, is_superuser, is_direcao, is_staff, is_aee, is_active, escola_id, created_at, updated_at)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, true, $10, NOW(), NOW())
-      `, id, email, email, hashedPassword, name || '', !!isSuperuser, !!isDirecao, !!isStaff, !!isAEE, escolaId)
-
-      try {
-        await enviarSenhaPorEmail(email, name || 'Professor', senhaGerada, escolaId);
-      } catch (mailError) {}
-
-      return NextResponse.json({ 
-        id, 
-        message: 'Usuário criado via SQL (Fallback) e senha enviada por e-mail' 
-      }, { status: 201 })
+    // Enviar email com a senha (não trava se falhar)
+    try {
+      await enviarSenhaPorEmail(email, name || 'Professor', senhaGerada, escolaId);
+    } catch (mailError) {
+      console.error('Falha ao enviar e-mail:', mailError);
     }
+
+    return NextResponse.json({
+      id: user.id,
+      message: 'Usuário criado e senha enviada por e-mail'
+    }, { status: 201 })
 
   } catch (error: any) {
     console.error('ERRO DETALHADO AO CRIAR USUÁRIO:', error)

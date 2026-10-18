@@ -44,18 +44,23 @@ function LoginContent({ nomeEscola }: { nomeEscola: string }) {
       })
 
       if (result?.error) {
-        const errorMsg = result.error.toLowerCase();
-        
-        if (errorMsg.includes('user_not_found')) {
-          setError("Usuário ou e-mail não encontrado. Verifique os dados e tente novamente.")
-        } else if (errorMsg.includes('invalid_password')) {
-          setError("Senha incorreta. Verifique se o Caps Lock está ligado ou recupere sua senha.")
-        } else if (errorMsg.includes('user_inactive')) {
-          setError("Sua conta está pausada pela administração. Entre em contato para mais informações.")
-        } else if (errorMsg.includes('user_not_approved')) {
-          setError("Seu cadastro ainda está pendente de aprovação pela direção.")
-        } else {
-          setError("Usuário ou senha inválidos. Tente novamente.")
+        // `code` vem do ErroLogin em src/lib/auth.ts. Usuário inexistente e
+        // senha errada caem no mesmo "credenciais" de propósito.
+        switch (result.code) {
+          case 'inativo':
+            setError("Sua conta está pausada pela administração. Entre em contato para mais informações.")
+            break
+          case 'pendente':
+            setError("Seu cadastro ainda está pendente de aprovação pela direção.")
+            break
+          case 'bloqueado':
+            setError("Muitas tentativas sem sucesso. Aguarde 15 minutos ou recupere sua senha.")
+            break
+          case 'escola':
+            setError("Não foi possível identificar a escola por este endereço.")
+            break
+          default:
+            setError("Usuário ou senha inválidos. Verifique o Caps Lock ou recupere sua senha.")
         }
         setLoading(false)
       } else {

@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { hash } from 'bcryptjs'
 import { enviarSenhaPorEmail } from '@/lib/mail'
+import { gerarSenhaProvisoria } from '@/lib/senha'
 
 export const runtime = 'nodejs'
 
@@ -30,9 +31,7 @@ export async function POST(
       return NextResponse.json({ message: 'Usuário já está aprovado' }, { status: 400 })
     }
 
-    // Geração de senha aleatória
-    const charset = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789abcdefghijkmnopqrstuvwxyz"
-    const senhaGerada = Array.from({ length: 10 }, () => charset[Math.floor(Math.random() * charset.length)]).join('')
+    const senhaGerada = gerarSenhaProvisoria()
     const hashedPassword = await hash(senhaGerada, 10)
 
     // Aprovar usuário
@@ -41,7 +40,8 @@ export async function POST(
       data: {
         isApproved: true,
         isActive: true,
-        password: hashedPassword
+        password: hashedPassword,
+        deveTrocarSenha: true
       }
     })
 

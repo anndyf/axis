@@ -148,3 +148,13 @@ export async function turmasSaoDaEscola(turmasIds: string[], escolaId: string) {
 export function provaDaEscola(escolaId: string) {
   return { OR: [{ turma: { escolaId } }, { turmaId: null, professorCriador: { escolaId } }] }
 }
+
+/**
+ * Conta com senha provisória ou igual à matrícula (User.deveTrocarSenha):
+ * as áreas logadas redirecionam para /trocar-senha até a troca ser feita.
+ * Lido do banco (não do JWT) pra liberar na hora em que a senha muda.
+ */
+export async function precisaTrocarSenha(userId: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { deveTrocarSenha: true } })
+  return !!user?.deveTrocarSenha
+}

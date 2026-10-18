@@ -1,0 +1,52 @@
+# CI: tipos + testes a cada push/PR (plano-roteiro-ferramentas.md, P0).
+# Sobe um Postgres descartável, aplica as migrations e roda a suíte, que usa
+# o banco (testes de integração em src/lib/*.test.ts).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: axis_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://postgres:ci@localhost:5432/axis_test
+      DIRECT_URL: postgresql://postgres:ci@localhost:5432/axis_test
+      NEXTAUTH_SECRET: ci-apenas
+      ROOT_DOMAIN: localhost
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Aplicar migrations
+        run: npx prisma migrate deploy
+
+      - name: Checagem de tipos
+        run: npx tsc --noEmit
+
+      - name: Testes
+        run: npm test

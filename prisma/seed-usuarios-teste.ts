@@ -99,13 +99,14 @@ async function main() {
     const password = await bcrypt.hash(matricula, 10)
     await prisma.user.upsert({
       where: { escolaId_username: { escolaId, username: matricula } },
-      update: { password, estudanteId: estudante.id },
+      update: { password, estudanteId: estudante.id, deveTrocarSenha: true },
       create: {
         username: matricula,
         email: `${matricula}@axis.com`,
         password,
         name: estudante.nome,
         isPortalUser: true,
+        deveTrocarSenha: true, // mesmo comportamento do app (senha = matrícula)
         estudanteId: estudante.id,
         escolaId,
         isApproved: true,

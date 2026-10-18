@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { hash } from 'bcryptjs'
 import { enviarSenhaPorEmail } from '@/lib/mail'
+import { gerarSenhaProvisoria } from '@/lib/senha'
 
 export const runtime = 'nodejs'
 
@@ -27,21 +28,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Todos os usuários selecionados já foram aprovados' }, { status: 400 })
     }
 
-    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%"
-    const gerarSenha = () =>
-      Array.from({ length: 10 }, () => charset[Math.floor(Math.random() * charset.length)]).join('')
-
     const resultados: { nome: string; email: string; ok: boolean }[] = []
 
     // Processa em paralelo
     await Promise.all(usuarios.map(async (user) => {
       try {
-        const senhaGerada = gerarSenha()
+        const senhaGerada = gerarSenhaProvisoria()
         const hashedPassword = await hash(senhaGerada, 10)
 
         await prisma.user.update({
           where: { id: user.id },
-          data: { isApproved: true, isActive: true, password: hashedPassword }
+          data: { isApproved: true, isActive: true, password: hashedPassword, deveTrocarSenha: true }
         })
 
         try {

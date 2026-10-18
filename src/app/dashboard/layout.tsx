@@ -5,7 +5,7 @@ import SessionTimer from "@/components/SessionTimer"
 import MessageNotification from "@/components/MessageNotification"
 import { Code } from "lucide-react"
 import DashboardLayoutWrapper from "@/components/DashboardLayoutWrapper"
-import { getGlobalConfig } from "@/lib/data-fetching"
+import { getGlobalConfig, precisaTrocarSenha } from "@/lib/data-fetching"
 import { getModulosAtivos } from "@/lib/modules-server"
 
 export const dynamic = 'force-dynamic'
@@ -25,6 +25,10 @@ export default async function DashboardLayout({
   // Se for usuário do portal, não acessa o dashboard administrativo
   if (session.user.isPortalUser) {
     redirect("/portal")
+  }
+
+  if (await precisaTrocarSenha(session.user.id)) {
+    redirect("/trocar-senha")
   }
 
   const escola = await prisma.escola.findUnique({
