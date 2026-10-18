@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
 import { logAudit } from '@/lib/audit'
 
 export const runtime = 'nodejs'
@@ -13,7 +14,7 @@ export async function PUT(
   try {
     const session = await auth()
 
-    if (!session?.user?.escolaId) {
+    if (!session?.user?.escolaId || !can(session.user, 'gestao')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 
@@ -35,6 +36,11 @@ export async function PUT(
 
     const { id } = await context.params
 
+    // turmaId vem do formulário - precisa ser uma turma da mesma escola
+    if (!(await prisma.turma.findUnique({ where: { id: turmaId, escolaId: session.user.escolaId }, select: { id: true } }))) {
+      return NextResponse.json({ message: 'Turma não encontrada' }, { status: 404 })
+    }
+
     const estudante = await prisma.estudante.update({
       where: { escolaId_matricula: { escolaId: session.user.escolaId, matricula: id } },
       data: {
@@ -53,7 +59,10 @@ export async function PUT(
     )
 
     return NextResponse.json(estudante)
-  } catch (error) {
+  } catch (error: any) {
+    if (error.code === 'P2025') {
+      return NextResponse.json({ message: 'Estudante não encontrado' }, { status: 404 })
+    }
     console.error('Erro ao atualizar estudante:', error)
     return NextResponse.json(
       { message: 'Erro ao atualizar estudante' },
@@ -70,7 +79,7 @@ export async function DELETE(
   try {
     const session = await auth()
 
-    if (!session?.user?.escolaId) {
+    if (!session?.user?.escolaId || !can(session.user, 'gestao')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 

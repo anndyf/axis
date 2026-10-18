@@ -21,7 +21,7 @@ Notas configuráveis por esquema, recuperação, conselho de classe, boletim, po
 | **Troca obrigatória de senha no 1º acesso** | Senha = matrícula é previsível | ✅ Feito: portal e senhas provisórias por e-mail; contas de portal existentes marcadas pela migration |
 | **Cabeçalhos de segurança HTTP** | HSTS, `X-Frame-Options`, `nosniff`, `Referrer-Policy` | ✅ Feito (CSP pendente) |
 | **CI (GitHub Actions)** | `tsc` + testes a cada push; hoje nada impede um commit quebrado | ✅ `.github/workflows/ci.yml` (roda ao subir para o GitHub) |
-| **Teste automático de isolamento entre escolas** | Os ~40 vazamentos corrigidos foram achados lendo código. Um teste que chama cada rota com usuário da escola B pedindo dado da escola A pega regressões | Próximo |
+| **Teste automático de isolamento entre escolas** | Os ~40 vazamentos corrigidos foram achados lendo código. Um teste que chama cada rota com usuário da escola B pedindo dado da escola A pega regressões | ✅ `src/lib/isolamento-escolas.test.ts`: 67 tentativas da escola B contra dados da A + 11 de aluno do portal; já achou 1 vazamento novo e 3 rotas sem checagem de papel |
 | **Monitoramento de erros** (Sentry ou similar) | Erros em produção hoje só aparecem no log do servidor | Próximo |
 | **Backup e exportação por escola** | Restauração testada + exportação completa dos dados de uma escola (portabilidade, encerramento de contrato) | Próximo |
 | **Lançamento de notas em transação** | Lote com erro no meio deixa metade salva | Pendência registrada |

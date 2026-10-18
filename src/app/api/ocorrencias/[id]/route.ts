@@ -33,7 +33,10 @@ export async function DELETE(
     )
 
     return NextResponse.json({ message: 'Ocorrência excluída com sucesso' })
-  } catch (error) {
+  } catch (error: any) {
+    if (error.code === 'P2025') {
+      return NextResponse.json({ message: 'Ocorrência não encontrada' }, { status: 404 })
+    }
     console.error('Erro ao excluir ocorrência:', error)
     return NextResponse.json({ message: 'Erro ao excluir ocorrência' }, { status: 500 })
   }
@@ -93,7 +96,10 @@ export async function PUT(
     )
 
     return NextResponse.json(ocorrencia)
-  } catch (error) {
+  } catch (error: any) {
+    if (error.code === 'P2025') {
+      return NextResponse.json({ message: 'Ocorrência não encontrada' }, { status: 404 })
+    }
     console.error('Erro ao atualizar ocorrência:', error)
     return NextResponse.json({ message: 'Erro ao atualizar ocorrência' }, { status: 500 })
   }
