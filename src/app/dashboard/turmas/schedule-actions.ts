@@ -35,10 +35,14 @@ export async function getSchedule(turmaId: string) {
 export type ScheduleItem = {
     diaSemana: number
     horario: number
-    disciplina: string
-    professor: string
+    disciplinaId: string
 }
 
+/**
+ * Salva a grade da turma. Recebe só a disciplina (chave); nome e professor
+ * são resolvidos aqui a partir das disciplinas DA PRÓPRIA TURMA - o client
+ * não define texto nem professor.
+ */
 export async function saveSchedule(turmaId: string, items: ScheduleItem[]) {
   const session = await auth()
   if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
@@ -48,24 +52,33 @@ export async function saveSchedule(turmaId: string, items: ScheduleItem[]) {
     return { error: "Sem permissão" }
   }
 
-  try {
-    // Transaction to update all
-    await prisma.$transaction(async (tx: any) => {
-      // Delete existing for this turma
-      await tx.horarioAula.deleteMany({
-        where: { turmaId }
-      })
+  const disciplinas = await prisma.disciplina.findMany({
+    where: { turmaId },
+    select: { id: true, nome: true, usuariosPermitidos: { select: { id: true, name: true, username: true }, take: 1 } }
+  })
+  const porId = new Map(disciplinas.map((d) => [d.id, d]))
+  if (items.some((i) => !porId.has(i.disciplinaId) || !(i.diaSemana >= 1 && i.diaSemana <= 5) || !(i.horario >= 1))) {
+    return { error: "Disciplina ou horário inválido" }
+  }
 
-      // Create new ones
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.horarioAula.deleteMany({ where: { turmaId } })
       if (items.length > 0) {
         await tx.horarioAula.createMany({
-            data: items.map(i => ({
-                turmaId,
-                diaSemana: i.diaSemana,
-                horario: i.horario,
-                disciplina: i.disciplina,
-                professor: i.professor
-            }))
+          data: items.map((i) => {
+            const disc = porId.get(i.disciplinaId)!
+            const prof = disc.usuariosPermitidos[0]
+            return {
+              turmaId,
+              diaSemana: i.diaSemana,
+              horario: i.horario,
+              disciplinaId: disc.id,
+              disciplina: disc.nome,
+              professorId: prof?.id ?? null,
+              professor: prof ? (prof.name || prof.username) : null,
+            }
+          })
         })
       }
     })

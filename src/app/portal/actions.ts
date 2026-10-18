@@ -28,7 +28,9 @@ export async function getStudentPortalData() {
             },
             disciplinas: {
               include: {
-                usuariosPermitidos: true
+                // Só o nome do professor: isto vai para o navegador do aluno
+                // (antes ia o registro inteiro, com e-mail e hash de senha)
+                usuariosPermitidos: { select: { name: true, username: true } }
               }
             }
           }

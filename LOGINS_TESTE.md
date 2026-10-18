@@ -88,6 +88,7 @@ npm test                                 # testes automatizados (usam o axis_tes
 npm run db:seed                          # dados de exemplo da CETEP
 npx tsx prisma/onboard-escola-teste.ts   # escola Horizonte
 npx tsx prisma/seed-usuarios-teste.ts    # usuários de teste (direção, AEE, portal...)
+npx tsx prisma/seed-calendario.ts       # calendário 2026, feriados, tempos de aula e horários
 ```
 
 ### Recriar o banco do zero
@@ -97,4 +98,5 @@ npx prisma migrate reset                 # apaga o axis_dev e reaplica as migrat
 npm run db:seed
 npx tsx prisma/onboard-escola-teste.ts
 npx tsx prisma/seed-usuarios-teste.ts
+npx tsx prisma/seed-calendario.ts
 ```

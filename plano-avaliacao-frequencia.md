@@ -10,7 +10,9 @@
 | 2. Regra de avaliação (schema + motor) | ✅ Migration `avaliacao_regra_configuravel`; motor com 5 formas de cálculo, peso por etapa, `MEDIA_COM_UNIDADE`, `MEDIA_COM_FINAL`; esquemas legados com resultado idêntico (testes) |
 | 3. Tela de esquemas | ✅ Escala, forma de cálculo por etapa e final, recuperação, frequência (campos gravados; chamada ainda não existe) |
 | 4. Migrar leitores de `nota1/2/3` | ✅ Todas as telas, PDFs e o portal leem `NotaUnidade` com colunas U1..UN do esquema da turma (`src/lib/services/notas-leitura.ts`). Lançamento parou o dual-write; seed grava no modelo novo. Colunas `nota_1/2/3` e `is_desistente_unid1/2/3` removidas (migration `remove_colunas_notas_legadas`, que antes copia para `notas_unidades` qualquer nota ainda sem etapas) |
-| 5–9 | ⏳ Não iniciados |
+| 5. Atividades do professor | ⏳ Não iniciado |
+| 6. Calendário + tempos de aula + horário com chaves reais | ✅ Configurações → Calendário letivo (ano, datas das unidades, feriados, sábados letivos, tempos por turno); horário da turma com disciplina/professor por chave e quadro de aulas previstas × carga horária (`src/lib/services/calendario.ts`) |
+| 7–9. Chamada, frequência, justificativas | ⏳ Próximo |
 
 Pendências pequenas registradas no caminho:
 - `api/conselho-classe` ainda valida a nota de recuperação contra 0–10 fixo (deveria usar `notaMaxima` do esquema).
