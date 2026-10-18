@@ -57,5 +57,14 @@
     "tsx": "^4.21.0",
     "typescript": "^5",
     "vitest": "^4.1.11"
+  },
+  "allowScripts": {
+    "@prisma/client@6.19.2": true,
+    "@prisma/engines@6.19.2": true,
+    "prisma@6.19.2": true,
+    "esbuild@0.27.3": true,
+    "sharp@0.34.5": true,
+    "unrs-resolver@1.11.1": true,
+    "core-js@3.48.0": true
   }
 }
