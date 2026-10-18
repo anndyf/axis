@@ -5,6 +5,7 @@ import Link from "next/link"
 import { ArrowLeft, Download, CheckCircle2, FileText, GraduationCap, AlertTriangle, TrendingDown, Info, Printer } from "lucide-react"
 import TeacherTipsModal from "@/components/TeacherTipsModal"
 import { analyzeRisk } from "@/lib/risk-analysis"
+import type { EtapaDaNota } from "@/lib/services/notas"
 
 interface Disciplina {
   id: string
@@ -14,21 +15,17 @@ interface Disciplina {
 interface NotaResultado {
   id: string
   nota: number
-  nota1?: number | null
-  nota2?: number | null
-  nota3?: number | null
+  etapas: EtapaDaNota[]
   notaRecuperacao: number | null
   status: string
-  isDesistenteUnid1?: boolean
-  isDesistenteUnid2?: boolean
-  isDesistenteUnid3?: boolean
   estudanteId: string
   estudanteNome: string
   disciplinaId: string
   disciplinaNome: string
 }
 
-type UnitOption = 'FINAL' | 'UNIDADE_1' | 'UNIDADE_2' | 'UNIDADE_3'
+// "UNIDADE_N" (N a partir de 1) = etapa N do esquema da turma; mesmo formato do ?unit= do PDF
+type UnitOption = 'FINAL' | `UNIDADE_${number}`
 
 export default function ResultadosTurmaClient({
   turmaId,
@@ -36,6 +33,7 @@ export default function ResultadosTurmaClient({
   disciplinas,
   initialNotas,
   initialEstudantes,
+  nomesEtapas,
   numUnidades = 3,
   notaMinimaAprovacao = 5
 }: {
@@ -44,6 +42,7 @@ export default function ResultadosTurmaClient({
   disciplinas: Disciplina[]
   initialNotas: NotaResultado[]
   initialEstudantes?: { matricula: string, nome: string }[]
+  nomesEtapas: string[]
   numUnidades?: number
   notaMinimaAprovacao?: number
 }) {
@@ -76,7 +75,7 @@ export default function ResultadosTurmaClient({
     // Se for modo numérico (Unidades)
     if (status === 'NUMERIC') {
         if (notaValue === undefined || notaValue === null) return { color: 'text-slate-300', text: 'font-normal', label: '-' }
-        if (notaValue >= 5) return { color: 'text-emerald-600', text: 'font-medium', label: notaValue.toFixed(1) }
+        if (notaValue >= notaMinimaAprovacao) return { color: 'text-emerald-600', text: 'font-medium', label: notaValue.toFixed(1) }
         return { color: 'text-rose-600', text: 'font-medium', label: notaValue.toFixed(1) }
     }
 
@@ -118,7 +117,7 @@ export default function ResultadosTurmaClient({
         let statusKey = n.status
 
         // Lógica de exibição do status
-        const isPositive = n.nota >= 5
+        const isPositive = n.nota >= notaMinimaAprovacao
         if (n.status === 'APROVADO' || isPositive) { statusKey = 'APROVADO'; label = 'AP'; }
         else if (n.status === 'RECU_FINAL' || !isPositive) { statusKey = 'RECUPERACAO'; label = 'RC'; }
         
@@ -150,19 +149,10 @@ export default function ResultadosTurmaClient({
     }
 
     // Lógica para Unidades
-    let value: number | null | undefined = null
-    let isDesistente = false
-
-    if (selectedUnit === 'UNIDADE_1') {
-        value = n.nota1
-        isDesistente = !!n.isDesistenteUnid1
-    } else if (selectedUnit === 'UNIDADE_2') {
-        value = n.nota2
-        isDesistente = !!n.isDesistenteUnid2
-    } else if (selectedUnit === 'UNIDADE_3') {
-        value = n.nota3
-        isDesistente = !!n.isDesistenteUnid3
-    }
+    // (o modo FINAL já retornou acima)
+    const etapa = n.etapas[Number(selectedUnit.replace('UNIDADE_', '')) - 1]
+    const value: number | null | undefined = etapa?.nota
+    const isDesistente = !!etapa?.desistente
     
     if (isDesistente) {
         if (value !== null && value !== undefined) {
@@ -269,9 +259,7 @@ export default function ResultadosTurmaClient({
               <div className="bg-slate-200/50 p-1 rounded-2xl flex items-center border border-slate-300/50 shadow-inner">
                 {[
                   { id: 'FINAL', label: 'Status', icon: CheckCircle2 },
-                  { id: 'UNIDADE_1', label: 'Und 1', icon: FileText },
-                  { id: 'UNIDADE_2', label: 'Und 2', icon: FileText },
-                  { id: 'UNIDADE_3', label: 'Und 3', icon: FileText }
+                  ...nomesEtapas.map((_, i) => ({ id: `UNIDADE_${i + 1}`, label: `Und ${i + 1}`, icon: FileText }))
                 ].map((item) => {
                   const Icon = item.icon
                   const active = selectedUnit === item.id
@@ -384,7 +372,7 @@ export default function ResultadosTurmaClient({
                     let worstRisk: any = { level: 'NONE' };
                     for (const n of notasDoAluno) {
                         if (n) {
-                            const analysis = analyzeRisk([n.nota1 ?? null, n.nota2 ?? null, n.nota3 ?? null], numUnidades, notaMinimaAprovacao);
+                            const analysis = analyzeRisk(n.etapas.map(e => e.nota), numUnidades, notaMinimaAprovacao);
                             if (worstRisk.level === 'NONE' || 
                                (analysis.level === 'CRITICAL') || 
                                (analysis.level === 'HIGH' && worstRisk.level !== 'CRITICAL') ||

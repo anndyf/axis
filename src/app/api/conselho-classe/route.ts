@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { StatusNota } from '@prisma/client'
 import { logAudit } from '@/lib/audit'
 import { can } from '@/lib/rbac'
-import { calcularMediaFinal, resolverEsquemaAvaliacaoId, type EsquemaConfig, type UnidadeInput } from '@/lib/services/notas'
+import { calcularMediaFinal, resolverEsquemaAvaliacaoId, paraEsquemaConfig, unidadesDeNotasSalvas, type EsquemaConfig } from '@/lib/services/notas'
 
 export const runtime = 'nodejs'
 
@@ -73,7 +73,8 @@ export async function POST(request: NextRequest) {
 
         // Buscar nota original, escopada a escola do chamador
         const notaOriginal = await prisma.notaFinal.findFirst({
-          where: { id: notaId, estudante: { escolaId } }
+          where: { id: notaId, estudante: { escolaId } },
+          include: { unidades: { select: { esquemaUnidadeId: true, notaCalculada: true, notaRecuperacao: true } } }
         })
 
         if (!notaOriginal) {
@@ -108,24 +109,9 @@ export async function POST(request: NextRequest) {
               })
             : null
           if (esquema) {
-            const esquemaConfig: EsquemaConfig = {
-              numUnidades: esquema.numUnidades,
-              notaMinimaAprovacao: esquema.notaMinimaAprovacao,
-              recuperacaoUnidadeAtiva: esquema.recuperacaoUnidadeAtiva,
-              modoRecuperacaoUnidade: esquema.modoRecuperacaoUnidade,
-              recuperacaoFinalAtiva: esquema.recuperacaoFinalAtiva,
-              modoRecuperacaoFinal: esquema.modoRecuperacaoFinal,
-            }
-            const notasPorOrdem: Record<number, number | null> = {
-              1: notaOriginal.nota1,
-              2: notaOriginal.nota2,
-              3: notaOriginal.nota3,
-            }
-            const unidadesInput: UnidadeInput[] = esquema.unidades.map((eu) => ({
-              esquemaUnidadeId: eu.id,
-              atividades: [{ peso: 10, valor: notasPorOrdem[eu.ordem] ?? null }],
-            }))
-            const resultado = calcularMediaFinal(unidadesInput, esquemaConfig)
+            const esquemaConfig: EsquemaConfig = paraEsquemaConfig(esquema)
+            // Lê as etapas do modelo novo (NotaUnidade), não mais nota_1/2/3
+            const resultado = calcularMediaFinal(unidadesDeNotasSalvas(esquema.unidades, notaOriginal.unidades), esquemaConfig)
             sugestaoAutomatica = resultado.completo
               ? (resultado.media !== null && resultado.media >= esquemaConfig.notaMinimaAprovacao ? 'APROVADO' : 'RECUPERACAO')
               : 'incompleto'

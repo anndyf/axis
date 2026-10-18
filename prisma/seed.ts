@@ -1,6 +1,8 @@
 import { PrismaClient } from '@prisma/client'
 import * as dotenv from 'dotenv'
 import bcrypt from 'bcryptjs'
+import { vincularCursosSemEsquema } from '../src/lib/services/esquemas-padrao'
+import { calcularMediaFinal, calcularStatus, paraEsquemaConfig } from '../src/lib/services/notas'
 
 dotenv.config()
 
@@ -11,7 +13,7 @@ async function main() {
 
   const hashedPassword = await bcrypt.hash('admin123', 10)
 
-  // 0. Escola de demonstração (mesmo padrão do backfill-escola-cetep.ts)
+  // 0. Escola de demonstração
   const escola = await prisma.escola.upsert({
     where: { slug: 'cetep' },
     update: {},
@@ -104,6 +106,10 @@ async function main() {
     })
     cursos.push(curso)
   }
+
+  // Esquemas de avaliação padrão (3 unidades / 2 semestral) + vínculo dos
+  // cursos - sem isso o lançamento de notas não funciona em banco novo.
+  await vincularCursosSemEsquema(prisma, escolaId)
 
   // 4. Criar Turmas
   console.log('🏫 Criando turmas...')
@@ -199,7 +205,15 @@ async function main() {
 
   for (const turma of turmas) {
     const turmaDisciplinas = await prisma.disciplina.findMany({ where: { turmaId: turma.id } })
-    
+    // Esquema do curso da turma (3 unidades anual ou 2 semestral) - as notas
+    // são lançadas por etapa, no modelo novo, e média/status saem do motor.
+    // (relido do banco: o array `cursos` acima é de antes do vínculo com os esquemas)
+    const cursoDaTurma = await prisma.curso.findUniqueOrThrow({ where: { id: turma.cursoId! } })
+    const esquema = await prisma.esquemaAvaliacao.findUniqueOrThrow({
+      where: { id: cursoDaTurma.esquemaAvaliacaoId! },
+      include: { unidades: { orderBy: { ordem: 'asc' }, include: { atividades: true } } }
+    })
+
     for (let i = 1; i <= 10; i++) { // Reduzi para 10 por turma para ser mais rápido
       const isMasculino = Math.random() > 0.5
       const nomeBase = isMasculino ? nomesMasculinos[Math.floor(Math.random() * 10)] : nomesFemininos[Math.floor(Math.random() * 10)]
@@ -218,28 +232,41 @@ async function main() {
         }
       })
 
-      // Lançar Notas para cada disciplina
+      // Lançar Notas para cada disciplina: um "nível" por aluno/disciplina e
+      // uma variação por etapa, pra ter aprovados e recuperações realistas.
       for (const disc of turmaDisciplinas) {
-        const notaRand = Math.random() * 10
-        const status = notaRand >= 6 ? 'APROVADO' : (notaRand >= 3 ? 'RECUPERACAO' : 'DESISTENTE')
+        const existente = await prisma.notaFinal.findUnique({
+          where: { estudanteId_disciplinaId: { estudanteId: estudante.id, disciplinaId: disc.id } }
+        })
+        if (existente) continue // Não sobrescrever notas existentes
 
-        await prisma.notaFinal.upsert({
-          where: {
-            estudanteId_disciplinaId: {
-                estudanteId: estudante.id,
-                disciplinaId: disc.id
-            }
-          },
-          update: {}, // Não sobrescrever notas existentes se houver
-          create: {
+        const nivel = 3 + Math.random() * 7
+        const etapas = esquema.unidades.map((u) => {
+          const atividade = u.atividades[0]
+          const valor = Math.min(atividade.notaMaxima, Math.max(0, nivel + (Math.random() * 3 - 1.5)))
+          return { unidade: u, atividade, valor: Math.round(valor * 10) / 10 }
+        })
+
+        const config = paraEsquemaConfig(esquema)
+        const resultado = calcularMediaFinal(
+          etapas.map((e) => ({ esquemaUnidadeId: e.unidade.id, peso: e.unidade.peso, formaCalculo: e.unidade.formaCalculo, atividades: [{ valor: e.valor }] })),
+          config
+        )
+
+        await prisma.notaFinal.create({
+          data: {
             estudanteId: estudante.id,
             disciplinaId: disc.id,
-            nota: parseFloat(notaRand.toFixed(1)),
-            nota1: parseFloat((notaRand * 0.5 + Math.random() * 3).toFixed(1)),
-            nota2: parseFloat((notaRand * 0.7 + Math.random() * 2).toFixed(1)),
-            nota3: parseFloat(notaRand.toFixed(1)),
-            status: status as any,
-            modifiedById: admin.id
+            nota: resultado.media ?? 0,
+            status: calcularStatus(resultado, config),
+            modifiedById: admin.id,
+            unidades: {
+              create: etapas.map((e) => ({
+                esquemaUnidadeId: e.unidade.id,
+                notaCalculada: e.valor,
+                atividades: { create: [{ esquemaAtividadeId: e.atividade.id, valor: e.valor }] }
+              }))
+            }
           }
         })
       }

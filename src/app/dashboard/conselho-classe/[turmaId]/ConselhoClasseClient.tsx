@@ -4,22 +4,18 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Save, AlertCircle, Gavel, Loader2, ChevronDown, ChevronUp, CheckCircle2, Printer, X } from "lucide-react"
+import { calcularMediaFinal, type EsquemaConfig, type EtapaDaNota, type UnidadeInput } from "@/lib/services/notas"
 
 interface NotaConselho {
   id: string
   nota: number
-  nota1?: number | null
-  nota2?: number | null
-  nota3?: number | null
   notaRecuperacao: number | null
   status: string
   estudanteId: string
   estudanteNome: string
   disciplinaId: string
   disciplinaNome: string
-  isDesistenteUnid1?: boolean
-  isDesistenteUnid2?: boolean
-  isDesistenteUnid3?: boolean
+  etapas: EtapaDaNota[]
 }
 
 const STATUS_OPTIONS = [
@@ -34,17 +30,19 @@ export default function ConselhoClasseClient({
   turmaNome,
   turmaCurso,
   turmaTurno,
-  turmaModalidade,
-  notasConselho
+  notasConselho,
+  esquemaConfig,
+  pesosEtapas
 }: {
   turmaId: string
   turmaNome: string
   turmaCurso?: string | null
   turmaTurno?: string | null
-  turmaModalidade?: string | null
   notasConselho: NotaConselho[]
+  esquemaConfig: EsquemaConfig
+  pesosEtapas: number[]
 }) {
-  const isSemestral = turmaModalidade === 'PROEJA' || turmaModalidade === 'SUBSEQUENTE'
+  const notaMinima = esquemaConfig.notaMinimaAprovacao
   const router = useRouter()
   const [decisoes, setDecisoes] = useState<Record<string, string>>(() => {
     // Inicializar com decisões já existentes no banco
@@ -69,37 +67,34 @@ export default function ConselhoClasseClient({
   const [showInstructions, setShowInstructions] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   
-  // Função para calcular a média real baseada nas unidades
-  const calcularMediaReal = (n: any) => {
+  // Média "real" para o comitê: média das unidades pelo motor (com os pesos
+  // e a forma de cálculo do esquema da turma); se houver recuperação e a
+  // média estiver abaixo do mínimo, simula a recuperação substituindo a
+  // menor unidade. Heurística só de exibição - a decisão é do Conselho
+  // (ver api/conselho-classe, que só valida o status escolhido).
+  const calcularMediaReal = (n: NotaConselho) => {
     if (n.nota === -1) return 0;
-    
-    const n1 = n.nota1 || 0;
-    const n2 = n.nota2 || 0;
-    const n3 = n.nota3 || 0;
-    
-    let media = isSemestral ? (n1 + n2) / 2 : (n1 + n2 + n3) / 3;
-    
+
+    const comoUnidades = (notas: number[]): UnidadeInput[] =>
+      notas.map((valor, i) => ({ esquemaUnidadeId: String(i), peso: pesosEtapas[i] ?? 1, atividades: [{ valor }] }))
+    const mediaDe = (notas: number[]) => calcularMediaFinal(comoUnidades(notas), esquemaConfig).media ?? 0
+
+    const notas = n.etapas.map(e => e.nota ?? 0);
+    let media = mediaDe(notas);
+
     // Pegar a nota de recuperação atual (do estado ou da nota)
     const notaRecVal = notasRec[n.id] !== undefined ? notasRec[n.id] : n.notaRecuperacao;
-    
-    // Se houver recuperação e a média for < 5, a recuperação pode ajudar
-    if (notaRecVal !== null && media < 5) {
-      if (isSemestral) {
-        // Para semestral, substitui a menor das 2
-        const menor = Math.min(n1, n2);
-        if (notaRecVal > menor) {
-          media = (notaRecVal + Math.max(n1, n2)) / 2;
-        }
-      } else {
-        // Regra anual: Recuperação substitui a menor das 3
-        const notasArray = [n1, n2, n3].sort((a, b) => a - b);
-        if (notaRecVal > (notasArray[0] || 0)) {
-          media = (notaRecVal + (notasArray[1] || 0) + (notasArray[2] || 0)) / 3;
-        }
+
+    if (notaRecVal !== null && notas.length > 0 && media < notaMinima) {
+      const iMenor = notas.indexOf(Math.min(...notas));
+      if (notaRecVal > notas[iMenor]) {
+        const substituidas = [...notas];
+        substituidas[iMenor] = notaRecVal;
+        media = mediaDe(substituidas);
       }
     }
-    
-    return Math.round(media * 10) / 10;
+
+    return media;
   }
 
   const toggleStudent = (id: string) => {
@@ -156,7 +151,7 @@ export default function ConselhoClasseClient({
       const nota = notasConselho.find(n => n.id === notaId)
       if (nota) {
         const media = calcularMediaReal(nota)
-        if (media >= 5) {
+        if (media >= notaMinima) {
           setDecisoes(prev => ({
             ...prev,
             [notaId]: 'APROVADO_RECUPERACAO'
@@ -183,7 +178,7 @@ export default function ConselhoClasseClient({
         const notaRecValue = notasRec[n.id]
         let statusFinal = decisoes[n.id] || n.status
 
-        if (media >= 5) {
+        if (media >= notaMinima) {
           statusFinal = 'APROVADO_RECUPERACAO'
         }
 
@@ -701,7 +696,7 @@ export default function ConselhoClasseClient({
               const recAprovado = data.notas.filter(n => {
                 const statusFinal = decisoes[n.id] || n.status
                 const notaAtual = notasRec[n.id]
-                return (statusFinal === 'APROVADO_RECUPERACAO' || (notaAtual !== null && notaAtual >= 5))
+                return (statusFinal === 'APROVADO_RECUPERACAO' || (notaAtual !== null && notaAtual >= notaMinima))
               }).length
 
               return (
@@ -797,7 +792,7 @@ export default function ConselhoClasseClient({
                                 const statusValue = decisoes[nota.id] || ''
                                 const notaRecVal = notasRec[nota.id] !== undefined ? (notasRec[nota.id] || null) : (nota.notaRecuperacao || null)
                                 const mediaCalculada = calcularMediaReal(nota)
-                                const isApproved = (notaRecVal !== null && notaRecVal >= 5) || mediaCalculada >= 5
+                                const isApproved = (notaRecVal !== null && notaRecVal >= notaMinima) || mediaCalculada >= notaMinima
                                 const isResolvida = isApproved || ['APROVADO_CONSELHO', 'DEPENDENCIA', 'CONSERVADO'].includes(statusValue || nota.status)
                                 
                                 // Definir cores dinâmicas para o select
@@ -826,22 +821,12 @@ export default function ConselhoClasseClient({
                                           {nota.disciplinaNome}
                                         </div>
                                         <div className="flex gap-1">
-                                          {nota.isDesistenteUnid1 && (
-                                            <span className="px-1.5 py-0.5 bg-rose-50 text-[8px] font-medium text-rose-600 border border-rose-100 rounded uppercase tracking-tighter" title="Infrequente na Unidade 1">
-                                              INF U1
+                                          {nota.etapas.map((etapa: EtapaDaNota, i: number) => etapa.desistente && (
+                                            <span key={i} className="px-1.5 py-0.5 bg-rose-50 text-[8px] font-medium text-rose-600 border border-rose-100 rounded uppercase tracking-tighter" title={`Infrequente na Unidade ${i + 1}`}>
+                                              INF U{i + 1}
                                             </span>
-                                          )}
-                                          {nota.isDesistenteUnid2 && (
-                                            <span className="px-1.5 py-0.5 bg-rose-50 text-[8px] font-medium text-rose-600 border border-rose-100 rounded uppercase tracking-tighter" title="Infrequente na Unidade 2">
-                                              INF U2
-                                            </span>
-                                          )}
-                                          {nota.isDesistenteUnid3 && (
-                                            <span className="px-1.5 py-0.5 bg-rose-50 text-[8px] font-medium text-rose-600 border border-rose-100 rounded uppercase tracking-tighter" title="Infrequente na Unidade 3">
-                                              INF U3
-                                            </span>
-                                          )}
-                                          {nota.status === 'DESISTENTE' && !nota.isDesistenteUnid1 && !nota.isDesistenteUnid2 && !nota.isDesistenteUnid3 && (
+                                          ))}
+                                          {nota.status === 'DESISTENTE' && !nota.etapas.some((e: EtapaDaNota) => e.desistente) && (
                                             <span className="px-1.5 py-0.5 bg-slate-100 text-[8px] font-medium text-slate-700 border border-slate-200 rounded uppercase tracking-tighter">
                                               INFREQUENTE
                                             </span>
@@ -850,7 +835,7 @@ export default function ConselhoClasseClient({
                                       </div>
                                     </td>
                                      <td className="px-4 py-4 text-center">
-                                        <span className={`text-lg font-medium font-mono ${mediaCalculada < 5 ? 'text-rose-600' : 'text-slate-700'}`}>
+                                        <span className={`text-lg font-medium font-mono ${mediaCalculada < notaMinima ? 'text-rose-600' : 'text-slate-700'}`}>
                                           {mediaCalculada.toFixed(1)}
                                         </span>
                                     </td>

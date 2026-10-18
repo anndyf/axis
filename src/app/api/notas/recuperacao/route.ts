@@ -7,8 +7,9 @@ import {
   calcularMediaFinal,
   calcularStatus,
   resolverEsquemaAvaliacaoId,
+  paraEsquemaConfig,
+  unidadesDeNotasSalvas,
   type EsquemaConfig,
-  type UnidadeInput,
 } from '@/lib/services/notas'
 
 export const runtime = 'nodejs'
@@ -58,15 +59,19 @@ export async function POST(request: NextRequest) {
     // Processar cada nota de recuperação
     const results = await Promise.all(
       notas.map(async ({ notaId, notaRecuperacao }) => {
-        // Validação de range (0-10) ou valor especial -1 (Não Realizou)
-        if (notaRecuperacao !== -1 && (notaRecuperacao < 0 || notaRecuperacao > 10)) {
-          throw new Error(`Nota de recuperação inválida: deve estar entre 0 e 10`)
+        // Validação de range ou valor especial -1 (Não Realizou) - o teto
+        // depende da escala do esquema, checado depois de resolvê-lo
+        if (notaRecuperacao !== -1 && notaRecuperacao < 0) {
+          throw new Error(`Nota de recuperação inválida: não pode ser negativa`)
         }
 
         // Buscar nota original, escopada a escola do chamador
         const notaOriginal = await prisma.notaFinal.findFirst({
           where: { id: notaId, estudante: { escolaId } },
-          include: { estudante: { select: { turma: { select: { cursoId: true, esquemaAvaliacaoId: true } } } } }
+          include: {
+            estudante: { select: { turma: { select: { cursoId: true, esquemaAvaliacaoId: true } } } },
+            unidades: { select: { esquemaUnidadeId: true, notaCalculada: true, notaRecuperacao: true } }
+          }
         })
 
         if (!notaOriginal) {
@@ -102,24 +107,13 @@ export async function POST(request: NextRequest) {
           throw new Error(`Esquema de avaliação não configurado para a turma desta nota (${notaId})`)
         }
 
-        const esquemaConfig: EsquemaConfig = {
-          numUnidades: esquema.numUnidades,
-          notaMinimaAprovacao: esquema.notaMinimaAprovacao,
-          recuperacaoUnidadeAtiva: esquema.recuperacaoUnidadeAtiva,
-          modoRecuperacaoUnidade: esquema.modoRecuperacaoUnidade,
-          recuperacaoFinalAtiva: esquema.recuperacaoFinalAtiva,
-          modoRecuperacaoFinal: esquema.modoRecuperacaoFinal,
+        if (notaRecuperacao !== -1 && notaRecuperacao > esquema.notaMaxima) {
+          throw new Error(`Nota de recuperação inválida: deve estar entre 0 e ${esquema.notaMaxima}`)
         }
-        const notasPorOrdem: Record<number, number | null> = {
-          1: notaOriginal.nota1,
-          2: notaOriginal.nota2,
-          3: notaOriginal.nota3,
-        }
-        const unidadesInput: UnidadeInput[] = esquema.unidades.map((eu) => ({
-          esquemaUnidadeId: eu.id,
-          atividades: [{ peso: eu.atividades[0]?.peso ?? 10, valor: notasPorOrdem[eu.ordem] ?? null }],
-        }))
-        const resultado = calcularMediaFinal(unidadesInput, esquemaConfig)
+
+        const esquemaConfig: EsquemaConfig = paraEsquemaConfig(esquema)
+        // Lê as etapas do modelo novo (NotaUnidade), não mais nota_1/2/3
+        const resultado = calcularMediaFinal(unidadesDeNotasSalvas(esquema.unidades, notaOriginal.unidades), esquemaConfig)
         // A proteção de status "especial" do motor existe pra não deixar uma
         // edição de nota normal desfazer uma aprovação por recuperação já
         // decidida (ver api/notas/lancar). Aqui é o contrário: esta rota É o

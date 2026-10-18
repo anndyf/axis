@@ -2,7 +2,8 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import ResultadosClient from "./ResultadosClient"
-import { resolverEsquemaAvaliacaoId } from "@/lib/services/notas"
+import { etapasDaNota } from "@/lib/services/notas"
+import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from "@/lib/services/notas-leitura"
 
 export const metadata = {
   title: 'Áxis - Resultados'
@@ -13,74 +14,56 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 async function getNotasResultados(turmaId: string, escolaId: string) {
-  // Usamos Row SQL para contornar o cache do Prisma Client desatualizado no servidor Next.js dev
-  // e garantir que os campos nota_1, nota_2 e nota_3 sejam lidos corretamente.
-  try {
-    // "estudante_id" guarda o id tecnico do estudante desde a Migration 3b (nao mais
-    // a matricula) - o JOIN precisa ser por e.id, e o frontend (ResultadosClient.tsx)
-    // espera a matricula de volta em "estudanteId" (usa como chave do mapa de estudantes).
-    const rawNotas = await prisma.$queryRaw<any[]>`
-      SELECT
-        nf.id,
-        nf.nota,
-        nf."nota_1" as "nota1",
-        nf."nota_2" as "nota2",
-        nf."nota_3" as "nota3",
-        nf."nota_recuperacao" as "notaRecuperacao",
-        nf.status,
-        nf."is_desistente_unid1" as "isDesistenteUnid1",
-        nf."is_desistente_unid2" as "isDesistenteUnid2",
-        nf."is_desistente_unid3" as "isDesistenteUnid3",
-        e.matricula as "estudanteId",
-        e.nome as "estudanteNome",
-        nf."disciplina_id" as "disciplinaId",
-        d.nome as "disciplinaNome"
-      FROM "notas_finais" nf
-      INNER JOIN "estudantes" e ON e.id = nf."estudante_id"
-      INNER JOIN "disciplinas" d ON d.id = nf."disciplina_id"
-      WHERE e."turma_id" = ${turmaId} AND e."escola_id" = ${escolaId}
-    `
-
-    const turma = await prisma.turma.findUnique({
-      where: { id: turmaId, escolaId },
-      include: {
-        disciplinas: {
-          orderBy: { nome: 'asc' }
-        },
-        estudantes: {
-          select: { matricula: true, nome: true },
-          orderBy: { nome: 'asc' }
-        }
+  const turma = await prisma.turma.findUnique({
+    where: { id: turmaId, escolaId },
+    include: {
+      disciplinas: {
+        orderBy: { nome: 'asc' }
+      },
+      estudantes: {
+        select: { matricula: true, nome: true },
+        orderBy: { nome: 'asc' }
       }
-    })
-
-    if (!turma) return null
-
-    // Resolve o esquema de avaliação (turma ?? curso) só pra saber numUnidades/
-    // notaMinimaAprovacao - usado pela análise de risco no client, que hoje
-    // hardcoda "3 unidades" (bug conhecido, ver src/lib/risk-analysis.ts).
-    const curso = turma.cursoId
-      ? await prisma.curso.findUnique({ where: { id: turma.cursoId }, select: { esquemaAvaliacaoId: true } })
-      : null
-    const esquemaId = resolverEsquemaAvaliacaoId(turma, curso)
-    const esquema = esquemaId
-      ? await prisma.esquemaAvaliacao.findUnique({
-          where: { id: esquemaId },
-          select: { numUnidades: true, notaMinimaAprovacao: true }
-        })
-      : null
-
-    return {
-      turma,
-      disciplinas: turma.disciplinas,
-      estudantes: turma.estudantes,
-      notasResultados: rawNotas,
-      numUnidades: esquema?.numUnidades ?? 3,
-      notaMinimaAprovacao: esquema?.notaMinimaAprovacao ?? 5,
     }
-  } catch (error) {
-    console.error("Erro ao buscar notas via SQL na página de resultados:", error)
-    return null
+  })
+
+  if (!turma) return null
+
+  // Notas por etapa vêm de NotaUnidade, alinhadas às etapas do esquema da
+  // turma (2, 3, 4... unidades) - não mais das colunas fixas nota_1/2/3.
+  const esquema = await carregarEsquemaDaTurma(turma)
+  const etapas = esquema?.etapas ?? []
+
+  const notas = await prisma.notaFinal.findMany({
+    where: { estudante: { turmaId, escolaId } },
+    include: {
+      estudante: { select: { matricula: true, nome: true } },
+      disciplina: { select: { nome: true } },
+      unidades: SELECT_ETAPAS_DA_NOTA
+    }
+  })
+
+  // O client usa a matrícula em "estudanteId" como chave do mapa de estudantes.
+  const notasResultados = notas.map((nf) => ({
+    id: nf.id,
+    nota: nf.nota,
+    notaRecuperacao: nf.notaRecuperacao,
+    status: nf.status,
+    estudanteId: nf.estudante.matricula,
+    estudanteNome: nf.estudante.nome,
+    disciplinaId: nf.disciplinaId,
+    disciplinaNome: nf.disciplina.nome,
+    etapas: etapasDaNota(etapas, nf.unidades)
+  }))
+
+  return {
+    turma,
+    disciplinas: turma.disciplinas,
+    estudantes: turma.estudantes,
+    notasResultados,
+    nomesEtapas: etapas.map((e) => e.nome),
+    numUnidades: esquema?.config.numUnidades ?? 3,
+    notaMinimaAprovacao: esquema?.config.notaMinimaAprovacao ?? 5,
   }
 }
 
@@ -109,6 +92,7 @@ export default async function ResultadosTurmaPage({
       disciplinas={data.disciplinas}
       initialNotas={data.notasResultados}
       initialEstudantes={data.estudantes}
+      nomesEtapas={data.nomesEtapas}
       numUnidades={data.numUnidades}
       notaMinimaAprovacao={data.notaMinimaAprovacao}
     />

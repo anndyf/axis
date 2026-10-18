@@ -2,9 +2,11 @@
 
 import { useState } from "react"
 import { Users, BookOpen, ChevronDown, ChevronUp, AlertCircle, FileText, X } from "lucide-react"
+import type { EtapaDaNota } from "@/lib/services/notas"
 
 export default function RelatorioClient({
   turma,
+  nomesEtapas,
   totalEstudantes,
   totalDisciplinas,
   totalAprovados,
@@ -191,9 +193,9 @@ export default function RelatorioClient({
                             <thead className="bg-slate-100 text-slate-600">
                               <tr>
                                 <th className="px-4 py-2 text-left font-semibold">Disciplina</th>
-                                <th className="px-4 py-2 text-center font-semibold">1ª Unid.</th>
-                                <th className="px-4 py-2 text-center font-semibold">2ª Unid.</th>
-                                <th className="px-4 py-2 text-center font-semibold">3ª Unid.</th>
+                                {nomesEtapas.map((nome: string) => (
+                                  <th key={nome} className="px-4 py-2 text-center font-semibold">{nome}</th>
+                                ))}
                                 <th className="px-4 py-2 text-center font-semibold text-blue-800">Média</th>
                                 <th className="px-4 py-2 text-center font-semibold">Recup.</th>
                                 <th className="px-4 py-2 text-center font-semibold">Status</th>
@@ -206,9 +208,9 @@ export default function RelatorioClient({
                                 if (!nota) return (
                                   <tr key={disc.id} className="text-slate-400">
                                     <td className="px-4 py-2 font-medium">{disc.nome}</td>
-                                    <td className="px-4 py-2 text-center">-</td>
-                                    <td className="px-4 py-2 text-center">-</td>
-                                    <td className="px-4 py-2 text-center">-</td>
+                                    {nomesEtapas.map((nome: string) => (
+                                      <td key={nome} className="px-4 py-2 text-center">-</td>
+                                    ))}
                                     <td className="px-4 py-2 text-center">-</td>
                                     <td className="px-4 py-2 text-center">-</td>
                                     <td className="px-4 py-2 text-center text-xs">Pendente</td>
@@ -218,9 +220,9 @@ export default function RelatorioClient({
                                 return (
                                   <tr key={disc.id} className="text-slate-700 hover:bg-slate-50">
                                     <td className="px-4 py-2 font-semibold text-slate-800">{disc.nome}</td>
-                                    <td className="px-4 py-2 text-center">{nota.nota1?.toFixed(1) ?? '-'}</td>
-                                    <td className="px-4 py-2 text-center">{nota.nota2?.toFixed(1) ?? '-'}</td>
-                                    <td className="px-4 py-2 text-center">{nota.nota3?.toFixed(1) ?? '-'}</td>
+                                    {nota.etapas.map((etapa: EtapaDaNota, i: number) => (
+                                      <td key={i} className="px-4 py-2 text-center">{etapa.nota?.toFixed(1) ?? '-'}</td>
+                                    ))}
                                     <td className="px-4 py-2 text-center font-bold text-blue-900">{nota.nota?.toFixed(1) ?? '-'}</td>
                                     <td className="px-4 py-2 text-center">{nota.notaRecuperacao?.toFixed(1) ?? '-'}</td>
                                     <td className="px-4 py-2 text-center">

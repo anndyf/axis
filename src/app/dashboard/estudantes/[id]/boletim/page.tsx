@@ -3,7 +3,8 @@ import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { ArrowLeft, Download, FileText } from "lucide-react"
-import { calcularMediaFinal, resolverEsquemaAvaliacaoId, type EsquemaConfig, type UnidadeInput } from "@/lib/services/notas"
+import { calcularMediaFinal, unidadesDeNotasSalvas, etapasDaNota } from "@/lib/services/notas"
+import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from "@/lib/services/notas-leitura"
 
 export const metadata = {
   title: 'Áxis - Estudantes'
@@ -19,10 +20,7 @@ async function getEstudanteBoletim(escolaId: string, matricula: string) {
       notas: {
         include: {
           disciplina: true,
-          unidades: {
-            orderBy: { esquemaUnidade: { ordem: 'asc' } },
-            select: { esquemaUnidadeId: true, notaCalculada: true, notaRecuperacao: true }
-          }
+          unidades: SELECT_ETAPAS_DA_NOTA
         },
         orderBy: {
           disciplina: {
@@ -34,24 +32,6 @@ async function getEstudanteBoletim(escolaId: string, matricula: string) {
   })
 }
 
-/** Resolve o EsquemaConfig da turma do estudante (override) ou do seu curso (padrão). */
-async function getEsquemaConfigDaTurma(turma: { cursoId: string | null; esquemaAvaliacaoId: string | null }): Promise<EsquemaConfig | null> {
-  const curso = turma.cursoId
-    ? await prisma.curso.findUnique({ where: { id: turma.cursoId }, select: { esquemaAvaliacaoId: true } })
-    : null
-  const esquemaId = resolverEsquemaAvaliacaoId(turma, curso)
-  if (!esquemaId) return null
-  const esquema = await prisma.esquemaAvaliacao.findUnique({ where: { id: esquemaId } })
-  if (!esquema) return null
-  return {
-    numUnidades: esquema.numUnidades,
-    notaMinimaAprovacao: esquema.notaMinimaAprovacao,
-    recuperacaoUnidadeAtiva: esquema.recuperacaoUnidadeAtiva,
-    modoRecuperacaoUnidade: esquema.modoRecuperacaoUnidade,
-    recuperacaoFinalAtiva: esquema.recuperacaoFinalAtiva,
-    modoRecuperacaoFinal: esquema.modoRecuperacaoFinal,
-  }
-}
 
 function getStatusColor(status: string) {
   switch (status) {
@@ -121,18 +101,15 @@ export default async function BoletimPage({
   // esquema de avaliação da turma (que na prática nem existia antes desta
   // frente). Lê de NotaUnidade (populado desde a Fase 3 do backfill),
   // não mais das colunas fixas nota1/nota2/nota3.
-  const esquemaConfig = await getEsquemaConfigDaTurma(estudante.turma)
+  const esquema = await carregarEsquemaDaTurma(estudante.turma)
+  const etapas = esquema?.etapas ?? []
+  const notaMinima = esquema?.config.notaMinimaAprovacao ?? 5
 
   const calcularMediaReal = (n: (typeof estudante.notas)[number]) => {
     if (n.nota === -1) return 0
-    if (!esquemaConfig) return n.nota
+    if (!esquema) return n.nota
 
-    const unidadesInput: UnidadeInput[] = n.unidades.map((u) => ({
-      esquemaUnidadeId: u.esquemaUnidadeId,
-      atividades: [{ peso: 10, valor: u.notaCalculada }],
-      notaRecuperacao: u.notaRecuperacao,
-    }))
-    const resultado = calcularMediaFinal(unidadesInput, esquemaConfig)
+    const resultado = calcularMediaFinal(unidadesDeNotasSalvas(etapas, n.unidades), esquema.config)
     return resultado.media ?? 0
   }
 
@@ -241,15 +218,11 @@ export default async function BoletimPage({
                     <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
                       Disciplina
                     </th>
-                    <th className="px-4 py-4 text-center text-xs font-medium text-slate-400 uppercase tracking-wider">
-                      U1
-                    </th>
-                    <th className="px-4 py-4 text-center text-xs font-medium text-slate-400 uppercase tracking-wider">
-                      U2
-                    </th>
-                    <th className="px-4 py-4 text-center text-xs font-medium text-slate-400 uppercase tracking-wider">
-                      U3
-                    </th>
+                    {etapas.map((etapa, i) => (
+                      <th key={etapa.id} title={etapa.nome} className="px-4 py-4 text-center text-xs font-medium text-slate-400 uppercase tracking-wider">
+                        U{i + 1}
+                      </th>
+                    ))}
                     <th className="px-4 py-4 text-center text-xs font-medium text-slate-400 uppercase tracking-wider">
                       Rec.
                     </th>
@@ -264,7 +237,8 @@ export default async function BoletimPage({
                 <tbody className="bg-white divide-y divide-slate-50">
                   {estudante.notas.map((nota) => {
                     const mediaCalculada = calcularMediaReal(nota);
-                    const isInfrequente = nota.status === 'DESISTENTE' || nota.isDesistenteUnid1 || nota.isDesistenteUnid2 || nota.isDesistenteUnid3;
+                    const etapasDoAluno = etapasDaNota(etapas, nota.unidades);
+                    const isInfrequente = nota.status === 'DESISTENTE' || etapasDoAluno.some(e => e.desistente);
                     
                     return (
                       <tr key={nota.id} className="hover:bg-slate-100/50 transition-colors">
@@ -282,15 +256,11 @@ export default async function BoletimPage({
                             </div>
                           </div>
                         </td>
-                        <td className="px-4 py-4 text-center text-sm text-slate-700 font-medium">
-                          {nota.nota1 !== null ? nota.nota1.toFixed(1) : '-'}
-                        </td>
-                        <td className="px-4 py-4 text-center text-sm text-slate-700 font-medium">
-                          {nota.nota2 !== null ? nota.nota2.toFixed(1) : '-'}
-                        </td>
-                        <td className="px-4 py-4 text-center text-sm text-slate-700 font-medium">
-                          {nota.nota3 !== null ? nota.nota3.toFixed(1) : '-'}
-                        </td>
+                        {etapasDoAluno.map((etapa, i) => (
+                          <td key={i} className="px-4 py-4 text-center text-sm text-slate-700 font-medium">
+                            {etapa.nota !== null ? etapa.nota.toFixed(1) : '-'}
+                          </td>
+                        ))}
                         <td className="px-4 py-4 text-center">
                           {nota.notaRecuperacao !== null ? (
                             <span className="text-sm font-medium text-slate-700">
@@ -299,7 +269,7 @@ export default async function BoletimPage({
                           ) : '-'}
                         </td>
                         <td className="px-6 py-4 text-center bg-slate-50">
-                          <span className={`text-base font-medium ${mediaCalculada < 5 ? 'text-red-600' : 'text-slate-800'}`}>
+                          <span className={`text-base font-medium ${mediaCalculada < notaMinima ? 'text-red-600' : 'text-slate-800'}`}>
                             {nota.nota === -1 ? '-' : mediaCalculada.toFixed(1)}
                           </span>
                         </td>
@@ -307,7 +277,7 @@ export default async function BoletimPage({
                           {(() => {
                             let statusParaExibir = nota.status;
                             if (statusParaExibir === 'DESISTENTE') {
-                              statusParaExibir = mediaCalculada >= 5 ? 'APROVADO' : 'RECUPERACAO';
+                              statusParaExibir = mediaCalculada >= notaMinima ? 'APROVADO' : 'RECUPERACAO';
                             }
                             return (
                               <span className={`px-3 py-1 inline-flex text-[10px] leading-5 font-medium rounded-full uppercase tracking-wider ${getStatusColor(statusParaExibir)}`}>

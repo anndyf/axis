@@ -3,18 +3,40 @@
 import { useState, useEffect } from "react"
 import { X, Save, Loader2, Plus, Trash2, ClipboardList } from "lucide-react"
 
-interface AtividadeForm { nome: string; peso: string }
-interface UnidadeForm { nome: string; atividades: AtividadeForm[] }
+// Ver plano-avaliacao-frequencia.md, seção 3.1 - cada campo aqui corresponde
+// a um campo de EsquemaAvaliacao/EsquemaUnidade/EsquemaAtividade.
+type FormaCalculo = "SOMA" | "MEDIA_ARITMETICA" | "MEDIA_PONDERADA" | "SOMA_COM_DIVISOR" | "MAIOR_NOTA"
+type ModoRecUnidade = "SUBSTITUI_SE_MAIOR" | "MEDIA_COM_UNIDADE"
+type ModoRecFinal = "NOTA_MINIMA_ISOLADA" | "SUBSTITUI_MENOR_UNIDADE" | "MEDIA_COM_FINAL"
 
+interface AtividadeForm { nome: string; notaMaxima: string; peso: string }
+interface UnidadeForm { nome: string; peso: string; formaCalculo: FormaCalculo; divisor: string; atividades: AtividadeForm[] }
+
+/** Formato devolvido por GET/POST/PUT de api/esquemas-avaliacao */
 export interface EsquemaParaEditar {
   id: string
   nome: string
   notaMinimaAprovacao: number
+  notaMaxima: number
+  casasDecimais: number
+  formaCalculoFinal: FormaCalculo
+  divisorFinal: number | null
   recuperacaoUnidadeAtiva: boolean
   modoRecuperacaoUnidade: string | null
   recuperacaoFinalAtiva: boolean
   modoRecuperacaoFinal: string | null
-  unidades: { nome: string; atividades: { nome: string; peso: number }[] }[]
+  notaMinimaExameFinal: number | null
+  registroFrequencia: "POR_AULA" | "POR_DIA"
+  apuracaoFrequencia: "GERAL" | "POR_COMPONENTE"
+  frequenciaMinima: number
+  unidades: {
+    id?: string
+    nome: string
+    peso: number
+    formaCalculo: FormaCalculo
+    divisor: number | null
+    atividades: { nome: string; notaMaxima: number; peso: number }[]
+  }[]
 }
 
 interface Props {
@@ -24,7 +46,52 @@ interface Props {
   esquemaParaEditar?: EsquemaParaEditar | null
 }
 
-const UNIDADE_PADRAO = (): UnidadeForm => ({ nome: "1ª Unidade", atividades: [{ nome: "Nota da Unidade", peso: "10" }] })
+const FORMAS_ETAPA: { valor: FormaCalculo; rotulo: string; ajuda: string }[] = [
+  { valor: "SOMA", rotulo: "Soma", ajuda: "Soma das atividades (ex.: prova 6 + trabalho 4)" },
+  { valor: "MEDIA_ARITMETICA", rotulo: "Média", ajuda: "Média simples das atividades lançadas" },
+  { valor: "MEDIA_PONDERADA", rotulo: "Média ponderada", ajuda: "Cada atividade tem um peso" },
+  { valor: "SOMA_COM_DIVISOR", rotulo: "Soma ÷ divisor", ajuda: "Soma das atividades dividida por um número fixo" },
+  { valor: "MAIOR_NOTA", rotulo: "Maior nota", ajuda: "Vale a melhor atividade" },
+]
+
+const FORMAS_FINAIS: { valor: FormaCalculo; rotulo: string; ajuda: string }[] = [
+  { valor: "MEDIA_ARITMETICA", rotulo: "Média das unidades", ajuda: "(U1 + U2 + ... ) / N" },
+  { valor: "MEDIA_PONDERADA", rotulo: "Média ponderada", ajuda: "Cada unidade tem um peso (ex.: 2 e 3)" },
+  { valor: "SOMA", rotulo: "Soma de pontos", ajuda: "Ex.: ano de 100 pontos, aprova com 60" },
+  { valor: "SOMA_COM_DIVISOR", rotulo: "Soma ÷ divisor", ajuda: "Soma das unidades dividida por um número fixo" },
+]
+
+const atividadePadrao = (notaMaxima = "10"): AtividadeForm => ({ nome: "Nota da Unidade", notaMaxima, peso: "1" })
+const unidadePadrao = (n: number): UnidadeForm => ({ nome: `${n}ª Unidade`, peso: "1", formaCalculo: "SOMA", divisor: "", atividades: [atividadePadrao()] })
+
+const num = (s: string) => parseFloat(s.replace(',', '.'))
+
+function Opcoes<T extends string>({ valor, opcoes, onChange }: { valor: T; opcoes: { valor: T; rotulo: string; ajuda?: string }[]; onChange: (v: T) => void }) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {opcoes.map(o => (
+        <button
+          key={o.valor} type="button" title={o.ajuda} onClick={() => onChange(o.valor)}
+          className={`px-3 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wide transition-all border ${valor === o.valor ? 'bg-blue-500 text-white border-blue-500 shadow-lg shadow-blue-200' : 'bg-white text-slate-400 border-slate-200 hover:border-slate-300'}`}
+        >
+          {o.rotulo}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function Toggle({ ativo, onClick }: { ativo: boolean; onClick: () => void }) {
+  return (
+    <button type="button" onClick={onClick} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ${ativo ? 'bg-blue-600' : 'bg-slate-300'}`}>
+      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${ativo ? 'translate-x-6' : 'translate-x-1'}`} />
+    </button>
+  )
+}
+
+const inputClass = "w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-slate-700 focus:bg-white focus:border-blue-500 transition-all"
+const labelClass = "block text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5 ml-1"
+const smallInput = "px-3 py-2 bg-white border border-slate-200 rounded-lg outline-none text-xs font-medium text-slate-700 focus:border-blue-500 text-center"
 
 export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esquemaParaEditar }: Props) {
   const isEdit = !!esquemaParaEditar
@@ -33,45 +100,70 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
 
   const [nome, setNome] = useState("")
   const [notaMinima, setNotaMinima] = useState("5")
+  const [notaMaxima, setNotaMaxima] = useState("10")
+  const [casasDecimais, setCasasDecimais] = useState(1)
+  const [formaFinal, setFormaFinal] = useState<FormaCalculo>("MEDIA_ARITMETICA")
+  const [divisorFinal, setDivisorFinal] = useState("")
   const [recUnidadeAtiva, setRecUnidadeAtiva] = useState(false)
+  const [modoRecUnidade, setModoRecUnidade] = useState<ModoRecUnidade>("SUBSTITUI_SE_MAIOR")
   const [recFinalAtiva, setRecFinalAtiva] = useState(true)
-  const [modoRecFinal, setModoRecFinal] = useState<"SUBSTITUI_MENOR_UNIDADE" | "NOTA_MINIMA_ISOLADA">("NOTA_MINIMA_ISOLADA")
-  const [unidades, setUnidades] = useState<UnidadeForm[]>([UNIDADE_PADRAO()])
+  const [modoRecFinal, setModoRecFinal] = useState<ModoRecFinal>("NOTA_MINIMA_ISOLADA")
+  const [notaMinimaExame, setNotaMinimaExame] = useState("")
+  const [registroFrequencia, setRegistroFrequencia] = useState<"POR_AULA" | "POR_DIA">("POR_AULA")
+  const [apuracaoFrequencia, setApuracaoFrequencia] = useState<"GERAL" | "POR_COMPONENTE">("GERAL")
+  const [frequenciaMinima, setFrequenciaMinima] = useState("75")
+  const [unidades, setUnidades] = useState<UnidadeForm[]>([unidadePadrao(1)])
 
   useEffect(() => {
-    if (isEdit && esquemaParaEditar) {
-      setNome(esquemaParaEditar.nome)
-      setNotaMinima(String(esquemaParaEditar.notaMinimaAprovacao))
-      setRecUnidadeAtiva(esquemaParaEditar.recuperacaoUnidadeAtiva)
-      setRecFinalAtiva(esquemaParaEditar.recuperacaoFinalAtiva)
-      setModoRecFinal((esquemaParaEditar.modoRecuperacaoFinal as any) || "NOTA_MINIMA_ISOLADA")
-      setUnidades(esquemaParaEditar.unidades.map(u => ({
-        nome: u.nome,
-        atividades: u.atividades.map(a => ({ nome: a.nome, peso: String(a.peso) }))
-      })))
-    } else {
-      setNome("")
-      setNotaMinima("5")
-      setRecUnidadeAtiva(false)
-      setRecFinalAtiva(true)
-      setModoRecFinal("NOTA_MINIMA_ISOLADA")
-      setUnidades([UNIDADE_PADRAO()])
-    }
+    const e = esquemaParaEditar
+    setNome(e?.nome ?? "")
+    setNotaMinima(String(e?.notaMinimaAprovacao ?? 5))
+    setNotaMaxima(String(e?.notaMaxima ?? 10))
+    setCasasDecimais(e?.casasDecimais ?? 1)
+    setFormaFinal(e?.formaCalculoFinal ?? "MEDIA_ARITMETICA")
+    setDivisorFinal(e?.divisorFinal ? String(e.divisorFinal) : "")
+    setRecUnidadeAtiva(e?.recuperacaoUnidadeAtiva ?? false)
+    setModoRecUnidade((e?.modoRecuperacaoUnidade as ModoRecUnidade) || "SUBSTITUI_SE_MAIOR")
+    setRecFinalAtiva(e?.recuperacaoFinalAtiva ?? true)
+    setModoRecFinal((e?.modoRecuperacaoFinal as ModoRecFinal) || "NOTA_MINIMA_ISOLADA")
+    setNotaMinimaExame(e?.notaMinimaExameFinal ? String(e.notaMinimaExameFinal) : "")
+    setRegistroFrequencia(e?.registroFrequencia ?? "POR_AULA")
+    setApuracaoFrequencia(e?.apuracaoFrequencia ?? "GERAL")
+    setFrequenciaMinima(String(e?.frequenciaMinima ?? 75))
+    setUnidades(e
+      ? e.unidades.map(u => ({
+          nome: u.nome,
+          peso: String(u.peso),
+          formaCalculo: u.formaCalculo,
+          divisor: u.divisor ? String(u.divisor) : "",
+          atividades: u.atividades.map(a => ({ nome: a.nome, notaMaxima: String(a.notaMaxima), peso: String(a.peso) }))
+        }))
+      : [unidadePadrao(1)])
     setError("")
-  }, [isOpen, esquemaParaEditar, isEdit])
+  }, [isOpen, esquemaParaEditar])
 
   if (!isOpen) return null
 
-  const addUnidade = () => setUnidades(prev => [...prev, { nome: `${prev.length + 1}ª Unidade`, atividades: [{ nome: "Nota da Unidade", peso: "10" }] }])
+  const addUnidade = () => setUnidades(prev => [...prev, { ...unidadePadrao(prev.length + 1), atividades: [atividadePadrao(notaMaxima)] }])
   const removeUnidade = (i: number) => setUnidades(prev => prev.filter((_, idx) => idx !== i))
-  const updateUnidadeNome = (i: number, nome: string) => setUnidades(prev => prev.map((u, idx) => idx === i ? { ...u, nome } : u))
+  const updateUnidade = (i: number, patch: Partial<UnidadeForm>) => setUnidades(prev => prev.map((u, idx) => idx === i ? { ...u, ...patch } : u))
 
-  const addAtividade = (uIdx: number) => setUnidades(prev => prev.map((u, idx) => idx === uIdx ? { ...u, atividades: [...u.atividades, { nome: "", peso: "" }] } : u))
+  const addAtividade = (uIdx: number) => setUnidades(prev => prev.map((u, idx) => idx === uIdx ? { ...u, atividades: [...u.atividades, { nome: "", notaMaxima: "", peso: "1" }] } : u))
   const removeAtividade = (uIdx: number, aIdx: number) => setUnidades(prev => prev.map((u, idx) => idx === uIdx ? { ...u, atividades: u.atividades.filter((_, ai) => ai !== aIdx) } : u))
-  const updateAtividade = (uIdx: number, aIdx: number, field: "nome" | "peso", value: string) =>
+  const updateAtividade = (uIdx: number, aIdx: number, field: keyof AtividadeForm, value: string) =>
     setUnidades(prev => prev.map((u, idx) => idx === uIdx ? { ...u, atividades: u.atividades.map((a, ai) => ai === aIdx ? { ...a, [field]: value } : a) } : u))
 
-  const somaPeso = (u: UnidadeForm) => u.atividades.reduce((acc, a) => acc + (parseFloat(a.peso.replace(',', '.')) || 0), 0)
+  // Teto que a etapa alcança com todas as atividades no máximo - ajuda a
+  // conferir se a configuração bate com a escala (ex.: soma deve dar 10).
+  const tetoEtapa = (u: UnidadeForm) => {
+    const maximos = u.atividades.map(a => num(a.notaMaxima) || 0)
+    if (maximos.length === 0) return 0
+    switch (u.formaCalculo) {
+      case "SOMA": return maximos.reduce((a, b) => a + b, 0)
+      case "SOMA_COM_DIVISOR": return maximos.reduce((a, b) => a + b, 0) / (num(u.divisor) || 1)
+      default: return Math.max(...maximos)
+    }
+  }
 
   const handleSubmit = async () => {
     if (!nome.trim()) { setError("Nome é obrigatório"); return }
@@ -80,7 +172,7 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
       if (!u.nome.trim()) { setError("Toda unidade precisa de um nome"); return }
       if (u.atividades.length === 0) { setError(`A unidade "${u.nome}" precisa de ao menos 1 atividade`); return }
       for (const a of u.atividades) {
-        if (!a.nome.trim() || a.peso === "") { setError(`Toda atividade da unidade "${u.nome}" precisa de nome e peso`); return }
+        if (!a.nome.trim() || !(num(a.notaMaxima) > 0)) { setError(`Toda atividade da unidade "${u.nome}" precisa de nome e nota máxima`); return }
       }
     }
 
@@ -89,14 +181,25 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
     try {
       const payload = {
         nome: nome.trim(),
-        notaMinimaAprovacao: parseFloat(notaMinima.replace(',', '.')) || 5,
+        notaMinimaAprovacao: num(notaMinima) || 5,
+        notaMaxima: num(notaMaxima) || 10,
+        casasDecimais,
+        formaCalculoFinal: formaFinal,
+        divisorFinal: formaFinal === "SOMA_COM_DIVISOR" ? num(divisorFinal) || null : null,
         recuperacaoUnidadeAtiva: recUnidadeAtiva,
-        modoRecuperacaoUnidade: recUnidadeAtiva ? "SUBSTITUI_SE_MAIOR" : null,
+        modoRecuperacaoUnidade: recUnidadeAtiva ? modoRecUnidade : null,
         recuperacaoFinalAtiva: recFinalAtiva,
         modoRecuperacaoFinal: recFinalAtiva ? modoRecFinal : null,
+        notaMinimaExameFinal: recFinalAtiva && modoRecFinal === "MEDIA_COM_FINAL" && notaMinimaExame ? num(notaMinimaExame) : null,
+        registroFrequencia,
+        apuracaoFrequencia,
+        frequenciaMinima: num(frequenciaMinima),
         unidades: unidades.map(u => ({
           nome: u.nome.trim(),
-          atividades: u.atividades.map(a => ({ nome: a.nome.trim(), peso: parseFloat(a.peso.replace(',', '.')) || 0 }))
+          peso: num(u.peso) || 1,
+          formaCalculo: u.formaCalculo,
+          divisor: u.formaCalculo === "SOMA_COM_DIVISOR" ? num(u.divisor) || null : null,
+          atividades: u.atividades.map(a => ({ nome: a.nome.trim(), notaMaxima: num(a.notaMaxima), peso: num(a.peso) || 1 }))
         }))
       }
 
@@ -136,7 +239,7 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
                 {isEdit ? 'Editar Esquema' : 'Novo Esquema de Avaliação'}
               </h2>
               <p className="text-xs text-slate-400 font-medium">
-                Defina as unidades, atividades e regras de recuperação
+                Unidades, cálculo da média, recuperação e frequência
               </p>
             </div>
           </div>
@@ -145,148 +248,179 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
           </button>
         </div>
 
-        <div className="p-8 space-y-6 overflow-y-auto">
+        <div className="p-8 space-y-8 overflow-y-auto">
           {error && (
             <div className="p-4 bg-rose-50 border border-rose-100 rounded-xl text-rose-600 text-xs font-semibold animate-in slide-in-from-top-2">
               {error}
             </div>
           )}
 
-          {/* Nome + nota mínima */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="md:col-span-2">
-              <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Nome do Esquema</label>
-              <input
-                required type="text" placeholder="Ex: Anual 4 Unidades"
-                value={nome}
-                onChange={e => setNome(e.target.value)}
-                className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-slate-700 focus:bg-white focus:border-blue-500 transition-all"
-              />
+          {/* Nome + escala */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="col-span-2">
+              <label className={labelClass}>Nome do Esquema</label>
+              <input required type="text" placeholder="Ex: Anual 4 Bimestres" value={nome} onChange={e => setNome(e.target.value)} className={inputClass} />
             </div>
             <div>
-              <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Nota Mínima</label>
-              <input
-                required type="text" inputMode="decimal"
-                value={notaMinima}
-                onChange={e => setNotaMinima(e.target.value)}
-                className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-slate-700 focus:bg-white focus:border-blue-500 transition-all"
-              />
+              <label className={labelClass}>Nota máxima</label>
+              <input type="text" inputMode="decimal" value={notaMaxima} onChange={e => setNotaMaxima(e.target.value)} className={inputClass} title="Escala das notas: 10 ou 100" />
+            </div>
+            <div>
+              <label className={labelClass}>Mínima p/ aprovar</label>
+              <input type="text" inputMode="decimal" value={notaMinima} onChange={e => setNotaMinima(e.target.value)} className={inputClass} />
+            </div>
+          </div>
+
+          {/* Média final */}
+          <div className="space-y-2">
+            <label className={labelClass}>Como as unidades formam a média final</label>
+            <Opcoes valor={formaFinal} opcoes={FORMAS_FINAIS} onChange={setFormaFinal} />
+            <p className="text-[10px] text-slate-400 ml-1">{FORMAS_FINAIS.find(f => f.valor === formaFinal)?.ajuda}</p>
+            {formaFinal === "SOMA_COM_DIVISOR" && (
+              <input type="text" inputMode="decimal" placeholder="Divisor" value={divisorFinal} onChange={e => setDivisorFinal(e.target.value)} className={`w-28 ${smallInput}`} />
+            )}
+            <div className="flex items-center gap-2 pt-1 ml-1">
+              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Casas decimais</span>
+              <Opcoes valor={String(casasDecimais)} opcoes={[{ valor: "0", rotulo: "0" }, { valor: "1", rotulo: "1" }, { valor: "2", rotulo: "2" }]} onChange={v => setCasasDecimais(Number(v))} />
             </div>
           </div>
 
           {/* Unidades */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-widest ml-1">Unidades</label>
+              <label className={labelClass}>Unidades</label>
               <button type="button" onClick={addUnidade} className="flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-wide">
                 <Plus className="w-3.5 h-3.5" /> Unidade
               </button>
             </div>
 
-            {unidades.map((u, uIdx) => {
-              const soma = somaPeso(u)
-              return (
-                <div key={uIdx} className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text" value={u.nome}
-                      onChange={e => updateUnidadeNome(uIdx, e.target.value)}
-                      className="flex-1 px-4 py-2.5 bg-white border border-slate-200 rounded-xl outline-none font-semibold text-sm text-slate-700 focus:border-blue-500"
-                      placeholder={`${uIdx + 1}ª Unidade`}
-                    />
-                    {unidades.length > 1 && (
-                      <button type="button" onClick={() => removeUnidade(uIdx)} className="p-2 text-rose-500 hover:bg-rose-50 rounded-xl transition-colors">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="space-y-2 pl-2">
-                    {u.atividades.map((a, aIdx) => (
-                      <div key={aIdx} className="flex items-center gap-2">
-                        <input
-                          type="text" placeholder="Nome (ex: Prova)"
-                          value={a.nome}
-                          onChange={e => updateAtividade(uIdx, aIdx, 'nome', e.target.value)}
-                          className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-lg outline-none text-xs font-medium text-slate-700 focus:border-blue-500"
-                        />
-                        <input
-                          type="text" inputMode="decimal" placeholder="Peso"
-                          value={a.peso}
-                          onChange={e => updateAtividade(uIdx, aIdx, 'peso', e.target.value)}
-                          className="w-20 px-3 py-2 bg-white border border-slate-200 rounded-lg outline-none text-xs font-medium text-slate-700 focus:border-blue-500 text-center"
-                        />
-                        {u.atividades.length > 1 && (
-                          <button type="button" onClick={() => removeAtividade(uIdx, aIdx)} className="p-1.5 text-rose-400 hover:bg-rose-50 rounded-lg transition-colors">
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                    <button type="button" onClick={() => addAtividade(uIdx)} className="flex items-center gap-1 text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-wide pl-1">
-                      <Plus className="w-3 h-3" /> Atividade
+            {unidades.map((u, uIdx) => (
+              <div key={uIdx} className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text" value={u.nome}
+                    onChange={e => updateUnidade(uIdx, { nome: e.target.value })}
+                    className="flex-1 px-4 py-2.5 bg-white border border-slate-200 rounded-xl outline-none font-semibold text-sm text-slate-700 focus:border-blue-500"
+                    placeholder={`${uIdx + 1}ª Unidade`}
+                  />
+                  {formaFinal === "MEDIA_PONDERADA" && (
+                    <input type="text" inputMode="decimal" title="Peso da unidade na média final" placeholder="Peso" value={u.peso} onChange={e => updateUnidade(uIdx, { peso: e.target.value })} className={`w-20 ${smallInput}`} />
+                  )}
+                  {unidades.length > 1 && (
+                    <button type="button" onClick={() => removeUnidade(uIdx)} className="p-2 text-rose-500 hover:bg-rose-50 rounded-xl transition-colors">
+                      <Trash2 className="w-4 h-4" />
                     </button>
-                  </div>
-
-                  <p className={`text-[10px] font-bold uppercase tracking-wide pl-1 ${soma === 10 ? 'text-emerald-600' : 'text-amber-600'}`}>
-                    Soma dos pesos: {soma.toFixed(1)} {soma !== 10 && '(normalmente soma 10)'}
-                  </p>
+                  )}
                 </div>
-              )
-            })}
+
+                <div className="pl-2 space-y-1">
+                  <Opcoes valor={u.formaCalculo} opcoes={FORMAS_ETAPA} onChange={v => updateUnidade(uIdx, { formaCalculo: v })} />
+                  {u.formaCalculo === "SOMA_COM_DIVISOR" && (
+                    <input type="text" inputMode="decimal" placeholder="Divisor" value={u.divisor} onChange={e => updateUnidade(uIdx, { divisor: e.target.value })} className={`w-28 ${smallInput}`} />
+                  )}
+                </div>
+
+                <div className="space-y-2 pl-2">
+                  {u.atividades.map((a, aIdx) => (
+                    <div key={aIdx} className="flex items-center gap-2">
+                      <input
+                        type="text" placeholder="Nome (ex: Prova)"
+                        value={a.nome}
+                        onChange={e => updateAtividade(uIdx, aIdx, 'nome', e.target.value)}
+                        className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-lg outline-none text-xs font-medium text-slate-700 focus:border-blue-500"
+                      />
+                      <input type="text" inputMode="decimal" placeholder="Vale" title="Nota máxima da atividade" value={a.notaMaxima} onChange={e => updateAtividade(uIdx, aIdx, 'notaMaxima', e.target.value)} className={`w-20 ${smallInput}`} />
+                      {u.formaCalculo === "MEDIA_PONDERADA" && (
+                        <input type="text" inputMode="decimal" placeholder="Peso" title="Peso na média ponderada" value={a.peso} onChange={e => updateAtividade(uIdx, aIdx, 'peso', e.target.value)} className={`w-16 ${smallInput}`} />
+                      )}
+                      {u.atividades.length > 1 && (
+                        <button type="button" onClick={() => removeAtividade(uIdx, aIdx)} className="p-1.5 text-rose-400 hover:bg-rose-50 rounded-lg transition-colors">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button type="button" onClick={() => addAtividade(uIdx)} className="flex items-center gap-1 text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-wide pl-1">
+                    <Plus className="w-3 h-3" /> Atividade
+                  </button>
+                </div>
+
+                <p className="text-[10px] font-bold uppercase tracking-wide pl-1 text-slate-500">
+                  Nota máxima da unidade: {Number(tetoEtapa(u).toFixed(2))}
+                </p>
+              </div>
+            ))}
           </div>
 
           {/* Recuperação */}
           <div className="space-y-3">
-            <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-widest ml-1">Recuperação</label>
+            <label className={labelClass}>Recuperação</label>
 
-            <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-2xl">
-              <div>
-                <p className="text-sm font-semibold text-slate-700">Recuperação por unidade</p>
-                <p className="text-[10px] text-slate-400">Reforça a nota de uma unidade específica, se maior</p>
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-slate-700">Recuperação por unidade (paralela)</p>
+                  <p className="text-[10px] text-slate-400">Nunca baixa a nota da unidade</p>
+                </div>
+                <Toggle ativo={recUnidadeAtiva} onClick={() => setRecUnidadeAtiva(v => !v)} />
               </div>
-              <button
-                type="button"
-                onClick={() => setRecUnidadeAtiva(v => !v)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ${recUnidadeAtiva ? 'bg-blue-600' : 'bg-slate-300'}`}
-              >
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${recUnidadeAtiva ? 'translate-x-6' : 'translate-x-1'}`} />
-              </button>
+              {recUnidadeAtiva && (
+                <Opcoes valor={modoRecUnidade} onChange={setModoRecUnidade} opcoes={[
+                  { valor: "SUBSTITUI_SE_MAIOR", rotulo: "Substitui se maior" },
+                  { valor: "MEDIA_COM_UNIDADE", rotulo: "Média com a unidade", ajuda: "(nota + recuperação) / 2, se melhorar" },
+                ]} />
+              )}
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-2xl">
-              <div>
-                <p className="text-sm font-semibold text-slate-700">Recuperação final</p>
-                <p className="text-[10px] text-slate-400">Afeta o resultado geral da disciplina</p>
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-slate-700">Recuperação final / exame</p>
+                  <p className="text-[10px] text-slate-400">Afeta o resultado geral da disciplina</p>
+                </div>
+                <Toggle ativo={recFinalAtiva} onClick={() => setRecFinalAtiva(v => !v)} />
               </div>
-              <button
-                type="button"
-                onClick={() => setRecFinalAtiva(v => !v)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ${recFinalAtiva ? 'bg-blue-600' : 'bg-slate-300'}`}
-              >
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${recFinalAtiva ? 'translate-x-6' : 'translate-x-1'}`} />
-              </button>
+              {recFinalAtiva && (
+                <>
+                  <Opcoes valor={modoRecFinal} onChange={setModoRecFinal} opcoes={[
+                    { valor: "NOTA_MINIMA_ISOLADA", rotulo: "Nota mínima isolada", ajuda: "Aprova se a recuperação atingir a nota mínima" },
+                    { valor: "SUBSTITUI_MENOR_UNIDADE", rotulo: "Substitui a menor unidade" },
+                    { valor: "MEDIA_COM_FINAL", rotulo: "Média com o exame", ajuda: "(média anual + exame) / 2" },
+                  ]} />
+                  {modoRecFinal === "MEDIA_COM_FINAL" && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-slate-500">Mínimo de (média + exame) / 2:</span>
+                      <input type="text" inputMode="decimal" placeholder={notaMinima} value={notaMinimaExame} onChange={e => setNotaMinimaExame(e.target.value)} className={`w-20 ${smallInput}`} />
+                    </div>
+                  )}
+                </>
+              )}
             </div>
+          </div>
 
-            {recFinalAtiva && (
-              <div className="pl-4 space-y-2">
-                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Como a recuperação final aprova?</p>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button" onClick={() => setModoRecFinal("NOTA_MINIMA_ISOLADA")}
-                    className={`px-4 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wide transition-all border ${modoRecFinal === "NOTA_MINIMA_ISOLADA" ? 'bg-blue-500 text-white border-blue-500 shadow-lg shadow-blue-200' : 'bg-white text-slate-400 border-slate-200 hover:border-slate-300'}`}
-                  >
-                    Nota mínima isolada
-                  </button>
-                  <button
-                    type="button" onClick={() => setModoRecFinal("SUBSTITUI_MENOR_UNIDADE")}
-                    className={`px-4 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wide transition-all border ${modoRecFinal === "SUBSTITUI_MENOR_UNIDADE" ? 'bg-blue-500 text-white border-blue-500 shadow-lg shadow-blue-200' : 'bg-white text-slate-400 border-slate-200 hover:border-slate-300'}`}
-                  >
-                    Substitui a menor unidade
-                  </button>
+          {/* Frequência */}
+          <div className="space-y-3">
+            <label className={labelClass}>Frequência</label>
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+              <div className="space-y-1">
+                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Chamada</p>
+                <Opcoes valor={registroFrequencia} onChange={setRegistroFrequencia} opcoes={[
+                  { valor: "POR_AULA", rotulo: "Por aula", ajuda: "Cada tempo do horário tem chamada" },
+                  { valor: "POR_DIA", rotulo: "Por dia", ajuda: "Uma chamada por dia (anos iniciais)" },
+                ]} />
+              </div>
+              <div className="space-y-1">
+                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Frequência mínima para aprovar</p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Opcoes valor={apuracaoFrequencia} onChange={setApuracaoFrequencia} opcoes={[
+                    { valor: "GERAL", rotulo: "Geral", ajuda: "Sobre o total de horas letivas (LDB)" },
+                    { valor: "POR_COMPONENTE", rotulo: "Por disciplina" },
+                  ]} />
+                  <input type="text" inputMode="decimal" value={frequenciaMinima} onChange={e => setFrequenciaMinima(e.target.value)} className={`w-20 ${smallInput}`} />
+                  <span className="text-xs text-slate-500">%</span>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
 

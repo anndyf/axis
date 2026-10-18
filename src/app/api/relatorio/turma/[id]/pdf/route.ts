@@ -3,6 +3,8 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import { etapasDaNota, desistenteEmTodas } from '@/lib/services/notas'
+import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from '@/lib/services/notas-leitura'
 
 export const runtime = 'nodejs'
 
@@ -31,7 +33,8 @@ export async function GET(
           include: {
             notas: {
               include: {
-                disciplina: true
+                disciplina: true,
+                unidades: SELECT_ETAPAS_DA_NOTA
               }
             }
           },
@@ -94,21 +97,15 @@ export async function GET(
     let totalRecuperacao = 0
     let totalDesistentes = 0
 
-    const isSemestral = turma.modalidade === 'PROEJA' || turma.modalidade === 'SUBSEQUENTE'
+    // Etapas do esquema da turma (2, 3, 4...) - antes "isSemestral" por
+    // Turma.modalidade, que nunca foi preenchida nos dados reais.
+    const etapas = (await carregarEsquemaDaTurma(turma))?.etapas ?? []
 
     turma.estudantes.forEach(estudante => {
       const aprovadas = estudante.notas.filter(n => n.status === 'APROVADO').length
       const recuperacao = estudante.notas.filter(n => n.status === 'RECUPERACAO').length
       
-      const desistente = isSemestral 
-        ? estudante.notas.some((n: any) => 
-            n.isDesistenteUnid1 && n.isDesistenteUnid2 &&
-            n.nota1 === null && n.nota2 === null
-          )
-        : estudante.notas.some((n: any) => 
-            n.isDesistenteUnid1 && n.isDesistenteUnid2 && n.isDesistenteUnid3 && 
-            n.nota1 === null && n.nota2 === null && n.nota3 === null
-          )
+      const desistente = estudante.notas.some((n) => desistenteEmTodas(etapasDaNota(etapas, n.unidades)))
 
       if (desistente) {
         totalDesistentes++

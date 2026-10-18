@@ -1,18 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { validarEsquema, criarEstruturaEsquema, type EsquemaBody } from '@/lib/services/esquemas-avaliacao'
 
 export const runtime = 'nodejs'
-
-interface AtividadeInput {
-  nome: string
-  peso: number
-}
-
-interface UnidadeInput {
-  nome: string
-  atividades: AtividadeInput[]
-}
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -28,69 +19,20 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ message: 'Esquema não encontrado' }, { status: 404 })
     }
 
-    const {
-      nome,
-      notaMinimaAprovacao,
-      recuperacaoUnidadeAtiva,
-      modoRecuperacaoUnidade,
-      recuperacaoFinalAtiva,
-      modoRecuperacaoFinal,
-      unidades
-    }: {
-      nome: string
-      notaMinimaAprovacao?: number
-      recuperacaoUnidadeAtiva?: boolean
-      modoRecuperacaoUnidade?: string | null
-      recuperacaoFinalAtiva?: boolean
-      modoRecuperacaoFinal?: string | null
-      unidades: UnidadeInput[]
-    } = await request.json()
-
-    if (!nome || !Array.isArray(unidades) || unidades.length === 0) {
-      return NextResponse.json({ message: 'Nome e ao menos 1 unidade são obrigatórios' }, { status: 400 })
-    }
-    for (const u of unidades) {
-      if (!u.nome || !Array.isArray(u.atividades) || u.atividades.length === 0) {
-        return NextResponse.json({ message: 'Cada unidade precisa de nome e ao menos 1 atividade' }, { status: 400 })
-      }
+    const validado = validarEsquema(await request.json() as EsquemaBody)
+    if ('erro' in validado) {
+      return NextResponse.json({ message: validado.erro }, { status: 400 })
     }
 
     const esquema = await prisma.$transaction(async (tx) => {
-      await tx.esquemaAvaliacao.update({
-        where: { id },
-        data: {
-          nome,
-          numUnidades: unidades.length,
-          notaMinimaAprovacao: notaMinimaAprovacao ?? 5,
-          recuperacaoUnidadeAtiva: !!recuperacaoUnidadeAtiva,
-          modoRecuperacaoUnidade: recuperacaoUnidadeAtiva ? (modoRecuperacaoUnidade as any) ?? 'SUBSTITUI_SE_MAIOR' : null,
-          recuperacaoFinalAtiva: recuperacaoFinalAtiva ?? true,
-          modoRecuperacaoFinal: (recuperacaoFinalAtiva ?? true) ? (modoRecuperacaoFinal as any) ?? 'NOTA_MINIMA_ISOLADA' : null,
-        }
-      })
+      await tx.esquemaAvaliacao.update({ where: { id }, data: validado.dados })
 
-      // Editar a estrutura não corrompe notas já lançadas (NotaAtividade.valor
-      // é um snapshot, não recalcula a partir do peso atual) - apagar e
-      // recriar unidades/atividades é seguro e mais simples que diff
-      // incremental. NotaUnidade/NotaAtividade de unidades removidas são
-      // apagadas em cascata (onDelete: Cascade) - só bloqueia (P2003) se
-      // alguma NotaUnidade referenciar uma unidade que sobreviveu à edição
-      // mas não deveria... na prática isso não acontece aqui porque tudo é
-      // recriado do zero.
+      // Apagar e recriar unidades/atividades é mais simples que diff
+      // incremental. NotaUnidade referencia EsquemaUnidade sem cascade: se o
+      // esquema já tem notas lançadas, o deleteMany falha com P2003 e a edição
+      // inteira é desfeita (tratado abaixo como 409).
       await tx.esquemaUnidade.deleteMany({ where: { esquemaId: id } })
-
-      for (let i = 0; i < unidades.length; i++) {
-        const u = unidades[i]
-        const unidadeCriada = await tx.esquemaUnidade.create({
-          data: { esquemaId: id, ordem: i + 1, nome: u.nome }
-        })
-        for (let j = 0; j < u.atividades.length; j++) {
-          const a = u.atividades[j]
-          await tx.esquemaAtividade.create({
-            data: { esquemaUnidadeId: unidadeCriada.id, ordem: j + 1, nome: a.nome, peso: a.peso }
-          })
-        }
-      }
+      await criarEstruturaEsquema(tx, id, validado.unidades)
 
       return tx.esquemaAvaliacao.findUnique({
         where: { id },

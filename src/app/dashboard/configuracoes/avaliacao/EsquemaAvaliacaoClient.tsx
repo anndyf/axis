@@ -6,18 +6,8 @@ import { ArrowLeft, Plus, Pencil, Trash2, ClipboardList, Layers } from "lucide-r
 import EsquemaAvaliacaoModal, { type EsquemaParaEditar } from "@/components/EsquemaAvaliacaoModal"
 import ConfirmModal from "@/components/ConfirmModal"
 
-interface Atividade { id: string; nome: string; peso: number }
-interface Unidade { id: string; nome: string; atividades: Atividade[] }
-interface Esquema {
-  id: string
-  nome: string
+type Esquema = EsquemaParaEditar & {
   numUnidades: number
-  notaMinimaAprovacao: number
-  recuperacaoUnidadeAtiva: boolean
-  modoRecuperacaoUnidade: string | null
-  recuperacaoFinalAtiva: boolean
-  modoRecuperacaoFinal: string | null
-  unidades: Unidade[]
   _count: { cursos: number; turmas: number }
 }
 
@@ -35,19 +25,7 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
   }
 
   const abrirEdicao = (esquema: Esquema) => {
-    setEsquemaParaEditar({
-      id: esquema.id,
-      nome: esquema.nome,
-      notaMinimaAprovacao: esquema.notaMinimaAprovacao,
-      recuperacaoUnidadeAtiva: esquema.recuperacaoUnidadeAtiva,
-      modoRecuperacaoUnidade: esquema.modoRecuperacaoUnidade,
-      recuperacaoFinalAtiva: esquema.recuperacaoFinalAtiva,
-      modoRecuperacaoFinal: esquema.modoRecuperacaoFinal,
-      unidades: esquema.unidades.map(u => ({
-        nome: u.nome,
-        atividades: u.atividades.map(a => ({ nome: a.nome, peso: a.peso }))
-      }))
-    })
+    setEsquemaParaEditar(esquema)
     setIsModalOpen(true)
   }
 

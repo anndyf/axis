@@ -3,19 +3,16 @@
 import { useState, useMemo } from "react"
 import Link from "next/link"
 import { ArrowLeft, Download, Filter, FileText, CheckCircle2, AlertCircle, UserMinus, Clock, MoreHorizontal, GraduationCap, Accessibility } from "lucide-react"
+import type { EtapaDaNota } from "@/lib/services/notas"
 
-type ViewMode = 'STATUS' | 'NOTA1' | 'NOTA2' | 'NOTA3' | 'MEDIA'
+// número = índice da etapa (U1, U2, ...) do esquema da turma
+type ViewMode = 'STATUS' | 'MEDIA' | number
 
 interface NotaData {
   disciplinaId: string
   nota: number
-  nota1?: number | null
-  nota2?: number | null
-  nota3?: number | null
   status: string
-  isDesistenteUnid1?: boolean
-  isDesistenteUnid2?: boolean
-  isDesistenteUnid3?: boolean
+  etapas: EtapaDaNota[]
 }
 
 interface RelatorioStatusClientProps {
@@ -34,9 +31,11 @@ interface RelatorioStatusClientProps {
       aeeProfile?: { id: string } | null
     }[]
   }
+  nomesEtapas: string[]
+  notaMinimaAprovacao: number
 }
 
-export default function RelatorioStatusClient({ turma }: RelatorioStatusClientProps) {
+export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAprovacao }: RelatorioStatusClientProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('STATUS')
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null)
 
@@ -64,7 +63,7 @@ export default function RelatorioStatusClient({ turma }: RelatorioStatusClientPr
   const getNotaStyle = (nota: number | null | undefined, isDesistente = false) => {
     if (isDesistente) return 'text-slate-800 font-medium'
     if (nota === null || nota === undefined) return 'text-slate-300 font-normal'
-    if (nota >= 5) return 'text-emerald-600 font-medium'
+    if (nota >= notaMinimaAprovacao) return 'text-emerald-600 font-medium'
     return 'text-rose-600 font-medium'
   }
 
@@ -110,15 +109,10 @@ export default function RelatorioStatusClient({ turma }: RelatorioStatusClientPr
     let value: number | string | null | undefined = null
     let isDesistente = false
 
-    if (viewMode === 'NOTA1') {
-      value = nota.nota1
-      isDesistente = !!nota.isDesistenteUnid1
-    } else if (viewMode === 'NOTA2') {
-      value = nota.nota2
-      isDesistente = !!nota.isDesistenteUnid2
-    } else if (viewMode === 'NOTA3') {
-      value = nota.nota3
-      isDesistente = !!nota.isDesistenteUnid3
+    if (typeof viewMode === 'number') {
+      const etapa = nota.etapas[viewMode]
+      value = etapa?.nota
+      isDesistente = !!etapa?.desistente
     } else if (viewMode === 'MEDIA') {
       value = nota.nota
       isDesistente = nota.status === 'DESISTENTE'
@@ -164,19 +158,18 @@ export default function RelatorioStatusClient({ turma }: RelatorioStatusClientPr
             
             <div className="flex flex-wrap items-center gap-3">
               <div className="bg-slate-200/50 p-1 rounded-2xl flex items-center border border-slate-300/50 shadow-inner">
-                {[
+                {([
                   { id: 'STATUS', label: 'Status', icon: CheckCircle2 },
-                  { id: 'NOTA1', label: 'Und 1', icon: FileText },
-                  { id: 'NOTA2', label: 'Und 2', icon: FileText },
-                  { id: 'NOTA3', label: 'Und 3', icon: FileText },
+                  ...nomesEtapas.map((_, i) => ({ id: i, label: `Und ${i + 1}`, icon: FileText })),
                   { id: 'MEDIA', label: 'Final', icon: GraduationCap }
-                ].map((item) => {
+                ] as { id: ViewMode; label: string; icon: typeof FileText }[]).map((item) => {
                   const Icon = item.icon
                   const active = viewMode === item.id
                   return (
                     <button
                       key={item.id}
-                      onClick={() => setViewMode(item.id as ViewMode)}
+                      title={typeof item.id === 'number' ? nomesEtapas[item.id] : undefined}
+                      onClick={() => setViewMode(item.id)}
                       className={`flex items-center space-x-2 px-4 py-2 rounded-[0.8rem] text-xs font-medium transition-all ${
                         active 
                         ? 'bg-black text-white shadow-lg active:scale-95' 

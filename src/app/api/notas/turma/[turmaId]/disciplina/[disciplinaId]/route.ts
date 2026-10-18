@@ -60,11 +60,18 @@ export async function GET(
         modoRecuperacaoUnidade: esquema.modoRecuperacaoUnidade,
         recuperacaoFinalAtiva: esquema.recuperacaoFinalAtiva,
         modoRecuperacaoFinal: esquema.modoRecuperacaoFinal,
+        formaCalculoFinal: esquema.formaCalculoFinal,
+        divisorFinal: esquema.divisorFinal,
+        notaMinimaExameFinal: esquema.notaMinimaExameFinal,
+        casasDecimais: esquema.casasDecimais,
         unidades: esquema.unidades.map((u) => ({
           id: u.id,
           ordem: u.ordem,
           nome: u.nome,
-          atividades: u.atividades.map((a) => ({ id: a.id, ordem: a.ordem, nome: a.nome, peso: a.peso }))
+          peso: u.peso,
+          formaCalculo: u.formaCalculo,
+          divisor: u.divisor,
+          atividades: u.atividades.map((a) => ({ id: a.id, ordem: a.ordem, nome: a.nome, notaMaxima: a.notaMaxima, peso: a.peso }))
         }))
       },
       notas: notasFinais.map((nf) => ({

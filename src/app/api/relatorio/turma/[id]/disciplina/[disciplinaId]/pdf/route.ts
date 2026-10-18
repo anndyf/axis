@@ -4,7 +4,8 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
-import { resolverEsquemaAvaliacaoId } from '@/lib/services/notas'
+import { etapasDaNota } from '@/lib/services/notas'
+import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from '@/lib/services/notas-leitura'
 
 export const runtime = 'nodejs'
 
@@ -30,7 +31,7 @@ export async function GET(
             include: {
               notas: {
                 where: { disciplinaId },
-                include: { disciplina: true }
+                include: { disciplina: true, unidades: SELECT_ETAPAS_DA_NOTA }
               }
             },
             orderBy: {
@@ -48,17 +49,9 @@ export async function GET(
       return NextResponse.json({ message: 'Turma ou Disciplina não encontrada' }, { status: 404 })
     }
 
-    // Resolve o esquema de avaliação (turma ?? curso) - substitui o antigo
-    // `isSemestral = turma.modalidade IN (PROEJA, SUBSEQUENTE)`, que nunca
-    // funcionou de fato pra dados reais (Turma.modalidade sempre NULL).
-    const curso = turma.cursoId
-      ? await prisma.curso.findUnique({ where: { id: turma.cursoId }, select: { esquemaAvaliacaoId: true } })
-      : null
-    const esquemaId = resolverEsquemaAvaliacaoId(turma, curso)
-    const esquema = esquemaId
-      ? await prisma.esquemaAvaliacao.findUnique({ where: { id: esquemaId }, select: { numUnidades: true } })
-      : null
-    const isSemestral = (esquema?.numUnidades ?? 3) < 3
+    // Uma coluna por etapa do esquema da turma (turma ?? curso) - lida de
+    // NotaUnidade, não mais das colunas fixas nota_1/2/3.
+    const etapas = (await carregarEsquemaDaTurma(turma))?.etapas ?? []
 
     // Criar PDF
     const doc = new jsPDF()
@@ -96,13 +89,10 @@ export async function GET(
     // Tabela de Estudantes
     const tableData = turma.estudantes.map((estudante: any, index: number) => {
       const nota = estudante.notas[0] || {}
-      
-      const n1 = (typeof nota.nota1 === 'number') ? nota.nota1.toFixed(1) : '-'
-      const n2 = (typeof nota.nota2 === 'number') ? nota.nota2.toFixed(1) : '-'
-      const n3 = (typeof nota.nota3 === 'number') ? nota.nota3.toFixed(1) : '-'
-      
+      const etapasDoAluno = etapasDaNota(etapas, nota.unidades ?? [])
+
       let media = '-'
-      if (nota.status === 'DESISTENTE' || (nota.isDesistenteUnid1 && nota.isDesistenteUnid2 && (isSemestral || nota.isDesistenteUnid3))) {
+      if (nota.status === 'DESISTENTE' || (etapasDoAluno.length > 0 && etapasDoAluno.every(e => e.desistente))) {
         media = 'DE'
       } else if (typeof nota.nota === 'number') {
         media = nota.nota.toFixed(1)
@@ -113,22 +103,16 @@ export async function GET(
       else if (nota.status === 'RECUPERACAO') status = 'RP'
       else if (nota.status === 'DESISTENTE') status = 'DE'
 
-      const row = [
+      return [
         (index + 1).toString(),
         estudante.nome,
-        n1,
-        n2
+        ...etapasDoAluno.map(e => e.nota !== null ? e.nota.toFixed(1) : '-'),
+        media,
+        status
       ]
-
-      if (!isSemestral) row.push(n3)
-      row.push(media, status)
-
-      return row
     })
 
-    const headers = ['#', 'Estudante', 'Unid 1', 'Unid 2']
-    if (!isSemestral) headers.push('Unid 3')
-    headers.push('Méd', 'Situação')
+    const headers = ['#', 'Estudante', ...etapas.map((_, i) => `Unid ${i + 1}`), 'Méd', 'Situação']
 
     autoTable(doc, {
       startY: 65,

@@ -2,6 +2,8 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import RelatorioStatusClient from "./RelatorioStatusClient"
+import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from "@/lib/services/notas-leitura"
+import { etapasDaNota } from "@/lib/services/notas"
 
 export const metadata = {
   title: 'Áxis - Turmas'
@@ -21,7 +23,8 @@ async function getRelatorioStatus(turmaId: string, escolaId: string) {
           aeeProfile: { select: { id: true } },
           notas: {
             include: {
-              disciplina: true
+              disciplina: true,
+              unidades: SELECT_ETAPAS_DA_NOTA
             }
           }
         },
@@ -49,5 +52,21 @@ export default async function RelatorioStatusPage({
     redirect("/dashboard/turmas")
   }
 
-  return <RelatorioStatusClient turma={turma} />
+  const esquema = await carregarEsquemaDaTurma(turma)
+  const etapas = esquema?.etapas ?? []
+  const turmaComEtapas = {
+    ...turma,
+    estudantes: turma.estudantes.map((e) => ({
+      ...e,
+      notas: e.notas.map((n) => ({ ...n, etapas: etapasDaNota(etapas, n.unidades) })),
+    })),
+  }
+
+  return (
+    <RelatorioStatusClient
+      turma={turmaComEtapas}
+      nomesEtapas={etapas.map((e) => e.nome)}
+      notaMinimaAprovacao={esquema?.config.notaMinimaAprovacao ?? 5}
+    />
+  )
 }

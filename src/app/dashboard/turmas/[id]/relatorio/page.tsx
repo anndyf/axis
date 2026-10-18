@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { ArrowLeft, Download, FileText } from "lucide-react"
 import RelatorioClient from "./RelatorioClient"
+import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from "@/lib/services/notas-leitura"
+import { etapasDaNota } from "@/lib/services/notas"
 
 export const metadata = {
   title: 'Áxis - Turmas'
@@ -19,7 +21,8 @@ async function getTurmaRelatorio(id: string, escolaId: string) {
         include: {
           notas: {
             include: {
-              disciplina: true
+              disciplina: true,
+              unidades: SELECT_ETAPAS_DA_NOTA
             }
           }
         },
@@ -61,6 +64,17 @@ export default async function RelatorioTurmaPage({
 
   if (!turma) {
     redirect("/dashboard/turmas")
+  }
+
+  // Colunas de unidade vêm do esquema da turma (2, 3, 4... etapas), não mais fixas em 3
+  const esquema = await carregarEsquemaDaTurma(turma)
+  const etapas = esquema?.etapas ?? []
+  const turmaComEtapas = {
+    ...turma,
+    estudantes: turma.estudantes.map((e) => ({
+      ...e,
+      notas: e.notas.map((n) => ({ ...n, etapas: etapasDaNota(etapas, n.unidades) })),
+    })),
   }
 
   // Calcular estatísticas
@@ -125,8 +139,9 @@ export default async function RelatorioTurmaPage({
       </header>
 
       {/* Main Content */}
-      <RelatorioClient 
-        turma={turma} 
+      <RelatorioClient
+        turma={turmaComEtapas}
+        nomesEtapas={etapas.map((e) => e.nome)}
         totalEstudantes={totalEstudantes}
         totalDisciplinas={totalDisciplinas}
         totalAprovados={totalAprovados}

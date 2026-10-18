@@ -3,7 +3,8 @@
 
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { resolverEsquemaAvaliacaoId } from "@/lib/services/notas"
+import { etapasDaNota } from "@/lib/services/notas"
+import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from "@/lib/services/notas-leitura"
 
 export async function getStudentPortalData() {
   const session = await auth()
@@ -34,7 +35,8 @@ export async function getStudentPortalData() {
         },
         notas: {
           include: {
-            disciplina: true
+            disciplina: true,
+            unidades: SELECT_ETAPAS_DA_NOTA
           },
           orderBy: {
             disciplina: { nome: 'asc' }
@@ -66,25 +68,20 @@ export async function getStudentPortalData() {
       }
     })
 
-    // Resolve o esquema de avaliação (turma ?? curso) só pra saber
-    // numUnidades/notaMinimaAprovacao - usado pela análise de risco no
-    // client, que hoje hardcoda "3 unidades" (bug conhecido).
-    const curso = estudante.turma.cursoId
-      ? await prisma.curso.findUnique({ where: { id: estudante.turma.cursoId }, select: { esquemaAvaliacaoId: true } })
-      : null
-    const esquemaId = resolverEsquemaAvaliacaoId(estudante.turma, curso)
-    const esquema = esquemaId
-      ? await prisma.esquemaAvaliacao.findUnique({
-          where: { id: esquemaId },
-          select: { numUnidades: true, notaMinimaAprovacao: true }
-        })
-      : null
+    // Esquema de avaliação da turma (turma ?? curso): colunas U1..UN do
+    // boletim e parâmetros da análise de risco.
+    const esquema = await carregarEsquemaDaTurma(estudante.turma)
+    const etapas = esquema?.etapas ?? []
 
     return {
-      estudante,
+      estudante: {
+        ...estudante,
+        notas: estudante.notas.map((n) => ({ ...n, etapas: etapasDaNota(etapas, n.unidades) })),
+      },
       mensagens,
-      numUnidades: esquema?.numUnidades ?? 3,
-      notaMinimaAprovacao: esquema?.notaMinimaAprovacao ?? 5,
+      nomesEtapas: etapas.map((e) => e.nome),
+      numUnidades: esquema?.config.numUnidades ?? 3,
+      notaMinimaAprovacao: esquema?.config.notaMinimaAprovacao ?? 5,
     }
   } catch (error) {
     console.error("Erro ao buscar dados do portal:", error)

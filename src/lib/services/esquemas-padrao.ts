@@ -43,7 +43,7 @@ async function garantirEsquema(db: Db, escolaId: string, nome: string, numUnidad
         create: Array.from({ length: numUnidades }, (_, i) => ({
           ordem: i + 1,
           nome: `${i + 1}ª Unidade`,
-          atividades: { create: [{ nome: 'Nota da Unidade', peso: 10, ordem: 1 }] },
+          atividades: { create: [{ nome: 'Nota da Unidade', notaMaxima: 10, ordem: 1 }] },
         })),
       },
     },

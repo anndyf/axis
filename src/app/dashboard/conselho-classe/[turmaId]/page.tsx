@@ -2,6 +2,8 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import ConselhoClasseClient from "./ConselhoClasseClient"
+import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from "@/lib/services/notas-leitura"
+import { etapasDaNota } from "@/lib/services/notas"
 
 export const metadata = {
   title: 'Áxis - Conselho classe'
@@ -18,7 +20,7 @@ async function getNotasConselho(turmaId: string, escolaId: string) {
           notas: {
             include: {
               disciplina: true,
-              unidades: { select: { notaCalculada: true, isDesistente: true } }
+              unidades: SELECT_ETAPAS_DA_NOTA
             }
           }
         }
@@ -27,6 +29,9 @@ async function getNotasConselho(turmaId: string, escolaId: string) {
   })
 
   if (!turma) return null
+
+  const esquema = await carregarEsquemaDaTurma(turma)
+  const etapas = esquema?.etapas ?? []
 
   // Filtrar notas que precisam de conselho. Não usa mais
   // Turma.modalidade (sempre NULL nos dados reais, regra nunca funcionou
@@ -53,14 +58,9 @@ async function getNotasConselho(turmaId: string, escolaId: string) {
     }).map((nota: any) => ({
       id: nota.id,
       nota: nota.nota,
-      nota1: nota.nota1,
-      nota2: nota.nota2,
-      nota3: nota.nota3,
       notaRecuperacao: nota.notaRecuperacao,
       status: nota.status,
-      isDesistenteUnid1: nota.isDesistenteUnid1,
-      isDesistenteUnid2: nota.isDesistenteUnid2,
-      isDesistenteUnid3: nota.isDesistenteUnid3,
+      etapas: etapasDaNota(etapas, nota.unidades),
       estudanteId: estudante.matricula,
       estudanteNome: estudante.nome,
       disciplinaId: nota.disciplinaId,
@@ -70,7 +70,10 @@ async function getNotasConselho(turmaId: string, escolaId: string) {
 
   return {
     turma,
-    notasConselho: notasFiltradas
+    notasConselho: notasFiltradas,
+    // Sem esquema resolvido, cai no comportamento legado (média simples, mínimo 5)
+    esquemaConfig: esquema?.config ?? { numUnidades: etapas.length, notaMinimaAprovacao: 5, recuperacaoUnidadeAtiva: false, recuperacaoFinalAtiva: true },
+    pesosEtapas: etapas.map((e) => e.peso)
   }
 }
 
@@ -98,8 +101,9 @@ export default async function ConselhoClasseTurmaPage({
       turmaNome={data.turma.nome}
       turmaCurso={data.turma.curso}
       turmaTurno={data.turma.turno}
-      turmaModalidade={data.turma.modalidade}
       notasConselho={data.notasConselho}
+      esquemaConfig={data.esquemaConfig}
+      pesosEtapas={data.pesosEtapas}
     />
   )
 }

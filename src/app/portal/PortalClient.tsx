@@ -21,10 +21,11 @@ import {
 } from "lucide-react"
 import { signOut } from "next-auth/react"
 import { analyzeRisk } from "@/lib/risk-analysis"
+import type { EtapaDaNota } from "@/lib/services/notas"
 import MarkdownContent from "@/components/MarkdownContent"
 
 export default function PortalClient({ initialData, user, nomeEscola }: { initialData: any, user: any, nomeEscola: string }) {
-  const { estudante, mensagens = [], error, numUnidades = 3, notaMinimaAprovacao = 5 } = initialData
+  const { estudante, mensagens = [], error, nomesEtapas = [], numUnidades = 3, notaMinimaAprovacao = 5 } = initialData
   const [selectedMessage, setSelectedMessage] = useState<any>(null)
   const [readMessageIds, setReadMessageIds] = useState<Set<string>>(new Set())
   const [isScheduleOpen, setIsScheduleOpen] = useState(false)
@@ -273,38 +274,30 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
                     <thead>
                       <tr className="bg-white border-b border-slate-100 whitespace-nowrap">
                         <th className="px-6 py-4 text-[9px] font-semibold text-slate-400 uppercase tracking-widest">Disciplina</th>
-                        <th className="px-4 py-4 text-[9px] font-semibold text-slate-400 uppercase tracking-widest text-center">U1</th>
-                        <th className="px-4 py-4 text-[9px] font-semibold text-slate-400 uppercase tracking-widest text-center">U2</th>
-                        <th className="px-4 py-4 text-[9px] font-semibold text-slate-400 uppercase tracking-widest text-center">U3</th>
+                        {nomesEtapas.map((nome: string, i: number) => (
+                          <th key={i} title={nome} className="px-4 py-4 text-[9px] font-semibold text-slate-400 uppercase tracking-widest text-center">U{i + 1}</th>
+                        ))}
                         <th className="px-4 py-4 text-[9px] font-semibold text-slate-400 uppercase tracking-widest text-center">Méd</th>
                         <th className="px-6 py-4 text-[9px] font-semibold text-slate-400 uppercase tracking-widest text-center">Risco</th>
                       </tr>
                     </thead>
               <tbody className="divide-y divide-slate-50">
                 {estudante.notas.map((nota: any) => {
-                  const risk = analyzeRisk([nota.nota1, nota.nota2, nota.nota3], numUnidades, notaMinimaAprovacao)
+                  const risk = analyzeRisk(nota.etapas.map((e: EtapaDaNota) => e.nota), numUnidades, notaMinimaAprovacao)
                   return (
                     <tr key={nota.id} className="hover:bg-slate-50/50 transition-colors">
                       <td className="px-6 py-4">
                         <p className="text-sm font-semibold text-slate-800">{nota.disciplina.nome}</p>
                       </td>
+                      {nota.etapas.map((etapa: EtapaDaNota, i: number) => (
+                        <td key={i} className="px-4 py-4 text-center">
+                          <span className={`text-xs font-semibold ${etapa.nota === null ? 'text-slate-300' : etapa.nota >= notaMinimaAprovacao ? 'text-blue-600' : 'text-rose-600'}`}>
+                            {etapa.nota !== null ? etapa.nota.toFixed(1).replace('.', ',') : '-'}
+                          </span>
+                        </td>
+                      ))}
                       <td className="px-4 py-4 text-center">
-                        <span className={`text-xs font-semibold ${nota.nota1 >= 5 ? 'text-blue-600' : nota.nota1 !== null ? 'text-rose-600' : 'text-slate-300'}`}>
-                          {nota.nota1 !== null ? nota.nota1.toFixed(1).replace('.', ',') : '-'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 text-center">
-                        <span className={`text-xs font-semibold ${nota.nota2 >= 5 ? 'text-blue-600' : nota.nota2 !== null ? 'text-rose-600' : 'text-slate-300'}`}>
-                          {nota.nota2 !== null ? nota.nota2.toFixed(1).replace('.', ',') : '-'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 text-center">
-                        <span className={`text-xs font-semibold ${nota.nota3 >= 5 ? 'text-blue-600' : nota.nota3 !== null ? 'text-rose-600' : 'text-slate-300'}`}>
-                          {nota.nota3 !== null ? nota.nota3.toFixed(1).replace('.', ',') : '-'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 text-center">
-                        <div className={`inline-flex px-3 py-1 rounded-lg font-semibold text-[10px] ${nota.nota >= 5 ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-rose-50 text-rose-700 border border-rose-100'}`}>
+                        <div className={`inline-flex px-3 py-1 rounded-lg font-semibold text-[10px] ${nota.nota >= notaMinimaAprovacao ?'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-rose-50 text-rose-700 border border-rose-100'}`}>
                           {nota.nota.toFixed(1).replace('.', ',')}
                         </div>
                       </td>

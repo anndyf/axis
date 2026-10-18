@@ -415,12 +415,6 @@ model NotaFinal {
   modifiedAt        DateTime         @default(now()) @map("modified_at")
   createdAt         DateTime         @default(now()) @map("created_at")
   updatedAt         DateTime         @updatedAt @map("updated_at")
-  nota1             Float?           @map("nota_1")
-  nota2             Float?           @map("nota_2")
-  nota3             Float?           @map("nota_3")
-  isDesistenteUnid1 Boolean          @default(false) @map("is_desistente_unid1")
-  isDesistenteUnid2 Boolean          @default(false) @map("is_desistente_unid2")
-  isDesistenteUnid3 Boolean          @default(false) @map("is_desistente_unid3")
   disciplina        Disciplina       @relation(fields: [disciplinaId], references: [id], onDelete: Cascade)
   estudante         Estudante        @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
   modifiedBy        User?            @relation("NotaModificador", fields: [modifiedById], references: [id])
@@ -449,11 +443,44 @@ model NotaFinalAudit {
 
 enum ModoRecuperacaoUnidade {
   SUBSTITUI_SE_MAIOR
+  MEDIA_COM_UNIDADE // vale a maior entre a nota e (nota + recuperação) / 2
 }
 
 enum ModoRecuperacaoFinal {
   SUBSTITUI_MENOR_UNIDADE
   NOTA_MINIMA_ISOLADA
+  MEDIA_COM_FINAL // (média + exame final) / 2 >= notaMinimaExameFinal
+}
+
+// Ver plano-avaliacao-frequencia.md, seção 3.1.
+enum TipoNota {
+  NUMERICA
+  CONCEITUAL // reservado - só NUMERICA está implementado
+}
+
+// Como notas se combinam: atividades -> nota da etapa (EsquemaUnidade.formaCalculo)
+// e etapas -> média final (EsquemaAvaliacao.formaCalculoFinal).
+enum FormaCalculo {
+  SOMA
+  MEDIA_ARITMETICA
+  MEDIA_PONDERADA
+  SOMA_COM_DIVISOR
+  MAIOR_NOTA
+}
+
+enum DefinicaoAtividades {
+  ESCOLA // atividades fixas no esquema (template)
+  PROFESSOR // professor cria as avaliações de cada etapa no diário
+}
+
+enum RegistroFrequencia {
+  POR_AULA
+  POR_DIA
+}
+
+enum ApuracaoFrequencia {
+  GERAL // LDB art. 24, VI: % do total de horas letivas
+  POR_COMPONENTE
 }
 
 // Modelo de avaliação configurável por escola (frente "regras de negócio"
@@ -473,6 +500,16 @@ model EsquemaAvaliacao {
   modoRecuperacaoUnidade  ModoRecuperacaoUnidade? @map("modo_recuperacao_unidade")
   recuperacaoFinalAtiva   Boolean                 @default(true) @map("recuperacao_final_ativa")
   modoRecuperacaoFinal    ModoRecuperacaoFinal?   @default(NOTA_MINIMA_ISOLADA) @map("modo_recuperacao_final")
+  notaMinimaExameFinal    Float?                  @map("nota_minima_exame_final")
+  tipoNota                TipoNota                @default(NUMERICA) @map("tipo_nota")
+  notaMaxima              Float                   @default(10) @map("nota_maxima")
+  casasDecimais           Int                     @default(1) @map("casas_decimais")
+  formaCalculoFinal       FormaCalculo            @default(MEDIA_ARITMETICA) @map("forma_calculo_final")
+  divisorFinal            Float?                  @map("divisor_final")
+  definicaoAtividades     DefinicaoAtividades     @default(ESCOLA) @map("definicao_atividades")
+  registroFrequencia      RegistroFrequencia      @default(POR_AULA) @map("registro_frequencia")
+  apuracaoFrequencia      ApuracaoFrequencia      @default(GERAL) @map("apuracao_frequencia")
+  frequenciaMinima        Float                   @default(75) @map("frequencia_minima")
   createdAt               DateTime                @default(now()) @map("created_at")
   updatedAt               DateTime                @updatedAt @map("updated_at")
   unidades                EsquemaUnidade[]
@@ -487,10 +524,13 @@ model EsquemaUnidade {
   id         String             @id @default(cuid())
   esquemaId  String             @map("esquema_id")
   esquema    EsquemaAvaliacao   @relation(fields: [esquemaId], references: [id], onDelete: Cascade)
-  ordem      Int
-  nome       String
-  atividades EsquemaAtividade[]
-  notas      NotaUnidade[]
+  ordem        Int
+  nome         String
+  peso         Float              @default(1) // peso da etapa na média final ponderada
+  formaCalculo FormaCalculo       @default(SOMA) @map("forma_calculo") // atividades -> nota da etapa
+  divisor      Float? // SOMA_COM_DIVISOR
+  atividades   EsquemaAtividade[]
+  notas        NotaUnidade[]
 
   @@unique([esquemaId, ordem])
   @@map("esquema_unidades")
@@ -501,7 +541,8 @@ model EsquemaAtividade {
   esquemaUnidadeId String         @map("esquema_unidade_id")
   esquemaUnidade   EsquemaUnidade @relation(fields: [esquemaUnidadeId], references: [id], onDelete: Cascade)
   nome             String
-  peso             Float
+  notaMaxima       Float           @map("nota_maxima") // quanto a atividade vale (teto do lançamento)
+  peso             Float           @default(1) // quanto pesa na MEDIA_PONDERADA da etapa
   ordem            Int
   notas            NotaAtividade[]
 
@@ -729,3 +770,4 @@ enum StatusNota {
 
   @@map("status_nota")
 }
+

@@ -8,9 +8,11 @@ import {
   calcularMediaFinal,
   calcularStatus,
   resolverEsquemaAvaliacaoId,
+  paraEsquemaConfig,
   type EsquemaConfig,
   type StatusNota,
   type UnidadeInput,
+  type FormaCalculo,
 } from '@/lib/services/notas'
 
 export const runtime = 'nodejs'
@@ -87,14 +89,8 @@ export async function POST(request: NextRequest) {
     if (!esquema) {
       return NextResponse.json({ message: 'Esquema de avaliação inválido' }, { status: 400 })
     }
-    const esquemaConfig: EsquemaConfig = {
-      numUnidades: esquema.numUnidades,
-      notaMinimaAprovacao: esquema.notaMinimaAprovacao,
-      recuperacaoUnidadeAtiva: esquema.recuperacaoUnidadeAtiva,
-      modoRecuperacaoUnidade: esquema.modoRecuperacaoUnidade,
-      recuperacaoFinalAtiva: esquema.recuperacaoFinalAtiva,
-      modoRecuperacaoFinal: esquema.modoRecuperacaoFinal,
-    }
+    const esquemaConfig: EsquemaConfig = paraEsquemaConfig(esquema)
+    const casas = esquema.casasDecimais
 
     // Otimização: Buscar todos os estudantes do lote de uma vez para os logs de auditoria.
     // O frontend envia a matricula (LancarNotasClient.tsx usa estudante.matricula como chave),
@@ -135,9 +131,11 @@ export async function POST(request: NextRequest) {
       let algumCampoTocado = false
       const unidadesParaSalvar: {
         esquemaUnidadeId: string
-        ordem: number
         isDesistente: boolean
         notaRecuperacao: number | null
+        peso: number
+        formaCalculo: FormaCalculo
+        divisor: number | null
         atividades: { esquemaAtividadeId: string; peso: number; valor: number | null }[]
       }[] = []
 
@@ -161,15 +159,17 @@ export async function POST(request: NextRequest) {
         const atividadesFinal = eu.atividades.map((ea) => {
           const payloadAtividade = payloadUnidade?.atividades.find((a) => a.esquemaAtividadeId === ea.id)
           const valor = parseNota(payloadAtividade?.valor) ?? existingAtividadeMap.get(ea.id) ?? null
-          if (valor !== null && (valor < 0 || valor > 10)) {
-            throw new Error(`Nota inválida para estudante ${estudanteId}: deve estar entre 0 e 10`)
+          if (valor !== null && (valor < 0 || valor > ea.notaMaxima)) {
+            throw new Error(`Nota inválida para estudante ${estudanteId}: ${ea.nome} deve estar entre 0 e ${ea.notaMaxima}`)
           }
           return { esquemaAtividadeId: ea.id, peso: ea.peso, valor }
         })
 
         unidadesParaSalvar.push({
           esquemaUnidadeId: eu.id,
-          ordem: eu.ordem,
+          peso: eu.peso,
+          formaCalculo: eu.formaCalculo,
+          divisor: eu.divisor,
           isDesistente,
           notaRecuperacao,
           atividades: atividadesFinal
@@ -187,6 +187,9 @@ export async function POST(request: NextRequest) {
 
       const unidadesInput: UnidadeInput[] = unidadesParaSalvar.map((u) => ({
         esquemaUnidadeId: u.esquemaUnidadeId,
+        peso: u.peso,
+        formaCalculo: u.formaCalculo,
+        divisor: u.divisor,
         atividades: u.atividades.map((a) => ({ peso: a.peso, valor: a.valor })),
         notaRecuperacao: u.notaRecuperacao,
       }))
@@ -200,28 +203,16 @@ export async function POST(request: NextRequest) {
       const finalStatus = calcularStatus(resultado, esquemaConfig, null, currentStatus)
       const notaCalculadaFinal = resultado.media ?? 0
 
-      // Dual-write nas colunas legadas (nota_1/2/3, is_desistente_unidN) por
-      // posição de ordem - só as 3 primeiras unidades tem slot legado;
-      // consumidores ainda não migrados (RelatorioClient, PDFs, etc.) leem
-      // essas colunas até serem migrados numa limpeza futura já mapeada.
-      const notaPorOrdem: Record<number, number | null> = {}
-      const desistentePorOrdem: Record<number, boolean> = {}
-      for (const u of unidadesParaSalvar) {
-        if (u.ordem <= 3) {
-          notaPorOrdem[u.ordem] = calcularNotaUnidade(u.atividades)
-          desistentePorOrdem[u.ordem] = u.isDesistente
-        }
-      }
+      // Nota de cada etapa, na ordem do esquema - gravada em NotaUnidade
+      // abaixo. As colunas legadas nota_1/2/3 e is_desistente_unidN não são
+      // mais escritas: todos os leitores migraram para NotaUnidade
+      // (plano-avaliacao-frequencia.md, passo 4).
+      const notasEtapas = unidadesParaSalvar.map((u) => calcularNotaUnidade(u.atividades, u.formaCalculo, u.divisor, casas))
+      const notasEtapasAnteriores = esquema.unidades.map((eu) => existingUnidadeMap.get(eu.id)?.notaCalculada ?? null)
 
       const dataComum = {
-        nota1: notaPorOrdem[1] ?? null,
-        nota2: notaPorOrdem[2] ?? null,
-        nota3: notaPorOrdem[3] ?? null,
         nota: notaCalculadaFinal,
         status: finalStatus,
-        isDesistenteUnid1: desistentePorOrdem[1] ?? false,
-        isDesistenteUnid2: desistentePorOrdem[2] ?? false,
-        isDesistenteUnid3: desistentePorOrdem[3] ?? false,
       }
 
       let notaId: string
@@ -241,8 +232,8 @@ export async function POST(request: NextRequest) {
           {
             alvo: targetName,
             disciplina: disciplineName,
-            anterior: { n1: existing.nota1, n2: existing.nota2, n3: existing.nota3, st: existing.status },
-            atual: { n1: dataComum.nota1, n2: dataComum.nota2, n3: dataComum.nota3, st: finalStatus }
+            anterior: { etapas: notasEtapasAnteriores, st: existing.status },
+            atual: { etapas: notasEtapas, st: finalStatus }
           }
         )
 
@@ -261,9 +252,7 @@ export async function POST(request: NextRequest) {
           {
             alvo: targetName,
             disciplina: disciplineName,
-            nota1: dataComum.nota1,
-            nota2: dataComum.nota2,
-            nota3: dataComum.nota3,
+            etapas: notasEtapas,
             status: finalStatus
           }
         )
@@ -271,20 +260,20 @@ export async function POST(request: NextRequest) {
         results.push({ id: notaId, created: true })
       }
 
-      // Dual-write: popula NotaUnidade/NotaAtividade (modelo novo, N unidades
-      // e N atividades por unidade) em paralelo às colunas legadas acima.
-      for (const u of unidadesParaSalvar) {
+      // Grava as etapas (NotaUnidade) e atividades (NotaAtividade) - fonte
+      // de verdade das notas por etapa.
+      for (const [i, u] of unidadesParaSalvar.entries()) {
         const notaUnidade = await prisma.notaUnidade.upsert({
           where: { notaFinalId_esquemaUnidadeId: { notaFinalId: notaId, esquemaUnidadeId: u.esquemaUnidadeId } },
           update: {
-            notaCalculada: calcularNotaUnidade(u.atividades),
+            notaCalculada: notasEtapas[i],
             notaRecuperacao: u.notaRecuperacao,
             isDesistente: u.isDesistente
           },
           create: {
             notaFinalId: notaId,
             esquemaUnidadeId: u.esquemaUnidadeId,
-            notaCalculada: calcularNotaUnidade(u.atividades),
+            notaCalculada: notasEtapas[i],
             notaRecuperacao: u.notaRecuperacao,
             isDesistente: u.isDesistente
           }
@@ -304,7 +293,7 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error('Erro crítico ao lançar notas:', error.message || error)
 
-    if (error.message?.includes('deve estar entre 0 e 10')) {
+    if (error.message?.startsWith('Nota inválida')) {
       return NextResponse.json({ message: error.message }, { status: 400 })
     }
 

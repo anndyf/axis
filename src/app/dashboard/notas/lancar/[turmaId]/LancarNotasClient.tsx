@@ -20,7 +20,7 @@ import {
   Accessibility,
   Printer
 } from "lucide-react"
-import { calcularNotaUnidade, calcularMediaFinal, type EsquemaConfig, type UnidadeInput } from "@/lib/services/notas"
+import { calcularNotaUnidade, calcularMediaFinal, paraEsquemaConfig, type EsquemaConfig, type UnidadeInput, type FormaCalculo } from "@/lib/services/notas"
 
 interface Estudante {
   matricula: string
@@ -40,6 +40,7 @@ interface EsquemaAtividade {
   id: string
   ordem: number
   nome: string
+  notaMaxima: number
   peso: number
 }
 
@@ -47,6 +48,9 @@ interface EsquemaUnidade {
   id: string
   ordem: number
   nome: string
+  peso: number
+  formaCalculo: FormaCalculo
+  divisor: number | null
   atividades: EsquemaAtividade[]
 }
 
@@ -57,6 +61,10 @@ interface EsquemaInfo {
   modoRecuperacaoUnidade: string | null
   recuperacaoFinalAtiva: boolean
   modoRecuperacaoFinal: string | null
+  formaCalculoFinal: FormaCalculo
+  divisorFinal: number | null
+  notaMinimaExameFinal: number | null
+  casasDecimais: number
   unidades: EsquemaUnidade[]
 }
 
@@ -102,14 +110,13 @@ export default function LancarNotasTurmaClient({
   const [feedbackModal, setFeedbackModal] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
 
-  const esquemaConfig: EsquemaConfig | null = esquema ? {
+  const esquemaConfig: EsquemaConfig | null = esquema ? paraEsquemaConfig({
+    ...esquema,
     numUnidades: esquema.unidades.length,
-    notaMinimaAprovacao: esquema.notaMinimaAprovacao,
-    recuperacaoUnidadeAtiva: esquema.recuperacaoUnidadeAtiva,
     modoRecuperacaoUnidade: esquema.modoRecuperacaoUnidade as any,
-    recuperacaoFinalAtiva: esquema.recuperacaoFinalAtiva,
     modoRecuperacaoFinal: esquema.modoRecuperacaoFinal as any,
-  } : null
+  }) : null
+  const casas = esquema?.casasDecimais ?? 1
 
   // Esquema legado (1 atividade por unidade) renderiza como uma tabela
   // simples - 1 input por unidade, sem sub-colunas de atividade nem coluna
@@ -169,7 +176,7 @@ export default function LancarNotasTurmaClient({
     return calcularNotaUnidade(unidade.atividades.map(a => ({
       peso: a.peso,
       valor: estado.atividades[a.id] !== '' ? parseFloat(estado.atividades[a.id]) : null
-    })))
+    })), unidade.formaCalculo, unidade.divisor, casas)
   }
 
   const calcularMedia = (estudanteId: string): { texto: string, valor: number | null } => {
@@ -182,6 +189,9 @@ export default function LancarNotasTurmaClient({
 
     const unidadesInput: UnidadeInput[] = esquema.unidades.map(u => ({
       esquemaUnidadeId: u.id,
+      peso: u.peso,
+      formaCalculo: u.formaCalculo,
+      divisor: u.divisor,
       atividades: u.atividades.map(a => ({
         peso: a.peso,
         valor: estado[u.id]?.atividades[a.id] !== '' && estado[u.id]?.atividades[a.id] !== undefined
@@ -191,7 +201,7 @@ export default function LancarNotasTurmaClient({
     }))
     const resultado = calcularMediaFinal(unidadesInput, esquemaConfig)
     if (resultado.media === null) return { texto: '-', valor: null }
-    return { texto: resultado.media.toFixed(1), valor: resultado.media }
+    return { texto: resultado.media.toFixed(casas), valor: resultado.media }
   }
 
   const getStatusColor = (media: { texto: string, valor: number | null }) => {
@@ -437,7 +447,7 @@ export default function LancarNotasTurmaClient({
                         <Fragment key={u.id}>
                           {u.atividades.map(a => (
                             <th key={a.id} className="px-2 py-2 text-[10px] font-medium text-slate-400 uppercase tracking-wide text-center border-l border-slate-100 w-20">
-                              {a.nome} <span className="text-slate-300">({a.peso})</span>
+                              {a.nome} <span className="text-slate-300">({a.notaMaxima})</span>
                             </th>
                           ))}
                           <th key={`${u.id}-subtotal`} className="px-2 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wide text-center bg-slate-100/60 w-16">
@@ -527,7 +537,7 @@ export default function LancarNotasTurmaClient({
                                   <input
                                     type="number" step="0.1"
                                     value={val}
-                                    onChange={(e) => atividade && handleAtividadeChange(estudante.matricula, u.id, atividade.id, e.target.value, atividade.peso)}
+                                    onChange={(e) => atividade && handleAtividadeChange(estudante.matricula, u.id, atividade.id, e.target.value, atividade.notaMaxima)}
                                     className={`w-14 h-9 text-center border-2 rounded-xl text-base font-medium transition-all outline-none ${
                                       unidadeEstado.isDesistente ? 'bg-orange-50 border-orange-200 text-orange-600' :
                                       isModified ? 'border-slate-400 bg-white ring-4 ring-slate-500/5' : 'border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400'
@@ -566,7 +576,7 @@ export default function LancarNotasTurmaClient({
                                       <input
                                         type="number" step="0.1"
                                         value={val}
-                                        onChange={(e) => handleAtividadeChange(estudante.matricula, u.id, a.id, e.target.value, a.peso)}
+                                        onChange={(e) => handleAtividadeChange(estudante.matricula, u.id, a.id, e.target.value, a.notaMaxima)}
                                         className={`w-14 h-9 text-center border-2 rounded-xl text-sm font-medium transition-all outline-none ${
                                           unidadeEstado.isDesistente ? 'bg-orange-50 border-orange-200 text-orange-600' :
                                           isModified ? 'border-slate-400 bg-white ring-4 ring-slate-500/5' : 'border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400'
