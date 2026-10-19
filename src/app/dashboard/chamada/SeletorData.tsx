@@ -19,7 +19,7 @@ export default function SeletorData({ data, hoje }: { data: string; hoje: string
         p.set("data", e.target.value)
         router.push(`${pathname}?${p.toString()}`)
       }}
-      className="px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg outline-none text-sm text-fg-muted focus:bg-white focus:border-accent"
+      className="h-9 rounded-lg border border-line bg-surface px-3 text-sm text-fg shadow-card outline-none transition-[border-color,box-shadow] duration-150 hover:border-line-strong focus:border-accent focus:ring-3 focus:ring-ring/40"
     />
   )
 }

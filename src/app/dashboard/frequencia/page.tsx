@@ -7,7 +7,8 @@ import { getTurmasPermitidas } from "@/lib/data-fetching"
 import { carregarFrequenciaDaTurma } from "@/lib/services/frequencia-leitura"
 import { linhasInfrequencia, formatarFrequencia } from "@/lib/services/frequencia"
 import { chaveData } from "@/lib/services/calendario"
-import { ArrowLeft, UserX, AlertTriangle } from "lucide-react"
+import { UserX, ClipboardCheck, CheckCircle2 } from "lucide-react"
+import { Alert, Badge, Card, CardHeader, EmptyState, PageHeader, buttonClasses, type BadgeTone } from "@/components/ui"
 import SeletorTurma from "./SeletorTurma"
 import JustificativasClient from "./JustificativasClient"
 
@@ -15,13 +16,7 @@ export const metadata = { title: 'Áxis - Frequência' }
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-const COR_RISCO: Record<string, string> = {
-  CRITICAL: "text-danger-fg bg-danger-subtle border-danger-line",
-  HIGH: "text-warning-fg bg-warning-subtle border-warning-line",
-  MEDIUM: "text-warning-fg bg-warning-subtle border-warning-line",
-  LOW: "text-success-fg bg-success-subtle border-success-line",
-  NONE: "text-fg-subtle bg-zinc-50 border-zinc-200",
-}
+const TOM_RISCO: Record<string, BadgeTone> = { CRITICAL: "danger", HIGH: "danger", MEDIUM: "warning", LOW: "success", NONE: "neutral" }
 
 export default async function FrequenciaPage({ searchParams }: { searchParams: Promise<{ turma?: string; todos?: string }> }) {
   const session = await auth()
@@ -32,8 +27,9 @@ export default async function FrequenciaPage({ searchParams }: { searchParams: P
   const turmas = (await getTurmasPermitidas(session)).map((t) => ({ id: t.id, nome: t.nome }))
   const turma = turmaId ? await prisma.turma.findFirst({ where: { id: turmaId, escolaId }, select: { id: true, nome: true } }) : null
 
-  const card = "bg-white rounded-lg shadow-sm border border-zinc-200 p-6 space-y-4"
-  let conteudo: React.ReactNode = <p className="text-sm text-fg-subtle">Escolha uma turma.</p>
+  let conteudo: React.ReactNode = (
+    <Card><EmptyState icon={UserX} title="Escolha uma turma" description="Veja quem está abaixo ou perto da frequência mínima e registre atestados e justificativas." /></Card>
+  )
 
   if (turma) {
     const [frequencia, alunos, disciplinas, justificativas] = await Promise.all([
@@ -53,48 +49,46 @@ export default async function FrequenciaPage({ searchParams }: { searchParams: P
 
     conteudo = (
       <>
-        <section className={card}>
-          <div className="flex flex-wrap items-center gap-3">
-            <h2 className="font-medium text-fg flex-1 flex items-center gap-2"><UserX className="w-4 h-4" /> Infrequência — {turma.nome}</h2>
-            <Link href={`/dashboard/frequencia?turma=${turma.id}${todos === "1" ? "" : "&todos=1"}`} className="text-xs font-medium text-accent-fg hover:underline">
-              {todos === "1" ? "Só abaixo ou perto do mínimo" : "Mostrar a turma toda"}
-            </Link>
-          </div>
-          {frequencia && (
-            <p className="text-sm text-fg-muted">
-              Mínimo de <strong>{frequencia.regra.minimo}%</strong> {frequencia.regra.apuracao === "GERAL" ? "do total de aulas" : "em cada disciplina"}.
-              {" "}{frequencia.aulasRestantes.total} {frequencia.registro === "POR_DIA" ? "dias letivos" : "aulas"} ainda previstas até o fim do ano letivo.
-            </p>
-          )}
-          {!frequencia?.temChamada && <p className="text-sm text-fg-subtle">Nenhuma chamada salva nesta turma ainda.</p>}
-          {frequencia?.temChamada && linhas.length === 0 && <p className="text-sm text-success-fg">Nenhum aluno abaixo ou perto da frequência mínima.</p>}
+        <Card className="overflow-hidden">
+          <CardHeader
+            title={`Infrequência — ${turma.nome}`}
+            description={frequencia ? `Mínimo de ${frequencia.regra.minimo}% ${frequencia.regra.apuracao === "GERAL" ? "do total de aulas" : "em cada disciplina"} · ${frequencia.aulasRestantes.total} ${frequencia.registro === "POR_DIA" ? "dias letivos" : "aulas"} ainda previstas até o fim do ano letivo` : undefined}
+            actions={
+              <Link href={`/dashboard/frequencia?turma=${turma.id}${todos === "1" ? "" : "&todos=1"}`} className={buttonClasses({ variant: "secondary", size: "sm" })}>
+                {todos === "1" ? "Só abaixo ou perto do mínimo" : "Mostrar a turma toda"}
+              </Link>
+            }
+          />
+          {!frequencia?.temChamada && <EmptyState icon={ClipboardCheck} title="Nenhuma chamada salva nesta turma ainda" description="A frequência aparece depois que os professores salvarem as primeiras chamadas." />}
+          {frequencia?.temChamada && linhas.length === 0 && <EmptyState icon={CheckCircle2} title="Ninguém abaixo ou perto da frequência mínima" description="Use “Mostrar a turma toda” para ver todos os alunos." />}
           {linhas.length > 0 && (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="text-xs text-fg-subtle uppercase tracking-wide">
-                  <tr className="border-b border-zinc-200">
-                    <th className="py-2 text-left font-medium">Aluno</th>
-                    <th className="py-2 text-center font-medium">Freq.</th>
-                    <th className="py-2 text-center font-medium" title="Faltas que contam / aulas">Faltas</th>
-                    <th className="py-2 text-center font-medium" title="Faltas sem atestado nem justificativa (ECA, art. 56)">Sem justif.</th>
-                    <th className="py-2 text-center font-medium" title="Quantas faltas ainda cabem até o fim do ano letivo">Pode faltar</th>
-                    <th className="py-2 text-left font-medium">Risco</th>
+              <table className="w-full min-w-[40rem] text-13">
+                <thead>
+                  <tr className="border-b border-line text-xs text-fg-subtle">
+                    <th scope="col" className="h-9 px-4 text-left font-medium sm:px-5">Aluno</th>
+                    <th scope="col" className="h-9 px-3 text-right font-medium">Freq.</th>
+                    <th scope="col" className="h-9 px-3 text-right font-medium" title="Faltas que contam / aulas">Faltas</th>
+                    <th scope="col" className="h-9 px-3 text-right font-medium" title="Faltas sem atestado nem justificativa (ECA, art. 56)">Sem justificativa</th>
+                    <th scope="col" className="h-9 px-3 text-right font-medium" title="Quantas faltas ainda cabem até o fim do ano letivo">Pode faltar</th>
+                    <th scope="col" className="h-9 px-4 text-left font-medium sm:px-5">Risco</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-100">
+                <tbody>
                   {linhas.map((l) => {
                     const aluno = nomeAluno.get(l.estudanteId)
+                    const abaixo = l.percentual !== null && !!frequencia && l.percentual < frequencia.regra.minimo
                     return (
-                      <tr key={l.estudanteId}>
-                        <td className="py-2">
+                      <tr key={l.estudanteId} className="border-b border-line-subtle transition-colors duration-150 last:border-0 hover:bg-subtle/60">
+                        <td className="h-10 px-4 sm:px-5">
                           <Link href={`/dashboard/estudantes/${aluno?.matricula}/boletim`} className="text-fg hover:underline">{aluno?.nome}</Link>
                           {l.disciplinaId && <span className="block text-xs text-fg-subtle">{nomeDisc.get(l.disciplinaId)}</span>}
                         </td>
-                        <td className={`py-2 text-center font-medium ${l.percentual !== null && frequencia && l.percentual < frequencia.regra.minimo ? "text-danger-fg" : "text-fg-muted"}`}>{formatarFrequencia(l.percentual)}</td>
-                        <td className="py-2 text-center text-fg-muted">{l.faltas - l.faltasAbonadas} / {l.aulas}</td>
-                        <td className="py-2 text-center text-fg-muted">{l.faltasSemJustificativa}</td>
-                        <td className="py-2 text-center text-fg-muted">{l.faltasRestantesPermitidas === null ? "—" : Math.max(0, l.faltasRestantesPermitidas)}</td>
-                        <td className="py-2"><span className={`text-xs border rounded-full px-2 py-0.5 ${COR_RISCO[l.risco.level]}`}>{l.risco.message}</span></td>
+                        <td className={`h-10 px-3 text-right tabular-nums ${abaixo ? "font-medium text-danger-fg" : "text-fg"}`}>{formatarFrequencia(l.percentual)}</td>
+                        <td className="h-10 px-3 text-right tabular-nums text-fg-muted">{l.faltas - l.faltasAbonadas} / {l.aulas}</td>
+                        <td className="h-10 px-3 text-right tabular-nums text-fg-muted">{l.faltasSemJustificativa}</td>
+                        <td className="h-10 px-3 text-right tabular-nums text-fg-muted">{l.faltasRestantesPermitidas === null ? "—" : Math.max(0, l.faltasRestantesPermitidas)}</td>
+                        <td className="h-10 px-4 sm:px-5"><Badge tone={TOM_RISCO[l.risco.level]} dot>{l.risco.message}</Badge></td>
                       </tr>
                     )
                   })}
@@ -103,12 +97,11 @@ export default async function FrequenciaPage({ searchParams }: { searchParams: P
             </div>
           )}
           {linhas.some((l) => l.faltasSemJustificativa >= 5) && (
-            <p className="text-xs text-warning-fg bg-warning-subtle border border-warning-line rounded-lg p-3 flex gap-2">
-              <AlertTriangle className="w-4 h-4 shrink-0" />
-              Faltas reiteradas sem justificativa devem ser comunicadas ao Conselho Tutelar depois de esgotados os recursos da escola (ECA, art. 56, II).
-            </p>
+            <div className="border-t border-line-subtle p-4 sm:px-5">
+              <Alert tone="warning">Faltas reiteradas sem justificativa devem ser comunicadas ao Conselho Tutelar depois de esgotados os recursos da escola (ECA, art. 56, II).</Alert>
+            </div>
           )}
-        </section>
+        </Card>
 
         <JustificativasClient
           alunos={alunos.map((a) => ({ id: a.id, nome: a.nome, matricula: a.matricula }))}
@@ -128,19 +121,12 @@ export default async function FrequenciaPage({ searchParams }: { searchParams: P
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 pb-16">
-      <div className="flex flex-wrap items-center gap-4">
-        <Link href="/dashboard" className="p-2 hover:bg-zinc-200 rounded-lg transition-colors">
-          <ArrowLeft className="w-5 h-5 text-fg-muted" />
-        </Link>
-        <div className="flex-1">
-          <h1 className="text-2xl font-medium text-accent-fg flex items-center gap-2">
-            <UserX className="w-6 h-6 text-fg-muted" /> Frequência
-          </h1>
-          <p className="text-sm text-fg-muted">Infrequência por turma e cadastro de atestados e justificativas.</p>
-        </div>
-        <SeletorTurma turmas={turmas} atual={turma?.id ?? ""} />
-      </div>
+    <div className="mx-auto max-w-5xl space-y-6">
+      <PageHeader
+        title="Frequência"
+        description="Infrequência por turma e cadastro de atestados e justificativas."
+        actions={<SeletorTurma turmas={turmas} atual={turma?.id ?? ""} />}
+      />
       {conteudo}
     </div>
   )

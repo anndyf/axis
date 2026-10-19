@@ -300,7 +300,7 @@ export default async function DashboardPage() {
               <EmptyState icon={Users} title="Nenhuma turma neste ano letivo" description="Cadastre as turmas para começar a lançar notas e fazer chamadas." action={<Link href="/dashboard/turmas" className={buttonClasses({ size: 'sm' })}>Ir para turmas</Link>} />
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-13">
+                <table className="w-full min-w-[32rem] text-13">
                   <thead>
                     <tr className="border-b border-line text-xs text-fg-subtle">
                       <th scope="col" className="h-9 px-4 text-left font-medium sm:px-5">Turma</th>

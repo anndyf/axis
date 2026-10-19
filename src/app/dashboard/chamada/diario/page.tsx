@@ -8,7 +8,8 @@ import { carregarEsquemaDaTurma } from "@/lib/services/notas-leitura"
 import { carregarCalendario, anoLetivoDaTurma } from "@/lib/services/frequencia-leitura"
 import { diasComAulaAte, hojeNaEscola } from "@/lib/services/chamada"
 import { diasLetivos, aulasPrevistasPorDisciplina, chaveData } from "@/lib/services/calendario"
-import { ArrowLeft, BookOpen, Clock } from "lucide-react"
+import { ArrowLeft, BookOpen } from "lucide-react"
+import { Badge, Card, CardBody, CardHeader, EmptyState, PageHeader, Stat, buttonClasses } from "@/components/ui"
 
 export const metadata = { title: 'Áxis - Diário de classe' }
 export const runtime = 'nodejs'
@@ -54,75 +55,77 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
     : null
 
   const linkChamada = (d: string) => `/dashboard/chamada/fazer?turma=${turma.id}${disciplinaId ? `&disciplina=${disciplinaId}` : ""}&data=${d}`
-  const card = "bg-white rounded-lg shadow-sm border border-zinc-200 p-6 space-y-3"
-
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-16">
-      <div className="flex items-center gap-4">
-        <Link href="/dashboard/chamada" className="p-2 hover:bg-zinc-200 rounded-lg transition-colors">
-          <ArrowLeft className="w-5 h-5 text-fg-muted" />
-        </Link>
-        <div>
-          <h1 className="text-2xl font-medium text-accent-fg flex items-center gap-2">
-            <BookOpen className="w-6 h-6 text-fg-muted" /> Diário de classe — {acesso.disciplina?.nome ?? "Chamada diária"}
-          </h1>
-          <p className="text-sm text-fg-muted">{turma.nome} · {ano}</p>
-        </div>
+    <div className="mx-auto max-w-4xl space-y-6">
+      <PageHeader
+        title={`Diário de classe — ${acesso.disciplina?.nome ?? "Chamada diária"}`}
+        description={`${turma.nome} · ${ano}`}
+        actions={<Link href="/dashboard/chamada" className={buttonClasses({ variant: "ghost" })}><ArrowLeft size={16} strokeWidth={1.75} /> Chamada</Link>}
+      />
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <Stat label={porDia ? "Dias com chamada" : "Aulas dadas"} value={dadas} />
+        <Stat label="Previstas no ano" value={previstasAno ?? "—"} />
+        {!porDia && <Stat label="Carga horária" value={cargaHoraria ?? "—"} />}
+        <Stat label="Chamadas pendentes" value={pendentes.length} hint={pendentes.length ? "Dias com aula sem chamada" : "Tudo em dia"} />
       </div>
 
-      <section className={`${card} grid grid-cols-2 sm:grid-cols-4 gap-4 space-y-0`}>
-        <Numero rotulo={porDia ? "Dias com chamada" : "Aulas dadas"} valor={dadas} />
-        <Numero rotulo="Previstas no ano" valor={previstasAno ?? "—"} />
-        {!porDia && <Numero rotulo="Carga horária" valor={cargaHoraria ?? "—"} />}
-        <Numero rotulo="Chamadas pendentes" valor={pendentes.length} destaque={pendentes.length > 0} />
-      </section>
-
       {pendentes.length > 0 && (
-        <section className={card}>
-          <h2 className="font-medium text-fg flex items-center gap-2"><Clock className="w-4 h-4" /> Dias com aula sem chamada</h2>
-          <div className="flex flex-wrap gap-2">
+        <Card>
+          <CardHeader title="Dias com aula sem chamada" description="Toque no dia para fazer a chamada." />
+          <CardBody className="flex flex-wrap gap-1.5">
             {pendentes.slice(0, 60).map((d) => (
-              <Link key={d} href={linkChamada(d)} className="text-xs text-warning-fg bg-warning-subtle border border-warning-line rounded-lg px-2 py-1 hover:bg-warning-subtle">{dataBR(d)}</Link>
+              <Link key={d} href={linkChamada(d)} className="rounded-md border border-line bg-surface px-2 py-1 text-xs tabular-nums text-fg-muted transition-colors duration-150 hover:border-line-strong hover:text-fg">{dataBR(d)}</Link>
             ))}
-          </div>
-        </section>
+            {pendentes.length > 60 && <span className="px-2 py-1 text-xs text-fg-subtle">e mais {pendentes.length - 60}</span>}
+          </CardBody>
+        </Card>
       )}
 
-      <section className={card}>
-        <h2 className="font-medium text-fg">Aulas registradas</h2>
-        {aulas.length === 0 && <p className="text-sm text-fg-subtle">Nenhuma aula registrada ainda.</p>}
-        <div className="divide-y divide-zinc-100">
-          {aulas.map((a) => {
-            const d = chaveData(a.data)
-            const faltas = a.faltas.reduce((s, f) => s + f.quantidade, 0)
-            return (
-              <div key={a.id} className="flex flex-wrap items-start gap-3 py-3">
-                <div className="w-28">
-                  <p className="text-sm font-medium text-fg">{dataBR(d)}</p>
-                  <p className="text-xs text-fg-subtle">{a.tempos.length ? a.tempos.map((t) => `${t}º`).join(", ") : `${a.quantidade} aula(s)`}</p>
-                </div>
-                <div className="flex-1 min-w-[12rem]">
-                  <p className="text-sm text-fg-muted whitespace-pre-line">{a.conteudo || <span className="text-fg-subtle">Sem conteúdo registrado</span>}</p>
-                  <p className="text-xs text-fg-subtle">
-                    {SITUACAO[a.situacao]}{a.situacao === "REALIZADA" && ` · ${faltas} ${faltas === 1 ? "falta" : "faltas"}`}
-                    {a.professor && ` · ${a.professor.name || a.professor.username}`}
-                  </p>
-                </div>
-                <Link href={linkChamada(d)} className="text-xs font-medium text-accent-fg hover:underline">Editar</Link>
-              </div>
-            )
-          })}
-        </div>
-      </section>
-    </div>
-  )
-}
-
-function Numero({ rotulo, valor, destaque }: { rotulo: string; valor: number | string; destaque?: boolean }) {
-  return (
-    <div>
-      <p className="text-xs text-fg-subtle">{rotulo}</p>
-      <p className={`text-2xl font-medium ${destaque ? "text-warning-fg" : "text-fg"}`}>{valor}</p>
+      <Card className="overflow-hidden">
+        <CardHeader title="Aulas registradas" />
+        {aulas.length === 0 ? (
+          <EmptyState icon={BookOpen} title="Nenhuma aula registrada ainda" description="As aulas aparecem aqui quando a chamada é salva." />
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[40rem] text-13">
+              <thead>
+                <tr className="border-b border-line text-xs text-fg-subtle">
+                  <th scope="col" className="h-9 px-4 text-left font-medium sm:px-5">Data</th>
+                  <th scope="col" className="h-9 px-3 text-left font-medium">Conteúdo</th>
+                  <th scope="col" className="h-9 px-3 text-right font-medium">Faltas</th>
+                  <th scope="col" className="h-9 px-4 text-right font-medium sm:px-5"><span className="sr-only">Ações</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                {aulas.map((a) => {
+                  const d = chaveData(a.data)
+                  const faltas = a.faltas.reduce((s, f) => s + f.quantidade, 0)
+                  return (
+                    <tr key={a.id} className="border-b border-line-subtle align-top last:border-0">
+                      <td className="whitespace-nowrap px-4 py-2.5 sm:px-5">
+                        <p className="tabular-nums text-fg">{dataBR(d)}</p>
+                        <p className="text-xs text-fg-subtle">{a.tempos.length ? a.tempos.map((t) => `${t}º`).join(", ") : `${a.quantidade} aula(s)`}</p>
+                      </td>
+                      <td className="min-w-[14rem] px-3 py-2.5">
+                        <p className="whitespace-pre-line text-fg">{a.conteudo || <span className="text-fg-subtle">Sem conteúdo registrado</span>}</p>
+                        <p className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-fg-subtle">
+                          {a.situacao === "REALIZADA" ? null : <Badge tone={a.situacao === "CANCELADA" ? "neutral" : "warning"}>{SITUACAO[a.situacao]}</Badge>}
+                          {a.professor && <span>{a.professor.name || a.professor.username}</span>}
+                        </p>
+                      </td>
+                      <td className="px-3 py-2.5 text-right tabular-nums text-fg-muted">{a.situacao === "REALIZADA" ? faltas : "—"}</td>
+                      <td className="px-4 py-2.5 text-right sm:px-5">
+                        <Link href={linkChamada(d)} className={buttonClasses({ size: "sm", variant: "secondary" })}>Editar</Link>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Card>
     </div>
   )
 }

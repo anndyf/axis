@@ -3,7 +3,8 @@
 import { useEffect, useState, useTransition } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, ClipboardCheck, Save, Loader2, CheckCircle2, AlertCircle, Minus, Plus, Ban } from "lucide-react"
+import { ArrowLeft, Save, Minus, Plus, Ban, Users } from "lucide-react"
+import { Alert, Avatar, Badge, Button, Card, CardBody, CardHeader, EmptyState, Label, PageHeader, SkeletonRows, Textarea, buttonClasses } from "@/components/ui"
 import { abrirChamada, salvarChamada, cancelarAula, type ChamadaAberta } from "../actions"
 
 interface Props {
@@ -13,8 +14,6 @@ interface Props {
   hoje: string
 }
 
-const input = "px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg outline-none text-sm text-fg-muted focus:bg-white focus:border-accent"
-const botao = "flex items-center gap-2 bg-zinc-900 text-white px-4 py-2 rounded-lg text-xs font-medium uppercase tracking-wide hover:bg-zinc-800 disabled:opacity-50"
 const dataBR = (iso: string) => iso.split("-").reverse().join("/")
 
 export default function ChamadaClient({ turmaId, disciplinaId, data, hoje }: Props) {
@@ -71,99 +70,96 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje }: Pro
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 pb-16">
-      <div className="flex items-center gap-4">
-        <Link href={`/dashboard/chamada?data=${data}`} className="p-2 hover:bg-zinc-200 rounded-lg transition-colors">
-          <ArrowLeft className="w-5 h-5 text-fg-muted" />
-        </Link>
-        <div className="flex-1">
-          <h1 className="text-2xl font-medium text-accent-fg flex items-center gap-2">
-            <ClipboardCheck className="w-6 h-6 text-fg-muted" /> {chamada ? (chamada.disciplina?.nome ?? "Chamada diária") : "Chamada"}
-          </h1>
-          <p className="text-sm text-fg-muted">
+    <div className="mx-auto max-w-3xl space-y-6 pb-24">
+      <PageHeader
+        title={chamada ? (chamada.disciplina?.nome ?? "Chamada diária") : "Chamada"}
+        description={
+          <>
             {chamada ? `${chamada.turma.nome} · ${dataBR(data)}` : dataBR(data)}
             {chamada && chamada.aula.tempos.length > 0 && ` · ${chamada.aula.tempos.map((t) => `${t}º`).join(", ")} ${chamada.aula.tempos.length > 1 ? "tempos" : "tempo"}`}
-          </p>
-        </div>
-        <input type="date" aria-label="Data da chamada" value={data} max={hoje} onChange={(e) => trocarData(e.target.value)} className={input} />
-      </div>
+          </>
+        }
+        actions={
+          <>
+            <Link href={`/dashboard/chamada?data=${data}`} className={buttonClasses({ variant: "ghost", size: "md" })}><ArrowLeft size={16} strokeWidth={1.75} /> Voltar</Link>
+            <input type="date" aria-label="Data da chamada" value={data} max={hoje} onChange={(e) => trocarData(e.target.value)} className="h-9 rounded-lg border border-line bg-surface px-3 text-sm text-fg shadow-card outline-none focus:border-accent focus:ring-3 focus:ring-ring/40" />
+          </>
+        }
+      />
 
-      {erroAbertura && (
-        <div className="p-4 rounded-xl border text-sm flex items-center gap-2 bg-danger-subtle border-danger-line text-danger-fg">
-          <AlertCircle className="w-4 h-4" /> {erroAbertura}
-        </div>
-      )}
+      {erroAbertura && <Alert tone="danger" title="Não foi possível abrir a chamada">{erroAbertura}</Alert>}
+      {aviso && <Alert tone={aviso.tipo === "ok" ? "success" : "danger"}>{aviso.texto}</Alert>}
+
       {!chamada && !erroAbertura && (
-        <div className="flex items-center gap-2 text-sm text-fg-subtle"><Loader2 className="w-4 h-4 animate-spin" /> Abrindo chamada…</div>
-      )}
-
-      {aviso && (
-        <div className={`p-4 rounded-xl border text-sm flex items-center gap-2 ${aviso.tipo === "ok" ? "bg-success-subtle border-success-line text-success-fg" : "bg-danger-subtle border-danger-line text-danger-fg"}`}>
-          {aviso.tipo === "ok" ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
-          {aviso.texto}
-        </div>
+        <Card><SkeletonRows linhas={8} colunas={2} /></Card>
       )}
 
       {chamada && (
         <>
           {chamada.aula.situacao === "CANCELADA" && (
-            <p className="text-sm text-fg-muted bg-zinc-100 border border-zinc-200 rounded-xl p-3">Esta aula está marcada como não dada. Salvar a chamada volta a contá-la.</p>
+            <Alert tone="info">Esta aula está marcada como não dada. Salvar a chamada volta a contá-la.</Alert>
           )}
 
-          <section className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6 space-y-3">
-            <div className="flex items-center justify-between">
-              <h2 className="font-medium text-fg">{chamada.alunos.length} alunos</h2>
-              <span className="text-xs text-fg-subtle">{totalFaltosos === 0 ? "Todos presentes" : `${totalFaltosos} com falta`}</span>
-            </div>
-            <div className="divide-y divide-zinc-100">
-              {chamada.alunos.map((a) => {
-                const q = faltas[a.id] ?? 0
-                const just = chamada.justificados[a.id]
-                return (
-                  <div key={a.id} className="flex items-center gap-3 py-2">
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm truncate ${q ? "text-danger-fg font-medium" : "text-fg"}`}>{a.nome}</p>
-                      <p className="text-xs text-fg-subtle">
-                        {a.matricula}
-                        {a.status && a.status !== "ATIVO" && ` · ${a.status}`}
-                        {just && <span className="ml-1 text-accent-fg">· {just === "ABONA" ? "falta abonada (atestado)" : "justificado"}</span>}
-                      </p>
-                    </div>
-                    {q > 0 && quantidade > 1 && (
-                      <div className="flex items-center gap-1">
-                        <button type="button" aria-label="Menos uma falta" onClick={() => ajustar(a.id, -1)} className="p-1 rounded hover:bg-zinc-100"><Minus className="w-3 h-3" /></button>
-                        <span className="text-xs text-fg-muted w-12 text-center">{q} de {quantidade}</span>
-                        <button type="button" aria-label="Mais uma falta" onClick={() => ajustar(a.id, 1)} className="p-1 rounded hover:bg-zinc-100"><Plus className="w-3 h-3" /></button>
+          <Card>
+            <CardHeader
+              title={`${chamada.alunos.length} alunos`}
+              actions={<Badge tone={totalFaltosos === 0 ? "success" : "danger"} dot>{totalFaltosos === 0 ? "Todos presentes" : `${totalFaltosos} com falta`}</Badge>}
+            />
+            {chamada.alunos.length === 0 ? (
+              <EmptyState icon={Users} title="Nenhum aluno nesta turma" description="Cadastre os estudantes da turma para fazer a chamada." />
+            ) : (
+              <ul className="divide-y divide-line-subtle">
+                {chamada.alunos.map((a) => {
+                  const q = faltas[a.id] ?? 0
+                  const just = chamada.justificados[a.id]
+                  return (
+                    <li key={a.id} className={`flex items-center gap-3 px-4 py-2 transition-colors duration-150 sm:px-5 ${q ? "bg-danger-subtle/60" : ""}`}>
+                      <Avatar nome={a.nome} size="sm" />
+                      <div className="min-w-0 flex-1">
+                        <p className={`truncate text-13 ${q ? "font-medium text-danger-fg" : "text-fg"}`}>{a.nome}</p>
+                        <p className="flex flex-wrap items-center gap-x-1.5 text-xs text-fg-subtle">
+                          <span className="font-mono">{a.matricula}</span>
+                          {a.status && a.status !== "ATIVO" && <span>· {a.status}</span>}
+                          {just && <span className="text-info-fg">· {just === "ABONA" ? "falta abonada (atestado)" : "justificado"}</span>}
+                        </p>
                       </div>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => alternar(a.id)}
-                      aria-pressed={q > 0}
-                      className={`w-24 py-2 rounded-lg text-xs font-medium uppercase tracking-wide border ${q ? "bg-danger-subtle border-danger-line text-danger-fg" : "bg-success-subtle border-success-line text-success-fg"}`}
-                    >
-                      {q ? "Faltou" : "Presente"}
-                    </button>
-                  </div>
-                )
-              })}
-            </div>
-          </section>
+                      {q > 0 && quantidade > 1 && (
+                        <div className="flex items-center gap-0.5">
+                          <Button size="sm" variant="ghost" aria-label="Menos uma falta" onClick={() => ajustar(a.id, -1)}><Minus size={14} strokeWidth={1.75} /></Button>
+                          <span className="w-12 text-center text-xs tabular-nums text-fg-muted">{q} de {quantidade}</span>
+                          <Button size="sm" variant="ghost" aria-label="Mais uma falta" onClick={() => ajustar(a.id, 1)}><Plus size={14} strokeWidth={1.75} /></Button>
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => alternar(a.id)}
+                        aria-pressed={q > 0}
+                        aria-label={`${a.nome}: ${q ? "faltou" : "presente"}. Tocar para ${q ? "marcar presença" : "marcar falta"}`}
+                        className={`h-8 w-24 shrink-0 rounded-md border text-xs font-medium transition-colors duration-150 ${q ? "border-danger-line bg-surface text-danger-fg hover:bg-danger-subtle" : "border-line bg-surface text-fg-muted hover:border-line-strong hover:text-fg"}`}
+                      >
+                        {q ? "Faltou" : "Presente"}
+                      </button>
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
+          </Card>
 
-          <section className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6 space-y-3">
-            <label className="block text-sm font-medium text-fg" htmlFor="conteudo">Conteúdo ministrado</label>
-            <textarea id="conteudo" value={conteudo} onChange={(e) => setConteudo(e.target.value)} rows={3} maxLength={5000} className={`${input} w-full`} placeholder="Ex.: Equações do 1º grau — resolução de exercícios" />
-            <div className="flex flex-wrap gap-2">
-              <button disabled={pendente} onClick={salvar} className={botao}>
-                {pendente ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Salvar chamada
-              </button>
-              {chamada.aula.situacao !== "CANCELADA" && (
-                <button disabled={pendente} onClick={naoDada} className="flex items-center gap-2 border border-zinc-200 text-fg-muted px-4 py-2 rounded-lg text-xs font-medium uppercase tracking-wide hover:bg-zinc-50 disabled:opacity-50">
-                  <Ban className="w-4 h-4" /> Aula não dada
-                </button>
-              )}
-            </div>
-          </section>
+          <Card>
+            <CardBody className="space-y-2">
+              <Label htmlFor="conteudo">Conteúdo ministrado</Label>
+              <Textarea id="conteudo" value={conteudo} onChange={(e) => setConteudo(e.target.value)} rows={3} maxLength={5000} placeholder="Ex.: Equações do 1º grau — resolução de exercícios" />
+            </CardBody>
+          </Card>
+
+          {/* Ações fixas no rodapé: alcançáveis com o polegar no celular */}
+          <div className="sticky bottom-4 z-20 flex flex-wrap justify-end gap-2 rounded-lg border border-line bg-elevated/95 p-2 shadow-overlay backdrop-blur">
+            {chamada.aula.situacao !== "CANCELADA" && (
+              <Button variant="ghost" disabled={pendente} onClick={naoDada}><Ban size={16} strokeWidth={1.75} /> Aula não dada</Button>
+            )}
+            <Button loading={pendente} onClick={salvar}><Save size={16} strokeWidth={1.75} /> Salvar chamada</Button>
+          </div>
         </>
       )}
     </div>
