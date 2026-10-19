@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { politicaDeSeguranca } from "./src/lib/csp";
 
 const nextConfig: NextConfig = {
   // Sem o indicador flutuante do modo dev (cobria o menu do usuário nas capturas)
@@ -37,8 +38,8 @@ const nextConfig: NextConfig = {
             key: "Cache-Control",
             value: "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
           },
-          // Cabeçalhos de segurança (plano-roteiro-ferramentas.md, P0). CSP
-          // fica para depois: precisa ser testada página a página.
+          // Cabeçalhos de segurança (plano-roteiro-ferramentas.md, P0)
+          { key: "Content-Security-Policy", value: politicaDeSeguranca(process.env.NODE_ENV !== "production") },
           { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "X-Content-Type-Options", value: "nosniff" },
