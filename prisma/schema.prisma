@@ -36,6 +36,8 @@ model Escola {
   diaNaoLetivos     DiaNaoLetivo[]
   diaLetivoExtras   DiaLetivoExtra[]
   tempoAulas        TempoAula[]
+  aulas             Aula[]
+  justificativas    Justificativa[]
 
   @@map("escolas")
 }
@@ -104,6 +106,8 @@ model User {
   estudante             Estudante?              @relation("UserEstudante", fields: [estudanteId], references: [id])
   disciplinasPermitidas Disciplina[]            @relation("DisciplinaUsuarios")
   turmasPermitidas      Turma[]                 @relation("TurmaUsuarios")
+  aulasRegistradas      Aula[]                  @relation("AulaProfessor")
+  justificativas        Justificativa[]         @relation("JustificativaAutor")
 
   @@unique([escolaId, email])
   @@unique([escolaId, username])
@@ -289,6 +293,7 @@ model Turma {
   questoes             Questao[]             @relation("QuestaoTurmas")
   usuariosPermitidos   User[]                @relation("TurmaUsuarios")
   diaNaoLetivos        DiaNaoLetivo[]
+  aulas                Aula[]
 
   @@index([anoLetivo])
   @@index([escolaId])
@@ -368,6 +373,8 @@ model Estudante {
   notasSimulado   NotaSimulado[]
   portalAccess    User[]                @relation("UserEstudante")
   ocorrencias     OcorrenciaEstudante[]
+  faltas          Falta[]
+  justificativas  Justificativa[]
 
   @@unique([escolaId, matricula])
   @@index([nome])
@@ -422,6 +429,7 @@ model Disciplina {
   notas              NotaFinal[]
   usuariosPermitidos User[]            @relation("DisciplinaUsuarios")
   questoes           Questao[]         @relation("QuestaoDisciplinas")
+  aulas              Aula[]
 
   @@index([turmaId])
   @@map("disciplinas")
@@ -905,4 +913,96 @@ model TempoAula {
 
   @@unique([escolaId, turno, ordem])
   @@map("tempos_aula")
+}
+
+// ---------------------------------------------------------------------------
+// Chamada e frequência (plano-avaliacao-frequencia.md, seção 3.4, passos 7-9).
+// ---------------------------------------------------------------------------
+
+enum SituacaoAula {
+  PREVISTA // chamada aberta, ainda não salva - não conta na frequência
+  REALIZADA // chamada salva: conta na frequência
+  CANCELADA // aula não dada (ex.: atividade extra, falta do professor)
+}
+
+// Registro de aula do diário de classe. Criado sob demanda quando o
+// professor abre a chamada, a partir do horário da turma e do calendário.
+// POR_AULA: uma linha por (turma, disciplina, dia), com `quantidade` = nº de
+// tempos da disciplina naquele dia. POR_DIA: disciplinaId null, quantidade 1.
+model Aula {
+  id           String       @id @default(cuid())
+  escolaId     String       @map("escola_id")
+  escola       Escola       @relation(fields: [escolaId], references: [id])
+  turmaId      String       @map("turma_id")
+  turma        Turma        @relation(fields: [turmaId], references: [id], onDelete: Cascade)
+  disciplinaId String?      @map("disciplina_id")
+  disciplina   Disciplina?  @relation(fields: [disciplinaId], references: [id], onDelete: Cascade)
+  professorId  String?      @map("professor_id")
+  professor    User?        @relation("AulaProfessor", fields: [professorId], references: [id], onDelete: SetNull)
+  data         DateTime     @db.Date
+  // Tempos do horário cobertos (HorarioAula.horario); vazio na chamada diária
+  tempos       Int[]
+  quantidade   Int          @default(1)
+  conteudo     String? // conteúdo ministrado
+  situacao     SituacaoAula @default(PREVISTA)
+  // turmaId|data|disciplinaId (ou DIA): garante uma aula por disciplina/dia
+  // mesmo com disciplinaId nulo (unique composto não trata null como igual)
+  chave        String       @unique
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+  faltas       Falta[]
+
+  @@index([escolaId])
+  @@index([turmaId, data])
+  @@index([disciplinaId])
+  @@map("aulas")
+}
+
+// Só a exceção é gravada: aluno sem Falta numa aula REALIZADA estava presente.
+model Falta {
+  id          String    @id @default(cuid())
+  aulaId      String    @map("aula_id")
+  aula        Aula      @relation(fields: [aulaId], references: [id], onDelete: Cascade)
+  estudanteId String    @map("estudante_id")
+  estudante   Estudante @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  // nº de tempos perdidos (1..aula.quantidade)
+  quantidade  Int       @default(1)
+
+  @@unique([aulaId, estudanteId])
+  @@index([estudanteId])
+  @@map("faltas")
+}
+
+enum TipoJustificativa {
+  ATESTADO
+  ABONO_LEGAL // ex.: serviço militar, Lei 6.202 (gestante), convocação judicial
+  OUTRO
+}
+
+enum EfeitoJustificativa {
+  ABONA // falta não conta na frequência
+  SO_JUSTIFICA // conta, mas fica registrada como justificada
+}
+
+// Vale para todas as faltas do aluno no intervalo [inicio, fim] - aplicada
+// na hora do cálculo, então cobre faltas lançadas antes ou depois dela.
+model Justificativa {
+  id              String              @id @default(cuid())
+  escolaId        String              @map("escola_id")
+  escola          Escola              @relation(fields: [escolaId], references: [id])
+  estudanteId     String              @map("estudante_id")
+  estudante       Estudante           @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  inicio          DateTime            @db.Date
+  fim             DateTime            @db.Date
+  tipo            TipoJustificativa
+  efeito          EfeitoJustificativa
+  descricao       String?
+  documentoUrl    String?             @map("documento_url")
+  registradoPorId String?             @map("registrado_por_id")
+  registradoPor   User?               @relation("JustificativaAutor", fields: [registradoPorId], references: [id], onDelete: SetNull)
+  createdAt       DateTime            @default(now()) @map("created_at")
+
+  @@index([escolaId])
+  @@index([estudanteId])
+  @@map("justificativas")
 }
