@@ -144,9 +144,9 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
               </button>
               <button 
                 onClick={() => { setShowForm(true); setSelectedOcorrencia(null); }}
-                className="flex items-center gap-2 bg-zinc-900 text-white px-7 py-3 rounded-lg font-bold hover:bg-zinc-800 transition-all shadow-card active:scale-95"
+                className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
               >
-                <Plus size={20} />
+                <Plus size={16} strokeWidth={1.75} />
                 <span>Novo Registro</span>
               </button>
             </div>
@@ -266,7 +266,7 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
                         {getTipoIcon(item.tipo)}
                         {item.tipo}
                       </span>
-                      <span className="px-4 py-1.5 bg-zinc-900 text-white rounded-full text-xs font-semibold shadow-card">
+                      <span className="px-4 py-1.5 bg-subtle border border-line text-fg rounded-full text-xs font-semibold shadow-card">
                         {format(new Date(item.data), "dd 'de' MMM, yyyy", { locale: ptBR })}
                       </span>
                     </div>
@@ -303,7 +303,7 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
                   <div className="flex flex-wrap gap-4">
                     {item.estudantes.map(est => (
                       <div key={est.matricula} className="flex items-center gap-3 bg-white border border-zinc-200 pl-2 pr-5 py-2 rounded-lg shadow-sm hover:border-zinc-900 transition-colors cursor-default">
-                        <div className="w-9 h-9 bg-zinc-900 text-white rounded-xl flex items-center justify-center font-bold text-xs ring-4 ring-zinc-50">
+                        <div className="w-9 h-9 bg-subtle border border-line text-fg rounded-xl flex items-center justify-center font-bold text-xs ring-4 ring-zinc-50">
                           {est.nome.charAt(0)}
                         </div>
                         <div>

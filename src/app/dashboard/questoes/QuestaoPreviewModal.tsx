@@ -41,7 +41,7 @@ export default function QuestaoPreviewModal({ questao, onClose, nomeEscola = 'Á
 
           {/* Cabeçalho Fictício da Prova */}
           <div className="text-center border-b-2 border-black pb-4 mb-6">
-            <h3 className="font-bold text-lg uppercase">{nomeEscola} - Avaliação</h3>
+            <h3 className="font-bold text-lg">{nomeEscola} - Avaliação</h3>
             <p className="text-sm">Professor: {questao.professor?.name || '____________________'}</p>
           </div>
 
@@ -91,10 +91,10 @@ export default function QuestaoPreviewModal({ questao, onClose, nomeEscola = 'Á
         {/* Footer */}
         <div className="px-6 py-4 border-t border-zinc-100 bg-zinc-50 flex justify-between items-center">
           <div className="flex gap-2">
-            <span className="px-2 py-1 bg-zinc-200 text-fg-muted text-xs font-bold uppercase rounded">
+            <span className="px-2 py-1 bg-zinc-200 text-fg-muted text-xs font-bold rounded">
               {questao.tipo === 'RECUPERACAO' ? 'Segunda Chamada' : 'Normal'}
             </span>
-            <span className="px-2 py-1 bg-zinc-200 text-fg-muted text-xs font-bold uppercase rounded">
+            <span className="px-2 py-1 bg-zinc-200 text-fg-muted text-xs font-bold rounded">
               {questao.unidade}ª Unidade
             </span>
           </div>

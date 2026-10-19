@@ -142,13 +142,13 @@ export default async function ConselhoClassePage() {
         {/* Dicas Fixas - Estilo Resultados */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {conselhoTips.map((tip, index) => (
-             <div key={index} className="bg-white/60 border border-zinc-300/60 p-5 rounded-xl flex items-start space-x-4 hover:bg-white hover:border-zinc-300 hover:shadow-card transition-all group">
+             <div key={index} className="bg-surface border border-line p-4 rounded-lg flex items-start gap-3">
                 <div className={`p-3 rounded-lg bg-subtle text-fg-muted transition-all shadow-card`}>
                    {tip.icon}
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-fg mb-1">{tip.title}</h3>
-                  <p className="text-xs font-medium text-fg-subtle uppercase leading-relaxed">{tip.description}</p>
+                  <p className="text-xs font-medium text-fg-subtle leading-relaxed">{tip.description}</p>
                 </div>
              </div>
           ))}

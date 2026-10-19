@@ -119,7 +119,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
   const turmaEntries = Object.entries(disciplinasPorTurma)
 
   return (
-    <div className="bg-[#f8fafc]">
+    <div className="bg-canvas">
       {/* Header Fixo Premium */}
       <header className="mb-6">
         <div className="max-w-5xl mx-auto px-6 py-4">
@@ -187,7 +187,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
                onClick={() => setShowOnlySelected(!showOnlySelected)}
                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
                  showOnlySelected 
-                 ? 'bg-zinc-900 text-white border-zinc-900 shadow-card' 
+                 ? 'bg-accent-subtle text-accent-fg border-accent shadow-card' 
                  : 'bg-white text-fg-subtle border-zinc-200 hover:border-zinc-300'
                }`}
             >
@@ -262,7 +262,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
                   >
                     <div className="flex items-center space-x-4">
                       <div className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all ${
-                        isExpanded ? 'bg-zinc-900 text-white' : 'bg-zinc-200 text-fg-muted'
+                        isExpanded ? 'bg-subtle border border-line text-fg' : 'bg-zinc-200 text-fg-muted'
                       }`}>
                         <School className="w-6 h-6" />
                       </div>
@@ -275,7 +275,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
                     </div>
                     <div className="flex items-center space-x-3">
                        {selecionadasNaTurma > 0 && !isExpanded && (
-                         <span className="px-3 py-1 bg-success-subtle text-success-fg text-xs font-medium rounded-full uppercase">
+                         <span className="px-3 py-1 bg-success-subtle text-success-fg text-xs font-medium rounded-full">
                             Ativo
                          </span>
                        )}

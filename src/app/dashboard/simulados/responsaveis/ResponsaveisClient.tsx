@@ -325,7 +325,7 @@ export default function ResponsaveisClient({
                           </span>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <span className="px-2.5 py-1 bg-zinc-900 text-white rounded-lg text-xs font-medium tracking-tighter">
+                          <span className="px-2.5 py-1 bg-subtle border border-line text-fg rounded-lg text-xs font-medium tracking-tighter">
                             {item.turma.nome}
                           </span>
                         </td>

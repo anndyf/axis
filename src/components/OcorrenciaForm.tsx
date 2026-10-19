@@ -112,7 +112,7 @@ export default function OcorrenciaForm({
         {/* Header */}
         <div className="px-8 py-6 border-b border-zinc-100 flex justify-between items-center bg-zinc-50/50">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-zinc-900 text-white rounded-lg flex items-center justify-center shadow-card">
+            <div className="w-12 h-12 bg-subtle border border-line text-fg rounded-lg flex items-center justify-center shadow-card">
               <UserPlus size={22} />
             </div>
             <div>
@@ -204,7 +204,7 @@ export default function OcorrenciaForm({
                           </div>
                           <div className="text-left">
                             <p className="text-sm font-bold text-fg">{est.nome}</p>
-                            <p className="text-xs font-bold text-fg-subtle uppercase">{est.turma?.nome}</p>
+                            <p className="text-xs font-bold text-fg-subtle">{est.turma?.nome}</p>
                           </div>
                         </div>
                         <Hash size={16} className="text-zinc-300" />
@@ -218,12 +218,12 @@ export default function OcorrenciaForm({
               {/* Selected Chips */}
               <div className="flex flex-wrap gap-2">
                 {selectedEstudantes.map(est => (
-                  <div key={est.matricula} className="flex items-center gap-2 bg-zinc-900 text-white pl-4 pr-2 py-2 rounded-xl shadow-card group">
+                  <div key={est.matricula} className="flex items-center gap-1.5 bg-subtle border border-line text-fg pl-3 pr-1 py-1 rounded-md group">
                     <span className="text-xs font-bold">{est.nome}</span>
                     <button 
                       type="button"
                       onClick={() => toggleEstudante(est)}
-                      className="p-1 hover:bg-white/20 rounded-lg transition-colors"
+                      className="p-1 text-fg-subtle hover:bg-line hover:text-fg rounded transition-colors duration-150"
                     >
                       <X size={14} />
                     </button>
@@ -232,7 +232,7 @@ export default function OcorrenciaForm({
                 {selectedEstudantes.length === 0 && (
                   <div className="flex items-center gap-3 text-warning-fg bg-warning-subtle px-5 py-3 rounded-lg border border-warning-line">
                     <AlertCircle size={16} />
-                    <p className="text-xs font-bold uppercase">Nenhum estudante selecionado ainda</p>
+                    <p className="text-xs font-bold">Nenhum estudante selecionado ainda</p>
                   </div>
                 )}
               </div>

@@ -94,7 +94,7 @@ export default function TeacherTipsModal({ storageKey, tips, title }: TeacherTip
               {tips.map((_, i) => (
                 <div 
                   key={i} 
-                  className={`h-2 rounded-full transition-all duration-300 ${i === currentStep ? "w-8 bg-zinc-900" : "w-2 bg-zinc-200"}`} 
+                  className={`h-2 rounded-full transition-all duration-300 ${i === currentStep ? "w-8 bg-accent" : "w-2 bg-zinc-200"}`} 
                 />
               ))}
             </div>

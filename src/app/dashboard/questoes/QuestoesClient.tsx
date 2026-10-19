@@ -212,17 +212,17 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
             <h1 className="text-3xl font-bold text-fg">Banco de Questões</h1>
             <div className="hidden lg:flex items-center gap-4 bg-white px-4 py-2 rounded-lg border border-zinc-200 shadow-sm">
               <div className="flex items-center gap-2">
-                <span className="text-xs text-fg-subtle font-semibold uppercase">Total:</span>
+                <span className="text-xs text-fg-subtle font-semibold">Total:</span>
                 <span className="text-sm font-bold text-fg">{metrics?.totalAprovadas || 0}</span>
               </div>
               <div className="w-px h-4 bg-zinc-200"></div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-success-fg font-semibold uppercase">{isAdmin ? "Aprovadas:" : "Minhas:"}</span>
+                <span className="text-xs text-success-fg font-semibold">{isAdmin ? "Aprovadas:" : "Minhas:"}</span>
                 <span className="text-sm font-bold text-success-fg">{isAdmin ? (metrics?.totalAprovadas || 0) : (metrics?.minhasQuestoes || 0)}</span>
               </div>
               <div className="w-px h-4 bg-zinc-200"></div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-warning-fg font-semibold uppercase">Pendentes:</span>
+                <span className="text-xs text-warning-fg font-semibold">Pendentes:</span>
                 <span className="text-sm font-bold text-warning-fg">{metrics?.totalPendentes || 0}</span>
               </div>
             </div>
@@ -404,7 +404,7 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
                     // Adiciona os IDs pendentes aos selecionados (evitando duplicatas)
                     setSelectedIds(Array.from(new Set([...selectedIds, ...pendentesIds])));
                   }}
-                  className="w-full px-3 py-2 text-white bg-warning hover:bg-warning shadow-sm font-bold rounded-lg transition-all text-xs flex items-center justify-center gap-1.5"
+                  className="w-full h-8 px-3 text-fg bg-surface border border-line hover:bg-subtle font-medium rounded-md transition-colors duration-150 text-13 flex items-center justify-center gap-1.5"
                 >
                   <CheckCircle2 size={14} /> Selecionar Pendentes
                 </button>
@@ -457,11 +457,11 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
               <div className="hidden sm:flex items-center gap-3 ml-2 bg-white px-3 py-1.5 rounded-lg border border-zinc-100 shadow-sm">
                 <div className="flex items-center gap-1.5">
                   <div className="w-2 h-2 rounded-full bg-accent"></div>
-                  <span className="text-xs font-bold text-fg-subtle uppercase">Normal</span>
+                  <span className="text-xs font-bold text-fg-subtle">Normal</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className="w-2 h-2 rounded-full bg-warning"></div>
-                  <span className="text-xs font-bold text-fg-subtle uppercase">2ª Chamada</span>
+                  <span className="text-xs font-bold text-fg-subtle">2ª Chamada</span>
                 </div>
               </div>
             </h2>
@@ -532,16 +532,16 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
                     <p className="truncate"><span className="font-semibold text-fg">Turma:</span> {q.turmas?.map((t: any)=>t.nome).join(', ') || 'Nenhuma'}</p>
                     <p className="flex items-center gap-1">
                       <span className="font-semibold text-fg">Status:</span> 
-                      {q.status === 'APROVADA' && <span className="bg-accent-subtle text-accent-fg text-xs px-2 py-0.5 rounded-full font-bold uppercase">Aprovada</span>}
-                      {q.status === 'PENDENTE' && <span className="bg-warning-subtle text-warning-fg text-xs px-2 py-0.5 rounded-full font-bold uppercase">Pendente</span>}
-                      {q.status === 'REJEITADA' && <span className="bg-zinc-100 text-fg-muted text-xs px-2 py-0.5 rounded-full font-bold uppercase">Rejeitada</span>}
+                      {q.status === 'APROVADA' && <span className="bg-accent-subtle text-accent-fg text-xs px-2 py-0.5 rounded-full font-bold">Aprovada</span>}
+                      {q.status === 'PENDENTE' && <span className="bg-warning-subtle text-warning-fg text-xs px-2 py-0.5 rounded-full font-bold">Pendente</span>}
+                      {q.status === 'REJEITADA' && <span className="bg-zinc-100 text-fg-muted text-xs px-2 py-0.5 rounded-full font-bold">Rejeitada</span>}
                     </p>
                     <p className="flex items-center gap-1">
                       <span className="font-semibold text-fg">Usos:</span> 
                       {q._count?.provas > 0 ? (
-                        <span className="bg-accent-subtle text-accent-fg text-xs px-2 py-0.5 rounded-full font-bold uppercase">Usada em {q._count.provas} prova{q._count.provas > 1 ? 's' : ''}</span>
+                        <span className="bg-accent-subtle text-accent-fg text-xs px-2 py-0.5 rounded-full font-bold">Usada em {q._count.provas} prova{q._count.provas > 1 ? 's' : ''}</span>
                       ) : (
-                        <span className="bg-zinc-100 text-fg-subtle text-xs px-2 py-0.5 rounded-full font-bold uppercase">Inédita</span>
+                        <span className="bg-zinc-100 text-fg-subtle text-xs px-2 py-0.5 rounded-full font-bold">Inédita</span>
                       )}
                     </p>
                     <p className="truncate"><span className="font-semibold text-fg">Autor:</span> {q.professor?.name}</p>

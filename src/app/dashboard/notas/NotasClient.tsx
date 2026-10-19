@@ -76,13 +76,13 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
         {/* Dicas Fixas - Estilo Resultados */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {launchTips.map((tip, index) => (
-             <div key={index} className="bg-white/60 border border-zinc-300/60 p-5 rounded-xl flex items-start space-x-4 hover:bg-white hover:border-zinc-300 hover:shadow-card transition-all group">
+             <div key={index} className="bg-surface border border-line p-4 rounded-lg flex items-start gap-3">
                 <div className={`p-3 rounded-lg bg-subtle text-fg-muted transition-all shadow-card`}>
                    {tip.icon}
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-fg mb-1">{tip.title}</h3>
-                  <p className="text-xs font-medium text-fg-subtle uppercase leading-relaxed">{tip.description}</p>
+                  <p className="text-xs font-medium text-fg-subtle leading-relaxed">{tip.description}</p>
                 </div>
              </div>
           ))}
@@ -177,7 +177,7 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
                     >
                       <td className="px-6 py-4">
                         <div className="flex flex-col">
-                           <span className="text-base font-medium text-fg-muted uppercase group-hover:text-success-fg transition-colors">{turma.nome}</span>
+                           <span className="text-base font-medium text-fg-muted group-hover:text-success-fg transition-colors">{turma.nome}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-center">

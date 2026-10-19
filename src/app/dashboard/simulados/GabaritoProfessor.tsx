@@ -41,13 +41,13 @@ export default function GabaritoProfessor({ titulo, questoes, maxNota = 4.0, nom
       {/* Header */}
       <div className="text-center border-b-[3px] border-black pb-4 mb-6">
         <h1 className="text-xl font-bold m-0">Centro Territorial de Educação Profissional</h1>
-        <h2 className="text-sm uppercase text-fg-muted mt-1 m-0">{nomeEscola}</h2>
+        <h2 className="text-sm text-fg-muted mt-1 m-0">{nomeEscola}</h2>
       </div>
 
       {/* Titulo */}
       <div className="text-center mb-8">
-        <h3 className="text-lg font-bold uppercase mb-4">{titulo}</h3>
-        <h4 className="text-base font-bold uppercase border-b-2 border-black inline-block px-12 pb-1">Gabarito do Professor</h4>
+        <h3 className="text-lg font-bold mb-4">{titulo}</h3>
+        <h4 className="text-base font-bold border-b-2 border-black inline-block px-12 pb-1">Gabarito do Professor</h4>
       </div>
 
       {/* Tabelas do Gabarito */}
@@ -55,7 +55,7 @@ export default function GabaritoProfessor({ titulo, questoes, maxNota = 4.0, nom
         
         {/* Coluna 1 */}
         <div className="border-2 border-black rounded-lg overflow-hidden w-64">
-          <div className="bg-zinc-200 text-center py-2 font-bold text-xs uppercase border-b-2 border-black">
+          <div className="bg-zinc-200 text-center py-2 font-bold text-xs border-b-2 border-black">
             Questão / Resposta
           </div>
           <div className="p-2 space-y-1">
@@ -68,7 +68,7 @@ export default function GabaritoProfessor({ titulo, questoes, maxNota = 4.0, nom
                       key={opt}
                       className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border border-zinc-400 ${
                         q.correta === opt 
-                          ? 'bg-black text-white border-black' 
+                          ? 'bg-accent-subtle text-accent-fg border-accent' 
                           : 'bg-white text-fg-subtle'
                       }`}
                     >
@@ -84,7 +84,7 @@ export default function GabaritoProfessor({ titulo, questoes, maxNota = 4.0, nom
         {/* Coluna 2 */}
         {col2.length > 0 && (
           <div className="border-2 border-black rounded-lg overflow-hidden w-64">
-            <div className="bg-zinc-200 text-center py-2 font-bold text-xs uppercase border-b-2 border-black">
+            <div className="bg-zinc-200 text-center py-2 font-bold text-xs border-b-2 border-black">
               Questão / Resposta
             </div>
             <div className="p-2 space-y-1">
@@ -97,7 +97,7 @@ export default function GabaritoProfessor({ titulo, questoes, maxNota = 4.0, nom
                         key={opt}
                         className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border border-zinc-400 ${
                           q.correta === opt 
-                            ? 'bg-black text-white border-black' 
+                            ? 'bg-accent-subtle text-accent-fg border-accent' 
                             : 'bg-white text-fg-subtle'
                         }`}
                       >
@@ -115,13 +115,13 @@ export default function GabaritoProfessor({ titulo, questoes, maxNota = 4.0, nom
 
       {/* Tabelas de Pontuação */}
       <div className="text-center mb-6">
-        <h4 className="text-base font-bold uppercase border-b-2 border-black inline-block px-12 pb-1 mb-6">Tabela de Pontuação</h4>
+        <h4 className="text-base font-bold border-b-2 border-black inline-block px-12 pb-1 mb-6">Tabela de Pontuação</h4>
         
         <div className="flex justify-center gap-12">
           
           {/* Pontuacao Col 1 */}
           <div className="border-2 border-black rounded-lg overflow-hidden w-64">
-            <div className="flex bg-zinc-200 font-bold text-xs uppercase border-b-2 border-black">
+            <div className="flex bg-zinc-200 font-bold text-xs border-b-2 border-black">
               <div className="flex-1 py-2 text-center border-r-2 border-black">Acertos</div>
               <div className="flex-1 py-2 text-center">Nota</div>
             </div>
@@ -138,7 +138,7 @@ export default function GabaritoProfessor({ titulo, questoes, maxNota = 4.0, nom
           {/* Pontuacao Col 2 */}
           {tabelaPontuacaoCol2.length > 0 && (
             <div className="border-2 border-black rounded-lg overflow-hidden w-64">
-              <div className="flex bg-zinc-200 font-bold text-xs uppercase border-b-2 border-black">
+              <div className="flex bg-zinc-200 font-bold text-xs border-b-2 border-black">
                 <div className="flex-1 py-2 text-center border-r-2 border-black">Acertos</div>
                 <div className="flex-1 py-2 text-center">Nota</div>
               </div>

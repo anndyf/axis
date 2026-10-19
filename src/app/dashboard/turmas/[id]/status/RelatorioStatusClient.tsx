@@ -172,7 +172,7 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
                       onClick={() => setViewMode(item.id)}
                       className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
                         active 
-                        ? 'bg-black text-white shadow-card active:scale-95' 
+                        ? 'bg-subtle border border-line text-fg shadow-card active:scale-95' 
                         : 'text-fg-muted hover:text-black hover:bg-white/50'
                       }`}
                     >
@@ -229,7 +229,7 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
                  <span className={`w-5 h-5 rounded flex items-center justify-center text-xs font-medium ${item.color} ${item.text || 'text-white'}`}>
                    {item.badge || item.id}
                  </span>
-                 <span className="text-xs font-medium text-fg-muted uppercase">{item.label}</span>
+                 <span className="text-xs font-medium text-fg-muted">{item.label}</span>
                </div>
              ))}
           </div>
@@ -241,10 +241,10 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-zinc-50/80 border-b border-zinc-300">
-                  <th className="px-2 py-2 text-center text-xs font-medium text-fg-subtle uppercase sticky left-0 bg-zinc-50/95 backdrop-blur z-20 w-10 border-r border-zinc-300">
+                  <th className="px-2 py-2 text-center text-xs font-medium text-fg-subtle sticky left-0 bg-zinc-50/95 backdrop-blur z-20 w-10 border-r border-zinc-300">
                     #
                   </th>
-                  <th className="px-1.5 py-2 text-left text-xs font-medium text-black uppercase sticky left-10 bg-zinc-50/95 backdrop-blur z-20 w-[1%] border-r border-zinc-300 shadow-[2px_0_5px_rgba(0,0,0,0.02)] whitespace-nowrap">
+                  <th className="px-1.5 py-2 text-left text-xs font-medium text-black sticky left-10 bg-zinc-50/95 backdrop-blur z-20 w-[1%] border-r border-zinc-300 shadow-[2px_0_5px_rgba(0,0,0,0.02)] whitespace-nowrap">
                     Estudante
                   </th>
                   {turma.disciplinas.map((disc) => (

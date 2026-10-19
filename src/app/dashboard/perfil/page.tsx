@@ -171,7 +171,7 @@ export default function ProfilePage() {
                   type="button"
                   onClick={() => handleSubmit()}
                   disabled={loading}
-                  className="h-12 px-8 bg-zinc-900 text-white rounded-xl font-medium shadow-card hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2 group"
+                  className="h-12 px-8 bg-accent text-on-accent rounded-xl font-medium shadow-card hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2 group"
                 >
                   {loading ? (
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -208,7 +208,7 @@ export default function ProfilePage() {
               </button>
               <button 
                 onClick={() => handleSubmit()}
-                className="py-4 rounded-lg font-medium bg-zinc-900 text-white hover:bg-zinc-800 transition-all shadow-card"
+                className="py-4 rounded-lg font-medium bg-accent text-on-accent hover:bg-accent-hover transition-all shadow-card"
               >
                 Confirmar
               </button>

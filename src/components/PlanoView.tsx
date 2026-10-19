@@ -103,7 +103,7 @@ export default function PlanoView({ planoId, onClose }: PlanoViewProps) {
                <Users className="w-3.5 h-3.5" /> Turmas Atendidas
             </h3>
             <div className="flex flex-wrap gap-1.5">
-                {plano.turmas.map(t => <span key={t.id} className="px-3 py-1.5 bg-white border border-zinc-100 shadow-sm rounded-lg font-bold text-fg-muted text-xs uppercase">{t.nome}</span>)}
+                {plano.turmas.map(t => <span key={t.id} className="px-3 py-1.5 bg-white border border-zinc-100 shadow-sm rounded-lg font-bold text-fg-muted text-xs">{t.nome}</span>)}
             </div>
           </div>
 

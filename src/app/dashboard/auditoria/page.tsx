@@ -266,7 +266,7 @@ export default async function AuditoriaPage({
                                   
                                   return (
                                     <div key={k} className="flex items-center gap-2 text-xs">
-                                      <span className="font-medium text-fg-subtle uppercase w-6">{k}:</span>
+                                      <span className="font-medium text-fg-subtle w-6">{k}:</span>
                                       <span className="px-1.5 py-0.5 bg-danger-subtle text-danger-fg rounded border border-danger-line line-through">
                                         {oldVal !== null ? String(oldVal) : 'Ø'}
                                       </span>

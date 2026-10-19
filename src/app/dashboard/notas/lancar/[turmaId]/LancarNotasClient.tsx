@@ -502,7 +502,7 @@ export default function LancarNotasTurmaClient({
                         <td className="px-6 py-4">
                           <div className="flex flex-col relative group/name">
                              <div className="flex items-center gap-2">
-                                <span className={`text-base font-medium uppercase ${isDesistenteGeral ? 'text-warning-fg' : 'text-fg-muted'}`}>{estudante.nome}</span>
+                                <span className={`text-base font-medium ${isDesistenteGeral ? 'text-warning-fg' : 'text-fg-muted'}`}>{estudante.nome}</span>
                                 {estudante.aeeProfile && (
                                    <Link
                                      href={`/dashboard/aee/${estudante.matricula}`}
@@ -652,7 +652,7 @@ export default function LancarNotasTurmaClient({
             <div className="p-6 max-h-[60vh] overflow-y-auto space-y-3 bg-zinc-50/20 custom-scrollbar">
               {estudantes.filter(e => JSON.stringify(notas[e.matricula]) !== JSON.stringify(originalNotas[e.matricula] || {})).map((est, i) => (
                  <div key={i} className="flex items-center justify-between bg-white p-3 rounded-lg border border-zinc-200 shadow-sm">
-                   <span className="text-sm font-medium text-fg-muted uppercase truncate pr-4">{est.nome}</span>
+                   <span className="text-sm font-medium text-fg-muted truncate pr-4">{est.nome}</span>
                    <div className="flex gap-2 flex-wrap justify-end">
                        {esquema.unidades.map(u => {
                         const subtotal = calcularSubtotalUnidade(est.matricula, u)
@@ -702,8 +702,8 @@ export default function LancarNotasTurmaClient({
               onClick={() => setFeedbackModal(null)}
               className={`w-full py-3.5 rounded-lg font-semibold text-sm transition-all active:scale-95 shadow-card ${
                 feedbackModal.type === 'success'
-                  ? 'bg-zinc-900 text-white hover:bg-zinc-800 '
-                  : 'bg-danger text-white hover:bg-danger '
+                  ? 'bg-accent text-on-accent hover:bg-accent-hover '
+                  : 'bg-danger text-on-accent hover:bg-danger '
               }`}
             >
               Entendi

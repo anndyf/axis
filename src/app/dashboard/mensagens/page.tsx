@@ -71,7 +71,7 @@ export default async function MessagesPage() {
             Se não estiver visualizando uma <span className="underline decoration-accent decoration-2 underline-offset-4">turma</span>, 
             <span className="ml-1 underline decoration-accent decoration-2 underline-offset-4">disciplina</span> ou 
             <span className="ml-1 underline decoration-accent decoration-2 underline-offset-4">estudante</span>, 
-            selecione a categoria <span className="px-2 py-0.5 bg-zinc-700 text-white rounded-md text-xs uppercase font-medium">Suporte Técnico</span> ao enviar sua mensagem.
+            selecione a categoria <span className="px-2 py-0.5 bg-zinc-700 text-white rounded-md text-xs font-medium">Suporte Técnico</span> ao enviar sua mensagem.
           </p>
         </div>
       </div>

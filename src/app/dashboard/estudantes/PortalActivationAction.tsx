@@ -89,7 +89,7 @@ export default function PortalActivationAction({
                    </div>
                    <button 
                     onClick={() => setIsModalOpen(false)}
-                    className="w-full bg-zinc-900 text-white py-4 rounded-lg font-bold text-xs hover:bg-zinc-800 transition-all"
+                    className="w-full bg-accent text-on-accent py-4 rounded-lg font-bold text-xs hover:bg-accent-hover transition-all"
                    >
                      Entendido
                    </button>

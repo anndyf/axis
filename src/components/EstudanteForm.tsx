@@ -251,18 +251,15 @@ export default function EstudanteForm({ estudante, isEdit = false }: EstudanteFo
       {/* Toast Notification */}
       {resultMsg && (
         <div className="fixed bottom-6 right-6 z-50 animate-slide-up">
-          <div className={`flex items-center gap-3 text-white px-5 py-3.5 rounded-lg shadow-card max-w-sm border ${
-            resultMsg.ok
-              ? 'bg-success border-success '
-              : 'bg-danger border-danger '
-          }`}>
-            <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
+          <div className={`flex items-center gap-3 bg-elevated text-fg px-4 py-3 rounded-lg shadow-overlay max-w-sm border border-line`} role="status">
+            <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${resultMsg.ok ? 'bg-success-subtle text-success-fg' : 'bg-danger-subtle text-danger-fg'}`}>
               {resultMsg.ok ? <CheckCheck size={16} /> : <X size={16} />}
             </div>
-            <p className="text-sm font-semibold leading-tight flex-1">{resultMsg.text}</p>
+            <p className="text-13 font-medium leading-tight flex-1">{resultMsg.text}</p>
             <button
               onClick={() => setResultMsg(null)}
-              className="shrink-0 text-white/60 hover:text-white transition-colors"
+              aria-label="Fechar aviso"
+              className="shrink-0 rounded-md p-1 text-fg-subtle hover:bg-subtle hover:text-fg transition-colors duration-150"
             >
               <X size={14} />
             </button>

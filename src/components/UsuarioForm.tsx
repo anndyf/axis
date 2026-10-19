@@ -114,9 +114,9 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
   ]
 
   return (
-    <div className="min-h-screen bg-[#f1f5f9] pb-20">
+    <div className="pb-20">
       {/* Navbar Minimalista */}
-      <nav className="bg-white/70 backdrop-blur-xl sticky top-0 z-50 border-b border-zinc-200">
+      <nav className="mb-6 border-b border-line pb-4">
         <div className="max-w-3xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <Link 
@@ -159,7 +159,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
           {/* Seção 1: Dados do Usuário */}
           <div className="bg-white rounded-xl p-8 shadow-sm border border-zinc-200">
             <div className="flex items-center space-x-4 mb-8">
-               <div className="w-10 h-10 bg-zinc-900 rounded-lg flex items-center justify-center text-white">
+               <div className="w-10 h-10 bg-subtle border border-line rounded-lg flex items-center justify-center text-fg">
                   <User className="w-5 h-5" />
                </div>
                <h2 className="text-xl font-semibold text-fg tracking-tight">Informações Básicas</h2>
@@ -221,12 +221,12 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
                     key={role.id} 
                     className={`flex items-center p-6 rounded-xl border-2 transition-all cursor-pointer ${
                       isActive 
-                        ? 'bg-zinc-900 border-zinc-900 text-white shadow-card translate-y-[-2px]' 
+                        ? 'bg-accent-subtle border-accent text-accent-fg'
                         : 'bg-white border-zinc-100 hover:border-zinc-300'
                     }`}
                   >
                     <div className={`w-12 h-12 rounded-lg flex items-center justify-center mr-5 ${
-                      isActive ? 'bg-white/10 text-white' : 'bg-zinc-100 text-fg-subtle'
+                      isActive ? 'bg-surface text-accent-fg' : 'bg-zinc-100 text-fg-subtle'
                     }`}>
                       {role.icon}
                     </div>
@@ -279,7 +279,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
               type="button" 
               onClick={() => setShowConfirm(true)}
               disabled={loading}
-              className="w-full flex items-center justify-center space-x-3 bg-zinc-900 text-white py-6 rounded-xl font-semibold text-lg hover:bg-zinc-800 transition-all shadow-card active:scale-[0.98] disabled:opacity-50"
+              className="w-full flex items-center justify-center space-x-3 bg-accent text-on-accent py-6 rounded-xl font-semibold text-lg hover:bg-accent-hover transition-all shadow-card active:scale-[0.98] disabled:opacity-50"
             >
               {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : <Save className="w-6 h-6" />}
               <span>{isEdit ? 'Salvar Alterações' : 'Finalizar Cadastro'}</span>
@@ -309,7 +309,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
               </button>
               <button 
                 onClick={() => handleSubmit()}
-                className="py-4 rounded-lg font-semibold bg-zinc-900 text-white hover:bg-zinc-800 transition-all shadow-card"
+                className="py-4 rounded-lg font-semibold bg-accent text-on-accent hover:bg-accent-hover transition-all shadow-card"
               >
                 Sim, Salvar
               </button>

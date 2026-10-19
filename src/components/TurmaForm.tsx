@@ -251,8 +251,8 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] pb-20">
-      <nav className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-zinc-200 uppercase">
+    <div className="pb-20">
+      <nav className="mb-6 border-b border-line pb-4">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/dashboard/turmas" className="flex items-center space-x-2 text-black hover:opacity-70 font-semibold transition-all text-xs">
             <ArrowLeft className="w-4 h-4" />
@@ -328,7 +328,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                       onClick={() => setFormData(prev => ({ ...prev, modalidade: mod, curso: "", turno: "" }))}
                       className={`py-2.5 rounded-xl font-semibold text-xs transition-all border-2 ${
                         formData.modalidade === mod 
-                        ? 'bg-black border-black text-white shadow-card' 
+                        ? 'bg-accent-subtle border-accent text-accent-fg shadow-card' 
                         : 'bg-zinc-50 border-zinc-50 text-black hover:border-zinc-200 hover:bg-white'
                       }`}
                     >
@@ -409,7 +409,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                         onClick={() => setFormData(p => ({ ...p, serie: s }))}
                         className={`flex-1 py-2.5 rounded-lg font-semibold text-sm transition-all border ${
                           formData.serie === s 
-                          ? 'bg-success border-success text-white shadow-card' 
+                          ? 'bg-success-subtle border-success-line text-success-fg shadow-card' 
                           : 'bg-zinc-50 border-transparent text-black hover:bg-zinc-100'
                         }`}
                       >

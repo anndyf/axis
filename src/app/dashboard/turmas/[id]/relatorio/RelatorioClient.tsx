@@ -144,14 +144,14 @@ export default function RelatorioClient({
                     {!isProfessorOnly && (
                       <div className="flex items-center gap-6 pr-4 hidden md:flex">
                         <div className="text-center">
-                          <p className="text-xs font-bold text-fg-subtle uppercase">Média Geral</p>
+                          <p className="text-xs font-bold text-fg-subtle">Média Geral</p>
                           <span className="text-sm font-bold text-fg-muted">{media}</span>
                         </div>
                         {frequencia && (() => {
                           const f = frequencia.porAluno[estudante.id]?.geral
                           return (
                             <div className="text-center" title={f ? `${f.faltas} faltas em ${f.aulas} aulas` : undefined}>
-                              <p className="text-xs font-bold text-fg-subtle uppercase">Frequência</p>
+                              <p className="text-xs font-bold text-fg-subtle">Frequência</p>
                               <span className={`text-sm font-bold ${f?.percentual != null && f.percentual < frequencia.minimo ? 'text-danger-fg' : 'text-fg-muted'}`}>
                                 {formatarFrequencia(f?.percentual ?? null)}
                               </span>
@@ -288,7 +288,7 @@ export default function RelatorioClient({
                           <p className="text-xs text-fg-subtle mt-0.5">{prof.email}</p>
                           <div className="mt-2 flex flex-wrap gap-1">
                             {prof.disciplinas.map((d: string) => (
-                              <span key={d} className="px-2 py-0.5 bg-accent-subtle text-accent-fg text-xs font-bold uppercase rounded border border-accent/25">
+                              <span key={d} className="px-2 py-0.5 bg-accent-subtle text-accent-fg text-xs font-bold rounded border border-accent/25">
                                 {d}
                               </span>
                             ))}

@@ -364,7 +364,7 @@ export default function ConselhoClasseClient({
         <div className="mb-3 flex items-start justify-between gap-6">
           {/* Identificação - Esquerda */}
           <div className="flex-1">
-            <p className="text-xs font-medium text-fg-muted mb-1 uppercase leading-tight">
+            <p className="text-xs font-medium text-fg-muted mb-1 leading-tight">
               Centro Territorial de Educação Profissional do Litoral Norte e Agreste Baiano
             </p>
             <div className="flex items-center gap-2 mb-1">
@@ -525,7 +525,7 @@ export default function ConselhoClasseClient({
                 <div className="flex items-center space-x-2 mb-0.5">
                   <h1 className="text-2xl font-bold text-fg tracking-tight">{turmaNome}</h1>
                   {turmaTurno && (
-                    <span className="px-2.5 py-1 bg-zinc-900 text-white text-xs font-medium rounded-md leading-none">
+                    <span className="px-2.5 py-1 bg-subtle border border-line text-fg text-xs font-medium rounded-md leading-none">
                       {turmaTurno}
                     </span>
                   )}
@@ -967,8 +967,8 @@ export default function ConselhoClasseClient({
                         return (
                           <tr key={notaId}>
                             <td className="px-6 py-4">
-                              <p className="font-medium text-fg text-xs uppercase">{nota.estudanteNome}</p>
-                              <p className="text-xs text-fg-subtle font-medium uppercase mt-0.5">{nota.disciplinaNome}</p>
+                              <p className="font-medium text-fg text-xs">{nota.estudanteNome}</p>
+                              <p className="text-xs text-fg-subtle font-medium mt-0.5">{nota.disciplinaNome}</p>
                             </td>
                             <td className="px-6 py-4 text-center font-medium text-fg-muted text-xs">
                               {notaRecVal !== null && notaRecVal !== undefined ? notaRecVal.toFixed(1) : '-'}

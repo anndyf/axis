@@ -91,7 +91,7 @@ function Toggle({ ativo, onClick }: { ativo: boolean; onClick: () => void }) {
 }
 
 const inputClass = "w-full px-5 py-4 bg-zinc-50 border border-zinc-200 rounded-lg outline-none font-semibold text-fg-muted focus:bg-white focus:border-accent transition-all"
-const labelClass = "block text-[10px] font-semibold text-fg-subtle uppercase tracking-widest mb-1.5 ml-1"
+const labelClass = "block text-xs font-medium text-fg-muted mb-1.5"
 const smallInput = "px-3 py-2 bg-white border border-zinc-200 rounded-lg outline-none text-xs font-medium text-fg-muted focus:border-accent text-center"
 
 export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esquemaParaEditar }: Props) {

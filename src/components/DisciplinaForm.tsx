@@ -352,7 +352,7 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
                                {Object.keys(groupedTurmas[turno]).sort().map(curso => (
                                    <div key={curso}>
                                       {curso !== 'Geral' && (
-                                          <h5 className="text-xs font-semibold text-fg-subtle mb-2 uppercase">{curso}</h5>
+                                          <h5 className="text-xs font-semibold text-fg-subtle mb-2">{curso}</h5>
                                       )}
                                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                                           {groupedTurmas[turno][curso].map(t => {

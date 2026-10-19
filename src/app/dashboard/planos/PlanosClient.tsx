@@ -179,9 +179,9 @@ export default function PlanosClient() {
               {!isAdmin && (
                 <button 
                   onClick={() => { setShowForm(true); setSelectedPlano(null); }}
-                  className="flex items-center gap-2 bg-zinc-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-zinc-800 transition-all text-xs active:scale-95 shadow-card"
+                  className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
                 >
-                  <Plus size={16} /> Novo Plano
+                  <Plus size={16} strokeWidth={1.75} /> Novo Plano
                 </button>
               )}
             </div>
@@ -195,13 +195,13 @@ export default function PlanosClient() {
         {/* Dicas Fixas - Estilo Resultados */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {planoTips.map((tip, index) => (
-             <div key={index} className="bg-white/60 border border-zinc-300/60 p-5 rounded-xl flex items-start space-x-4 hover:bg-white hover:border-zinc-300 hover:shadow-card transition-all group">
+             <div key={index} className="bg-surface border border-line p-4 rounded-lg flex items-start gap-3">
                 <div className={`p-3 rounded-lg bg-subtle text-fg-muted transition-all shadow-card`}>
                    {tip.icon}
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-fg mb-1">{tip.title}</h3>
-                  <p className="text-xs font-medium text-fg-subtle uppercase leading-relaxed">{tip.description}</p>
+                  <p className="text-xs font-medium text-fg-subtle leading-relaxed">{tip.description}</p>
                 </div>
              </div>
           ))}
@@ -345,7 +345,7 @@ export default function PlanosClient() {
                                                                                 <FileText size={18} />
                                                                             </div>
                                                                             <div className="flex flex-col">
-                                                                                 <span className="text-base font-medium text-fg-muted uppercase group-hover:text-fg-muted transition-colors leading-tight">{plano.disciplinaNome}</span>
+                                                                                 <span className="text-base font-medium text-fg-muted group-hover:text-fg-muted transition-colors leading-tight">{plano.disciplinaNome}</span>
                                                                                  <span className="text-xs font-medium text-fg-subtle mt-1">
                                                                                     {isAdmin ? `PROF. ${plano.professor.name}` : 'Documento Quinzenal'}
                                                                                  </span>

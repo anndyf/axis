@@ -154,7 +154,7 @@ export default function RecuperacaoTurmaClient({
         {/* Dicas Estilo Simulados */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {recuperacaoTips.map((tip, index) => (
-             <div key={index} className="bg-white/60 border border-zinc-300/60 p-4 rounded-lg flex items-start space-x-4 hover:bg-white hover:border-zinc-300 hover:shadow-sm transition-all">
+             <div key={index} className="bg-surface border border-line p-4 rounded-lg flex items-start gap-3">
                 <div className={`p-2.5 rounded-xl bg-subtle text-fg-muted`}>
                    {tip.icon}
                 </div>
@@ -268,7 +268,7 @@ export default function RecuperacaoTurmaClient({
                         <td className="px-6 py-4">
                           <div className="flex flex-col">
                             <div className="flex items-center gap-2">
-                              <span className="text-base font-medium text-fg-muted uppercase">{nota.estudanteNome}</span>
+                              <span className="text-base font-medium text-fg-muted">{nota.estudanteNome}</span>
                               {nota.status === 'DESISTENTE' && (
                                 <span className="px-1.5 py-0.5 bg-danger-subtle text-danger-fg text-xs font-medium rounded shadow-sm border border-danger-line">DESISTENTE</span>
                               )}
@@ -344,7 +344,7 @@ export default function RecuperacaoTurmaClient({
             <div className="p-6 max-h-[50vh] overflow-y-auto space-y-2 bg-zinc-50/20 custom-scrollbar">
               {notasRecuperacao.filter(n => n.disciplinaId === disciplinaSelecionada && notas[n.id] !== originalNotas[n.id]).map(n => (
                  <div key={n.id} className="flex items-center justify-between bg-white p-3 rounded-lg border border-zinc-200 shadow-sm">
-                  <span className="text-sm font-medium text-fg-muted uppercase truncate pr-4">{n.estudanteNome}</span>
+                  <span className="text-sm font-medium text-fg-muted truncate pr-4">{n.estudanteNome}</span>
                   <span className="text-sm font-medium text-danger-fg min-w-max">{notas[n.id] === '-1' ? 'FALTOU' : `NOTA: ${notas[n.id]}`}</span>
                 </div>
               ))}

@@ -696,7 +696,7 @@ export default function MessagesClient({
                       await updateTicketStatus(selectedMessage.id, 'RESOLVIDO')
                       setSelectedMessage({...selectedMessage, isResolved: true, status: 'RESOLVIDO'})
                     }}
-                    className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-success hover:bg-success text-white border border-success transition-colors shadow-sm cursor-pointer flex items-center gap-1"
+                    className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-accent hover:bg-accent-hover text-on-accent transition-colors shadow-sm cursor-pointer flex items-center gap-1"
                   >
                     <Check size={12} /> Marcar Resolvido
                   </button>

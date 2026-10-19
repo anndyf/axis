@@ -4,13 +4,14 @@ import { useState, useTransition } from "react"
 import Link from "next/link"
 import { Plus, Trash2, Save, Loader2, CheckCircle2, AlertCircle, Pencil, X } from "lucide-react"
 import { criarAvaliacao, editarAvaliacao, removerAvaliacao } from "./actions"
+import { buttonClasses } from "@/components/ui"
 
 interface Avaliacao { id: string; nome: string; data: string; notaMaxima: number; peso: number; temNotas: boolean }
 interface Etapa { id: string; nome: string; formaCalculo: string; teto: number; avaliacoes: Avaliacao[] }
 
 const card = "bg-white rounded-lg shadow-sm border border-zinc-200 p-6 space-y-3"
 const input = "px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg outline-none text-sm text-fg-muted focus:bg-white focus:border-accent"
-const botao = "flex items-center gap-2 bg-zinc-900 text-white px-4 py-2 rounded-lg text-xs font-medium uppercase tracking-wide hover:bg-zinc-800 disabled:opacity-50"
+const botao = buttonClasses({ size: "sm" })
 const num = (n: number) => String(Math.round(n * 100) / 100).replace(".", ",")
 const dataBR = (iso: string) => iso.split("-").reverse().join("/")
 const FORMA: Record<string, string> = {

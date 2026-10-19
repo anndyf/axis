@@ -265,21 +265,21 @@ export default function MatrizCurricularClient({
   })
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd]">
+    <div className="">
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
-      <header className="bg-white/80 backdrop-blur-xl border-b border-zinc-200 sticky top-0 z-50 -mx-4 -mt-4 md:-mx-8 md:-mt-8 mb-4 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto py-4">
+      <header className="mb-6">
+        <div className="max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="flex items-center space-x-5">
+            <div className="flex min-w-0 items-center gap-3">
               <Link
                 href="/dashboard"
                 className="p-2 hover:bg-zinc-100 rounded-lg transition-colors text-fg-subtle hover:text-fg-muted"
               >
-                <ArrowLeft size={20} />
+                <ArrowLeft size={16} strokeWidth={1.75} />
               </Link>
               <div>
-                <h1 className="text-2xl font-semibold text-fg tracking-tight">Matriz Curricular</h1>
-                <p className="text-base text-fg-muted font-medium">Definição de disciplinas padrão por curso e série</p>
+                <h1 className="text-2xl font-semibold tracking-tight text-fg">Matriz Curricular</h1>
+                <p className="text-sm text-fg-muted">Definição de disciplinas padrão por curso e série</p>
               </div>
             </div>
           </div>
@@ -386,7 +386,7 @@ export default function MatrizCurricularClient({
                               className="flex-1 text-left px-4 py-2.5 min-w-0"
                             >
                               <span className={`block text-sm font-semibold truncate ${selectedCurso === c.id ? 'text-accent-fg' : 'text-fg-muted'}`}>{c.nome}</span>
-                              <span className="text-xs font-bold text-fg-subtle uppercase">{c.modalidade} · {c.turnos?.join(', ') || '—'}</span>
+                              <span className="text-xs font-bold text-fg-subtle">{c.modalidade} · {c.turnos?.join(', ') || '—'}</span>
                             </button>
                             {/* Ações: editar e excluir */}
                             <div className="flex items-center gap-1 pr-2 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
@@ -651,7 +651,7 @@ export default function MatrizCurricularClient({
                               onClick={(e) => e.stopPropagation()}
                             />
                           ) : (
-                            <span className="text-base font-semibold text-fg-muted uppercase">{item.nome}</span>
+                            <span className="text-base font-semibold text-fg-muted">{item.nome}</span>
                           )}
                         </div>
                       </td>
@@ -743,26 +743,26 @@ export default function MatrizCurricularClient({
       {/* Barra flutuante de ação em lote */}
       {selectedIds.size > 0 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-slide-up">
-          <div className="flex items-center gap-4 bg-zinc-900 text-white px-5 py-3.5 rounded-lg shadow-card border border-white/10">
+          <div className="flex items-center gap-4 bg-elevated text-fg px-4 py-2.5 rounded-xl shadow-overlay border border-line">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-danger flex items-center justify-center text-xs font-semibold">
+              <div className="w-6 h-6 rounded-full bg-subtle text-fg flex items-center justify-center text-xs font-semibold tabular-nums">
                 {selectedIds.size}
               </div>
-              <span className="text-sm font-semibold">
+              <span className="text-13 font-medium whitespace-nowrap">
                 {selectedIds.size === 1 ? 'disciplina selecionada' : 'disciplinas selecionadas'}
               </span>
             </div>
-            <div className="w-px h-5 bg-white/20" />
+            <div className="w-px h-5 bg-line" />
             <button
               onClick={() => setSelectedIds(new Set())}
-              className="text-xs font-semibold text-white/50 hover:text-white transition-colors"
+              className="text-13 font-medium text-fg-muted hover:text-fg transition-colors duration-150"
             >
               Cancelar
             </button>
             <button
               onClick={handleDeleteBulk}
               disabled={saving}
-              className="flex items-center gap-2 bg-danger hover:bg-danger text-white text-xs font-bold px-4 py-2 rounded-xl transition-all disabled:opacity-50 active:scale-95"
+              className="flex h-8 items-center gap-2 bg-danger hover:bg-[color-mix(in_oklab,var(--danger)_86%,black)] text-white text-13 font-medium px-3 rounded-md transition-colors duration-150 disabled:opacity-50"
             >
               {saving
                 ? <Loader2 size={14} className="animate-spin" />
@@ -776,14 +776,15 @@ export default function MatrizCurricularClient({
       {/* Toast de propagação para turmas */}
       {propagacaoMsg && (
         <div className="fixed bottom-6 right-6 z-50 animate-slide-up">
-          <div className="flex items-center gap-3 bg-success text-white px-5 py-3.5 rounded-lg shadow-card border border-success max-w-sm">
-            <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-3 bg-elevated text-fg px-4 py-3 rounded-lg shadow-overlay border border-line max-w-sm" role="status">
+            <div className="w-7 h-7 rounded-md bg-success-subtle text-success-fg flex items-center justify-center shrink-0">
               <BookOpen size={16} />
             </div>
-            <p className="text-sm font-semibold leading-tight">{propagacaoMsg}</p>
+            <p className="text-13 font-medium leading-tight">{propagacaoMsg}</p>
             <button
               onClick={() => setPropagacaoMsg(null)}
-              className="ml-auto shrink-0 text-white/60 hover:text-white transition-colors"
+              aria-label="Fechar aviso"
+              className="ml-auto shrink-0 rounded-md px-1.5 text-fg-subtle hover:bg-subtle hover:text-fg transition-colors duration-150"
             >
               <span className="text-lg leading-none">×</span>
             </button>

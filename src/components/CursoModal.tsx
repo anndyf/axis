@@ -320,7 +320,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
                     onClick={() => setFormData(prev => ({ ...prev, nivelEnsino: prev.nivelEnsino === n ? "" : n }))}
                     className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all border ${
                       formData.nivelEnsino === n
-                        ? 'bg-success text-white border-success shadow-card '
+                        ? 'bg-success-subtle text-success-fg border-success-line shadow-card '
                         : 'bg-zinc-50 text-fg-subtle border-zinc-200 hover:border-zinc-300 hover:text-fg-muted'
                     }`}
                   >

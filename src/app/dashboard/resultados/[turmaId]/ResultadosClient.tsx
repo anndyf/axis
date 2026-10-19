@@ -336,10 +336,10 @@ export default function ResultadosTurmaClient({
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-zinc-50/80 border-b border-zinc-300">
-                  <th className="px-2 py-2 text-center text-xs font-medium text-fg-subtle uppercase sticky left-0 bg-zinc-50/95 backdrop-blur z-20 w-10 border-r border-zinc-300">
+                  <th className="px-2 py-2 text-center text-xs font-medium text-fg-subtle sticky left-0 bg-zinc-50/95 backdrop-blur z-20 w-10 border-r border-zinc-300">
                     #
                   </th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-black uppercase sticky left-8 bg-white z-30 min-w-[250px] border-r border-zinc-300 shadow-[2px_0_5px_rgba(0,0,0,0.05)] whitespace-nowrap">
+                  <th className="px-3 py-2 text-left text-xs font-medium text-black sticky left-8 bg-white z-30 min-w-[250px] border-r border-zinc-300 shadow-[2px_0_5px_rgba(0,0,0,0.05)] whitespace-nowrap">
                     Estudante
                   </th>
                   {disciplinas.map((disc) => (
@@ -351,7 +351,7 @@ export default function ResultadosTurmaClient({
                       </div>
                     </th>
                   ))}
-                  <th className="w-24 px-2 py-2 text-center text-xs font-medium text-fg-muted uppercase sticky right-0 bg-zinc-50/95 backdrop-blur z-20 border-l border-zinc-300">
+                  <th className="w-24 px-2 py-2 text-center text-xs font-medium text-fg-muted sticky right-0 bg-zinc-50/95 backdrop-blur z-20 border-l border-zinc-300">
                     Risco
                   </th>
                 </tr>

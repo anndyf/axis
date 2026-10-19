@@ -651,7 +651,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
                     onClick={() => setFormData({...formData, correta: letter})}
                     className={`mt-2 shrink-0 w-10 h-10 rounded-full border-2 flex items-center justify-center font-semibold transition-all ${
                       formData.correta === letter
-                      ? 'bg-success border-success text-white'
+                      ? 'bg-success-subtle border-success-line text-success-fg'
                       : 'bg-zinc-50 border-zinc-100 text-fg-subtle hover:border-accent/25'
                     }`}
                   >
@@ -733,11 +733,11 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
                       onClick={() => toggleSelection(t.id, 'turmasIds')}
                       className={`px-4 py-2.5 rounded-xl text-xs font-bold border transition-all flex items-center gap-2 shadow-sm ${
                         formData.turmasIds.includes(t.id)
-                        ? 'bg-success border-success text-white translate-y-[-2px] '
-                        : 'bg-white border-zinc-200 text-fg-muted hover:border-success hover:bg-zinc-50'
+                        ? 'bg-accent-subtle border-accent text-accent-fg'
+                        : 'bg-white border-zinc-200 text-fg-muted hover:border-line-strong hover:bg-subtle'
                       }`}
                     >
-                      <Users size={14} className={formData.turmasIds.includes(t.id) ? 'text-white/85' : 'text-fg-subtle'} />
+                      <Users size={14} className={formData.turmasIds.includes(t.id) ? 'text-accent-fg' : 'text-fg-subtle'} />
                       {t.nome}
                     </button>
                   ))}
@@ -807,7 +807,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
             <button
               type="button"
               onClick={() => setCurrentStep(currentStep + 1)}
-              className="bg-zinc-900 hover:bg-black text-white px-8 py-3 rounded-lg font-bold flex items-center gap-2 transition-all shadow-card active:scale-95 text-sm"
+              className="bg-accent hover:bg-accent-hover text-on-accent px-8 py-3 rounded-lg font-bold flex items-center gap-2 transition-all shadow-card active:scale-95 text-sm"
             >
               Próximo Passo →
             </button>

@@ -381,7 +381,7 @@ export default function SimuladosClient({
         <div className="hidden print:block border-b-2 border-zinc-800 pb-4 mb-6">
            <div className="flex justify-between items-end">
               <div>
-                 <h1 className="text-2xl font-bold text-fg uppercase">Lista de Lançamento de Simulado</h1>
+                 <h1 className="text-2xl font-bold text-fg">Lista de Lançamento de Simulado</h1>
                  <p className="text-sm font-medium text-fg-muted mt-1">
                     Turma: {turmas.find(t => t.id === selectedTurma)?.nome || 'Não selecionada'} • 
                     Prova: {provas.find((p: any) => p.id === selectedProva)?.titulo || 'Não selecionada'} • 
@@ -401,13 +401,13 @@ export default function SimuladosClient({
         {/* Dicas Fixas - Estilo Resultados */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 print:hidden">
           {simuTips.map((tip, index) => (
-             <div key={index} className="bg-white/60 border border-zinc-300/60 p-5 rounded-xl flex items-start space-x-4 hover:bg-white hover:border-zinc-300 hover:shadow-card transition-all group">
+             <div key={index} className="bg-surface border border-line p-4 rounded-lg flex items-start gap-3">
                 <div className={`p-3 rounded-lg bg-subtle text-fg-muted transition-all shadow-card`}>
                    {tip.icon}
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-fg mb-1">{tip.title}</h3>
-                  <p className="text-xs font-medium text-fg-subtle uppercase leading-relaxed">{tip.description}</p>
+                  <p className="text-xs font-medium text-fg-subtle leading-relaxed">{tip.description}</p>
                 </div>
              </div>
           ))}
@@ -642,7 +642,7 @@ export default function SimuladosClient({
                          <td className="px-4 py-3.5 text-center text-sm font-bold text-fg-subtle">{index + 1}</td>
                          <td className="px-6 py-3.5 print:py-1.5 print:px-2">
                            <div className="flex flex-col">
-                             <span className="text-base print:text-sm font-medium text-fg-muted print:text-fg uppercase">{est.nome}</span>
+                             <span className="text-base print:text-sm font-medium text-fg-muted print:text-fg">{est.nome}</span>
                              <span className="text-xs print:text-xs font-medium text-fg-subtle">Matrícula: {est.matricula}</span>
                            </div>
                          </td>
@@ -750,7 +750,7 @@ export default function SimuladosClient({
             <div className="p-6 max-h-[60vh] overflow-y-auto space-y-3 bg-zinc-50/20 custom-scrollbar">
               {estudantes.filter(e => notasTemp[e.matricula] !== originalNotas[e.matricula]).map((est, i) => (
                  <div key={i} className="flex items-center justify-between bg-white p-3 rounded-lg border border-zinc-200 shadow-sm">
-                   <span className="text-sm font-medium text-fg-muted uppercase truncate pr-4">{est.nome}</span>
+                   <span className="text-sm font-medium text-fg-muted truncate pr-4">{est.nome}</span>
                    <div className="flex gap-2">
                       <span className="text-xs font-medium bg-zinc-50 text-fg-muted px-2.5 py-1 rounded-lg border border-zinc-200">
                         Nova Nota: {notasTemp[est.matricula] || '0.0'}
@@ -855,7 +855,7 @@ export default function SimuladosClient({
                   {gabarito?.map((q: any) => (
                     <tr key={q.numero} className="hover:bg-zinc-50">
                       <td className="px-4 py-3 text-sm font-bold text-fg-muted">{q.numero}</td>
-                      <td className="px-4 py-3 text-xs font-medium text-fg-subtle uppercase">{q.disciplina}</td>
+                      <td className="px-4 py-3 text-xs font-medium text-fg-subtle">{q.disciplina}</td>
                       <td className="px-4 py-3 text-sm font-semibold text-success-fg text-center">{q.correta}</td>
                     </tr>
                   ))}

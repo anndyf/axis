@@ -1013,7 +1013,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                     </p>
                     {tipoProva !== 'DEPENDÊNCIA' && tipoProva !== 'OUTRO' && (
                       <div className="flex items-center gap-2 animate-fade-in zoom-in duration-300">
-                        <span className="text-xs font-bold text-fg-subtle uppercase">Unidade:</span>
+                        <span className="text-xs font-bold text-fg-subtle">Unidade:</span>
                         <select 
                           value={unidade}
                           onChange={(e) => setUnidade(e.target.value)}
@@ -1132,7 +1132,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                       }))
                     }
                   }}
-                  className="text-xs font-bold text-accent-fg hover:underline uppercase"
+                  className="text-xs font-bold text-accent-fg hover:underline"
                 >
                   Definir p/ Todas
                 </button>
@@ -1264,7 +1264,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                     }}
                     disabled={loading}
                     className={`px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-card active:scale-95 disabled:opacity-50 ${
-                        !lastSavedProva ? 'bg-zinc-300 text-fg-subtle cursor-not-allowed' : 'bg-success hover:bg-success text-white'
+                        !lastSavedProva ? 'bg-zinc-300 text-fg-subtle cursor-not-allowed' : 'bg-accent hover:bg-accent-hover text-on-accent'
                     }`}
                   >
                     <Printer size={18} />
@@ -1773,7 +1773,7 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
             <div className="flex flex-wrap gap-2">
               <button 
                 onClick={() => onDownload({ layout: localLayout, ampliada: localAmpliada })}
-                className="bg-success hover:bg-success text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-card active:scale-95 transition-all flex items-center justify-center gap-2"
+                className="bg-accent hover:bg-accent-hover text-on-accent px-4 py-2.5 rounded-xl text-xs font-bold shadow-card active:scale-95 transition-all flex items-center justify-center gap-2"
               >
                 <FileDown size={16} />
                 Gerar PDF

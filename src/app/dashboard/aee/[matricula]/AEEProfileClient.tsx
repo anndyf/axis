@@ -122,16 +122,16 @@ export default function AEEProfileClient({
   )
 
   return (
-    <div className="bg-[#f8fafc] pb-24">
+    <div className="bg-canvas pb-24">
       {/* Header Premium */}
-      <div className="bg-white/80 backdrop-blur-md sticky top-0 z-40 border-b border-zinc-200">
+      <div className="mb-6 border-b border-line pb-4">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button onClick={() => router.back()} className="p-2 hover:bg-zinc-100 rounded-xl transition-colors">
               <ArrowLeft className="w-5 h-5 text-fg-muted" />
             </button>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-zinc-900 rounded-lg flex items-center justify-center text-white shadow-card">
+              <div className="w-10 h-10 bg-subtle border border-line rounded-lg flex items-center justify-center text-fg shadow-card">
                 <Accessibility className="w-6 h-6" />
               </div>
               <div>
@@ -192,7 +192,7 @@ export default function AEEProfileClient({
             
             {/* Card de Identificação Estilo Perfil */}
             <div className="bg-white rounded-xl shadow-card border border-zinc-200 relative overflow-hidden group">
-               <div className="absolute top-0 left-0 w-full h-24 bg-zinc-900" />
+               <div className="absolute top-0 left-0 w-full h-24 bg-subtle border-b border-line" />
                
                <div className="relative flex flex-col items-center mt-8 px-6 pb-8">
                   <div className="w-24 h-24 bg-white p-1.5 rounded-xl shadow-card relative">
@@ -251,7 +251,7 @@ export default function AEEProfileClient({
                       onClick={() => setFormData({...formData, precisaProvaAdaptada: !formData.precisaProvaAdaptada})}
                       className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
                         formData.precisaProvaAdaptada 
-                        ? 'bg-zinc-900 border-zinc-900 text-white shadow-card' 
+                        ? 'bg-accent-subtle border-accent text-accent-fg shadow-card' 
                         : 'bg-white border-zinc-100 text-fg-muted grayscale opacity-60'
                       }`}
                     >
@@ -263,7 +263,7 @@ export default function AEEProfileClient({
                       onClick={() => setFormData({...formData, precisaProvaSalaEspecial: !formData.precisaProvaSalaEspecial})}
                       className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
                         formData.precisaProvaSalaEspecial 
-                        ? 'bg-zinc-900 border-zinc-900 text-white shadow-card' 
+                        ? 'bg-accent-subtle border-accent text-accent-fg shadow-card' 
                         : 'bg-white border-zinc-100 text-fg-muted grayscale opacity-60'
                       }`}
                     >
@@ -313,7 +313,7 @@ export default function AEEProfileClient({
                         key={c.code} onClick={() => toggleCID(c.code)}
                         className={`w-full text-left p-3 rounded-xl border-2 transition-all flex items-center gap-3 ${
                           formData.cids.includes(c.code) 
-                          ? 'bg-zinc-900 border-zinc-900' 
+                          ? 'bg-accent border-accent' 
                           : 'bg-white border-zinc-100 hover:border-zinc-200'
                         }`}
                       >
@@ -333,7 +333,7 @@ export default function AEEProfileClient({
                     const found = CIDS_AEE.find((c: any) => c.code === code)
                     return (
                       <div key={code} className="bg-zinc-50 border border-zinc-200 p-3 rounded-xl flex items-center gap-3">
-                        <div className="w-10 h-10 bg-zinc-900 text-white rounded-lg flex items-center justify-center font-semibold text-xs">
+                        <div className="w-10 h-10 bg-subtle border border-line text-fg rounded-lg flex items-center justify-center font-semibold text-xs">
                            {code}
                         </div>
                         <p className="text-xs font-bold text-fg-muted leading-tight">{found?.label || 'CID Específico'}</p>
@@ -345,7 +345,7 @@ export default function AEEProfileClient({
             </div>
 
             {/* Contato de Emergência */}
-            <div className="bg-zinc-900 text-white p-6 rounded-xl shadow-card space-y-4">
+            <div className="bg-surface border border-line text-fg p-5 rounded-lg space-y-4">
               <h2 className="text-xs font-semibold text-fg-subtle flex items-center gap-2">
                 <Phone className="w-3.5 h-3.5" />
                 Contato de Emergência
@@ -353,21 +353,21 @@ export default function AEEProfileClient({
               {isDirecao ? (
                 <div className="space-y-3">
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-white/40 ml-1">Nome do Contato</label>
+                    <label className="text-xs font-medium text-fg-muted">Nome do Contato</label>
                     <input 
                       type="text" value={formData.contatoNome}
                       onChange={(e) => setFormData({...formData, contatoNome: e.target.value})}
                       placeholder="Ex: Maria (Mãe)"
-                      className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:bg-white/20 transition-all placeholder:text-white/30"
+                      className="w-full h-9 bg-surface border border-line rounded-lg px-3 text-sm text-fg transition-colors duration-150 hover:border-line-strong focus:border-accent placeholder:text-fg-subtle"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-white/40 ml-1">Telefone</label>
+                    <label className="text-xs font-medium text-fg-muted">Telefone</label>
                     <input 
                       type="text" value={formData.contatoTelefone}
                       onChange={(e) => setFormData({...formData, contatoTelefone: formatPhone(e.target.value)})}
                       placeholder="(00) 0 0000-0000"
-                      className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:bg-white/20 transition-all placeholder:text-white/30 font-mono"
+                      className="w-full h-9 bg-surface border border-line rounded-lg px-3 text-sm text-fg transition-colors duration-150 hover:border-line-strong focus:border-accent placeholder:text-fg-subtle font-mono"
                     />
                   </div>
                 </div>

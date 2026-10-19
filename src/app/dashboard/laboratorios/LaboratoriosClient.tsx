@@ -319,7 +319,7 @@ export default function LaboratoriosClient({
                         setEditingLabId(null)
                         setShowLabModal(true)
                       }}
-                      className="p-1.5 bg-zinc-900 text-white rounded-lg hover:bg-zinc-700 transition-all shadow-sm"
+                      className="p-1.5 bg-accent text-on-accent rounded-lg hover:bg-accent-hover transition-all shadow-sm"
                       title="Novo Laboratório"
                     >
                       <Plus size={14} />
@@ -412,9 +412,9 @@ export default function LaboratoriosClient({
                                  return (
                                    <td key={day.toISOString()} className={`p-2 border-b border-zinc-100 border-l border-zinc-50 ${isSameDay(day, new Date()) ? 'bg-accent-subtle' : ''}`}>
                                      {reserva ? (
-                                       <div className={`p-3 rounded-xl border relative group ${isMyReserva ? 'bg-success border-success text-white shadow-card ' : 'bg-white border-zinc-200 text-fg-muted shadow-sm'}`}>
+                                       <div className={`p-3 rounded-xl border relative group ${isMyReserva ? 'bg-success-subtle border-success-line text-success-fg' : 'bg-white border-zinc-200 text-fg-muted shadow-sm'}`}>
                                          <p className="text-xs font-bold line-clamp-1">{reserva.user?.name || reserva.user?.username}</p>
-                                         <p className={`text-xs font-medium line-clamp-1 ${isMyReserva ? 'text-white/85' : 'text-fg-subtle'}`}>{reserva.disciplina || "Uso Técnico"}</p>
+                                         <p className={`text-xs font-medium line-clamp-1 ${isMyReserva ? 'text-success-fg/80' : 'text-fg-subtle'}`}>{reserva.disciplina || "Uso Técnico"}</p>
                                          
                                          {(isMyReserva || isAdmin) && (
                                            <button 
@@ -446,7 +446,7 @@ export default function LaboratoriosClient({
                                          }}
                                          className={`w-full h-10 rounded-xl border transition-all flex items-center justify-center group ${
                                            selectedSlots.find(s => s.data === format(day, 'yyyy-MM-dd') && s.turno === turno.id && s.horario === horario)
-                                             ? 'bg-zinc-900 border-zinc-900 text-white ring-4 ring-zinc-900/10'
+                                             ? 'bg-accent-subtle border-accent text-accent-fg ring-4 ring-zinc-900/10'
                                              : 'border-dashed border-zinc-200 hover:border-zinc-900 hover:bg-white'
                                          }`}
                                        >
@@ -597,7 +597,7 @@ export default function LaboratoriosClient({
            <div className="bg-white rounded-xl shadow-overlay w-full max-w-md overflow-hidden animate-pop-in">
               <div className="p-6 border-b border-zinc-100 flex items-center justify-between bg-zinc-50">
                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-zinc-900 text-white rounded-xl flex items-center justify-center shadow-card"><Monitor size={20}/></div>
+                    <div className="w-10 h-10 bg-subtle border border-line text-fg rounded-xl flex items-center justify-center shadow-card"><Monitor size={20}/></div>
                     <div>
                         <h3 className="text-lg font-bold text-fg tracking-tight">{editingLabId ? 'Editar Laboratório' : 'Novo Laboratório'}</h3>
                         <p className="text-xs font-medium text-fg-subtle">Acesso Administrativo</p>

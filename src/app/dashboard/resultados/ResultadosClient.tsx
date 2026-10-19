@@ -152,7 +152,7 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
                     
                     <div className="space-y-1.5 text-sm text-fg-muted">
                       <div className="flex justify-between items-center">
-                        <span className="text-xs uppercase font-medium text-fg-subtle truncate max-w-[60%]">{turma.curso || 'Ensino Médio'}</span>
+                        <span className="text-xs font-medium text-fg-subtle truncate max-w-[60%]">{turma.curso || 'Ensino Médio'}</span>
                         {turma.turno && (
                           <span className="bg-zinc-200/50 text-fg-muted text-xs font-medium px-1.5 py-0.5 rounded border border-zinc-300/50">
                               {turma.turno}
@@ -160,7 +160,7 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
                         )}
                       </div>
                       <div className="flex justify-between items-center pt-1 mt-1 border-t border-zinc-200">
-                        <span className="text-xs uppercase font-medium text-fg-subtle">Estudantes</span>
+                        <span className="text-xs font-medium text-fg-subtle">Estudantes</span>
                         <span className="font-medium text-fg">{turma._count.estudantes}</span>
                       </div>
                     </div>

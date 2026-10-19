@@ -354,7 +354,7 @@ export default function PendenciasClient({
                               <button
                                 onClick={() => handleResolve(item.id)}
                                 disabled={resolvingId === item.id}
-                                className="w-full md:w-64 flex items-center justify-center gap-2 bg-success hover:bg-success text-white px-6 py-3.5 rounded-lg font-bold text-sm transition-all shadow-card active:scale-95 disabled:opacity-50"
+                                className="w-full md:w-64 flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-6 py-3.5 rounded-lg font-bold text-sm transition-all shadow-card active:scale-95 disabled:opacity-50"
                               >
                                 {resolvingId === item.id ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
                                 Resolver Chamado

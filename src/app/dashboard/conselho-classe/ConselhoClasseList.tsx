@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Search, GraduationCap, CheckCircle2, AlertCircle, Users, ChevronRight, Filter, Info, BarChart3 } from "lucide-react"
+import { Badge } from "@/components/ui"
 
 interface TurmaProcessada {
   id: string
@@ -23,14 +24,6 @@ export default function ConselhoClasseList({
 
   const turnos = Object.keys(gruposIniciais).sort()
   
-  const getTurnoColor = (turno: string) => {
-    const t = turno.toUpperCase()
-    if (t.includes('MATUTINO')) return 'bg-warning'
-    if (t.includes('VESPERTINO')) return 'bg-zinc-700'
-    if (t.includes('NOTURNO')) return 'bg-zinc-600'
-    return 'bg-zinc-600'
-  }
-
   const conselhoTips = [
     {
       title: "Deliberação Final",
@@ -114,62 +107,47 @@ export default function ConselhoClasseList({
 
             return (
               <div key={turno}>
-                <div className="bg-zinc-50 px-6 py-2 border-b border-zinc-300">
-                   <span className={`px-3 py-0.5 text-white text-xs font-medium rounded-md ${getTurnoColor(turno)} shadow-sm`}>
-                    {turno}
-                  </span>
+                <div className="flex items-center gap-2 border-b border-line-subtle bg-canvas/60 px-4 py-2 sm:px-5">
+                  <span className="text-xs font-semibold text-fg-muted">{turno.charAt(0) + turno.slice(1).toLowerCase()}</span>
+                  <span className="text-xs tabular-nums text-fg-subtle">· {turmasNoTurno.length} {turmasNoTurno.length === 1 ? 'turma' : 'turmas'}</span>
                 </div>
-                <table className="w-full text-left">
-                  <thead className="bg-white border-b border-zinc-200">
-                    <tr>
-                      <th className="px-6 py-3 text-xs font-medium text-fg-subtle">Turma / Curso</th>
-                      <th className="px-6 py-3 text-xs font-medium text-fg-subtle text-center">Situação IA</th>
-                      <th className="px-6 py-3 text-xs font-medium text-fg-subtle text-center">Status</th>
-                      <th className="px-6 py-3 text-xs font-medium text-fg-subtle text-center w-24">Ação</th>
+                <div className="relative overflow-x-auto">
+                <table className="w-full min-w-[32rem] text-left text-13">
+                  <thead>
+                    <tr className="border-b border-line-subtle text-xs text-fg-subtle">
+                      <th scope="col" className="h-9 px-4 font-medium sm:px-5">Turma / curso</th>
+                      <th scope="col" className="h-9 px-3 font-medium">Alunos</th>
+                      <th scope="col" className="h-9 px-3 font-medium">Situação</th>
+                      <th scope="col" className="h-9 w-12 px-4 font-medium sm:px-5"><span className="sr-only">Abrir</span></th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-50">
+                  <tbody>
                     {turmasNoTurno.map((turma) => (
-                      <tr 
-                        key={turma.id} 
-                        className={`group hover:bg-zinc-50 transition-colors cursor-pointer ${!turma.isResolvido ? 'bg-danger-subtle' : ''}`}
+                      <tr
+                        key={turma.id}
+                        className="group cursor-pointer border-b border-line-subtle last:border-0 transition-colors duration-150 hover:bg-subtle/60"
                         onClick={() => window.location.href = `/dashboard/conselho-classe/${turma.id}`}
                       >
-                        <td className="px-6 py-4">
-                           <div className="flex flex-col">
-                              <span className="text-sm font-medium text-fg-muted uppercase group-hover:text-fg-muted transition-colors">{turma.nome}</span>
-                              <span className="text-xs font-medium text-fg-subtle">{turma.curso}</span>
-                           </div>
+                        <td className="px-4 py-2.5 sm:px-5">
+                          <span className="block font-medium text-fg">{turma.nome}</span>
+                          <span className="block text-xs text-fg-subtle">{turma.curso}</span>
                         </td>
-                        <td className="px-6 py-4 text-center">
-                           <div className="flex flex-col items-center">
-                              {turma.isResolvido ? (
-                                <span className="text-xs font-medium text-success-fg bg-success-subtle px-2 py-0.5 rounded border border-success-line uppercase">{turma.totalAlunosResolvidos} DECIDIDOS</span>
-                              ) : (
-                                <span className="text-xs font-medium text-danger-fg bg-danger-subtle px-2 py-0.5 rounded border border-danger-line uppercase">{turma.totalAlunosPendentes} PENDENTES</span>
-                              )}
-                           </div>
+                        <td className="px-3 py-2.5 tabular-nums text-fg-muted">
+                          {turma.isResolvido ? `${turma.totalAlunosResolvidos} decididos` : `${turma.totalAlunosPendentes} pendentes`}
                         </td>
-                        <td className="px-6 py-4 text-center">
-                           <span className={`text-xs font-medium px-2 py-1 rounded-full border border-current opacity-70 ${
-                             turma.isResolvido ? 'text-success-fg' : 'text-danger-fg animate-pulse'
-                           }`}>
-                             {turma.isResolvido ? 'Fechado' : 'Em Conselho'}
-                           </span>
+                        <td className="px-3 py-2.5">
+                          <Badge tone={turma.isResolvido ? 'success' : 'warning'} dot>{turma.isResolvido ? 'Fechado' : 'Em conselho'}</Badge>
                         </td>
-                        <td className="px-6 py-4 text-center">
-                           <div className="flex justify-center">
-                              <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                                turma.isResolvido ? 'bg-zinc-200 text-fg-subtle group-hover:bg-success group-hover:text-white' : 'bg-danger-subtle text-danger-fg group-hover:bg-danger group-hover:text-white'
-                              }`}>
-                                 <ChevronRight size={16} />
-                              </div>
-                           </div>
+                        <td className="px-4 py-2.5 text-right sm:px-5">
+                          <Link href={`/dashboard/conselho-classe/${turma.id}`} aria-label={`Abrir conselho da ${turma.nome}`} className="inline-flex rounded-md p-1 text-fg-subtle transition-colors duration-150 group-hover:text-fg" onClick={(e) => e.stopPropagation()}>
+                            <ChevronRight size={16} strokeWidth={1.75} />
+                          </Link>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+                </div>
               </div>
             )
           })}

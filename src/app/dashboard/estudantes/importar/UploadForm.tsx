@@ -329,7 +329,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
                         setTurmaSearch("")
                         setManualTurma("")
                     }}
-                    className="w-full sm:w-auto px-8 py-4 bg-zinc-900 text-white rounded-lg font-bold hover:bg-zinc-800 transition-all shadow-card active:scale-95"
+                    className="w-full sm:w-auto px-8 py-4 bg-accent text-on-accent rounded-lg font-bold hover:bg-accent-hover transition-all shadow-card active:scale-95"
                   >
                     Nova Importação
                   </button>
@@ -426,7 +426,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
                                         }}
                                         className={`w-full text-left px-4 py-3 text-sm transition-all flex items-center justify-between border-b border-zinc-50 last:border-none ${
                                             manualTurma === t.nome 
-                                            ? 'bg-zinc-900 shadow-card z-10' 
+                                            ? 'bg-accent z-10' 
                                             : 'text-fg-muted hover:bg-zinc-50'
                                         }`}
                                     >
@@ -458,10 +458,10 @@ export default function UploadForm({ turmas }: UploadFormProps) {
                 <table className="w-full">
                   <thead className="bg-zinc-100 border-b border-zinc-300 sticky top-0">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-fg-muted uppercase">#</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-fg-muted uppercase">Matrícula</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-fg-muted uppercase">Nome</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-fg-muted uppercase">Turma de Destino</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-fg-muted">#</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-fg-muted">Matrícula</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-fg-muted">Nome</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-fg-muted">Turma de Destino</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-zinc-300">

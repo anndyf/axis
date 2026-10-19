@@ -274,7 +274,7 @@ export default function ImportarHorarioClient({
                         className="w-4 h-4 rounded accent-[var(--success)] cursor-pointer"
                       />
                       <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-xs font-semibold text-fg-subtle bg-zinc-100 px-2 py-1 rounded-lg font-mono uppercase">
+                        <span className="text-xs font-semibold text-fg-subtle bg-zinc-100 px-2 py-1 rounded-lg font-mono">
                           {e.turmaCode}
                         </span>
                       </div>
@@ -305,7 +305,7 @@ export default function ImportarHorarioClient({
                 <div className="divide-y divide-zinc-100">
                   {jaVinculadas.map((e, i) => (
                     <div key={i} className="flex items-center gap-4 px-6 py-3 opacity-60">
-                      <span className="text-xs font-semibold text-fg-subtle bg-zinc-100 px-2 py-1 rounded-lg font-mono uppercase">
+                      <span className="text-xs font-semibold text-fg-subtle bg-zinc-100 px-2 py-1 rounded-lg font-mono">
                         {e.turmaCode}
                       </span>
                       <p className="text-sm text-fg-muted flex-1">{e.discNomeBanco}</p>
@@ -331,7 +331,7 @@ export default function ImportarHorarioClient({
                   {resultado.naoEncontrados.map((n, i) => (
                     <div key={i} className="px-6 py-4">
                       <div className="flex items-start gap-3">
-                        <span className="text-xs font-semibold text-danger bg-danger-subtle px-2 py-1 rounded-lg font-mono uppercase shrink-0">
+                        <span className="text-xs font-semibold text-danger bg-danger-subtle px-2 py-1 rounded-lg font-mono shrink-0">
                           {n.turmaCode}
                         </span>
                         <div className="flex-1">
