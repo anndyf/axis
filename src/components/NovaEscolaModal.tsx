@@ -172,7 +172,7 @@ export default function NovaEscolaModal({ isOpen, onClose, onSuccess }: NovaEsco
                 />
               </div>
               <input
-                type="password" placeholder="Senha (mín. 6 caracteres)"
+                type="password" placeholder="Senha provisória (mín. 8 caracteres)"
                 value={formData.adminSenha}
                 onChange={e => setFormData({ ...formData, adminSenha: e.target.value })}
                 className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-slate-700 focus:bg-white focus:border-blue-500 transition-all"
