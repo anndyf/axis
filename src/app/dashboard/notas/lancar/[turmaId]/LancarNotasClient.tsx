@@ -65,6 +65,7 @@ interface EsquemaInfo {
   divisorFinal: number | null
   notaMinimaExameFinal: number | null
   casasDecimais: number
+  definicaoAtividades?: 'ESCOLA' | 'PROFESSOR'
   unidades: EsquemaUnidade[]
 }
 
@@ -424,6 +425,17 @@ export default function LancarNotasTurmaClient({
             <div className={`p-3 flex items-center gap-2 border-b ${message.type === 'success' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-red-50 text-red-700 border-red-100'}`}>
               {message.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
               <span className="text-sm font-medium">{message.text}</span>
+            </div>
+          )}
+
+          {esquema?.definicaoAtividades === 'PROFESSOR' && disciplinaSelecionada && (
+            <div className="p-3 flex flex-wrap items-center gap-2 border-b bg-blue-50 text-blue-800 border-blue-100 text-sm">
+              <AlertCircle size={16} />
+              <span>
+                Nesta turma o professor define as avaliações de cada unidade.
+                {esquema.unidades.some(u => u.atividades.length === 0) && ' Unidades sem avaliação ainda não recebem nota.'}
+              </span>
+              <Link href={`/dashboard/notas/avaliacoes?disciplina=${disciplinaSelecionada}`} className="font-medium underline">Minhas avaliações</Link>
             </div>
           )}
 

@@ -49,5 +49,17 @@ Ambiente: PostgreSQL 16 local subiu; `axis_dev` e `axis_test` criados, migration
 - [x] Seed `prisma/seed-frequencia.ts` (rodar depois de `seed.ts` e `seed-calendario.ts`: `npx tsx prisma/seed-frequencia.ts`): chamadas dos últimos 30 dias letivos de cada turma pelo horário × calendário; 1º aluno de cada turma infrequente (~35%), 2º perto do limite (~20%) com um atestado de 2 dias, demais ~4%. Idempotente (rodado 2x: 2ª vez cria 0), guarda de host local.
   - **[decisão]** Seed novo em vez de mexer no `seed-calendario.ts`, para poder rodar/repetir separado.
 
+### 3. Atividades criadas pelo professor (passo 5)
+- [x] Modelos `AvaliacaoDisciplina` e `NotaAvaliacao` — migration `20261019030000_atividades_professor` (só tabelas novas).
+- [x] Regras puras em `src/lib/services/avaliacoes-professor.ts` (teste `avaliacoes-professor.test.ts`): teto da etapa, validação do formulário.
+- [x] Tela `/dashboard/notas/avaliacoes` ("Minhas avaliações"): criar/editar/remover avaliações por unidade, com o total distribuído × máximo. Ações em `src/app/dashboard/notas/avaliacoes/actions.ts`, acesso em `src/lib/avaliacoes-acesso.ts`. Teste `src/lib/avaliacoes-professor-acoes.test.ts` (teto, lançamento, edição com notas, outro professor, escola B x A, portal).
+- [x] Integração com o motor de notas: no modo PROFESSOR, `api/notas/turma/...` entrega as avaliações do professor no lugar das atividades do template (mesmo formato, a tela de lançamento funciona sem mudança) e `api/notas/lancar` grava em `NotaAvaliacao`. Aviso + link "Minhas avaliações" no lançamento de notas. Opção "Atividades definidas pela escola / pelo professor" no modal de esquema.
+  - **[decisão]** As atividades do template da escola viram o **teto** da etapa no modo PROFESSOR: a nota máxima que a etapa alcança com as avaliações do professor não passa da que alcançaria com o template (SOMA com template "Total 10" → avaliações somam no máximo 10).
+  - **[decisão]** Avaliação com notas lançadas: nome e data podem mudar; nota máxima e peso não; não pode ser removida.
+  - **[decisão]** Editar um esquema em que professores já criaram avaliações é recusado (409), como já era com notas lançadas — recriar as unidades apagaria as avaliações. Relação `AvaliacaoDisciplina → EsquemaUnidade` com `onDelete: Restrict`.
+  - **[decisão]** Etapa sem nenhuma atividade no lançamento mantém a nota já gravada (defesa para não zerar notas se o modo mudar com notas existentes).
+  - **[correção de segurança]** `api/notas/turma/[turmaId]/disciplina/[disciplinaId]` (GET) não conferia papel nem se a disciplina era da turma: aluno do portal lia as notas da turma inteira, e qualquer professor lia as de qualquer disciplina. Agora: equipe, disciplina da turma, professor só as dele.
+  - **[correção]** O modal de esquema não enviava `definicaoAtividades`, então salvar voltava sempre para ESCOLA.
+
 ## Próximo passo
-Item 3 (atividades criadas pelo professor).
+Encerramento: planos, seção "Para validar localmente" e pull request.

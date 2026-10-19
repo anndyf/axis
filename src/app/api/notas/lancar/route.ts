@@ -5,6 +5,7 @@ import { logAudit } from '@/lib/audit'
 import { reportarErro } from '@/lib/monitoramento'
 import { can } from '@/lib/rbac'
 import { resolverEsquemaAvaliacaoId, paraEsquemaConfig, type StatusNota } from '@/lib/services/notas'
+import { atividadesDaDisciplina } from '@/lib/services/notas-leitura'
 import {
   montarLancamentoAluno,
   ErroLancamento,
@@ -76,11 +77,15 @@ export async function POST(request: NextRequest) {
     if (!esquema) {
       return NextResponse.json({ message: 'Esquema de avaliação inválido' }, { status: 400 })
     }
+    // PROFESSOR: as atividades de cada etapa são as avaliações que o
+    // professor criou para a disciplina (gravadas em NotaAvaliacao)
+    const porProfessor = esquema.definicaoAtividades === 'PROFESSOR'
+    const atividades = await atividadesDaDisciplina(esquema, disciplinaId)
     const esquemaLancamento = {
       config: paraEsquemaConfig(esquema),
       notaMaxima: esquema.notaMaxima,
       casasDecimais: esquema.casasDecimais,
-      unidades: esquema.unidades,
+      unidades: esquema.unidades.map((u) => ({ ...u, atividades: atividades.get(u.id) ?? [] })),
     }
 
     // O frontend envia a matrícula; notas_finais.estudante_id guarda o id técnico.
@@ -98,7 +103,7 @@ export async function POST(request: NextRequest) {
 
     const existentes = await prisma.notaFinal.findMany({
       where: { disciplinaId, estudanteId: { in: estudantes.map((e) => e.id) } },
-      include: { unidades: { include: { atividades: true } } },
+      include: { unidades: { include: { atividades: true, avaliacoes: true } } },
     })
     const existentePorAluno = new Map(existentes.map((n) => [n.estudanteId, n]))
 
@@ -110,7 +115,12 @@ export async function POST(request: NextRequest) {
       const lancamento = montarLancamentoAluno(
         esquemaLancamento,
         item.unidades,
-        existente?.unidades ?? [],
+        (existente?.unidades ?? []).map((u) => ({
+          ...u,
+          atividades: porProfessor
+            ? u.avaliacoes.map((a) => ({ esquemaAtividadeId: a.avaliacaoId, valor: a.valor }))
+            : u.atividades,
+        })),
         existente?.status as StatusNota | undefined,
         item.estudanteId
       )
@@ -138,6 +148,14 @@ export async function POST(request: NextRequest) {
             create: { notaFinalId: notaId, esquemaUnidadeId: u.esquemaUnidadeId, ...campos },
           })
           for (const a of u.atividades) {
+            if (porProfessor) {
+              await tx.notaAvaliacao.upsert({
+                where: { notaUnidadeId_avaliacaoId: { notaUnidadeId: notaUnidade.id, avaliacaoId: a.esquemaAtividadeId } },
+                update: { valor: a.valor },
+                create: { notaUnidadeId: notaUnidade.id, avaliacaoId: a.esquemaAtividadeId, valor: a.valor },
+              })
+              continue
+            }
             await tx.notaAtividade.upsert({
               where: { notaUnidadeId_esquemaAtividadeId: { notaUnidadeId: notaUnidade.id, esquemaAtividadeId: a.esquemaAtividadeId } },
               update: { valor: a.valor },

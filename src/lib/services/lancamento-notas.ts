@@ -44,6 +44,8 @@ export interface EsquemaParaLancamento {
 
 export interface UnidadeExistente {
   esquemaUnidadeId: string
+  /** nota da etapa já gravada - preservada se a etapa não tem atividades */
+  notaCalculada?: number | null
   notaRecuperacao: number | null
   isDesistente: boolean
   atividades: { esquemaAtividadeId: string; valor: number | null }[]
@@ -117,7 +119,11 @@ export function montarLancamentoAluno(
       esquemaUnidadeId: eu.id,
       isDesistente,
       notaRecuperacao,
-      notaCalculada: calcularNotaUnidade(atividades, eu.formaCalculo, eu.divisor, esquema.casasDecimais),
+      // Etapa sem nenhuma atividade (ex.: professor ainda não criou as
+      // avaliações) não tem de onde calcular: mantém a nota já gravada.
+      notaCalculada: eu.atividades.length === 0
+        ? (existente?.notaCalculada ?? null)
+        : calcularNotaUnidade(atividades, eu.formaCalculo, eu.divisor, esquema.casasDecimais),
       atividades,
       peso: eu.peso,
       formaCalculo: eu.formaCalculo,
@@ -129,9 +135,12 @@ export function montarLancamentoAluno(
     unidades.map((u) => ({
       esquemaUnidadeId: u.esquemaUnidadeId,
       peso: u.peso,
-      formaCalculo: u.formaCalculo,
-      divisor: u.divisor,
-      atividades: u.atividades.map((a) => ({ peso: a.peso, valor: a.valor })),
+      // sem atividades: entra a nota preservada da etapa, como valor único
+      formaCalculo: u.atividades.length === 0 ? 'SOMA' : u.formaCalculo,
+      divisor: u.atividades.length === 0 ? null : u.divisor,
+      atividades: u.atividades.length === 0
+        ? [{ valor: u.notaCalculada }]
+        : u.atividades.map((a) => ({ peso: a.peso, valor: a.valor })),
       notaRecuperacao: u.notaRecuperacao,
     })),
     esquema.config

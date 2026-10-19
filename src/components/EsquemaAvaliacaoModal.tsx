@@ -26,6 +26,7 @@ export interface EsquemaParaEditar {
   recuperacaoFinalAtiva: boolean
   modoRecuperacaoFinal: string | null
   notaMinimaExameFinal: number | null
+  definicaoAtividades?: "ESCOLA" | "PROFESSOR"
   registroFrequencia: "POR_AULA" | "POR_DIA"
   apuracaoFrequencia: "GERAL" | "POR_COMPONENTE"
   frequenciaMinima: number
@@ -109,6 +110,7 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
   const [recFinalAtiva, setRecFinalAtiva] = useState(true)
   const [modoRecFinal, setModoRecFinal] = useState<ModoRecFinal>("NOTA_MINIMA_ISOLADA")
   const [notaMinimaExame, setNotaMinimaExame] = useState("")
+  const [definicaoAtividades, setDefinicaoAtividades] = useState<"ESCOLA" | "PROFESSOR">("ESCOLA")
   const [registroFrequencia, setRegistroFrequencia] = useState<"POR_AULA" | "POR_DIA">("POR_AULA")
   const [apuracaoFrequencia, setApuracaoFrequencia] = useState<"GERAL" | "POR_COMPONENTE">("GERAL")
   const [frequenciaMinima, setFrequenciaMinima] = useState("75")
@@ -127,6 +129,7 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
     setRecFinalAtiva(e?.recuperacaoFinalAtiva ?? true)
     setModoRecFinal((e?.modoRecuperacaoFinal as ModoRecFinal) || "NOTA_MINIMA_ISOLADA")
     setNotaMinimaExame(e?.notaMinimaExameFinal ? String(e.notaMinimaExameFinal) : "")
+    setDefinicaoAtividades(e?.definicaoAtividades ?? "ESCOLA")
     setRegistroFrequencia(e?.registroFrequencia ?? "POR_AULA")
     setApuracaoFrequencia(e?.apuracaoFrequencia ?? "GERAL")
     setFrequenciaMinima(String(e?.frequenciaMinima ?? 75))
@@ -191,6 +194,7 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
         recuperacaoFinalAtiva: recFinalAtiva,
         modoRecuperacaoFinal: recFinalAtiva ? modoRecFinal : null,
         notaMinimaExameFinal: recFinalAtiva && modoRecFinal === "MEDIA_COM_FINAL" && notaMinimaExame ? num(notaMinimaExame) : null,
+        definicaoAtividades,
         registroFrequencia,
         apuracaoFrequencia,
         frequenciaMinima: num(frequenciaMinima),
@@ -395,6 +399,17 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
                   )}
                 </>
               )}
+            </div>
+          </div>
+
+          {/* Quem define as atividades de cada unidade */}
+          <div className="space-y-3">
+            <label className={labelClass}>Atividades das unidades</label>
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+              <Opcoes valor={definicaoAtividades} onChange={setDefinicaoAtividades} opcoes={[
+                { valor: "ESCOLA", rotulo: "Definidas pela escola", ajuda: "As atividades abaixo valem para todas as disciplinas" },
+                { valor: "PROFESSOR", rotulo: "Definidas pelo professor", ajuda: "Cada professor cria as avaliações; as atividades abaixo viram o máximo da unidade" },
+              ]} />
             </div>
           </div>
 

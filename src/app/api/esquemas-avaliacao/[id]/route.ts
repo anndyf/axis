@@ -24,6 +24,15 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ message: validado.erro }, { status: 400 })
     }
 
+    // Recriar as unidades apagaria as avaliações que os professores criaram
+    // nelas (atividades definidas pelo professor) - mesma regra das notas.
+    if (await prisma.avaliacaoDisciplina.count({ where: { esquemaUnidade: { esquemaId: id } } })) {
+      return NextResponse.json(
+        { message: 'Não é possível editar: professores já criaram avaliações nas unidades atuais deste esquema.' },
+        { status: 409 }
+      )
+    }
+
     const esquema = await prisma.$transaction(async (tx) => {
       await tx.esquemaAvaliacao.update({ where: { id }, data: validado.dados })
 

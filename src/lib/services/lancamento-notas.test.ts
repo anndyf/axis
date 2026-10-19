@@ -62,3 +62,15 @@ describe('montarLancamentoAluno', () => {
     expect(r.status).toBe('APROVADO_CONSELHO')
   })
 })
+
+describe('etapa sem atividades (professor ainda não criou as avaliações)', () => {
+  it('preserva a nota já gravada e a usa na média', () => {
+    const semAtividadesNaU2: EsquemaParaLancamento = { ...esquema, unidades: [esquema.unidades[0], { ...esquema.unidades[1], atividades: [] }] }
+    const r = montarLancamentoAluno(semAtividadesNaU2, [
+      { esquemaUnidadeId: 'u1', atividades: [{ esquemaAtividadeId: 'a1', valor: 6 }, { esquemaAtividadeId: 'a2', valor: 4 }] },
+    ], [{ esquemaUnidadeId: 'u2', notaCalculada: 8, notaRecuperacao: null, isDesistente: false, atividades: [] }], undefined, 'M1')
+    expect(r.unidades.map((u) => u.notaCalculada)).toEqual([10, 8])
+    expect(r.media).toBe(9)
+    expect(r.status).toBe('APROVADO')
+  })
+})

@@ -44,3 +44,32 @@ export async function carregarEsquemaDaTurma(turma: { cursoId: string | null; es
     registroFrequencia: esquema.registroFrequencia,
   }
 }
+
+export interface AtividadeEfetiva {
+  id: string
+  nome: string
+  notaMaxima: number
+  peso: number
+  ordem: number
+}
+
+/**
+ * Atividades que valem no lançamento de uma disciplina, por etapa: as do
+ * template da escola (definicaoAtividades = ESCOLA) ou as avaliações que o
+ * professor criou para a disciplina (PROFESSOR). Os ids são de
+ * EsquemaAtividade ou de AvaliacaoDisciplina, conforme o modo.
+ */
+export async function atividadesDaDisciplina(
+  esquema: { definicaoAtividades: 'ESCOLA' | 'PROFESSOR'; unidades: { id: string; atividades: AtividadeEfetiva[] }[] },
+  disciplinaId: string
+): Promise<Map<string, AtividadeEfetiva[]>> {
+  if (esquema.definicaoAtividades !== 'PROFESSOR') {
+    return new Map(esquema.unidades.map((u) => [u.id, u.atividades]))
+  }
+  const avaliacoes = await prisma.avaliacaoDisciplina.findMany({
+    where: { disciplinaId, esquemaUnidadeId: { in: esquema.unidades.map((u) => u.id) } },
+    orderBy: [{ ordem: 'asc' }, { createdAt: 'asc' }],
+    select: { id: true, nome: true, notaMaxima: true, peso: true, ordem: true, esquemaUnidadeId: true },
+  })
+  return new Map(esquema.unidades.map((u) => [u.id, avaliacoes.filter((a) => a.esquemaUnidadeId === u.id)]))
+}
