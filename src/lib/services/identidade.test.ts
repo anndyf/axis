@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { normalizarHex, contraste, textoSobre, avaliarCor, variaveisDeDestaque, validarLogo, logoParaPdf, DESTAQUE_PADRAO } from './identidade'
+import { normalizarHex, contraste, textoSobre, avaliarCor, variaveisDaEscola, validarLogo, logoParaPdf, DESTAQUE_PADRAO } from './identidade'
 
 describe('cor de destaque', () => {
   it('normaliza hex', () => {
@@ -34,10 +34,16 @@ describe('cor de destaque', () => {
     expect(avaliarCor('xyz')).toBeNull()
   })
 
-  it('variáveis com fallback', () => {
-    expect(variaveisDeDestaque(null)).toEqual({ '--accent': DESTAQUE_PADRAO, '--on-accent': '#ffffff' })
-    expect(variaveisDeDestaque('invalida')['--accent']).toBe(DESTAQUE_PADRAO)
-    expect(variaveisDeDestaque('#FACC15')).toEqual({ '--accent': '#facc15', '--on-accent': '#18181b' })
+  it('destaque fixo no azul Áxis, que passa AA com texto branco', () => {
+    expect(DESTAQUE_PADRAO).toBe('#205ee6')
+    expect(avaliarCor(DESTAQUE_PADRAO)).toMatchObject({ textoSobre: '#ffffff', avisos: [] })
+    expect(contraste(DESTAQUE_PADRAO, '#ffffff')).toBeGreaterThanOrEqual(4.5)
+  })
+
+  it('cor da escola vira só o detalhe --escola, com fallback', () => {
+    expect(variaveisDaEscola(null)).toEqual({ '--escola': DESTAQUE_PADRAO })
+    expect(variaveisDaEscola('invalida')).toEqual({ '--escola': DESTAQUE_PADRAO })
+    expect(variaveisDaEscola('#FACC15')).toEqual({ '--escola': '#facc15' })
   })
 })
 

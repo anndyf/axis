@@ -21,7 +21,7 @@ export default async function IdentidadePage() {
     <div className="mx-auto max-w-5xl">
       <PageHeader
         title="Identidade visual"
-        description="Logo e cor de destaque da escola. A cor aparece no botão principal, no item ativo do menu, nos links e no login."
+        description="Logo e cor da escola. O logo aparece no menu, no cabeçalho, no portal e nos PDFs; a cor, só como detalhe. Botões, links e menu usam sempre o azul Áxis."
       />
       <IdentidadeClient
         nomeEscola={escola?.nome ?? "Escola"}

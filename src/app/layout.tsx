@@ -7,7 +7,7 @@ import NextTopLoader from 'nextjs-toploader';
 import { escolaDaRequisicao } from "@/lib/escola-atual";
 import { cookies } from "next/headers";
 import { COOKIE_TEMA, temaValido } from "@/lib/tema";
-import { variaveisDeDestaque } from "@/lib/services/identidade";
+import { DESTAQUE_PADRAO, variaveisDaEscola } from "@/lib/services/identidade";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,11 +19,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Cor do tema do navegador/PWA = cor de destaque da escola (fallback: padrão)
+// Cor do tema do navegador/PWA = azul Áxis (fixo)
 export async function generateViewport(): Promise<Viewport> {
-  const escola = await escolaDaRequisicao();
   return {
-    themeColor: variaveisDeDestaque(escola?.corPrimaria)["--accent"],
+    themeColor: DESTAQUE_PADRAO,
     width: "device-width",
     initialScale: 1,
     maximumScale: 1,
@@ -57,12 +56,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Destaque da escola nos tokens do design system (globals.css)
+  // Cor da escola só como detalhe (--escola); o destaque é fixo no globals.css
   const escola = await escolaDaRequisicao();
   // Tema escolhido no menu do usuário (cookie), aplicado já no HTML do servidor: sem piscar
   const tema = temaValido((await cookies()).get(COOKIE_TEMA)?.value);
   return (
-    <html lang="pt-BR" data-theme={tema} style={variaveisDeDestaque(escola?.corPrimaria) as React.CSSProperties}>
+    <html lang="pt-BR" data-theme={tema} style={variaveisDaEscola(escola?.corPrimaria) as React.CSSProperties}>
       <head>
         {/* PWA meta tags para melhor suporte em iOS */}
         <meta name="mobile-web-app-capable" content="yes" />

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Upload, RotateCcw, LayoutDashboard, Users, ClipboardCheck, FileText } from "lucide-react"
 import { Button, Card, CardBody, CardHeader, CardFooter, Field, Input, Alert, Badge } from "@/components/ui"
 import { useToast } from "@/components/ui/Toast"
-import { avaliarCor, normalizarHex, textoSobre } from "@/lib/services/identidade"
+import { avaliarCor, normalizarHex } from "@/lib/services/identidade"
 import { salvarIdentidade } from "./actions"
 
 const LADO_MAX = 256
@@ -45,7 +45,7 @@ export default function IdentidadeClient({ nomeEscola, corInicial, logoInicial, 
   const avaliacao = useMemo(() => avaliarCor(corEfetiva), [corEfetiva])
   const corInvalida = cor.trim() !== "" && !normalizarHex(cor)
   const logoEnviado = logo.startsWith("data:")
-  const estiloPrevia = { "--accent": corEfetiva, "--on-accent": textoSobre(corEfetiva) } as React.CSSProperties
+  const estiloPrevia = { "--escola": corEfetiva } as React.CSSProperties
 
   const salvar = async () => {
     setErro(null)
@@ -73,7 +73,7 @@ export default function IdentidadeClient({ nomeEscola, corInicial, logoInicial, 
       <Card>
         <CardHeader title="Configuração" />
         <CardBody className="space-y-6">
-          <Field label="Cor de destaque" hint={`Formato #RRGGBB. Em branco, usa o padrão do Áxis (${corPadrao}).`} error={corInvalida ? "Cor inválida. Use o formato #RRGGBB." : undefined}>
+          <Field label="Cor da escola" hint={`Aparece só como detalhe: faixa de boas-vindas e marca no menu. Botões, links e menu seguem o azul Áxis. Formato #RRGGBB; em branco, usa o azul (${corPadrao}).`} error={corInvalida ? "Cor inválida. Use o formato #RRGGBB." : undefined}>
             {(p) => (
               <div className="flex items-center gap-2">
                 <input
@@ -96,11 +96,9 @@ export default function IdentidadeClient({ nomeEscola, corInicial, logoInicial, 
           {avaliacao && (
             <div className="space-y-2">
               <div className="flex flex-wrap gap-2 text-xs">
-                <Badge tone={avaliacao.contrasteTexto >= 4.5 ? "success" : "danger"}>Texto do botão: {avaliacao.contrasteTexto.toFixed(1).replace(".", ",")}:1</Badge>
                 <Badge tone={avaliacao.contrasteFundo >= 3 ? "success" : "danger"}>Sobre o fundo branco: {avaliacao.contrasteFundo.toFixed(1).replace(".", ",")}:1</Badge>
-                <Badge>Texto sobre a cor: {avaliacao.textoSobre === "#ffffff" ? "branco" : "escuro"} (automático)</Badge>
               </div>
-              {avaliacao.avisos.map((a) => <Alert key={a} tone="warning">{a}</Alert>)}
+              {avaliacao.contrasteFundo < 3 && <Alert tone="warning">Esta cor é clara demais sobre o fundo branco: o detalhe quase não aparece.</Alert>}
             </div>
           )}
 
@@ -124,30 +122,32 @@ export default function IdentidadeClient({ nomeEscola, corInicial, logoInicial, 
         </CardFooter>
       </Card>
 
-      {/* Pré-visualização ao vivo: os tokens de destaque recalculam dentro de [data-accent] */}
-      <Card data-accent style={estiloPrevia} className="overflow-hidden">
+      {/* Pré-visualização ao vivo: --escola local; o resto segue o azul Áxis */}
+      <Card style={estiloPrevia} className="overflow-hidden">
         <CardHeader title="Pré-visualização" description="Como fica antes de salvar." />
         <CardBody className="space-y-5 bg-canvas">
-          <div className="flex overflow-hidden rounded-lg border border-line bg-surface">
-            <div className="w-44 shrink-0 space-y-1 border-r border-line bg-canvas p-2">
-              <div className="flex items-center gap-2 px-1 py-1.5">
+          <div className="flex overflow-hidden rounded-2xl border border-line bg-surface">
+            <div className="w-28 shrink-0 space-y-1 bg-sidebar p-2 sm:w-44">
+              <div className="flex min-w-0 items-center gap-2 border-l-2 border-escola px-1.5 py-1.5">
                 {logo ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={logo} alt="" className="size-6 rounded object-contain" />
+                  <img src={logo} alt="" className="size-6 shrink-0 rounded-full bg-surface object-contain p-0.5" />
                 ) : (
-                  <span className="flex size-6 items-center justify-center rounded bg-accent text-xs font-semibold text-on-accent">{nomeEscola.charAt(0)}</span>
+                  <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-surface text-xs font-semibold text-accent-fg">{nomeEscola.charAt(0)}</span>
                 )}
-                <span className="truncate text-xs font-semibold text-fg">{nomeEscola}</span>
+                <span className="truncate text-xs font-semibold text-sidebar-fg">{nomeEscola}</span>
               </div>
               {[{ i: LayoutDashboard, t: "Dashboard" }, { i: ClipboardCheck, t: "Chamada", ativo: true }, { i: FileText, t: "Lançar notas" }, { i: Users, t: "Turmas" }].map(({ i: Icone, t, ativo }) => (
-                <div key={t} className={`relative flex h-7 items-center gap-2 rounded-md px-2 text-xs ${ativo ? "bg-subtle font-medium text-fg" : "text-fg-muted"}`}>
-                  {ativo && <span className="absolute -left-2 top-1.5 bottom-1.5 w-0.5 rounded-full bg-accent" />}
-                  <Icone size={14} strokeWidth={1.75} className={ativo ? "text-accent" : "text-fg-subtle"} /> {t}
+                <div key={t} className={`flex h-7 min-w-0 items-center gap-2 rounded-full px-2 text-xs ${ativo ? "bg-sidebar-active font-medium text-sidebar-fg" : "text-sidebar-fg-muted"}`}>
+                  <Icone size={14} strokeWidth={1.75} className="shrink-0" /> <span className="truncate">{t}</span>
                 </div>
               ))}
             </div>
             <div className="min-w-0 flex-1 space-y-3 p-4">
-              <p className="text-sm font-semibold text-fg">Chamada de hoje</p>
+              <div className="border-l-4 border-escola pl-3">
+                <p className="text-xs text-fg-subtle">Boas-vindas de volta,</p>
+                <p className="text-sm font-semibold text-fg">Chamada de hoje</p>
+              </div>
               <p className="text-xs text-fg-muted">Marque só quem faltou. <span className="text-accent-fg underline">Ver diário</span></p>
               <div className="flex flex-wrap gap-2">
                 <Button size="sm">Salvar chamada</Button>
@@ -157,7 +157,7 @@ export default function IdentidadeClient({ nomeEscola, corInicial, logoInicial, 
             </div>
           </div>
 
-          <div className="grid overflow-hidden rounded-lg border border-line bg-surface sm:grid-cols-2">
+          <div className="grid overflow-hidden rounded-2xl border border-line bg-surface sm:grid-cols-2">
             <div className="space-y-2 p-4">
               <p className="text-sm font-semibold text-fg">Entrar</p>
               <div className="h-8 rounded-md border border-line bg-surface" />

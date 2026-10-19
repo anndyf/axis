@@ -20,7 +20,7 @@ const TAMANHOS: Record<ButtonSize, string> = {
 /** Classes de botão - para usar em <Link> ou <a> com o mesmo visual. */
 export function buttonClasses({ variant = 'primary', size = 'md', className }: { variant?: ButtonVariant; size?: ButtonSize; className?: string } = {}) {
   return cn(
-    'inline-flex items-center justify-center shrink-0 whitespace-nowrap rounded-md font-medium select-none',
+    'inline-flex items-center justify-center shrink-0 whitespace-nowrap rounded-lg font-medium select-none',
     'transition-colors duration-150 disabled:pointer-events-none disabled:opacity-50',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
     VARIANTES[variant],
