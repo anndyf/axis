@@ -10,6 +10,8 @@ import { diasComAulaAte, hojeNaEscola } from "@/lib/services/chamada"
 import { diasLetivos, aulasPrevistasPorDisciplina, chaveData } from "@/lib/services/calendario"
 import { ArrowLeft, BookOpen, ChevronRight } from "lucide-react"
 import { getDisciplinasPermitidas } from "@/lib/data-fetching"
+import { agruparPorUnidade, unidadeAtual } from "@/lib/services/diario"
+import { rotuloTempos } from "@/lib/services/inicio-professor"
 import { calendarioDaDisciplina } from "@/lib/services/calendario-disciplina"
 import CalendarioDisciplina from "@/components/CalendarioDisciplina"
 import { Badge, Card, CardBody, CardHeader, EmptyState, PageHeader, Stat, buttonClasses } from "@/components/ui"
@@ -19,6 +21,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 const dataBR = (iso: string) => iso.split("-").reverse().join("/")
+const DIAS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"]
 const SITUACAO: Record<string, string> = { REALIZADA: "Dada", CANCELADA: "Não dada", PREVISTA: "Chamada não salva" }
 
 export default async function DiarioPage({ searchParams }: { searchParams: Promise<{ turma?: string; disciplina?: string }> }) {
@@ -37,15 +40,28 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
     carregarEsquemaDaTurma(turma),
     prisma.aula.findMany({
       where: { escolaId, turmaId: turma.id, disciplinaId },
-      orderBy: { data: 'desc' },
-      select: { id: true, data: true, tempos: true, quantidade: true, conteudo: true, situacao: true, professor: { select: { name: true, username: true } }, faltas: { select: { quantidade: true } }, observacoes: { orderBy: { estudante: { nome: 'asc' } }, select: { id: true, texto: true, estudante: { select: { nome: true } } } } },
+      orderBy: { data: 'asc' },
+      select: {
+        id: true, data: true, tempos: true, quantidade: true, conteudo: true, situacao: true,
+        professor: { select: { name: true, username: true } },
+        faltas: { orderBy: { estudante: { nome: 'asc' } }, select: { id: true, quantidade: true, tempos: true, estudante: { select: { nome: true } } } },
+        observacoes: { orderBy: { estudante: { nome: 'asc' } }, select: { id: true, texto: true, estudante: { select: { nome: true } } } },
+      },
     }),
     prisma.horarioAula.findMany({ where: { turmaId: turma.id }, select: { diaSemana: true, horario: true, disciplinaId: true } }),
     anoLetivoDaTurma(escolaId, turma),
     disciplinaId ? prisma.disciplina.findFirst({ where: { id: disciplinaId, turmaId: turma.id }, select: { cargaHoraria: true } }).then((d) => d?.cargaHoraria ?? null) : Promise.resolve(null),
   ])
-  const calendario = await carregarCalendario(escolaId, ano)
+  const [calendario, etapas] = await Promise.all([
+    carregarCalendario(escolaId, ano),
+    prisma.etapaCalendario.findMany({ where: { periodoLetivo: { escolaId, anoLetivo: ano }, esquemaUnidadeId: { in: (esquema?.etapas ?? []).map((e) => e.id) } }, select: { esquemaUnidadeId: true, inicio: true, fim: true } }),
+  ])
   const hoje = hojeNaEscola()
+  // Unidades (1ª, 2ª, 3ª UNIDADE...) pelas datas da EtapaCalendario
+  const datasEtapa = new Map(etapas.map((e) => [e.esquemaUnidadeId, { inicio: chaveData(e.inicio), fim: chaveData(e.fim) }]))
+  const unidades = (esquema?.etapas ?? []).map((e) => ({ id: e.id, nome: e.nome, ordem: e.ordem, inicio: datasEtapa.get(e.id)?.inicio ?? null, fim: datasEtapa.get(e.id)?.fim ?? null }))
+  const grupos = agruparPorUnidade(aulas.map((a) => ({ ...a, data: chaveData(a.data) })), unidades)
+  const aberta = unidadeAtual(unidades, hoje)
   const porDia = esquema?.registroFrequencia === "POR_DIA"
 
   const registradas = new Set(aulas.filter((a) => a.situacao !== "PREVISTA").map((a) => chaveData(a.data)))
@@ -100,55 +116,66 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
         </Card>
       )}
 
-      <Card className="overflow-hidden">
-        <CardHeader title="Aulas registradas" />
+      <section className="space-y-3" aria-label="Aulas por unidade">
+        <h2 className="text-base font-semibold text-fg">Aulas registradas</h2>
         {aulas.length === 0 ? (
-          <EmptyState icon={BookOpen} title="Nenhuma aula registrada ainda" description="As aulas aparecem aqui quando a chamada é salva." />
-        ) : (
-          <div className="relative overflow-x-auto">
-            <table className="w-full min-w-[40rem] text-13">
-              <thead>
-                <tr className="border-b border-line text-xs text-fg-subtle">
-                  <th scope="col" className="h-9 px-4 text-left font-medium sm:px-5">Data</th>
-                  <th scope="col" className="h-9 px-3 text-left font-medium">Conteúdo</th>
-                  <th scope="col" className="h-9 px-3 text-right font-medium">Faltas</th>
-                  <th scope="col" className="h-9 px-4 text-right font-medium sm:px-5"><span className="sr-only">Ações</span></th>
-                </tr>
-              </thead>
-              <tbody>
-                {aulas.map((a) => {
-                  const d = chaveData(a.data)
-                  const faltas = a.faltas.reduce((s, f) => s + f.quantidade, 0)
-                  return (
-                    <tr key={a.id} className="border-b border-line-subtle align-top last:border-0">
-                      <td className="whitespace-nowrap px-4 py-2.5 sm:px-5">
-                        <p className="tabular-nums text-fg">{dataBR(d)}</p>
-                        <p className="text-xs text-fg-subtle">{a.tempos.length ? a.tempos.map((t) => `${t}º`).join(", ") : `${a.quantidade} aula(s)`}</p>
-                      </td>
-                      <td className="min-w-[14rem] px-3 py-2.5">
-                        <p className="whitespace-pre-line text-fg">{a.conteudo || <span className="text-fg-subtle">Sem conteúdo registrado</span>}</p>
-                        <p className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-fg-subtle">
-                          {a.situacao === "REALIZADA" ? null : <Badge tone={a.situacao === "CANCELADA" ? "neutral" : "warning"}>{SITUACAO[a.situacao]}</Badge>}
-                          {a.professor && <span>{a.professor.name || a.professor.username}</span>}
-                        </p>
+          <Card><EmptyState icon={BookOpen} title="Nenhuma aula registrada ainda" description="As aulas aparecem aqui quando a chamada é salva." /></Card>
+        ) : grupos.map((g) => {
+          const dadasNaUnidade = g.aulas.filter((a) => a.situacao === "REALIZADA").reduce((s, a) => s + a.quantidade, 0)
+          return (
+            <details key={g.id} open={g.id === aberta || (aberta === null && g === grupos[0])} className="group rounded-2xl border border-line bg-surface shadow-card">
+              <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 px-4 py-3 marker:hidden sm:px-5 [&::-webkit-details-marker]:hidden">
+                <ChevronRight size={18} strokeWidth={1.75} aria-hidden className="shrink-0 text-fg-subtle transition-transform duration-150 group-open:rotate-90" />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-semibold uppercase text-fg">{g.nome}</span>
+                  <span className="block text-13 text-fg-subtle">
+                    {g.inicio && g.fim ? `${dataBR(g.inicio)} a ${dataBR(g.fim)} · ` : g.id === "fora" ? "" : "Sem datas no calendário · "}
+                    {g.aulas.length} {g.aulas.length === 1 ? "registro" : "registros"}{!porDia && ` · ${dadasNaUnidade} ${dadasNaUnidade === 1 ? "aula dada" : "aulas dadas"}`}
+                  </span>
+                </span>
+              </summary>
+              {g.aulas.length === 0 ? (
+                <p className="border-t border-line-subtle px-4 py-4 text-13 text-fg-subtle sm:px-5">Nenhuma aula registrada nesta unidade.</p>
+              ) : (
+                <ol className="border-t border-line-subtle">
+                  {g.aulas.map((a) => {
+                    const faltas = a.faltas.reduce((s, f) => s + f.quantidade, 0)
+                    return (
+                      <li key={a.id} className="border-b border-line-subtle px-4 py-3 last:border-0 sm:px-5">
+                        <div className="flex flex-wrap items-start gap-x-3 gap-y-1">
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium text-fg tabular-nums">{DIAS[new Date(`${a.data}T12:00:00Z`).getUTCDay()]}, {dataBR(a.data)}</p>
+                            <p className="flex flex-wrap items-center gap-1.5 text-xs text-fg-subtle">
+                              <span>{a.tempos.length ? rotuloTempos([...a.tempos].sort((x, y) => x - y)) : `${a.quantidade} aula(s)`}</span>
+                              {a.situacao !== "REALIZADA" && <Badge tone={a.situacao === "CANCELADA" ? "neutral" : "warning"}>{SITUACAO[a.situacao]}</Badge>}
+                              {a.professor && <span>· {a.professor.name || a.professor.username}</span>}
+                            </p>
+                          </div>
+                          <Link href={linkChamada(a.data)} className={buttonClasses({ size: "sm", variant: "secondary", className: "min-h-9" })} aria-label={`Editar a chamada de ${dataBR(a.data)}`}>Editar</Link>
+                        </div>
+                        <p className="mt-2 whitespace-pre-line break-words text-13 text-fg">{a.conteudo || <span className="text-fg-subtle">Sem conteúdo registrado</span>}</p>
+                        {a.situacao === "REALIZADA" && (
+                          <p className="mt-1.5 text-xs text-fg-muted">
+                            <span className="font-medium text-fg">{faltas === 0 ? "Todos presentes" : `${faltas} ${faltas === 1 ? "falta" : "faltas"}:`}</span>{" "}
+                            {a.faltas.map((f, i) => (
+                              <span key={f.id}>{i > 0 && ", "}{f.estudante.nome}{a.tempos.length > 1 && f.tempos.length > 0 && ` (${f.tempos.map((t) => `${t}º`).join(" e ")})`}</span>
+                            ))}
+                          </p>
+                        )}
                         {a.observacoes.length > 0 && (
-                          <ul className="mt-1.5 space-y-0.5 text-xs text-fg-muted" aria-label="Observações">
-                            {a.observacoes.map((o) => <li key={o.id}><span className="font-medium text-fg">{o.estudante.nome}:</span> {o.texto}</li>)}
+                          <ul className="mt-1.5 space-y-0.5 rounded-xl bg-subtle px-3 py-2 text-xs text-fg-muted" aria-label="Observações">
+                            {a.observacoes.map((o) => <li key={o.id} className="break-words"><span className="font-medium text-fg">{o.estudante.nome}:</span> {o.texto}</li>)}
                           </ul>
                         )}
-                      </td>
-                      <td className="px-3 py-2.5 text-right tabular-nums text-fg-muted">{a.situacao === "REALIZADA" ? faltas : "—"}</td>
-                      <td className="px-4 py-2.5 text-right sm:px-5">
-                        <Link href={linkChamada(d)} className={buttonClasses({ size: "sm", variant: "secondary" })}>Editar</Link>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Card>
+                      </li>
+                    )
+                  })}
+                </ol>
+              )}
+            </details>
+          )
+        })}
+      </section>
     </div>
     </div>
   )

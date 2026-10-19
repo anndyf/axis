@@ -242,6 +242,93 @@ describe('chamada - falta por tempo e observação', () => {
   })
 })
 
+describe('replicar conteúdo', () => {
+  const DIA = '2026-03-23' // segunda
+  const R: Record<string, string> = {}
+
+  beforeAll(async () => {
+    const t1 = await prisma.turma.findUniqueOrThrow({ where: { id: B.turma }, select: { cursoId: true } })
+    // Mesma disciplina do prof em outras turmas de B; uma igual do outro professor; uma de outro nome
+    for (const [chave, nomeTurma] of [['t2', 'TB2'], ['t3', 'TB3']] as const) {
+      R[chave] = (await prisma.turma.create({ data: { escolaId: B.escola, nome: nomeTurma, cursoId: t1.cursoId, turno: 'Matutino', anoLetivo: 2026 } })).id
+    }
+    R.mat2 = (await prisma.disciplina.create({ data: { nome: 'MAT b', turmaId: R.t2, usuariosPermitidos: { connect: { id: B.prof } } } })).id
+    R.mat3 = (await prisma.disciplina.create({ data: { nome: 'Mat B', turmaId: R.t3, usuariosPermitidos: { connect: { id: B.prof } } } })).id
+    R.matOutro = (await prisma.disciplina.create({ data: { nome: 'Mat B', turmaId: R.t3, usuariosPermitidos: { connect: { id: B.outroProf } } } })).id
+    // TB2: Mat na segunda (1º). TB3: Mat só na quarta (2º)
+    await prisma.horarioAula.createMany({ data: [
+      { turmaId: R.t2, diaSemana: 1, horario: 1, disciplina: 'Mat', disciplinaId: R.mat2 },
+      { turmaId: R.t3, diaSemana: 3, horario: 2, disciplina: 'Mat', disciplinaId: R.mat3 },
+      { turmaId: R.t3, diaSemana: 1, horario: 3, disciplina: 'Mat', disciplinaId: R.matOutro },
+    ] })
+    R.alunoT2 = (await prisma.estudante.create({ data: { escolaId: B.escola, turmaId: R.t2, matricula: `${SUFIXO}-t2`, nome: 'Caio' } })).id
+    // TB3 já tem conteúdo na quarta anterior (18/03)
+    await prisma.aula.create({ data: { escolaId: B.escola, turmaId: R.t3, disciplinaId: R.mat3, data: new Date('2026-03-18'), tempos: [2], quantidade: 1, situacao: 'REALIZADA', chave: `${R.t3}|2026-03-18|${R.mat3}`, conteudo: 'Conteúdo antigo' } })
+
+    sessao.atual = sessaoDe(B, 'prof')
+    const a = await acoes()
+    const aberta = await a.abrirChamada(B.turma, B.disciplina, DIA)
+    if ('erro' in aberta) throw new Error(aberta.erro)
+    R.origem = aberta.aula.id
+    await a.salvarChamada(R.origem, [{ estudanteId: B.aluno1, tempos: [1] }], 'Funções afins')
+  })
+
+  it('sugere as disciplinas de mesmo nome do professor (não a do outro) e a data', async () => {
+    sessao.atual = sessaoDe(B, 'prof')
+    const a = await acoes()
+    const r = await a.opcoesReplicacao(R.origem)
+    if ('erro' in r) throw new Error(r.erro)
+    expect(r.conteudo).toBe('Funções afins')
+    expect(r.alvos.map((x) => [x.turmaNome, x.data, x.temAula, x.conteudoAtual])).toEqual([
+      ['TB2', DIA, true, null], // mesma data
+      ['TB3', '2026-03-11', true, null], // quarta anterior sem conteúdo (18/03 já tem)
+    ])
+    // data trocada pelo professor
+    const trocada = await a.opcoesReplicacao(R.origem, { [R.mat3]: '2026-03-18' })
+    if ('erro' in trocada) throw new Error(trocada.erro)
+    expect(trocada.alvos[1]).toMatchObject({ data: '2026-03-18', conteudoAtual: 'Conteúdo antigo' })
+  })
+
+  it('grava só o conteúdo: cria PREVISTA e não sobrescreve sem confirmação', async () => {
+    const a = await acoes()
+    const r = await a.replicarConteudo(R.origem, [{ disciplinaId: R.mat2, data: DIA }, { disciplinaId: R.mat3, data: '2026-03-18' }])
+    if ('erro' in r) throw new Error(r.erro)
+    expect(r.resultados.map((x) => x.status)).toEqual(['criado', 'conflito'])
+    const criada = await prisma.aula.findFirstOrThrow({ where: { turmaId: R.t2, disciplinaId: R.mat2 }, include: { faltas: true } })
+    expect(criada).toMatchObject({ situacao: 'PREVISTA', conteudo: 'Funções afins', tempos: [1], quantidade: 1, professorId: B.prof })
+    expect(criada.faltas).toHaveLength(0)
+    expect((await prisma.aula.findFirstOrThrow({ where: { turmaId: R.t3, data: new Date('2026-03-18') } })).conteudo).toBe('Conteúdo antigo')
+
+    // com confirmação, troca só o conteúdo (situação e faltas ficam)
+    const confirmada = await a.replicarConteudo(R.origem, [{ disciplinaId: R.mat3, data: '2026-03-18', sobrescrever: true }])
+    expect(confirmada).toEqual({ resultados: [{ disciplinaId: R.mat3, status: 'gravado' }] })
+    expect(await prisma.aula.findFirstOrThrow({ where: { turmaId: R.t3, data: new Date('2026-03-18') } })).toMatchObject({ conteudo: 'Funções afins', situacao: 'REALIZADA' })
+    // dia sem a disciplina no horário: recusa
+    const semAula = await a.replicarConteudo(R.origem, [{ disciplinaId: R.mat3, data: '2026-03-24' }])
+    expect(semAula).toMatchObject({ resultados: [{ status: 'erro' }] })
+  })
+
+  it('professor não replica para disciplina de outro professor nem a partir da aula de outro', async () => {
+    const a = await acoes()
+    const r = await a.replicarConteudo(R.origem, [{ disciplinaId: R.matOutro, data: DIA }])
+    expect(r).toMatchObject({ resultados: [{ status: 'erro', mensagem: 'Disciplina não disponível para replicar.' }] })
+    expect(await prisma.aula.count({ where: { disciplinaId: R.matOutro } })).toBe(0)
+    sessao.atual = sessaoDe(B, 'outroProf')
+    expect(await a.opcoesReplicacao(R.origem)).toEqual({ erro: 'Aula não encontrada' })
+    expect(await a.replicarConteudo(R.origem, [{ disciplinaId: R.matOutro, data: DIA }])).toEqual({ erro: 'Aula não encontrada' })
+  })
+
+  it('escola A não lê nem replica a partir de aula de B, nem para disciplina de B', async () => {
+    sessao.atual = sessaoDe(A, 'admin')
+    const a = await acoes()
+    expect(await a.opcoesReplicacao(R.origem)).toEqual({ erro: 'Aula não encontrada' })
+    expect(await a.replicarConteudo(R.origem, [{ disciplinaId: R.mat2, data: DIA }])).toEqual({ erro: 'Aula não encontrada' })
+    sessao.atual = sessaoDe(A, 'prof')
+    expect(await a.replicarConteudo(A.aula, [{ disciplinaId: R.mat2, data: DIA }])).toMatchObject({ resultados: [{ status: 'erro' }] })
+    expect(await prisma.aula.count({ where: { turmaId: R.t2 } })).toBe(1)
+  })
+})
+
 describe('justificativas - permissões e isolamento', () => {
   const j = () => import('@/app/dashboard/frequencia/actions')
 

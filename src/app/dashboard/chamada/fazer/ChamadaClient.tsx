@@ -2,13 +2,14 @@
 
 import { useEffect, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { Ban, CalendarDays, CalendarRange, Check, MessageSquareText, MoreVertical, Save, Users } from "lucide-react"
+import { Ban, CalendarDays, CalendarRange, Check, Copy, MessageSquareText, MoreVertical, Save, Users } from "lucide-react"
 import { Alert, Avatar, BottomSheet, Button, Card, EmptyState, Label, SkeletonRows, Textarea, cn } from "@/components/ui"
 import { Menu } from "@/components/ui/Menu"
 import { rotuloTempos } from "@/lib/services/inicio-professor"
 import type { DiaDoCalendario } from "@/lib/services/calendario-disciplina"
 import CalendarioDisciplina from "@/components/CalendarioDisciplina"
-import { abrirChamada, salvarChamada, cancelarAula, salvarObservacao, type ChamadaAberta } from "../actions"
+import { abrirChamada, salvarChamada, cancelarAula, salvarObservacao, opcoesReplicacao, type AlvoReplicacao, type ChamadaAberta } from "../actions"
+import ReplicarConteudo from "./ReplicarConteudo"
 
 interface Props {
   turmaId: string
@@ -43,6 +44,9 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
   const [obsAberta, setObsAberta] = useState<{ id: string; nome: string; texto: string } | null>(null)
   const [salvandoObs, setSalvandoObs] = useState(false)
   const [calendarioAberto, setCalendarioAberto] = useState(false)
+  // Destinos possíveis do "Salvar e replicar" (mesma disciplina do professor em outras turmas)
+  const [podeReplicar, setPodeReplicar] = useState(false)
+  const [replicar, setReplicar] = useState<AlvoReplicacao[] | null>(null)
 
   useEffect(() => {
     let ativo = true
@@ -53,6 +57,7 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
       setFaltas(r.faltas)
       setObservacoes(r.observacoes)
       setConteudo(r.aula.conteudo)
+      if (r.disciplina) opcoesReplicacao(r.aula.id).then((o) => { if (ativo && !("erro" in o)) setPodeReplicar(o.alvos.length > 0) })
     })
     return () => { ativo = false }
   }, [turmaId, disciplinaId, data])
@@ -79,14 +84,26 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
     return prox
   })
 
-  const salvar = () => startTransition(async () => {
-    if (!chamada) return
+  /** Grava a chamada; true se deu certo. */
+  const gravar = async (): Promise<boolean> => {
+    if (!chamada) return false
     const lista = Object.entries(faltas).map(([estudanteId, f]) => (temposDaAula.length ? { estudanteId, tempos: f.tempos } : { estudanteId, quantidade: f.quantidade }))
     const r = await salvarChamada(chamada.aula.id, lista, conteudo)
-    if ("erro" in r) { setAviso({ tipo: "erro", texto: r.erro }); return }
-    setChamada({ ...chamada, aula: { ...chamada.aula, situacao: "REALIZADA" } })
+    if ("erro" in r) { setAviso({ tipo: "erro", texto: r.erro }); return false }
+    setChamada({ ...chamada, aula: { ...chamada.aula, situacao: "REALIZADA", conteudo: conteudo.trim() } })
     setAviso({ tipo: "ok", texto: `Chamada salva: ${lista.length === 0 ? "todos presentes" : `${lista.length} ${lista.length === 1 ? "falta" : "faltas"}`}.` })
     router.refresh()
+    return true
+  }
+  const salvar = () => startTransition(async () => { await gravar() })
+
+  /** "Salvar e replicar": salva e abre a escolha das outras turmas com o conteúdo já gravado. */
+  const salvarEReplicar = () => startTransition(async () => {
+    if (!chamada || !conteudo.trim()) { setAviso({ tipo: "erro", texto: "Escreva o conteúdo ministrado antes de replicar." }); return }
+    if (!(await gravar())) return
+    const r = await opcoesReplicacao(chamada.aula.id)
+    if ("erro" in r) { setAviso({ tipo: "erro", texto: r.erro }); return }
+    setReplicar(r.alvos)
   })
 
   const naoDada = () => startTransition(async () => {
@@ -243,6 +260,14 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
           <section className="rounded-2xl border border-line bg-surface p-4 shadow-card md:p-5">
             <Label htmlFor="conteudo">Conteúdo ministrado</Label>
             <Textarea id="conteudo" className="mt-2" value={conteudo} onChange={(e) => setConteudo(e.target.value)} rows={3} maxLength={5000} placeholder="Ex.: Equações do 1º grau — resolução de exercícios" />
+            {podeReplicar && (
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                <p className="text-13 text-fg-subtle">Deu a mesma aula em outras turmas?</p>
+                <Button variant="secondary" disabled={pendente} onClick={salvarEReplicar} className="min-h-11 w-full sm:w-auto">
+                  <Copy size={16} strokeWidth={1.75} /> Salvar e replicar
+                </Button>
+              </div>
+            )}
           </section>
 
           {/* Rodapé fixo acima da barra inferior (a lista tem padding equivalente); no desktop gruda no fim da área */}
@@ -283,6 +308,10 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
           />
         )}
       </BottomSheet>
+
+      {chamada && replicar && (
+        <ReplicarConteudo aulaId={chamada.aula.id} aberto alvosIniciais={replicar} onFechar={() => setReplicar(null)} />
+      )}
 
       {/* Celular: um mês por vez, num painel que sobe de baixo */}
       {calendario && (
