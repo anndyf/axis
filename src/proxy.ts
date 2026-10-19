@@ -45,6 +45,12 @@ function extractSlug(hostname: string): string | null {
 }
 
 function redirectToEscolaInvalida(request: NextRequest, motivo: string) {
+  // Sessão/manifest não dependem de escola: sem escola válida, respondem
+  // vazios/padrão em vez de erro (evita falha do SessionProvider na página)
+  if (ROTAS_SEM_ESCOLA.has(request.nextUrl.pathname)) {
+    return NextResponse.next({ request: { headers: headersSemEscola(request) } })
+  }
+
   // Rotas /api/* precisam de uma resposta JSON, nao da pagina de erro em HTML -
   // um rewrite pra /escola-invalida quebraria qualquer client (ex: NextAuth)
   // que espera JSON e recebe HTML de volta.
@@ -55,12 +61,30 @@ function redirectToEscolaInvalida(request: NextRequest, motivo: string) {
   const url = request.nextUrl.clone()
   url.pathname = '/escola-invalida'
   url.search = `?motivo=${motivo}`
-  return NextResponse.rewrite(url)
+  return NextResponse.rewrite(url, { request: { headers: headersSemEscola(request) } })
+}
+
+// Rotas que funcionam sem escola (domínio raiz): a página de entrada do Áxis,
+// o manifest (cai no padrão) e a sessão do NextAuth (que o SessionProvider
+// consulta em toda página; sem cookie no domínio raiz, volta vazia).
+const ROTAS_SEM_ESCOLA = new Set(['/entrada', '/manifest', '/api/auth/session'])
+
+/** Headers da requisição sem um x-escola-id que tenha vindo do cliente. */
+function headersSemEscola(request: NextRequest) {
+  const h = new Headers(request.headers)
+  h.delete('x-escola-id')
+  return h
 }
 
 export async function proxy(request: NextRequest) {
   const hostname = request.headers.get('host') || ''
   let slug = extractSlug(hostname)
+  const { pathname } = request.nextUrl
+
+  // A página de entrada não depende de escola em nenhum endereço
+  if (pathname === '/entrada') {
+    return NextResponse.next({ request: { headers: headersSemEscola(request) } })
+  }
 
   // Fallback de dev: sem subdominio (ex: localhost:3000 direto), usa a escola
   // definida em DEV_ESCOLA_SLUG. Nunca deve ser usado em producao real.
@@ -69,6 +93,13 @@ export async function proxy(request: NextRequest) {
   }
 
   if (!slug) {
+    // Domínio raiz: "/" mostra a página de entrada; o resto que não precisa
+    // de escola passa sem x-escola-id; qualquer outra rota é escola inválida.
+    if (pathname === '/') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/entrada'
+      return NextResponse.rewrite(url, { request: { headers: headersSemEscola(request) } })
+    }
     return redirectToEscolaInvalida(request, 'nao_encontrada')
   }
 

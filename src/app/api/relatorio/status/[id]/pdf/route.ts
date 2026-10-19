@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import { adicionarLogoNoPdf } from '@/lib/pdf-logo'
 import { etapasDaNota, desistenteEmTodas } from '@/lib/services/notas'
 import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from '@/lib/services/notas-leitura'
 
@@ -91,6 +92,7 @@ export async function GET(
 
     // Criar PDF em formato paisagem
     const doc = new jsPDF('landscape')
+    await adicionarLogoNoPdf(doc, session.user.escolaId)
 
     // Preparar dados da tabela
     const headers = ['Nº', 'NOME DO ALUNO', ...turma.disciplinas.map(d => abreviarNome(d.nome))]

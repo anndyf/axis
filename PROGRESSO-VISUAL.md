@@ -35,7 +35,20 @@ Capturas: `npx tsx scripts/capturas.ts <fase>` com `npm run dev` rodando (Chromi
 - Nota: com `npm run dev` rodando, o Next às vezes corrompe `.next/dev/types/routes.d.ts` (gerado); a verificação considera 0 erros de `tsc` fora de `.next/`.
 
 ### 3. Identidade visual da escola e acesso
-- [ ] pendente
+- [x] Regras puras `src/lib/services/identidade.ts` (teste `identidade.test.ts`): hex válido, contraste WCAG, texto legível automático sobre o destaque (branco ou quase preto), avisos de contraste (texto do botão < 4,5:1; destaque sobre branco < 3:1), validação do logo.
+- [x] Tela `/dashboard/configuracoes/identidade` (só `gestao`): cor (seletor + hex), logo (envio de imagem ou endereço https), pré-visualização ao vivo (menu, botão, link, login) e contraste. Ação `salvarIdentidade` com escola da sessão (teste `src/lib/identidade-acoes.test.ts`). Atalho em Configurações.
+  - **[decisão]** Não havia upload no projeto. O logo pode ser **enviado** (reduzido no navegador para até 256px, PNG ou JPEG, gravado em `Escola.logoUrl` como data URL de até 150 KB) ou um **endereço https**. Endereço externo aparece só nas telas; nos PDFs entra só a imagem enviada — o servidor nunca busca URL informada pelo usuário (evita SSRF).
+  - **[decisão]** `corSecundaria` não foi usada: a direção pede uma única cor de destaque.
+- [x] A cor da escola vira `--accent`/`--on-accent` no `<html>` (layout raiz, via `src/lib/escola-atual.ts` com o `x-escola-id` do proxy); hover e tons suaves derivam no CSS (`:root, [data-accent]`). `themeColor` do navegador e a barra de carregamento usam a mesma cor.
+- [x] Logo no menu lateral, nas páginas de acesso (login, redefinir/trocar senha) e no cabeçalho dos PDFs (`src/lib/pdf-logo.ts` em `api/relatorio/*` e `api/boletim/[id]/pdf`; teste `pdf-logo.test.ts`). Portal: na fase 4.
+- [x] Manifest dinâmico em `/manifest` (`src/app/manifest/route.ts`): nome e cor do tema da escola, com o `public/manifest.json` como base/fallback.
+- [x] Login (`src/app/login`): duas colunas no desktop (formulário + painel na cor de destaque com a marca da escola e grade sutil, sem fotos), coluna única no celular; mostrar/ocultar senha e aviso de Caps Lock (`PasswordInput`); botão com estado carregando; mensagem com título e texto para cada código (`credenciais`, `inativo`, `pendente`, `bloqueado`, `escola`, sessão expirada); "Esqueci minha senha" ao lado do rótulo da senha, recuperação no `Dialog` acessível.
+- [x] `/redefinir-senha` e `/trocar-senha` (`NovaSenhaForm`) no mesmo layout (`src/components/AcessoLayout.tsx`), com indicador de força (`src/lib/services/forca-senha.ts`, mínimo 8 igual ao servidor; teste `forca-senha.test.ts`) e confirmação em tempo real.
+  - **[decisão]** `/cadastro-professor` hoje só redireciona para o login (não existe formulário de cadastro). Criar um fluxo de cadastro seria regra de negócio; ficou como está.
+- [x] Página de entrada no domínio raiz (`/entrada`, servida em `/` quando não há subdomínio): apresentação curta + "Endereço da sua escola" que leva para `<slug>.<domínio>/login`. Não lista escolas nem consulta se o endereço existe. Helpers puros `src/lib/services/dominio.ts` (teste `dominio.test.ts`).
+- [x] `src/proxy.ts`: no domínio raiz, `/` reescreve para `/entrada`; `/entrada` funciona em qualquer endereço; `/manifest` e `/api/auth/session` passam sem escola (também em escola inexistente/suspensa — antes o SessionProvider dava erro na página de escola inválida). DEV_ESCOLA_SLUG funciona como antes. Teste `src/lib/proxy.test.ts` (raiz sem slug, slug válido, inexistente, suspensa, cancelada, DEV_ESCOLA_SLUG).
+  - **[correção de segurança]** O proxy agora **remove** qualquer `x-escola-id` enviado pelo cliente em toda resposta sem escola (rewrite para escola inválida, página de entrada, rotas sem escola). Antes, nesses caminhos o header do cliente seguia adiante; nenhuma página o lia ali, mas com páginas públicas novas passou a importar.
+- [x] `/escola-invalida` no novo padrão, com botão para a página de entrada (endereço raiz calculado do host).
 
 ### 4. Migração das telas
 - [ ] pendente
@@ -44,4 +57,4 @@ Capturas: `npx tsx scripts/capturas.ts <fase>` com `npm run dev` rodando (Chromi
 - [ ] pendente
 
 ## Próximo passo
-Fase 3: identidade visual da escola, login, páginas de acesso, página de entrada no domínio raiz.
+Capturas da fase 3 e início da fase 4 (lançamento de notas, chamada, frequência, boletim, conselho, resultados).

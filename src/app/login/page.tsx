@@ -1,12 +1,10 @@
-import { headers } from "next/headers"
-import { prisma } from "@/lib/prisma"
+import { escolaDaRequisicao } from "@/lib/escola-atual"
 import LoginForm from "./LoginForm"
 
-export default async function LoginPage() {
-  const escolaId = (await headers()).get('x-escola-id')
-  const escola = escolaId
-    ? await prisma.escola.findUnique({ where: { id: escolaId }, select: { nome: true } })
-    : null
+export const metadata = { title: "Entrar · Áxis" }
 
-  return <LoginForm nomeEscola={escola?.nome ?? 'Sistema de Gestão Acadêmica'} />
+export default async function LoginPage() {
+  // Escola do subdomínio (x-escola-id do proxy); nada vem do cliente
+  const escola = await escolaDaRequisicao()
+  return <LoginForm escola={{ nome: escola?.nome ?? "Áxis", logoUrl: escola?.logoUrl ?? null }} />
 }

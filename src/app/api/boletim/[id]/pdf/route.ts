@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import { adicionarLogoNoPdf } from '@/lib/pdf-logo'
 import { carregarFrequenciaDaTurma } from '@/lib/services/frequencia-leitura'
 import { situacaoComFrequencia, formatarFrequencia, ROTULO_REPROVADO_FALTA } from '@/lib/services/frequencia'
 
@@ -56,6 +57,7 @@ export async function GET(
 
     // Criar PDF
     const doc = new jsPDF()
+    await adicionarLogoNoPdf(doc, session.user.escolaId)
 
     // Cabeçalho
     doc.setFontSize(20)
