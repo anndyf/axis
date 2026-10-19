@@ -80,3 +80,38 @@ export function analyzeRisk(
     };
   }
 }
+
+/**
+ * Risco por faltas (plano-avaliacao-frequencia.md, 3.4). Usa a frequência
+ * atual e a projeção até o fim do período (services/frequencia.ts,
+ * projetarFrequencia). Aqui `pointsNeeded` = faltas que o aluno ainda pode
+ * ter sem cair abaixo do mínimo (0 se já não pode faltar mais).
+ */
+export function analyzeAttendanceRisk(params: {
+  percentual: number | null
+  minimo: number
+  maximaPossivel?: number | null
+  faltasRestantesPermitidas?: number | null
+}): RiskAnalysis {
+  const { percentual, minimo, maximaPossivel = null, faltasRestantesPermitidas = null } = params
+  if (percentual === null) {
+    return { level: 'NONE', pointsNeeded: 0, message: 'Sem chamada', color: 'text-slate-400' }
+  }
+  const restantes = faltasRestantesPermitidas ?? 0
+
+  // Mesmo sem faltar mais nenhuma aula, não chega ao mínimo
+  if (maximaPossivel !== null && maximaPossivel < minimo) {
+    return { level: 'CRITICAL', pointsNeeded: 0, message: 'Não alcança mais a frequência mínima', color: 'text-rose-600' }
+  }
+  if (percentual < minimo) {
+    return { level: 'HIGH', pointsNeeded: Math.max(0, restantes), message: 'Abaixo da frequência mínima', color: 'text-orange-600' }
+  }
+  // poucas faltas ainda permitidas só pesa para quem já faltou alguma vez
+  if (percentual < minimo + 10 || (faltasRestantesPermitidas !== null && restantes <= 3 && percentual < 100)) {
+    const msg = faltasRestantesPermitidas !== null
+      ? `Atenção (pode faltar mais ${Math.max(0, restantes)} ${restantes === 1 ? 'aula' : 'aulas'})`
+      : 'Atenção (perto do mínimo)'
+    return { level: 'MEDIUM', pointsNeeded: Math.max(0, restantes), message: msg, color: 'text-amber-500' }
+  }
+  return { level: 'LOW', pointsNeeded: Math.max(0, restantes), message: 'Frequência regular', color: 'text-emerald-500' }
+}

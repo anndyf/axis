@@ -167,3 +167,42 @@ describe('chamada - isolamento entre escolas', () => {
     expect(await a.abrirChamada(B.turma, B.disciplina, SEGUNDA)).toEqual({ erro: 'Não autorizado' })
   })
 })
+
+describe('justificativas - permissões e isolamento', () => {
+  const j = () => import('@/app/dashboard/frequencia/actions')
+
+  it('gestão registra e remove justificativa de aluno da própria escola', async () => {
+    sessao.atual = sessaoDe(B, 'admin')
+    const a = await j()
+    expect(await a.criarJustificativa({ estudanteId: B.aluno1, inicio: '2026-03-02', fim: '2026-03-04', tipo: 'ATESTADO', efeito: 'ABONA', descricao: 'gripe' })).toEqual({ ok: true })
+    const criada = await prisma.justificativa.findFirstOrThrow({ where: { estudanteId: B.aluno1 } })
+    expect(criada).toMatchObject({ escolaId: B.escola, registradoPorId: B.admin, efeito: 'ABONA' })
+    expect(await a.removerJustificativa(criada.id)).toEqual({ ok: true })
+    expect(await prisma.justificativa.count({ where: { estudanteId: B.aluno1 } })).toBe(0)
+  })
+
+  it('valida datas, tipo e efeito', async () => {
+    const a = await j()
+    expect(await a.criarJustificativa({ estudanteId: B.aluno1, inicio: '2026-03-05', fim: '2026-03-04', tipo: 'ATESTADO', efeito: 'ABONA' })).toHaveProperty('erro')
+    expect(await a.criarJustificativa({ estudanteId: B.aluno1, inicio: '2026-03-05', fim: '2026-03-05', tipo: 'INVENTADO', efeito: 'ABONA' })).toHaveProperty('erro')
+    expect(await a.criarJustificativa({ estudanteId: B.aluno1, inicio: '2026-03-05', fim: '2026-03-05', tipo: 'ATESTADO', efeito: 'APAGA' })).toHaveProperty('erro')
+  })
+
+  it('gestão de B não registra para aluno de A nem remove justificativa de A', async () => {
+    const jA = await prisma.justificativa.create({ data: { escolaId: A.escola, estudanteId: A.aluno1, inicio: new Date('2026-03-02'), fim: new Date('2026-03-02'), tipo: 'ATESTADO', efeito: 'ABONA' } })
+    const a = await j()
+    expect(await a.criarJustificativa({ estudanteId: A.aluno2, inicio: '2026-03-02', fim: '2026-03-02', tipo: 'ATESTADO', efeito: 'ABONA' })).toHaveProperty('erro')
+    expect(await a.removerJustificativa(jA.id)).toHaveProperty('erro')
+    expect(await prisma.justificativa.count({ where: { escolaId: A.escola } })).toBe(1)
+    expect(await prisma.justificativa.count({ where: { estudanteId: A.aluno2 } })).toBe(0)
+  })
+
+  it('professor e aluno do portal não registram', async () => {
+    const a = await j()
+    sessao.atual = sessaoDe(B, 'prof')
+    expect(await a.criarJustificativa({ estudanteId: B.aluno1, inicio: '2026-03-02', fim: '2026-03-02', tipo: 'ATESTADO', efeito: 'ABONA' })).toEqual({ erro: 'Não autorizado' })
+    sessao.atual = sessaoDe(B, 'admin', { isPortalUser: true })
+    expect(await a.criarJustificativa({ estudanteId: B.aluno1, inicio: '2026-03-02', fim: '2026-03-02', tipo: 'ATESTADO', efeito: 'ABONA' })).toEqual({ erro: 'Não autorizado' })
+    expect(await prisma.justificativa.count({ where: { estudanteId: B.aluno1 } })).toBe(0)
+  })
+})

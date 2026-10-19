@@ -187,3 +187,30 @@ describe('situacaoComFrequencia', () => {
     expect(situacaoComFrequencia('APROVADO', undefined, { apuracao: 'GERAL', minimo: 75 }, 'mat', true)).toBe('APROVADO')
   })
 })
+
+describe('linhasInfrequencia', () => {
+  it('lista quem está abaixo ou perto do mínimo, do pior para o melhor', async () => {
+    const { linhasInfrequencia } = await import('./frequencia')
+    const r = calcularFrequenciaTurma(['a', 'b', 'c'], AULAS, [
+      { aulaId: 'm1', estudanteId: 'a', quantidade: 2 }, // a: 4/6 faltas? não: 2 de 6 -> 66.7
+      { aulaId: 'p1', estudanteId: 'b', quantidade: 1 }, // b: 1 de 6 -> 83.3 (alerta)
+    ], [{ estudanteId: 'a', inicio: '2026-03-02', fim: '2026-03-02', efeito: 'SO_JUSTIFICA' }])
+    const linhas = linhasInfrequencia(['a', 'b', 'c'], r, { apuracao: 'GERAL', minimo: 75 }, { total: 0, porDisciplina: new Map() })
+    expect(linhas.map((l) => l.estudanteId)).toEqual(['a', 'b'])
+    expect(linhas[0]).toMatchObject({ percentual: 66.7, faltas: 2, faltasJustificadas: 2, faltasSemJustificativa: 0 })
+    expect(linhas[0].risco.level).toBe('CRITICAL') // sem aulas restantes, não recupera
+    expect(linhas[1].risco.level).toBe('MEDIUM')
+    expect(linhasInfrequencia(['a', 'b', 'c'], r, { apuracao: 'GERAL', minimo: 75 }, { total: 0, porDisciplina: new Map() }, true)).toHaveLength(3)
+  })
+
+  it('POR_COMPONENTE usa a pior disciplina e as aulas restantes dela', async () => {
+    const { linhasInfrequencia } = await import('./frequencia')
+    const r = calcularFrequenciaTurma(['a'], AULAS, [{ aulaId: 'm1', estudanteId: 'a', quantidade: 2 }], [])
+    const [l] = linhasInfrequencia(['a'], r, { apuracao: 'POR_COMPONENTE', minimo: 75 }, { total: 100, porDisciplina: new Map([['mat', 36]]) })
+    expect(l.disciplinaId).toBe('mat')
+    expect(l.percentual).toBe(50)
+    // 40 aulas no total de mat, limite 10 faltas, já tem 2 -> pode 8
+    expect(l.faltasRestantesPermitidas).toBe(8)
+    expect(l.risco.level).toBe('HIGH')
+  })
+})

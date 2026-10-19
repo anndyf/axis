@@ -13,6 +13,7 @@
  */
 import { chaveData } from '@/lib/services/calendario'
 import type { StatusNota } from '@/lib/services/notas'
+import { analyzeAttendanceRisk, type RiskAnalysis } from '@/lib/risk-analysis'
 
 export type SituacaoAula = 'PREVISTA' | 'REALIZADA' | 'CANCELADA'
 export type EfeitoJustificativa = 'ABONA' | 'SO_JUSTIFICA'
@@ -258,3 +259,72 @@ export function situacaoComFrequencia(
 
 /** Rótulo curto para telas e PDFs. */
 export const ROTULO_REPROVADO_FALTA = 'Rep. Falta'
+
+export interface LinhaInfrequencia {
+  estudanteId: string
+  /** frequência que vale pela regra (GERAL: total; POR_COMPONENTE: a pior disciplina) */
+  percentual: number | null
+  /** disciplina que define o percentual em POR_COMPONENTE */
+  disciplinaId: string | null
+  aulas: number
+  faltas: number
+  faltasAbonadas: number
+  faltasJustificadas: number
+  /** faltas sem nenhuma justificativa - base para comunicar o Conselho Tutelar (ECA, art. 56) */
+  faltasSemJustificativa: number
+  maximaPossivel: number | null
+  faltasRestantesPermitidas: number | null
+  risco: RiskAnalysis
+}
+
+/**
+ * Linhas do relatório de infrequência de uma turma: alunos abaixo do mínimo
+ * ou se aproximando dele (risco por faltas MEDIUM ou pior), do pior para o
+ * melhor. `todos` = true devolve a turma inteira.
+ */
+export function linhasInfrequencia(
+  estudanteIds: string[],
+  porAluno: Map<string, FrequenciaAluno>,
+  regra: RegraFrequencia,
+  restantes: { total: number; porDisciplina: Map<string, number> },
+  todos = false
+): LinhaInfrequencia[] {
+  const linhas: LinhaInfrequencia[] = []
+  for (const id of estudanteIds) {
+    const freq = porAluno.get(id)
+    if (!freq) continue
+
+    let contagem = freq.geral
+    let disciplinaId: string | null = null
+    let proj = projetarFrequencia(freq.geral, restantes.total, regra.minimo)
+    if (regra.apuracao === 'POR_COMPONENTE') {
+      for (const [k, c] of Object.entries(freq.porDisciplina)) {
+        if (k === CHAVE_DIA || c.percentual === null) continue
+        const p = projetarFrequencia(c, restantes.porDisciplina.get(k) ?? 0, regra.minimo)
+        const pior = disciplinaId === null
+          || c.percentual < (contagem.percentual ?? Infinity)
+          || (c.percentual === contagem.percentual && (p.faltasRestantesPermitidas ?? 0) < (proj.faltasRestantesPermitidas ?? 0))
+        if (pior) { contagem = c; disciplinaId = k; proj = p }
+      }
+    }
+
+    const risco = analyzeAttendanceRisk({ percentual: contagem.percentual, minimo: regra.minimo, ...proj })
+    linhas.push({
+      estudanteId: id,
+      percentual: contagem.percentual,
+      disciplinaId,
+      aulas: contagem.aulas,
+      faltas: contagem.faltas,
+      faltasAbonadas: contagem.faltasAbonadas,
+      faltasJustificadas: contagem.faltasJustificadas,
+      faltasSemJustificativa: contagem.faltas - contagem.faltasAbonadas - contagem.faltasJustificadas,
+      ...proj,
+      risco,
+    })
+  }
+
+  const ordem: Record<string, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3, NONE: 4 }
+  return linhas
+    .filter((l) => todos || ['CRITICAL', 'HIGH', 'MEDIUM'].includes(l.risco.level))
+    .sort((a, b) => ordem[a.risco.level] - ordem[b.risco.level] || (a.percentual ?? 101) - (b.percentual ?? 101))
+}

@@ -41,8 +41,12 @@ Ambiente: PostgreSQL 16 local subiu; `axis_dev` e `axis_test` criados, migration
   - Situação "Rep. Falta" exibida via `situacaoComFrequencia` (boletim, PDF do boletim, PDF da turma) quando o ano letivo já terminou.
   - **[decisão]** Conselho de classe passa a listar também quem tem nota para aprovar mas frequência abaixo do mínimo (o conselho decide). Nesses casos a tela **não** marca mais "Aprovado na Recuperação" automaticamente pela média.
   - **[correção de segurança]** `api/boletim/[id]/pdf`: aluno do portal conseguia baixar o boletim de colegas da mesma escola (a rota está fora do layout do dashboard). Agora só o próprio.
-- [ ] Justificativas (gestão) + relatório de infrequência + risco por faltas
+- [x] `/dashboard/frequencia` (gestão): relatório de infrequência por turma (abaixo ou perto do mínimo; "mostrar a turma toda"), com faltas que contam, faltas sem justificativa, quantas faltas ainda cabem até o fim do ano e risco; aviso do ECA art. 56 quando há 5+ faltas sem justificativa. Cadastro/remoção de atestados e justificativas (ABONA ou SO_JUSTIFICA, por intervalo de datas). Ações em `src/app/dashboard/frequencia/actions.ts`, testadas em `chamada-acoes.test.ts` (escola B x A, professor, portal).
+  - Risco por faltas: `analyzeAttendanceRisk` em `src/lib/risk-analysis.ts` (teste `risk-analysis.test.ts`), usando a projeção até o fim do período (`projetarFrequencia`). Linhas do relatório: `linhasInfrequencia` em `services/frequencia.ts`.
+  - **[decisão]** Item "Frequência" (gestão) adicionado ao catálogo `src/lib/modules.ts`, como o da chamada.
+  - **[decisão]** O risco por faltas não foi enfiado na coluna "Risco" do portal (que é de notas) para não mudar o layout; o portal mostra a frequência em vermelho abaixo do mínimo.
+  - **[decisão]** "Pode faltar" usa as aulas previstas pelo horário × calendário até o fim do ano letivo; sem calendário, conta só as aulas já dadas.
 - [ ] Seed de aulas/faltas
 
 ## Próximo passo
-Justificativas (gestão), relatório de infrequência, risco por faltas.
+Seed de aulas e faltas de exemplo.
