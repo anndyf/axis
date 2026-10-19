@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Shield, Database, Check, AlertCircle, Save, ClipboardList, ChevronRight, CalendarDays } from "lucide-react"
+import { Shield, Database, Check, AlertCircle, Save, ClipboardList, ChevronRight, CalendarDays, Palette } from "lucide-react"
 
 export default function ConfiguracoesPage() {
   const [loading, setLoading] = useState(true)
@@ -103,6 +103,22 @@ export default function ConfiguracoesPage() {
           <div>
             <p className="font-medium text-blue-900">Calendário Letivo</p>
             <p className="text-sm text-slate-600">Início e fim do ano, datas das unidades, feriados, sábados letivos e tempos de aula.</p>
+          </div>
+        </div>
+        <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-slate-600 transition-colors" />
+      </Link>
+
+      <Link
+        href="/dashboard/configuracoes/identidade"
+        className="flex items-center justify-between bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:border-slate-300 hover:shadow-md transition-all group"
+      >
+        <div className="flex items-center gap-4">
+          <div className="p-3 rounded-xl bg-slate-100 text-slate-700 group-hover:bg-slate-700 group-hover:text-white transition-colors">
+            <Palette className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="font-medium text-blue-900">Identidade visual</p>
+            <p className="text-sm text-slate-600">Logo e cor de destaque da escola no sistema, no login e nos PDFs.</p>
           </div>
         </div>
         <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-slate-600 transition-colors" />

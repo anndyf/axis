@@ -36,10 +36,6 @@
   --line: #e4e4e7;
   --line-strong: #d4d4d8;
 
-  --accent-hover: color-mix(in oklab, var(--accent) 86%, black);
-  --accent-subtle: color-mix(in oklab, var(--accent) 9%, var(--surface));
-  --accent-fg: color-mix(in oklab, var(--accent) 82%, black);
-  --ring: color-mix(in oklab, var(--accent) 55%, transparent);
 
   --success: #16a34a;
   --success-subtle: #f0fdf4;
@@ -62,6 +58,18 @@
   --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04);
 
   color-scheme: light;
+}
+
+/*
+ * Derivados do destaque. Também em [data-accent] para que um trecho com outro
+ * --accent (pré-visualização da identidade da escola) recalcule hover e tons
+ * suaves - custom properties derivadas resolvem onde são declaradas.
+ */
+:root, [data-accent] {
+  --accent-hover: color-mix(in oklab, var(--accent) 86%, black);
+  --accent-subtle: color-mix(in oklab, var(--accent) 9%, var(--surface));
+  --accent-fg: color-mix(in oklab, var(--accent) 82%, black);
+  --ring: color-mix(in oklab, var(--accent) 55%, transparent);
 }
 
 /*

@@ -4,6 +4,8 @@ import "./globals.css";
 import Providers from "@/components/Providers";
 import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
 import NextTopLoader from 'nextjs-toploader';
+import { escolaDaRequisicao } from "@/lib/escola-atual";
+import { variaveisDeDestaque } from "@/lib/services/identidade";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,18 +17,23 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const viewport: Viewport = {
-  themeColor: "#0F172A",
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-};
+// Cor do tema do navegador/PWA = cor de destaque da escola (fallback: padrão)
+export async function generateViewport(): Promise<Viewport> {
+  const escola = await escolaDaRequisicao();
+  return {
+    themeColor: variaveisDeDestaque(escola?.corPrimaria)["--accent"],
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  };
+}
 
 export const metadata: Metadata = {
   title: "Áxis – Sistema de Gestão Escolar",
   description: "Sistema de Gestão Escolar Áxis – Lançamento de notas, laboratórios e relatórios.",
-  manifest: "/manifest.json",
+  // Manifest por escola (nome e cor do tema); src/app/manifest/route.ts
+  manifest: "/manifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -43,13 +50,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Destaque da escola nos tokens do design system (globals.css)
+  const escola = await escolaDaRequisicao();
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" style={variaveisDeDestaque(escola?.corPrimaria) as React.CSSProperties}>
       <head>
         {/* PWA meta tags para melhor suporte em iOS */}
         <meta name="mobile-web-app-capable" content="yes" />
@@ -67,7 +76,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <NextTopLoader 
-          color="#2563eb"
+          color="var(--accent)"
           initialPosition={0.08}
           crawlSpeed={200}
           height={3}
@@ -75,7 +84,7 @@ export default function RootLayout({
           showSpinner={false}
           easing="ease"
           speed={200}
-          shadow="0 0 10px #2563eb,0 0 5px #2563eb"
+          shadow={false}
         />
         <Providers>{children}</Providers>
         <ServiceWorkerRegistrar />

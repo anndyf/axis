@@ -37,7 +37,6 @@ export default function VitrineClient() {
       <PageHeader
         title="Componentes"
         description="Design system do Áxis (src/components/ui): tokens, controles e estados para revisão."
-        breadcrumb={[{ label: "Configurações", href: "/dashboard/configuracoes" }, { label: "Componentes" }]}
         actions={<><Button variant="secondary"><Download size={16} strokeWidth={1.75} /> Exportar</Button><Button><Plus size={16} strokeWidth={1.75} /> Novo</Button></>}
       />
 
