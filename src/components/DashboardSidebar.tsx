@@ -109,12 +109,13 @@ export default function DashboardSidebar({
   }, [])
 
   useEffect(() => {
-    getUnreadCount().then(setUnreadCount)
-    getPendingUsersCount().then(setPendingUsersCount)
-    const interval = setInterval(() => {
-      getUnreadCount().then(setUnreadCount)
-      getPendingUsersCount().then(setPendingUsersCount)
-    }, 30000)
+    // Consulta interrompida (troca de página, rede) não é erro: tenta na próxima rodada
+    const atualizar = () => {
+      getUnreadCount().then(setUnreadCount).catch(() => {})
+      getPendingUsersCount().then(setPendingUsersCount).catch(() => {})
+    }
+    atualizar()
+    const interval = setInterval(atualizar, 30000)
     return () => clearInterval(interval)
   }, [])
 

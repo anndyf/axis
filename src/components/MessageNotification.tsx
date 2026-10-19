@@ -21,25 +21,36 @@ export default function MessageNotification() {
         return;
     }
 
+    let ativo = true
     const checkMessages = async () => {
+      // Aba em segundo plano: não consulta (volta a consultar quando ficar visível)
+      if (document.visibilityState === "hidden") return
       try {
         const msg = await getLatestUnreadMessage()
-        
+        if (!ativo) return
         if (msg && msg.id !== lastNotificationId) {
           setLatestMessage(msg)
           setLastNotificationId(msg.id)
           setShow(true)
         }
       } catch (e) {
-        console.error("Error checking for notifications", e)
+        // "Failed to fetch": a consulta foi interrompida (troca de página, aba
+        // fechando, rede caiu). Não é erro: a próxima rodada tenta de novo.
+        if (!ativo || e instanceof TypeError) return
+        console.error("Erro ao verificar notificações", e)
       }
     }
 
-    // Check immediately and then every 30 seconds
+    // Verifica logo, a cada 30 s e quando a aba volta a ficar visível
     checkMessages()
     const interval = setInterval(checkMessages, 30000)
+    document.addEventListener("visibilitychange", checkMessages)
 
-    return () => clearInterval(interval)
+    return () => {
+      ativo = false
+      clearInterval(interval)
+      document.removeEventListener("visibilitychange", checkMessages)
+    }
   }, [lastNotificationId, isMessagesPage])
 
   if (!show || !latestMessage || isMessagesPage) return null
