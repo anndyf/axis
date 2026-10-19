@@ -83,3 +83,26 @@ export async function carregarFrequenciaDaTurma(escolaId: string, turmaId: strin
     temChamada: aulas.some((a) => a.situacao === 'REALIZADA'),
   }
 }
+
+/**
+ * Versão enxuta e serializável para mandar ao navegador (só percentuais e
+ * contagens). null quando a turma ainda não tem nenhuma chamada.
+ */
+export function resumoFrequenciaParaTela(f: FrequenciaDaTurma | null) {
+  if (!f?.temChamada) return null
+  const resumo = (c?: { aulas: number; faltasConsideradas: number; percentual: number | null }) =>
+    ({ aulas: c?.aulas ?? 0, faltas: c?.faltasConsideradas ?? 0, percentual: c?.percentual ?? null })
+  return {
+    minimo: f.regra.minimo,
+    apuracao: f.regra.apuracao,
+    anoEncerrado: f.anoEncerrado,
+    porAluno: Object.fromEntries(
+      [...f.porAluno].map(([id, fa]) => [id, {
+        geral: resumo(fa.geral),
+        porDisciplina: Object.fromEntries(Object.entries(fa.porDisciplina).map(([k, c]) => [k, resumo(c)])),
+      }])
+    ),
+  }
+}
+
+export type ResumoFrequenciaTela = NonNullable<ReturnType<typeof resumoFrequenciaParaTela>>

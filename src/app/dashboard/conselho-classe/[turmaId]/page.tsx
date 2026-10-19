@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma"
 import ConselhoClasseClient from "./ConselhoClasseClient"
 import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from "@/lib/services/notas-leitura"
 import { etapasDaNota } from "@/lib/services/notas"
+import { carregarFrequenciaDaTurma } from "@/lib/services/frequencia-leitura"
+import { frequenciaConsiderada } from "@/lib/services/frequencia"
 
 export const metadata = {
   title: 'Áxis - Conselho classe'
@@ -33,6 +35,17 @@ async function getNotasConselho(turmaId: string, escolaId: string) {
   const esquema = await carregarEsquemaDaTurma(turma)
   const etapas = esquema?.etapas ?? []
 
+  // Frequência que vale para aprovação em cada disciplina (regra do esquema)
+  const frequencia = await carregarFrequenciaDaTurma(escolaId, turma.id)
+  const freqDa = (estudanteId: string, disciplinaId: string) => {
+    const f = frequencia?.temChamada ? frequencia.porAluno.get(estudanteId) : undefined
+    return f && frequencia ? frequenciaConsiderada(f, frequencia.regra, disciplinaId) : null
+  }
+  const abaixoDoMinimo = (estudanteId: string, disciplinaId: string) => {
+    const p = freqDa(estudanteId, disciplinaId)
+    return p !== null && p < (frequencia?.regra.minimo ?? 75)
+  }
+
   // Filtrar notas que precisam de conselho. Não usa mais
   // Turma.modalidade (sempre NULL nos dados reais, regra nunca funcionou
   // de fato) nem "3 vs 2 notas" hardcoded - `unidades` (NotaUnidade,
@@ -51,6 +64,9 @@ async function getNotasConselho(turmaId: string, escolaId: string) {
       ]
       if (statusConselho.includes(nota.status)) return true
 
+      // 3. Frequência abaixo do mínimo: o conselho precisa decidir, mesmo com nota para aprovar
+      if (abaixoDoMinimo(estudante.id, nota.disciplinaId)) return true
+
       // 2. Todas as unidades do esquema preenchidas (ou marcadas desistente) e ainda não aprovado
       const completa = nota.unidades.length > 0 &&
         nota.unidades.every((u: any) => u.notaCalculada !== null || u.isDesistente)
@@ -64,7 +80,9 @@ async function getNotasConselho(turmaId: string, escolaId: string) {
       estudanteId: estudante.matricula,
       estudanteNome: estudante.nome,
       disciplinaId: nota.disciplinaId,
-      disciplinaNome: nota.disciplina.nome
+      disciplinaNome: nota.disciplina.nome,
+      frequencia: freqDa(estudante.id, nota.disciplinaId),
+      abaixoMinimoFrequencia: abaixoDoMinimo(estudante.id, nota.disciplinaId)
     }))
   )
 
@@ -73,7 +91,8 @@ async function getNotasConselho(turmaId: string, escolaId: string) {
     notasConselho: notasFiltradas,
     // Sem esquema resolvido, cai no comportamento legado (média simples, mínimo 5)
     esquemaConfig: esquema?.config ?? { numUnidades: etapas.length, notaMinimaAprovacao: 5, recuperacaoUnidadeAtiva: false, recuperacaoFinalAtiva: true },
-    pesosEtapas: etapas.map((e) => e.peso)
+    pesosEtapas: etapas.map((e) => e.peso),
+    frequenciaMinima: frequencia?.regra.minimo ?? 75
   }
 }
 
@@ -104,6 +123,7 @@ export default async function ConselhoClasseTurmaPage({
       notasConselho={data.notasConselho}
       esquemaConfig={data.esquemaConfig}
       pesosEtapas={data.pesosEtapas}
+      frequenciaMinima={data.frequenciaMinima}
     />
   )
 }

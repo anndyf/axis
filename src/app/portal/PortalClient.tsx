@@ -21,11 +21,12 @@ import {
 } from "lucide-react"
 import { signOut } from "next-auth/react"
 import { analyzeRisk } from "@/lib/risk-analysis"
+import { formatarFrequencia } from "@/lib/services/frequencia"
 import type { EtapaDaNota } from "@/lib/services/notas"
 import MarkdownContent from "@/components/MarkdownContent"
 
 export default function PortalClient({ initialData, user, nomeEscola }: { initialData: any, user: any, nomeEscola: string }) {
-  const { estudante, mensagens = [], error, nomesEtapas = [], numUnidades = 3, notaMinimaAprovacao = 5 } = initialData
+  const { estudante, mensagens = [], error, nomesEtapas = [], numUnidades = 3, notaMinimaAprovacao = 5, frequencia = null } = initialData
   const [selectedMessage, setSelectedMessage] = useState<any>(null)
   const [readMessageIds, setReadMessageIds] = useState<Set<string>>(new Set())
   const [isScheduleOpen, setIsScheduleOpen] = useState(false)
@@ -268,6 +269,11 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
                 <div className="px-6 py-5 bg-slate-50/50 border-b border-slate-100 flex items-center gap-3">
                    <BookOpen className="text-blue-600 w-5 h-5" />
                    <h3 className="text-sm font-semibold text-slate-800 uppercase tracking-tight">Boletim Escolar</h3>
+                   {frequencia && (
+                     <span className={`ml-auto text-xs font-semibold ${frequencia.geral.percentual !== null && frequencia.geral.percentual < frequencia.minimo ? 'text-rose-600' : 'text-slate-500'}`}>
+                       Frequência {formatarFrequencia(frequencia.geral.percentual)} · {frequencia.geral.faltas} {frequencia.geral.faltas === 1 ? 'falta' : 'faltas'} · mínimo {frequencia.minimo}%
+                     </span>
+                   )}
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
@@ -278,6 +284,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
                           <th key={i} title={nome} className="px-4 py-4 text-[9px] font-semibold text-slate-400 uppercase tracking-widest text-center">U{i + 1}</th>
                         ))}
                         <th className="px-4 py-4 text-[9px] font-semibold text-slate-400 uppercase tracking-widest text-center">Méd</th>
+                        {frequencia && <th className="px-4 py-4 text-[9px] font-semibold text-slate-400 uppercase tracking-widest text-center">Freq</th>}
                         <th className="px-6 py-4 text-[9px] font-semibold text-slate-400 uppercase tracking-widest text-center">Risco</th>
                       </tr>
                     </thead>
@@ -301,6 +308,16 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
                           {nota.nota.toFixed(1).replace('.', ',')}
                         </div>
                       </td>
+                      {frequencia && (() => {
+                        const f = frequencia.porDisciplina[nota.disciplinaId]
+                        return (
+                          <td className="px-4 py-4 text-center" title={f ? `${f.faltas} faltas em ${f.aulas} aulas` : undefined}>
+                            <span className={`text-xs font-semibold ${f?.percentual != null && f.percentual < frequencia.minimo ? 'text-rose-600' : 'text-slate-600'}`}>
+                              {formatarFrequencia(f?.percentual ?? null)}
+                            </span>
+                          </td>
+                        )
+                      })()}
                       <td className="px-6 py-4">
                          <div className={`
                             flex items-center gap-2 px-3 py-1.5 rounded-xl border

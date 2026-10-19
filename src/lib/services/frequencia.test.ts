@@ -152,7 +152,6 @@ describe('situação', () => {
     expect(periodoEncerrado({ fimPeriodo: '2026-12-18', hoje: '2026-12-19' })).toBe(true)
     expect(periodoEncerrado({ fimPeriodo: '2026-12-18', hoje: '2026-12-18' })).toBe(false)
     expect(periodoEncerrado({ fimPeriodo: null, hoje: '2027-01-01' })).toBe(false)
-    expect(periodoEncerrado({ fimPeriodo: null, hoje: '2026-05-01', notasCompletas: true })).toBe(true)
   })
 })
 
@@ -175,4 +174,16 @@ it('formatarFrequencia', () => {
   expect(formatarFrequencia(87.5)).toBe('87,5%')
   expect(formatarFrequencia(100)).toBe('100,0%')
   expect(formatarFrequencia(null)).toBe('—')
+})
+
+describe('situacaoComFrequencia', () => {
+  it('GERAL usa o total; POR_COMPONENTE a disciplina', async () => {
+    const { situacaoComFrequencia } = await import('./frequencia')
+    // mat 50%, por 100%, geral 66.7%
+    const f = calcularFrequenciaAluno('a', AULAS, [{ aulaId: 'm1', estudanteId: 'a', quantidade: 2 }], [])
+    expect(situacaoComFrequencia('APROVADO', f, { apuracao: 'GERAL', minimo: 75 }, 'por', true)).toBe('REPROVADO_FALTA')
+    expect(situacaoComFrequencia('APROVADO', f, { apuracao: 'POR_COMPONENTE', minimo: 75 }, 'por', true)).toBe('APROVADO')
+    expect(situacaoComFrequencia('APROVADO', f, { apuracao: 'POR_COMPONENTE', minimo: 75 }, 'mat', true)).toBe('REPROVADO_FALTA')
+    expect(situacaoComFrequencia('APROVADO', undefined, { apuracao: 'GERAL', minimo: 75 }, 'mat', true)).toBe('APROVADO')
+  })
 })

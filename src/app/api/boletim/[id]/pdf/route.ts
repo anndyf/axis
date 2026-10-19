@@ -3,6 +3,8 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import { carregarFrequenciaDaTurma } from '@/lib/services/frequencia-leitura'
+import { situacaoComFrequencia, formatarFrequencia, ROTULO_REPROVADO_FALTA } from '@/lib/services/frequencia'
 
 export const runtime = 'nodejs'
 
@@ -36,9 +38,16 @@ export async function GET(
       }
     })
 
-    if (!estudante) {
+    // Aluno do portal só baixa o próprio boletim
+    if (!estudante || (session.user.isPortalUser && estudante.id !== session.user.estudanteId)) {
       return NextResponse.json({ message: 'Estudante não encontrado' }, { status: 404 })
     }
+
+    const frequencia = await carregarFrequenciaDaTurma(session.user.escolaId, estudante.turmaId, [estudante.id])
+    const freqAluno = frequencia?.porAluno.get(estudante.id)
+    const comFrequencia = !!frequencia?.temChamada
+    // fonte padrão do jsPDF: hífen simples no lugar do travessão
+    const fmtFreq = (p: number | null) => (p === null ? '-' : formatarFrequencia(p))
 
     const escola = await prisma.escola.findUnique({
       where: { id: session.user.escolaId },
@@ -83,17 +92,33 @@ export async function GET(
     doc.setFont('helvetica', 'normal')
     doc.text(media, 50, 59)
 
+    if (comFrequencia) {
+      doc.setFont('helvetica', 'bold')
+      doc.text('Frequência:', 110, 59)
+      doc.setFont('helvetica', 'normal')
+      doc.text(`${fmtFreq(freqAluno?.geral.percentual ?? null)} (mínimo ${frequencia!.regra.minimo}%)`, 135, 59)
+    }
+
     // Tabela de Notas
-    const tableData = estudante.notas.map(nota => [
-      nota.disciplina.nome,
-      nota.nota === -1 ? '-' : nota.nota.toFixed(1),
-      nota.status === 'APROVADO' ? 'Aprovado' : 
-      nota.status === 'RECUPERACAO' ? 'Recuperação' : 'Desistente'
-    ])
+    const tableData = estudante.notas.map(nota => {
+      const situacao = frequencia
+        ? situacaoComFrequencia(nota.status, freqAluno, frequencia.regra, nota.disciplinaId, frequencia.anoEncerrado)
+        : nota.status
+      const linha = [
+        nota.disciplina.nome,
+        nota.nota === -1 ? '-' : nota.nota.toFixed(1),
+        situacao === 'REPROVADO_FALTA' ? ROTULO_REPROVADO_FALTA :
+        situacao === 'APROVADO' ? 'Aprovado' :
+        situacao === 'RECUPERACAO' ? 'Recuperação' : 'Desistente'
+      ]
+      if (comFrequencia) linha.splice(2, 0, fmtFreq(freqAluno?.porDisciplina[nota.disciplinaId]?.percentual ?? null))
+      return linha
+    })
+    const colStatus = comFrequencia ? 3 : 2
 
     autoTable(doc, {
       startY: 70,
-      head: [['Disciplina', 'Nota', 'Status']],
+      head: [comFrequencia ? ['Disciplina', 'Nota', 'Freq.', 'Status'] : ['Disciplina', 'Nota', 'Status']],
       body: tableData,
       theme: 'grid',
       headStyles: {
@@ -107,16 +132,26 @@ export async function GET(
       bodyStyles: {
         halign: 'center'
       },
-      columnStyles: {
-        0: { halign: 'left', cellWidth: 100 },
-        1: { halign: 'center', cellWidth: 40 },
-        2: { halign: 'center', cellWidth: 40 }
-      },
+      columnStyles: comFrequencia
+        ? {
+            0: { halign: 'left', cellWidth: 85 },
+            1: { halign: 'center', cellWidth: 30 },
+            2: { halign: 'center', cellWidth: 30 },
+            3: { halign: 'center', cellWidth: 35 }
+          }
+        : {
+            0: { halign: 'left', cellWidth: 100 },
+            1: { halign: 'center', cellWidth: 40 },
+            2: { halign: 'center', cellWidth: 40 }
+          },
       didParseCell: function(data: any) {
-        if (data.section === 'body' && data.column.index === 2) {
+        if (data.section === 'body' && data.column.index === colStatus) {
           const status = data.cell.raw
           if (status === 'Aprovado') {
             data.cell.styles.textColor = [22, 163, 74]
+            data.cell.styles.fontStyle = 'bold'
+          } else if (status === ROTULO_REPROVADO_FALTA) {
+            data.cell.styles.textColor = [225, 29, 72]
             data.cell.styles.fontStyle = 'bold'
           } else if (status === 'Recuperação') {
             data.cell.styles.textColor = [234, 88, 12]

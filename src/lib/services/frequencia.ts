@@ -214,11 +214,11 @@ export function calcularSituacaoFinal(
 }
 
 /**
- * O período conta como encerrado quando o ano letivo já terminou ou quando
- * todas as etapas já têm nota (fechamento antecipado).
+ * O período conta como encerrado quando o fim do ano letivo (calendário) já
+ * passou. Notas completas não encerram: a frequência ainda pode mudar até o
+ * último dia letivo. Sem calendário não há chamada, então não há reprovação.
  */
-export function periodoEncerrado(params: { fimPeriodo?: Date | string | null; hoje: string; notasCompletas?: boolean }): boolean {
-  if (params.notasCompletas) return true
+export function periodoEncerrado(params: { fimPeriodo?: Date | string | null; hoje: string }): boolean {
   return !!params.fimPeriodo && chaveData(params.fimPeriodo) < params.hoje
 }
 
@@ -239,3 +239,22 @@ export function projetarFrequencia(c: ContagemFrequencia, aulasRestantes: number
 export function formatarFrequencia(p: number | null): string {
   return p === null ? '—' : `${p.toFixed(1).replace('.', ',')}%`
 }
+
+/**
+ * Situação final de uma linha de nota (aluno × disciplina) já com a
+ * frequência que vale pela regra: GERAL usa a frequência total do aluno,
+ * POR_COMPONENTE a da disciplina. Sem frequência calculada, fica o status das notas.
+ */
+export function situacaoComFrequencia(
+  statusNota: StatusNota,
+  freq: FrequenciaAluno | undefined,
+  regra: RegraFrequencia,
+  disciplinaId: string,
+  encerrado: boolean
+): SituacaoFinal {
+  if (!freq) return statusNota
+  return calcularSituacaoFinal(statusNota, frequenciaConsiderada(freq, regra, disciplinaId), regra, encerrado)
+}
+
+/** Rótulo curto para telas e PDFs. */
+export const ROTULO_REPROVADO_FALTA = 'Rep. Falta'

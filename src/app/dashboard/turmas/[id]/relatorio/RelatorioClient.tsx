@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Users, BookOpen, ChevronDown, ChevronUp, AlertCircle, FileText, X } from "lucide-react"
 import type { EtapaDaNota } from "@/lib/services/notas"
+import { formatarFrequencia } from "@/lib/services/frequencia"
 
 export default function RelatorioClient({
   turma,
@@ -12,7 +13,8 @@ export default function RelatorioClient({
   totalAprovados,
   totalRecuperacao,
   totalDesistentes,
-  isProfessorOnly
+  isProfessorOnly,
+  frequencia = null
 }: any) {
   const [expandedStudent, setExpandedStudent] = useState<string | null>(null)
   const [showProfessorsModal, setShowProfessorsModal] = useState(false)
@@ -167,6 +169,17 @@ export default function RelatorioClient({
                           <p className="text-[10px] font-bold text-slate-400 uppercase">Média Geral</p>
                           <span className="text-sm font-bold text-slate-700">{media}</span>
                         </div>
+                        {frequencia && (() => {
+                          const f = frequencia.porAluno[estudante.id]?.geral
+                          return (
+                            <div className="text-center" title={f ? `${f.faltas} faltas em ${f.aulas} aulas` : undefined}>
+                              <p className="text-[10px] font-bold text-slate-400 uppercase">Frequência</p>
+                              <span className={`text-sm font-bold ${f?.percentual != null && f.percentual < frequencia.minimo ? 'text-rose-600' : 'text-slate-700'}`}>
+                                {formatarFrequencia(f?.percentual ?? null)}
+                              </span>
+                            </div>
+                          )
+                        })()}
                         <div className="text-center w-24">
                           <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full ${statusColor} uppercase tracking-widest`}>
                             {statusText}
@@ -198,6 +211,7 @@ export default function RelatorioClient({
                                 ))}
                                 <th className="px-4 py-2 text-center font-semibold text-blue-800">Média</th>
                                 <th className="px-4 py-2 text-center font-semibold">Recup.</th>
+                                {frequencia && <th className="px-4 py-2 text-center font-semibold">Freq.</th>}
                                 <th className="px-4 py-2 text-center font-semibold">Status</th>
                               </tr>
                             </thead>
@@ -213,6 +227,7 @@ export default function RelatorioClient({
                                     ))}
                                     <td className="px-4 py-2 text-center">-</td>
                                     <td className="px-4 py-2 text-center">-</td>
+                                    {frequencia && <td className="px-4 py-2 text-center">{formatarFrequencia(frequencia.porAluno[estudante.id]?.porDisciplina[disc.id]?.percentual ?? null)}</td>}
                                     <td className="px-4 py-2 text-center text-xs">Pendente</td>
                                   </tr>
                                 )
@@ -225,6 +240,10 @@ export default function RelatorioClient({
                                     ))}
                                     <td className="px-4 py-2 text-center font-bold text-blue-900">{nota.nota?.toFixed(1) ?? '-'}</td>
                                     <td className="px-4 py-2 text-center">{nota.notaRecuperacao?.toFixed(1) ?? '-'}</td>
+                                    {frequencia && (() => {
+                                      const p = frequencia.porAluno[estudante.id]?.porDisciplina[disc.id]?.percentual ?? null
+                                      return <td className={`px-4 py-2 text-center ${p !== null && p < frequencia.minimo ? 'text-rose-600 font-semibold' : ''}`}>{formatarFrequencia(p)}</td>
+                                    })()}
                                     <td className="px-4 py-2 text-center">
                                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${getStatusColor(nota.status)}`}>
                                         {nota.status}

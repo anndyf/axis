@@ -5,6 +5,8 @@ import Link from "next/link"
 import { ArrowLeft, Download, FileText } from "lucide-react"
 import { calcularMediaFinal, unidadesDeNotasSalvas, etapasDaNota } from "@/lib/services/notas"
 import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from "@/lib/services/notas-leitura"
+import { carregarFrequenciaDaTurma } from "@/lib/services/frequencia-leitura"
+import { situacaoComFrequencia, formatarFrequencia, ROTULO_REPROVADO_FALTA } from "@/lib/services/frequencia"
 
 export const metadata = {
   title: 'Áxis - Estudantes'
@@ -49,6 +51,8 @@ function getStatusColor(status: string) {
       return 'text-rose-700 bg-rose-100 shadow-sm border border-rose-200'
     case 'DESISTENTE':
       return 'text-blue-800 bg-slate-200 shadow-sm border border-slate-300'
+    case 'REPROVADO_FALTA':
+      return 'text-rose-700 bg-rose-100 shadow-sm border border-rose-200'
     default:
       return 'text-slate-800 bg-slate-100'
   }
@@ -72,6 +76,8 @@ function getStatusText(status: string) {
       return 'Dependência'
     case 'CONSERVADO':
       return 'Conservado'
+    case 'REPROVADO_FALTA':
+      return ROTULO_REPROVADO_FALTA
     default:
       return status
   }
@@ -104,6 +110,11 @@ export default async function BoletimPage({
   const esquema = await carregarEsquemaDaTurma(estudante.turma)
   const etapas = esquema?.etapas ?? []
   const notaMinima = esquema?.config.notaMinimaAprovacao ?? 5
+
+  // Frequência (chamada): por disciplina e geral, regra do esquema da turma
+  const frequencia = await carregarFrequenciaDaTurma(session.user.escolaId, estudante.turma.id, [estudante.id])
+  const freqAluno = frequencia?.porAluno.get(estudante.id)
+  const freqMinima = frequencia?.regra.minimo ?? 75
 
   const calcularMediaReal = (n: (typeof estudante.notas)[number]) => {
     if (n.nota === -1) return 0
@@ -178,6 +189,15 @@ export default async function BoletimPage({
                   <p className="text-sm text-slate-400 font-medium uppercase tracking-wider">Total de Disciplinas</p>
                   <p className="font-medium text-slate-900">{estudante.notas.length}</p>
                 </div>
+                {frequencia?.temChamada && (
+                  <div>
+                    <p className="text-sm text-slate-400 font-medium uppercase tracking-wider">Frequência</p>
+                    <p className={`font-medium ${(freqAluno?.geral.percentual ?? 100) < freqMinima ? 'text-red-600' : 'text-slate-900'}`}>
+                      {formatarFrequencia(freqAluno?.geral.percentual ?? null)}
+                      <span className="text-xs text-slate-400 font-normal"> · {freqAluno?.geral.faltasConsideradas ?? 0} faltas · mínimo {freqMinima}%</span>
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -229,6 +249,11 @@ export default async function BoletimPage({
                     <th className="px-6 py-4 text-center text-xs font-medium text-slate-400 uppercase tracking-wider bg-slate-100/50">
                       Média
                     </th>
+                    {frequencia?.temChamada && (
+                      <th title="Frequência na disciplina" className="px-4 py-4 text-center text-xs font-medium text-slate-400 uppercase tracking-wider">
+                        Freq.
+                      </th>
+                    )}
                     <th className="px-6 py-4 text-center text-xs font-medium text-slate-400 uppercase tracking-wider">
                       Status
                     </th>
@@ -239,6 +264,7 @@ export default async function BoletimPage({
                     const mediaCalculada = calcularMediaReal(nota);
                     const etapasDoAluno = etapasDaNota(etapas, nota.unidades);
                     const isInfrequente = nota.status === 'DESISTENTE' || etapasDoAluno.some(e => e.desistente);
+                    const freqDisc = freqAluno?.porDisciplina[nota.disciplinaId];
                     
                     return (
                       <tr key={nota.id} className="hover:bg-slate-100/50 transition-colors">
@@ -273,11 +299,21 @@ export default async function BoletimPage({
                             {nota.nota === -1 ? '-' : mediaCalculada.toFixed(1)}
                           </span>
                         </td>
+                        {frequencia?.temChamada && (
+                          <td className="px-4 py-4 text-center text-sm" title={freqDisc ? `${freqDisc.faltasConsideradas} faltas em ${freqDisc.aulas} aulas` : undefined}>
+                            <span className={(freqDisc?.percentual ?? 100) < freqMinima ? 'text-red-600 font-medium' : 'text-slate-700'}>
+                              {formatarFrequencia(freqDisc?.percentual ?? null)}
+                            </span>
+                          </td>
+                        )}
                         <td className="px-6 py-4 text-center">
                           {(() => {
-                            let statusParaExibir = nota.status;
+                            let statusParaExibir: string = nota.status;
                             if (statusParaExibir === 'DESISTENTE') {
                               statusParaExibir = mediaCalculada >= notaMinima ? 'APROVADO' : 'RECUPERACAO';
+                            }
+                            if (frequencia) {
+                              statusParaExibir = situacaoComFrequencia(statusParaExibir as any, freqAluno, frequencia.regra, nota.disciplinaId, frequencia.anoEncerrado);
                             }
                             return (
                               <span className={`px-3 py-1 inline-flex text-[10px] leading-5 font-medium rounded-full uppercase tracking-wider ${getStatusColor(statusParaExibir)}`}>

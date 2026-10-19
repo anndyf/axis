@@ -27,7 +27,7 @@ Ambiente: PostgreSQL 16 local subiu; `axis_dev` e `axis_test` criados, migration
   - **[decisão]** Sem `Falta.justificativaId`: a justificativa vale por intervalo de datas e é aplicada no cálculo, então cobre faltas lançadas antes ou depois do cadastro do atestado.
 - [x] Motor de frequência `src/lib/services/frequencia.ts` (puro, `frequencia.test.ts`): por disciplina e geral, GERAL/POR_COMPONENTE, mínimo do esquema, ABONA/SO_JUSTIFICA, projeção até o fim do período, `calcularSituacaoFinal` (REPROVADO_FALTA).
   - **[decisão]** REPROVADO_FALTA é calculado na leitura (situação final = status das notas + frequência) e **não é gravado** em `NotaFinal.status`; o enum do banco não mudou. Assim a situação nunca fica desatualizada quando entra uma falta ou um atestado.
-  - **[decisão]** REPROVADO_FALTA só se aplica com o período encerrado (fim do ano letivo passou ou todas as etapas têm nota). Antes disso, abaixo do mínimo é alerta.
+  - **[decisão]** REPROVADO_FALTA só se aplica com o período encerrado (o fim do ano letivo no calendário já passou). Antes disso, abaixo do mínimo é alerta ("abaixo do mínimo" em vermelho). Notas completas **não** encerram o período (a frequência ainda muda até o último dia letivo).
   - **[decisão]** Decisão do conselho (APROVADO_CONSELHO, DEPENDENCIA, CONSERVADO) e DESISTENTE prevalecem sobre a frequência.
   - **[decisão]** Chamada POR_DIA força apuração GERAL (não há disciplina).
 - [x] Planejamento da chamada `src/lib/services/chamada.ts` (puro, `chamada.test.ts`): dia letivo pelo calendário (período, feriados da escola/turma, dias extras), tempos da disciplina pelo horário, POR_AULA/POR_DIA, validação das faltas.
@@ -37,9 +37,12 @@ Ambiente: PostgreSQL 16 local subiu; `axis_dev` e `axis_test` criados, migration
   - **[decisão]** A aula é aberta/criada pela server action chamada no navegador, não na renderização da página (prefetch de link não cria registro).
   - **[decisão]** "Aula não dada" mantém as faltas gravadas, sem efeito; salvar a chamada de novo volta a contá-la.
   - Professor só vê/abre as próprias disciplinas; gestão vê todas da escola. Chamada diária (POR_DIA): professor com alguma disciplina na turma ou turma atribuída a ele.
-- [ ] Frequência no boletim, portal, relatórios e conselho
+- [x] Frequência no boletim (tela e PDF), portal do aluno, relatório da turma (tela e PDF global) e conselho de classe — uma coluna "Freq." / um campo novo em cada tela, sem reorganizar o layout. Só aparece quando a turma já tem alguma chamada salva. Leitura em `src/lib/services/frequencia-leitura.ts`; teste `src/lib/frequencia-leitura.test.ts`.
+  - Situação "Rep. Falta" exibida via `situacaoComFrequencia` (boletim, PDF do boletim, PDF da turma) quando o ano letivo já terminou.
+  - **[decisão]** Conselho de classe passa a listar também quem tem nota para aprovar mas frequência abaixo do mínimo (o conselho decide). Nesses casos a tela **não** marca mais "Aprovado na Recuperação" automaticamente pela média.
+  - **[correção de segurança]** `api/boletim/[id]/pdf`: aluno do portal conseguia baixar o boletim de colegas da mesma escola (a rota está fora do layout do dashboard). Agora só o próprio.
 - [ ] Justificativas (gestão) + relatório de infrequência + risco por faltas
 - [ ] Seed de aulas/faltas
 
 ## Próximo passo
-Frequência no boletim, portal, relatórios e conselho.
+Justificativas (gestão), relatório de infrequência, risco por faltas.

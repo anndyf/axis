@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { etapasDaNota } from "@/lib/services/notas"
 import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from "@/lib/services/notas-leitura"
+import { carregarFrequenciaDaTurma, resumoFrequenciaParaTela } from "@/lib/services/frequencia-leitura"
 
 export async function getStudentPortalData() {
   const session = await auth()
@@ -75,6 +76,13 @@ export async function getStudentPortalData() {
     const esquema = await carregarEsquemaDaTurma(estudante.turma)
     const etapas = esquema?.etapas ?? []
 
+    // Frequência só do próprio aluno (números agregados, nada de outros alunos)
+    const resumoFreq = resumoFrequenciaParaTela(await carregarFrequenciaDaTurma(escolaId, estudante.turmaId, [estudante.id]))
+    const freqAluno = resumoFreq?.porAluno[estudante.id]
+    const frequencia = resumoFreq && freqAluno
+      ? { minimo: resumoFreq.minimo, apuracao: resumoFreq.apuracao, geral: freqAluno.geral, porDisciplina: freqAluno.porDisciplina }
+      : null
+
     return {
       estudante: {
         ...estudante,
@@ -84,6 +92,7 @@ export async function getStudentPortalData() {
       nomesEtapas: etapas.map((e) => e.nome),
       numUnidades: esquema?.config.numUnidades ?? 3,
       notaMinimaAprovacao: esquema?.config.notaMinimaAprovacao ?? 5,
+      frequencia,
     }
   } catch (error) {
     console.error("Erro ao buscar dados do portal:", error)

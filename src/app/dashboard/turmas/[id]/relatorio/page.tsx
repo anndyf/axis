@@ -6,6 +6,7 @@ import { ArrowLeft, Download, FileText } from "lucide-react"
 import RelatorioClient from "./RelatorioClient"
 import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from "@/lib/services/notas-leitura"
 import { etapasDaNota } from "@/lib/services/notas"
+import { carregarFrequenciaDaTurma, resumoFrequenciaParaTela } from "@/lib/services/frequencia-leitura"
 
 export const metadata = {
   title: 'Áxis - Turmas'
@@ -76,6 +77,8 @@ export default async function RelatorioTurmaPage({
       notas: e.notas.map((n) => ({ ...n, etapas: etapasDaNota(etapas, n.unidades) })),
     })),
   }
+
+  const frequencia = resumoFrequenciaParaTela(await carregarFrequenciaDaTurma(session.user.escolaId, turma.id))
 
   // Calcular estatísticas
   const totalEstudantes = turma.estudantes.length
@@ -148,6 +151,7 @@ export default async function RelatorioTurmaPage({
         totalRecuperacao={totalRecuperacao}
         totalDesistentes={totalDesistentes}
         isProfessorOnly={isProfessorOnly}
+        frequencia={frequencia}
       />
     </div>
   )

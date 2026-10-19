@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Save, AlertCircle, Gavel, Loader2, ChevronDown, ChevronUp, CheckCircle2, Printer, X } from "lucide-react"
 import { calcularMediaFinal, type EsquemaConfig, type EtapaDaNota, type UnidadeInput } from "@/lib/services/notas"
+import { formatarFrequencia } from "@/lib/services/frequencia"
 
 interface NotaConselho {
   id: string
@@ -16,6 +17,9 @@ interface NotaConselho {
   disciplinaId: string
   disciplinaNome: string
   etapas: EtapaDaNota[]
+  /** frequência que vale para aprovação na disciplina; null = sem chamada */
+  frequencia?: number | null
+  abaixoMinimoFrequencia?: boolean
 }
 
 const STATUS_OPTIONS = [
@@ -32,7 +36,8 @@ export default function ConselhoClasseClient({
   turmaTurno,
   notasConselho,
   esquemaConfig,
-  pesosEtapas
+  pesosEtapas,
+  frequenciaMinima = 75
 }: {
   turmaId: string
   turmaNome: string
@@ -41,6 +46,7 @@ export default function ConselhoClasseClient({
   notasConselho: NotaConselho[]
   esquemaConfig: EsquemaConfig
   pesosEtapas: number[]
+  frequenciaMinima?: number
 }) {
   const notaMinima = esquemaConfig.notaMinimaAprovacao
   const router = useRouter()
@@ -151,7 +157,7 @@ export default function ConselhoClasseClient({
       const nota = notasConselho.find(n => n.id === notaId)
       if (nota) {
         const media = calcularMediaReal(nota)
-        if (media >= notaMinima) {
+        if (media >= notaMinima && !nota.abaixoMinimoFrequencia) {
           setDecisoes(prev => ({
             ...prev,
             [notaId]: 'APROVADO_RECUPERACAO'
@@ -178,7 +184,8 @@ export default function ConselhoClasseClient({
         const notaRecValue = notasRec[n.id]
         let statusFinal = decisoes[n.id] || n.status
 
-        if (media >= notaMinima) {
+        // Abaixo da frequência mínima a nota não aprova sozinha: vale a decisão do conselho
+        if (media >= notaMinima && !n.abaixoMinimoFrequencia) {
           statusFinal = 'APROVADO_RECUPERACAO'
         }
 
@@ -792,7 +799,7 @@ export default function ConselhoClasseClient({
                                 const statusValue = decisoes[nota.id] || ''
                                 const notaRecVal = notasRec[nota.id] !== undefined ? (notasRec[nota.id] || null) : (nota.notaRecuperacao || null)
                                 const mediaCalculada = calcularMediaReal(nota)
-                                const isApproved = (notaRecVal !== null && notaRecVal >= notaMinima) || mediaCalculada >= notaMinima
+                                const isApproved = ((notaRecVal !== null && notaRecVal >= notaMinima) || mediaCalculada >= notaMinima) && !nota.abaixoMinimoFrequencia
                                 const isResolvida = isApproved || ['APROVADO_CONSELHO', 'DEPENDENCIA', 'CONSERVADO'].includes(statusValue || nota.status)
                                 
                                 // Definir cores dinâmicas para o select
@@ -826,6 +833,11 @@ export default function ConselhoClasseClient({
                                               INF U{i + 1}
                                             </span>
                                           ))}
+                                          {nota.frequencia !== null && nota.frequencia !== undefined && (
+                                            <span className={`px-1.5 py-0.5 text-[8px] font-medium border rounded uppercase tracking-tighter ${nota.abaixoMinimoFrequencia ? 'bg-rose-50 text-rose-600 border-rose-100' : 'bg-slate-50 text-slate-500 border-slate-200'}`} title={`Frequência mínima: ${frequenciaMinima}%`}>
+                                              FREQ {formatarFrequencia(nota.frequencia)}{nota.abaixoMinimoFrequencia && ' · abaixo do mínimo'}
+                                            </span>
+                                          )}
                                           {nota.status === 'DESISTENTE' && !nota.etapas.some((e: EtapaDaNota) => e.desistente) && (
                                             <span className="px-1.5 py-0.5 bg-slate-100 text-[8px] font-medium text-slate-700 border border-slate-200 rounded uppercase tracking-tighter">
                                               INFREQUENTE
