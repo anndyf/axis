@@ -328,3 +328,17 @@ export function resolverEsquemaAvaliacaoId(
 ): string | null {
   return turma.esquemaAvaliacaoId ?? curso?.esquemaAvaliacaoId ?? null
 }
+
+/** Marcador de "não realizou" a recuperação final (mesmo valor usado pela tela do conselho). */
+export const RECUPERACAO_NAO_REALIZADA = -1
+
+/**
+ * Nota de recuperação final válida na escala do esquema da turma (0 a
+ * notaMaxima, ex.: 10 ou 100), ou o marcador de "não realizou". null/undefined
+ * = não informada, válido.
+ */
+export function notaRecuperacaoValida(valor: number | null | undefined, notaMaxima: number): boolean {
+  if (valor === null || valor === undefined) return true
+  if (valor === RECUPERACAO_NAO_REALIZADA) return true
+  return Number.isFinite(valor) && valor >= 0 && valor <= notaMaxima
+}

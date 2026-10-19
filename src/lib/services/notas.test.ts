@@ -306,3 +306,17 @@ describe('leitura de notas salvas por etapa', () => {
     expect(desistenteEmTodas([])).toBe(false)
   })
 })
+
+describe('notaRecuperacaoValida', () => {
+  it('usa a escala do esquema, não 10 fixo', async () => {
+    const { notaRecuperacaoValida } = await import('./notas')
+    expect(notaRecuperacaoValida(10, 10)).toBe(true)
+    expect(notaRecuperacaoValida(10.5, 10)).toBe(false)
+    expect(notaRecuperacaoValida(85, 100)).toBe(true)
+    expect(notaRecuperacaoValida(101, 100)).toBe(false)
+    expect(notaRecuperacaoValida(-0.5, 100)).toBe(false)
+    expect(notaRecuperacaoValida(-1, 10)).toBe(true) // não realizou
+    expect(notaRecuperacaoValida(null, 10)).toBe(true)
+    expect(notaRecuperacaoValida(NaN, 10)).toBe(false)
+  })
+})
