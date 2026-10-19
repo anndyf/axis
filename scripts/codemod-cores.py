@@ -285,6 +285,59 @@ def cabecalhos(texto):
     return re.sub(r'<header className="mb-6(?: border-b border-line pb-4)?">[\s\S]*?</header>', um, texto)
 
 
+def maiusculas(texto, caminho):
+    """Sem rótulos em caixa alta (direção Linear/Stripe): tira `uppercase` das
+    classes, menos em campos de digitação (input/textarea/select, onde ajuda a
+    digitar códigos) e na visão de impressão da prova."""
+    if 'Print' in caminho:
+        return texto
+    def um(m):
+        inicio = texto.rfind('<', 0, m.start())
+        tag = re.match(r'<\s*([A-Za-z]\w*)', texto[inicio:inicio + 40]) if inicio >= 0 else None
+        if tag and tag.group(1).lower() in ('input', 'textarea', 'select'):
+            return m.group(0)
+        return re.sub(r'(?<![\w:-])uppercase(?![\w-])\s?', '', m.group(0))
+    return re.sub(r'className=(?:"[^"]*"|\{`[^`]*`\})', um, texto)
+
+
+def estados(texto):
+    """Estados selecionados e botões cheios fora da paleta: selecionado preto →
+    destaque suave; selecionado verde → sucesso suave; botão verde cheio (ação)
+    (com hover, ou seja, clicável) → primário na cor da escola. Verde fica só
+    para status."""
+    # fundos hex quase brancos (#f…): o fundo da página já é o canvas
+    texto = re.sub(r'min-h-screen bg-\[#f[0-9a-fA-F]{5}\]\s?', '', texto)
+    texto = re.sub(r'(?<![\w:-])bg-\[#f[0-9a-fA-F]{5}\]', 'bg-canvas', texto)
+    trocas = [
+        (r'bg-(?:black|zinc-900) border-(?:black|zinc-900) text-white', 'bg-accent-subtle border-accent text-accent-fg'),
+        (r'bg-(?:black|zinc-900) text-white border-(?:black|zinc-900)', 'bg-accent-subtle text-accent-fg border-accent'),
+        (r'bg-success border-success text-white', 'bg-success-subtle border-success-line text-success-fg'),
+        (r'bg-success text-white border-success', 'bg-success-subtle text-success-fg border-success-line'),
+    ]
+    for a, b in trocas:
+        texto = re.sub(r'(?<![\w:/-])' + a + r'(?![\w/-])', b, texto)
+    def botao(m):
+        c = m.group(0)
+        if 'hover:bg-success' in c and re.search(r'(?<![\w:-])bg-success(?![\w/-])', c) and re.search(r'(?<![\w:/-])text-white(?![\w/-])', c):
+            c = re.sub(r'(?<![\w:-])bg-success(?![\w/-])', 'bg-accent', c)
+            c = re.sub(r'(?<![\w:/-])text-white(?![\w/-])', 'text-on-accent', c)
+            c = re.sub(r'hover:bg-success(?![\w/-])', 'hover:bg-accent-hover', c)
+        escuro = re.search(r'(?<![\w:-])bg-(?:zinc-900|black)(?![\w/-])', c)
+        branco = re.search(r'(?<![\w:/-])text-white(?![\w/-])', c)
+        if escuro and branco and not re.search(r'(?<![\w:-])(?:absolute|fixed)(?![\w-])', c):
+            if re.search(r'hover:bg-(?:zinc-800|zinc-700|black)', c):
+                # botão escuro → primário
+                c = re.sub(r'(?<![\w:-])bg-(?:zinc-900|black)(?![\w/-])', 'bg-accent', c)
+                c = re.sub(r'(?<![\w:/-])text-white(?![\w/-])', 'text-on-accent', c)
+                c = re.sub(r'hover:bg-(?:zinc-800|zinc-700|black)(?![\w/-])', 'hover:bg-accent-hover', c)
+            else:
+                # chip/ícone escuro → neutro
+                c = re.sub(r'(?<![\w:-])bg-(?:zinc-900|black)(?![\w/-])', 'bg-subtle border border-line', c)
+                c = re.sub(r'(?<![\w:/-])text-white(?![\w/-])', 'text-fg', c)
+        return c
+    return re.sub(r'className=(?:"[^"]*"|\{`[^`]*`\})', botao, texto)
+
+
 def arquivos(raiz):
     for p in Path(raiz).rglob('*'):
         if p.suffix in ('.tsx', '.ts') and '.test.' not in p.name and 'components/ui' not in str(p):
@@ -301,7 +354,7 @@ if __name__ == '__main__':
         if contar:
             total += len(ALVO.findall(texto))
             continue
-        novo = limpar_espacos(cabecalhos(titulos(botoes(acabamento(sombras(casca(migrar(texto), str(p))))))))
+        novo = limpar_espacos(estados(maiusculas(cabecalhos(titulos(botoes(acabamento(sombras(casca(migrar(texto), str(p))))))), str(p))))
         if novo != texto:
             p.write_text(novo)
             mudados += 1
