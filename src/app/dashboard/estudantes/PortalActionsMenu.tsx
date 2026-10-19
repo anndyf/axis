@@ -69,7 +69,7 @@ export default function PortalActionsMenu() {
       {isOpen && (
         <div className="absolute right-0 left-0 md:left-auto mt-2 w-full md:w-64 bg-white rounded-xl shadow-overlay border border-zinc-300 py-2 z-50 animate-slide-up">
           <div className="px-4 py-2 mb-1 border-b border-zinc-200">
-            <span className="text-xs font-medium text-fg-subtle uppercase tracking-wider">Ações em Lote</span>
+            <span className="text-xs font-medium text-fg-subtle">Ações em Lote</span>
           </div>
           
           <button
@@ -84,7 +84,7 @@ export default function PortalActionsMenu() {
             )}
             <div>
               <p className="font-medium">Ativar Todos</p>
-              <p className="text-[10px] text-success-fg">Cria acesso para alunos sem portal</p>
+              <p className="text-xs text-success-fg">Cria acesso para alunos sem portal</p>
             </div>
           </button>
 
@@ -100,7 +100,7 @@ export default function PortalActionsMenu() {
             )}
             <div>
               <p className="font-medium">Desativar Todos</p>
-              <p className="text-[10px] text-danger-fg">Remove acesso de todos os alunos</p>
+              <p className="text-xs text-danger-fg">Remove acesso de todos os alunos</p>
             </div>
           </button>
         </div>

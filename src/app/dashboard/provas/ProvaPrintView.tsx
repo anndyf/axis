@@ -129,7 +129,7 @@ export default function ProvaPrintView({ prova, options, nomeEscola = 'Áxis', l
                         </div>
                         
                         <div className="flex flex-col border border-black w-24 shrink-0 h-16">
-                          <div className="border-b border-black text-center font-bold text-[9px] py-1">NOTA</div>
+                          <div className="border-b border-black text-center font-bold text-xs py-1">NOTA</div>
                           <div className="flex-1"></div>
                         </div>
                       </div>
@@ -159,7 +159,7 @@ export default function ProvaPrintView({ prova, options, nomeEscola = 'Áxis', l
 
                   {/* GABARITO (Estilo ENEM Vertical) na Primeira Página */}
                   <div className="w-full mt-4 mb-8 avoid-break font-sans" style={{ fontFamily: 'Arial, sans-serif' }}>
-                    <h3 className="font-bold text-[12pt] mb-4 text-center uppercase border-b-2 border-black pb-1 tracking-widest">
+                    <h3 className="font-bold text-[12pt] mb-4 text-center border-b-2 border-black pb-1">
                       {apenasGabarito ? 'GABARITO DO PROFESSOR' : 'CARTÃO DE RESPOSTA'}
                     </h3>
                     
@@ -180,7 +180,7 @@ export default function ProvaPrintView({ prova, options, nomeEscola = 'Áxis', l
                             
                             return (
                               <div key={colIndex} className="flex-1 border-2 border-black rounded-sm overflow-hidden max-w-[220px]">
-                                <div className="bg-zinc-200 text-center font-bold text-[9px] py-1.5 border-b-2 border-black tracking-wider print:bg-zinc-200">
+                                <div className="bg-zinc-200 text-center font-bold text-xs py-1.5 border-b-2 border-black tracking-wider print:bg-zinc-200">
                                   QUESTÃO / RESPOSTA
                                 </div>
                                 <div className="flex flex-col">
@@ -194,7 +194,7 @@ export default function ProvaPrintView({ prova, options, nomeEscola = 'Áxis', l
                                       <div key={rIdx} className={`flex items-center px-3 py-1.5 ${rowClass}`}>
                                         {qNum <= totalQuestoes ? (
                                           <>
-                                            <span className="font-bold text-[11px] w-6 text-black">{String(qNum).padStart(2, '0')}</span>
+                                            <span className="font-bold text-xs w-6 text-black">{String(qNum).padStart(2, '0')}</span>
                                             <div className="flex gap-2 ml-4">
                                               {letras.map(l => {
                                                 const isCorrect = apenasGabarito && l === questoes[qNum - 1]?.correta;
@@ -202,7 +202,7 @@ export default function ProvaPrintView({ prova, options, nomeEscola = 'Áxis', l
                                                   ? "bg-black text-white font-bold border-black print:bg-black print:text-white print:border-black print:color-adjust-exact" 
                                                   : "bg-white text-fg-subtle border-zinc-500 print:bg-white";
                                                 return (
-                                                  <div key={l} className={`w-4 h-4 rounded-full border flex items-center justify-center text-[8px] ${bubbleClass}`}>
+                                                  <div key={l} className={`w-4 h-4 rounded-full border flex items-center justify-center text-xs ${bubbleClass}`}>
                                                     {l}
                                                   </div>
                                                 )
@@ -227,7 +227,7 @@ export default function ProvaPrintView({ prova, options, nomeEscola = 'Áxis', l
                   {/* TABELA DE PONTUAÇÃO (Apenas no Gabarito do Professor) */}
                   {apenasGabarito && (
                     <div className="w-full mt-8 mb-8 avoid-break font-sans" style={{ fontFamily: 'Arial, sans-serif' }}>
-                      <h3 className="font-bold text-[12pt] mb-4 text-center uppercase border-b-2 border-black pb-1 tracking-widest">
+                      <h3 className="font-bold text-[12pt] mb-4 text-center border-b-2 border-black pb-1">
                         TABELA DE PONTUAÇÃO
                       </h3>
                       
@@ -253,7 +253,7 @@ export default function ProvaPrintView({ prova, options, nomeEscola = 'Áxis', l
                               
                               return (
                                 <div key={colIndex} className="flex-1 border-2 border-black rounded-sm overflow-hidden max-w-[220px]">
-                                  <div className="bg-zinc-200 text-center font-bold text-[9px] py-1.5 border-b-2 border-black tracking-wider flex justify-between px-4 print:bg-zinc-200">
+                                  <div className="bg-zinc-200 text-center font-bold text-xs py-1.5 border-b-2 border-black tracking-wider flex justify-between px-4 print:bg-zinc-200">
                                     <span>ACERTOS</span>
                                     <span>NOTA</span>
                                   </div>
@@ -271,8 +271,8 @@ export default function ProvaPrintView({ prova, options, nomeEscola = 'Áxis', l
                                       
                                       return (
                                         <div key={rIdx} className={`flex items-center justify-between px-4 py-1.5 ${rowClass}`}>
-                                          <span className="font-bold text-[11px] text-black">{String(acertos).padStart(2, '0')}</span>
-                                          <span className="font-bold text-[11px] text-accent-fg">{notaStr}</span>
+                                          <span className="font-bold text-xs text-black">{String(acertos).padStart(2, '0')}</span>
+                                          <span className="font-bold text-xs text-accent-fg">{notaStr}</span>
                                         </div>
                                       )
                                     })}
@@ -315,7 +315,7 @@ export default function ProvaPrintView({ prova, options, nomeEscola = 'Áxis', l
                       <React.Fragment key={idx}>
                         {isNewDisc && (
                           <div className="w-full mb-6 mt-4 border-b-2 border-black pb-1 break-inside-avoid" style={{ columnSpan: 'all', WebkitColumnSpan: 'all' }}>
-                            <h4 className="font-bold text-center uppercase tracking-widest text-[12pt]">{currentDisc}</h4>
+                            <h4 className="font-bold text-center text-[12pt]">{currentDisc}</h4>
                           </div>
                         )}
                         <div className="mb-6 w-full">

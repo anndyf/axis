@@ -61,7 +61,7 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
             <div className="flex items-center gap-2">
               <Link 
                   href="/dashboard/notas/recuperacao"
-                  className="flex items-center gap-2 bg-zinc-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-zinc-800 transition-all text-xs uppercase tracking-widest active:scale-95 shadow-card"
+                  className="flex items-center gap-2 bg-zinc-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-zinc-800 transition-all text-xs active:scale-95 shadow-card"
               >
                   <TrendingUp size={16} /> Lançar Recuperação Final
               </Link>
@@ -81,8 +81,8 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
                    {tip.icon}
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-fg uppercase tracking-widest mb-1">{tip.title}</h3>
-                  <p className="text-[11px] font-medium text-fg-subtle uppercase leading-relaxed">{tip.description}</p>
+                  <h3 className="text-sm font-medium text-fg mb-1">{tip.title}</h3>
+                  <p className="text-xs font-medium text-fg-subtle uppercase leading-relaxed">{tip.description}</p>
                 </div>
              </div>
           ))}
@@ -93,7 +93,7 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
             <div className="absolute top-0 right-0 w-32 h-32 bg-success-subtle rounded-full -mr-16 -mt-16 opacity-50 blur-3xl"></div>
             
             <div className="flex-1 min-w-[250px] space-y-2">
-                <label className="text-[10px] font-medium text-fg-subtle uppercase tracking-[0.2em] ml-2">Pesquisar Turma</label>
+                <label className="text-xs font-medium text-fg-subtle ml-2">Pesquisar Turma</label>
                 <div className="relative group">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-zinc-50 rounded-lg text-fg-subtle group-focus-within:text-success-fg group-focus-within:bg-success-subtle transition-all">
                         <Search size={18} />
@@ -109,7 +109,7 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
             </div>
 
             <div className="flex-1 min-w-[200px] space-y-2">
-                <label className="text-[10px] font-medium text-fg-subtle uppercase tracking-[0.2em] ml-2">Turno / Período</label>
+                <label className="text-xs font-medium text-fg-subtle ml-2">Turno / Período</label>
                 <div className="relative group">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-zinc-50 rounded-lg text-fg-subtle group-focus-within:text-success-fg group-focus-within:bg-success-subtle transition-all">
                     <Filter size={16} />
@@ -128,7 +128,7 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
             <div className="pb-2.5">
                 <div className="flex items-center gap-2 bg-success-subtle px-4 py-2.5 rounded-lg border border-success-line shadow-sm">
                     <span className="w-2 h-2 rounded-full bg-success animate-pulse"></span>
-                    <span className="text-[10px] font-semibold text-success-fg uppercase tracking-widest">{filteredTurmas.length} turmas mapeadas</span>
+                    <span className="text-xs font-semibold text-success-fg">{filteredTurmas.length} turmas mapeadas</span>
                 </div>
             </div>
         </div>
@@ -136,14 +136,14 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
         {/* Listagem Estilo Premium */}
         <div className="bg-white rounded-xl shadow-card border border-zinc-200 overflow-hidden">
           <div className="p-8 border-b border-zinc-200 bg-zinc-50/10 flex items-center justify-between">
-            <h2 className="text-[10px] font-semibold text-fg-subtle uppercase tracking-[0.2em] flex items-center gap-3">
+            <h2 className="text-xs font-semibold text-fg-subtle flex items-center gap-3">
                <div className="w-8 h-8 rounded-lg bg-success-subtle text-success-fg flex items-center justify-center shadow-card">
                  <Users size={16} />
                </div>
                Listagem de Turmas para Lançamento
             </h2>
             <div className="hidden md:block">
-              <span className="px-3 py-1 bg-zinc-50 text-fg-subtle text-[10px] font-semibold uppercase tracking-widest rounded-full border border-zinc-200">
+              <span className="px-3 py-1 bg-zinc-50 text-fg-subtle text-xs font-semibold rounded-full border border-zinc-200">
                 Acesso Rápido Habilitado
               </span>
             </div>
@@ -153,11 +153,11 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
             <table className="w-full text-left">
               <thead className="bg-zinc-50 border-b border-zinc-300">
                 <tr>
-                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle uppercase tracking-widest">Turma / Série</th>
-                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle uppercase tracking-widest text-center">Turno</th>
-                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle uppercase tracking-widest text-center">Estudantes</th>
-                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle uppercase tracking-widest text-center">Disciplinas</th>
-                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle uppercase tracking-widest text-center w-24">Ação</th>
+                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle">Turma / Série</th>
+                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center">Turno</th>
+                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center">Estudantes</th>
+                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center">Disciplinas</th>
+                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center w-24">Ação</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-200">
@@ -165,7 +165,7 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
                   <tr>
                     <td colSpan={5} className="px-6 py-16 text-center text-zinc-300">
                       <BarChart3 className="w-12 h-12 opacity-20 mx-auto mb-3" />
-                      <p className="text-sm font-medium uppercase tracking-widest">Ajuste os filtros para localizar a turma</p>
+                      <p className="text-sm font-medium">Ajuste os filtros para localizar a turma</p>
                     </td>
                   </tr>
                 ) : (
@@ -181,7 +181,7 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <span className="px-3 py-1 bg-zinc-200 text-fg-muted text-[11px] font-medium rounded-lg border border-zinc-300 uppercase tracking-wider">
+                        <span className="px-3 py-1 bg-zinc-200 text-fg-muted text-xs font-medium rounded-lg border border-zinc-300">
                           {turma.turno || 'N/A'}
                         </span>
                       </td>

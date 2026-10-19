@@ -108,7 +108,7 @@ export default function PlanoForm({ plano, onSuccess, onClose }: PlanoFormProps)
               <h2 className="text-xl font-bold text-fg tracking-tight leading-tight">
                 {plano ? 'Editar Plano' : 'Novo Plano'}
               </h2>
-              <p className="text-fg-subtle text-[11px] font-medium uppercase tracking-wider">Gestão Pedagógica</p>
+              <p className="text-fg-subtle text-xs font-medium">Gestão Pedagógica</p>
             </div>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-zinc-50 rounded-lg transition-all text-zinc-300 hover:text-fg-muted border border-transparent hover:border-zinc-100"><X size={20} /></button>
@@ -122,13 +122,13 @@ export default function PlanoForm({ plano, onSuccess, onClose }: PlanoFormProps)
           )}
 
           <div className="space-y-4">
-            <h3 className="text-[10px] font-bold text-fg-subtle uppercase tracking-widest flex items-center gap-2 px-1">
+            <h3 className="text-xs font-bold text-fg-subtle flex items-center gap-2 px-1">
                <Users size={12} /> Turmas e Período
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-lg border border-zinc-100 shadow-sm">
               <div className="space-y-1.5 text-left">
-                <label className="text-[9px] font-bold text-fg-subtle uppercase tracking-wider ml-1">Disciplina</label>
+                <label className="text-xs font-bold text-fg-subtle ml-1">Disciplina</label>
                 <select 
                   required
                   className="w-full h-10 px-3 bg-zinc-50 border border-zinc-100 rounded-xl text-xs font-semibold text-fg-muted focus:bg-white focus:ring-4 focus:ring-ring transition-all outline-none appearance-none"
@@ -146,23 +146,23 @@ export default function PlanoForm({ plano, onSuccess, onClose }: PlanoFormProps)
 
               <div className="grid grid-cols-2 gap-3">
                  <div className="space-y-1.5 text-left">
-                    <label className="text-[9px] font-bold text-fg-subtle uppercase tracking-wider ml-1">Início</label>
+                    <label className="text-xs font-bold text-fg-subtle ml-1">Início</label>
                     <div className="relative">
                       <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-fg-subtle" />
-                      <input type="date" required className="w-full h-10 pl-8 pr-3 bg-zinc-50 border border-zinc-100 rounded-xl text-[11px] font-semibold text-fg-muted" value={formData.periodoInicio} onChange={e => setFormData({...formData, periodoInicio: e.target.value})} />
+                      <input type="date" required className="w-full h-10 pl-8 pr-3 bg-zinc-50 border border-zinc-100 rounded-xl text-xs font-semibold text-fg-muted" value={formData.periodoInicio} onChange={e => setFormData({...formData, periodoInicio: e.target.value})} />
                     </div>
                  </div>
                  <div className="space-y-1.5 text-left">
-                    <label className="text-[9px] font-bold text-fg-subtle uppercase tracking-wider ml-1">Fim</label>
+                    <label className="text-xs font-bold text-fg-subtle ml-1">Fim</label>
                     <div className="relative">
                       <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-fg-subtle" />
-                      <input type="date" required className="w-full h-10 pl-8 pr-3 bg-zinc-50 border border-zinc-100 rounded-xl text-[11px] font-semibold text-fg-muted" value={formData.periodoFim} onChange={e => setFormData({...formData, periodoFim: e.target.value})} />
+                      <input type="date" required className="w-full h-10 pl-8 pr-3 bg-zinc-50 border border-zinc-100 rounded-xl text-xs font-semibold text-fg-muted" value={formData.periodoFim} onChange={e => setFormData({...formData, periodoFim: e.target.value})} />
                     </div>
                  </div>
               </div>
 
               <div className="space-y-1.5 md:col-span-2">
-                 <label className="text-[9px] font-bold text-fg-subtle uppercase tracking-wider ml-1">Categoria de Turmas</label>
+                 <label className="text-xs font-bold text-fg-subtle ml-1">Categoria de Turmas</label>
                  <select 
                    value={selectedClusterKey}
                    disabled={!selectedDisc}
@@ -185,7 +185,7 @@ export default function PlanoForm({ plano, onSuccess, onClose }: PlanoFormProps)
                           {disciplinaData[selectedDisc][selectedClusterKey].map((turma: Turma) => (
                               <button
                                 key={turma.id} type="button" onClick={() => toggleTurma(turma.id)}
-                                className={`px-4 py-2 rounded-xl text-[11px] font-bold transition-all ${
+                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                                   formData.turmasIds.includes(turma.id) ? 'bg-accent text-on-accent shadow-card ' : 'bg-zinc-50 text-fg-subtle border border-zinc-100 hover:bg-zinc-100'
                                 }`}
                               >
@@ -222,7 +222,7 @@ export default function PlanoForm({ plano, onSuccess, onClose }: PlanoFormProps)
 function TextField({ icon, title, value, onChange, placeholder, rows = 4, full = false }: any) {
     return (
         <div className={`space-y-1.5 ${full ? 'md:col-span-2' : ''}`}>
-            <label className="text-[9px] font-bold text-fg-subtle uppercase tracking-widest ml-1 flex items-center gap-2">
+            <label className="text-xs font-bold text-fg-subtle ml-1 flex items-center gap-2">
                 {icon} {title}
             </label>
             <textarea 

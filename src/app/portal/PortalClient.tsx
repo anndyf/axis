@@ -65,7 +65,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
           <p className="text-fg-muted mb-6">{error}</p>
           <button 
             onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-zinc-900 text-white rounded-lg font-semibold text-[10px] uppercase tracking-widest hover:bg-zinc-800 transition-all"
+            className="px-6 py-3 bg-zinc-900 text-white rounded-lg font-semibold text-xs hover:bg-zinc-800 transition-all"
           >
             Tentar Novamente
           </button>
@@ -92,12 +92,12 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
             <img src="/images/logo_axis.png" alt="Áxis" className="w-full h-full object-contain" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold text-fg tracking-tight leading-none uppercase">
+            <h1 className="text-lg font-semibold text-fg leading-none">
                {activeTab === 'home' ? '' : 
                 activeTab === 'messages' ? 'Mensagens' :
                 activeTab === 'grades' ? 'Boletim' : 'Meu Perfil'}
             </h1>
-            <span className="text-[9px] font-semibold text-accent-fg uppercase tracking-widest opacity-70">
+            <span className="text-xs font-semibold text-accent-fg opacity-70">
               {activeTab === 'home' ? `Olá, ${estudante.nome.split(' ')[0]} • ${nomeEscola}` : `Portal do Aluno • ${nomeEscola}`}
             </span>
           </div>
@@ -133,7 +133,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
                    
                    <div className="space-y-3">
                      <div className="bg-white/10 backdrop-blur-md rounded-lg px-5 py-3 border border-white/20">
-                       <span className="text-[9px] font-semibold uppercase tracking-widest block opacity-70 mb-0.5 text-on-accent/80">Minha Turma</span>
+                       <span className="text-xs font-semibold block opacity-70 mb-0.5 text-on-accent/80">Minha Turma</span>
                        <p className="text-xl font-semibold tracking-tight leading-none">{estudante.turma.nome}</p>
                      </div>
                      
@@ -142,7 +142,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
                        onClick={() => setIsScheduleOpen(true)}
                      >
                        <div>
-                         <span className="text-[9px] font-semibold uppercase tracking-widest block opacity-70 text-on-accent/80">Horário de Aulas</span>
+                         <span className="text-xs font-semibold block opacity-70 text-on-accent/80">Horário de Aulas</span>
                          <p className="text-xs font-semibold mt-1 flex items-center gap-1 group-hover/btn:translate-x-1 transition-transform">
                            Ver Quadro →
                          </p>
@@ -163,11 +163,11 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
                         <div className="w-8 h-8 bg-warning-subtle rounded-xl flex items-center justify-center text-warning-fg">
                            <Bell className="w-4 h-4" />
                         </div>
-                        <h3 className="text-sm font-semibold text-fg uppercase tracking-tight">Recentes</h3>
+                        <h3 className="text-sm font-semibold text-fg">Recentes</h3>
                     </div>
                     <button 
                         onClick={() => setActiveTab('messages')}
-                        className="text-[10px] font-semibold text-accent-fg uppercase tracking-widest hover:underline"
+                        className="text-xs font-semibold text-accent-fg hover:underline"
                     >
                         Ver Todas
                     </button>
@@ -180,7 +180,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
                            className="p-4 rounded-lg bg-zinc-50 border border-zinc-100 hover:border-accent/25 transition-all cursor-pointer group active:scale-[0.98]"
                         >
                            <h4 className="text-xs font-semibold text-fg group-hover:text-accent-fg transition-colors truncate">{msg.subject}</h4>
-                           <p className="text-[11px] text-fg-subtle line-clamp-1 mt-1 font-medium">{msg.content}</p>
+                           <p className="text-xs text-fg-subtle line-clamp-1 mt-1 font-medium">{msg.content}</p>
                         </div>
                      ))}
                   </div>
@@ -194,7 +194,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
                 </div>
                 <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-semibold text-fg leading-none mb-1">Análise de Desempenho</h4>
-                    <p className="text-[11px] text-fg-subtle font-medium truncate">Confira suas médias e alertas de risco no boletim.</p>
+                    <p className="text-xs text-fg-subtle font-medium truncate">Confira suas médias e alertas de risco no boletim.</p>
                 </div>
                 <button 
                     onClick={() => setActiveTab('grades')}
@@ -212,7 +212,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
             <div className="hidden md:flex mb-6">
                <button 
                  onClick={() => setActiveTab('home')}
-                 className="flex items-center gap-2 px-4 py-2 bg-white border border-zinc-200 rounded-xl text-xs font-semibold uppercase tracking-widest text-fg-subtle hover:text-accent-fg hover:border-accent/25 transition-all shadow-sm"
+                 className="flex items-center gap-2 px-4 py-2 bg-white border border-zinc-200 rounded-xl text-xs font-semibold text-fg-subtle hover:text-accent-fg hover:border-accent/25 transition-all shadow-sm"
                >
                  <ArrowLeft size={14} /> Voltar ao Início
                </button>
@@ -233,11 +233,11 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
                   }`}
                 >
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-[9px] font-semibold text-fg-subtle uppercase tracking-widest">
+                    <span className="text-xs font-semibold text-fg-subtle">
                        {new Date(msg.createdAt).toLocaleDateString()}
                     </span>
                     {isMessageNew(msg) && (
-                        <span className="px-2 py-0.5 bg-accent text-on-accent text-[8px] font-semibold uppercase tracking-widest rounded-full">Nova</span>
+                        <span className="px-2 py-0.5 bg-accent text-on-accent text-xs font-semibold rounded-full">Nova</span>
                     )}
                   </div>
                   <h4 className="text-sm font-semibold text-fg mb-1 leading-tight">{msg.subject}</h4>
@@ -246,7 +246,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
                )) : (
                 <div className="text-center py-20 opacity-50">
                     <Bell className="w-12 h-12 mx-auto mb-3 text-zinc-300" />
-                    <p className="text-xs font-semibold uppercase tracking-widest">Nada por aqui</p>
+                    <p className="text-xs font-semibold">Nada por aqui</p>
                 </div>
                )}
             </div>
@@ -259,7 +259,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
             <div className="hidden md:flex mb-2">
                <button 
                  onClick={() => setActiveTab('home')}
-                 className="flex items-center gap-2 px-4 py-2 bg-white border border-zinc-200 rounded-xl text-xs font-semibold uppercase tracking-widest text-fg-subtle hover:text-accent-fg hover:border-accent/25 transition-all shadow-sm"
+                 className="flex items-center gap-2 px-4 py-2 bg-white border border-zinc-200 rounded-xl text-xs font-semibold text-fg-subtle hover:text-accent-fg hover:border-accent/25 transition-all shadow-sm"
                >
                  <ArrowLeft size={14} /> Voltar ao Início
                </button>
@@ -268,7 +268,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
              <div className="bg-white rounded-xl shadow-card border border-zinc-100 overflow-hidden">
                 <div className="px-6 py-5 bg-zinc-50/50 border-b border-zinc-100 flex items-center gap-3">
                    <BookOpen className="text-accent-fg w-5 h-5" />
-                   <h3 className="text-sm font-semibold text-fg uppercase tracking-tight">Boletim Escolar</h3>
+                   <h3 className="text-sm font-semibold text-fg">Boletim Escolar</h3>
                    {frequencia && (
                      <span className={`ml-auto text-xs font-semibold ${frequencia.geral.percentual !== null && frequencia.geral.percentual < frequencia.minimo ? 'text-danger-fg' : 'text-fg-subtle'}`}>
                        Frequência {formatarFrequencia(frequencia.geral.percentual)} · {frequencia.geral.faltas} {frequencia.geral.faltas === 1 ? 'falta' : 'faltas'} · mínimo {frequencia.minimo}%
@@ -279,13 +279,13 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-white border-b border-zinc-100 whitespace-nowrap">
-                        <th className="px-6 py-4 text-[9px] font-semibold text-fg-subtle uppercase tracking-widest">Disciplina</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-fg-subtle">Disciplina</th>
                         {nomesEtapas.map((nome: string, i: number) => (
-                          <th key={i} title={nome} className="px-4 py-4 text-[9px] font-semibold text-fg-subtle uppercase tracking-widest text-center">U{i + 1}</th>
+                          <th key={i} title={nome} className="px-4 py-4 text-xs font-semibold text-fg-subtle text-center">U{i + 1}</th>
                         ))}
-                        <th className="px-4 py-4 text-[9px] font-semibold text-fg-subtle uppercase tracking-widest text-center">Méd</th>
-                        {frequencia && <th className="px-4 py-4 text-[9px] font-semibold text-fg-subtle uppercase tracking-widest text-center">Freq</th>}
-                        <th className="px-6 py-4 text-[9px] font-semibold text-fg-subtle uppercase tracking-widest text-center">Risco</th>
+                        <th className="px-4 py-4 text-xs font-semibold text-fg-subtle text-center">Méd</th>
+                        {frequencia && <th className="px-4 py-4 text-xs font-semibold text-fg-subtle text-center">Freq</th>}
+                        <th className="px-6 py-4 text-xs font-semibold text-fg-subtle text-center">Risco</th>
                       </tr>
                     </thead>
               <tbody className="divide-y divide-zinc-50">
@@ -304,7 +304,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
                         </td>
                       ))}
                       <td className="px-4 py-4 text-center">
-                        <div className={`inline-flex px-3 py-1 rounded-lg font-semibold text-[10px] ${nota.nota >= notaMinimaAprovacao ?'bg-success-subtle text-success-fg border border-success-line' : 'bg-danger-subtle text-danger-fg border border-danger-line'}`}>
+                        <div className={`inline-flex px-3 py-1 rounded-lg font-semibold text-xs ${nota.nota >= notaMinimaAprovacao ?'bg-success-subtle text-success-fg border border-success-line' : 'bg-danger-subtle text-danger-fg border border-danger-line'}`}>
                           {nota.nota.toFixed(1).replace('.', ',')}
                         </div>
                       </td>
@@ -331,7 +331,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
                             {risk.level === 'MEDIUM' && <Info size={12} className="text-warning-fg" />}
                             {risk.level === 'LOW' && <CheckCircle2 size={12} className="text-success-fg" />}
                             
-                            <span className={`text-[9px] font-semibold uppercase tracking-tight ${risk.color}`}>
+                            <span className={`text-xs font-semibold ${risk.color}`}>
                                {risk.level === 'NONE' ? 'Sem dados' : 
                                 risk.level === 'CRITICAL' ? 'Risco Crítico' :
                                 risk.level === 'HIGH' ? 'Risco Alto' :
@@ -355,7 +355,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
             <div className="hidden md:flex mb-2">
                <button 
                  onClick={() => setActiveTab('home')}
-                 className="flex items-center gap-2 px-4 py-2 bg-white border border-zinc-200 rounded-xl text-xs font-semibold uppercase tracking-widest text-fg-subtle hover:text-accent-fg hover:border-accent/25 transition-all shadow-sm"
+                 className="flex items-center gap-2 px-4 py-2 bg-white border border-zinc-200 rounded-xl text-xs font-semibold text-fg-subtle hover:text-accent-fg hover:border-accent/25 transition-all shadow-sm"
                >
                  <ArrowLeft size={14} /> Voltar ao Início
                </button>
@@ -366,22 +366,22 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
                       <UserIcon className="w-10 h-10 text-accent-fg" />
                   </div>
                   <h2 className="text-2xl font-semibold text-fg">{estudante.nome}</h2>
-                  <p className="text-xs font-semibold text-fg-subtle uppercase tracking-widest mt-1">Matrícula: {estudante.matricula}</p>
+                  <p className="text-xs font-semibold text-fg-subtle mt-1">Matrícula: {estudante.matricula}</p>
                   
                   <div className="grid grid-cols-2 gap-4 mt-8 text-left">
                       <div className="bg-zinc-50 p-4 rounded-lg">
-                          <span className="text-[9px] font-semibold text-fg-subtle uppercase tracking-widest block mb-1">Turma</span>
+                          <span className="text-xs font-semibold text-fg-subtle block mb-1">Turma</span>
                           <p className="text-xs font-semibold text-fg-muted">{estudante.turma.nome}</p>
                       </div>
                       <div className="bg-zinc-50 p-4 rounded-lg">
-                          <span className="text-[9px] font-semibold text-fg-subtle uppercase tracking-widest block mb-1">Turno</span>
+                          <span className="text-xs font-semibold text-fg-subtle block mb-1">Turno</span>
                           <p className="text-xs font-semibold text-fg-muted">{estudante.turma.turno || '---'}</p>
                       </div>
                   </div>
 
                   <button 
                     onClick={() => signOut({ callbackUrl: "/login" })}
-                    className="w-full mt-10 flex items-center justify-center gap-3 px-6 py-4 bg-danger-subtle text-danger-fg rounded-xl font-semibold text-xs uppercase tracking-widest hover:bg-danger-subtle transition-all active:scale-95"
+                    className="w-full mt-10 flex items-center justify-center gap-3 px-6 py-4 bg-danger-subtle text-danger-fg rounded-xl font-semibold text-xs hover:bg-danger-subtle transition-all active:scale-95"
                   >
                     <LogOut className="w-5 h-5" />
                     Sair do Sistema
@@ -394,8 +394,8 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
         {/* Footer Info */}
         <div className="flex flex-col gap-6 items-center text-center p-8 pb-12">
           <div className="flex flex-col items-center gap-2">
-            <span className="text-[10px] font-semibold text-fg-subtle uppercase tracking-[0.2em]">Áxis v2.0 • {estudante.turma.anoLetivo}</span>
-            <span className="text-[9px] font-semibold text-zinc-300 uppercase tracking-widest">
+            <span className="text-xs font-semibold text-fg-subtle">Áxis v2.0 • {estudante.turma.anoLetivo}</span>
+            <span className="text-xs font-semibold text-zinc-300">
               © {new Date().getFullYear()} {nomeEscola}
             </span>
           </div>
@@ -405,10 +405,10 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
           <div className="flex flex-col items-center gap-2">
             <div className="flex items-center gap-2 py-1.5 px-4 bg-white border border-zinc-100 rounded-full shadow-sm">
               <Code size={12} className="text-accent-fg" />
-              <span className="text-[9px] font-semibold text-fg-subtle uppercase tracking-tight">Desenvolvido por</span>
-              <span className="text-[9px] font-semibold text-fg uppercase tracking-tight">Andressa Mirella</span>
+              <span className="text-xs font-semibold text-fg-subtle">Desenvolvido por</span>
+              <span className="text-xs font-semibold text-fg">Andressa Mirella</span>
             </div>
-            <span className="text-[8px] font-semibold text-zinc-300 uppercase tracking-widest">Todos os direitos reservados</span>
+            <span className="text-xs font-semibold text-zinc-300">Todos os direitos reservados</span>
           </div>
         </div>
 
@@ -421,14 +421,14 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
             className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'home' ? 'text-white scale-110' : 'text-fg-subtle'}`}
         >
             <Home className="w-6 h-6" />
-            <span className="text-[8px] font-semibold uppercase tracking-tighter">Início</span>
+            <span className="text-xs font-semibold">Início</span>
         </button>
         <button 
             onClick={() => setActiveTab('messages')}
             className={`flex flex-col items-center gap-1 transition-all relative ${activeTab === 'messages' ? 'text-white scale-110' : 'text-fg-subtle'}`}
         >
             <MessageSquare className="w-6 h-6" />
-            <span className="text-[8px] font-semibold uppercase tracking-tighter">Avisos</span>
+            <span className="text-xs font-semibold">Avisos</span>
             {hasUnreadMessages && <span className="absolute top-0 right-0 w-2 h-2 bg-danger rounded-full border border-zinc-900" />}
         </button>
         <div className="w-16 h-16 bg-white rounded-full -mt-10 border-4 border-zinc-900 shadow-card flex items-center justify-center p-1.5">
@@ -439,14 +439,14 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
             className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'grades' ? 'text-white scale-110' : 'text-fg-subtle'}`}
         >
             <BookOpen className="w-6 h-6" />
-            <span className="text-[8px] font-semibold uppercase tracking-tighter">Notas</span>
+            <span className="text-xs font-semibold">Notas</span>
         </button>
         <button 
             onClick={() => setActiveTab('profile')}
             className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'profile' ? 'text-white scale-110' : 'text-fg-subtle'}`}
         >
             <UserIcon className="w-6 h-6" />
-            <span className="text-[8px] font-semibold uppercase tracking-tighter">Eu</span>
+            <span className="text-xs font-semibold">Eu</span>
         </button>
       </nav>
 
@@ -460,13 +460,13 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
           <div className="bg-white rounded-xl shadow-card relative w-full max-w-2xl overflow-hidden animate-pop-in">
             <div className="bg-zinc-50 border-b border-zinc-100 p-6 md:p-8 flex justify-between items-start">
               <div className="pr-10">
-                <span className="inline-block px-3 py-1 bg-accent-subtle text-accent-fg rounded-lg text-[10px] font-semibold uppercase tracking-widest mb-3">
+                <span className="inline-block px-3 py-1 bg-accent-subtle text-accent-fg rounded-lg text-xs font-semibold mb-3">
                   Comunicado
                 </span>
                 <h3 className="text-xl md:text-2xl font-semibold text-fg leading-tight">
                   {selectedMessage.subject}
                 </h3>
-                <div className="flex items-center gap-3 mt-3 text-fg-subtle text-xs font-semibold uppercase tracking-wide">
+                <div className="flex items-center gap-3 mt-3 text-fg-subtle text-xs font-semibold">
                   <span>{new Date(selectedMessage.createdAt).toLocaleDateString()} às {new Date(selectedMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                   {selectedMessage.sender?.name && (
                     <>
@@ -493,7 +493,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
             <div className="bg-zinc-50 border-t border-zinc-100 p-4 md:p-6 flex justify-end">
               <button 
                 onClick={() => setSelectedMessage(null)}
-                className="flex items-center gap-2 px-6 py-3 bg-zinc-900 text-white rounded-xl font-semibold text-[10px] uppercase tracking-widest hover:bg-zinc-800 transition-all shadow-card hover:shadow-card active:scale-95"
+                className="flex items-center gap-2 px-6 py-3 bg-zinc-900 text-white rounded-xl font-semibold text-xs hover:bg-zinc-800 transition-all shadow-card hover:shadow-card active:scale-95"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Voltar
@@ -516,7 +516,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
                    <Calendar className="w-6 h-6 text-accent-fg" />
                    Horário de Aulas
                  </h3>
-                 <p className="text-xs font-semibold text-fg-subtle uppercase tracking-widest mt-1">
+                 <p className="text-xs font-semibold text-fg-subtle mt-1">
                    {estudante.turma.nome}
                  </p>
                </div>
@@ -534,11 +534,11 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
                    <thead>
                      <tr>
                        <th className="p-3 text-center w-16 bg-zinc-50 rounded-tl-xl border-b border-r border-zinc-200">
-                         <span className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest">Hor</span>
+                         <span className="text-xs font-semibold text-fg-subtle">Hor</span>
                        </th>
                        {["Seg", "Ter", "Qua", "Qui", "Sex"].map((day, idx) => (
                          <th key={day} className={`p-3 w-[19%] border-b border-zinc-200 bg-zinc-50 ${idx === 4 ? 'rounded-tr-xl' : 'border-r'}`}>
-                           <span className="text-xs font-semibold text-accent-fg uppercase tracking-tight block text-center">
+                           <span className="text-xs font-semibold text-accent-fg block text-center">
                              {day}
                            </span>
                          </th>
@@ -582,12 +582,12 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
                                     <div className="flex flex-col items-center justify-center h-full text-center p-1 rounded-xl hover:bg-accent-subtle transition-colors">
                                         <p className="text-xs font-semibold text-fg leading-tight mb-1">{aula.disciplina}</p>
                                         {profName && profName.trim() !== "" && (
-                                            <p className="text-[9px] font-semibold text-fg-subtle uppercase tracking-wider">{profName}</p>
+                                            <p className="text-xs font-semibold text-fg-subtle">{profName}</p>
                                         )}
                                     </div>
                                 ) : (
                                     <div className="h-full flex items-center justify-center">
-                                        <span className="text-[10px] font-semibold text-zinc-300 tracking-tighter">--------</span>
+                                        <span className="text-xs font-semibold text-zinc-300 tracking-tighter">--------</span>
                                     </div>
                                 )}
                              </td>
@@ -603,7 +603,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
             <div className="p-4 bg-zinc-50 border-t border-zinc-200 flex justify-end shrink-0">
                <button 
                  onClick={() => setIsScheduleOpen(false)}
-                 className="flex items-center gap-2 px-6 py-2.5 bg-zinc-900 text-white rounded-xl font-semibold text-[10px] uppercase tracking-widest hover:bg-zinc-800 transition-all shadow-card active:scale-95"
+                 className="flex items-center gap-2 px-6 py-2.5 bg-zinc-900 text-white rounded-xl font-semibold text-xs hover:bg-zinc-800 transition-all shadow-card active:scale-95"
                >
                  <ArrowLeft className="w-4 h-4" />
                  Voltar

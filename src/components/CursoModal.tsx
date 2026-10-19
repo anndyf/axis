@@ -218,7 +218,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
           <div className="space-y-5">
             {/* Nome */}
             <div className="group">
-              <label className="block text-[10px] font-semibold text-fg-subtle uppercase tracking-widest mb-1.5 ml-1">Nome do Curso</label>
+              <label className="block text-xs font-semibold text-fg-subtle mb-1.5 ml-1">Nome do Curso</label>
               <input
                 required type="text" placeholder="Ex: Técnico em Meio Ambiente"
                 value={formData.nome}
@@ -243,7 +243,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
 
             {/* Sigla */}
             <div className="group">
-              <label className="block text-[10px] font-semibold text-fg-subtle uppercase tracking-widest mb-1.5 ml-1">Sigla</label>
+              <label className="block text-xs font-semibold text-fg-subtle mb-1.5 ml-1">Sigla</label>
               <div className="relative">
                 <input
                   required type="text" placeholder="Ex: MA" maxLength={8}
@@ -254,7 +254,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
                 <Hash className="w-4 h-4 text-fg-subtle absolute left-4 top-1/2 -translate-y-1/2" />
               </div>
               {!isEdit && formData.modalidades.length > 1 && (
-                <p className="text-[10px] text-fg-subtle mt-1.5 ml-1">
+                <p className="text-xs text-fg-subtle mt-1.5 ml-1">
                   💡 Será combinada com cada modalidade (ex: {formData.sigla || "MA"}_EPTM)
                 </p>
               )}
@@ -262,7 +262,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
 
             {/* Modalidades */}
             <div className="space-y-2">
-              <label className="block text-[10px] font-semibold text-fg-subtle uppercase tracking-widest mb-2 ml-1">
+              <label className="block text-xs font-semibold text-fg-subtle mb-2 ml-1">
                 Modalidade{!isEdit && 's'}
                 {!isEdit && formData.modalidades.length > 1 && (
                   <span className="ml-2 text-accent-fg normal-case font-bold">
@@ -276,7 +276,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
                     key={m} type="button"
                     onClick={() => handleToggleModalidade(m)}
                     disabled={isEdit}
-                    className={`px-4 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wide transition-all border ${
+                    className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all border ${
                       formData.modalidades.includes(m)
                         ? 'bg-accent text-on-accent border-accent shadow-card '
                         : 'bg-zinc-50 text-fg-subtle border-zinc-200 hover:border-zinc-300 hover:text-fg-muted'
@@ -287,7 +287,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
                 ))}
               </div>
               {isEdit && (
-                <p className="text-[10px] text-fg-subtle ml-1">
+                <p className="text-xs text-fg-subtle ml-1">
                   ⚠️ A modalidade não pode ser alterada após a criação.
                 </p>
               )}
@@ -295,13 +295,13 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
               {/* Preview de criação */}
               {!isEdit && formData.modalidades.length > 1 && formData.nome && (
                 <div className="mt-3 p-3 bg-accent-subtle border border-accent/25 rounded-xl space-y-1">
-                  <p className="text-[10px] font-bold text-accent-fg uppercase tracking-wider mb-1.5">Serão criados:</p>
+                  <p className="text-xs font-bold text-accent-fg mb-1.5">Serão criados:</p>
                   {formData.modalidades.map(m => (
                     <div key={m} className="flex items-center gap-2 text-xs text-accent-fg">
                       <span className="w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
                       <span className="font-semibold">{formData.nome}</span>
                       <span className="text-accent">–</span>
-                      <span className="font-bold text-[10px] bg-accent-subtle px-1.5 py-0.5 rounded">{m}</span>
+                      <span className="font-bold text-xs bg-accent-subtle px-1.5 py-0.5 rounded">{m}</span>
                     </div>
                   ))}
                 </div>
@@ -310,7 +310,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
 
             {/* Nível de Ensino */}
             <div className="space-y-2">
-              <label className="block text-[10px] font-semibold text-fg-subtle uppercase tracking-widest mb-2 ml-1">
+              <label className="block text-xs font-semibold text-fg-subtle mb-2 ml-1">
                 Nível de Ensino <span className="normal-case font-medium text-zinc-300">(opcional)</span>
               </label>
               <div className="flex flex-wrap gap-2">
@@ -318,7 +318,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
                   <button
                     key={n} type="button"
                     onClick={() => setFormData(prev => ({ ...prev, nivelEnsino: prev.nivelEnsino === n ? "" : n }))}
-                    className={`px-4 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wide transition-all border ${
+                    className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all border ${
                       formData.nivelEnsino === n
                         ? 'bg-success text-white border-success shadow-card '
                         : 'bg-zinc-50 text-fg-subtle border-zinc-200 hover:border-zinc-300 hover:text-fg-muted'
@@ -332,7 +332,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
 
             {/* Esquema de Avaliação */}
             <div className="group">
-              <label className="block text-[10px] font-semibold text-fg-subtle uppercase tracking-widest mb-1.5 ml-1">
+              <label className="block text-xs font-semibold text-fg-subtle mb-1.5 ml-1">
                 Esquema de Avaliação <span className="normal-case font-medium text-zinc-300">(opcional)</span>
               </label>
               <select
@@ -349,13 +349,13 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
 
             {/* Turnos */}
             <div className="space-y-2">
-              <label className="block text-[10px] font-semibold text-fg-subtle uppercase tracking-widest mb-2 ml-1">Turnos Disponíveis</label>
+              <label className="block text-xs font-semibold text-fg-subtle mb-2 ml-1">Turnos Disponíveis</label>
               <div className="flex flex-wrap gap-2">
                 {TURNOS.map(t => (
                   <button
                     key={t} type="button"
                     onClick={() => handleToggleTurno(t)}
-                    className={`px-4 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wide transition-all border ${
+                    className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all border ${
                       formData.turnos.includes(t)
                         ? 'bg-accent text-on-accent border-accent shadow-card '
                         : 'bg-zinc-50 text-fg-subtle border-zinc-200 hover:border-zinc-300 hover:text-fg-muted'

@@ -102,7 +102,7 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
             )}
 
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-fg-subtle uppercase tracking-widest ml-1">Turma do Aluno *</label>
+              <label className="text-xs font-bold text-fg-subtle ml-1">Turma do Aluno *</label>
               <select
                 required
                 value={form.turmaId}
@@ -117,7 +117,7 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-fg-subtle uppercase tracking-widest ml-1">Nome Completo do Estudante *</label>
+              <label className="text-xs font-bold text-fg-subtle ml-1">Nome Completo do Estudante *</label>
               <input
                 type="text"
                 required
@@ -130,7 +130,7 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-fg-subtle uppercase tracking-widest ml-1">Matrícula *</label>
+                <label className="text-xs font-bold text-fg-subtle ml-1">Matrícula *</label>
                 <input
                   type="text"
                   required
@@ -142,7 +142,7 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-fg-subtle uppercase tracking-widest ml-1">Motivo da Solicitação *</label>
+                <label className="text-xs font-bold text-fg-subtle ml-1">Motivo da Solicitação *</label>
                 <input
                   type="text"
                   required
@@ -165,7 +165,7 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
                       key={motivo}
                       type="button"
                       onClick={() => setForm(p => ({ ...p, observacao: motivo }))}
-                      className="text-[10px] font-bold bg-zinc-100 hover:bg-accent-subtle hover:text-accent-fg text-fg-subtle px-3 py-1.5 rounded-lg border border-zinc-200 hover:border-accent/25 transition-all cursor-pointer"
+                      className="text-xs font-bold bg-zinc-100 hover:bg-accent-subtle hover:text-accent-fg text-fg-subtle px-3 py-1.5 rounded-lg border border-zinc-200 hover:border-accent/25 transition-all cursor-pointer"
                     >
                       {motivo}
                     </button>

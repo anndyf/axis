@@ -129,20 +129,20 @@ export default function ResultadosTurmaClient({
             if (n.nota !== null && n.nota !== undefined) {
                  return (
                      <div className="flex flex-col items-center justify-center gap-[1px]" title="Infrequente (Desistente)">
-                         <span className={`w-5 h-5 rounded flex items-center justify-center text-[9px] font-medium ${config.color} ${config.text} shadow-sm`}>{label}</span>
-                         <span className="text-[7px] font-semibold uppercase tracking-wider bg-warning-subtle text-warning-fg px-1 rounded">INF</span>
+                         <span className={`w-5 h-5 rounded flex items-center justify-center text-xs font-medium ${config.color} ${config.text} shadow-sm`}>{label}</span>
+                         <span className="text-[7px] font-semibold bg-warning-subtle text-warning-fg px-1 rounded">INF</span>
                      </div>
                  )
             }
             return (
                  <div className="flex items-center justify-center h-full w-full" title="Infrequente (Desistente)">
-                    <span className="text-[9px] font-semibold uppercase tracking-wider bg-warning-subtle text-warning-fg px-2 py-0.5 rounded border border-warning-line">INF</span>
+                    <span className="text-xs font-semibold bg-warning-subtle text-warning-fg px-2 py-0.5 rounded border border-warning-line">INF</span>
                  </div>
             )
         }
 
         return (
-            <span className={`w-5 h-5 rounded flex items-center justify-center text-[9px] font-medium ${config.color} ${config.text} shadow-sm`}>
+            <span className={`w-5 h-5 rounded flex items-center justify-center text-xs font-medium ${config.color} ${config.text} shadow-sm`}>
               {label}
             </span>
         )
@@ -159,14 +159,14 @@ export default function ResultadosTurmaClient({
              const config = getStatusConfig('NUMERIC', value)
              return (
                  <div className="flex flex-col items-center justify-center gap-0.5" title="Infrequente nesta unidade">
-                     <span className={`text-[11px] font-medium ${config.color}`}>{config.label}</span>
-                     <span className="text-[8px] font-semibold uppercase tracking-wider bg-warning-subtle text-warning-fg px-1 rounded">INF</span>
+                     <span className={`text-xs font-medium ${config.color}`}>{config.label}</span>
+                     <span className="text-xs font-semibold bg-warning-subtle text-warning-fg px-1 rounded">INF</span>
                  </div>
              )
         }
         return (
              <div className="flex items-center justify-center h-full w-full" title="Infrequente nesta unidade (Sem nota)">
-                <span className="text-[9px] font-semibold uppercase tracking-wider bg-warning-subtle text-warning-fg px-2 py-0.5 rounded border border-warning-line">INF</span>
+                <span className="text-xs font-semibold bg-warning-subtle text-warning-fg px-2 py-0.5 rounded border border-warning-line">INF</span>
              </div>
         )
     }
@@ -243,12 +243,12 @@ export default function ResultadosTurmaClient({
               </Link>
               <div>
                 <div className="flex items-center space-x-2 mb-0.5">
-                  <h1 className="text-3xl font-medium text-black tracking-tight uppercase">RESULTADO - {turmaNome}</h1>
-                  <span className="px-2.5 py-1 bg-zinc-700 text-white text-[10px] font-medium rounded-md uppercase tracking-widest leading-none">
+                  <h1 className="text-3xl font-medium text-black">RESULTADO - {turmaNome}</h1>
+                  <span className="px-2.5 py-1 bg-zinc-700 text-white text-xs font-medium rounded-md leading-none">
                     Realtime
                   </span>
                 </div>
-                <p className="text-xs font-medium text-fg-subtle uppercase tracking-widest flex items-center">
+                <p className="text-xs font-medium text-fg-subtle flex items-center">
                   <span className="text-fg-muted mr-2 font-medium">{turmaNome}</span>
                   • Relatório de Notas • {selectedUnit.replace('UNIDADE_', 'Unidade ').replace('FINAL', 'Final')}
                 </p>
@@ -274,7 +274,7 @@ export default function ResultadosTurmaClient({
                       }`}
                     >
                       <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-fg-subtle'}`} />
-                      <span className="uppercase tracking-wide">{item.label}</span>
+                      <span className="">{item.label}</span>
                     </button>
                   )
                 })}
@@ -284,7 +284,7 @@ export default function ResultadosTurmaClient({
                 href={`/api/relatorio/resultados/${turmaId}/pdf?unit=${selectedUnit}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center space-x-2 bg-zinc-700 text-white px-5 py-2.5 rounded-lg hover:bg-zinc-800 transition-all shadow-card active:scale-95 font-medium text-xs uppercase tracking-widest"
+                className="flex items-center space-x-2 bg-zinc-700 text-white px-5 py-2.5 rounded-lg hover:bg-zinc-800 transition-all shadow-card active:scale-95 font-medium text-xs"
               >
                 <Download className="w-4 h-4" />
                 <span>PDF</span>
@@ -301,12 +301,12 @@ export default function ResultadosTurmaClient({
           {/* Metrics */}
           <div className="flex items-center space-x-6 px-2">
             <div>
-               <p className="text-[10px] font-medium text-fg-subtle uppercase tracking-widest">Estudantes</p>
+               <p className="text-xs font-medium text-fg-subtle">Estudantes</p>
                <p className="text-2xl font-medium text-black leading-none">{matrixData.length}</p>
             </div>
             <div className="w-px h-8 bg-zinc-200" />
             <div>
-               <p className="text-[10px] font-medium text-fg-subtle uppercase tracking-widest">Disciplinas</p>
+               <p className="text-xs font-medium text-fg-subtle">Disciplinas</p>
                <p className="text-2xl font-medium text-black leading-none">{disciplinas.length}</p>
             </div>
           </div>
@@ -322,10 +322,10 @@ export default function ResultadosTurmaClient({
                { id: 'INF', badge: 'INF', label: 'Infrequente', color: 'bg-warning-subtle border border-warning-line', text: 'text-warning-fg' }
              ].map((item) => (
                <div key={item.id} className="flex items-center space-x-1.5" title={item.label}>
-                 <span className={`w-5 h-5 rounded flex items-center justify-center text-[9px] font-medium ${item.color} ${(item as any).text || 'text-white'}`}>
+                 <span className={`w-5 h-5 rounded flex items-center justify-center text-xs font-medium ${item.color} ${(item as any).text || 'text-white'}`}>
                    {(item as any).badge || item.id}
                  </span>
-                 <span className="text-[10px] font-medium text-fg-muted uppercase">{item.label}</span>
+                 <span className="text-xs font-medium text-fg-muted uppercase">{item.label}</span>
                </div>
              ))}
           </div>
@@ -337,22 +337,22 @@ export default function ResultadosTurmaClient({
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-zinc-50/80 border-b border-zinc-300">
-                  <th className="px-2 py-2 text-center text-[10px] font-medium text-fg-subtle uppercase sticky left-0 bg-zinc-50/95 backdrop-blur z-20 w-10 border-r border-zinc-300">
+                  <th className="px-2 py-2 text-center text-xs font-medium text-fg-subtle uppercase sticky left-0 bg-zinc-50/95 backdrop-blur z-20 w-10 border-r border-zinc-300">
                     #
                   </th>
-                  <th className="px-3 py-2 text-left text-[11px] font-medium text-black uppercase sticky left-8 bg-white z-30 min-w-[250px] border-r border-zinc-300 shadow-[2px_0_5px_rgba(0,0,0,0.05)] whitespace-nowrap">
+                  <th className="px-3 py-2 text-left text-xs font-medium text-black uppercase sticky left-8 bg-white z-30 min-w-[250px] border-r border-zinc-300 shadow-[2px_0_5px_rgba(0,0,0,0.05)] whitespace-nowrap">
                     Estudante
                   </th>
                   {disciplinas.map((disc) => (
                     <th key={disc.id} className="w-11 min-w-[2.75rem] max-w-[2.75rem] px-0 py-2 align-bottom h-24 border-r border-zinc-200 last:border-0">
                       <div className="flex items-center justify-center h-full w-full">
-                        <span className="text-[10px] font-medium text-fg-muted uppercase tracking-widest [writing-mode:vertical-rl] rotate-180 whitespace-nowrap overflow-hidden text-ellipsis max-h-[85px]">
+                        <span className="text-xs font-medium text-fg-muted [writing-mode:vertical-rl] rotate-180 whitespace-nowrap overflow-hidden text-ellipsis max-h-[85px]">
                           {abreviarNome(disc.nome)}
                         </span>
                       </div>
                     </th>
                   ))}
-                  <th className="w-24 px-2 py-2 text-center text-[9px] font-medium text-fg-muted uppercase sticky right-0 bg-zinc-50/95 backdrop-blur z-20 border-l border-zinc-300">
+                  <th className="w-24 px-2 py-2 text-center text-xs font-medium text-fg-muted uppercase sticky right-0 bg-zinc-50/95 backdrop-blur z-20 border-l border-zinc-300">
                     Risco
                   </th>
                 </tr>
@@ -360,7 +360,7 @@ export default function ResultadosTurmaClient({
               <tbody className="divide-y divide-zinc-200">
                 {matrixData.length === 0 ? (
                   <tr>
-                    <td colSpan={disciplinas.length + 3} className="py-12 text-center text-fg-subtle font-medium uppercase tracking-widest text-xs">
+                    <td colSpan={disciplinas.length + 3} className="py-12 text-center text-fg-subtle font-medium text-xs">
                        Nenhum estudante nesta turma.
                     </td>
                   </tr>
@@ -419,7 +419,7 @@ export default function ResultadosTurmaClient({
                              {worstRisk.level === 'HIGH' && <TrendingDown size={10} className="text-warning-fg" />}
                              {worstRisk.level === 'MEDIUM' && <Info size={10} className="text-warning-fg" />}
                              
-                             <span className={`text-[9px] font-medium uppercase tracking-tight ${worstRisk.color || 'text-fg-subtle'}`}>
+                             <span className={`text-xs font-medium ${worstRisk.color || 'text-fg-subtle'}`}>
                                {worstRisk.level === 'NONE' ? '-' : 
                                 worstRisk.level === 'CRITICAL' ? 'Crítico' :
                                 worstRisk.level === 'HIGH' ? 'Alto' :

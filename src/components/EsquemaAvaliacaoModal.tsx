@@ -73,7 +73,7 @@ function Opcoes<T extends string>({ valor, opcoes, onChange }: { valor: T; opcoe
       {opcoes.map(o => (
         <button
           key={o.valor} type="button" title={o.ajuda} onClick={() => onChange(o.valor)}
-          className={`px-3 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wide transition-all border ${valor === o.valor ? 'bg-accent text-on-accent border-accent shadow-card ' : 'bg-white text-fg-subtle border-zinc-200 hover:border-zinc-300'}`}
+          className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border ${valor === o.valor ? 'bg-accent text-on-accent border-accent shadow-card ' : 'bg-white text-fg-subtle border-zinc-200 hover:border-zinc-300'}`}
         >
           {o.rotulo}
         </button>
@@ -279,12 +279,12 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
           <div className="space-y-2">
             <label className={labelClass}>Como as unidades formam a média final</label>
             <Opcoes valor={formaFinal} opcoes={FORMAS_FINAIS} onChange={setFormaFinal} />
-            <p className="text-[10px] text-fg-subtle ml-1">{FORMAS_FINAIS.find(f => f.valor === formaFinal)?.ajuda}</p>
+            <p className="text-xs text-fg-subtle ml-1">{FORMAS_FINAIS.find(f => f.valor === formaFinal)?.ajuda}</p>
             {formaFinal === "SOMA_COM_DIVISOR" && (
               <input type="text" inputMode="decimal" placeholder="Divisor" value={divisorFinal} onChange={e => setDivisorFinal(e.target.value)} className={`w-28 ${smallInput}`} />
             )}
             <div className="flex items-center gap-2 pt-1 ml-1">
-              <span className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest">Casas decimais</span>
+              <span className="text-xs font-semibold text-fg-subtle">Casas decimais</span>
               <Opcoes valor={String(casasDecimais)} opcoes={[{ valor: "0", rotulo: "0" }, { valor: "1", rotulo: "1" }, { valor: "2", rotulo: "2" }]} onChange={v => setCasasDecimais(Number(v))} />
             </div>
           </div>
@@ -293,7 +293,7 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <label className={labelClass}>Unidades</label>
-              <button type="button" onClick={addUnidade} className="flex items-center gap-1 text-[11px] font-bold text-accent-fg hover:text-accent-fg uppercase tracking-wide">
+              <button type="button" onClick={addUnidade} className="flex items-center gap-1 text-xs font-bold text-accent-fg hover:text-accent-fg">
                 <Plus className="w-3.5 h-3.5" /> Unidade
               </button>
             </div>
@@ -344,12 +344,12 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
                       )}
                     </div>
                   ))}
-                  <button type="button" onClick={() => addAtividade(uIdx)} className="flex items-center gap-1 text-[10px] font-bold text-accent-fg hover:text-accent-fg uppercase tracking-wide pl-1">
+                  <button type="button" onClick={() => addAtividade(uIdx)} className="flex items-center gap-1 text-xs font-bold text-accent-fg hover:text-accent-fg pl-1">
                     <Plus className="w-3 h-3" /> Atividade
                   </button>
                 </div>
 
-                <p className="text-[10px] font-bold uppercase tracking-wide pl-1 text-fg-subtle">
+                <p className="text-xs font-bold pl-1 text-fg-subtle">
                   Nota máxima da unidade: {Number(tetoEtapa(u).toFixed(2))}
                 </p>
               </div>
@@ -364,7 +364,7 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-semibold text-fg-muted">Recuperação por unidade (paralela)</p>
-                  <p className="text-[10px] text-fg-subtle">Nunca baixa a nota da unidade</p>
+                  <p className="text-xs text-fg-subtle">Nunca baixa a nota da unidade</p>
                 </div>
                 <Toggle ativo={recUnidadeAtiva} onClick={() => setRecUnidadeAtiva(v => !v)} />
               </div>
@@ -380,7 +380,7 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-semibold text-fg-muted">Recuperação final / exame</p>
-                  <p className="text-[10px] text-fg-subtle">Afeta o resultado geral da disciplina</p>
+                  <p className="text-xs text-fg-subtle">Afeta o resultado geral da disciplina</p>
                 </div>
                 <Toggle ativo={recFinalAtiva} onClick={() => setRecFinalAtiva(v => !v)} />
               </div>
@@ -393,7 +393,7 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
                   ]} />
                   {modoRecFinal === "MEDIA_COM_FINAL" && (
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-fg-subtle">Mínimo de (média + exame) / 2:</span>
+                      <span className="text-xs text-fg-subtle">Mínimo de (média + exame) / 2:</span>
                       <input type="text" inputMode="decimal" placeholder={notaMinima} value={notaMinimaExame} onChange={e => setNotaMinimaExame(e.target.value)} className={`w-20 ${smallInput}`} />
                     </div>
                   )}
@@ -418,14 +418,14 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
             <label className={labelClass}>Frequência</label>
             <div className="p-4 bg-zinc-50 border border-zinc-200 rounded-lg space-y-3">
               <div className="space-y-1">
-                <p className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest">Chamada</p>
+                <p className="text-xs font-semibold text-fg-subtle">Chamada</p>
                 <Opcoes valor={registroFrequencia} onChange={setRegistroFrequencia} opcoes={[
                   { valor: "POR_AULA", rotulo: "Por aula", ajuda: "Cada tempo do horário tem chamada" },
                   { valor: "POR_DIA", rotulo: "Por dia", ajuda: "Uma chamada por dia (anos iniciais)" },
                 ]} />
               </div>
               <div className="space-y-1">
-                <p className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest">Frequência mínima para aprovar</p>
+                <p className="text-xs font-semibold text-fg-subtle">Frequência mínima para aprovar</p>
                 <div className="flex flex-wrap items-center gap-2">
                   <Opcoes valor={apuracaoFrequencia} onChange={setApuracaoFrequencia} opcoes={[
                     { valor: "GERAL", rotulo: "Geral", ajuda: "Sobre o total de horas letivas (LDB)" },

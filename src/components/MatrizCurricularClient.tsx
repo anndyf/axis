@@ -295,7 +295,7 @@ export default function MatrizCurricularClient({
 
             {/* Modalidade */}
             <div className="flex-1 min-w-[130px] max-w-[180px] space-y-1.5">
-                <label className="text-[9px] font-semibold text-fg-subtle uppercase tracking-[0.2em] ml-1">Modalidade</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1">Modalidade</label>
                 <div className="relative">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-subtle">
                       <Layers size={15} />
@@ -315,7 +315,7 @@ export default function MatrizCurricularClient({
 
             {/* Turno */}
             <div className="flex-1 min-w-[130px] max-w-[170px] space-y-1.5">
-                <label className="text-[9px] font-semibold text-fg-subtle uppercase tracking-[0.2em] ml-1">Turno</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1">Turno</label>
                 <div className="relative">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-subtle">
                       <Clock size={15} />
@@ -336,10 +336,10 @@ export default function MatrizCurricularClient({
             {/* Curso — Dropdown customizado */}
             <div className="flex-[2] min-w-[220px] space-y-1.5">
                 <div className="flex items-center justify-between ml-1">
-                  <label className="text-[9px] font-semibold text-fg-subtle uppercase tracking-[0.2em]">Curso</label>
+                  <label className="text-xs font-semibold text-fg-subtle">Curso</label>
                   <button
                     onClick={() => { setCursoParaEditar(null); setIsModalCursoOpen(true) }}
-                    className="text-[9px] font-bold text-accent-fg uppercase tracking-wider hover:text-accent-fg transition-colors flex items-center gap-1 bg-accent-subtle hover:bg-accent-subtle px-2 py-0.5 rounded-md"
+                    className="text-xs font-bold text-accent-fg hover:text-accent-fg transition-colors flex items-center gap-1 bg-accent-subtle hover:bg-accent-subtle px-2 py-0.5 rounded-md"
                   >
                     <Plus size={9} strokeWidth={3} />
                     Novo
@@ -386,7 +386,7 @@ export default function MatrizCurricularClient({
                               className="flex-1 text-left px-4 py-2.5 min-w-0"
                             >
                               <span className={`block text-sm font-semibold truncate ${selectedCurso === c.id ? 'text-accent-fg' : 'text-fg-muted'}`}>{c.nome}</span>
-                              <span className="text-[10px] font-bold text-fg-subtle uppercase">{c.modalidade} · {c.turnos?.join(', ') || '—'}</span>
+                              <span className="text-xs font-bold text-fg-subtle uppercase">{c.modalidade} · {c.turnos?.join(', ') || '—'}</span>
                             </button>
                             {/* Ações: editar e excluir */}
                             <div className="flex items-center gap-1 pr-2 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
@@ -428,7 +428,7 @@ export default function MatrizCurricularClient({
 
             {/* Série / Ciclo */}
             <div className="flex-1 min-w-[160px] max-w-[210px] space-y-1.5">
-                <label className="text-[9px] font-semibold text-fg-subtle uppercase tracking-[0.2em] ml-1">Série / Ciclo</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1">Série / Ciclo</label>
                 <div className="relative">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-subtle">
                     <Filter size={15} />
@@ -449,7 +449,7 @@ export default function MatrizCurricularClient({
 
             {/* Ano Letivo — compacto */}
             <div className="w-[110px] shrink-0 space-y-1.5">
-                <label className="text-[9px] font-semibold text-fg-subtle uppercase tracking-[0.2em] ml-1">Ano</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1">Ano</label>
                 <div className="relative">
                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-subtle">
                         <Calendar size={14} />
@@ -470,7 +470,7 @@ export default function MatrizCurricularClient({
             <div className="shrink-0 pb-0.5">
                 <div className="flex items-center gap-1.5 bg-accent text-on-accent px-3 py-2.5 rounded-xl shadow-card">
                     <span className="w-1.5 h-1.5 rounded-full bg-white/70 animate-pulse" />
-                    <span className="text-[11px] font-semibold uppercase tracking-wider whitespace-nowrap">{itemsFiltradosNaLista.length} disciplinas</span>
+                    <span className="text-xs font-semibold whitespace-nowrap">{itemsFiltradosNaLista.length} disciplinas</span>
                 </div>
             </div>
         </div>
@@ -484,7 +484,7 @@ export default function MatrizCurricularClient({
             </h2>
             <form onSubmit={handleAdd} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
               <div className="md:col-span-5 space-y-1.5">
-                <label className="text-xs font-semibold text-fg-subtle uppercase tracking-widest ml-1">Nomes (Separe por linha ou vírgula)</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1">Nomes (Separe por linha ou vírgula)</label>
                 <textarea
                   placeholder="Português&#10;Matemática&#10;História"
                   value={novoNome}
@@ -494,7 +494,7 @@ export default function MatrizCurricularClient({
                 />
               </div>
               <div className="md:col-span-4 space-y-1.5">
-                <label className="text-xs font-semibold text-fg-subtle uppercase tracking-widest ml-1">Área do Simulado</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1">Área do Simulado</label>
                 <select
                   value={novaArea}
                   onChange={(e) => setNovaArea(e.target.value)}
@@ -508,7 +508,7 @@ export default function MatrizCurricularClient({
                 <button
                   type="submit"
                   disabled={saving || !novoNome}
-                  className="w-full bg-zinc-900 border border-zinc-900 text-white font-semibold h-[60px] rounded-xl shadow-card transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95 text-sm uppercase tracking-widest"
+                  className="w-full bg-zinc-900 border border-zinc-900 text-white font-semibold h-[60px] rounded-xl shadow-card transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95 text-sm"
                 >
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                   Lançar na Matriz
@@ -560,17 +560,17 @@ export default function MatrizCurricularClient({
             {!selectedCurso && !searchTerm ? (
               <div className="p-20 text-center space-y-4">
                 <Search className="w-12 h-12 text-zinc-200 mx-auto" />
-                <p className="text-sm font-semibold text-fg-subtle uppercase tracking-widest">Selecione um curso para ver a matriz</p>
+                <p className="text-sm font-semibold text-fg-subtle">Selecione um curso para ver a matriz</p>
               </div>
             ) : loading ? (
               <div className="p-20 text-center flex flex-col items-center gap-3">
                 <Loader2 className="w-8 h-8 text-accent-fg animate-spin" />
-                <p className="text-sm font-semibold text-fg-subtle uppercase tracking-widest">Sincronizando dados...</p>
+                <p className="text-sm font-semibold text-fg-subtle">Sincronizando dados...</p>
               </div>
             ) : items.length === 0 ? (
               <div className="p-20 text-center space-y-3">
                  <AlertCircle className="w-10 h-10 text-zinc-200 mx-auto" />
-                 <p className="text-sm font-semibold text-fg-subtle uppercase tracking-widest">Matriz vazia para esta configuração</p>
+                 <p className="text-sm font-semibold text-fg-subtle">Matriz vazia para esta configuração</p>
               </div>
             ) : (
               <table className="w-full text-left">
@@ -592,12 +592,12 @@ export default function MatrizCurricularClient({
                         className="w-4 h-4 rounded cursor-pointer accent-[var(--accent)]"
                       />
                     </th>
-                    <th className="px-4 py-4 text-xs font-semibold text-fg-subtle uppercase tracking-widest">Disciplina</th>
+                    <th className="px-4 py-4 text-xs font-semibold text-fg-subtle">Disciplina</th>
                     {searchTerm && (
-                      <th className="px-4 py-4 text-xs font-semibold text-fg-subtle uppercase tracking-widest">Curso / Série</th>
+                      <th className="px-4 py-4 text-xs font-semibold text-fg-subtle">Curso / Série</th>
                     )}
-                    <th className="px-6 py-4 text-xs font-semibold text-fg-subtle uppercase tracking-widest">Área Vinculada</th>
-                    <th className="px-6 py-4 text-xs font-semibold text-fg-subtle uppercase tracking-widest text-right">Ação</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-fg-subtle">Área Vinculada</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-fg-subtle text-right">Ação</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100/80">
@@ -663,7 +663,7 @@ export default function MatrizCurricularClient({
                               return (
                                 <>
                                   <span className="text-sm font-bold text-fg-muted">{c?.nome || '—'}</span>
-                                  <span className="text-[10px] font-semibold text-fg-subtle uppercase tracking-tighter">
+                                  <span className="text-xs font-semibold text-fg-subtle">
                                     {item.serie}ª Série • {c?.modalidade || '—'}
                                   </span>
                                 </>
@@ -683,7 +683,7 @@ export default function MatrizCurricularClient({
                             {areas.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
                           </select>
                         ) : item.area ? (
-                          <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-accent-subtle text-accent-fg text-xs font-semibold uppercase tracking-wider border border-accent/25">
+                          <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-accent-subtle text-accent-fg text-xs font-semibold border border-accent/25">
                             {item.area.nome}
                           </span>
                         ) : (
@@ -755,14 +755,14 @@ export default function MatrizCurricularClient({
             <div className="w-px h-5 bg-white/20" />
             <button
               onClick={() => setSelectedIds(new Set())}
-              className="text-xs font-semibold text-white/50 hover:text-white transition-colors uppercase tracking-widest"
+              className="text-xs font-semibold text-white/50 hover:text-white transition-colors"
             >
               Cancelar
             </button>
             <button
               onClick={handleDeleteBulk}
               disabled={saving}
-              className="flex items-center gap-2 bg-danger hover:bg-danger text-white text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-xl transition-all disabled:opacity-50 active:scale-95"
+              className="flex items-center gap-2 bg-danger hover:bg-danger text-white text-xs font-bold px-4 py-2 rounded-xl transition-all disabled:opacity-50 active:scale-95"
             >
               {saving
                 ? <Loader2 size={14} className="animate-spin" />

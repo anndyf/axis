@@ -457,11 +457,11 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
               <div className="hidden sm:flex items-center gap-3 ml-2 bg-white px-3 py-1.5 rounded-lg border border-zinc-100 shadow-sm">
                 <div className="flex items-center gap-1.5">
                   <div className="w-2 h-2 rounded-full bg-accent"></div>
-                  <span className="text-[10px] font-bold text-fg-subtle uppercase">Normal</span>
+                  <span className="text-xs font-bold text-fg-subtle uppercase">Normal</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className="w-2 h-2 rounded-full bg-warning"></div>
-                  <span className="text-[10px] font-bold text-fg-subtle uppercase">2ª Chamada</span>
+                  <span className="text-xs font-bold text-fg-subtle uppercase">2ª Chamada</span>
                 </div>
               </div>
             </h2>
@@ -511,7 +511,7 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
                       />
                     </div>
                     {q.unidade ? (
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${q.unidade == 1 ? 'bg-accent-subtle text-accent-fg' : 'bg-success-subtle text-success-fg'}`}>
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${q.unidade == 1 ? 'bg-accent-subtle text-accent-fg' : 'bg-success-subtle text-success-fg'}`}>
                         {q.unidade}ª Unidade
                       </span>
                     ) : (
@@ -532,16 +532,16 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
                     <p className="truncate"><span className="font-semibold text-fg">Turma:</span> {q.turmas?.map((t: any)=>t.nome).join(', ') || 'Nenhuma'}</p>
                     <p className="flex items-center gap-1">
                       <span className="font-semibold text-fg">Status:</span> 
-                      {q.status === 'APROVADA' && <span className="bg-accent-subtle text-accent-fg text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">Aprovada</span>}
-                      {q.status === 'PENDENTE' && <span className="bg-warning-subtle text-warning-fg text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">Pendente</span>}
-                      {q.status === 'REJEITADA' && <span className="bg-zinc-100 text-fg-muted text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">Rejeitada</span>}
+                      {q.status === 'APROVADA' && <span className="bg-accent-subtle text-accent-fg text-xs px-2 py-0.5 rounded-full font-bold uppercase">Aprovada</span>}
+                      {q.status === 'PENDENTE' && <span className="bg-warning-subtle text-warning-fg text-xs px-2 py-0.5 rounded-full font-bold uppercase">Pendente</span>}
+                      {q.status === 'REJEITADA' && <span className="bg-zinc-100 text-fg-muted text-xs px-2 py-0.5 rounded-full font-bold uppercase">Rejeitada</span>}
                     </p>
                     <p className="flex items-center gap-1">
                       <span className="font-semibold text-fg">Usos:</span> 
                       {q._count?.provas > 0 ? (
-                        <span className="bg-accent-subtle text-accent-fg text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">Usada em {q._count.provas} prova{q._count.provas > 1 ? 's' : ''}</span>
+                        <span className="bg-accent-subtle text-accent-fg text-xs px-2 py-0.5 rounded-full font-bold uppercase">Usada em {q._count.provas} prova{q._count.provas > 1 ? 's' : ''}</span>
                       ) : (
-                        <span className="bg-zinc-100 text-fg-subtle text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">Inédita</span>
+                        <span className="bg-zinc-100 text-fg-subtle text-xs px-2 py-0.5 rounded-full font-bold uppercase">Inédita</span>
                       )}
                     </p>
                     <p className="truncate"><span className="font-semibold text-fg">Autor:</span> {q.professor?.name}</p>

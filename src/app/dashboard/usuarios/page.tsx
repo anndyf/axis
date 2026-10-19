@@ -56,7 +56,7 @@ export default async function UsuariosPage() {
                 <h1 className="text-2xl font-medium text-accent-fg flex items-center gap-3">
                   Gerenciar Usuários
                   {pendentes > 0 && (
-                    <span className="px-2.5 py-0.5 text-xs font-bold bg-warning-subtle text-warning-fg border border-warning-line rounded-full uppercase tracking-wider animate-pulse">
+                    <span className="px-2.5 py-0.5 text-xs font-bold bg-warning-subtle text-warning-fg border border-warning-line rounded-full animate-pulse">
                       {pendentes} pendente{pendentes !== 1 ? 's' : ''}
                     </span>
                   )}

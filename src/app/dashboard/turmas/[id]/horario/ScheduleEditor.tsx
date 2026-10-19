@@ -91,7 +91,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
                   <Calendar className="w-6 h-6 text-fg-muted" />
                   Horário: {turma.nome}
                 </h1>
-                <p className="text-xs font-medium text-fg-subtle uppercase tracking-widest">
+                <p className="text-xs font-medium text-fg-subtle">
                   {turma.curso} • {turma.anoLetivo}
                 </p>
               </div>
@@ -102,7 +102,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
               className="flex items-center gap-2 bg-zinc-900 text-white px-6 py-3 rounded-xl hover:bg-zinc-800 transition-all shadow-card active:scale-95 disabled:opacity-50"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              <span className="text-xs font-medium uppercase tracking-wide">Salvar Alterações</span>
+              <span className="text-xs font-medium">Salvar Alterações</span>
             </button>
           </div>
         </div>
@@ -121,14 +121,14 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
             <Info className="w-5 h-5 text-fg-muted" />
           </div>
           <div>
-            <h4 className="text-sm font-medium text-accent-fg uppercase tracking-tight mb-1">Como preencher</h4>
+            <h4 className="text-sm font-medium text-accent-fg mb-1">Como preencher</h4>
             <p className="text-xs text-fg-muted font-medium leading-relaxed">
               Selecione a <span className="font-medium">disciplina</span> de cada horário. O professor vem do vínculo da disciplina com a turma.
               Este horário, junto com o <Link href="/dashboard/configuracoes/calendario" className="underline">calendário letivo</Link>,
               define as aulas previstas e a chamada de cada dia.
             </p>
             {tempos.length === 0 && (
-              <p className="text-[11px] text-warning-fg font-medium mt-2">
+              <p className="text-xs text-warning-fg font-medium mt-2">
                 Os tempos de aula (hora de início e fim) do turno desta turma ainda não foram cadastrados no calendário letivo.
               </p>
             )}
@@ -155,11 +155,11 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
               <thead>
                 <tr className="bg-zinc-50 border-b border-zinc-300">
                   <th className="p-4 text-center w-24">
-                    <span className="text-[10px] font-medium text-fg-subtle uppercase tracking-widest">Horário</span>
+                    <span className="text-xs font-medium text-fg-subtle">Horário</span>
                   </th>
                   {DAYS.map((day) => (
                     <th key={day.id} className="p-4 w-[18%]">
-                      <span className="text-sm font-medium text-fg uppercase tracking-tight block text-center bg-zinc-100/50 py-2 rounded-xl border border-zinc-200/50">
+                      <span className="text-sm font-medium text-fg block text-center bg-zinc-100/50 py-2 rounded-xl border border-zinc-200/50">
                         {day.label}
                       </span>
                     </th>
@@ -173,7 +173,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
                     <tr key={period} className="hover:bg-zinc-50/30 transition-colors">
                       <td className="p-4 text-center border-r border-zinc-200 bg-zinc-50/30">
                         <span className="font-medium text-fg-subtle">{period}º</span>
-                        {tempo && <span className="block text-[10px] text-fg-subtle">{tempo.inicio}–{tempo.fim}</span>}
+                        {tempo && <span className="block text-xs text-fg-subtle">{tempo.inicio}–{tempo.fim}</span>}
                       </td>
                       {DAYS.map((day) => {
                         const key = `${day.id}-${period}`
@@ -186,7 +186,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
                                 aria-label={`${day.label}, ${period}º horário`}
                                 value={disciplinaId}
                                 onChange={(e) => setSchedule((prev) => ({ ...prev, [key]: e.target.value }))}
-                                className="w-full text-[10px] font-medium text-fg bg-transparent outline-none text-center appearance-none cursor-pointer"
+                                className="w-full text-xs font-medium text-fg bg-transparent outline-none text-center appearance-none cursor-pointer"
                               >
                                 <option value="">--------</option>
                                 {turma.disciplinas.map((d) => (
@@ -194,7 +194,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
                                 ))}
                               </select>
                               {disciplinaId && (
-                                <span className={`text-[9px] font-medium uppercase tracking-tighter mt-0.5 truncate w-full px-1 ${professor ? "text-fg-subtle" : "text-warning-fg"}`}>
+                                <span className={`text-xs font-medium mt-0.5 truncate w-full px-1 ${professor ? "text-fg-subtle" : "text-warning-fg"}`}>
                                   {professor ?? "sem professor vinculado"}
                                 </span>
                               )}
@@ -222,7 +222,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-zinc-50 text-fg-subtle text-xs uppercase tracking-wide">
+              <thead className="bg-zinc-50 text-fg-subtle text-xs">
                 <tr>
                   <th className="px-4 py-2 text-left">Disciplina</th>
                   <th className="px-4 py-2 text-center">Tempos/semana</th>

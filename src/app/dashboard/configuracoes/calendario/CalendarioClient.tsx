@@ -122,7 +122,7 @@ export default function CalendarioClient(props: Props) {
         {!props.periodo && <p className="text-sm text-warning-fg">Salve o início e o fim do ano letivo antes.</p>}
         {props.esquemas.map((esq) => (
           <div key={esq.id} className="space-y-2">
-            <p className="text-xs font-semibold text-fg-subtle uppercase tracking-widest">{esq.nome}</p>
+            <p className="text-xs font-semibold text-fg-subtle">{esq.nome}</p>
             {esq.unidades.map((u) => (
               <div key={u.id} className="flex flex-wrap items-center gap-2">
                 <span className="w-32 text-sm text-fg-muted">{u.nome}</span>
@@ -228,7 +228,7 @@ export default function CalendarioClient(props: Props) {
           ))}
         </div>
         <div className="flex gap-2">
-          <button onClick={() => setTempos((prev) => ({ ...prev, [turno]: [...(prev[turno] ?? []), { inicio: "", fim: "" }] }))} className="flex items-center gap-1 text-xs font-bold text-accent-fg uppercase tracking-wide">
+          <button onClick={() => setTempos((prev) => ({ ...prev, [turno]: [...(prev[turno] ?? []), { inicio: "", fim: "" }] }))} className="flex items-center gap-1 text-xs font-bold text-accent-fg">
             <Plus className="w-3.5 h-3.5" /> Tempo
           </button>
           <button disabled={pendente} className={botao} onClick={() => executar(() => salvarTemposAula(turno, temposDoTurno), "Tempos de aula salvos.")}>

@@ -136,7 +136,7 @@ export default function AEEProfileClient({
               </div>
               <div>
                 <h1 className="text-xl font-bold text-fg tracking-tight">Ficha de Atendimento Especial (AEE)</h1>
-                <p className="text-xs font-bold text-fg-subtle uppercase tracking-widest">{estudante.nome} · Turma {estudante.turma.nome}</p>
+                <p className="text-xs font-bold text-fg-subtle">{estudante.nome} · Turma {estudante.turma.nome}</p>
               </div>
             </div>
           </div>
@@ -222,19 +222,19 @@ export default function AEEProfileClient({
                     )}
                   </div>
                   
-                  <h3 className="mt-4 text-xl font-medium text-fg text-center leading-tight uppercase tracking-tight">
+                  <h3 className="mt-4 text-xl font-medium text-fg text-center leading-tight">
                     {estudante.nome}
                   </h3>
-                  <p className="text-xs font-semibold text-fg-subtle uppercase tracking-widest mt-1">
+                  <p className="text-xs font-semibold text-fg-subtle mt-1">
                     Matrícula {estudante.matricula}
                   </p>
                   
-                  <div className="mt-4 inline-flex items-center px-4 py-1.5 rounded-full bg-zinc-50 border border-zinc-100 text-fg-muted text-[10px] font-semibold uppercase tracking-widest">
+                  <div className="mt-4 inline-flex items-center px-4 py-1.5 rounded-full bg-zinc-50 border border-zinc-100 text-fg-muted text-xs font-semibold">
                     {estudante.turma.nome}
                   </div>
 
                   {isDirecao && formData.fotoUrl && (
-                    <label className="mt-6 cursor-pointer text-[10px] font-semibold text-fg-subtle uppercase tracking-widest hover:text-fg transition-colors flex items-center gap-2">
+                    <label className="mt-6 cursor-pointer text-xs font-semibold text-fg-subtle hover:text-fg transition-colors flex items-center gap-2">
                        <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
                        <Upload className="w-3.5 h-3.5" /> Alterar Foto
                     </label>
@@ -244,7 +244,7 @@ export default function AEEProfileClient({
 
             {/* Necessidades Específicas (TAGS) */}
             <div className="bg-white p-6 rounded-xl border border-zinc-200 shadow-sm space-y-4">
-                <h5 className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest">Necessidades de Prova</h5>
+                <h5 className="text-xs font-semibold text-fg-subtle">Necessidades de Prova</h5>
                 {isDirecao ? (
                   <div className="grid grid-cols-1 gap-3">
                     <button 
@@ -256,7 +256,7 @@ export default function AEEProfileClient({
                       }`}
                     >
                         <ClipboardCheck className={`w-5 h-5 ${formData.precisaProvaAdaptada ? 'text-white' : 'text-zinc-300'}`} />
-                        <span className="text-xs font-semibold uppercase tracking-tight">Prova Adaptada</span>
+                        <span className="text-xs font-semibold">Prova Adaptada</span>
                     </button>
 
                     <button 
@@ -268,18 +268,18 @@ export default function AEEProfileClient({
                       }`}
                     >
                         <Users className={`w-5 h-5 ${formData.precisaProvaSalaEspecial ? 'text-white' : 'text-zinc-300'}`} />
-                        <span className="text-xs font-semibold uppercase tracking-tight">Sala Especial</span>
+                        <span className="text-xs font-semibold">Sala Especial</span>
                     </button>
                   </div>
                 ) : (
                   <div className="flex flex-wrap gap-2">
                     {formData.precisaProvaAdaptada && (
-                      <span className="bg-zinc-100 text-fg-muted border border-zinc-200 px-3 py-1.5 rounded-xl text-[10px] font-semibold uppercase tracking-widest flex items-center gap-2">
+                      <span className="bg-zinc-100 text-fg-muted border border-zinc-200 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2">
                         <ClipboardCheck className="w-3 h-3" /> Prova Adaptada
                       </span>
                     )}
                     {formData.precisaProvaSalaEspecial && (
-                      <span className="bg-zinc-100 text-fg-muted border border-zinc-200 px-3 py-1.5 rounded-xl text-[10px] font-semibold uppercase tracking-widest flex items-center gap-2">
+                      <span className="bg-zinc-100 text-fg-muted border border-zinc-200 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2">
                         <Users className="w-3 h-3" /> Sala Especial
                       </span>
                     )}
@@ -292,7 +292,7 @@ export default function AEEProfileClient({
 
             {/* CID Selection (Direção) ou Visualização (Professor) */}
             <div className="bg-white p-6 rounded-xl border border-zinc-200 shadow-sm">
-              <h2 className="text-xs font-semibold text-fg-subtle uppercase tracking-widest mb-4 flex items-center gap-2">
+              <h2 className="text-xs font-semibold text-fg-subtle mb-4 flex items-center gap-2">
                 <AlertCircle className="w-3.5 h-3.5" />
                 Diagnóstico (CIDs)
               </h2>
@@ -317,7 +317,7 @@ export default function AEEProfileClient({
                           : 'bg-white border-zinc-100 hover:border-zinc-200'
                         }`}
                       >
-                         <div className={`w-10 h-10 shrink-0 bg-zinc-100 rounded-lg flex items-center justify-center font-semibold text-[10px] text-fg-subtle ${formData.cids.includes(c.code) ? 'bg-white/10 text-white' : ''}`}>
+                         <div className={`w-10 h-10 shrink-0 bg-zinc-100 rounded-lg flex items-center justify-center font-semibold text-xs text-fg-subtle ${formData.cids.includes(c.code) ? 'bg-white/10 text-white' : ''}`}>
                             {c.code}
                          </div>
                          <div className="min-w-0">
@@ -333,7 +333,7 @@ export default function AEEProfileClient({
                     const found = CIDS_AEE.find((c: any) => c.code === code)
                     return (
                       <div key={code} className="bg-zinc-50 border border-zinc-200 p-3 rounded-xl flex items-center gap-3">
-                        <div className="w-10 h-10 bg-zinc-900 text-white rounded-lg flex items-center justify-center font-semibold text-[10px]">
+                        <div className="w-10 h-10 bg-zinc-900 text-white rounded-lg flex items-center justify-center font-semibold text-xs">
                            {code}
                         </div>
                         <p className="text-xs font-bold text-fg-muted leading-tight">{found?.label || 'CID Específico'}</p>
@@ -346,14 +346,14 @@ export default function AEEProfileClient({
 
             {/* Contato de Emergência */}
             <div className="bg-zinc-900 text-white p-6 rounded-xl shadow-card space-y-4">
-              <h2 className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest flex items-center gap-2">
+              <h2 className="text-xs font-semibold text-fg-subtle flex items-center gap-2">
                 <Phone className="w-3.5 h-3.5" />
                 Contato de Emergência
               </h2>
               {isDirecao ? (
                 <div className="space-y-3">
                   <div className="space-y-1">
-                    <label className="text-[9px] font-semibold text-white/40 uppercase tracking-widest ml-1">Nome do Contato</label>
+                    <label className="text-xs font-semibold text-white/40 ml-1">Nome do Contato</label>
                     <input 
                       type="text" value={formData.contatoNome}
                       onChange={(e) => setFormData({...formData, contatoNome: e.target.value})}
@@ -362,7 +362,7 @@ export default function AEEProfileClient({
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[9px] font-semibold text-white/40 uppercase tracking-widest ml-1">Telefone</label>
+                    <label className="text-xs font-semibold text-white/40 ml-1">Telefone</label>
                     <input 
                       type="text" value={formData.contatoTelefone}
                       onChange={(e) => setFormData({...formData, contatoTelefone: formatPhone(e.target.value)})}
@@ -387,7 +387,7 @@ export default function AEEProfileClient({
               
               {/* Condição do Estudante */}
               <section>
-                <h3 className="text-xs font-semibold text-fg-subtle uppercase tracking-widest mb-4 flex items-center gap-2">
+                <h3 className="text-xs font-semibold text-fg-subtle mb-4 flex items-center gap-2">
                   <Info className="w-5 h-5 text-warning-fg" />
                   Contexto / Condição do Estudante
                 </h3>
@@ -407,7 +407,7 @@ export default function AEEProfileClient({
 
               {/* Recomendações Pedagógicas */}
               <section className="bg-success-subtle p-8 rounded-xl border border-success-line">
-                <h3 className="text-xs font-semibold text-success-fg uppercase tracking-widest mb-4 flex items-center gap-2">
+                <h3 className="text-xs font-semibold text-success-fg mb-4 flex items-center gap-2">
                   <ClipboardCheck className="w-5 h-5" />
                   Instruções para o Professor
                 </h3>
@@ -427,7 +427,7 @@ export default function AEEProfileClient({
 
               {/* Notas da Direção/Coordenação */}
               <section>
-                <h3 className="text-xs font-semibold text-fg-subtle uppercase tracking-widest mb-4 flex items-center gap-2">
+                <h3 className="text-xs font-semibold text-fg-subtle mb-4 flex items-center gap-2">
                    <GraduationCap className="w-5 h-5 text-accent-fg" />
                    Observações Internas
                 </h3>
@@ -447,7 +447,7 @@ export default function AEEProfileClient({
             {/* Histórico de Ates de Leitura (Só Direção Vê) */}
             {isDirecao && perfilExistente?.acknowledgements?.length > 0 && (
               <div className="bg-white p-8 rounded-xl border border-zinc-200 shadow-sm">
-                <h3 className="text-xs font-semibold text-fg-subtle uppercase tracking-widest mb-6 flex items-center gap-2">
+                <h3 className="text-xs font-semibold text-fg-subtle mb-6 flex items-center gap-2">
                    <CheckCircle2 className="w-4 h-4 text-success-fg" /> Confirmaram Leitura
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -458,7 +458,7 @@ export default function AEEProfileClient({
                       </div>
                       <div className="min-w-0">
                         <p className="text-sm font-bold text-fg truncate">{ack.user.name}</p>
-                        <p className="text-[10px] text-fg-subtle font-semibold uppercase tracking-widest">Lido em {new Date(ack.readAt).toLocaleDateString('pt-BR')}</p>
+                        <p className="text-xs text-fg-subtle font-semibold">Lido em {new Date(ack.readAt).toLocaleDateString('pt-BR')}</p>
                       </div>
                     </div>
                   ))}

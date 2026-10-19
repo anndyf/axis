@@ -202,7 +202,7 @@ export default function TurmasListClient({
             <Users className="w-4 h-4 text-white" />
           </div>
           <div className="text-white pr-2">
-            <p className="text-[10px] font-semibold uppercase tracking-widest opacity-50 leading-none mb-1">Turmas</p>
+            <p className="text-xs font-semibold opacity-50 leading-none mb-1">Turmas</p>
             <p className="text-lg font-semibold leading-none">{filteredTurmas.length}</p>
           </div>
         </div>
@@ -246,7 +246,7 @@ export default function TurmasListClient({
               title="Limpar filtros"
             >
               <X className="w-4 h-4 group-hover:rotate-90 transition-transform" />
-              <span className="text-[10px] font-semibold uppercase tracking-widest">Limpar</span>
+              <span className="text-xs font-semibold">Limpar</span>
             </button>
           )}
         </div>
@@ -255,18 +255,18 @@ export default function TurmasListClient({
       {/* Lista */}
       {turnosOrdenados.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-xl border border-dashed border-zinc-200">
-           <p className="text-fg-subtle font-semibold uppercase tracking-widest text-sm">Nenhuma turma encontrada com esses filtros</p>
+           <p className="text-fg-subtle font-semibold text-sm">Nenhuma turma encontrada com esses filtros</p>
         </div>
       ) : (
         <div className="space-y-12">
           {turnosOrdenados.map(turno => (
             <div key={turno} className="space-y-6">
               <div className="flex items-center space-x-4">
-                <h2 className="text-sm font-medium text-black uppercase tracking-widest bg-white px-4 py-1 rounded-full shadow-sm border border-zinc-100">
+                <h2 className="text-sm font-medium text-black bg-white px-4 py-1 rounded-full shadow-sm border border-zinc-100">
                   {turno}
                 </h2>
                 <div className="h-px bg-zinc-200 flex-1"></div>
-                <span className="text-[10px] font-semibold text-fg-subtle bg-zinc-100 px-2 py-0.5 rounded uppercase">
+                <span className="text-xs font-semibold text-fg-subtle bg-zinc-100 px-2 py-0.5 rounded uppercase">
                   {turmasAgrupadas[turno].length} {turmasAgrupadas[turno].length === 1 ? 'Turma' : 'Turmas'}
                 </span>
               </div>
@@ -290,10 +290,10 @@ export default function TurmasListClient({
                             <Icon className="w-6 h-6 text-white" />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <h3 className="text-lg font-semibold text-black uppercase tracking-tight leading-none whitespace-nowrap truncate">
+                            <h3 className="text-lg font-semibold text-black leading-none whitespace-nowrap truncate">
                               {turma.nome}
                             </h3>
-                            <p className="text-[11px] text-black/40 font-semibold uppercase tracking-wide mt-1 whitespace-nowrap truncate">
+                            <p className="text-xs text-black/40 font-semibold mt-1 whitespace-nowrap truncate">
                               {cursoExibicao}
                             </p>
                           </div>
@@ -353,17 +353,17 @@ export default function TurmasListClient({
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                            {turma.modalidade && (
-                             <span className="px-1.5 py-0.5 bg-zinc-50 text-fg-subtle text-[10px] rounded font-semibold uppercase tracking-widest border border-zinc-100">
+                             <span className="px-1.5 py-0.5 bg-zinc-50 text-fg-subtle text-xs rounded font-semibold border border-zinc-100">
                                {turma.modalidade}
                              </span>
                            )}
                         </div>
                         <div className="flex items-center space-x-3">
-                           <div className="flex items-center text-[10px] font-semibold text-black/60">
+                           <div className="flex items-center text-xs font-semibold text-black/60">
                              <Users className="w-3 h-3 mr-1 text-zinc-300" />
                              {turma._count.estudantes}
                            </div>
-                            <div className="flex items-center text-[10px] font-semibold text-black/60">
+                            <div className="flex items-center text-xs font-semibold text-black/60">
                              <FileText className="w-3 h-3 mr-1 text-zinc-300" />
                              {turma._count.disciplinas}
                            </div>
@@ -372,10 +372,10 @@ export default function TurmasListClient({
 
                       {turma.minhasDisciplinas && turma.minhasDisciplinas.length > 0 && (
                         <div className="mt-4 pt-4 border-t border-zinc-100">
-                          <p className="text-[9px] font-bold text-fg-subtle uppercase tracking-widest mb-2">Suas Disciplinas</p>
+                          <p className="text-xs font-bold text-fg-subtle mb-2">Suas Disciplinas</p>
                           <div className="flex flex-wrap gap-1.5">
                             {turma.minhasDisciplinas.map((d: any) => (
-                              <span key={d.id} className="inline-flex items-center px-2 py-1 bg-accent-subtle text-accent-fg text-[10px] font-bold rounded-lg border border-accent/25 uppercase tracking-tight">
+                              <span key={d.id} className="inline-flex items-center px-2 py-1 bg-accent-subtle text-accent-fg text-xs font-bold rounded-lg border border-accent/25">
                                 {d.nome}
                               </span>
                             ))}

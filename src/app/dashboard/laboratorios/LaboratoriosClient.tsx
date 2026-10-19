@@ -235,7 +235,7 @@ export default function LaboratoriosClient({
                    <Calendar className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-medium text-fg-subtle uppercase tracking-widest">Semana de</p>
+                  <p className="text-xs font-medium text-fg-subtle">Semana de</p>
                   <p className="text-sm font-semibold text-fg">
                      {`${format(startOfWeek(selectedDate, { weekStartsOn: 1 }), "dd/MM")} a ${format(endOfWeek(selectedDate, { weekStartsOn: 1 }), "dd/MM")}`}
                   </p>
@@ -253,7 +253,7 @@ export default function LaboratoriosClient({
                 
                 <button 
                   onClick={() => setSelectedDate(new Date())}
-                  className="px-4 py-2.5 rounded-xl text-[10px] font-bold text-fg bg-white shadow-sm hover:bg-zinc-50 transition-all"
+                  className="px-4 py-2.5 rounded-xl text-xs font-bold text-fg bg-white shadow-sm hover:bg-zinc-50 transition-all"
                 >
                   HOJE
                 </button>
@@ -295,7 +295,7 @@ export default function LaboratoriosClient({
          {/* Sidebar de Labs */}
          <div className="lg:col-span-1 space-y-4">
             <div className="flex items-center justify-between ml-1">
-              <h3 className="text-xs font-semibold text-fg-subtle uppercase tracking-widest">Laboratórios</h3>
+              <h3 className="text-xs font-semibold text-fg-subtle">Laboratórios</h3>
               <div className="flex gap-2">
                 {isAdmin && (
                   <>
@@ -349,7 +349,7 @@ export default function LaboratoriosClient({
                <div className="p-4 bg-zinc-50 rounded-lg border border-zinc-200 animate-slide-up">
                   <div className="flex items-center gap-2 mb-2">
                     <Info size={14} className="text-accent-fg" />
-                    <span className="text-[10px] font-bold text-fg-subtle uppercase tracking-widest">Sobre este espaço</span>
+                    <span className="text-xs font-bold text-fg-subtle">Sobre este espaço</span>
                   </div>
                   <p className="text-xs text-fg-muted leading-relaxed font-medium">
                     {initialLaboratorios.find(l => l.id === selectedLab)?.descricao}
@@ -375,23 +375,23 @@ export default function LaboratoriosClient({
                 <div key={turno.id} className="space-y-4">
                    <div className="flex items-center gap-3 ml-2">
                       <div className="w-2 h-2 rounded-full bg-zinc-900 shadow-[0_0_8px_rgba(15,23,42,0.3)]"></div>
-                      <h4 className="text-sm font-bold text-fg uppercase tracking-[0.1em]">{turno.nome}</h4>
+                      <h4 className="text-sm font-bold text-fg">{turno.nome}</h4>
                    </div>
 
                    <div className="overflow-x-auto rounded-xl border border-zinc-200 shadow-sm bg-white">
                      <table className="w-full border-collapse table-fixed">
                        <thead>
                          <tr className="bg-zinc-50/50 text-fg-subtle">
-                           <th className="p-4 text-left text-[10px] font-bold uppercase tracking-[0.2em] border-b border-zinc-100 w-24">Horário</th>
+                           <th className="p-4 text-left text-xs font-bold border-b border-zinc-100 w-24">Horário</th>
                            {weekDays.map(day => {
                              const isToday = isSameDay(day, new Date())
                              return (
                                <th key={day.toISOString()} className={`p-4 text-center border-b border-zinc-100 min-w-[140px] ${isToday ? 'bg-accent-subtle' : ''}`}>
                                  <div className="flex flex-col items-center gap-0.5">
-                                   <span className={`text-[10px] font-bold uppercase tracking-widest ${isToday ? 'text-accent-fg' : 'text-fg-subtle'}`}>
+                                   <span className={`text-xs font-bold ${isToday ? 'text-accent-fg' : 'text-fg-subtle'}`}>
                                      {format(day, "EEEE", { locale: ptBR })}
                                    </span>
-                                   <span className={`text-[9px] font-medium ${isToday ? 'text-accent-fg' : 'text-fg-subtle'}`}>
+                                   <span className={`text-xs font-medium ${isToday ? 'text-accent-fg' : 'text-fg-subtle'}`}>
                                      {format(day, "dd/MM")}
                                    </span>
                                  </div>
@@ -413,8 +413,8 @@ export default function LaboratoriosClient({
                                    <td key={day.toISOString()} className={`p-2 border-b border-zinc-100 border-l border-zinc-50 ${isSameDay(day, new Date()) ? 'bg-accent-subtle' : ''}`}>
                                      {reserva ? (
                                        <div className={`p-3 rounded-xl border relative group ${isMyReserva ? 'bg-success border-success text-white shadow-card ' : 'bg-white border-zinc-200 text-fg-muted shadow-sm'}`}>
-                                         <p className="text-[10px] font-bold line-clamp-1 uppercase tracking-tight">{reserva.user?.name || reserva.user?.username}</p>
-                                         <p className={`text-[9px] font-medium line-clamp-1 ${isMyReserva ? 'text-white/85' : 'text-fg-subtle'}`}>{reserva.disciplina || "Uso Técnico"}</p>
+                                         <p className="text-xs font-bold line-clamp-1">{reserva.user?.name || reserva.user?.username}</p>
+                                         <p className={`text-xs font-medium line-clamp-1 ${isMyReserva ? 'text-white/85' : 'text-fg-subtle'}`}>{reserva.disciplina || "Uso Técnico"}</p>
                                          
                                          {(isMyReserva || isAdmin) && (
                                            <button 
@@ -483,7 +483,7 @@ export default function LaboratoriosClient({
                     <div className="w-10 h-10 bg-zinc-100 text-fg rounded-xl flex items-center justify-center"><Clock size={20}/></div>
                     <div>
                         <h3 className="text-lg font-bold text-fg tracking-tight">Nova Reserva</h3>
-                        <p className="text-xs font-medium text-fg-subtle uppercase tracking-widest">
+                        <p className="text-xs font-medium text-fg-subtle">
                           {selectedSlots.length > 0 
                             ? `${selectedSlots.length} Horário(s) Selecionado(s)` 
                             : `${activeSlot?.horario}º Horário / ${turnos.find(t => t.id === activeSlot?.turno)?.nome}`
@@ -507,7 +507,7 @@ export default function LaboratoriosClient({
                  <div className="space-y-4">
                     {/* Seletor de Turma */}
                     <div className="space-y-2">
-                       <label className="text-[10px] font-bold text-fg-subtle uppercase tracking-[0.2em] ml-1">Turma</label>
+                       <label className="text-xs font-bold text-fg-subtle ml-1">Turma</label>
                        <select 
                          value={selectedTurmaId}
                          onChange={(e) => {
@@ -526,7 +526,7 @@ export default function LaboratoriosClient({
                     {/* Seletor de Disciplina */}
                     {selectedTurmaId && (
                       <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-fg-subtle uppercase tracking-[0.2em] ml-1">Disciplina</label>
+                        <label className="text-xs font-bold text-fg-subtle ml-1">Disciplina</label>
                         <select 
                           value={selectedDisciplinaId}
                           onChange={(e) => setSelectedDisciplinaId(e.target.value)}
@@ -543,7 +543,7 @@ export default function LaboratoriosClient({
                     {/* Campo de Texto (Motivo) - APENAS ADMIN */}
                     {isAdmin && (
                       <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-fg-subtle uppercase tracking-[0.2em] ml-1">Motivo / Atividade (Manual)</label>
+                        <label className="text-xs font-bold text-fg-subtle ml-1">Motivo / Atividade (Manual)</label>
                         <input 
                           type="text" 
                           value={formDisciplina}
@@ -600,7 +600,7 @@ export default function LaboratoriosClient({
                     <div className="w-10 h-10 bg-zinc-900 text-white rounded-xl flex items-center justify-center shadow-card"><Monitor size={20}/></div>
                     <div>
                         <h3 className="text-lg font-bold text-fg tracking-tight">{editingLabId ? 'Editar Laboratório' : 'Novo Laboratório'}</h3>
-                        <p className="text-[10px] font-medium text-fg-subtle uppercase tracking-widest">Acesso Administrativo</p>
+                        <p className="text-xs font-medium text-fg-subtle">Acesso Administrativo</p>
                     </div>
                  </div>
                  <button onClick={() => { setShowLabModal(false); setEditingLabId(null); }} className="p-2 hover:bg-zinc-200 rounded-xl transition-all text-fg-subtle"><X size={20}/></button>
@@ -609,7 +609,7 @@ export default function LaboratoriosClient({
               <div className="p-8 space-y-6">
                  <div className="space-y-4">
                     <div className="space-y-2">
-                       <label className="text-[10px] font-bold text-fg-subtle uppercase tracking-[0.2em] ml-1">Nome do Espaço</label>
+                       <label className="text-xs font-bold text-fg-subtle ml-1">Nome do Espaço</label>
                        <input 
                          type="text" 
                          value={formLab.nome}
@@ -619,7 +619,7 @@ export default function LaboratoriosClient({
                        />
                     </div>
                     <div className="space-y-2">
-                       <label className="text-[10px] font-bold text-fg-subtle uppercase tracking-[0.2em] ml-1">Descrição (Opcional)</label>
+                       <label className="text-xs font-bold text-fg-subtle ml-1">Descrição (Opcional)</label>
                        <textarea 
                          value={formLab.descricao}
                          onChange={(e) => setFormLab(prev => ({ ...prev, descricao: e.target.value }))}

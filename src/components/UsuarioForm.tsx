@@ -129,7 +129,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
             
             <div className="flex items-center space-x-2">
                <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-               <span className="text-[10px] font-semibold uppercase tracking-widest text-fg-subtle">
+               <span className="text-xs font-semibold text-fg-subtle">
                   Sistema de Resultados
                </span>
             </div>
@@ -167,7 +167,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
 
             <div className="space-y-6">
               <div>
-                <label className="block text-xs font-semibold text-fg-subtle uppercase tracking-widest mb-2 ml-1">
+                <label className="block text-xs font-semibold text-fg-subtle mb-2 ml-1">
                   Nome Completo
                 </label>
                 <input 
@@ -179,7 +179,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-xs font-semibold text-fg-subtle uppercase tracking-widest mb-2 ml-1">
+                  <label className="block text-xs font-semibold text-fg-subtle mb-2 ml-1">
                     E-mail do Usuário
                   </label>
                   <input 
@@ -189,7 +189,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-fg-subtle uppercase tracking-widest mb-2 ml-1">
+                  <label className="block text-xs font-semibold text-fg-subtle mb-2 ml-1">
                     {isEdit ? 'Alterar Senha' : 'Senha Inicial'}
                   </label>
                   <input 
@@ -231,7 +231,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
                       {role.icon}
                     </div>
                     <div className="flex-grow">
-                       <p className={`font-semibold uppercase tracking-tight text-sm ${isActive ? 'text-white' : 'text-fg'}`}>
+                       <p className={`font-semibold text-sm ${isActive ? 'text-white' : 'text-fg'}`}>
                           {role.label}
                        </p>
                        <p className={`text-xs ${isActive ? 'text-fg-subtle' : 'text-fg-subtle'}`}>
@@ -269,7 +269,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
               <div className="bg-zinc-100 p-4 rounded-lg flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <Calendar className="w-4 h-4 text-fg-subtle" />
-                  <span className="text-xs font-semibold text-fg-subtle uppercase tracking-widest">Último Acesso</span>
+                  <span className="text-xs font-semibold text-fg-subtle">Último Acesso</span>
                 </div>
                 <span className="text-sm font-semibold text-fg-muted">{formatLastLogin(usuario?.lastLogin)}</span>
               </div>

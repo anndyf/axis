@@ -237,25 +237,25 @@ export default async function EstudantesPage({
               <div className="p-1.5 bg-zinc-100 text-fg-subtle rounded-lg border border-zinc-200">
                  <ShieldCheck size={14} />
               </div>
-              <span className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest leading-none">Gestão de Acesso</span>
+              <span className="text-xs font-semibold text-fg-subtle leading-none">Gestão de Acesso</span>
            </div>
            <div className="flex items-center gap-2">
               <div className="p-1.5 bg-zinc-100 text-fg-subtle rounded-lg border border-zinc-200">
                  <Pencil size={14} />
               </div>
-              <span className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest leading-none">Editar Dados</span>
+              <span className="text-xs font-semibold text-fg-subtle leading-none">Editar Dados</span>
            </div>
            <div className="flex items-center gap-2">
               <div className="p-1.5 bg-accent-subtle text-accent-fg rounded-lg border border-accent/25">
                  <Accessibility size={14} />
               </div>
-              <span className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest leading-none">Ficha AEE</span>
+              <span className="text-xs font-semibold text-fg-subtle leading-none">Ficha AEE</span>
            </div>
            <div className="flex items-center gap-2">
               <div className="p-1.5 bg-zinc-100 text-fg-subtle rounded-lg border border-zinc-200">
                  <FileText size={14} />
               </div>
-              <span className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest leading-none">Gerar Boletim</span>
+              <span className="text-xs font-semibold text-fg-subtle leading-none">Gerar Boletim</span>
            </div>
         </div>
 
@@ -299,7 +299,7 @@ export default async function EstudantesPage({
               ).sort(([a], [b]) => a.localeCompare(b)).map(([turmaNome, estudantesDaTurma]: [string, any]) => (
                 <div key={turmaNome} className="mb-0 border-b-8 border-zinc-100 last:border-0">
                   <div className="bg-zinc-50 px-6 py-4 border-b border-zinc-200 flex items-center justify-between">
-                    <h2 className="text-base font-bold text-fg uppercase tracking-widest flex items-center gap-2">
+                    <h2 className="text-base font-bold text-fg flex items-center gap-2">
                       <Users className="w-5 h-5 text-fg-subtle" />
                       {turmaNome}
                     </h2>
@@ -309,13 +309,13 @@ export default async function EstudantesPage({
                     <table className="w-full">
                       <thead className="bg-white border-b border-zinc-200">
                         <tr>
-                          <th className="px-6 py-3 text-left text-xs font-bold text-fg-subtle uppercase tracking-widest">
+                          <th className="px-6 py-3 text-left text-xs font-bold text-fg-subtle">
                             Nome
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-bold text-fg-subtle uppercase tracking-widest">
+                          <th className="px-6 py-3 text-left text-xs font-bold text-fg-subtle">
                             Notas Lançadas
                           </th>
-                          <th className="px-6 py-3 text-right text-xs font-bold text-fg-subtle uppercase tracking-widest">
+                          <th className="px-6 py-3 text-right text-xs font-bold text-fg-subtle">
                             Ações / Gestão
                           </th>
                         </tr>
@@ -329,7 +329,7 @@ export default async function EstudantesPage({
                                   {estudante.nome.charAt(0).toUpperCase()}
                                 </div>
                                 <div className="ml-4">
-                                  <div className="text-sm font-bold text-fg uppercase tracking-tight flex items-center gap-2">
+                                  <div className="text-sm font-bold text-fg flex items-center gap-2">
                                     {estudante.nome}
                                     {estudante.aeeProfile && (
                                       <Link 
@@ -341,7 +341,7 @@ export default async function EstudantesPage({
                                       </Link>
                                     )}
                                   </div>
-                                  <div className="text-[11px] font-bold tracking-widest text-fg-subtle uppercase mt-0.5">
+                                  <div className="text-xs font-bold text-fg-subtle mt-0.5">
                                     Matrícula: {estudante.matricula}
                                   </div>
                                 </div>

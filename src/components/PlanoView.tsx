@@ -60,7 +60,7 @@ export default function PlanoView({ planoId, onClose }: PlanoViewProps) {
       <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm animate-fade-in">
         <div className="bg-white p-8 rounded-lg shadow-overlay flex flex-col items-center gap-3">
             <div className="w-8 h-8 border-3 border-accent/25 border-t-accent rounded-full animate-spin" />
-            <p className="text-fg-subtle text-xs font-bold uppercase tracking-widest animate-pulse">Buscando Detalhes...</p>
+            <p className="text-fg-subtle text-xs font-bold animate-pulse">Buscando Detalhes...</p>
         </div>
       </div>
     )
@@ -82,12 +82,12 @@ export default function PlanoView({ planoId, onClose }: PlanoViewProps) {
                  <FileText className="w-5 h-5 text-accent-fg" />
             </div>
             <div>
-                <h2 className="text-lg font-bold text-fg tracking-tight leading-tight uppercase">{plano.disciplinaNome}</h2>
+                <h2 className="text-lg font-bold text-fg leading-tight">{plano.disciplinaNome}</h2>
                 <div className="flex items-center gap-3 mt-0.5">
-                    <span className="text-[10px] font-bold text-fg-subtle flex items-center gap-1">
+                    <span className="text-xs font-bold text-fg-subtle flex items-center gap-1">
                         <Calendar size={12} className="text-accent" /> {formatDate(plano.periodoInicio)} - {formatDate(plano.periodoFim)}
                     </span>
-                    <span className="text-[10px] font-bold text-fg-subtle flex items-center gap-1">
+                    <span className="text-xs font-bold text-fg-subtle flex items-center gap-1">
                         <UserIcon size={12} className="text-accent" /> PROF. {plano.professor.name.toUpperCase()}
                     </span>
                 </div>
@@ -99,11 +99,11 @@ export default function PlanoView({ planoId, onClose }: PlanoViewProps) {
         {/* Content Compact */}
         <div className="flex-1 overflow-y-auto p-6 space-y-8 bg-zinc-50/20 custom-scrollbar">
           <div className="space-y-3 px-1">
-            <h3 className="text-[10px] font-bold text-fg-subtle uppercase tracking-widest flex items-center gap-2">
+            <h3 className="text-xs font-bold text-fg-subtle flex items-center gap-2">
                <Users className="w-3.5 h-3.5" /> Turmas Atendidas
             </h3>
             <div className="flex flex-wrap gap-1.5">
-                {plano.turmas.map(t => <span key={t.id} className="px-3 py-1.5 bg-white border border-zinc-100 shadow-sm rounded-lg font-bold text-fg-muted text-[10px] uppercase">{t.nome}</span>)}
+                {plano.turmas.map(t => <span key={t.id} className="px-3 py-1.5 bg-white border border-zinc-100 shadow-sm rounded-lg font-bold text-fg-muted text-xs uppercase">{t.nome}</span>)}
             </div>
           </div>
 
@@ -132,7 +132,7 @@ export default function PlanoView({ planoId, onClose }: PlanoViewProps) {
 function ViewSection({ icon, title, content, full = false }: any) {
     return (
         <div className={`space-y-2 ${full ? 'md:col-span-2' : ''}`}>
-            <label className="text-[9px] font-bold text-fg-subtle uppercase tracking-widest ml-1 flex items-center gap-1.5">
+            <label className="text-xs font-bold text-fg-subtle ml-1 flex items-center gap-1.5">
                 {icon} {title}
             </label>
             <div className="w-full p-4 bg-white border border-zinc-100 rounded-lg shadow-sm text-xs font-medium text-fg-muted leading-relaxed whitespace-pre-wrap">

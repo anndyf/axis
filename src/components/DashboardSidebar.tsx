@@ -138,7 +138,7 @@ export default function DashboardSidebar({
           <Link href="/dashboard" className="min-w-0 flex-1 rounded-md" title={recolhido ? escola.nome : undefined}>
             <MarcaEscola escola={escola} compacta={recolhido} />
           </Link>
-          {!recolhido && anoLetivo && <span className="shrink-0 rounded-md border border-line px-1.5 text-[11px] font-medium leading-5 text-fg-subtle tabular-nums">{anoLetivo}</span>}
+          {!recolhido && anoLetivo && <span className="shrink-0 rounded-md border border-line px-1.5 text-xs font-medium leading-5 text-fg-subtle tabular-nums">{anoLetivo}</span>}
           <button type="button" onClick={closeMobile} aria-label="Fechar menu" className="rounded-md p-1 text-fg-subtle hover:bg-subtle hover:text-fg md:hidden">
             <X size={16} strokeWidth={1.75} />
           </button>
@@ -149,7 +149,7 @@ export default function DashboardSidebar({
           {menuGroups.map((group) => (
             <div key={group.title}>
               {!recolhido ? (
-                <p className="mb-1 px-2 text-[11px] font-medium text-fg-subtle">{group.title}</p>
+                <p className="mb-1 px-2 text-xs font-medium text-fg-subtle">{group.title}</p>
               ) : (
                 <div className="mx-2 mb-2 h-px bg-line-subtle first:hidden" aria-hidden />
               )}
@@ -213,7 +213,7 @@ export default function DashboardSidebar({
                   <>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-13 font-medium text-fg">{user.name}</span>
-                      <span className="block truncate text-[11px] text-fg-subtle">{papelDoUsuario(user)}</span>
+                      <span className="block truncate text-xs text-fg-subtle">{papelDoUsuario(user)}</span>
                     </span>
                     <ChevronsUpDown size={14} strokeWidth={1.75} className="shrink-0 text-fg-subtle" aria-hidden />
                   </>

@@ -169,7 +169,7 @@ export default function RecuperacaoTurmaClient({
         {/* Filtros Estilo Simulados */}
         <div className="bg-white p-5 rounded-lg shadow-sm border border-zinc-200 flex flex-wrap gap-5 items-end">
             <div className="flex-1 min-w-[300px] space-y-1.5">
-                <label className="text-sm font-medium text-fg-subtle uppercase tracking-wider ml-1">Disciplina Alvo</label>
+                <label className="text-sm font-medium text-fg-subtle ml-1">Disciplina Alvo</label>
                 <div className="relative">
                   <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-subtle" size={16} />
                   <select
@@ -185,11 +185,11 @@ export default function RecuperacaoTurmaClient({
             
             <div className="flex items-center gap-3 pb-1">
                 <div className="text-center px-4 py-2 bg-danger-subtle rounded-xl border border-danger-line">
-                    <p className="text-[10px] font-medium text-danger uppercase tracking-widest">Pendente</p>
+                    <p className="text-xs font-medium text-danger">Pendente</p>
                     <p className="text-base font-medium text-danger-fg leading-none mt-1">{stats.total}</p>
                 </div>
                 <div className="text-center px-4 py-2 bg-success-subtle rounded-xl border border-success-line">
-                    <p className="text-[10px] font-medium text-success uppercase tracking-widest">Recuperado</p>
+                    <p className="text-xs font-medium text-success">Recuperado</p>
                     <p className="text-base font-medium text-success-fg leading-none mt-1">{stats.aprovados}</p>
                 </div>
             </div>
@@ -225,12 +225,12 @@ export default function RecuperacaoTurmaClient({
             <table className="w-full text-left">
               <thead className="bg-zinc-50 border-b border-zinc-300">
                 <tr>
-                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle uppercase tracking-widest w-12 text-center">#</th>
-                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle uppercase tracking-widest">Estudante</th>
-                  <th className="px-4 py-4 text-xs font-medium text-fg-subtle uppercase tracking-widest w-32 text-center">Média Anual</th>
-                  <th className="px-4 py-4 text-xs font-medium text-fg-subtle uppercase tracking-widest w-32 text-center">Recuperação</th>
-                  <th className="px-4 py-4 text-xs font-medium text-fg-subtle uppercase tracking-widest w-16 text-center">Faltou</th>
-                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle uppercase tracking-widest w-32 text-center">Resultado</th>
+                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle w-12 text-center">#</th>
+                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle">Estudante</th>
+                  <th className="px-4 py-4 text-xs font-medium text-fg-subtle w-32 text-center">Média Anual</th>
+                  <th className="px-4 py-4 text-xs font-medium text-fg-subtle w-32 text-center">Recuperação</th>
+                  <th className="px-4 py-4 text-xs font-medium text-fg-subtle w-16 text-center">Faltou</th>
+                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle w-32 text-center">Resultado</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-200/80">
@@ -238,14 +238,14 @@ export default function RecuperacaoTurmaClient({
                    <tr>
                       <td colSpan={6} className="px-6 py-16 text-center text-zinc-300">
                         <TrendingDown className="w-12 h-12 opacity-20 mx-auto mb-3" />
-                        <p className="text-sm font-medium uppercase tracking-widest">Selecione uma disciplina para iniciar</p>
+                        <p className="text-sm font-medium">Selecione uma disciplina para iniciar</p>
                       </td>
                    </tr>
                 ) : filteredNotas.length === 0 ? (
                    <tr>
                       <td colSpan={6} className="px-6 py-16 text-center text-zinc-300">
                         <Search className="w-12 h-12 opacity-20 mx-auto mb-3" />
-                        <p className="text-sm font-medium uppercase tracking-widest">Nenhum estudante sob recuperação final nesta disciplina</p>
+                        <p className="text-sm font-medium">Nenhum estudante sob recuperação final nesta disciplina</p>
                       </td>
                    </tr>
                 ) : (
@@ -270,10 +270,10 @@ export default function RecuperacaoTurmaClient({
                             <div className="flex items-center gap-2">
                               <span className="text-base font-medium text-fg-muted uppercase">{nota.estudanteNome}</span>
                               {nota.status === 'DESISTENTE' && (
-                                <span className="px-1.5 py-0.5 bg-danger-subtle text-danger-fg text-[9px] font-medium rounded uppercase tracking-tighter shadow-sm border border-danger-line">DESISTENTE</span>
+                                <span className="px-1.5 py-0.5 bg-danger-subtle text-danger-fg text-xs font-medium rounded shadow-sm border border-danger-line">DESISTENTE</span>
                               )}
                             </div>
-                            <span className="text-[11px] font-medium text-fg-subtle tracking-widest uppercase">Matrícula: {nota.estudanteId}</span>
+                            <span className="text-xs font-medium text-fg-subtle">Matrícula: {nota.estudanteId}</span>
                           </div>
                         </td>
                         <td className="px-4 py-4 text-center">
@@ -296,7 +296,7 @@ export default function RecuperacaoTurmaClient({
                            <input type="checkbox" checked={isFaltou} onChange={(e) => toggleNaoRealizou(nota.id, e.target.checked)} className="w-5 h-5 text-danger-fg border-zinc-300 rounded-lg cursor-pointer transition-all active:scale-90" />
                         </td>
                         <td className="px-6 py-4 text-center">
-                            <span className={`inline-block whitespace-nowrap px-3 py-1 rounded-full text-[10px] font-medium border uppercase tracking-widest ${
+                            <span className={`inline-block whitespace-nowrap px-3 py-1 rounded-full text-xs font-medium border ${
                               nota.status === 'DESISTENTE' ? 'text-danger-fg bg-danger-subtle border-danger-line' : status.class
                             }`}>
                              {nota.status === 'DESISTENTE' ? 'DESISTENTE' : status.text}
@@ -313,7 +313,7 @@ export default function RecuperacaoTurmaClient({
           {disciplinaSelecionada && filteredNotas.length > 0 && (
             <div className="p-5 bg-zinc-50 border-t border-zinc-200 flex justify-end items-center gap-4">
               <div className="hidden md:block">
-                 <p className="text-[10px] font-medium text-fg-subtle uppercase tracking-widest">Confirme o lançamento para substituir a média anual automática.</p>
+                 <p className="text-xs font-medium text-fg-subtle">Confirme o lançamento para substituir a média anual automática.</p>
               </div>
                <button
                 onClick={handleSubmit}
@@ -335,8 +335,8 @@ export default function RecuperacaoTurmaClient({
               <div className="flex items-center gap-3">
                  <div className="w-10 h-10 bg-danger text-white rounded-xl flex items-center justify-center shadow-card"><TrendingUp size={20}/></div>
                   <div>
-                    <h3 className="text-lg font-medium text-fg uppercase tracking-tight">Consolidar Recuperação Final</h3>
-                    <p className="text-xs font-medium text-fg-subtle uppercase tracking-widest">Ação permanente no boletim anual</p>
+                    <h3 className="text-lg font-medium text-fg">Consolidar Recuperação Final</h3>
+                    <p className="text-xs font-medium text-fg-subtle">Ação permanente no boletim anual</p>
                   </div>
               </div>
               <button onClick={() => setShowConfirmModal(false)} className="p-2 hover:bg-zinc-300 rounded-xl transition-all"><X size={20}/></button>

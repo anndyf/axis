@@ -135,7 +135,7 @@ export default function EstudantesFilter({ cursos, turmas, totalResults }: Filte
              )}
            </div>
            <div>
-             <p className="text-xs font-medium text-zinc-200 uppercase tracking-widest">
+             <p className="text-xs font-medium text-zinc-200">
                {isPending ? 'Buscando...' : 'Total Encontrado'}
              </p>
              <p className="text-2xl font-medium leading-none">

@@ -133,7 +133,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
               </Link>
               <div>
                 <h1 className="text-xl font-medium text-fg leading-tight">Vincular Disciplinas</h1>
-                <p className="text-xs font-medium text-fg-muted uppercase tracking-tight">
+                <p className="text-xs font-medium text-fg-muted">
                    Professor: {usuario.name}
                 </p>
               </div>
@@ -213,7 +213,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
         {/* Disciplinas Vinculadas Atualmente */}
         {disciplinasSelecionadasList.length > 0 && (
           <div className="mb-10 p-6 bg-white rounded-xl border border-zinc-200 shadow-sm">
-            <h2 className="text-xs font-bold text-fg uppercase tracking-widest mb-5 flex items-center gap-2">
+            <h2 className="text-xs font-bold text-fg mb-5 flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-fg-subtle" />
               Disciplinas Já Vinculadas ({disciplinasSelecionadasList.length})
             </h2>
@@ -267,7 +267,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
                         <School className="w-6 h-6" />
                       </div>
                       <div>
-                        <h3 className="font-medium text-fg uppercase tracking-tight text-lg">{label}</h3>
+                        <h3 className="font-medium text-fg text-lg">{label}</h3>
                         <p className="text-xs font-medium text-fg-subtle">
                            {selecionadasNaTurma} de {disciplinas.length} disciplinas vinculadas
                         </p>
@@ -275,7 +275,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
                     </div>
                     <div className="flex items-center space-x-3">
                        {selecionadasNaTurma > 0 && !isExpanded && (
-                         <span className="px-3 py-1 bg-success-subtle text-success-fg text-[10px] font-medium rounded-full uppercase">
+                         <span className="px-3 py-1 bg-success-subtle text-success-fg text-xs font-medium rounded-full uppercase">
                             Ativo
                          </span>
                        )}
@@ -320,14 +320,14 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
                               </div>
                               
                               {outroProfessor && !isSelected && (
-                                <div className="mt-2 flex items-center gap-1.5 text-[10px] text-warning-fg font-bold uppercase tracking-tight bg-warning-subtle px-2 py-1 rounded-lg">
+                                <div className="mt-2 flex items-center gap-1.5 text-xs text-warning-fg font-bold bg-warning-subtle px-2 py-1 rounded-lg">
                                   <AlertCircle className="w-3 h-3" />
                                   <span>{outroProfessor.name || 'Outro Prof.'}</span>
                                 </div>
                               )}
 
                               {isSelected && usuario.disciplinasPermitidas.some((up: any) => up.id === disc.id) && (
-                                <div className="mt-2 flex items-center gap-1.5 text-[10px] text-success-fg font-bold uppercase tracking-tight bg-success-subtle px-2 py-1 rounded-lg">
+                                <div className="mt-2 flex items-center gap-1.5 text-xs text-success-fg font-bold bg-success-subtle px-2 py-1 rounded-lg">
                                   <CheckCircle2 className="w-3 h-3" />
                                   <span>VINCULADA A VOCÊ</span>
                                 </div>
@@ -348,13 +348,13 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
       {/* Info Flutuante no Rodapé */}
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-zinc-900 text-white px-6 py-3 rounded-full shadow-overlay flex items-center space-x-4 border border-white/10 backdrop-blur-md">
          <Info className="w-4 h-4 text-accent" />
-         <span className="text-xs font-medium uppercase tracking-widest leading-none">
+         <span className="text-xs font-medium leading-none">
             {selectedIds.length} selecionadas
          </span>
          {todasDisciplinas.some(d => selectedIds.includes(d.id) && d.usuariosPermitidos?.some((u: any) => u.id !== usuario.id)) && (
            <div className="flex items-center gap-2 border-l border-white/20 pl-4 ml-4">
              <AlertCircle className="w-4 h-4 text-warning" />
-             <span className="text-xs font-bold text-warning uppercase tracking-tight">Vínculos serão transferidos</span>
+             <span className="text-xs font-bold text-warning">Vínculos serão transferidos</span>
            </div>
          )}
       </div>

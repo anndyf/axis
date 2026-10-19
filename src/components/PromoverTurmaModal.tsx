@@ -81,8 +81,8 @@ export default function PromoverTurmaModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           <div className="bg-accent-subtle border border-accent/25 rounded-lg p-4 flex gap-3">
             <AlertCircle className="w-5 h-5 text-accent-fg shrink-0 mt-0.5" />
-            <div className="text-[11px] text-accent-fg font-medium leading-relaxed">
-              <p className="font-bold border-b border-accent/25 mb-1 pb-1 uppercase tracking-tight">O que acontecerá:</p>
+            <div className="text-xs text-accent-fg font-medium leading-relaxed">
+              <p className="font-bold border-b border-accent/25 mb-1 pb-1">O que acontecerá:</p>
               <ul className="list-disc ml-3 space-y-0.5">
                 <li>Uma nova turma para o <b>{labelLevel} {serie}</b> será criada.</li>
                 <li>Disciplinas serão clonadas automaticamente.</li>
@@ -95,7 +95,7 @@ export default function PromoverTurmaModal({
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-semibold uppercase tracking-widest text-fg-subtle ml-1">{labelLevel} Alvo</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1">{labelLevel} Alvo</label>
                 <input
                   type="number"
                   min="1"
@@ -106,7 +106,7 @@ export default function PromoverTurmaModal({
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-semibold uppercase tracking-widest text-fg-subtle ml-1">Ano Letivo</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1">Ano Letivo</label>
                 <input
                   type="number"
                   value={anoLetivo}
@@ -117,12 +117,12 @@ export default function PromoverTurmaModal({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] font-semibold uppercase tracking-widest text-fg-subtle ml-1">Código da Nova Turma</label>
+              <label className="text-xs font-semibold text-fg-subtle ml-1">Código da Nova Turma</label>
               <input
                 type="text"
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
-                className="w-full bg-zinc-50 border-none rounded-xl px-4 py-2.5 text-sm font-semibold text-fg focus:ring-2 focus:ring-ring transition-all uppercase tracking-wider font-mono shadow-card"
+                className="w-full bg-zinc-50 border-none rounded-xl px-4 py-2.5 text-sm font-semibold text-fg focus:ring-2 focus:ring-ring transition-all font-mono shadow-card"
               />
             </div>
           </div>

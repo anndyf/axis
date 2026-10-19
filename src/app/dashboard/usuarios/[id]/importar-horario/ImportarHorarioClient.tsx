@@ -122,7 +122,7 @@ export default function ImportarHorarioClient({
             </Link>
             <div>
               <h1 className="text-lg font-semibold text-fg">Importar Horário</h1>
-              <p className="text-xs font-medium text-fg-subtle uppercase tracking-widest">
+              <p className="text-xs font-medium text-fg-subtle">
                 Professor: {usuario.name}
               </p>
             </div>
@@ -222,17 +222,17 @@ export default function ImportarHorarioClient({
             <div className="grid grid-cols-3 gap-3">
               <div className="bg-white rounded-lg border border-zinc-200 p-4 text-center">
                 <p className="text-2xl font-semibold text-fg">{resultado.totalPares}</p>
-                <p className="text-[10px] font-bold text-fg-subtle uppercase tracking-widest mt-1">Pares lidos</p>
+                <p className="text-xs font-bold text-fg-subtle mt-1">Pares lidos</p>
               </div>
               <div className="bg-success-subtle rounded-lg border border-success-line p-4 text-center">
                 <p className="text-2xl font-semibold text-success-fg">{resultado.encontrados.length}</p>
-                <p className="text-[10px] font-bold text-success-fg uppercase tracking-widest mt-1">Encontrados</p>
+                <p className="text-xs font-bold text-success-fg mt-1">Encontrados</p>
               </div>
               <div className={`rounded-lg border p-4 text-center ${resultado.naoEncontrados.length > 0 ? 'bg-danger-subtle border-danger-line' : 'bg-zinc-50 border-zinc-200'}`}>
                 <p className={`text-2xl font-semibold ${resultado.naoEncontrados.length > 0 ? 'text-danger-fg' : 'text-fg-subtle'}`}>
                   {resultado.naoEncontrados.length}
                 </p>
-                <p className={`text-[10px] font-bold uppercase tracking-widest mt-1 ${resultado.naoEncontrados.length > 0 ? 'text-danger' : 'text-fg-subtle'}`}>Não encontrados</p>
+                <p className={`text-xs font-bold mt-1 ${resultado.naoEncontrados.length > 0 ? 'text-danger' : 'text-fg-subtle'}`}>Não encontrados</p>
               </div>
             </div>
 
@@ -281,7 +281,7 @@ export default function ImportarHorarioClient({
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-fg truncate">{e.discNomeBanco}</p>
                         {normalizar(e.discNome) !== normalizar(e.discNomeBanco) && (
-                          <p className="text-[10px] text-fg-subtle truncate">
+                          <p className="text-xs text-fg-subtle truncate">
                             no horário: "{e.discNome}"
                           </p>
                         )}
@@ -309,7 +309,7 @@ export default function ImportarHorarioClient({
                         {e.turmaCode}
                       </span>
                       <p className="text-sm text-fg-muted flex-1">{e.discNomeBanco}</p>
-                      <span className="text-[10px] font-bold text-accent-fg bg-accent-subtle px-2 py-0.5 rounded-full uppercase tracking-widest">
+                      <span className="text-xs font-bold text-accent-fg bg-accent-subtle px-2 py-0.5 rounded-full">
                         já vinculada
                       </span>
                     </div>
@@ -339,12 +339,12 @@ export default function ImportarHorarioClient({
                           <p className="text-xs text-fg-subtle mt-0.5">{n.motivo}</p>
                           {n.sugestoes.length > 0 && (
                             <div className="mt-2">
-                              <p className="text-[10px] font-bold text-fg-subtle uppercase tracking-widest mb-1">
+                              <p className="text-xs font-bold text-fg-subtle mb-1">
                                 Disciplinas desta turma:
                               </p>
                               <div className="flex flex-wrap gap-1">
                                 {n.sugestoes.map((s, j) => (
-                                  <span key={j} className="text-[10px] bg-zinc-100 text-fg-muted px-2 py-0.5 rounded-lg">
+                                  <span key={j} className="text-xs bg-zinc-100 text-fg-muted px-2 py-0.5 rounded-lg">
                                     {s}
                                   </span>
                                 ))}

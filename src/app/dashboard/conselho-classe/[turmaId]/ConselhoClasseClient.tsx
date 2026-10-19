@@ -364,7 +364,7 @@ export default function ConselhoClasseClient({
         <div className="mb-3 flex items-start justify-between gap-6">
           {/* Identificação - Esquerda */}
           <div className="flex-1">
-            <p className="text-[9px] font-medium text-fg-muted mb-1 uppercase leading-tight">
+            <p className="text-xs font-medium text-fg-muted mb-1 uppercase leading-tight">
               Centro Territorial de Educação Profissional do Litoral Norte e Agreste Baiano
             </p>
             <div className="flex items-center gap-2 mb-1">
@@ -379,8 +379,8 @@ export default function ConselhoClasseClient({
           
           {/* Legenda - Direita */}
           <div className="bg-white rounded px-3 py-2 border border-zinc-300" style={{minWidth: '450px'}}>
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[8px]">
-              <span className="font-medium text-accent-fg text-[9px] mr-1">LEGENDA:</span>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs">
+              <span className="font-medium text-accent-fg text-xs mr-1">LEGENDA:</span>
               <div className="flex items-center gap-1">
                 <span className="px-2 py-1 bg-success-subtle border border-success font-medium rounded text-success-fg text-[7px]">AR</span>
                 <span className="font-medium">Aprov. Recup.</span>
@@ -405,10 +405,10 @@ export default function ConselhoClasseClient({
           </div>
         </div>
         
-        <table className="print-table w-full border-collapse text-[9px]">
+        <table className="print-table w-full border-collapse text-xs">
           <thead>
             <tr>
-              <th className="border border-zinc-400 px-2 bg-white font-medium text-center text-[8px]" style={{minWidth: '120px', maxWidth: '120px', width: '120px', height: '100px', verticalAlign: 'middle'}}>
+              <th className="border border-zinc-400 px-2 bg-white font-medium text-center text-xs" style={{minWidth: '120px', maxWidth: '120px', width: '120px', height: '100px', verticalAlign: 'middle'}}>
                 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%'}}>
                   ESTUDANTE
                 </div>
@@ -444,8 +444,8 @@ export default function ConselhoClasseClient({
 
                 return (
                   <tr key={estudanteId}>
-                    <td className="border border-zinc-400 px-2 py-0.5 font-medium text-left bg-white text-[10px] leading-tight" style={{maxWidth: '120px', width: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
-                      <span className="text-fg-muted mr-1 text-[8px]">{String(idx + 1).padStart(2, '0')}</span>
+                    <td className="border border-zinc-400 px-2 py-0.5 font-medium text-left bg-white text-xs leading-tight" style={{maxWidth: '120px', width: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
+                      <span className="text-fg-muted mr-1 text-xs">{String(idx + 1).padStart(2, '0')}</span>
                       <span>{data.nome}</span>
                     </td>
                     {disciplinas.map((disc) => {
@@ -494,9 +494,9 @@ export default function ConselhoClasseClient({
                       return (
                         <td key={disc} className={`border border-zinc-400 px-1 py-1 text-center font-medium ${bgColor} ${textColor}`}>
                           <div className="flex flex-col items-center leading-tight">
-                            <span className="text-[8px] font-medium">{statusAbrev}</span>
+                            <span className="text-xs font-medium">{statusAbrev}</span>
                             {notaFinal !== null && notaFinal !== undefined && (
-                              <span className="text-[10px]">{notaFinal.toFixed(1)}</span>
+                              <span className="text-xs">{notaFinal.toFixed(1)}</span>
                             )}
                           </div>
                         </td>
@@ -525,7 +525,7 @@ export default function ConselhoClasseClient({
                 <div className="flex items-center space-x-2 mb-0.5">
                   <h1 className="text-2xl font-bold text-fg tracking-tight">{turmaNome}</h1>
                   {turmaTurno && (
-                    <span className="px-2.5 py-1 bg-zinc-900 text-white text-[10px] font-medium rounded-md uppercase tracking-widest leading-none">
+                    <span className="px-2.5 py-1 bg-zinc-900 text-white text-xs font-medium rounded-md leading-none">
                       {turmaTurno}
                     </span>
                   )}
@@ -578,15 +578,15 @@ export default function ConselhoClasseClient({
                     <div className="flex flex-wrap items-center gap-2">
                       <div className="px-3 py-1.5 bg-white rounded-xl border border-zinc-200 flex items-center space-x-2">
                         <div className="w-1 h-1 bg-zinc-400 rounded-full" />
-                        <span className="text-[10px] font-medium text-fg-subtle uppercase tracking-wider">{total} Alunos</span>
+                        <span className="text-xs font-medium text-fg-subtle">{total} Alunos</span>
                       </div>
                       <div className="px-3 py-1.5 bg-success-subtle rounded-xl border border-success-line flex items-center space-x-2">
                         <div className="w-1 h-1 bg-success rounded-full" />
-                        <span className="text-[10px] font-medium text-success-fg uppercase tracking-wider">{concluidos} Concluídos</span>
+                        <span className="text-xs font-medium text-success-fg">{concluidos} Concluídos</span>
                       </div>
                       <div className="px-3 py-1.5 bg-warning-subtle rounded-xl border border-warning-line flex items-center space-x-2">
                         <div className="w-1 h-1 bg-warning rounded-full animate-pulse" />
-                        <span className="text-[10px] font-medium text-warning-fg uppercase tracking-wider">{pendentes} Pendentes</span>
+                        <span className="text-xs font-medium text-warning-fg">{pendentes} Pendentes</span>
                       </div>
                     </div>
                   )
@@ -597,7 +597,7 @@ export default function ConselhoClasseClient({
                   <button 
                     type="button"
                     onClick={handlePrint}
-                    className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all bg-white text-fg-muted border border-zinc-300 hover:border-zinc-500 hover:text-fg-muted hover:bg-zinc-100"
+                    className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-medium transition-all bg-white text-fg-muted border border-zinc-300 hover:border-zinc-500 hover:text-fg-muted hover:bg-zinc-100"
                   >
                     <Printer className="w-3 h-3" />
                     <span>Imprimir</span>
@@ -606,7 +606,7 @@ export default function ConselhoClasseClient({
                   <button 
                     type="button"
                     onClick={() => setShowInstructions(!showInstructions)}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all ${
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
                       showInstructions 
                       ? 'bg-zinc-800 text-white shadow-card' 
                       : 'bg-white text-fg-subtle border border-zinc-300 hover:border-accent/25 hover:text-accent-fg font-medium'
@@ -629,15 +629,15 @@ export default function ConselhoClasseClient({
                       <h3 className="text-base font-medium text-fg tracking-tight">Guia Rápido do Conselho</h3>
                       <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div className="space-y-2">
-                          <span className="text-[10px] font-medium text-accent-fg uppercase tracking-widest">Passo 01</span>
+                          <span className="text-xs font-medium text-accent-fg">Passo 01</span>
                           <p className="text-xs text-fg-subtle leading-relaxed font-medium">Clique no nome do aluno para abrir a lista de matérias com pendência.</p>
                         </div>
                         <div className="space-y-2">
-                          <span className="text-[10px] font-medium text-accent-fg uppercase tracking-widest">Passo 02</span>
+                          <span className="text-xs font-medium text-accent-fg">Passo 02</span>
                           <p className="text-xs text-fg-subtle leading-relaxed font-medium">Ajuste a <b>Nota Rec.</b> se necessário. Notas acima de 5.0 aprovam na hora.</p>
                         </div>
                         <div className="space-y-2">
-                          <span className="text-[10px] font-medium text-accent-fg uppercase tracking-widest">Passo 03</span>
+                          <span className="text-xs font-medium text-accent-fg">Passo 03</span>
                           <p className="text-xs text-fg-subtle leading-relaxed font-medium">Defina a <b>Decisão Final</b> e use o botão <b>Gravar</b> no rodapé fixo.</p>
                         </div>
                       </div>
@@ -648,26 +648,26 @@ export default function ConselhoClasseClient({
 
               {/* Legenda Minimalista */}
               <div className="mt-8 pt-6 border-t border-zinc-50 flex flex-wrap items-center gap-8 px-2">
-                <span className="text-[10px] font-medium text-zinc-300 uppercase tracking-widest">Legenda de Estados:</span>
+                <span className="text-xs font-medium text-zinc-300">Legenda de Estados:</span>
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 rounded-full bg-success" />
-                  <span className="text-[10px] font-medium text-fg-muted uppercase tracking-wider">Aprovado</span>
+                  <span className="text-xs font-medium text-fg-muted">Aprovado</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 rounded-full bg-white0" />
-                  <span className="text-[10px] font-medium text-fg-muted uppercase tracking-wider">Dependência</span>
+                  <span className="text-xs font-medium text-fg-muted">Dependência</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 rounded-full bg-danger" />
-                  <span className="text-[10px] font-medium text-fg-subtle uppercase tracking-wider">Conservado</span>
+                  <span className="text-xs font-medium text-fg-subtle">Conservado</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 rounded-full bg-warning" />
-                  <span className="text-[10px] font-medium text-fg-subtle uppercase tracking-wider">Recuperação</span>
+                  <span className="text-xs font-medium text-fg-subtle">Recuperação</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 rounded-sm bg-warning-subtle border border-warning-line" />
-                  <span className="text-[10px] font-medium text-warning-fg uppercase tracking-wider">Infrequente (INF)</span>
+                  <span className="text-xs font-medium text-warning-fg">Infrequente (INF)</span>
                 </div>
               </div>
             </div>
@@ -739,19 +739,19 @@ export default function ConselhoClasseClient({
                         {/* Status Detalhado */}
                         <div className="flex flex-wrap items-center gap-2 mt-1.5">
                           {recTotal > 0 && (
-                            <span className="text-[10px] font-medium uppercase tracking-wider px-2 py-0.5 rounded-md bg-zinc-100 text-fg-muted border border-zinc-200">
+                            <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-zinc-100 text-fg-muted border border-zinc-200">
                               {recTotal} {recTotal === 1 ? 'Recuperação' : 'Recuperações'} ({recAprovado} Passou)
                             </span>
                           )}
                           
-                          <span className={`text-[10px] font-medium uppercase tracking-wider px-2 py-0.5 rounded-md ${
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded-md ${
                              todasResolvidas ? 'bg-success-subtle text-success-fg border border-success-line' : 'bg-accent-subtle text-accent-fg border border-accent/25'
                           }`}>
                             {levadasAoConselho} {levadasAoConselho === 1 ? 'Matéria' : 'Matérias'} analit.
                           </span>
 
                           {!isExpanded && (
-                             <span className="text-[10px] font-medium text-fg-subtle ml-1">
+                             <span className="text-xs font-medium text-fg-subtle ml-1">
                                {resolvidasCount}/{data.notas.length} Resolvidas
                              </span>
                           )}
@@ -763,7 +763,7 @@ export default function ConselhoClasseClient({
                        {todasResolvidas && !isExpanded && (
                           <div className="hidden md:flex items-center space-x-1.5 px-3 py-1 bg-success-subtle text-success-fg rounded-lg border border-success-line">
                              <CheckCircle2 className="w-3.5 h-3.5" />
-                             <span className="text-[10px] font-medium uppercase tracking-wider">Concluído</span>
+                             <span className="text-xs font-medium">Concluído</span>
                           </div>
                        )}
                        <div className={`p-1.5 rounded-lg border transition-all ${isExpanded ? 'bg-white border-accent/25 text-accent-fg shadow-sm' : 'bg-white border-zinc-200 text-fg-subtle'}`}>
@@ -779,11 +779,11 @@ export default function ConselhoClasseClient({
                         <table className="w-full">
                           <thead>
                             <tr className="border-b border-zinc-200">
-                               <th className="px-4 py-3 text-left text-sm font-medium text-fg-subtle uppercase tracking-widest w-10">#</th>
-                              <th className="px-4 py-3 text-left text-sm font-medium text-fg-subtle uppercase tracking-widest text-nowrap">Disciplina</th>
-                              <th className="px-4 py-3 text-center text-sm font-medium text-fg-subtle uppercase tracking-widest">Média Anual</th>
-                              <th className="px-4 py-3 text-center text-sm font-medium text-fg-subtle uppercase tracking-widest text-nowrap">Nota Rec.</th>
-                              <th className="px-4 py-3 text-left text-sm font-medium text-accent-fg uppercase tracking-widest">Decisão</th>
+                               <th className="px-4 py-3 text-left text-sm font-medium text-fg-subtle w-10">#</th>
+                              <th className="px-4 py-3 text-left text-sm font-medium text-fg-subtle text-nowrap">Disciplina</th>
+                              <th className="px-4 py-3 text-center text-sm font-medium text-fg-subtle">Média Anual</th>
+                              <th className="px-4 py-3 text-center text-sm font-medium text-fg-subtle text-nowrap">Nota Rec.</th>
+                              <th className="px-4 py-3 text-left text-sm font-medium text-accent-fg">Decisão</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y-0">
@@ -830,17 +830,17 @@ export default function ConselhoClasseClient({
                                         </div>
                                         <div className="flex gap-1">
                                           {nota.etapas.map((etapa: EtapaDaNota, i: number) => etapa.desistente && (
-                                            <span key={i} className="px-1.5 py-0.5 bg-danger-subtle text-[8px] font-medium text-danger-fg border border-danger-line rounded uppercase tracking-tighter" title={`Infrequente na Unidade ${i + 1}`}>
+                                            <span key={i} className="px-1.5 py-0.5 bg-danger-subtle text-xs font-medium text-danger-fg border border-danger-line rounded" title={`Infrequente na Unidade ${i + 1}`}>
                                               INF U{i + 1}
                                             </span>
                                           ))}
                                           {nota.frequencia !== null && nota.frequencia !== undefined && (
-                                            <span className={`px-1.5 py-0.5 text-[8px] font-medium border rounded uppercase tracking-tighter ${nota.abaixoMinimoFrequencia ? 'bg-danger-subtle text-danger-fg border-danger-line' : 'bg-zinc-50 text-fg-subtle border-zinc-200'}`} title={`Frequência mínima: ${frequenciaMinima}%`}>
+                                            <span className={`px-1.5 py-0.5 text-xs font-medium border rounded ${nota.abaixoMinimoFrequencia ? 'bg-danger-subtle text-danger-fg border-danger-line' : 'bg-zinc-50 text-fg-subtle border-zinc-200'}`} title={`Frequência mínima: ${frequenciaMinima}%`}>
                                               FREQ {formatarFrequencia(nota.frequencia)}{nota.abaixoMinimoFrequencia && ' · abaixo do mínimo'}
                                             </span>
                                           )}
                                           {nota.status === 'DESISTENTE' && !nota.etapas.some((e: EtapaDaNota) => e.desistente) && (
-                                            <span className="px-1.5 py-0.5 bg-zinc-100 text-[8px] font-medium text-fg-muted border border-zinc-200 rounded uppercase tracking-tighter">
+                                            <span className="px-1.5 py-0.5 bg-zinc-100 text-xs font-medium text-fg-muted border border-zinc-200 rounded">
                                               INFREQUENTE
                                             </span>
                                           )}
@@ -934,7 +934,7 @@ export default function ConselhoClasseClient({
             <div className="bg-white rounded-xl shadow-overlay max-w-2xl w-full flex flex-col max-h-[90vh] animate-pop-in">
               <div className="p-8 border-b border-zinc-50 flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-medium text-fg uppercase tracking-tight">Revisar Decisões</h3>
+                  <h3 className="text-xl font-medium text-fg">Revisar Decisões</h3>
                   <p className="text-xs font-medium text-fg-subtle mt-1">Confira os dados antes de consolidar no sistema</p>
                 </div>
                 <button 
@@ -949,7 +949,7 @@ export default function ConselhoClasseClient({
               <div className="p-8 overflow-y-auto flex-1 custom-scrollbar">
                 <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden shadow-card font-mono">
                   <table className="w-full text-left">
-                    <thead className="bg-zinc-200/50 text-fg-subtle font-medium uppercase text-[10px] tracking-widest">
+                    <thead className="bg-zinc-200/50 text-fg-subtle font-medium text-xs">
                       <tr>
                         <th className="px-6 py-4">Estudante / Disciplina</th>
                         <th className="px-6 py-4 text-center">Nota Rec.</th>
@@ -968,12 +968,12 @@ export default function ConselhoClasseClient({
                           <tr key={notaId}>
                             <td className="px-6 py-4">
                               <p className="font-medium text-fg text-xs uppercase">{nota.estudanteNome}</p>
-                              <p className="text-[10px] text-fg-subtle font-medium uppercase mt-0.5">{nota.disciplinaNome}</p>
+                              <p className="text-xs text-fg-subtle font-medium uppercase mt-0.5">{nota.disciplinaNome}</p>
                             </td>
                             <td className="px-6 py-4 text-center font-medium text-fg-muted text-xs">
                               {notaRecVal !== null && notaRecVal !== undefined ? notaRecVal.toFixed(1) : '-'}
                             </td>
-                            <td className={`px-6 py-4 text-center text-[10px] font-medium uppercase tracking-widest ${statusOpt?.color || 'text-fg'}`}>
+                            <td className={`px-6 py-4 text-center text-xs font-medium ${statusOpt?.color || 'text-fg'}`}>
                               {statusOpt?.label || status}
                             </td>
                           </tr>
@@ -988,14 +988,14 @@ export default function ConselhoClasseClient({
                 <button
                   type="button"
                   onClick={() => setShowConfirmModal(false)}
-                  className="px-8 py-3 rounded-lg font-medium text-fg-subtle hover:bg-white transition-all text-sm uppercase tracking-widest"
+                  className="px-8 py-3 rounded-lg font-medium text-fg-subtle hover:bg-white transition-all text-sm"
                 >
                   Voltar
                 </button>
                 <button
                   type="button"
                   onClick={handleConfirmSave}
-                  className="px-10 py-3 rounded-lg bg-accent text-on-accent font-medium uppercase tracking-widest hover:bg-accent-hover shadow-card transition-all flex items-center space-x-3 active:scale-95 text-xs"
+                  className="px-10 py-3 rounded-lg bg-accent text-on-accent font-medium hover:bg-accent-hover shadow-card transition-all flex items-center space-x-3 active:scale-95 text-xs"
                 >
                   <Save className="w-4 h-4" />
                   <span>Gravar Permanentemente</span>

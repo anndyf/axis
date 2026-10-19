@@ -129,6 +129,19 @@ def animacao(m):
     return 'animate-pop-in' if 'zoom-in' in s else 'animate-slide-up' if 'slide-in' in s else 'animate-fade-in'
 
 
+TRACKING = r'tracking-(?:wide|wider|widest|tight(?:er)?|\[[0-9.]+em\])'
+
+
+def tipografia(cls):
+    """Rótulos 'gritados' (MAIÚSCULAS + espaçamento largo em 9-10px) -> texto
+    normal em 12px; mínimo de 12px para legibilidade."""
+    if re.search(r'(?<![\w:-])uppercase(?![\w-])', cls) and re.search(r'(?<![\w:-])' + TRACKING + r'(?![\w-])', cls):
+        cls = re.sub(r'\s*(?<![\w:-])uppercase(?![\w-])', '', cls)
+        cls = re.sub(r'\s*(?<![\w:-])' + TRACKING + r'(?![\w-])', '', cls)
+    cls = re.sub(r'(?<![\w-])((?:[a-z0-9-]+:)*)text-\[(?:8|9|10|11)px\](?![\w-])', r'\1text-xs', cls)
+    return cls
+
+
 def acabamento(texto):
     """Ajustes por className: texto sobre o destaque legível com qualquer cor
     de escola; degradês órfãos (to-/via- sem bg-gradient)."""
@@ -140,7 +153,7 @@ def acabamento(texto):
         cls = re.sub(r'(?<![\w-])((?:[a-z0-9-]+:)*hover:)bg-accent(?![\w/-])', r'\1bg-accent-hover', cls)
         cls = re.sub(r'\s*(?<![\w-])(?:[a-z0-9-]+:)*(?:to|via)-zinc-\d{2,3}(?:/\d+)?(?![\w-])', '', cls)
         cls = re.sub(r'(?<![\w-])((?:[a-z0-9-]+:)*)from-zinc-(\d{2,3})(?![\w-])', r'\1bg-zinc-\2', cls)
-        return cls
+        return tipografia(cls)
     texto = re.sub(r'className=(?:"[^"]*"|\{`[^`]*`\})', ajustar, texto)
     # painel de modal: logo depois do fundo "fixed inset-0", sombra de camada flutuante
     return re.sub(r'(fixed inset-0[^"]*">\s*<div className="[^"]*?)shadow-card', r'\1shadow-overlay', texto)

@@ -73,8 +73,8 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
                    {tip.icon}
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-fg uppercase tracking-widest mb-1">{tip.title}</h3>
-                  <p className="text-[11px] font-medium text-fg-subtle uppercase leading-relaxed">{tip.description}</p>
+                  <h3 className="text-sm font-medium text-fg mb-1">{tip.title}</h3>
+                  <p className="text-xs font-medium text-fg-subtle uppercase leading-relaxed">{tip.description}</p>
                 </div>
              </div>
           ))}
@@ -83,7 +83,7 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
         {/* Filtros Estilo Simulados */}
         <div className="bg-white p-5 rounded-lg shadow-sm border border-zinc-200 flex flex-wrap gap-5 items-end">
             <div className="flex-1 min-w-[250px] space-y-1.5">
-                <label className="text-sm font-medium text-fg-subtle uppercase tracking-wider ml-1">Turma</label>
+                <label className="text-sm font-medium text-fg-subtle ml-1">Turma</label>
                 <div className="relative">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-subtle" size={16} />
                     <input 
@@ -97,7 +97,7 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
             </div>
 
             <div className="flex-1 min-w-[200px] space-y-1.5">
-                <label className="text-sm font-medium text-fg-subtle uppercase tracking-wider ml-1">Turno</label>
+                <label className="text-sm font-medium text-fg-subtle ml-1">Turno</label>
                 <div className="relative">
                   <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-subtle" size={16} />
                   <select 
@@ -113,7 +113,7 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
 
             <div className="flex items-center gap-3 pb-1">
                 <div className="text-center px-4 py-2 bg-danger-subtle rounded-xl border border-danger-line">
-                    <p className="text-[10px] font-medium text-danger uppercase tracking-widest">Alerta</p>
+                    <p className="text-xs font-medium text-danger">Alerta</p>
                     <p className="text-base font-medium text-danger-fg leading-none mt-1">{totalAlunosEmRecuperacao}</p>
                 </div>
             </div>
@@ -132,10 +132,10 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
             <table className="w-full text-left">
               <thead className="bg-zinc-50 border-b border-zinc-300">
                 <tr>
-                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle uppercase tracking-widest">Turma / Pendência</th>
-                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle uppercase tracking-widest text-center">Turno</th>
-                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle uppercase tracking-widest text-center">Estudantes</th>
-                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle uppercase tracking-widest text-center w-24">Ação</th>
+                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle">Turma / Pendência</th>
+                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center">Turno</th>
+                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center">Estudantes</th>
+                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center w-24">Ação</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-200">
@@ -143,7 +143,7 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
                   <tr>
                     <td colSpan={4} className="px-6 py-16 text-center text-zinc-300">
                       <BarChart3 className="w-12 h-12 opacity-20 mx-auto mb-3" />
-                       <p className="text-sm font-medium uppercase tracking-widest">Nenhuma turma com pendências encontrada</p>
+                       <p className="text-sm font-medium">Nenhuma turma com pendências encontrada</p>
                     </td>
                   </tr>
                 ) : (
@@ -156,11 +156,11 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
                       <td className="px-6 py-4">
                         <div className="flex flex-col">
                            <span className="text-base font-medium text-fg-muted uppercase group-hover:text-danger-fg transition-colors">{turma.nome}</span>
-                           <span className="text-[11px] font-medium text-danger-fg uppercase">{turma.totalRecuperacao} ALUNOS PARA RECUPERAÇÃO FINAL</span>
+                           <span className="text-xs font-medium text-danger-fg uppercase">{turma.totalRecuperacao} ALUNOS PARA RECUPERAÇÃO FINAL</span>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <span className="px-3 py-1 bg-zinc-200 text-fg-muted text-[11px] font-medium rounded-lg border border-zinc-300 uppercase tracking-wider">
+                        <span className="px-3 py-1 bg-zinc-200 text-fg-muted text-xs font-medium rounded-lg border border-zinc-300">
                           {turma.turno || 'N/A'}
                         </span>
                       </td>

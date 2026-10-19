@@ -119,7 +119,7 @@ export default function OcorrenciaForm({
               <h3 className="text-xl font-bold text-fg tracking-tight">
                 {ocorrencia ? 'Editar Registro' : 'Novo Registro de Ocorrência'}
               </h3>
-              <p className="text-xs font-bold text-fg-subtle uppercase tracking-widest">Preencha os dados do evento</p>
+              <p className="text-xs font-bold text-fg-subtle">Preencha os dados do evento</p>
             </div>
           </div>
           <button 
@@ -135,7 +135,7 @@ export default function OcorrenciaForm({
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-[11px] font-bold text-fg-subtle uppercase tracking-widest ml-1">Título da Ocorrência</label>
+              <label className="text-xs font-bold text-fg-subtle ml-1">Título da Ocorrência</label>
               <input
                 required
                 type="text"
@@ -147,7 +147,7 @@ export default function OcorrenciaForm({
             </div>
 
             <div className="space-y-2">
-              <label className="text-[11px] font-bold text-fg-subtle uppercase tracking-widest ml-1">Tipo de Evento</label>
+              <label className="text-xs font-bold text-fg-subtle ml-1">Tipo de Evento</label>
               <select
                 value={formData.tipo}
                 onChange={e => setFormData({ ...formData, tipo: e.target.value })}
@@ -163,7 +163,7 @@ export default function OcorrenciaForm({
             </div>
 
             <div className="space-y-2">
-              <label className="text-[11px] font-bold text-fg-subtle uppercase tracking-widest ml-1">Data do Evento</label>
+              <label className="text-xs font-bold text-fg-subtle ml-1">Data do Evento</label>
               <input
                 type="date"
                 value={formData.data}
@@ -174,7 +174,7 @@ export default function OcorrenciaForm({
           </div>
 
           <div className="space-y-2">
-            <label className="text-[11px] font-bold text-fg-subtle uppercase tracking-widest ml-1">Estudantes Envolvidos</label>
+            <label className="text-xs font-bold text-fg-subtle ml-1">Estudantes Envolvidos</label>
             
             {/* Multi-select students */}
             <div className="space-y-4">
@@ -204,7 +204,7 @@ export default function OcorrenciaForm({
                           </div>
                           <div className="text-left">
                             <p className="text-sm font-bold text-fg">{est.nome}</p>
-                            <p className="text-[10px] font-bold text-fg-subtle uppercase">{est.turma?.nome}</p>
+                            <p className="text-xs font-bold text-fg-subtle uppercase">{est.turma?.nome}</p>
                           </div>
                         </div>
                         <Hash size={16} className="text-zinc-300" />
@@ -219,7 +219,7 @@ export default function OcorrenciaForm({
               <div className="flex flex-wrap gap-2">
                 {selectedEstudantes.map(est => (
                   <div key={est.matricula} className="flex items-center gap-2 bg-zinc-900 text-white pl-4 pr-2 py-2 rounded-xl shadow-card group">
-                    <span className="text-xs font-bold uppercase tracking-tight">{est.nome}</span>
+                    <span className="text-xs font-bold">{est.nome}</span>
                     <button 
                       type="button"
                       onClick={() => toggleEstudante(est)}
@@ -240,7 +240,7 @@ export default function OcorrenciaForm({
           </div>
 
           <div className="space-y-2">
-            <label className="text-[11px] font-bold text-fg-subtle uppercase tracking-widest ml-1">Descrição Detalhada</label>
+            <label className="text-xs font-bold text-fg-subtle ml-1">Descrição Detalhada</label>
             <textarea
               required
               rows={12}

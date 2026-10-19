@@ -40,7 +40,7 @@ export default function GabaritoProfessor({ titulo, questoes, maxNota = 4.0, nom
       
       {/* Header */}
       <div className="text-center border-b-[3px] border-black pb-4 mb-6">
-        <h1 className="text-xl font-bold uppercase tracking-wide m-0">Centro Territorial de Educação Profissional</h1>
+        <h1 className="text-xl font-bold m-0">Centro Territorial de Educação Profissional</h1>
         <h2 className="text-sm uppercase text-fg-muted mt-1 m-0">{nomeEscola}</h2>
       </div>
 

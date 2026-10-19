@@ -154,10 +154,10 @@ export default function RelatorioClient({
                         {estudante.nome.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1">
-                        <div className="text-sm font-bold text-fg uppercase tracking-tight">
+                        <div className="text-sm font-bold text-fg">
                           {estudante.nome}
                         </div>
-                        <div className="text-[10px] font-bold text-fg-subtle uppercase tracking-widest mt-0.5">
+                        <div className="text-xs font-bold text-fg-subtle mt-0.5">
                           {estudante.matricula}
                         </div>
                       </div>
@@ -166,14 +166,14 @@ export default function RelatorioClient({
                     {!isProfessorOnly && (
                       <div className="flex items-center gap-6 pr-4 hidden md:flex">
                         <div className="text-center">
-                          <p className="text-[10px] font-bold text-fg-subtle uppercase">Média Geral</p>
+                          <p className="text-xs font-bold text-fg-subtle uppercase">Média Geral</p>
                           <span className="text-sm font-bold text-fg-muted">{media}</span>
                         </div>
                         {frequencia && (() => {
                           const f = frequencia.porAluno[estudante.id]?.geral
                           return (
                             <div className="text-center" title={f ? `${f.faltas} faltas em ${f.aulas} aulas` : undefined}>
-                              <p className="text-[10px] font-bold text-fg-subtle uppercase">Frequência</p>
+                              <p className="text-xs font-bold text-fg-subtle uppercase">Frequência</p>
                               <span className={`text-sm font-bold ${f?.percentual != null && f.percentual < frequencia.minimo ? 'text-danger-fg' : 'text-fg-muted'}`}>
                                 {formatarFrequencia(f?.percentual ?? null)}
                               </span>
@@ -181,7 +181,7 @@ export default function RelatorioClient({
                           )
                         })()}
                         <div className="text-center w-24">
-                          <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full ${statusColor} uppercase tracking-widest`}>
+                          <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full ${statusColor}`}>
                             {statusText}
                           </span>
                         </div>
@@ -245,7 +245,7 @@ export default function RelatorioClient({
                                       return <td className={`px-4 py-2 text-center ${p !== null && p < frequencia.minimo ? 'text-danger-fg font-semibold' : ''}`}>{formatarFrequencia(p)}</td>
                                     })()}
                                     <td className="px-4 py-2 text-center">
-                                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${getStatusColor(nota.status)}`}>
+                                      <span className={`px-2 py-0.5 rounded text-xs font-bold ${getStatusColor(nota.status)}`}>
                                         {nota.status}
                                       </span>
                                     </td>
@@ -310,7 +310,7 @@ export default function RelatorioClient({
                           <p className="text-xs text-fg-subtle mt-0.5">{prof.email}</p>
                           <div className="mt-2 flex flex-wrap gap-1">
                             {prof.disciplinas.map((d: string) => (
-                              <span key={d} className="px-2 py-0.5 bg-accent-subtle text-accent-fg text-[10px] font-bold uppercase rounded border border-accent/25">
+                              <span key={d} className="px-2 py-0.5 bg-accent-subtle text-accent-fg text-xs font-bold uppercase rounded border border-accent/25">
                                 {d}
                               </span>
                             ))}

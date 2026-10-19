@@ -158,7 +158,7 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
       <section className="bg-white p-6 md:p-8 rounded-xl shadow-card border border-zinc-100">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="space-y-2">
-            <label className="text-[11px] font-bold text-fg-subtle uppercase tracking-widest ml-1">Estudante</label>
+            <label className="text-xs font-bold text-fg-subtle ml-1">Estudante</label>
             <div className="relative group">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-fg transition-colors" size={18} />
               <input 
@@ -172,7 +172,7 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
           </div>
 
           <div className="space-y-2">
-            <label className="text-[11px] font-bold text-fg-subtle uppercase tracking-widest ml-1">Período Inicial</label>
+            <label className="text-xs font-bold text-fg-subtle ml-1">Período Inicial</label>
             <div className="relative group">
               <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-fg transition-colors" size={18} />
               <input 
@@ -185,7 +185,7 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
           </div>
 
           <div className="space-y-2">
-            <label className="text-[11px] font-bold text-fg-subtle uppercase tracking-widest ml-1">Período Final</label>
+            <label className="text-xs font-bold text-fg-subtle ml-1">Período Final</label>
             <div className="relative group">
               <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-fg transition-colors" size={18} />
               <input 
@@ -198,7 +198,7 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
           </div>
 
           <div className="space-y-2">
-            <label className="text-[11px] font-bold text-fg-subtle uppercase tracking-widest ml-1">Turma</label>
+            <label className="text-xs font-bold text-fg-subtle ml-1">Turma</label>
             <div className="relative group">
               <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-fg transition-colors" size={18} />
               <select 
@@ -215,7 +215,7 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
           </div>
 
           <div className="space-y-2">
-            <label className="text-[11px] font-bold text-fg-subtle uppercase tracking-widest ml-1">Tipo de Ocorrência</label>
+            <label className="text-xs font-bold text-fg-subtle ml-1">Tipo de Ocorrência</label>
             <div className="relative group">
               <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-fg transition-colors" size={18} />
               <select 
@@ -239,7 +239,7 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
         {loading ? (
           <div className="py-32 text-center">
             <div className="w-12 h-12 border-4 border-zinc-200 border-t-zinc-900 rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-fg-subtle font-bold uppercase tracking-widest animate-pulse">Consultando Registros...</p>
+            <p className="text-fg-subtle font-bold animate-pulse">Consultando Registros...</p>
           </div>
         ) : ocorrencias.length === 0 ? (
           <div className="py-32 text-center bg-white border border-dashed border-zinc-200 rounded-xl">
@@ -262,11 +262,11 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
                   <div className="space-y-4">
                     <div className="flex flex-wrap items-center gap-3">
-                      <span className={`px-4 py-1.5 rounded-full border text-[10px] font-semibold uppercase tracking-widest shadow-sm flex items-center gap-2 ${getTipoColor(item.tipo)}`}>
+                      <span className={`px-4 py-1.5 rounded-full border text-xs font-semibold shadow-sm flex items-center gap-2 ${getTipoColor(item.tipo)}`}>
                         {getTipoIcon(item.tipo)}
                         {item.tipo}
                       </span>
-                      <span className="px-4 py-1.5 bg-zinc-900 text-white rounded-full text-[10px] font-semibold uppercase tracking-widest shadow-card">
+                      <span className="px-4 py-1.5 bg-zinc-900 text-white rounded-full text-xs font-semibold shadow-card">
                         {format(new Date(item.data), "dd 'de' MMM, yyyy", { locale: ptBR })}
                       </span>
                     </div>
@@ -308,7 +308,7 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
                         </div>
                         <div>
                           <p className="text-xs font-bold text-fg leading-none mb-1">{est.nome}</p>
-                          <p className="text-[9px] font-semibold text-fg-subtle uppercase tracking-tighter">Turma: {est.turma.nome}</p>
+                          <p className="text-xs font-semibold text-fg-subtle">Turma: {est.turma.nome}</p>
                         </div>
                       </div>
                     ))}
@@ -316,7 +316,7 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
 
                   <div className="flex items-center gap-4 border-l border-zinc-100 pl-8 md:pl-10 print:border-zinc-200">
                     <div className="text-right">
-                      <p className="text-[10px] font-semibold text-fg-subtle uppercase tracking-[0.2em] leading-none mb-2">Registrado por</p>
+                      <p className="text-xs font-semibold text-fg-subtle leading-none mb-2">Registrado por</p>
                       <p className="font-bold text-fg text-sm whitespace-nowrap">{item.autor.name || "Sistema"}</p>
                     </div>
                     <div className="w-12 h-12 bg-zinc-100 rounded-lg flex items-center justify-center text-fg-subtle border border-zinc-200">
@@ -336,7 +336,7 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
           <div className="w-14 h-14 bg-zinc-50 rounded-xl flex items-center justify-center text-zinc-200">
             <Printer size={24} />
           </div>
-          <h4 className="text-fg font-bold uppercase tracking-[0.1em]">Configuração de Impressão</h4>
+          <h4 className="text-fg font-bold">Configuração de Impressão</h4>
           <p className="text-fg-subtle text-sm max-w-sm">Use os filtros acima para definir o conteúdo do relatório mensal desejado antes de imprimir.</p>
         </div>
       </section>

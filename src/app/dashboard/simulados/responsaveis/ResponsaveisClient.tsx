@@ -170,7 +170,7 @@ export default function ResponsaveisClient({
 
             <form onSubmit={handleAdd} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-fg-subtle uppercase tracking-widest ml-1">Turma</label>
+                <label className="text-xs font-medium text-fg-subtle ml-1">Turma</label>
                 <select
                   required
                   value={formData.turmaId}
@@ -183,7 +183,7 @@ export default function ResponsaveisClient({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-fg-subtle uppercase tracking-widest ml-1">Unidade</label>
+                <label className="text-xs font-medium text-fg-subtle ml-1">Unidade</label>
                 <select
                   required
                   value={formData.unidade}
@@ -196,7 +196,7 @@ export default function ResponsaveisClient({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-fg-subtle uppercase tracking-widest ml-1">Prova</label>
+                <label className="text-xs font-medium text-fg-subtle ml-1">Prova</label>
                 <select
                   required
                   value={formData.provaId}
@@ -220,7 +220,7 @@ export default function ResponsaveisClient({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-fg-subtle uppercase tracking-widest ml-1">Professor Responsável</label>
+                <label className="text-xs font-medium text-fg-subtle ml-1">Professor Responsável</label>
                 <select
                   required
                   value={formData.userId}
@@ -273,10 +273,10 @@ export default function ResponsaveisClient({
               <table className="w-full text-left">
                 <thead className="bg-zinc-50 border-b border-zinc-300">
                   <tr>
-                    <th className="px-6 py-4 text-[10px] font-medium text-fg-subtle uppercase tracking-widest">Professor / Prova</th>
-                    <th className="px-6 py-4 text-[10px] font-medium text-fg-subtle uppercase tracking-widest text-center">Unidade</th>
-                    <th className="px-6 py-4 text-[10px] font-medium text-fg-subtle uppercase tracking-widest text-center">Turma</th>
-                    <th className="px-6 py-4 text-[10px] font-medium text-fg-subtle uppercase tracking-widest text-right">Ação</th>
+                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle">Professor / Prova</th>
+                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center">Unidade</th>
+                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center">Turma</th>
+                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-right">Ação</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-200">
@@ -312,7 +312,7 @@ export default function ResponsaveisClient({
                                 <h4 className="text-sm font-medium text-fg tracking-tight">{item.user.name || item.user.email}</h4>
                                 <div className="flex items-center gap-1.5 mt-1">
                                     <BookOpen className="w-3 h-3 text-fg-subtle" />
-                                    <span className="text-[10px] font-medium text-fg-subtle uppercase tracking-widest">
+                                    <span className="text-xs font-medium text-fg-subtle">
                                         {item.prova ? `#${item.prova.codigo} - ${item.prova.titulo}` : item.area?.nome}
                                     </span>
                                 </div>
@@ -320,12 +320,12 @@ export default function ResponsaveisClient({
                           </div>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <span className="px-2.5 py-1 bg-accent-subtle text-accent-fg border border-accent/25 rounded-lg text-[10px] font-medium tracking-tighter">
+                          <span className="px-2.5 py-1 bg-accent-subtle text-accent-fg border border-accent/25 rounded-lg text-xs font-medium tracking-tighter">
                             {item.unidade ? `${item.unidade}ª Und` : item.prova?.unidade ? `${item.prova.unidade}ª Und` : 'Ambas'}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <span className="px-2.5 py-1 bg-zinc-900 text-white rounded-lg text-[10px] font-medium tracking-tighter">
+                          <span className="px-2.5 py-1 bg-zinc-900 text-white rounded-lg text-xs font-medium tracking-tighter">
                             {item.turma.nome}
                           </span>
                         </td>

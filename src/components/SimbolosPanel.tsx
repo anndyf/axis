@@ -206,8 +206,8 @@ export default function SimbolosPanel({ inputRef, onInsertQuill, onInsert }: Sim
       >
         <div className="flex items-center gap-2">
           <span className="text-base">𝛴</span>
-          <span className="text-xs font-semibold text-fg-muted uppercase tracking-wider">Símbolos Especiais</span>
-          <span className="text-[10px] text-fg-subtle font-medium">Mat. · Quím. · Lógica · Conjuntos</span>
+          <span className="text-xs font-semibold text-fg-muted">Símbolos Especiais</span>
+          <span className="text-xs text-fg-subtle font-medium">Mat. · Quím. · Lógica · Conjuntos</span>
         </div>
         {open 
           ? <ChevronUp className="w-4 h-4 text-fg-subtle" /> 
@@ -224,7 +224,7 @@ export default function SimbolosPanel({ inputRef, onInsertQuill, onInsert }: Sim
                 key={cat.id}
                 type="button"
                 onClick={() => setAba(cat.id)}
-                className={`px-4 py-2 text-[11px] font-bold whitespace-nowrap transition-colors border-b-2 -mb-px ${
+                className={`px-4 py-2 text-xs font-bold whitespace-nowrap transition-colors border-b-2 -mb-px ${
                   aba === cat.id
                     ? "border-accent text-accent-fg bg-accent-subtle"
                     : "border-transparent text-fg-subtle hover:text-fg-muted hover:bg-zinc-50"
@@ -250,7 +250,7 @@ export default function SimbolosPanel({ inputRef, onInsertQuill, onInsert }: Sim
             ))}
           </div>
 
-          <p className="px-3 pb-2.5 text-[10px] text-fg-subtle font-medium">
+          <p className="px-3 pb-2.5 text-xs text-fg-subtle font-medium">
             💡 Passe o mouse sobre o símbolo para ver o nome. Clique para inserir no campo ativo.
           </p>
         </div>

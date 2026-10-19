@@ -90,7 +90,7 @@ export default function TransferModal({ isOpen, onClose, fromUserId, fromUserNam
             </div>
             <div>
               <h3 className="text-lg font-semibold text-fg tracking-tight">Transferir Posse</h3>
-              <p className="text-xs text-fg-subtle font-semibold uppercase tracking-wider">Segurança de Dados</p>
+              <p className="text-xs text-fg-subtle font-semibold">Segurança de Dados</p>
             </div>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-zinc-200 rounded-xl transition-colors text-fg-subtle">
@@ -101,14 +101,14 @@ export default function TransferModal({ isOpen, onClose, fromUserId, fromUserNam
         <div className="p-6 space-y-6">
           <div className="flex items-center justify-between p-4 bg-zinc-50 rounded-lg border border-zinc-100">
             <div className="text-center flex-1">
-              <div className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest mb-1">Origem</div>
+              <div className="text-xs font-semibold text-fg-subtle mb-1">Origem</div>
               <div className="text-sm font-semibold text-fg-muted truncate">{fromUserName}</div>
             </div>
             <div className="px-4">
               <ArrowRight className="w-5 h-5 text-zinc-300" />
             </div>
             <div className="text-center flex-1">
-              <div className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest mb-1">Destino</div>
+              <div className="text-xs font-semibold text-fg-subtle mb-1">Destino</div>
               {selectedToUserId ? (
                 <div className="text-sm font-semibold text-accent-fg truncate">
                   {users.find(u => u.id === selectedToUserId)?.name}
@@ -120,7 +120,7 @@ export default function TransferModal({ isOpen, onClose, fromUserId, fromUserNam
           </div>
 
           <div className="space-y-3">
-            <label className="text-xs font-semibold text-fg-subtle uppercase tracking-widest flex items-center gap-2">
+            <label className="text-xs font-semibold text-fg-subtle flex items-center gap-2">
               <UserIcon className="w-3 h-3" /> Selecionar Usuário de Destino
             </label>
             <select
@@ -136,14 +136,14 @@ export default function TransferModal({ isOpen, onClose, fromUserId, fromUserNam
                 </option>
               ))}
             </select>
-            {fetchingUsers && <p className="text-[10px] text-accent-fg font-semibold animate-pulse">Carregando usuários...</p>}
+            {fetchingUsers && <p className="text-xs text-accent-fg font-semibold animate-pulse">Carregando usuários...</p>}
           </div>
 
           <div className="bg-warning-subtle rounded-lg p-4 border border-warning-line space-y-2 overflow-hidden">
-            <h4 className="text-xs font-semibold text-warning-fg uppercase tracking-widest flex items-center gap-2">
+            <h4 className="text-xs font-semibold text-warning-fg flex items-center gap-2">
               ⚠️ Observação Crítica
             </h4>
-            <p className="text-[11px] text-warning-fg font-medium leading-relaxed whitespace-normal break-words">
+            <p className="text-xs text-warning-fg font-medium leading-relaxed whitespace-normal break-words">
               Esta ação transferirá permanentemente a autoria de todas as notas e registros. 
               O usuário de origem será <span className="font-semibold underline">desativado</span> por segurança.
             </p>

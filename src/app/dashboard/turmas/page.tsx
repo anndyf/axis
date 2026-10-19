@@ -55,7 +55,7 @@ export default async function TurmasPage() {
             </div>
             <Link
               href="/dashboard/turmas/nova"
-              className={`flex items-center space-x-2 bg-zinc-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-zinc-800 transition-all text-xs uppercase tracking-widest active:scale-95 shadow-card ${(!session.user.isSuperuser && !session.user.isDirecao) ? 'hidden' : ''}`}
+              className={`flex items-center space-x-2 bg-zinc-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-zinc-800 transition-all text-xs active:scale-95 shadow-card ${(!session.user.isSuperuser && !session.user.isDirecao) ? 'hidden' : ''}`}
             >
               <Plus size={16} />
               <span>Nova Turma</span>
@@ -78,12 +78,12 @@ export default async function TurmasPage() {
               
               <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-hide">
                 <div className="bg-white/10 backdrop-blur-md rounded-xl p-2 border border-white/20 min-w-[75px] text-center shrink-0">
-                  <p className="text-zinc-200 text-[9px] font-medium uppercase tracking-wider mb-0.5 opacity-80">Total</p>
+                  <p className="text-zinc-200 text-xs font-medium mb-0.5 opacity-80">Total</p>
                   <p className="text-xl font-medium text-white leading-none">{turmas.length}</p>
                 </div>
                 {turnosOrdenados.map(turno => (
                   <div key={turno} className="bg-white/10 backdrop-blur-md rounded-xl p-2 border border-white/20 min-w-[75px] text-center shrink-0">
-                    <p className="text-zinc-200 text-[9px] font-medium uppercase tracking-wider mb-0.5 opacity-80">{turno}</p>
+                    <p className="text-zinc-200 text-xs font-medium mb-0.5 opacity-80">{turno}</p>
                     <p className="text-xl font-medium text-white leading-none">{turmasAgrupadas[turno].length}</p>
                   </div>
                 ))}
@@ -109,7 +109,7 @@ export default async function TurmasPage() {
             </p>
             <Link
               href="/dashboard/turmas/nova"
-              className="inline-flex items-center space-x-2 bg-zinc-900 text-white px-8 py-4 rounded-lg hover:bg-zinc-800 transition-all font-medium text-xs uppercase tracking-widest shadow-card active:scale-95"
+              className="inline-flex items-center space-x-2 bg-zinc-900 text-white px-8 py-4 rounded-lg hover:bg-zinc-800 transition-all font-medium text-xs shadow-card active:scale-95"
             >
               <Plus size={16} />
               <span>Criar Primeira Turma</span>

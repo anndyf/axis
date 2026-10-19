@@ -104,7 +104,7 @@ export default function DisciplinasList({ disciplinas }: DisciplinasListProps) {
       {/* Filters */}
       <div className="bg-white p-4 rounded-lg shadow-sm border border-zinc-300 flex flex-col md:flex-row gap-4 items-end">
         <div className="flex-1 w-full space-y-1.5">
-            <label className="text-xs font-medium text-fg-subtle uppercase tracking-wider ml-1">Pesquisar</label>
+            <label className="text-xs font-medium text-fg-subtle ml-1">Pesquisar</label>
             <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-subtle" size={18} />
                 <input 
@@ -118,7 +118,7 @@ export default function DisciplinasList({ disciplinas }: DisciplinasListProps) {
         </div>
 
         <div className="w-full md:w-48 space-y-1.5">
-            <label className="text-xs font-medium text-fg-subtle uppercase tracking-wider ml-1">Turno</label>
+            <label className="text-xs font-medium text-fg-subtle ml-1">Turno</label>
             <select 
                 value={filterTurno}
                 onChange={(e) => setFilterTurno(e.target.value)}
@@ -130,7 +130,7 @@ export default function DisciplinasList({ disciplinas }: DisciplinasListProps) {
         </div>
 
         <div className="w-full md:w-64 space-y-1.5">
-            <label className="text-xs font-medium text-fg-subtle uppercase tracking-wider ml-1">Turma</label>
+            <label className="text-xs font-medium text-fg-subtle ml-1">Turma</label>
             <select 
                 value={filterTurma}
                 onChange={(e) => setFilterTurma(e.target.value)}

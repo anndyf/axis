@@ -3,6 +3,7 @@
 import { useState, useEffect, Fragment } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { Button, EmptyState, PageHeader, buttonClasses } from "@/components/ui"
 import {
   ArrowLeft,
   Save,
@@ -18,7 +19,9 @@ import {
   Search,
   Loader2,
   Accessibility,
-  Printer
+  Printer,
+  Info,
+  ChevronDown
 } from "lucide-react"
 import { calcularNotaUnidade, calcularMediaFinal, paraEsquemaConfig, type EsquemaConfig, type UnidadeInput, type FormaCalculo } from "@/lib/services/notas"
 
@@ -314,73 +317,58 @@ export default function LancarNotasTurmaClient({
     : 6
 
   return (
-    <div className="bg-zinc-50">
-      {/* Header Estilo Simulados - Ajustado para ser Flush com o Layout */}
-      <header className="mb-6 border-b border-line pb-4">
-        <div className="max-w-7xl mx-auto py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link href="/dashboard/notas" className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-fg-subtle hover:text-fg-muted">
-                <ArrowLeft size={20}/>
-              </Link>
-              <div>
-                <h1 className="text-2xl font-medium text-fg tracking-tight">
-                  {disciplinaSelecionada ? selectedDiscName : "Lançar Notas"}
-                </h1>
-                <p className="text-base text-fg-muted font-medium">{disciplinaSelecionada ? `Turma: ${turmaNome}` : `Turma Selecionada: ${turmaNome}`}</p>
-              </div>
-            </div>
+    <div className="mx-auto max-w-7xl">
+      <PageHeader
+        title={disciplinaSelecionada ? selectedDiscName : "Lançar notas"}
+        description={`Turma ${turmaNome}`}
+        actions={
+          <>
+            <Link href="/dashboard/notas" className={buttonClasses({ variant: "ghost" })}><ArrowLeft size={16} strokeWidth={1.75} /> Turmas</Link>
+            {disciplinaSelecionada && (
+              <a
+                href={`/api/relatorio/turma/${turmaId}/disciplina/${disciplinaSelecionada}/pdf`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={buttonClasses({ variant: "secondary" })}
+                title="Imprimir o mapa de notas desta disciplina"
+              >
+                <Printer size={16} strokeWidth={1.75} /> <span className="hidden md:inline">Imprimir mapa</span>
+              </a>
+            )}
+            {hasUnsavedChanges() && (
+              <Button onClick={handleSubmit} loading={saving}>
+                {!saving && <Save size={16} strokeWidth={1.75} />} {saving ? "Salvando…" : "Salvar notas"}
+              </Button>
+            )}
+          </>
+        }
+      />
 
-            <div className="flex items-center gap-3">
-              {disciplinaSelecionada && (
-                <a
-                  href={`/api/relatorio/turma/${turmaId}/disciplina/${disciplinaSelecionada}/pdf`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 bg-white text-fg-muted px-4 py-2.5 rounded-xl font-bold border border-zinc-200 hover:bg-zinc-50 transition-all text-xs active:scale-95 shadow-sm"
-                  title="Imprimir Mapa de Notas desta Disciplina"
-                >
-                  <Printer size={16} />
-                  <span className="hidden md:inline">IMPRIMIR MAPA</span>
-                </a>
-              )}
+      <main className="space-y-6">
 
-              {hasUnsavedChanges() && (
-                <button
-                  onClick={handleSubmit}
-                  disabled={saving}
-                  className="flex items-center gap-2 bg-zinc-900 border border-zinc-900 text-white px-5 py-2.5 rounded-xl font-medium hover:bg-zinc-800 transition-all text-sm active:scale-95 shadow-card"
-                >
-                  {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save size={16} />}
-                  {saving ? 'SALVANDO...' : 'SALVAR NOTAS'}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-
-        {/* Dicas Estilo Simulados */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {launchTips.map((tip, index) => (
-             <div key={index} className="bg-white/60 border border-zinc-300/60 p-4 rounded-lg flex items-start space-x-4 hover:bg-white hover:border-zinc-300 hover:shadow-sm transition-all">
-                <div className={`p-2.5 rounded-xl bg-subtle text-fg-muted`}>
-                   {tip.icon}
-                </div>
+        {/* Dicas de uso: recolhidas para não competir com a tabela */}
+        <details className="group rounded-lg border border-line bg-surface shadow-card">
+          <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-13 font-medium text-fg-muted hover:text-fg">
+            <Info size={16} strokeWidth={1.75} className="text-fg-subtle" aria-hidden /> Como funciona o lançamento
+            <ChevronDown size={14} strokeWidth={1.75} className="ml-auto transition-transform duration-150 group-open:rotate-180" aria-hidden />
+          </summary>
+          <ul className="grid gap-4 border-t border-line-subtle px-4 py-4 md:grid-cols-3">
+            {launchTips.map((tip, index) => (
+              <li key={index} className="flex gap-3">
+                <span className="mt-0.5 text-fg-subtle [&_svg]:size-4">{tip.icon}</span>
                 <div>
-                  <h3 className="text-base font-medium text-fg mb-1">{tip.title}</h3>
-                  <p className="text-sm text-fg-muted leading-relaxed">{tip.description}</p>
+                  <p className="text-13 font-medium text-fg">{tip.title}</p>
+                  <p className="text-13 text-fg-muted">{tip.description}</p>
                 </div>
-             </div>
-          ))}
-        </div>
+              </li>
+            ))}
+          </ul>
+        </details>
 
         {/* Filtros Estilo Simulados */}
         <div className="bg-white p-5 rounded-lg shadow-sm border border-zinc-200 flex flex-wrap gap-5 items-end">
             <div className="flex-1 min-w-[300px] space-y-1.5">
-                <label className="text-sm font-medium text-fg-subtle uppercase tracking-wider ml-1">Disciplina</label>
+                <label className="text-sm font-medium text-fg-subtle ml-1">Disciplina</label>
                 <div className="relative">
                   <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-subtle" size={16} />
                   <select
@@ -396,7 +384,7 @@ export default function LancarNotasTurmaClient({
 
             <div className="hidden lg:flex items-center gap-3 pb-1 border-l pl-5 border-zinc-200 flex-1">
                <div className="bg-warning-subtle p-2.5 rounded-xl text-warning-fg border border-warning-line"><UserMinus size={18}/></div>
-               <p className="text-[11px] text-fg-muted leading-tight font-medium max-w-[450px]">
+               <p className="text-xs text-fg-muted leading-tight font-medium max-w-[450px]">
                  <strong className="text-fg-muted">Aluno sem nota?</strong> Marque como <strong className="text-fg-muted">Infrequente</strong> aquele aluno que não frequenta ou só apareceu para fazer a prova, clicando no ícone <span className="inline-flex mx-1 p-1 bg-white border border-zinc-300 rounded text-fg-subtle"><UserMinus size={10}/></span> ao lado da nota para não afetar cálculos indevidos.
                </p>
             </div>
@@ -445,24 +433,24 @@ export default function LancarNotasTurmaClient({
                 {esquema && !isSimples ? (
                   <>
                     <tr>
-                      <th rowSpan={2} className="px-6 py-4 text-xs font-medium text-fg-subtle uppercase tracking-widest w-12 text-center align-bottom">#</th>
-                      <th rowSpan={2} className="px-6 py-4 text-xs font-medium text-fg-subtle uppercase tracking-widest align-bottom">Estudante</th>
+                      <th rowSpan={2} className="px-6 py-4 text-xs font-medium text-fg-subtle w-12 text-center align-bottom">#</th>
+                      <th rowSpan={2} className="px-6 py-4 text-xs font-medium text-fg-subtle align-bottom">Estudante</th>
                       {esquema.unidades.map(u => (
-                        <th key={u.id} colSpan={u.atividades.length + 1} className="px-4 py-2 text-xs font-medium text-fg-subtle uppercase tracking-widest text-center border-l border-zinc-200">
+                        <th key={u.id} colSpan={u.atividades.length + 1} className="px-4 py-2 text-xs font-medium text-fg-subtle text-center border-l border-zinc-200">
                           {u.nome}
                         </th>
                       ))}
-                      <th rowSpan={2} className="px-6 py-4 text-xs font-medium text-fg-subtle uppercase tracking-widest w-24 text-center align-bottom">Média</th>
+                      <th rowSpan={2} className="px-6 py-4 text-xs font-medium text-fg-subtle w-24 text-center align-bottom">Média</th>
                     </tr>
                     <tr>
                       {esquema.unidades.map(u => (
                         <Fragment key={u.id}>
                           {u.atividades.map(a => (
-                            <th key={a.id} className="px-2 py-2 text-[10px] font-medium text-fg-subtle uppercase tracking-wide text-center border-l border-zinc-100 w-20">
+                            <th key={a.id} className="px-2 py-2 text-xs font-medium text-fg-subtle text-center border-l border-zinc-100 w-20">
                               {a.nome} <span className="text-zinc-300">({a.notaMaxima})</span>
                             </th>
                           ))}
-                          <th key={`${u.id}-subtotal`} className="px-2 py-2 text-[10px] font-bold text-fg-subtle uppercase tracking-wide text-center bg-zinc-100/60 w-16">
+                          <th key={`${u.id}-subtotal`} className="px-2 py-2 text-xs font-bold text-fg-subtle text-center bg-zinc-100/60 w-16">
                             Subtotal
                           </th>
                         </Fragment>
@@ -471,12 +459,12 @@ export default function LancarNotasTurmaClient({
                   </>
                 ) : (
                   <tr>
-                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle uppercase tracking-widest w-12 text-center">#</th>
-                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle uppercase tracking-widest">Estudante</th>
+                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle w-12 text-center">#</th>
+                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle">Estudante</th>
                     {(esquema?.unidades ?? []).map(u => (
-                      <th key={u.id} className="px-4 py-4 text-xs font-medium text-fg-subtle uppercase tracking-widest w-32 text-center">{u.nome}</th>
+                      <th key={u.id} className="px-4 py-4 text-xs font-medium text-fg-subtle w-32 text-center">{u.nome}</th>
                     ))}
-                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle uppercase tracking-widest w-24 text-center">Média</th>
+                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle w-24 text-center">Média</th>
                   </tr>
                 )}
               </thead>
@@ -486,22 +474,20 @@ export default function LancarNotasTurmaClient({
                      <td colSpan={totalColunas} className="px-6 py-16 text-center">
                        <div className="flex flex-col items-center gap-2">
                          <Loader2 className="w-8 h-8 text-fg-muted animate-spin" />
-                         <p className="text-fg-subtle text-sm font-medium uppercase tracking-widest animate-pulse">Sincronizando...</p>
+                         <p className="text-fg-subtle text-sm font-medium animate-pulse">Sincronizando...</p>
                        </div>
                      </td>
                    </tr>
                 ) : !disciplinaSelecionada ? (
                    <tr>
-                      <td colSpan={totalColunas} className="px-6 py-16 text-center text-zinc-300">
-                        <BarChart2 className="w-12 h-12 opacity-20 mx-auto mb-3" />
-                        <p className="text-sm font-medium uppercase tracking-widest">Selecione uma disciplina para iniciar o lançamento</p>
+                      <td colSpan={totalColunas}>
+                        <EmptyState icon={BarChart2} title="Escolha a disciplina" description="Selecione a disciplina acima para abrir a tabela de notas da turma." />
                       </td>
                    </tr>
                 ) : filteredEstudantes.length === 0 ? (
                    <tr>
-                      <td colSpan={totalColunas} className="px-6 py-16 text-center text-zinc-300">
-                        <Search className="w-12 h-12 opacity-20 mx-auto mb-3" />
-                        <p className="text-sm font-medium uppercase tracking-widest">Nenhum estudante encontrado</p>
+                      <td colSpan={totalColunas}>
+                        <EmptyState icon={Search} title="Nenhum estudante encontrado" description="Confira o filtro por nome." />
                       </td>
                    </tr>
                 ) : (
@@ -531,7 +517,7 @@ export default function LancarNotasTurmaClient({
                                    </Link>
                                 )}
                              </div>
-                            <span className="text-[11px] font-medium text-fg-subtle tracking-widest uppercase">Matrícula: {estudante.matricula}</span>
+                            <span className="text-xs font-medium text-fg-subtle">Matrícula: {estudante.matricula}</span>
                           </div>
                         </td>
                         {(esquema?.unidades ?? []).map((u) => {
@@ -635,7 +621,7 @@ export default function LancarNotasTurmaClient({
           {disciplinaSelecionada && filteredEstudantes.length > 0 && (
             <div className="p-5 bg-zinc-50 border-t border-zinc-200 flex justify-end items-center gap-4">
               <div className="hidden md:block">
-                 <p className="text-[11px] font-medium text-fg-subtle uppercase tracking-widest">Confira todas as notas antes de salvar o fechamento.</p>
+                 <p className="text-xs font-medium text-fg-subtle">Confira todas as notas antes de salvar o fechamento.</p>
               </div>
                <button
                 onClick={handleSubmit}
@@ -657,8 +643,8 @@ export default function LancarNotasTurmaClient({
               <div className="flex items-center gap-3">
                  <div className="w-10 h-10 bg-zinc-600 text-white rounded-xl flex items-center justify-center shadow-card"><Save size={20}/></div>
                   <div>
-                     <h3 className="text-lg font-medium text-fg uppercase tracking-tight">Consolidar Dados</h3>
-                    <p className="text-xs font-medium text-fg-subtle uppercase tracking-widest">Revise as alterações da turma</p>
+                     <h3 className="text-lg font-medium text-fg">Consolidar Dados</h3>
+                    <p className="text-xs font-medium text-fg-subtle">Revise as alterações da turma</p>
                   </div>
               </div>
               <button onClick={() => setShowModal(false)} className="p-2 hover:bg-zinc-300 rounded-xl transition-all"><X size={20}/></button>
@@ -674,7 +660,7 @@ export default function LancarNotasTurmaClient({
                         const estadoOriginal = originalNotas[est.matricula]?.[u.id]
                         if (JSON.stringify(estadoAtual) === JSON.stringify(estadoOriginal)) return null
                         return (
-                          <span key={u.id} className="text-[11px] font-medium bg-zinc-50 text-fg-muted px-2.5 py-1 rounded-lg border border-zinc-200">
+                          <span key={u.id} className="text-xs font-medium bg-zinc-50 text-fg-muted px-2.5 py-1 rounded-lg border border-zinc-200">
                             {u.nome}: {subtotal !== null ? subtotal.toFixed(1) : '0'} {estadoAtual?.isDesistente && <span className="text-warning-fg ml-1">(INF)</span>}
                           </span>
                         )

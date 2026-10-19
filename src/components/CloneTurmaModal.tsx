@@ -104,7 +104,7 @@ export default function CloneTurmaModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           <div className="bg-warning-subtle border border-warning-line rounded-lg p-4 flex gap-3">
             <AlertTriangle className="w-5 h-5 text-warning-fg shrink-0 mt-0.5" />
-            <p className="text-[11px] text-warning-fg font-medium leading-relaxed">
+            <p className="text-xs text-warning-fg font-medium leading-relaxed">
               As disciplinas serão copiadas, mas <span className="font-semibold underline">vínculos com professores e alunos não serão mantidos</span>. 
               A nova turma nascerá limpa.
             </p>
@@ -113,7 +113,7 @@ export default function CloneTurmaModal({
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-semibold uppercase tracking-widest text-fg-subtle ml-1">Novo Turno</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1">Novo Turno</label>
                 <select
                   value={turno}
                   onChange={(e) => setTurno(e.target.value)}
@@ -123,7 +123,7 @@ export default function CloneTurmaModal({
                 </select>
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-semibold uppercase tracking-widest text-fg-subtle ml-1">Nomenclatura (Número)</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1">Nomenclatura (Número)</label>
                 <input
                   type="number"
                   min="1"
@@ -136,12 +136,12 @@ export default function CloneTurmaModal({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] font-semibold uppercase tracking-widest text-fg-subtle ml-1">Nome Final da Turma</label>
+              <label className="text-xs font-semibold text-fg-subtle ml-1">Nome Final da Turma</label>
               <input
                 type="text"
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
-                className="w-full bg-zinc-50 border-none rounded-xl px-4 py-2.5 text-sm font-semibold text-fg focus:ring-2 focus:ring-success/30 transition-all uppercase tracking-wider font-mono shadow-card"
+                className="w-full bg-zinc-50 border-none rounded-xl px-4 py-2.5 text-sm font-semibold text-fg focus:ring-2 focus:ring-success/30 transition-all font-mono shadow-card"
               />
             </div>
           </div>

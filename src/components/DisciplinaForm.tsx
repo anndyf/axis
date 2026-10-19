@@ -342,7 +342,7 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
                    <div className="max-h-[500px] overflow-y-auto pr-2 custom-scrollbar space-y-6">
                      {sortedTurnos.map(turno => (
                         <div key={turno}>
-                           <h4 className="flex items-center text-sm font-semibold text-fg uppercase tracking-wider mb-3 pb-1 border-b border-zinc-100">
+                           <h4 className="flex items-center text-sm font-semibold text-fg mb-3 pb-1 border-b border-zinc-100">
                                 {turno === 'Matutino' && <Sun className="w-4 h-4 mr-2 text-warning-fg"/>}
                                 {turno === 'Vespertino' && <Sunset className="w-4 h-4 mr-2 text-warning-fg"/>}
                                 {turno === 'Noturno' && <Moon className="w-4 h-4 mr-2 text-accent-fg"/>}

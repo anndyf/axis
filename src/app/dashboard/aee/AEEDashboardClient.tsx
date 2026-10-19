@@ -189,7 +189,7 @@ export default function AEEDashboardClient({
                {!activePanel && isDirecao && (
                  <button
                    onClick={() => { setActivePanel('create'); setSelectedStudent(null); setStudentSearch(""); }}
-                   className="flex items-center justify-center space-y-0 space-x-2 bg-success text-white px-6 py-2.5 rounded-lg hover:bg-success transition-all shadow-sm text-sm font-medium uppercase tracking-widest active:scale-95"
+                   className="flex items-center justify-center space-y-0 space-x-2 bg-success text-white px-6 py-2.5 rounded-lg hover:bg-success transition-all shadow-sm text-sm font-medium active:scale-95"
                  >
                    <PlusCircle className="w-4 h-4" />
                    <span className="whitespace-nowrap">Nova Ficha</span>
@@ -199,7 +199,7 @@ export default function AEEDashboardClient({
                {activePanel === 'edit' && isDirecao && !isEditing && (
                  <button 
                     onClick={() => setIsEditing(true)}
-                    className="flex items-center gap-2 bg-white border border-zinc-300 px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-widest hover:bg-zinc-50 transition-all shadow-sm"
+                    className="flex items-center gap-2 bg-white border border-zinc-300 px-4 py-2 rounded-lg text-xs font-semibold hover:bg-zinc-50 transition-all shadow-sm"
                  >
                     <Edit3 size={14} /> Editar Ficha
                  </button>
@@ -208,7 +208,7 @@ export default function AEEDashboardClient({
                {(activePanel === 'create' || (isDirecao && isEditing)) && (
                  <button 
                     onClick={handleSave} disabled={saving}
-                    className="flex items-center gap-2 bg-black text-white px-6 py-2 rounded-lg text-xs font-semibold uppercase tracking-widest hover:bg-zinc-800 transition-all disabled:opacity-50 shadow-sm"
+                    className="flex items-center gap-2 bg-black text-white px-6 py-2 rounded-lg text-xs font-semibold hover:bg-zinc-800 transition-all disabled:opacity-50 shadow-sm"
                  >
                     {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                     {saving ? 'Gravando...' : 'Salvar Alterações'}
@@ -218,7 +218,7 @@ export default function AEEDashboardClient({
                {!isDirecao && activePanel === 'edit' && !selectedProfile?.acknowledgements?.some((ack: any) => ack.user.id === usuario.id) && (
                  <button 
                     onClick={() => handleAtestar(selectedProfile)} disabled={saving}
-                    className="flex items-center gap-2 bg-success text-white px-6 py-2 rounded-lg text-xs font-semibold uppercase tracking-widest hover:bg-success transition-all shadow-sm"
+                    className="flex items-center gap-2 bg-success text-white px-6 py-2 rounded-lg text-xs font-semibold hover:bg-success transition-all shadow-sm"
                  >
                     {saving ? <Loader2 size={14} className="animate-spin" /> : <ClipboardCheck size={14} />}
                     Confirmar Ciência
@@ -249,7 +249,7 @@ export default function AEEDashboardClient({
                   </div>
                   <div>
                     <p className="text-lg font-bold text-fg leading-none">{aeeAlunos.length}</p>
-                    <p className="text-[10px] text-fg-subtle font-bold uppercase tracking-widest mt-1">Mapeados</p>
+                    <p className="text-xs text-fg-subtle font-bold mt-1">Mapeados</p>
                   </div>
                </div>
                <div className="bg-white p-4 rounded-xl border border-zinc-200 flex items-center gap-4 shadow-card">
@@ -258,7 +258,7 @@ export default function AEEDashboardClient({
                   </div>
                   <div>
                     <p className="text-lg font-bold text-fg leading-none">{aeeAlunos.filter(a => a.acknowledgements.length > 0).length}</p>
-                    <p className="text-[10px] text-fg-subtle font-bold uppercase tracking-widest mt-1">Lidos</p>
+                    <p className="text-xs text-fg-subtle font-bold mt-1">Lidos</p>
                   </div>
                </div>
                <div className="bg-white p-4 rounded-xl border border-zinc-200 flex items-center gap-4 shadow-card">
@@ -267,7 +267,7 @@ export default function AEEDashboardClient({
                   </div>
                   <div>
                     <p className="text-lg font-bold text-fg leading-none">{aeeAlunos.filter(a => a.acknowledgements.length === 0).length}</p>
-                    <p className="text-[10px] text-fg-subtle font-bold uppercase tracking-widest mt-1">Pendentes</p>
+                    <p className="text-xs text-fg-subtle font-bold mt-1">Pendentes</p>
                   </div>
                </div>
             </div>
@@ -301,7 +301,7 @@ export default function AEEDashboardClient({
                    <div className="w-20 h-20 bg-zinc-50 rounded-xl flex items-center justify-center mx-auto mb-6 text-zinc-200 border border-zinc-100 shadow-card">
                       <Accessibility size={40} />
                    </div>
-                   <p className="text-fg-subtle uppercase tracking-[0.2em] text-[10px] font-semibold">Nenhum registro encontrado</p>
+                   <p className="text-fg-subtle text-xs font-semibold">Nenhum registro encontrado</p>
                    <p className="text-fg font-medium mt-2">Tente outros critérios de busca ou filtros.</p>
                  </div>
                ) : (
@@ -309,10 +309,10 @@ export default function AEEDashboardClient({
                    <table className="w-full text-left">
                      <thead>
                         <tr className="bg-zinc-50 border-b border-zinc-200">
-                           <th className="px-6 py-3.5 text-[10px] text-fg uppercase tracking-widest font-semibold">Estudante</th>
-                           <th className="px-6 py-3.5 text-[10px] text-fg uppercase tracking-widest font-semibold">Turma</th>
-                           <th className="px-6 py-3.5 text-[10px] text-fg uppercase tracking-widest font-semibold">Diagnóstico</th>
-                           <th className="px-6 py-3.5 text-[10px] text-fg uppercase tracking-widest font-semibold">Acompanhamento</th>
+                           <th className="px-6 py-3.5 text-xs text-fg font-semibold">Estudante</th>
+                           <th className="px-6 py-3.5 text-xs text-fg font-semibold">Turma</th>
+                           <th className="px-6 py-3.5 text-xs text-fg font-semibold">Diagnóstico</th>
+                           <th className="px-6 py-3.5 text-xs text-fg font-semibold">Acompanhamento</th>
                            <th className="px-6 py-3.5 text-right"></th>
                         </tr>
                      </thead>
@@ -326,7 +326,7 @@ export default function AEEDashboardClient({
                                    </div>
                                    <div>
                                       <p className="text-sm font-medium text-fg uppercase leading-none mb-1">{a.estudante.nome}</p>
-                                      <p className="text-[10px] text-fg uppercase tracking-tighter">Mat: {a.estudante.matricula}</p>
+                                      <p className="text-xs text-fg">Mat: {a.estudante.matricula}</p>
                                    </div>
                                 </div>
                              </td>
@@ -334,9 +334,9 @@ export default function AEEDashboardClient({
                              <td className="px-6 py-4">
                                 <div className="flex flex-wrap gap-1">
                                    {a.cids.slice(0, 2).map((c: string) => (
-                                     <span key={c} className="text-[9px] bg-zinc-100 text-fg px-1.5 py-0.5 rounded border border-zinc-200 uppercase">{c}</span>
+                                     <span key={c} className="text-xs bg-zinc-100 text-fg px-1.5 py-0.5 rounded border border-zinc-200 uppercase">{c}</span>
                                    ))}
-                                   {a.cids.length > 2 && <span className="text-[9px] text-fg">+{a.cids.length - 2}</span>}
+                                   {a.cids.length > 2 && <span className="text-xs text-fg">+{a.cids.length - 2}</span>}
                                 </div>
                              </td>
                              <td className="px-6 py-4">
@@ -352,20 +352,20 @@ export default function AEEDashboardClient({
                                       return (
                                          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-warning-subtle text-warning-fg rounded-full border border-warning-line">
                                             <div className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" />
-                                            <span className="text-[9px] uppercase tracking-widest font-medium">Pendente</span>
+                                            <span className="text-xs font-medium">Pendente</span>
                                          </div>
                                       )
                                    } else if (totalLidos < totalProfessores) {
                                       return (
                                          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-accent-subtle text-accent-fg rounded-full border border-accent/25">
-                                            <span className="text-[9px] uppercase tracking-widest font-bold font-mono">{totalLidos}/{totalProfessores} Lidos</span>
+                                            <span className="text-xs font-bold font-mono">{totalLidos}/{totalProfessores} Lidos</span>
                                          </div>
                                       )
                                    } else {
                                       return (
                                          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-success-subtle text-success-fg rounded-full border border-success-line">
                                             <CheckCircle2 size={10} />
-                                            <span className="text-[9px] uppercase tracking-widest font-medium">Lido</span>
+                                            <span className="text-xs font-medium">Lido</span>
                                          </div>
                                       )
                                    }
@@ -419,7 +419,7 @@ export default function AEEDashboardClient({
                                <div className="w-10 h-10 bg-zinc-100 rounded-lg flex items-center justify-center font-medium text-fg-subtle">{s.nome.charAt(0)}</div>
                                <div>
                                   <p className="text-sm font-semibold uppercase text-fg">{s.nome}</p>
-                                  <p className="text-[10px] text-fg uppercase tracking-widest">{s.turma.nome}</p>
+                                  <p className="text-xs text-fg">{s.turma.nome}</p>
                                 </div>
                             </div>
                             <ChevronRight size={18} className="text-zinc-300 group-hover:text-black" />
@@ -454,18 +454,18 @@ export default function AEEDashboardClient({
                             {activePanel === 'edit' && !isEditing && (
                                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-accent-subtle text-accent-fg rounded-full border border-accent/25 self-center md:self-auto">
                                   <Accessibility size={10} />
-                                  <span className="text-[9px] font-semibold uppercase tracking-widest">Ficha Ativa</span>
+                                  <span className="text-xs font-semibold">Ficha Ativa</span>
                                </div>
                             )}
                          </div>
                          <div className="flex flex-wrap justify-center md:justify-start items-center gap-4">
                             <div className="flex items-center gap-2">
-                               <span className="text-[10px] text-fg-subtle font-semibold uppercase tracking-widest leading-none">Matrícula</span>
+                               <span className="text-xs text-fg-subtle font-semibold leading-none">Matrícula</span>
                                <span className="text-sm font-bold text-fg-muted">{activePanel === 'create' ? selectedStudent?.matricula : selectedProfile?.estudante.matricula}</span>
                             </div>
                             <div className="w-px h-4 bg-zinc-200 hidden md:block" />
                             <div className="flex items-center gap-2">
-                               <span className="text-[10px] text-fg-subtle font-semibold uppercase tracking-widest leading-none">Turma</span>
+                               <span className="text-xs text-fg-subtle font-semibold leading-none">Turma</span>
                                <span className="text-sm font-bold text-fg-muted uppercase">{activePanel === 'create' ? selectedStudent?.turma.nome : selectedProfile?.estudante.turma.nome}</span>
                             </div>
                          </div>
@@ -474,16 +474,16 @@ export default function AEEDashboardClient({
                       {activePanel === 'edit' && !isEditing && (
                          <div className="shrink-0 flex items-center gap-4 bg-zinc-50 px-4 py-2 rounded-xl border border-zinc-100 shadow-card">
                             <div>
-                               <p className="text-[9px] text-fg-subtle font-semibold uppercase tracking-[0.2em] mb-1">Status de Ciência</p>
+                               <p className="text-xs text-fg-subtle font-semibold mb-1">Status de Ciência</p>
                                {selectedProfile.acknowledgements.length === 0 ? (
                                   <div className="flex items-center gap-1.5 text-warning-fg">
                                      <Clock size={12} className="animate-pulse" />
-                                     <span className="text-xs font-bold uppercase tracking-tight">Pendente</span>
+                                     <span className="text-xs font-bold">Pendente</span>
                                   </div>
                                ) : (
                                   <div className="flex items-center gap-1.5 text-success-fg">
                                      <CheckCircle2 size={14} />
-                                     <span className="text-xs font-bold uppercase tracking-tight">{selectedProfile.acknowledgements.length} Leituras</span>
+                                     <span className="text-xs font-bold">{selectedProfile.acknowledgements.length} Leituras</span>
                                   </div>
                                )}
                             </div>
@@ -495,7 +495,7 @@ export default function AEEDashboardClient({
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Diagnóstico (CIDs) */}
                       <div className="bg-white border border-zinc-200 rounded-xl p-5 shadow-card space-y-4">
-                         <label className="text-[10px] text-fg-subtle font-semibold uppercase tracking-[0.2em] flex items-center gap-3">
+                         <label className="text-xs text-fg-subtle font-semibold flex items-center gap-3">
                             <div className="p-2 bg-danger-subtle text-danger-fg rounded-xl border border-danger-line">
                                <AlertCircle size={16} />
                             </div>
@@ -515,13 +515,13 @@ export default function AEEDashboardClient({
                                   {CIDS_AEE.filter(c => c.code.includes(cidSearch.toUpperCase()) || c.label.toUpperCase().includes(cidSearch.toUpperCase())).map(c => (
                                      <button 
                                         key={c.code} onClick={() => toggleCID(c.code)}
-                                        className={`flex items-center justify-between px-4 py-3 rounded-xl border text-[10px] font-bold transition-all text-left group ${
+                                        className={`flex items-center justify-between px-4 py-3 rounded-xl border text-xs font-bold transition-all text-left group ${
                                            formData.cids.includes(c.code) ? 'bg-black text-white border-black shadow-card scale-[1.02]' : 'bg-white text-fg-muted border-zinc-200 hover:bg-zinc-50'
                                         }`}
                                      >
                                         <div className="flex items-center gap-3">
                                            <span className={`px-2 py-0.5 rounded font-semibold border ${formData.cids.includes(c.code) ? 'bg-white/20 border-white/30' : 'bg-zinc-100 border-zinc-200 text-fg'}`}>{c.code}</span>
-                                           <span className="uppercase tracking-tight opacity-90 line-clamp-1">{c.label}</span>
+                                           <span className="opacity-90 line-clamp-1">{c.label}</span>
                                         </div>
                                         {formData.cids.includes(c.code) && <CheckCircle2 size={14} className="text-white" />}
                                      </button>
@@ -534,10 +534,10 @@ export default function AEEDashboardClient({
                                   const cid = CIDS_AEE.find(c => c.code === code)
                                   return (
                                      <div key={code} className="bg-zinc-50 border border-zinc-100 p-4 rounded-lg flex items-center gap-4 transition-all hover:bg-white hover:border-zinc-200 hover:shadow-card group">
-                                        <div className="bg-zinc-900 text-white px-2.5 py-1 rounded-lg text-[10px] font-semibold uppercase tracking-wider shrink-0 shadow-sm">
+                                        <div className="bg-zinc-900 text-white px-2.5 py-1 rounded-lg text-xs font-semibold shrink-0 shadow-sm">
                                            {code}
                                         </div>
-                                        <div className="text-xs font-bold text-fg uppercase tracking-tight leading-tight">
+                                        <div className="text-xs font-bold text-fg leading-tight">
                                            {cid?.label || "CID Desconhecido"}
                                         </div>
                                      </div>
@@ -553,7 +553,7 @@ export default function AEEDashboardClient({
 
                       {/* Configurações de Prova */}
                       <div className="bg-white border border-zinc-200 rounded-xl p-5 shadow-card space-y-4">
-                         <label className="text-[10px] text-fg-subtle font-semibold uppercase tracking-[0.2em] flex items-center gap-3">
+                         <label className="text-xs text-fg-subtle font-semibold flex items-center gap-3">
                             <div className="p-2 bg-accent-subtle text-accent-fg rounded-xl border border-accent/25">
                                <ClipboardCheck size={16} />
                             </div>
@@ -581,8 +581,8 @@ export default function AEEDashboardClient({
                                        <Icon size={20} />
                                     </div>
                                     <div>
-                                       <span className="text-sm font-semibold uppercase tracking-widest block mb-0.5">{item.label}</span>
-                                       <span className={`text-[10px] font-bold uppercase ${isSelected ? 'text-white/50' : 'text-fg-subtle'}`}>
+                                       <span className="text-sm font-semibold block mb-0.5">{item.label}</span>
+                                       <span className={`text-xs font-bold uppercase ${isSelected ? 'text-white/50' : 'text-fg-subtle'}`}>
                                           {isSelected ? 'Configuração Ativada' : 'Não Solicitado'}
                                        </span>
                                     </div>
@@ -602,7 +602,7 @@ export default function AEEDashboardClient({
                          const Icon = field.icon as any
                          return (
                             <div key={field.id} className="bg-white border border-zinc-200 rounded-xl p-5 shadow-card space-y-4">
-                               <label className="text-[10px] text-fg-subtle font-semibold uppercase tracking-[0.2em] flex items-center gap-3">
+                               <label className="text-xs text-fg-subtle font-semibold flex items-center gap-3">
                                   <div className={`p-2 bg-subtle text-fg-muted rounded-xl border border-line`}>
                                      <Icon size={18} />
                                   </div>
@@ -620,7 +620,7 @@ export default function AEEDashboardClient({
 
                       {isDirecao && (
                          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 shadow-card space-y-4">
-                            <label className="text-[10px] text-fg-subtle font-semibold uppercase tracking-[0.2em] flex items-center gap-3">
+                            <label className="text-xs text-fg-subtle font-semibold flex items-center gap-3">
                                <div className="p-2 bg-white/5 text-white/40 rounded-xl border border-white/10">
                                   <Lock size={18} />
                                 </div>
@@ -632,7 +632,7 @@ export default function AEEDashboardClient({
                                placeholder="Notas administrativas, controle de laudos, renovações e acompanhamento interno da gestão..."
                                className={`w-full bg-white/5 border border-white/10 rounded-lg px-8 py-6 text-base font-medium text-white leading-relaxed outline-none transition-all placeholder:text-white/20 ${isEditing ? 'focus:bg-white/10 focus:border-white/20' : 'cursor-default border-transparent'}`}
                             />
-                            <p className="text-[9px] text-white/30 uppercase tracking-widest font-semibold text-right pr-4">Visível apenas para a direção e superusuários</p>
+                            <p className="text-xs text-white/30 font-semibold text-right pr-4">Visível apenas para a direção e superusuários</p>
                          </div>
                       )}
                    </div>
@@ -645,11 +645,11 @@ export default function AEEDashboardClient({
                             <div className="p-2 bg-danger-subtle text-danger-fg rounded-xl">
                                <Phone size={16} />
                             </div>
-                            <p className="text-[10px] font-semibold uppercase tracking-widest text-fg-subtle">Contatos de Emergência do Estudante</p>
+                            <p className="text-xs font-semibold text-fg-subtle">Contatos de Emergência do Estudante</p>
                          </div>
                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                               <label className="text-[9px] font-semibold uppercase tracking-widest text-fg-subtle px-1">Nome do Responsável</label>
+                               <label className="text-xs font-semibold text-fg-subtle px-1">Nome do Responsável</label>
                                <input 
                                   type="text" readOnly={!isEditing} value={formData.contatoNome}
                                   onChange={e => setFormData(f => ({ ...f, contatoNome: e.target.value }))}
@@ -657,7 +657,7 @@ export default function AEEDashboardClient({
                                />
                             </div>
                             <div className="space-y-2">
-                               <label className="text-[9px] font-semibold uppercase tracking-widest text-fg-subtle px-1">Telefone / WhatsApp</label>
+                               <label className="text-xs font-semibold text-fg-subtle px-1">Telefone / WhatsApp</label>
                                <input 
                                   type="text" readOnly={!isEditing} value={formData.contatoTelefone}
                                   onChange={e => setFormData(f => ({ ...f, contatoTelefone: formatPhone(e.target.value) }))}
@@ -685,7 +685,7 @@ export default function AEEDashboardClient({
                                      <div className="p-2 bg-success-subtle text-success-fg rounded-xl">
                                         <CheckCircle2 size={16} />
                                      </div>
-                                     <label className="text-[10px] font-semibold uppercase tracking-widest text-fg-subtle">Controle Docente</label>
+                                     <label className="text-xs font-semibold text-fg-subtle">Controle Docente</label>
                                   </div>
                                   <div className="px-3 py-1 bg-zinc-900 text-white rounded-lg text-xs font-semibold shadow-sm">
                                      {lidosCont} / {totalCont}
@@ -697,7 +697,7 @@ export default function AEEDashboardClient({
                                   </div>
                                   <button 
                                      onClick={() => document.getElementById('relatorio-leituras')?.scrollIntoView({ behavior: 'smooth' })}
-                                     className="w-full py-3.5 text-[10px] text-fg font-semibold uppercase tracking-[0.2em] border-2 border-zinc-100 rounded-lg hover:bg-zinc-50 hover:border-zinc-200 transition-all active:scale-[0.98]"
+                                     className="w-full py-3.5 text-xs text-fg font-semibold border-2 border-zinc-100 rounded-lg hover:bg-zinc-50 hover:border-zinc-200 transition-all active:scale-[0.98]"
                                   >
                                      Auditoria Nominal de Leituras
                                   </button>
@@ -711,13 +711,13 @@ export default function AEEDashboardClient({
                    {activePanel === 'edit' && isDirecao && (
                       <div id="relatorio-leituras" className="pt-10 border-t border-zinc-200 space-y-8 animate-fade-in">
                          <div className="flex items-center justify-between">
-                            <h3 className="text-base font-bold text-fg uppercase tracking-widest flex items-center gap-3">
+                            <h3 className="text-base font-bold text-fg flex items-center gap-3">
                                <div className="w-1.5 h-6 bg-accent rounded-full" />
                                Relatório Nominal de Ciência
                             </h3>
                             <div className="flex gap-6">
-                               <div className="flex items-center gap-2 text-[10px] text-fg-subtle font-semibold uppercase tracking-widest"><div className="w-2.5 h-2.5 rounded-full bg-success shadow-[0_0_8px_rgba(16,185,129,0.5)]" /> Concluído</div>
-                               <div className="flex items-center gap-2 text-[10px] text-fg-subtle font-semibold uppercase tracking-widest"><div className="w-2.5 h-2.5 rounded-full bg-zinc-200" /> Pendente</div>
+                               <div className="flex items-center gap-2 text-xs text-fg-subtle font-semibold"><div className="w-2.5 h-2.5 rounded-full bg-success shadow-[0_0_8px_rgba(16,185,129,0.5)]" /> Concluído</div>
+                               <div className="flex items-center gap-2 text-xs text-fg-subtle font-semibold"><div className="w-2.5 h-2.5 rounded-full bg-zinc-200" /> Pendente</div>
                             </div>
                          </div>
                          
@@ -740,7 +740,7 @@ export default function AEEDashboardClient({
                                            </div>
                                            <div className="min-w-0">
                                               <p className="text-xs font-bold text-fg truncate uppercase mt-0.5">{name}</p>
-                                              <p className="text-[9px] text-fg-subtle font-bold uppercase tracking-widest mt-0.5">
+                                              <p className="text-xs text-fg-subtle font-bold mt-0.5">
                                                  {lidoAt ? `Lido: ${lidoAt}` : 'Não Visualizado'}
                                               </p>
                                            </div>

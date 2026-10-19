@@ -70,7 +70,7 @@ export default function MigracaoPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
         <div className="bg-white p-6 rounded-xl border border-zinc-200 shadow-sm">
-          <label className="block text-sm font-bold text-fg-muted mb-4 uppercase tracking-wider">
+          <label className="block text-sm font-bold text-fg-muted mb-4">
             1. Turma de Origem (A que será esvaziada)
           </label>
           <select 
@@ -85,11 +85,11 @@ export default function MigracaoPage() {
               </option>
             ))}
           </select>
-          <p className="text-[10px] text-fg-subtle mt-2 italic">Dica: Escolha a turma que tem o ID que você deseja descartar.</p>
+          <p className="text-xs text-fg-subtle mt-2 italic">Dica: Escolha a turma que tem o ID que você deseja descartar.</p>
         </div>
 
         <div className="bg-white p-6 rounded-xl border border-zinc-200 shadow-sm">
-          <label className="block text-sm font-bold text-fg-muted mb-4 uppercase tracking-wider">
+          <label className="block text-sm font-bold text-fg-muted mb-4">
             2. Turma de Destino (A que será mantida)
           </label>
           <select 
@@ -104,7 +104,7 @@ export default function MigracaoPage() {
               </option>
             ))}
           </select>
-          <p className="text-[10px] text-fg-subtle mt-2 italic">Dica: Esta é a turma que você seleciona no Gerador de Provas.</p>
+          <p className="text-xs text-fg-subtle mt-2 italic">Dica: Esta é a turma que você seleciona no Gerador de Provas.</p>
         </div>
       </div>
 

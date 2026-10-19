@@ -128,7 +128,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
         >
           <Users className={`w-4 h-4 mb-2 ${filtroStatus === 'todos' ? 'text-white/60' : 'text-fg-subtle'}`} />
           <p className={`text-2xl font-semibold leading-none ${filtroStatus === 'todos' ? 'text-white' : 'text-fg'}`}>{stats.total}</p>
-          <p className={`text-[9px] font-bold uppercase tracking-widest mt-1 ${filtroStatus === 'todos' ? 'text-white/60' : 'text-fg-subtle'}`}>Total</p>
+          <p className={`text-xs font-bold mt-1 ${filtroStatus === 'todos' ? 'text-white/60' : 'text-fg-subtle'}`}>Total</p>
         </button>
 
         {/* Ativos */}
@@ -142,7 +142,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
         >
           <CheckCircle2 className={`w-4 h-4 mb-2 ${filtroStatus === 'ativos' ? 'text-white/70' : 'text-success-fg'}`} />
           <p className={`text-2xl font-semibold leading-none ${filtroStatus === 'ativos' ? 'text-white' : 'text-fg'}`}>{stats.ativos}</p>
-          <p className={`text-[9px] font-bold uppercase tracking-widest mt-1 ${filtroStatus === 'ativos' ? 'text-white/60' : 'text-fg-subtle'}`}>Ativos</p>
+          <p className={`text-xs font-bold mt-1 ${filtroStatus === 'ativos' ? 'text-white/60' : 'text-fg-subtle'}`}>Ativos</p>
         </button>
 
         {/* Pendentes */}
@@ -159,28 +159,28 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
           )}
           <Clock className={`w-4 h-4 mb-2 ${filtroStatus === 'pendentes' ? 'text-white/70' : 'text-warning-fg'}`} />
           <p className={`text-2xl font-semibold leading-none ${filtroStatus === 'pendentes' ? 'text-white' : 'text-fg'}`}>{stats.pendentes}</p>
-          <p className={`text-[9px] font-bold uppercase tracking-widest mt-1 ${filtroStatus === 'pendentes' ? 'text-white/60' : 'text-fg-subtle'}`}>Pendentes</p>
+          <p className={`text-xs font-bold mt-1 ${filtroStatus === 'pendentes' ? 'text-white/60' : 'text-fg-subtle'}`}>Pendentes</p>
         </button>
 
         {/* Pausados */}
         <div className="p-4 rounded-lg border border-zinc-200 bg-white text-left">
           <PauseCircle className="w-4 h-4 mb-2 text-danger" />
           <p className="text-2xl font-semibold leading-none text-fg">{stats.pausados}</p>
-          <p className="text-[9px] font-bold uppercase tracking-widest mt-1 text-fg-subtle">Pausados</p>
+          <p className="text-xs font-bold mt-1 text-fg-subtle">Pausados</p>
         </div>
 
         {/* Professores */}
         <div className="p-4 rounded-lg border border-zinc-200 bg-white text-left">
           <GraduationCap className="w-4 h-4 mb-2 text-accent-fg" />
           <p className="text-2xl font-semibold leading-none text-fg">{stats.professores}</p>
-          <p className="text-[9px] font-bold uppercase tracking-widest mt-1 text-fg-subtle">Professores</p>
+          <p className="text-xs font-bold mt-1 text-fg-subtle">Professores</p>
         </div>
 
         {/* Admins */}
         <div className="p-4 rounded-lg border border-zinc-200 bg-white text-left">
           <Shield className="w-4 h-4 mb-2 text-accent-fg" />
           <p className="text-2xl font-semibold leading-none text-fg">{stats.admins}</p>
-          <p className="text-[9px] font-bold uppercase tracking-widest mt-1 text-fg-subtle">Admins</p>
+          <p className="text-xs font-bold mt-1 text-fg-subtle">Admins</p>
         </div>
       </div>
       {/* Barra de ferramentas */}
@@ -215,7 +215,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
         {totalPendentes > 0 && (
           <button
             onClick={selecionarTodosPendentes}
-            className="shrink-0 flex items-center gap-2 px-4 py-2.5 bg-warning-subtle hover:bg-warning-subtle border border-warning-line text-warning-fg text-xs font-bold uppercase tracking-widest rounded-xl transition-all"
+            className="shrink-0 flex items-center gap-2 px-4 py-2.5 bg-warning-subtle hover:bg-warning-subtle border border-warning-line text-warning-fg text-xs font-bold rounded-xl transition-all"
           >
             <Clock className="w-3.5 h-3.5" />
             Selecionar {totalPendentes} pendente{totalPendentes !== 1 ? 's' : ''}
@@ -242,10 +242,10 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
                     className="w-4 h-4 rounded cursor-pointer accent-[var(--accent)]"
                   />
                 </th>
-                <th className="px-4 py-4 text-left text-xs font-medium text-fg-muted uppercase tracking-widest">Usuário</th>
-                <th className="px-6 py-4 text-center text-xs font-medium text-fg-muted uppercase tracking-widest">Função & Status</th>
-                <th className="px-6 py-4 text-center text-xs font-medium text-fg-muted uppercase tracking-widest">Permissões</th>
-                <th className="px-6 py-4 text-right text-xs font-medium text-fg-muted uppercase tracking-widest">Gerenciamento</th>
+                <th className="px-4 py-4 text-left text-xs font-medium text-fg-muted">Usuário</th>
+                <th className="px-6 py-4 text-center text-xs font-medium text-fg-muted">Função & Status</th>
+                <th className="px-6 py-4 text-center text-xs font-medium text-fg-muted">Permissões</th>
+                <th className="px-6 py-4 text-right text-xs font-medium text-fg-muted">Gerenciamento</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-200">
@@ -292,7 +292,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
                           )}
                         </div>
                         <div className="text-xs text-fg-muted font-medium tracking-tight">{usuario.email}</div>
-                        <div className="text-[10px] text-fg-subtle font-medium uppercase tracking-widest mt-0.5">
+                        <div className="text-xs text-fg-subtle font-medium mt-0.5">
                           @{usuario.username}
                         </div>
                       </div>
@@ -303,24 +303,24 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
                     <div className="flex flex-col items-center gap-1.5">
                       <div className="flex items-center gap-1.5">
                         {!usuario.isApproved ? (
-                          <span className="px-2.5 py-0.5 inline-flex items-center text-[10px] font-medium uppercase tracking-wider rounded-full bg-warning-subtle text-warning-fg border border-warning-line">
+                          <span className="px-2.5 py-0.5 inline-flex items-center text-xs font-medium rounded-full bg-warning-subtle text-warning-fg border border-warning-line">
                             <Clock className="w-3 h-3 mr-1" />
                             Solicitação
                           </span>
                         ) : (
                           <>
                             {usuario.isSuperuser && (
-                              <span className="px-2.5 py-0.5 inline-flex items-center text-[10px] font-medium uppercase tracking-wider rounded-full bg-accent-subtle text-accent-fg border border-accent/25">
+                              <span className="px-2.5 py-0.5 inline-flex items-center text-xs font-medium rounded-full bg-accent-subtle text-accent-fg border border-accent/25">
                                 <Shield className="w-3 h-3 mr-1" />Admin
                               </span>
                             )}
                              {usuario.isStaff && (
-                               <span className="px-2.5 py-0.5 inline-flex items-center text-[10px] font-medium uppercase tracking-wider rounded-full bg-zinc-200 text-fg border border-zinc-300">
+                               <span className="px-2.5 py-0.5 inline-flex items-center text-xs font-medium rounded-full bg-zinc-200 text-fg border border-zinc-300">
                                  <GraduationCap className="w-3 h-3 mr-1" />Professor
                                </span>
                              )}
                              {(usuario as any).isAEE && (
-                               <span className="px-2.5 py-0.5 inline-flex items-center text-[10px] font-medium uppercase tracking-wider rounded-full bg-success-subtle text-success-fg border border-success-line">
+                               <span className="px-2.5 py-0.5 inline-flex items-center text-xs font-medium rounded-full bg-success-subtle text-success-fg border border-success-line">
                                  <Accessibility className="w-3 h-3 mr-1" />AEE
                                </span>
                              )}
@@ -328,12 +328,12 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
                         )}
                       </div>
                       {usuario.isApproved && !usuario.isActive && (
-                        <span className="px-2.5 py-0.5 inline-flex items-center text-[10px] font-medium uppercase tracking-wider rounded-full bg-danger-subtle text-danger-fg border border-danger-line animate-pulse">
+                        <span className="px-2.5 py-0.5 inline-flex items-center text-xs font-medium rounded-full bg-danger-subtle text-danger-fg border border-danger-line animate-pulse">
                           <PauseCircle className="w-3 h-3 mr-1" />Acesso Pausado
                         </span>
                       )}
                       {usuario.isApproved && usuario.isActive && (
-                        <span className="px-2.5 py-0.5 inline-flex items-center text-[10px] font-medium uppercase tracking-wider rounded-full bg-success-subtle text-success-fg border border-success-line">
+                        <span className="px-2.5 py-0.5 inline-flex items-center text-xs font-medium rounded-full bg-success-subtle text-success-fg border border-success-line">
                           <CheckCircle2 className="w-3 h-3 mr-1" />Ativo
                         </span>
                       )}
@@ -342,12 +342,12 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
 
                   <td className="px-6 py-4 whitespace-nowrap text-center text-sm">
                     {usuario.isSuperuser ? (
-                      <span className="text-fg-muted font-medium text-[10px] uppercase tracking-widest bg-zinc-50 px-3 py-1 rounded-lg border border-zinc-200">Controle Total</span>
+                      <span className="text-fg-muted font-medium text-xs bg-zinc-50 px-3 py-1 rounded-lg border border-zinc-200">Controle Total</span>
                     ) : !usuario.isApproved ? (
-                      <span className="text-fg-subtle italic text-[10px] font-medium uppercase tracking-widest">A aguardar</span>
+                      <span className="text-fg-subtle italic text-xs font-medium">A aguardar</span>
                     ) : (
                       <span className="font-medium text-fg-muted text-xs">
-                        {usuario._count.disciplinasPermitidas} <span className="text-[10px] font-medium text-fg-subtle uppercase tracking-tight">Disciplinas</span>
+                        {usuario._count.disciplinasPermitidas} <span className="text-xs font-medium text-fg-subtle">Disciplinas</span>
                       </span>
                     )}
                   </td>
@@ -369,7 +369,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
                 <tr>
                   <td colSpan={5} className="px-6 py-20 text-center">
                     <Users className="w-10 h-10 text-zinc-200 mx-auto mb-3" />
-                    <p className="text-sm font-semibold text-fg-subtle uppercase tracking-widest">Nenhum usuário encontrado</p>
+                    <p className="text-sm font-semibold text-fg-subtle">Nenhum usuário encontrado</p>
                   </td>
                 </tr>
               )}
@@ -397,7 +397,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
             {/* Cancelar */}
             <button
               onClick={() => setSelectedIds(new Set())}
-              className="text-xs font-semibold text-white/50 hover:text-white transition-colors uppercase tracking-widest"
+              className="text-xs font-semibold text-white/50 hover:text-white transition-colors"
             >
               Cancelar
             </button>
@@ -407,7 +407,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
               <button
                 onClick={handleAprovarEmMassa}
                 disabled={aprovando}
-                className="flex items-center gap-2 bg-success hover:bg-success text-white text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-xl transition-all disabled:opacity-50 active:scale-95"
+                className="flex items-center gap-2 bg-success hover:bg-success text-white text-xs font-bold px-4 py-2 rounded-xl transition-all disabled:opacity-50 active:scale-95"
               >
                 {aprovando
                   ? <Loader2 size={14} className="animate-spin" />

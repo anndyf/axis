@@ -71,7 +71,7 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
             <div className="absolute top-0 right-0 w-32 h-32 bg-zinc-100 rounded-full -mr-16 -mt-16 opacity-50 blur-3xl"></div>
             
             <div className="flex-1 min-w-[200px] space-y-2">
-                <label className="text-[10px] font-medium text-fg-subtle uppercase tracking-[0.2em] ml-2">Curso</label>
+                <label className="text-xs font-medium text-fg-subtle ml-2">Curso</label>
                 <select 
                     value={filterCurso}
                     onChange={(e) => setFilterCurso(e.target.value)}
@@ -83,7 +83,7 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
             </div>
 
             <div className="flex-1 min-w-[200px] space-y-2">
-                <label className="text-[10px] font-medium text-fg-subtle uppercase tracking-[0.2em] ml-2">Turno</label>
+                <label className="text-xs font-medium text-fg-subtle ml-2">Turno</label>
                 <select 
                     value={filterTurno}
                     onChange={(e) => setFilterTurno(e.target.value)}
@@ -95,7 +95,7 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
             </div>
 
             <div className="flex-[2] min-w-[250px] space-y-2">
-                <label className="text-[10px] font-medium text-fg-subtle uppercase tracking-[0.2em] ml-2">Pesquisar Turma</label>
+                <label className="text-xs font-medium text-fg-subtle ml-2">Pesquisar Turma</label>
                 <div className="relative group">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-zinc-50 rounded-lg text-fg-subtle group-focus-within:text-fg-muted group-focus-within:bg-zinc-100 transition-all">
                         <Search size={18} />
@@ -113,7 +113,7 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
             <div className="pb-2.5">
                 <div className="flex items-center gap-2 bg-zinc-100 px-4 py-2.5 rounded-lg border border-zinc-200 shadow-sm">
                     <span className="w-2 h-2 rounded-full bg-zinc-500 animate-pulse"></span>
-                    <span className="text-[10px] font-semibold text-fg uppercase tracking-widest">{filteredTurmas.length} turmas mapeadas</span>
+                    <span className="text-xs font-semibold text-fg">{filteredTurmas.length} turmas mapeadas</span>
                 </div>
             </div>
         </div>
@@ -121,7 +121,7 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
         {/* Turmas Grid Style Premium */}
         <div className="bg-white rounded-xl shadow-card border border-zinc-200 p-8">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-[10px] font-semibold text-fg-subtle uppercase tracking-[0.2em] flex items-center gap-3">
+            <h2 className="text-xs font-semibold text-fg-subtle flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-zinc-100 text-fg-muted flex items-center justify-center shadow-card">
                 <Users size={16} />
               </div>
@@ -154,7 +154,7 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
                       <div className="flex justify-between items-center">
                         <span className="text-xs uppercase font-medium text-fg-subtle truncate max-w-[60%]">{turma.curso || 'Ensino Médio'}</span>
                         {turma.turno && (
-                          <span className="bg-zinc-200/50 text-fg-muted text-[10px] font-medium px-1.5 py-0.5 rounded border border-zinc-300/50 uppercase tracking-tighter">
+                          <span className="bg-zinc-200/50 text-fg-muted text-xs font-medium px-1.5 py-0.5 rounded border border-zinc-300/50">
                               {turma.turno}
                           </span>
                         )}

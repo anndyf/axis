@@ -306,7 +306,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
                 <div className="max-w-md mx-auto mb-10 p-6 bg-zinc-50 rounded-lg border border-zinc-200 text-left">
                     <div className="flex items-center gap-2 mb-4 text-warning-fg">
                        <AlertCircle className="w-5 h-5" />
-                       <span className="font-bold text-sm uppercase tracking-tight">Registros ignorados ({skippedList.length})</span>
+                       <span className="font-bold text-sm">Registros ignorados ({skippedList.length})</span>
                     </div>
                     <ul className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                         {skippedList.map((item: string, i: number) => (
@@ -431,11 +431,11 @@ export default function UploadForm({ turmas }: UploadFormProps) {
                                         }`}
                                     >
                                         <div className="flex flex-col">
-                                            <span className={`font-semibold uppercase tracking-tight ${manualTurma === t.nome ? 'text-white' : 'text-fg font-bold'}`}>
+                                            <span className={`font-semibold ${manualTurma === t.nome ? 'text-white' : 'text-fg font-bold'}`}>
                                                 {t.nome}
                                             </span>
                                             {(t.modalidade || t.turno) && (
-                                                <span className={`text-[10px] uppercase tracking-widest font-bold mt-0.5 ${manualTurma === t.nome ? 'text-zinc-300' : 'text-fg-subtle'}`}>
+                                                <span className={`text-xs font-bold mt-0.5 ${manualTurma === t.nome ? 'text-zinc-300' : 'text-fg-subtle'}`}>
                                                     {t.modalidade} {t.turno && `· ${t.turno}`}
                                                 </span>
                                             )}

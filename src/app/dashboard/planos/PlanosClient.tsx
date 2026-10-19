@@ -179,7 +179,7 @@ export default function PlanosClient() {
               {!isAdmin && (
                 <button 
                   onClick={() => { setShowForm(true); setSelectedPlano(null); }}
-                  className="flex items-center gap-2 bg-zinc-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-zinc-800 transition-all text-xs uppercase tracking-widest active:scale-95 shadow-card"
+                  className="flex items-center gap-2 bg-zinc-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-zinc-800 transition-all text-xs active:scale-95 shadow-card"
                 >
                   <Plus size={16} /> Novo Plano
                 </button>
@@ -200,8 +200,8 @@ export default function PlanosClient() {
                    {tip.icon}
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-fg uppercase tracking-widest mb-1">{tip.title}</h3>
-                  <p className="text-[11px] font-medium text-fg-subtle uppercase leading-relaxed">{tip.description}</p>
+                  <h3 className="text-sm font-medium text-fg mb-1">{tip.title}</h3>
+                  <p className="text-xs font-medium text-fg-subtle uppercase leading-relaxed">{tip.description}</p>
                 </div>
              </div>
           ))}
@@ -212,7 +212,7 @@ export default function PlanosClient() {
             <div className="absolute top-0 right-0 w-32 h-32 bg-zinc-50 rounded-full -mr-16 -mt-16 opacity-50 blur-3xl"></div>
             
             <div className="flex-1 min-w-[200px] space-y-2">
-                <label className="text-[10px] font-medium text-fg-subtle uppercase tracking-[0.2em] ml-2">Filtrar por Turma</label>
+                <label className="text-xs font-medium text-fg-subtle ml-2">Filtrar por Turma</label>
                 <div className="relative group">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-zinc-50 rounded-lg text-fg-subtle group-focus-within:text-fg-muted group-focus-within:bg-zinc-50 transition-all">
                     <Users size={16} />
@@ -229,7 +229,7 @@ export default function PlanosClient() {
             </div>
 
             <div className="flex-1 min-w-[200px] space-y-2">
-                <label className="text-[10px] font-medium text-fg-subtle uppercase tracking-[0.2em] ml-2">Disciplina</label>
+                <label className="text-xs font-medium text-fg-subtle ml-2">Disciplina</label>
                 <div className="relative group">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-zinc-50 rounded-lg text-fg-subtle group-focus-within:text-fg-muted group-focus-within:bg-zinc-50 transition-all">
                         <Search size={16} />
@@ -246,7 +246,7 @@ export default function PlanosClient() {
 
             {isAdmin && (
                 <div className="flex-1 min-w-[200px] space-y-2">
-                    <label className="text-[10px] font-medium text-fg-subtle uppercase tracking-[0.2em] ml-2">Professor</label>
+                    <label className="text-xs font-medium text-fg-subtle ml-2">Professor</label>
                     <div className="relative group">
                       <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-zinc-50 rounded-lg text-fg-subtle group-focus-within:text-fg-muted group-focus-within:bg-zinc-50 transition-all">
                         <BookOpen size={16} />
@@ -267,7 +267,7 @@ export default function PlanosClient() {
         {/* Matriz de Planos Estilo Resultados (Cards Table) */}
         <div className="bg-white rounded-xl shadow-card border border-zinc-200 overflow-hidden relative">
           <div className="p-6 border-b border-zinc-50 bg-zinc-50/10 flex items-center justify-between">
-            <h2 className="text-sm font-medium text-fg-subtle flex items-center gap-3 uppercase tracking-[0.2em] ml-2">
+            <h2 className="text-sm font-medium text-fg-subtle flex items-center gap-3 ml-2">
               <div className="w-8 h-8 rounded-lg bg-zinc-50 text-fg-muted flex items-center justify-center shadow-card">
                 <Users size={16} />
               </div>
@@ -275,7 +275,7 @@ export default function PlanosClient() {
             </h2>
             <div className="hidden md:flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-success animate-pulse shadow-card"></span>
-                <p className="text-[10px] font-medium text-fg-subtle uppercase tracking-widest leading-none">Acesso em tempo real</p>
+                <p className="text-xs font-medium text-fg-subtle leading-none">Acesso em tempo real</p>
             </div>
           </div>
 
@@ -287,7 +287,7 @@ export default function PlanosClient() {
             ) : turmasNomes.length === 0 ? (
               <div className="text-center py-20 text-zinc-300">
                   <BarChart3 className="w-12 h-12 opacity-20 mx-auto mb-3" />
-                  <p className="text-sm font-medium uppercase tracking-widest">Nenhum plano localizado</p>
+                  <p className="text-sm font-medium">Nenhum plano localizado</p>
               </div>
             ) : (
                 <div className="divide-y divide-zinc-200">
@@ -306,10 +306,10 @@ export default function PlanosClient() {
                                             <Users size={20} />
                                         </div>
                                         <div className="text-left">
-                                            <h3 className="text-lg font-medium text-fg uppercase tracking-tight group-hover:text-fg-muted transition-colors">{turmaNome}</h3>
+                                            <h3 className="text-lg font-medium text-fg group-hover:text-fg-muted transition-colors">{turmaNome}</h3>
                                             <div className="flex items-center gap-2 mt-0.5">
                                                 <div className="w-1.5 h-1.5 rounded-full bg-zinc-300"></div>
-                                                <span className="text-[10px] font-medium text-fg-subtle uppercase tracking-[0.1em]">{matches.length} Documentos Arquivados</span>
+                                                <span className="text-xs font-medium text-fg-subtle">{matches.length} Documentos Arquivados</span>
                                             </div>
                                         </div>
                                     </div>
@@ -324,14 +324,14 @@ export default function PlanosClient() {
                                             <div key={month} className="space-y-0">
                                                 <div className="px-8 py-3 bg-zinc-50 border-b border-zinc-200 flex items-center gap-3">
                                                    <div className="w-1 h-3 bg-zinc-500 rounded-full"></div>
-                                                   <span className="text-[10px] font-medium text-fg-muted uppercase tracking-[0.2em]">{month}</span>
+                                                   <span className="text-xs font-medium text-fg-muted">{month}</span>
                                                 </div>
                                                 <table className="w-full text-left border-collapse">
                                                     <thead>
                                                         <tr className="bg-white">
-                                                            <th className="px-8 py-4 text-[10px] font-medium text-fg-subtle uppercase tracking-[0.15em] border-b border-zinc-50">Disciplina / Matéria</th>
-                                                            <th className="px-6 py-4 text-[10px] font-medium text-fg-subtle uppercase tracking-[0.15em] text-center border-b border-zinc-50">Período de Vigência</th>
-                                                            <th className="px-8 py-4 text-[10px] font-medium text-fg-subtle uppercase tracking-[0.15em] text-center border-b border-zinc-50">Ações</th>
+                                                            <th className="px-8 py-4 text-xs font-medium text-fg-subtle border-b border-zinc-50">Disciplina / Matéria</th>
+                                                            <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center border-b border-zinc-50">Período de Vigência</th>
+                                                            <th className="px-8 py-4 text-xs font-medium text-fg-subtle text-center border-b border-zinc-50">Ações</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody className="divide-y divide-zinc-50">
@@ -346,7 +346,7 @@ export default function PlanosClient() {
                                                                             </div>
                                                                             <div className="flex flex-col">
                                                                                  <span className="text-base font-medium text-fg-muted uppercase group-hover:text-fg-muted transition-colors leading-tight">{plano.disciplinaNome}</span>
-                                                                                 <span className="text-[10px] font-medium text-fg-subtle uppercase tracking-widest mt-1">
+                                                                                 <span className="text-xs font-medium text-fg-subtle mt-1">
                                                                                     {isAdmin ? `PROF. ${plano.professor.name}` : 'Documento Quinzenal'}
                                                                                  </span>
                                                                              </div>
@@ -355,7 +355,7 @@ export default function PlanosClient() {
                                                                     <td className="px-6 py-5 text-center">
                                                                         <div className="inline-flex items-center gap-2 bg-zinc-50 px-4 py-2 rounded-xl border border-zinc-200 shadow-sm group-hover:bg-white transition-all">
                                                                             <Calendar size={14} className="text-fg-subtle" />
-                                                                            <span className="text-xs font-medium text-fg-muted uppercase tracking-tighter">
+                                                                            <span className="text-xs font-medium text-fg-muted">
                                                                                 {new Date(plano.periodoInicio).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', timeZone: 'UTC'})} — {new Date(plano.periodoFim).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', timeZone: 'UTC'})}
                                                                             </span>
                                                                         </div>

@@ -59,18 +59,18 @@ export default function MessageNotification() {
 
         <div className="flex-1 min-w-0 py-2 pr-4">
           <div className="flex items-center justify-between mb-0.5">
-            <p className="text-[10px] font-semibold text-accent-fg uppercase tracking-widest leading-none">Nova Mensagem</p>
+            <p className="text-xs font-semibold text-accent-fg leading-none">Nova Mensagem</p>
             <button onClick={() => setShow(false)} className="p-1 hover:bg-zinc-100 rounded-lg transition-all -mr-2">
               <X size={14} className="text-fg-subtle" />
             </button>
           </div>
           <h4 className="text-sm font-semibold text-fg truncate tracking-tight">{latestMessage.subject}</h4>
-          <p className="text-[11px] font-medium text-fg-subtle truncate mt-0.5">De: {latestMessage.sender?.name || latestMessage.sender?.username}</p>
+          <p className="text-xs font-medium text-fg-subtle truncate mt-0.5">De: {latestMessage.sender?.name || latestMessage.sender?.username}</p>
           
           <Link 
             href="/dashboard/mensagens" 
             onClick={() => setShow(false)}
-            className="mt-2 flex items-center gap-1.5 text-[10px] font-semibold text-fg uppercase tracking-tight hover:text-accent-fg transition-colors group"
+            className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-fg hover:text-accent-fg transition-colors group"
           >
             Ver Mensagem 
             <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />

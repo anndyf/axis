@@ -435,7 +435,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
           <div className="space-y-3">
             <div className="flex items-center justify-between ml-1">
               <label className="text-sm font-bold text-fg-muted">Enunciado da Questão</label>
-              <span className="text-[10px] font-bold text-fg-subtle uppercase tracking-widest">Suporte a negrito, itálico e listas</span>
+              <span className="text-xs font-bold text-fg-subtle">Suporte a negrito, itálico e listas</span>
             </div>
             <div className="rich-text-editor">
               <ReactQuill 
@@ -519,7 +519,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
                     >
                       <X size={16} />
                     </button>
-                    <div className="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] px-2 py-1 rounded backdrop-blur-sm">
+                    <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
                       Imagem otimizada
                     </div>
                   </div>
@@ -542,12 +542,12 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
                       <p className="text-xs font-bold text-fg-subtle group-hover:text-fg-muted text-center">
                         Clique para enviar imagem
                       </p>
-                      <p className="text-[10px] text-fg-subtle mt-1">
+                      <p className="text-xs text-fg-subtle mt-1">
                         Será otimizada automaticamente
                       </p>
                     </label>
                     <div className="text-center mt-2">
-                      <span className="text-[10px] text-fg-subtle bg-zinc-50 px-2 py-1 rounded border border-zinc-100">
+                      <span className="text-xs text-fg-subtle bg-zinc-50 px-2 py-1 rounded border border-zinc-100">
                         Ou cole a URL abaixo
                       </span>
                     </div>
@@ -585,12 +585,12 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
                   <option value="1">1ª Unidade</option>
                   <option value="2">2ª Unidade</option>
                 </select>
-                <p className="text-[10px] text-fg-subtle mt-1 pl-1">Isso ajudará a gerar provas automaticamente filtrando pelas questões dessa unidade.</p>
+                <p className="text-xs text-fg-subtle mt-1 pl-1">Isso ajudará a gerar provas automaticamente filtrando pelas questões dessa unidade.</p>
               </div>
 
               {/* Tipo de Questão */}
               <div className="flex-1 min-w-[200px]">
-                <label className="flex items-center gap-1.5 text-xs font-semibold text-fg uppercase tracking-wider mb-2">
+                <label className="flex items-center gap-1.5 text-xs font-semibold text-fg mb-2">
                   <Info size={16} className="text-fg-muted" />
                   Tipo de Questão
                 </label>
@@ -613,19 +613,19 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
           <div className="space-y-8 animate-slide-up">
           <div className="space-y-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 ml-1">
-              <h3 className="text-sm font-bold text-fg-muted uppercase tracking-wider">Alternativas de Resposta</h3>
+              <h3 className="text-sm font-bold text-fg-muted">Alternativas de Resposta</h3>
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setShowPasteModal(true)}
-                  className="flex items-center gap-1.5 px-3 py-1 bg-accent-subtle text-accent-fg rounded-full border border-accent/25 hover:bg-accent-subtle transition-all font-bold text-[10px] uppercase tracking-tight hover:scale-105 active:scale-95"
+                  className="flex items-center gap-1.5 px-3 py-1 bg-accent-subtle text-accent-fg rounded-full border border-accent/25 hover:bg-accent-subtle transition-all font-bold text-xs hover:scale-105 active:scale-95"
                 >
                   <Plus size={12} />
                   Colar Bloco
                 </button>
                 <div className="flex items-center gap-1.5 px-3 py-1 bg-success-subtle text-success-fg rounded-full border border-success-line animate-slide-up shadow-sm">
                   <CheckCircle2 size={14} className="text-success-fg" />
-                  <span className="text-[10px] font-semibold uppercase tracking-tight">Clique na letra da questão correta</span>
+                  <span className="text-xs font-semibold">Clique na letra da questão correta</span>
                 </div>
               </div>
             </div>
@@ -710,11 +710,11 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
               <label className="text-sm font-bold text-fg-muted">Onde aplicar esta questão?</label>
               <div className="flex items-center gap-2">
                  <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                 <span className="text-[10px] font-bold text-accent-fg uppercase tracking-widest">Vincular a Diários</span>
+                 <span className="text-xs font-bold text-accent-fg">Vincular a Diários</span>
               </div>
             </div>
             
-            <p className="text-[11px] text-fg-subtle font-medium ml-1">
+            <p className="text-xs text-fg-subtle font-medium ml-1">
               Primeiro selecione a(s) Turma(s) alvo, em seguida selecione a disciplina desejada.
             </p>
 
@@ -722,7 +722,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
               {/* Passo 1: Seleção de Turmas */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2 px-2">
-                  <span className="text-[10px] font-semibold text-fg-subtle uppercase tracking-[0.2em]">Passo 1: Turmas</span>
+                  <span className="text-xs font-semibold text-fg-subtle">Passo 1: Turmas</span>
                   <div className="h-px flex-1 bg-zinc-100" />
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -748,7 +748,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
               {formData.turmasIds.length > 0 && (
                 <div className="space-y-3 animate-slide-up">
                   <div className="flex items-center gap-2 px-2">
-                    <span className="text-[10px] font-semibold text-fg-subtle uppercase tracking-[0.2em]">Passo 2: Disciplinas nas Turmas Selecionadas</span>
+                    <span className="text-xs font-semibold text-fg-subtle">Passo 2: Disciplinas nas Turmas Selecionadas</span>
                     <div className="h-px flex-1 bg-zinc-100" />
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -768,7 +768,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
                             <BookOpen size={14} className={formData.disciplinasIds.includes(d.id) ? 'text-on-accent/80' : 'text-fg-subtle'} />
                             <span className="flex flex-col items-start leading-tight">
                                <span>{d.nome}</span>
-                               <span className={`text-[9px] font-medium ${formData.disciplinasIds.includes(d.id) ? 'text-on-accent/80' : 'text-fg-subtle'}`}>{turmaNome}</span>
+                               <span className={`text-xs font-medium ${formData.disciplinasIds.includes(d.id) ? 'text-on-accent/80' : 'text-fg-subtle'}`}>{turmaNome}</span>
                             </span>
                           </button>
                           
@@ -840,7 +840,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold text-fg leading-none">Colar Bloco de Respostas</h3>
-                    <p className="text-xs text-fg-subtle font-bold mt-1 uppercase tracking-widest">Preenchimento Automático</p>
+                    <p className="text-xs text-fg-subtle font-bold mt-1">Preenchimento Automático</p>
                   </div>
                 </div>
                 <button onClick={() => setShowPasteModal(false)} className="p-2 hover:bg-zinc-100 rounded-full transition-colors">

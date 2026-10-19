@@ -72,7 +72,7 @@ export default function PortalActivationAction({
                    </div>
                    <div>
                       <h3 className="font-bold text-fg tracking-tight">Gestão de Acesso</h3>
-                      <p className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest">Ativação do Portal do Aluno</p>
+                      <p className="text-xs font-semibold text-fg-subtle">Ativação do Portal do Aluno</p>
                    </div>
                 </div>
                 <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-zinc-100 rounded-full transition-colors">
@@ -88,7 +88,7 @@ export default function PortalActivationAction({
                    </div>
                    <button 
                     onClick={() => setIsModalOpen(false)}
-                    className="w-full bg-zinc-900 text-white py-4 rounded-lg font-bold uppercase tracking-widest text-xs hover:bg-zinc-800 transition-all"
+                    className="w-full bg-zinc-900 text-white py-4 rounded-lg font-bold text-xs hover:bg-zinc-800 transition-all"
                    >
                      Entendido
                    </button>
@@ -100,7 +100,7 @@ export default function PortalActivationAction({
                    </p>
                    
                    <div className="space-y-2">
-                      <label className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest ml-1">Confirmar Matrícula</label>
+                      <label className="text-xs font-semibold text-fg-subtle ml-1">Confirmar Matrícula</label>
                       <input 
                         type="text" 
                         value={matricula}
@@ -113,7 +113,7 @@ export default function PortalActivationAction({
                    <button 
                     onClick={handleCreate}
                     disabled={loading || !matricula}
-                    className="w-full bg-zinc-900 text-white py-4 rounded-lg font-bold uppercase tracking-widest text-xs hover:bg-zinc-800 transition-all flex items-center justify-center gap-2 shadow-card disabled:opacity-50"
+                    className="w-full bg-zinc-900 text-white py-4 rounded-lg font-bold text-xs hover:bg-zinc-800 transition-all flex items-center justify-center gap-2 shadow-card disabled:opacity-50"
                    >
                      {loading ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={16} />}
                      Ativar Acesso Agora

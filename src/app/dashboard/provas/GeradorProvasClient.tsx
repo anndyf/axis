@@ -261,7 +261,7 @@ const ManualSelectorModal = ({ isOpen, onClose, onSelect, questions, selectedIds
                   setLoadingSerie(false)
                 }}
                 disabled={loadingSerie}
-                className="text-xs font-bold text-accent-fg hover:text-accent-fg flex items-center gap-1 uppercase tracking-tight disabled:opacity-50"
+                className="text-xs font-bold text-accent-fg hover:text-accent-fg flex items-center gap-1 disabled:opacity-50"
               >
                 {loadingSerie ? "Buscando..." : "Buscar em outras turmas do mesmo ano"}
               </button>
@@ -314,7 +314,7 @@ const ManualSelectorModal = ({ isOpen, onClose, onSelect, questions, selectedIds
                 </div>
                 <div className="flex items-center flex-wrap gap-2 mt-2">
                   {q._count?.provas > 0 && (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-accent-subtle text-accent-fg uppercase tracking-widest border border-accent/25">
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-accent-subtle text-accent-fg border border-accent/25">
                       Usada em {q._count.provas} prova{q._count.provas > 1 ? 's' : ''}
                     </span>
                   )}
@@ -322,13 +322,13 @@ const ManualSelectorModal = ({ isOpen, onClose, onSelect, questions, selectedIds
                     className={`w-2 h-2 rounded-full shrink-0 ${q.tipo === 'RECUPERACAO' ? 'bg-warning' : 'bg-accent'}`} 
                     title={q.tipo === 'RECUPERACAO' ? 'Questão de Segunda Chamada' : 'Questão Normal'}
                   />
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-white border border-zinc-100 text-fg-subtle uppercase tracking-widest">{q.dificuldade}</span>
+                  <span className="text-xs font-bold px-2 py-0.5 rounded bg-white border border-zinc-100 text-fg-subtle">{q.dificuldade}</span>
                   {q.turmas && q.turmas.length > 0 && (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-accent-subtle border border-accent/25 text-accent-fg uppercase tracking-widest">
+                    <span className="text-xs font-bold px-2 py-0.5 rounded bg-accent-subtle border border-accent/25 text-accent-fg">
                       {q.turmas[0].nome}
                     </span>
                   )}
-                  {selectedIds.includes(q.id) && <span className="text-[10px] font-bold text-accent-fg ml-auto">Selecionada</span>}
+                  {selectedIds.includes(q.id) && <span className="text-xs font-bold text-accent-fg ml-auto">Selecionada</span>}
                 </div>
               </div>
             ))
@@ -917,7 +917,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
         <div className="xl:col-span-5 space-y-6">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-zinc-100 space-y-6">
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-fg-subtle uppercase tracking-widest ml-1">Título da Prova</label>
+              <label className="text-xs font-semibold text-fg-subtle ml-1">Título da Prova</label>
               <input 
                 value={titulo}
                 onChange={(e) => setTitulo(e.target.value)}
@@ -928,7 +928,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-fg-subtle uppercase tracking-widest ml-1">Tipo de Prova</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1">Tipo de Prova</label>
                 <select 
                   value={tipoProva}
                   onChange={(e) => setTipoProva(e.target.value)}
@@ -942,7 +942,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-fg-subtle uppercase tracking-widest ml-1">Área (Preset)</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1">Área (Preset)</label>
                 <select 
                   value={areaConhecimento}
                   onChange={(e) => setAreaConhecimento(e.target.value)}
@@ -961,7 +961,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
 
             {/* Filtros de Turma */}
             <div className="bg-zinc-50/50 p-4 rounded-xl border border-zinc-100 space-y-3">
-              <label className="text-xs font-semibold text-fg-subtle uppercase tracking-widest ml-1">Filtrar Turmas</label>
+              <label className="text-xs font-semibold text-fg-subtle ml-1">Filtrar Turmas</label>
               <div className="grid grid-cols-2 gap-3">
                 <select 
                   value={filterCurso}
@@ -990,7 +990,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-fg-subtle uppercase tracking-widest ml-1">
+              <label className="text-xs font-semibold text-fg-subtle ml-1">
                 Selecionar Turma {filteredTurmas.length < turmas.length && <span className="text-accent-fg">({filteredTurmas.length} encontradas)</span>}
               </label>
               <select 
@@ -1013,11 +1013,11 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                     </p>
                     {tipoProva !== 'DEPENDÊNCIA' && tipoProva !== 'OUTRO' && (
                       <div className="flex items-center gap-2 animate-fade-in zoom-in duration-300">
-                        <span className="text-[10px] font-bold text-fg-subtle uppercase">Unidade:</span>
+                        <span className="text-xs font-bold text-fg-subtle uppercase">Unidade:</span>
                         <select 
                           value={unidade}
                           onChange={(e) => setUnidade(e.target.value)}
-                          className="bg-white border border-zinc-200 rounded-lg px-2 py-1 text-[10px] font-bold text-accent-fg focus:ring-1 focus:ring-ring"
+                          className="bg-white border border-zinc-200 rounded-lg px-2 py-1 text-xs font-bold text-accent-fg focus:ring-1 focus:ring-ring"
                         >
                           <option value="">1ª e 2ª Unidades</option>
                           <option value="1">1ª Unidade</option>
@@ -1031,7 +1031,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
 
             <div className="space-y-2 mt-4 border-t border-zinc-100 pt-4">
               <div className="flex items-center justify-between ml-1">
-                <label className="text-xs font-semibold text-fg-subtle uppercase tracking-widest">Filtro de Questões (Banco)</label>
+                <label className="text-xs font-semibold text-fg-subtle">Filtro de Questões (Banco)</label>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1.5" title="Questão Normal">
                     <div className="w-2 h-2 rounded-full bg-accent"></div>
@@ -1053,7 +1053,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
             </div>
 
             <div className="space-y-3">
-              <label className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest ml-1">Formato e Acessibilidade</label>
+              <label className="text-xs font-semibold text-fg-subtle ml-1">Formato e Acessibilidade</label>
               <div className="flex flex-wrap items-center gap-3">
                 <div className="flex bg-zinc-100 p-1 rounded-xl">
                   <button 
@@ -1091,8 +1091,8 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                   <div className="flex items-center gap-2 text-left">
                     <Eye size={16} className={isAmpliada ? 'text-warning-fg' : 'text-fg-subtle group-hover:text-warning-fg'} />
                     <div>
-                      <p className="text-[11px] font-bold leading-tight">Prova Ampliada</p>
-                      <p className="text-[9px] font-medium opacity-70 leading-tight">Acessibilidade</p>
+                      <p className="text-xs font-bold leading-tight">Prova Ampliada</p>
+                      <p className="text-xs font-medium opacity-70 leading-tight">Acessibilidade</p>
                     </div>
                   </div>
                   <div className={`w-8 h-4 rounded-full relative transition-colors ${isAmpliada ? 'bg-warning' : 'bg-zinc-200'}`}>
@@ -1103,7 +1103,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest ml-1">Valor por Questão no PDF</label>
+              <label className="text-xs font-semibold text-fg-subtle ml-1">Valor por Questão no PDF</label>
               <input 
                 value={valorQuestao}
                 onChange={(e) => setValorQuestao(e.target.value)}
@@ -1118,7 +1118,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
           {selectedTurma && (
             <div className="bg-white p-6 rounded-xl shadow-sm border border-zinc-100 space-y-4">
               <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-semibold text-fg-subtle uppercase tracking-widest ml-1">Questões por Disciplina</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1">Questões por Disciplina</label>
                 <button 
                   onClick={() => {
                     const qtd = prompt("Quantidade de questões para cada disciplina:")
@@ -1132,7 +1132,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                       }))
                     }
                   }}
-                  className="text-[10px] font-bold text-accent-fg hover:underline uppercase"
+                  className="text-xs font-bold text-accent-fg hover:underline uppercase"
                 >
                   Definir p/ Todas
                 </button>
@@ -1148,7 +1148,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
                          <span className={`text-sm font-medium truncate max-w-[200px] ${isHighlighted ? 'text-success-fg' : 'text-fg-muted'}`}>{c.nome}</span>
-                         <span className={`text-[10px] font-bold bg-white px-1.5 py-0.5 rounded border ${isHighlighted ? 'text-success-fg border-success-line' : 'text-fg-subtle border-zinc-200'}`} title="Questões disponíveis nesta turma">
+                         <span className={`text-xs font-bold bg-white px-1.5 py-0.5 rounded border ${isHighlighted ? 'text-success-fg border-success-line' : 'text-fg-subtle border-zinc-200'}`} title="Questões disponíveis nesta turma">
                            {filteredAvailableQuestions.filter((q: any) => 
                              q.disciplinas?.some((d: any) => normalizeText(d.nome || "") === normalizeText(c.nome || ""))
                            ).length}
@@ -1170,7 +1170,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                             setLoading(false)
                           }
                         }}
-                        className="text-[10px] font-bold text-accent-fg hover:text-accent-fg flex items-center gap-1 uppercase tracking-tighter mt-1"
+                        className="text-xs font-bold text-accent-fg hover:text-accent-fg flex items-center gap-1 mt-1"
                       >
                         <Search size={10} /> Selecionar Manuais
                       </button>
@@ -1279,7 +1279,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                   <div key={`${q.id}-${idx}`} className="bg-white border border-zinc-100 rounded-lg p-6 shadow-sm group hover:border-accent/25 transition-all">
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold text-accent-fg uppercase tracking-widest">Questão {idx + 1} • {q.disciplinas[0]?.nome}</span>
+                        <span className="text-xs font-semibold text-accent-fg">Questão {idx + 1} • {q.disciplinas[0]?.nome}</span>
                         <div 
                           className={`w-2 h-2 rounded-full ${q.tipo === 'RECUPERACAO' ? 'bg-warning' : 'bg-accent'}`} 
                           title={q.tipo === 'RECUPERACAO' ? 'Questão de Segunda Chamada' : 'Questão Normal'}
@@ -1321,20 +1321,20 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                     )}
                     <div className="mt-4 pt-4 border-t border-zinc-50 flex items-center gap-2 flex-wrap">
                       {q._count?.provas > 0 && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-accent-subtle text-accent-fg uppercase tracking-widest border border-accent/25" title="Já utilizada em outras avaliações">
+                        <span className="text-xs font-bold px-2 py-0.5 rounded bg-accent-subtle text-accent-fg border border-accent/25" title="Já utilizada em outras avaliações">
                           Usada em {q._count.provas} prova{q._count.provas > 1 ? 's' : ''}
                         </span>
                       )}
                       {q.unidade && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-accent-subtle text-accent-fg uppercase tracking-widest border border-accent/25">
+                        <span className="text-xs font-bold px-2 py-0.5 rounded bg-accent-subtle text-accent-fg border border-accent/25">
                           {q.unidade}ª Unidade
                         </span>
                       )}
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-accent-subtle text-accent-fg uppercase tracking-widest border border-accent/25">
+                      <span className="text-xs font-bold px-2 py-0.5 rounded bg-accent-subtle text-accent-fg border border-accent/25">
                         {q.disciplinas[0]?.nome}
                       </span>
                       {q.turmas?.[0] && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-100 text-fg-subtle uppercase tracking-widest border border-zinc-200">
+                        <span className="text-xs font-bold px-2 py-0.5 rounded bg-zinc-100 text-fg-subtle border border-zinc-200">
                           {q.turmas[0].nome}
                         </span>
                       )}
@@ -1375,7 +1375,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                 <div className="flex items-center gap-3">
                   <h2 className="text-2xl font-bold text-fg leading-tight">Avaliações Recentes</h2>
                   {!loadingHistory && Array.isArray(displayedProvas) && (
-                    <span className="bg-warning-subtle text-warning-fg text-[10px] font-semibold px-2.5 py-1 rounded-full uppercase tracking-widest hidden sm:block border border-warning-line">
+                    <span className="bg-warning-subtle text-warning-fg text-xs font-semibold px-2.5 py-1 rounded-full hidden sm:block border border-warning-line">
                       {displayedProvas.length} {displayedProvas.length === 1 ? 'Prova' : 'Provas'}
                     </span>
                   )}
@@ -1458,21 +1458,21 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                 <div key={p.id} className="bg-white p-6 rounded-xl border border-zinc-100 shadow-sm hover:shadow-card transition-all group">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex flex-wrap gap-2">
-                      <span className="bg-success-subtle text-success-fg text-[10px] font-semibold px-2 py-1 rounded uppercase tracking-widest border border-success-line">
+                      <span className="bg-success-subtle text-success-fg text-xs font-semibold px-2 py-1 rounded border border-success-line">
                         {p.turma?.nome}
                       </span>
                       {p.turma?.curso && (
-                        <span title={p.turma.curso} className="bg-accent-subtle text-accent-fg text-[10px] font-semibold px-2 py-1 rounded uppercase tracking-widest border border-accent/25 flex items-center justify-center">
+                        <span title={p.turma.curso} className="bg-accent-subtle text-accent-fg text-xs font-semibold px-2 py-1 rounded border border-accent/25 flex items-center justify-center">
                           {getCourseIcon(p.turma.curso)}
                         </span>
                       )}
                       {p.area?.nome && (
-                        <span className="bg-accent-subtle text-accent-fg text-[10px] font-semibold px-2 py-1 rounded uppercase tracking-widest border border-accent/25">
+                        <span className="bg-accent-subtle text-accent-fg text-xs font-semibold px-2 py-1 rounded border border-accent/25">
                           {p.area.nome}
                         </span>
                       )}
                     </div>
-                    <div className="text-[10px] text-fg-subtle font-bold flex items-center gap-1">
+                    <div className="text-xs text-fg-subtle font-bold flex items-center gap-1">
                       <Calendar size={12} />
                       {new Date(p.createdAt).toLocaleDateString('pt-BR')}
                     </div>
@@ -1669,7 +1669,7 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
           ) : (
             questoes.map((q: any, idx: number) => (
               <div key={q.id} className="bg-white p-6 rounded-lg border border-zinc-100 shadow-sm">
-                <span className="text-[10px] font-semibold text-accent-fg uppercase tracking-widest mb-2 block">Questão {idx + 1}</span>
+                <span className="text-xs font-semibold text-accent-fg mb-2 block">Questão {idx + 1}</span>
                 <div className="text-fg font-medium mb-4 leading-relaxed overflow-hidden break-words w-full" dangerouslySetInnerHTML={{ __html: q.enunciado }} />
                 {q.imagemUrl && (
                   <div className="mb-4 rounded-xl overflow-hidden border border-zinc-100 bg-zinc-50 flex justify-center">
@@ -1688,7 +1688,7 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
                       ? 'bg-success-subtle border-success-line text-success-fg font-bold' 
                       : 'bg-zinc-50 border-zinc-50 text-fg-subtle'
                     }`}>
-                      <span className={`w-5 h-5 rounded-full shrink-0 flex items-center justify-center text-[10px] ${
+                      <span className={`w-5 h-5 rounded-full shrink-0 flex items-center justify-center text-xs ${
                         q.correta === letter ? 'bg-success text-white' : 'bg-zinc-200 text-fg-subtle'
                       }`}>
                         {letter}
@@ -1707,7 +1707,7 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
         <div className="p-6 border-t border-zinc-100 bg-white flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-wrap items-end gap-3">
             <div className="space-y-2">
-              <label className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest">Formato</label>
+              <label className="text-xs font-semibold text-fg-subtle">Formato</label>
               <div className="flex gap-1 bg-zinc-100 p-1 rounded-xl">
                 <button 
                   onClick={() => setLocalLayout(1)}
@@ -1745,8 +1745,8 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
               <div className="flex items-center gap-2 text-left">
                 <Eye size={16} className={localAmpliada ? 'text-warning-fg' : 'text-fg-subtle group-hover:text-warning-fg'} />
                 <div>
-                  <p className="text-[11px] font-bold leading-tight">Prova Ampliada</p>
-                  <p className="text-[9px] font-medium opacity-70 leading-tight">Acessibilidade</p>
+                  <p className="text-xs font-bold leading-tight">Prova Ampliada</p>
+                  <p className="text-xs font-medium opacity-70 leading-tight">Acessibilidade</p>
                 </div>
               </div>
               <div className={`w-8 h-4 rounded-full relative transition-colors ${localAmpliada ? 'bg-warning' : 'bg-zinc-200'}`}>

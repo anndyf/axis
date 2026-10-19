@@ -72,7 +72,7 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
           </div>
           <button
             onClick={abrirNovo}
-            className="flex items-center space-x-2 bg-zinc-900 text-white px-5 py-3 rounded-lg font-medium hover:bg-zinc-800 transition-all text-xs uppercase tracking-widest active:scale-95 shadow-card"
+            className="flex items-center space-x-2 bg-zinc-900 text-white px-5 py-3 rounded-lg font-medium hover:bg-zinc-800 transition-all text-xs active:scale-95 shadow-card"
           >
             <Plus size={16} />
             <span>Novo Esquema</span>
@@ -92,7 +92,7 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
             </p>
             <button
               onClick={abrirNovo}
-              className="inline-flex items-center space-x-2 bg-zinc-900 text-white px-8 py-4 rounded-lg hover:bg-zinc-800 transition-all font-medium text-xs uppercase tracking-widest shadow-card active:scale-95"
+              className="inline-flex items-center space-x-2 bg-zinc-900 text-white px-8 py-4 rounded-lg hover:bg-zinc-800 transition-all font-medium text-xs shadow-card active:scale-95"
             >
               <Plus size={16} />
               <span>Criar Esquema</span>
@@ -109,7 +109,7 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
                     </div>
                     <div>
                       <h3 className="font-semibold text-fg">{esquema.nome}</h3>
-                      <p className="text-[11px] text-fg-subtle font-medium uppercase tracking-wide">
+                      <p className="text-xs text-fg-subtle font-medium">
                         {esquema.numUnidades} {esquema.numUnidades === 1 ? 'unidade' : 'unidades'} · nota mín. {esquema.notaMinimaAprovacao}
                       </p>
                     </div>
@@ -126,13 +126,13 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
 
                 <div className="flex flex-wrap gap-1.5 mb-4">
                   {esquema.unidades.map(u => (
-                    <span key={u.id} className="px-2.5 py-1 bg-zinc-50 border border-zinc-200 rounded-lg text-[10px] font-medium text-fg-muted">
+                    <span key={u.id} className="px-2.5 py-1 bg-zinc-50 border border-zinc-200 rounded-lg text-xs font-medium text-fg-muted">
                       {u.nome} ({u.atividades.length} {u.atividades.length === 1 ? 'atividade' : 'atividades'})
                     </span>
                   ))}
                 </div>
 
-                <div className="flex items-center gap-3 text-[10px] font-medium text-fg-subtle uppercase tracking-wide">
+                <div className="flex items-center gap-3 text-xs font-medium text-fg-subtle">
                   <span>{esquema._count.cursos} {esquema._count.cursos === 1 ? 'curso' : 'cursos'}</span>
                   <span>·</span>
                   <span>{esquema._count.turmas} {esquema._count.turmas === 1 ? 'turma' : 'turmas'}</span>

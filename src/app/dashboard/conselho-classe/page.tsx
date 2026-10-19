@@ -147,8 +147,8 @@ export default async function ConselhoClassePage() {
                    {tip.icon}
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-fg uppercase tracking-widest mb-1">{tip.title}</h3>
-                  <p className="text-[11px] font-medium text-fg-subtle uppercase leading-relaxed">{tip.description}</p>
+                  <h3 className="text-sm font-medium text-fg mb-1">{tip.title}</h3>
+                  <p className="text-xs font-medium text-fg-subtle uppercase leading-relaxed">{tip.description}</p>
                 </div>
              </div>
           ))}

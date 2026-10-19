@@ -45,15 +45,15 @@ export default async function MessagesPage() {
         <div className="flex flex-wrap items-center gap-6 bg-white border border-zinc-200 px-6 py-3 rounded-xl shadow-sm">
            <div className="flex items-center gap-2 group">
               <span className="w-2 h-2 rounded-full bg-zinc-500 shadow-card group-hover:scale-125 transition-transform"></span>
-              <p className="text-[10px] font-medium text-fg-muted uppercase tracking-widest">Suporte</p>
+              <p className="text-xs font-medium text-fg-muted">Suporte</p>
            </div>
            <div className="flex items-center gap-2 group">
               <span className="w-2 h-2 rounded-full bg-accent shadow-card group-hover:scale-125 transition-transform"></span>
-              <p className="text-[10px] font-medium text-fg-muted uppercase tracking-widest">Direção</p>
+              <p className="text-xs font-medium text-fg-muted">Direção</p>
            </div>
            <div className="flex items-center gap-2 group">
               <span className="w-2 h-2 rounded-full bg-success shadow-card group-hover:scale-125 transition-transform"></span>
-              <p className="text-[10px] font-medium text-fg-muted uppercase tracking-widest">Geral</p>
+              <p className="text-xs font-medium text-fg-muted">Geral</p>
            </div>
         </div>
       </div>
@@ -64,14 +64,14 @@ export default async function MessagesPage() {
           <LifeBuoy className="text-fg-muted w-7 h-7" />
         </div>
         <div className="flex-1 text-center md:text-left">
-          <p className="text-xs font-medium text-accent-fg uppercase tracking-widest mb-1">
+          <p className="text-xs font-medium text-accent-fg mb-1">
              Precisa de ajuda com os dados?
           </p>
           <p className="text-sm font-medium text-fg leading-relaxed">
             Se não estiver visualizando uma <span className="underline decoration-accent decoration-2 underline-offset-4">turma</span>, 
             <span className="ml-1 underline decoration-accent decoration-2 underline-offset-4">disciplina</span> ou 
             <span className="ml-1 underline decoration-accent decoration-2 underline-offset-4">estudante</span>, 
-            selecione a categoria <span className="px-2 py-0.5 bg-zinc-700 text-white rounded-md text-[10px] uppercase font-medium">Suporte Técnico</span> ao enviar sua mensagem.
+            selecione a categoria <span className="px-2 py-0.5 bg-zinc-700 text-white rounded-md text-xs uppercase font-medium">Suporte Técnico</span> ao enviar sua mensagem.
           </p>
         </div>
       </div>

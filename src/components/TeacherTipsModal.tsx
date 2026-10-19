@@ -61,7 +61,7 @@ export default function TeacherTipsModal({ storageKey, tips, title }: TeacherTip
               <Lightbulb className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-fg-subtle">Dica do sistema</p>
+              <p className="text-xs font-semibold text-fg-subtle">Dica do sistema</p>
               <h3 className="text-xl font-semibold text-fg leading-tight">{title}</h3>
             </div>
           </div>
@@ -98,7 +98,7 @@ export default function TeacherTipsModal({ storageKey, tips, title }: TeacherTip
                 />
               ))}
             </div>
-            <span className="text-xs font-semibold text-fg-subtle uppercase tracking-widest">
+            <span className="text-xs font-semibold text-fg-subtle">
               Passo {currentStep + 1} de {tips.length}
             </span>
           </div>

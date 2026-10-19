@@ -196,7 +196,7 @@ export default function PendenciasClient({
               <FileText size={28} />
             </div>
             <div>
-              <p className="text-sm font-bold text-fg-subtle uppercase tracking-wider">Total</p>
+              <p className="text-sm font-bold text-fg-subtle">Total</p>
               <h2 className="text-3xl font-semibold text-fg">{stats.total}</h2>
             </div>
           </div>
@@ -206,7 +206,7 @@ export default function PendenciasClient({
               <Clock size={28} />
             </div>
             <div>
-              <p className="text-sm font-bold text-fg-subtle uppercase tracking-wider">Pendentes</p>
+              <p className="text-sm font-bold text-fg-subtle">Pendentes</p>
               <h2 className="text-3xl font-semibold text-danger-fg">{stats.pendentes}</h2>
             </div>
           </div>
@@ -216,7 +216,7 @@ export default function PendenciasClient({
               <CheckCircle2 size={28} />
             </div>
             <div>
-              <p className="text-sm font-bold text-fg-subtle uppercase tracking-wider">Resolvidas</p>
+              <p className="text-sm font-bold text-fg-subtle">Resolvidas</p>
               <h2 className="text-3xl font-semibold text-success-fg">{stats.resolvidos}</h2>
             </div>
           </div>
@@ -279,8 +279,8 @@ export default function PendenciasClient({
                 <div className="flex items-center justify-between px-2">
                   <div className="flex items-center gap-3">
                     <div className="w-1.5 h-6 bg-accent rounded-full"></div>
-                    <h2 className="text-xl font-semibold text-fg uppercase tracking-tight">{group.nome}</h2>
-                    <span className="bg-zinc-200 text-fg-muted px-2 py-0.5 rounded-lg text-[10px] font-semibold uppercase tracking-widest">
+                    <h2 className="text-xl font-semibold text-fg">{group.nome}</h2>
+                    <span className="bg-zinc-200 text-fg-muted px-2 py-0.5 rounded-lg text-xs font-semibold">
                       {group.items.length} {group.items.length === 1 ? 'solicitação' : 'solicitações'}
                     </span>
                   </div>
@@ -288,7 +288,7 @@ export default function PendenciasClient({
                     <button
                       onClick={() => handleResolveAll(group.items.map(i => i.id), group.nome)}
                       disabled={resolvingGroup !== null}
-                      className="text-xs font-semibold text-accent-fg uppercase tracking-widest hover:text-accent-fg transition-colors flex items-center gap-2"
+                      className="text-xs font-semibold text-accent-fg hover:text-accent-fg transition-colors flex items-center gap-2"
                     >
                       {resolvingGroup === group.nome ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
                       Resolver Tudo
@@ -308,7 +308,7 @@ export default function PendenciasClient({
                                 <Clock size={14} /> {item.date}
                               </span>
                               {item.internalStatus && (
-                                <span className={`px-3 py-1 text-[10px] font-semibold uppercase tracking-widest rounded-lg border flex items-center gap-1.5 ${statusOptions.find(s => s.label === item.internalStatus)?.color || 'bg-zinc-100 text-fg-muted border-zinc-200'}`}>
+                                <span className={`px-3 py-1 text-xs font-semibold rounded-lg border flex items-center gap-1.5 ${statusOptions.find(s => s.label === item.internalStatus)?.color || 'bg-zinc-100 text-fg-muted border-zinc-200'}`}>
                                   <Tag size={10} /> {item.internalStatus}
                                 </span>
                               )}
@@ -330,10 +330,10 @@ export default function PendenciasClient({
                             <div className="flex flex-wrap items-center justify-between gap-4">
                               <div className="flex items-center gap-4">
                                 <div className="flex items-center gap-2">
-                                  <div className="w-6 h-6 rounded-full bg-accent-subtle flex items-center justify-center text-[10px] font-bold text-accent-fg">
+                                  <div className="w-6 h-6 rounded-full bg-accent-subtle flex items-center justify-center text-xs font-bold text-accent-fg">
                                     {item.professor.charAt(0).toUpperCase()}
                                   </div>
-                                  <p className="text-[11px] font-bold text-fg-subtle uppercase tracking-widest">
+                                  <p className="text-xs font-bold text-fg-subtle">
                                     De: <span className="text-fg-muted">{item.professor}</span>
                                   </p>
                                 </div>
@@ -341,7 +341,7 @@ export default function PendenciasClient({
                               
                               <button 
                                 onClick={() => toggleExpand(item.id)}
-                                className="text-xs font-semibold text-fg-subtle hover:text-accent-fg uppercase tracking-widest flex items-center gap-1 transition-colors"
+                                className="text-xs font-semibold text-fg-subtle hover:text-accent-fg flex items-center gap-1 transition-colors"
                               >
                                 {item.replies.length > 0 ? `${item.replies.length} ${item.replies.length === 1 ? 'Mensagem' : 'Mensagens'}` : 'Ver Detalhes'}
                                 {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -372,11 +372,11 @@ export default function PendenciasClient({
                                 <div className="grid grid-cols-1 gap-2 animate-fade-in">
                                   <div className="flex gap-2">
                                     <div className="flex-1 flex flex-col gap-1">
-                                      <label className="text-[9px] font-semibold text-fg-subtle uppercase tracking-widest ml-1">Status Interno:</label>
+                                      <label className="text-xs font-semibold text-fg-subtle ml-1">Status Interno:</label>
                                       <select 
                                         value={item.internalStatus || ""}
                                         onChange={(e) => handleStatusUpdate(item.id, e.target.value || null)}
-                                        className="w-full bg-zinc-100 border-none rounded-xl px-3 py-2 text-[10px] font-bold text-fg-muted outline-none focus:ring-2 focus:ring-ring"
+                                        className="w-full bg-zinc-100 border-none rounded-xl px-3 py-2 text-xs font-bold text-fg-muted outline-none focus:ring-2 focus:ring-ring"
                                       >
                                         <option value="">Sem Status</option>
                                         {statusOptions.map(opt => (
@@ -397,7 +397,7 @@ export default function PendenciasClient({
                             {/* Original Observation */}
                             {item.observacao && (
                               <div className="space-y-2">
-                                <h4 className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest">Solicitação Original</h4>
+                                <h4 className="text-xs font-semibold text-fg-subtle">Solicitação Original</h4>
                                 <div className="bg-white p-4 rounded-lg border border-zinc-200 text-sm text-fg-muted">
                                   {item.observacao}
                                 </div>
@@ -405,20 +405,20 @@ export default function PendenciasClient({
                             )}
 
                             <div className="space-y-4">
-                              <h4 className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest">Linha do Tempo / Conversa</h4>
+                              <h4 className="text-xs font-semibold text-fg-subtle">Linha do Tempo / Conversa</h4>
                               {item.replies.length === 0 ? (
                                 <p className="text-sm text-fg-subtle italic">Nenhum evento registrado ainda.</p>
                               ) : (
                                 <div className="space-y-4">
                                   {item.replies.map((reply: any) => (
                                     <div key={reply.id} className="flex gap-3 items-start">
-                                      <div className="w-8 h-8 rounded-xl bg-white border border-zinc-200 flex items-center justify-center text-[10px] font-bold text-fg-subtle shrink-0">
+                                      <div className="w-8 h-8 rounded-xl bg-white border border-zinc-200 flex items-center justify-center text-xs font-bold text-fg-subtle shrink-0">
                                         {reply.sender.name?.charAt(0) || reply.sender.username.charAt(0)}
                                       </div>
                                       <div className="bg-white p-4 rounded-lg border border-zinc-200 shadow-sm flex-1">
                                         <div className="flex justify-between items-center mb-2">
-                                          <span className="text-[11px] font-bold text-fg-muted">{reply.sender.name || reply.sender.username}</span>
-                                          <span className="text-[10px] text-fg-subtle font-medium">{new Date(reply.createdAt).toLocaleString('pt-BR')}</span>
+                                          <span className="text-xs font-bold text-fg-muted">{reply.sender.name || reply.sender.username}</span>
+                                          <span className="text-xs text-fg-subtle font-medium">{new Date(reply.createdAt).toLocaleString('pt-BR')}</span>
                                         </div>
                                         <div className="text-sm text-fg-muted prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: reply.content }} />
                                       </div>
@@ -451,7 +451,7 @@ export default function PendenciasClient({
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-fg tracking-tight">Responder Chamado</h2>
-                  <p className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest mt-0.5">Chamado #{replyingTo.id.slice(-6).toUpperCase()} - {replyingTo.estudante}</p>
+                  <p className="text-xs font-semibold text-fg-subtle mt-0.5">Chamado #{replyingTo.id.slice(-6).toUpperCase()} - {replyingTo.estudante}</p>
                 </div>
               </div>
               <button 
@@ -465,7 +465,7 @@ export default function PendenciasClient({
             <div className="p-8 space-y-6">
               {/* Templates Section */}
               <div>
-                <label className="text-[11px] font-semibold text-fg-subtle uppercase tracking-widest ml-1 mb-3 block">Mensagens Rápidas (Templates)</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1 mb-3 block">Mensagens Rápidas (Templates)</label>
                 <div className="flex flex-wrap gap-2">
                   {templates.map(template => (
                     <button
@@ -480,7 +480,7 @@ export default function PendenciasClient({
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-fg-subtle uppercase tracking-widest ml-1 mb-2 block">Sua Resposta</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1 mb-2 block">Sua Resposta</label>
                 <textarea
                   autoFocus
                   placeholder="Escreva aqui sua resposta para o professor..."

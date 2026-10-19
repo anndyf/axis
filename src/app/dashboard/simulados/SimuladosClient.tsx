@@ -364,7 +364,7 @@ export default function SimuladosClient({
               {(user.isSuperuser || user.isDirecao) && (
                 <Link 
                   href="/dashboard/simulados/responsaveis"
-                  className="flex items-center gap-2 bg-zinc-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-zinc-800 transition-all text-xs uppercase tracking-widest active:scale-95 shadow-card"
+                  className="flex items-center gap-2 bg-zinc-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-zinc-800 transition-all text-xs active:scale-95 shadow-card"
                 >
                   <Users size={16} /> Designar Responsáveis
                 </Link>
@@ -389,7 +389,7 @@ export default function SimuladosClient({
                  </p>
               </div>
               <div className="text-right">
-                 <p className="text-xs font-bold text-fg-subtle uppercase tracking-widest">Desempenho</p>
+                 <p className="text-xs font-bold text-fg-subtle">Desempenho</p>
                  <p className="text-sm font-medium text-fg">Média: {stats.media} | Aprovados: {stats.total > 0 ? Math.round((stats.aprovados / stats.total) * 100) : 0}%</p>
               </div>
            </div>
@@ -406,8 +406,8 @@ export default function SimuladosClient({
                    {tip.icon}
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-fg uppercase tracking-widest mb-1">{tip.title}</h3>
-                  <p className="text-[11px] font-medium text-fg-subtle uppercase leading-relaxed">{tip.description}</p>
+                  <h3 className="text-sm font-medium text-fg mb-1">{tip.title}</h3>
+                  <p className="text-xs font-medium text-fg-subtle uppercase leading-relaxed">{tip.description}</p>
                 </div>
              </div>
           ))}
@@ -418,7 +418,7 @@ export default function SimuladosClient({
             <div className="absolute top-0 right-0 w-32 h-32 bg-danger-subtle rounded-full -mr-16 -mt-16 opacity-50 blur-3xl"></div>
             
             <div className="flex-1 min-w-[200px] space-y-2">
-                <label className="text-[10px] font-medium text-fg-subtle uppercase tracking-[0.2em] ml-2">Filtrar por Turma</label>
+                <label className="text-xs font-medium text-fg-subtle ml-2">Filtrar por Turma</label>
                 <div className="relative group">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-zinc-50 rounded-lg text-fg-subtle group-focus-within:text-danger-fg group-focus-within:bg-danger-subtle transition-all">
                     <Users size={16} />
@@ -435,7 +435,7 @@ export default function SimuladosClient({
             </div>
 
             <div className="flex-1 min-w-[200px] space-y-2">
-                <label className="text-[10px] font-medium text-fg-subtle uppercase tracking-[0.2em] ml-2">
+                <label className="text-xs font-medium text-fg-subtle ml-2">
                    {selectedUnidade === "1" ? "Área de Conhecimento" : "Prova"}
                 </label>
                 <div className="relative group">
@@ -472,7 +472,7 @@ export default function SimuladosClient({
             </div>
 
                         <div className="flex-1 min-w-[200px] space-y-2">
-                <label className="text-[10px] font-medium text-fg-subtle uppercase tracking-[0.2em] ml-2">Unidade / Etapa</label>
+                <label className="text-xs font-medium text-fg-subtle ml-2">Unidade / Etapa</label>
                 <div className="flex bg-zinc-50 p-1.5 rounded-lg shadow-card border border-zinc-100">
                   <button
                     onClick={() => setSelectedUnidade("1")}
@@ -495,11 +495,11 @@ export default function SimuladosClient({
 
             <div className="flex items-center gap-3 pb-1">
                 <div className="text-center px-4 py-2 bg-zinc-50 rounded-xl border border-zinc-200">
-                    <p className="text-[10px] font-medium text-fg-subtle uppercase tracking-widest">Média</p>
+                    <p className="text-xs font-medium text-fg-subtle">Média</p>
                     <p className="text-lg font-semibold text-fg-muted leading-none mt-1">{stats.media}</p>
                 </div>
                 <div className="text-center px-4 py-2 bg-success-subtle rounded-xl border border-success-line">
-                    <p className="text-[10px] font-medium text-success uppercase tracking-widest">Aprov.</p>
+                    <p className="text-xs font-medium text-success">Aprov.</p>
                     <p className="text-lg font-semibold text-success-fg leading-none mt-1">{stats.total > 0 ? Math.round((stats.aprovados / stats.total) * 100) : 0}%</p>
                 </div>
             </div>
@@ -527,7 +527,7 @@ export default function SimuladosClient({
                  )}
                </div>
                {launchInfo && (
-                  <p className="text-[10px] font-medium text-fg-subtle uppercase tracking-widest mt-1.5 flex items-center gap-1.5">
+                  <p className="text-xs font-medium text-fg-subtle mt-1.5 flex items-center gap-1.5">
                      <span className="w-1.5 h-1.5 rounded-full bg-success"></span>
                      Último lançamento por <span className="text-fg-muted font-bold">{launchInfo.author}</span> em {launchInfo.date}
                   </p>
@@ -576,14 +576,14 @@ export default function SimuladosClient({
             <div className="px-4 py-3 bg-accent-subtle border-b border-accent/25 flex items-center justify-between gap-4 print:hidden">
               <div className="flex items-center gap-2 text-accent-fg">
                 <Info size={16} className="shrink-0" />
-                <p className="text-[11px] font-bold uppercase tracking-wider">Algum aluno não está aparecendo na lista desta turma?</p>
+                <p className="text-xs font-bold">Algum aluno não está aparecendo na lista desta turma?</p>
               </div>
               <button
                 onClick={() => {
                   setMissingStudentForm(p => ({ ...p, turmaId: selectedTurma }))
                   setShowMissingStudentModal(true)
                 }}
-                className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-4 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-widest transition-all shadow-card active:scale-95 shrink-0"
+                className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-4 py-2 rounded-xl text-xs font-semibold transition-all shadow-card active:scale-95 shrink-0"
               >
                 <UserPlus size={14} />
                 Reportar Ausência
@@ -595,12 +595,12 @@ export default function SimuladosClient({
             <table className="w-full text-left border-collapse">
               <thead className="bg-zinc-50 border-b border-zinc-300">
                 <tr>
-                  <th className="px-4 py-4 w-12 text-center text-sm font-medium text-fg-subtle uppercase tracking-widest border-b">#</th>
-                  <th className="px-6 py-4 print:py-2 print:px-2 text-sm print:text-xs font-medium text-fg-subtle uppercase tracking-widest border-b print:border-zinc-800">Estudante</th>
-                  <th className="px-2 py-4 print:py-2 print:px-2 text-sm print:text-xs font-medium text-fg-subtle uppercase tracking-widest w-24 text-center border-b print:border-zinc-800">Falta</th>
-                  <th className="px-4 py-4 print:py-2 print:px-2 text-sm print:text-xs font-medium text-fg-subtle uppercase tracking-widest w-32 text-center border-b print:border-zinc-800">Nota</th>
-                  <th className="px-4 py-4 print:py-2 print:px-2 text-sm print:text-xs font-medium text-fg-subtle uppercase tracking-widest w-32 text-center border-b print:border-zinc-800">2ª Chamada</th>
-                  <th className="px-6 py-4 print:py-2 print:px-2 text-sm print:text-xs font-medium text-fg-subtle uppercase tracking-widest text-center border-b print:border-zinc-800">Status</th>
+                  <th className="px-4 py-4 w-12 text-center text-sm font-medium text-fg-subtle border-b">#</th>
+                  <th className="px-6 py-4 print:py-2 print:px-2 text-sm print:text-xs font-medium text-fg-subtle border-b print:border-zinc-800">Estudante</th>
+                  <th className="px-2 py-4 print:py-2 print:px-2 text-sm print:text-xs font-medium text-fg-subtle w-24 text-center border-b print:border-zinc-800">Falta</th>
+                  <th className="px-4 py-4 print:py-2 print:px-2 text-sm print:text-xs font-medium text-fg-subtle w-32 text-center border-b print:border-zinc-800">Nota</th>
+                  <th className="px-4 py-4 print:py-2 print:px-2 text-sm print:text-xs font-medium text-fg-subtle w-32 text-center border-b print:border-zinc-800">2ª Chamada</th>
+                  <th className="px-6 py-4 print:py-2 print:px-2 text-sm print:text-xs font-medium text-fg-subtle text-center border-b print:border-zinc-800">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-200">
@@ -609,7 +609,7 @@ export default function SimuladosClient({
                     <td colSpan={6} className="px-6 py-16 text-center">
                       <div className="flex flex-col items-center gap-2">
                         <Loader2 className="w-8 h-8 text-fg-muted animate-spin" />
-                        <p className="text-fg-subtle text-xs font-medium uppercase tracking-widest animate-pulse">Sincronizando...</p>
+                        <p className="text-fg-subtle text-xs font-medium animate-pulse">Sincronizando...</p>
                       </div>
                     </td>
                   </tr>
@@ -617,7 +617,7 @@ export default function SimuladosClient({
                   <tr>
                     <td colSpan={6} className="px-6 py-16 text-center text-zinc-300">
                       <BarChart3 className="w-12 h-12 opacity-20 mx-auto mb-3" />
-                      <p className="text-xs font-medium uppercase tracking-widest">Selecione os filtros para iniciar</p>
+                      <p className="text-xs font-medium">Selecione os filtros para iniciar</p>
                     </td>
                   </tr>
                 ) : (
@@ -643,7 +643,7 @@ export default function SimuladosClient({
                          <td className="px-6 py-3.5 print:py-1.5 print:px-2">
                            <div className="flex flex-col">
                              <span className="text-base print:text-sm font-medium text-fg-muted print:text-fg uppercase">{est.nome}</span>
-                             <span className="text-[11px] print:text-[9px] font-medium text-fg-subtle tracking-widest uppercase">Matrícula: {est.matricula}</span>
+                             <span className="text-xs print:text-xs font-medium text-fg-subtle">Matrícula: {est.matricula}</span>
                            </div>
                          </td>
                          <td className="px-2 py-3.5 text-center">
@@ -696,7 +696,7 @@ export default function SimuladosClient({
                         </td>
                         <td className="px-6 py-3.5 print:py-1.5 print:px-2 text-center">
                           {hasNota ? (
-                            <span className={`inline-flex px-3 py-1 print:px-0 print:py-0 rounded-full print:rounded-none text-[10px] print:text-[10px] font-semibold uppercase tracking-widest border print:border-none shadow-sm print:shadow-none print:bg-transparent print:text-fg-muted ${
+                            <span className={`inline-flex px-3 py-1 print:px-0 print:py-0 rounded-full print:rounded-none text-xs print:text-xs font-semibold border print:border-none shadow-sm print:shadow-none print:bg-transparent print:text-fg-muted ${
                               isFalta && nota2 < 0 ? 'bg-warning-subtle text-warning-fg border-warning-line' :
                               isAltaPerformance ? 'bg-success-subtle text-success-fg border-success-line' : 
                               isNaMedia ? 'bg-zinc-200 text-fg border-zinc-300' :
@@ -705,7 +705,7 @@ export default function SimuladosClient({
                               {isFalta && nota2 < 0 ? 'Faltou' : isAltaPerformance ? 'Alta Performance' : isNaMedia ? 'Na Média' : 'Abaixo da Média'}
                             </span>
                           ) : (
-                            <span className="text-zinc-300 text-[10px] font-medium uppercase tracking-widest italic opacity-50">Não Lançado</span>
+                            <span className="text-zinc-300 text-xs font-medium italic opacity-50">Não Lançado</span>
                           )}
                         </td>
                       </tr>
@@ -719,7 +719,7 @@ export default function SimuladosClient({
           {filteredEstudantes.length > 0 && canLaunch && (
             <div className="p-5 bg-zinc-50 border-t border-zinc-200 flex justify-end items-center gap-4 print:hidden">
                <div className="hidden md:block">
-                  <p className="text-[11px] font-medium text-fg-subtle uppercase tracking-widest">Verifique se as notas são de 0.0 a 4.0 antes de salvar.</p>
+                  <p className="text-xs font-medium text-fg-subtle">Verifique se as notas são de 0.0 a 4.0 antes de salvar.</p>
                </div>
                <button
                  onClick={handleSubmit}
@@ -741,8 +741,8 @@ export default function SimuladosClient({
               <div className="flex items-center gap-3">
                  <div className="w-10 h-10 bg-zinc-600 text-white rounded-xl flex items-center justify-center shadow-card"><Save size={20}/></div>
                   <div>
-                     <h3 className="text-lg font-medium text-fg uppercase tracking-tight">Consolidar Dados</h3>
-                    <p className="text-xs font-medium text-fg-subtle uppercase tracking-widest">Revise as alterações do Simulado</p>
+                     <h3 className="text-lg font-medium text-fg">Consolidar Dados</h3>
+                    <p className="text-xs font-medium text-fg-subtle">Revise as alterações do Simulado</p>
                   </div>
               </div>
               <button onClick={() => setShowModal(false)} className="p-2 hover:bg-zinc-300 rounded-xl transition-all"><X size={20}/></button>
@@ -752,7 +752,7 @@ export default function SimuladosClient({
                  <div key={i} className="flex items-center justify-between bg-white p-3 rounded-lg border border-zinc-200 shadow-sm">
                    <span className="text-sm font-medium text-fg-muted uppercase truncate pr-4">{est.nome}</span>
                    <div className="flex gap-2">
-                      <span className="text-[11px] font-medium bg-zinc-50 text-fg-muted px-2.5 py-1 rounded-lg border border-zinc-200">
+                      <span className="text-xs font-medium bg-zinc-50 text-fg-muted px-2.5 py-1 rounded-lg border border-zinc-200">
                         Nova Nota: {notasTemp[est.matricula] || '0.0'}
                       </span>
                    </div>
@@ -764,7 +764,7 @@ export default function SimuladosClient({
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-6 py-3 rounded-xl font-medium text-fg-muted hover:bg-zinc-200 transition-all uppercase tracking-widest text-xs flex-1 md:flex-none text-center"
+                  className="px-6 py-3 rounded-xl font-medium text-fg-muted hover:bg-zinc-200 transition-all text-xs flex-1 md:flex-none text-center"
                 >
                   Continuar Editando
                 </button>
@@ -772,7 +772,7 @@ export default function SimuladosClient({
                   type="button"
                   onClick={handleSave}
                   disabled={saving}
-                  className="px-8 py-3 bg-zinc-600 text-white rounded-xl font-medium hover:bg-zinc-700 transition-all shadow-card flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 uppercase tracking-widest text-xs flex-1 md:flex-none"
+                  className="px-8 py-3 bg-zinc-600 text-white rounded-xl font-medium hover:bg-zinc-700 transition-all shadow-card flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 text-xs flex-1 md:flex-none"
                 >
                   {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                   {saving ? 'Confirmando...' : 'Confirmar e Salvar'}
@@ -801,7 +801,7 @@ export default function SimuladosClient({
             <div className="p-6 bg-zinc-50 border-t border-zinc-100">
               <button
                 onClick={() => setShowWelcomeModal(false)}
-                className="w-full py-3.5 bg-accent hover:bg-accent-hover text-on-accent rounded-xl font-bold uppercase tracking-widest text-xs transition-all shadow-card active:scale-95"
+                className="w-full py-3.5 bg-accent hover:bg-accent-hover text-on-accent rounded-xl font-bold text-xs transition-all shadow-card active:scale-95"
               >
                 Ciente, iniciar lançamentos
               </button>
@@ -846,9 +846,9 @@ export default function SimuladosClient({
               <table className="w-full text-left border-collapse">
                 <thead className="bg-zinc-50 border-b border-zinc-300">
                   <tr>
-                    <th className="px-4 py-3 text-xs font-medium text-fg-subtle uppercase tracking-widest border-b">Q.</th>
-                    <th className="px-4 py-3 text-xs font-medium text-fg-subtle uppercase tracking-widest border-b">Disciplina</th>
-                    <th className="px-4 py-3 text-xs font-medium text-fg-subtle uppercase tracking-widest border-b text-center">Correta</th>
+                    <th className="px-4 py-3 text-xs font-medium text-fg-subtle border-b">Q.</th>
+                    <th className="px-4 py-3 text-xs font-medium text-fg-subtle border-b">Disciplina</th>
+                    <th className="px-4 py-3 text-xs font-medium text-fg-subtle border-b text-center">Correta</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100">
@@ -886,7 +886,7 @@ export default function SimuladosClient({
               </p>
 
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-fg-subtle uppercase tracking-widest ml-1">Turma do Estudante *</label>
+                <label className="text-xs font-bold text-fg-subtle ml-1">Turma do Estudante *</label>
                 <select
                   required
                   value={missingStudentForm.turmaId}
@@ -901,7 +901,7 @@ export default function SimuladosClient({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-fg-subtle uppercase tracking-widest ml-1">Nome Completo do Estudante *</label>
+                <label className="text-xs font-bold text-fg-subtle ml-1">Nome Completo do Estudante *</label>
                 <input
                   type="text"
                   required
@@ -913,7 +913,7 @@ export default function SimuladosClient({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-fg-subtle uppercase tracking-widest ml-1">Matrícula *</label>
+                <label className="text-xs font-bold text-fg-subtle ml-1">Matrícula *</label>
                 <input
                   type="text"
                   required
@@ -925,7 +925,7 @@ export default function SimuladosClient({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-fg-subtle uppercase tracking-widest ml-1">Motivo da Solicitação *</label>
+                <label className="text-xs font-bold text-fg-subtle ml-1">Motivo da Solicitação *</label>
                 <textarea
                   required
                   value={missingStudentForm.observacao}
@@ -948,7 +948,7 @@ export default function SimuladosClient({
                       key={motivo}
                       type="button"
                       onClick={() => setMissingStudentForm(p => ({ ...p, observacao: motivo }))}
-                      className="text-[9px] font-bold bg-zinc-100 hover:bg-accent-subtle hover:text-accent-fg text-fg-subtle px-2.5 py-1.5 rounded-lg border border-zinc-200 hover:border-accent/25 transition-all cursor-pointer"
+                      className="text-xs font-bold bg-zinc-100 hover:bg-accent-subtle hover:text-accent-fg text-fg-subtle px-2.5 py-1.5 rounded-lg border border-zinc-200 hover:border-accent/25 transition-all cursor-pointer"
                     >
                       {motivo}
                     </button>

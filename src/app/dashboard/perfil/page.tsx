@@ -95,7 +95,7 @@ export default function ProfilePage() {
                   {session?.user?.email}
                 </p>
                 
-                <div className="mt-4 inline-flex items-center px-3 py-1 rounded-full bg-zinc-50 text-fg-muted text-xs font-medium uppercase tracking-wider">
+                <div className="mt-4 inline-flex items-center px-3 py-1 rounded-full bg-zinc-50 text-fg-muted text-xs font-medium">
                   {session?.user?.isSuperuser ? "Administrador" : "Professor"}
                 </div>
              </div>
@@ -112,7 +112,7 @@ export default function ProfilePage() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
-                <label className="text-xs font-medium text-fg-subtle uppercase tracking-widest ml-1">
+                <label className="text-xs font-medium text-fg-subtle ml-1">
                   Senha Atual
                 </label>
                 <input
@@ -126,7 +126,7 @@ export default function ProfilePage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-2">
-                  <label className="text-xs font-medium text-fg-subtle uppercase tracking-widest ml-1">
+                  <label className="text-xs font-medium text-fg-subtle ml-1">
                     Nova Senha
                   </label>
                   <input
@@ -139,7 +139,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-medium text-fg-subtle uppercase tracking-widest ml-1">
+                  <label className="text-xs font-medium text-fg-subtle ml-1">
                     Confirmar Nova Senha
                   </label>
                   <input

@@ -135,7 +135,7 @@ export default function IdentidadeClient({ nomeEscola, corInicial, logoInicial, 
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={logo} alt="" className="size-6 rounded object-contain" />
                 ) : (
-                  <span className="flex size-6 items-center justify-center rounded bg-accent text-[11px] font-semibold text-on-accent">{nomeEscola.charAt(0)}</span>
+                  <span className="flex size-6 items-center justify-center rounded bg-accent text-xs font-semibold text-on-accent">{nomeEscola.charAt(0)}</span>
                 )}
                 <span className="truncate text-xs font-semibold text-fg">{nomeEscola}</span>
               </div>

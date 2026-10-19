@@ -60,7 +60,7 @@ export default function ConselhoClasseList({
           <div className="absolute top-0 right-0 w-32 h-32 bg-zinc-50 rounded-full -mr-16 -mt-16 opacity-50 blur-3xl"></div>
           
           <div className="flex-1 min-w-[300px] space-y-2">
-              <label className="text-[10px] font-medium text-fg-subtle uppercase tracking-[0.2em] ml-2">Turma ou Curso</label>
+              <label className="text-xs font-medium text-fg-subtle ml-2">Turma ou Curso</label>
               <div className="relative group">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-zinc-50 rounded-lg text-fg-subtle group-focus-within:text-fg-muted group-focus-within:bg-zinc-50 transition-all">
                       <Search size={18} />
@@ -78,7 +78,7 @@ export default function ConselhoClasseList({
           <div className="pb-2.5">
               <div className="flex items-center gap-2 bg-zinc-50 px-4 py-2.5 rounded-lg border border-zinc-200 shadow-sm">
                   <span className="w-2 h-2 rounded-full bg-zinc-500 animate-pulse"></span>
-                  <span className="text-[10px] font-semibold text-fg-muted uppercase tracking-widest">Sincronização Ativa</span>
+                  <span className="text-xs font-semibold text-fg-muted">Sincronização Ativa</span>
               </div>
           </div>
       </div>
@@ -86,7 +86,7 @@ export default function ConselhoClasseList({
       {/* Listagem Estilo Premium */}
       <div className="bg-white rounded-xl shadow-card border border-zinc-200 overflow-hidden">
         <div className="p-8 border-b border-zinc-200 bg-zinc-50/10 flex items-center justify-between">
-           <h2 className="text-[10px] font-semibold text-fg-subtle uppercase tracking-[0.2em] flex items-center gap-3">
+           <h2 className="text-xs font-semibold text-fg-subtle flex items-center gap-3">
              <div className="w-8 h-8 rounded-lg bg-zinc-50 text-fg-muted flex items-center justify-center shadow-card">
                <Users size={16} />
              </div>
@@ -98,7 +98,7 @@ export default function ConselhoClasseList({
           {turnos.length === 0 ? (
             <div className="text-center py-20 text-zinc-300">
               <BarChart3 className="w-12 h-12 opacity-20 mx-auto mb-3" />
-              <p className="text-xs font-medium uppercase tracking-widest">Nenhuma turma para deliberar</p>
+              <p className="text-xs font-medium">Nenhuma turma para deliberar</p>
             </div>
           ) : turnos.map(turno => {
             const turmasNoTurno: TurmaProcessada[] = []
@@ -115,17 +115,17 @@ export default function ConselhoClasseList({
             return (
               <div key={turno}>
                 <div className="bg-zinc-50 px-6 py-2 border-b border-zinc-300">
-                   <span className={`px-3 py-0.5 text-white text-[9px] font-medium uppercase tracking-widest rounded-md ${getTurnoColor(turno)} shadow-sm`}>
+                   <span className={`px-3 py-0.5 text-white text-xs font-medium rounded-md ${getTurnoColor(turno)} shadow-sm`}>
                     {turno}
                   </span>
                 </div>
                 <table className="w-full text-left">
                   <thead className="bg-white border-b border-zinc-200">
                     <tr>
-                      <th className="px-6 py-3 text-[10px] font-medium text-fg-subtle uppercase tracking-widest">Turma / Curso</th>
-                      <th className="px-6 py-3 text-[10px] font-medium text-fg-subtle uppercase tracking-widest text-center">Situação IA</th>
-                      <th className="px-6 py-3 text-[10px] font-medium text-fg-subtle uppercase tracking-widest text-center">Status</th>
-                      <th className="px-6 py-3 text-[10px] font-medium text-fg-subtle uppercase tracking-widest text-center w-24">Ação</th>
+                      <th className="px-6 py-3 text-xs font-medium text-fg-subtle">Turma / Curso</th>
+                      <th className="px-6 py-3 text-xs font-medium text-fg-subtle text-center">Situação IA</th>
+                      <th className="px-6 py-3 text-xs font-medium text-fg-subtle text-center">Status</th>
+                      <th className="px-6 py-3 text-xs font-medium text-fg-subtle text-center w-24">Ação</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-50">
@@ -138,20 +138,20 @@ export default function ConselhoClasseList({
                         <td className="px-6 py-4">
                            <div className="flex flex-col">
                               <span className="text-sm font-medium text-fg-muted uppercase group-hover:text-fg-muted transition-colors">{turma.nome}</span>
-                              <span className="text-[10px] font-medium text-fg-subtle uppercase tracking-wider">{turma.curso}</span>
+                              <span className="text-xs font-medium text-fg-subtle">{turma.curso}</span>
                            </div>
                         </td>
                         <td className="px-6 py-4 text-center">
                            <div className="flex flex-col items-center">
                               {turma.isResolvido ? (
-                                <span className="text-[10px] font-medium text-success-fg bg-success-subtle px-2 py-0.5 rounded border border-success-line uppercase">{turma.totalAlunosResolvidos} DECIDIDOS</span>
+                                <span className="text-xs font-medium text-success-fg bg-success-subtle px-2 py-0.5 rounded border border-success-line uppercase">{turma.totalAlunosResolvidos} DECIDIDOS</span>
                               ) : (
-                                <span className="text-[10px] font-medium text-danger-fg bg-danger-subtle px-2 py-0.5 rounded border border-danger-line uppercase">{turma.totalAlunosPendentes} PENDENTES</span>
+                                <span className="text-xs font-medium text-danger-fg bg-danger-subtle px-2 py-0.5 rounded border border-danger-line uppercase">{turma.totalAlunosPendentes} PENDENTES</span>
                               )}
                            </div>
                         </td>
                         <td className="px-6 py-4 text-center">
-                           <span className={`text-[9px] font-medium px-2 py-1 rounded-full uppercase tracking-widest border border-current opacity-70 ${
+                           <span className={`text-xs font-medium px-2 py-1 rounded-full border border-current opacity-70 ${
                              turma.isResolvido ? 'text-success-fg' : 'text-danger-fg animate-pulse'
                            }`}>
                              {turma.isResolvido ? 'Fechado' : 'Em Conselho'}
