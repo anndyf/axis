@@ -32,10 +32,14 @@ Ambiente: PostgreSQL 16 local subiu; `axis_dev` e `axis_test` criados, migration
   - **[decisão]** Chamada POR_DIA força apuração GERAL (não há disciplina).
 - [x] Planejamento da chamada `src/lib/services/chamada.ts` (puro, `chamada.test.ts`): dia letivo pelo calendário (período, feriados da escola/turma, dias extras), tempos da disciplina pelo horário, POR_AULA/POR_DIA, validação das faltas.
   - **[decisão]** Chamada só em dia letivo com aula da disciplina no horário, nunca em data futura; sem calendário configurado, a chamada é recusada com aviso.
-- [ ] Tela de chamada do professor + diário
+- [x] Tela de chamada do professor + diário de classe — `/dashboard/chamada` (aulas do dia pelo horário, seletor de data, diários com nº de chamadas pendentes), `/dashboard/chamada/fazer` (todos presentes por padrão, um toque marca falta, ajuste de quantos tempos, conteúdo ministrado, "aula não dada"), `/dashboard/chamada/diario` (aulas dadas, conteúdo, faltas, dias com aula sem chamada, previstas × carga horária). Ações em `src/app/dashboard/chamada/actions.ts`, acesso em `src/lib/chamada-acesso.ts`, teste `src/lib/chamada-acoes.test.ts` (fluxo, regras, professor de outra disciplina, escola B x A, portal).
+  - **[decisão]** Item "Chamada e Diário" adicionado ao catálogo `src/lib/modules.ts` (dados do menu; o componente `DashboardSidebar` não foi tocado). Sem isso a tela ficaria inacessível. Se a sessão visual mexer no catálogo, é uma linha para reconciliar.
+  - **[decisão]** A aula é aberta/criada pela server action chamada no navegador, não na renderização da página (prefetch de link não cria registro).
+  - **[decisão]** "Aula não dada" mantém as faltas gravadas, sem efeito; salvar a chamada de novo volta a contá-la.
+  - Professor só vê/abre as próprias disciplinas; gestão vê todas da escola. Chamada diária (POR_DIA): professor com alguma disciplina na turma ou turma atribuída a ele.
 - [ ] Frequência no boletim, portal, relatórios e conselho
 - [ ] Justificativas (gestão) + relatório de infrequência + risco por faltas
 - [ ] Seed de aulas/faltas
 
 ## Próximo passo
-Tela de chamada do professor (server actions + página).
+Frequência no boletim, portal, relatórios e conselho.

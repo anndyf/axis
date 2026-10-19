@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { resolverEsquemaAvaliacaoId, paraEsquemaConfig, type EsquemaConfig } from '@/lib/services/notas'
+import { regraDoEsquema, type RegraFrequencia, type RegistroFrequencia } from '@/lib/services/frequencia'
 
 /**
  * Leitura de notas no modelo novo (NotaUnidade) para telas e PDFs -
@@ -16,6 +17,9 @@ export interface EsquemaDaTurma {
   config: EsquemaConfig
   notaMaxima: number
   etapas: { id: string; nome: string; ordem: number; peso: number }[]
+  /** regra de frequência do mesmo esquema (mínimo, GERAL/POR_COMPONENTE) */
+  frequencia: RegraFrequencia
+  registroFrequencia: RegistroFrequencia
 }
 
 /** Esquema efetivo da turma (override da turma ?? padrão do curso), com as etapas em ordem. */
@@ -32,5 +36,11 @@ export async function carregarEsquemaDaTurma(turma: { cursoId: string | null; es
   })
   if (!esquema) return null
 
-  return { config: paraEsquemaConfig(esquema), notaMaxima: esquema.notaMaxima, etapas: esquema.unidades }
+  return {
+    config: paraEsquemaConfig(esquema),
+    notaMaxima: esquema.notaMaxima,
+    etapas: esquema.unidades,
+    frequencia: regraDoEsquema(esquema),
+    registroFrequencia: esquema.registroFrequencia,
+  }
 }

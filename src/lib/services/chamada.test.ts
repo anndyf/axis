@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { aulasDoDia, planejarChamada, validarFaltas, chaveAula, hojeNaEscola, dataValida, diasComAulaAte } from './chamada'
+import { aulasDoDia, planejarChamada, validarFaltas, chaveAula, hojeNaEscola, dataValida, diasComAulaAte, aulasRestantes } from './chamada'
 
 const CAL = {
   inicio: '2026-02-02',
@@ -96,5 +96,23 @@ describe('utilitários', () => {
     const cal = { ...CAL, inicio: '2026-03-02', fim: '2026-03-10' }
     expect(diasComAulaAte('2026-03-09', 't', cal, HOR, 'mat')).toEqual(['2026-03-02', '2026-03-07', '2026-03-09'])
     expect(diasComAulaAte('2026-03-03', 't', cal, HOR, 'por')).toEqual(['2026-03-02', '2026-03-03'])
+  })
+})
+
+describe('aulasRestantes', () => {
+  const cal = { ...CAL, inicio: '2026-03-02', fim: '2026-03-10' }
+  it('POR_AULA conta tempos por disciplina depois da data', () => {
+    // depois de 06/03: sáb 07 (segue segunda: mat 2, por 1), seg 09 (mat 2, por 1), ter 10 (por 1)
+    const r = aulasRestantes('2026-03-06', 't', cal, HOR, 'POR_AULA')
+    expect(r.porDisciplina.get('mat')).toBe(4)
+    expect(r.porDisciplina.get('por')).toBe(3)
+    expect(r.total).toBe(7)
+  })
+  it('POR_DIA conta dias com aula', () => {
+    expect(aulasRestantes('2026-03-06', 't', cal, HOR, 'POR_DIA').total).toBe(3)
+  })
+  it('antes do início conta o período todo; depois do fim, zero', () => {
+    expect(aulasRestantes('2026-01-01', 't', cal, HOR, 'POR_DIA').total).toBe(aulasRestantes('2026-03-01', 't', cal, HOR, 'POR_DIA').total)
+    expect(aulasRestantes('2026-03-10', 't', cal, HOR, 'POR_AULA').total).toBe(0)
   })
 })

@@ -135,3 +135,36 @@ export function diasComAulaAte(
   const semanas = new Set(horario.filter((h) => h.disciplinaId && (disciplinaId === null || h.disciplinaId === disciplinaId)).map((h) => h.diaSemana))
   return dias.filter((d) => semanas.has(d.diaSemana)).map((d) => d.data)
 }
+
+/**
+ * Aulas (tempos) previstas pelo horário × calendário DEPOIS de `depoisDe`
+ * até o fim do período - base da projeção de frequência. POR_DIA conta 1
+ * por dia letivo com aula no horário.
+ */
+export function aulasRestantes(
+  depoisDe: string,
+  turmaId: string,
+  calendario: CalendarioEntrada,
+  horario: HorarioTempo[],
+  registro: RegistroFrequencia
+): { total: number; porDisciplina: Map<string, number> } {
+  const porDisciplina = new Map<string, number>()
+  const inicio = depoisDe >= chaveData(calendario.inicio)
+    ? new Date(Date.parse(`${depoisDe}T00:00:00Z`) + 86_400_000).toISOString().slice(0, 10)
+    : chaveData(calendario.inicio)
+  if (inicio > chaveData(calendario.fim)) return { total: 0, porDisciplina }
+
+  let total = 0
+  for (const dia of diasLetivos({ ...calendario, inicio }, turmaId)) {
+    const tempos = horario.filter((h) => h.diaSemana === dia.diaSemana && h.disciplinaId)
+    if (registro === 'POR_DIA') {
+      if (tempos.length) total += 1
+      continue
+    }
+    for (const h of tempos) {
+      porDisciplina.set(h.disciplinaId!, (porDisciplina.get(h.disciplinaId!) ?? 0) + 1)
+      total += 1
+    }
+  }
+  return { total, porDisciplina }
+}
