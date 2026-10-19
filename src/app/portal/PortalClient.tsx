@@ -264,7 +264,44 @@ export default function PortalClient({ initialData, user, escola, abaInicial }: 
               {estudante.notas.length === 0 ? (
                 <EmptyState icon={BookOpen} title="Nenhuma nota lançada ainda" description="As notas aparecem aqui assim que os professores lançarem." />
               ) : (
-                <div className="relative overflow-x-auto">
+                <>
+                {/* Celular: um cartão por disciplina */}
+                <ul className="divide-y divide-line-subtle md:hidden">
+                  {estudante.notas.map((nota: any) => {
+                    const risk = analyzeRisk(nota.etapas.map((e: EtapaDaNota) => e.nota), numUnidades, notaMinimaAprovacao)
+                    const r = RISCO[risk.level] ?? RISCO.NONE
+                    const f = frequencia?.porDisciplina[nota.disciplinaId]
+                    return (
+                      <li key={nota.id} className="px-4 py-4">
+                        <div className="flex items-start gap-3">
+                          <div className="min-w-0 flex-1">
+                            <p className="break-words text-sm font-semibold text-fg">{nota.disciplina.nome}</p>
+                            <div className="mt-1"><Badge tone={r.tom} dot>{r.rotulo}</Badge></div>
+                          </div>
+                          <div className="shrink-0 text-right">
+                            <p className="text-xs text-fg-subtle">Média</p>
+                            <p className={cn('text-xl font-semibold tabular-nums', nota.nota >= notaMinimaAprovacao ? 'text-fg' : 'text-danger-fg')}>{nota1(nota.nota)}</p>
+                          </div>
+                        </div>
+                        <dl className="mt-3 grid grid-cols-[repeat(auto-fill,minmax(4.5rem,1fr))] gap-2">
+                          {nota.etapas.map((etapa: EtapaDaNota, i: number) => (
+                            <div key={i} className="rounded-xl bg-subtle px-2 py-1.5 text-center">
+                              <dt className="truncate text-[11px] text-fg-subtle" title={nomesEtapas[i]}>{nomesEtapas[i] ?? `U${i + 1}`}</dt>
+                              <dd className={cn('text-sm font-medium tabular-nums', etapa.nota === null ? 'text-fg-disabled' : etapa.nota >= notaMinimaAprovacao ? 'text-fg' : 'text-danger-fg')}>{nota1(etapa.nota)}</dd>
+                            </div>
+                          ))}
+                          {frequencia && (
+                            <div className="rounded-xl bg-subtle px-2 py-1.5 text-center">
+                              <dt className="text-[11px] text-fg-subtle">Frequência</dt>
+                              <dd className={cn('text-sm font-medium tabular-nums', f?.percentual != null && f.percentual < frequencia.minimo ? 'text-danger-fg' : 'text-fg')}>{formatarFrequencia(f?.percentual ?? null)}</dd>
+                            </div>
+                          )}
+                        </dl>
+                      </li>
+                    )
+                  })}
+                </ul>
+                <div className="relative hidden overflow-x-auto md:block">
                   <table className="w-full min-w-[34rem] text-13">
                     <thead>
                       <tr className="border-b border-line text-xs text-fg-subtle">
@@ -305,6 +342,7 @@ export default function PortalClient({ initialData, user, escola, abaInicial }: 
                     </tbody>
                   </table>
                 </div>
+                </>
               )}
             </Card>
           </div>
