@@ -8,12 +8,13 @@ export const runtime = 'nodejs'
 
 export default async function AEEDashboardPage() {
   const session = await auth()
-  if (!session) redirect("/login")
+  if (!session?.user?.escolaId) redirect("/login")
+  const escolaId = session.user.escolaId
 
   const isAEE = (session.user as any).isAEE
   const isDirecao = session.user.isDirecao || session.user.isSuperuser || isAEE
 
-  const turmasWhere: any = {}
+  const turmasWhere: any = { escolaId }
   if (!isDirecao) {
     // Turmas vinculadas via Disciplinas OU manual
     turmasWhere.OR = [
@@ -29,11 +30,12 @@ export default async function AEEDashboardPage() {
   })
 
   // Busca perfis AEE
-  const aeeWhere: any = {}
+  const aeeWhere: any = { estudante: { escolaId } }
   if (!isDirecao) {
     // Alunos das turmas onde o professor tem disciplina vinculada OU manual
     aeeWhere.estudante = {
-      turma: { 
+      escolaId,
+      turma: {
         OR: [
           { usuariosPermitidos: { some: { id: session.user.id } } },
           { 
@@ -77,11 +79,12 @@ export default async function AEEDashboardPage() {
   // Busca estudantes que NÃO possuem ficha AEE (apenas para Direção)
   let estudantesSemAee: any[] = []
   if (isDirecao) {
-    const config = await prisma.globalConfig.findUnique({ where: { id: 'global' } })
-    const currentYear = config?.anoLetivoAtual || 2026
+    const config = await prisma.globalConfig.findUnique({ where: { id: escolaId } })
+    const currentYear = config?.anoLetivoAtual || new Date().getFullYear()
 
     estudantesSemAee = await prisma.estudante.findMany({
       where: {
+        escolaId,
         aeeProfile: { is: null },
         turma: { anoLetivo: currentYear }
       },

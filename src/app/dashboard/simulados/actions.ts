@@ -7,10 +7,10 @@ export async function reportarEstudanteFaltante(turmaId: string, nomeEstudante: 
   try {
     const session = await auth()
     const user = session?.user as any
-    if (!user) return { error: "Não autorizado" }
+    if (!user?.escolaId) return { error: "Não autorizado" }
 
     // Obter turma
-    const turma = await prisma.turma.findUnique({ where: { id: turmaId } })
+    const turma = await prisma.turma.findUnique({ where: { id: turmaId, escolaId: user.escolaId } })
     if (!turma) return { error: "Turma não encontrada" }
 
     const subject = `[Cadastro Pendente] Estudante ${nomeEstudante}`

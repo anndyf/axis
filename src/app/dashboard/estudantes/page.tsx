@@ -3,7 +3,8 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
-import { ArrowLeft, Plus, GraduationCap, Upload, Users, Accessibility, Pencil, FileText, Info, ShieldCheck } from "lucide-react"
+import { Plus, GraduationCap, Upload, Accessibility, Pencil, FileText, ShieldCheck } from "lucide-react"
+import { Avatar, Badge, EmptyState, PageHeader, buttonClasses } from "@/components/ui"
 import EstudantesFilter from "./EstudantesFilter"
 import PortalActivationAction from "./PortalActivationAction"
 import PortalActionsMenu from "./PortalActionsMenu"
@@ -25,11 +26,12 @@ async function getEstudantes(filters: {
   serie?: string;
   userId?: string;
   isDirecao?: boolean;
+  escolaId: string;
 }) {
-  const config = await prisma.globalConfig.findUnique({ where: { id: 'global' } })
+  const config = await prisma.globalConfig.findUnique({ where: { id: filters.escolaId } })
   const currentYear = config?.anoLetivoAtual || new Date().getFullYear()
 
-  const where: any = {}
+  const where: any = { escolaId: filters.escolaId }
   
   // Só aplicamos a restrição de ano letivo se NÃO houver uma busca por texto.
   // Se houver busca, queremos encontrar o aluno em qualquer ano para evitar duplicidade.
@@ -120,9 +122,10 @@ export default async function EstudantesPage({
 }) {
   const session = await auth()
   
-  if (!session) {
+  if (!session?.user?.escolaId) {
     redirect("/login")
   }
+  const escolaId = session.user.escolaId
 
   const resolvedParams = await searchParams
   const search = typeof resolvedParams.search === 'string' ? resolvedParams.search : undefined
@@ -137,12 +140,14 @@ export default async function EstudantesPage({
   // Utilizando cast 'any' para evitar erros de lint stale com o cliente Prisma gerado
   const [dbCursos, turmas] = await Promise.all([
     (prisma as any).curso.findMany({
+      where: { escolaId },
       select: { id: true, nome: true, modalidade: true },
       orderBy: { nome: 'asc' }
     }),
     (prisma as any).turma.findMany({
       where: {
-        anoLetivo: (await prisma.globalConfig.findUnique({ where: { id: 'global' } }))?.anoLetivoAtual || new Date().getFullYear(),
+        escolaId,
+        anoLetivo: (await prisma.globalConfig.findUnique({ where: { id: escolaId } }))?.anoLetivoAtual || new Date().getFullYear(),
         ...(isDirecao ? {} : {
           OR: [
             { usuariosPermitidos: { some: { id: session.user.id } } },
@@ -157,7 +162,7 @@ export default async function EstudantesPage({
 
   // Busca de estudantes apenas se houver filtros para não sobrecarregar
   const { estudantes, portalUserIds } = hasFilters 
-    ? await getEstudantes({ search, cursoId, turmaId, turno, serie, userId: session.user.id, isDirecao }) 
+    ? await getEstudantes({ search, cursoId, turmaId, turno, serie, userId: session.user.id, isDirecao, escolaId })
     : { estudantes: [], portalUserIds: new Set() }
 
   // Combinar cursos do banco (novos) com cursos legados (strings nas turmas)
@@ -174,226 +179,127 @@ export default async function EstudantesPage({
     }))
     .sort((a, b) => a.nome.localeCompare(b.nome))
 
+  const podeGerir = session.user.isSuperuser || session.user.isDirecao
+  const acaoIcone = "p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg"
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
-      <header className="bg-white/80 backdrop-blur-xl border-b border-slate-300 sticky top-0 z-50 -mx-4 -mt-4 md:-mx-8 md:-mt-8 mb-4 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto py-4">
-          <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
-            <div className="flex items-center space-x-5">
-              <Link
-                href="/dashboard"
-                className="p-2 hover:bg-slate-200 rounded-lg transition-colors text-slate-400 hover:text-slate-700"
-              >
-                <ArrowLeft size={20} />
-              </Link>
-              <div>
-                <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Estudantes</h1>
-                <p className="text-base text-slate-700 font-medium">Gerenciar cadastro de alunos</p>
-              </div>
-            </div>
-            
-            <div className={`grid grid-cols-2 md:flex md:items-center gap-2 ${(!session.user.isSuperuser && !session.user.isDirecao) ? 'hidden' : ''}`}>
-              <Link
-                href="/dashboard/aee"
-                className="flex items-center justify-center space-x-2 bg-indigo-50 text-indigo-700 px-3 md:px-4 py-2.5 rounded-lg hover:bg-indigo-100 transition-all border border-indigo-200 shadow-sm text-sm font-bold"
-              >
-                <Accessibility className="w-4 h-4" />
-                <span className="whitespace-nowrap">Painel AEE</span>
-              </Link>
-              <div className="hidden md:block w-px h-6 bg-slate-200 mx-1" />
-              <div className="col-span-2 md:col-auto">
-                <PortalActionsMenu />
-              </div>
-              <div className="hidden md:block w-px h-6 bg-slate-300 mx-1" />
-              <Link
-                href="/dashboard/estudantes/importar"
-                className="flex items-center justify-center space-x-2 bg-slate-700 text-white px-3 md:px-4 py-2.5 rounded-lg hover:bg-slate-800 transition-all shadow-sm text-sm font-medium"
-              >
-                <Upload className="w-4 h-4" />
-                <span className="whitespace-nowrap">Importar</span>
-              </Link>
-              <Link
-                href="/dashboard/estudantes/novo"
-                className="flex items-center justify-center space-x-2 bg-gradient-to-r from-green-600 to-green-700 text-white px-3 md:px-4 py-2.5 rounded-lg hover:from-green-700 hover:to-green-800 transition-all shadow-sm text-sm font-medium"
-              >
-                <Plus className="w-4 h-4" />
-                <span className="whitespace-nowrap">Novo Aluno</span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="mx-auto max-w-7xl space-y-4 pb-16">
+      <PageHeader
+        title="Estudantes"
+        description="Cadastro de alunos, acesso ao portal e boletins."
+        actions={podeGerir ? (
+          <>
+            <Link href="/dashboard/aee" className={buttonClasses({ variant: "ghost" })}>
+              <Accessibility size={16} strokeWidth={1.75} /> Painel AEE
+            </Link>
+            <PortalActionsMenu />
+            <Link href="/dashboard/estudantes/importar" className={buttonClasses({ variant: "secondary" })}>
+              <Upload size={16} strokeWidth={1.75} /> Importar
+            </Link>
+            <Link href="/dashboard/estudantes/novo" className={buttonClasses()}>
+              <Plus size={16} strokeWidth={1.75} /> Novo aluno
+            </Link>
+          </>
+        ) : undefined}
+      />
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-32">
-        {/* Legenda de Ícones - NOVO */}
-        <div className="bg-white/50 backdrop-blur p-4 rounded-3xl border border-white/50 shadow-sm flex flex-wrap items-center justify-center gap-8 mb-6">
-           <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-slate-100 text-slate-500 rounded-lg border border-slate-200">
-                 <ShieldCheck size={14} />
-              </div>
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Gestão de Acesso</span>
-           </div>
-           <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-slate-100 text-slate-500 rounded-lg border border-slate-200">
-                 <Pencil size={14} />
-              </div>
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Editar Dados</span>
-           </div>
-           <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-indigo-50 text-indigo-500 rounded-lg border border-indigo-200">
-                 <Accessibility size={14} />
-              </div>
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Ficha AEE</span>
-           </div>
-           <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-slate-100 text-slate-500 rounded-lg border border-slate-200">
-                 <FileText size={14} />
-              </div>
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Gerar Boletim</span>
-           </div>
-        </div>
+      <div className="bg-surface rounded-lg border border-line overflow-hidden">
+         <EstudantesFilter cursos={cursos} turmas={turmas} totalResults={estudantes.length} />
+         {estudantes.length > 0 && (
+           <p className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2 text-xs text-fg-subtle sm:px-5">
+             <span className="inline-flex items-center gap-1.5"><ShieldCheck size={14} strokeWidth={1.75} aria-hidden /> Acesso ao portal</span>
+             <span className="inline-flex items-center gap-1.5"><Pencil size={14} strokeWidth={1.75} aria-hidden /> Editar dados</span>
+             <span className="inline-flex items-center gap-1.5"><Accessibility size={14} strokeWidth={1.75} aria-hidden /> Ficha AEE</span>
+             <span className="inline-flex items-center gap-1.5"><FileText size={14} strokeWidth={1.75} aria-hidden /> Boletim</span>
+           </p>
+         )}
+      </div>
 
-        <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-300/40 border border-slate-200 overflow-hidden mb-6">
-           <EstudantesFilter cursos={cursos} turmas={turmas} totalResults={estudantes.length} />
-        </div>
-
-        <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-300/50 border border-slate-200 overflow-hidden">
-          {estudantes.length === 0 ? (
-            <div className="p-12 text-center">
-              <GraduationCap className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-slate-800 mb-2">
-                {hasFilters ? 'Nenhum estudante encontrado' : 'Pesquise por estudantes'}
-              </h3>
-              <p className="text-slate-700 mb-6">
-                {hasFilters 
-                  ? 'Tente ajustar os filtros de busca' 
-                  : 'Utilize a busca ou os filtros acima para carregar a lista de estudantes sem sobrecarregar o sistema.'}
-              </p>
-              {!hasFilters && (
-                <div className="flex justify-center gap-4">
-                  <Link
-                    href="/dashboard/estudantes/novo"
-                    className="inline-flex items-center space-x-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
-                  >
-                    <Plus className="w-5 h-5" />
-                    <span>Adicionar Estudante</span>
-                  </Link>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col">
-              {Object.entries(
-                estudantes.reduce((acc: any, estudante: any) => {
-                  const turma = estudante.turma.nome || "Sem Turma"
-                  if (!acc[turma]) acc[turma] = []
-                  acc[turma].push(estudante)
-                  return acc
-                }, {})
-              ).sort(([a], [b]) => a.localeCompare(b)).map(([turmaNome, estudantesDaTurma]: [string, any]) => (
-                <div key={turmaNome} className="mb-0 border-b-8 border-slate-100 last:border-0">
-                  <div className="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-                    <h2 className="text-base font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2">
-                      <Users className="w-5 h-5 text-slate-400" />
-                      {turmaNome}
-                    </h2>
-                    <span className="text-xs font-bold text-slate-500 bg-slate-200 px-3 py-1 rounded-full">{estudantesDaTurma.length} estudantes</span>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead className="bg-white border-b border-slate-200">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">
-                            Nome
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">
-                            Notas Lançadas
-                          </th>
-                          <th className="px-6 py-3 text-right text-xs font-bold text-slate-400 uppercase tracking-widest">
-                            Ações / Gestão
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-slate-100">
-                        {estudantesDaTurma.map((estudante: any) => (
-                          <tr key={estudante.matricula} className="hover:bg-slate-50 transition-colors">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="flex items-center">
-                                <div className="w-10 h-10 bg-slate-800 rounded-2xl flex items-center justify-center text-white font-bold shadow-md">
-                                  {estudante.nome.charAt(0).toUpperCase()}
-                                </div>
-                                <div className="ml-4">
-                                  <div className="text-sm font-bold text-slate-800 uppercase tracking-tight flex items-center gap-2">
-                                    {estudante.nome}
-                                    {estudante.aeeProfile && (
-                                      <Link 
-                                        href={`/dashboard/aee/${estudante.matricula}`}
-                                        className="p-1 bg-indigo-50 text-indigo-600 rounded-lg border border-indigo-200 hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
-                                        title="Aluno com Atendimento Especializado (AEE)"
-                                      >
-                                        <Accessibility className="w-3.5 h-3.5" />
-                                      </Link>
-                                    )}
-                                  </div>
-                                  <div className="text-[11px] font-bold tracking-widest text-slate-400 uppercase mt-0.5">
-                                    Matrícula: {estudante.matricula}
-                                  </div>
-                                </div>
+      {estudantes.length === 0 ? (
+        <EmptyState
+          icon={GraduationCap}
+          title={hasFilters ? 'Nenhum estudante encontrado' : 'Pesquise por estudantes'}
+          description={hasFilters
+            ? 'Tente ajustar os filtros de busca.'
+            : 'Use a busca ou os filtros acima para carregar a lista sem sobrecarregar o sistema.'}
+          action={!hasFilters ? (
+            <Link href="/dashboard/estudantes/novo" className={buttonClasses({ variant: "secondary" })}>
+              <Plus size={16} strokeWidth={1.75} /> Adicionar estudante
+            </Link>
+          ) : undefined}
+          className="rounded-lg border border-line bg-surface"
+        />
+      ) : (
+        <div className="space-y-4">
+          {Object.entries(
+            estudantes.reduce((acc: any, estudante: any) => {
+              const turma = estudante.turma.nome || "Sem Turma"
+              if (!acc[turma]) acc[turma] = []
+              acc[turma].push(estudante)
+              return acc
+            }, {})
+          ).sort(([a], [b]) => a.localeCompare(b)).map(([turmaNome, estudantesDaTurma]: [string, any]) => (
+            <section key={turmaNome} className="bg-surface rounded-lg border border-line overflow-hidden" aria-label={turmaNome}>
+              <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3 sm:px-5">
+                <h2 className="text-sm font-semibold text-fg">{turmaNome}</h2>
+                <span className="text-xs tabular-nums text-fg-subtle">{estudantesDaTurma.length} {estudantesDaTurma.length === 1 ? 'estudante' : 'estudantes'}</span>
+              </div>
+              <div className="relative overflow-x-auto">
+                <table className="w-full min-w-[32rem] text-13">
+                  <thead>
+                    <tr className="border-b border-line-subtle text-xs text-fg-subtle">
+                      <th scope="col" className="h-9 px-4 text-left font-medium sm:px-5">Nome</th>
+                      <th scope="col" className="h-9 px-3 text-right font-medium">Notas lançadas</th>
+                      <th scope="col" className="h-9 px-4 text-right font-medium sm:px-5"><span className="sr-only">Ações</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {estudantesDaTurma.map((estudante: any) => (
+                      <tr key={estudante.matricula} className="border-b border-line-subtle last:border-0 transition-colors duration-150 hover:bg-subtle/60">
+                        <td className="px-4 py-2 sm:px-5">
+                          <div className="flex items-center gap-3">
+                            <Avatar nome={estudante.nome} size="sm" />
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5 font-medium text-fg">
+                                <span className="truncate">{estudante.nome}</span>
+                                {estudante.aeeProfile && <Badge tone="accent">AEE</Badge>}
                               </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-600">
-                              {estudante._count.notas}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-right">
-                               <div className="flex items-center justify-end gap-2">
-                                  {/* Icone Gestão de Acesso */}
-                                  <PortalActivationAction 
-                                      estudanteId={estudante.matricula} 
-                                      initialMatricula={estudante.matricula}
-                                      hasUser={portalUserIds.has(estudante.matricula)}
-                                  />
-
-                                  <Link
-                                    href={`/dashboard/estudantes/${estudante.matricula}/editar`}
-                                    className="p-2 bg-slate-50 text-slate-400 border border-slate-200 rounded-xl hover:text-slate-900 hover:bg-white transition-all shadow-sm"
-                                    title="Editar Dados"
-                                  >
-                                    <Pencil size={18} />
-                                  </Link>
-
-                                  {/* Link Direto AEE - Apenas se já existir perfil */}
-                                  {estudante.aeeProfile && (
-                                    <Link
-                                      href={`/dashboard/aee/${estudante.matricula}`}
-                                      className="p-2 bg-indigo-50 text-indigo-500 border border-indigo-100 rounded-xl hover:text-indigo-900 hover:bg-white transition-all shadow-sm"
-                                      title="Ficha AEE"
-                                    >
-                                      <Accessibility size={18} />
-                                    </Link>
-                                  )}
-
-                                  <Link
-                                    href={`/dashboard/estudantes/${estudante.matricula}/boletim`}
-                                    className="p-2 bg-slate-50 text-slate-400 border border-slate-200 rounded-xl hover:text-slate-900 hover:bg-white transition-all shadow-sm"
-                                    title="Gerar Boletim"
-                                  >
-                                    <FileText size={18} />
-                                  </Link>
-                               </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+                              <div className="font-mono text-xs text-fg-subtle">{estudante.matricula}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-3 py-2 text-right tabular-nums text-fg-muted">
+                          {estudante._count.notas}
+                        </td>
+                        <td className="px-4 py-2 sm:px-5">
+                           <div className="flex items-center justify-end gap-0.5">
+                              <PortalActivationAction
+                                  estudanteId={estudante.matricula}
+                                  initialMatricula={estudante.matricula}
+                                  hasUser={portalUserIds.has(estudante.matricula)}
+                              />
+                              <Link href={`/dashboard/estudantes/${estudante.matricula}/editar`} className={acaoIcone} title="Editar dados" aria-label={`Editar dados de ${estudante.nome}`}>
+                                <Pencil size={16} strokeWidth={1.75} />
+                              </Link>
+                              {estudante.aeeProfile && (
+                                <Link href={`/dashboard/aee/${estudante.matricula}`} className={acaoIcone} title="Ficha AEE" aria-label={`Ficha AEE de ${estudante.nome}`}>
+                                  <Accessibility size={16} strokeWidth={1.75} />
+                                </Link>
+                              )}
+                              <Link href={`/dashboard/estudantes/${estudante.matricula}/boletim`} className={acaoIcone} title="Boletim" aria-label={`Boletim de ${estudante.nome}`}>
+                                <FileText size={16} strokeWidth={1.75} />
+                              </Link>
+                           </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          ))}
         </div>
-      </main>
+      )}
     </div>
   )
 }

@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { turmasSaoDaEscola } from '@/lib/data-fetching'
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
-    if (!session?.user) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+    if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
 
     const { id } = await params
 
-    const plano = await prisma.planoEnsino.findUnique({
-      where: { id },
+    const plano = await prisma.planoEnsino.findFirst({
+      where: { id, professor: { escolaId: session.user.escolaId } },
       include: {
         turmas: true,
         professor: { select: { id: true, name: true } }
@@ -33,7 +34,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
-    if (!session?.user) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+    if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
 
     const { id } = await params
 
@@ -44,11 +45,15 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         observacoes, turmasIds 
     } = data
 
-    const existing = await prisma.planoEnsino.findUnique({ where: { id } })
+    const existing = await prisma.planoEnsino.findFirst({ where: { id, professor: { escolaId: session.user.escolaId } } })
     if (!existing) return NextResponse.json({ message: 'Plano não encontrado' }, { status: 404 })
 
     if (!session.user.isSuperuser && !session.user.isDirecao && existing.professorId !== session.user.id) {
         return NextResponse.json({ message: 'Acesso negado' }, { status: 403 })
+    }
+
+    if (!Array.isArray(turmasIds) || !(await turmasSaoDaEscola(turmasIds, session.user.escolaId))) {
+      return NextResponse.json({ message: 'Turma não encontrada' }, { status: 404 })
     }
 
     const updated = await prisma.planoEnsino.update({
@@ -79,11 +84,11 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
-    if (!session?.user) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+    if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
 
     const { id } = await params
 
-    const existing = await prisma.planoEnsino.findUnique({ where: { id } })
+    const existing = await prisma.planoEnsino.findFirst({ where: { id, professor: { escolaId: session.user.escolaId } } })
     if (!existing) return NextResponse.json({ message: 'Plano não encontrado' }, { status: 404 })
 
     if (!session.user.isSuperuser && !session.user.isDirecao && existing.professorId !== session.user.id) {

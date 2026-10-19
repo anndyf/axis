@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
+import { can } from "@/lib/rbac"
+import { garantirEsquemasPadrao, esquemaPadraoParaModalidade, contarNotasLancadas } from "@/lib/services/esquemas-padrao"
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
-    if (!session?.user?.escolaId) {
+    if (!session?.user?.escolaId || !can(session.user, "gestao")) {
       return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
     }
     const escolaId = session.user.escolaId
@@ -55,6 +57,19 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       }
     }
 
+    // null = "Padrão da escola" no formulário; undefined = campo não enviado
+    const novoEsquemaId = esquemaAvaliacaoId === undefined
+      ? current.esquemaAvaliacaoId
+      : esquemaAvaliacaoId || esquemaPadraoParaModalidade(await garantirEsquemasPadrao(prisma, escolaId), current.modalidade)
+
+    // Só as turmas sem esquema próprio herdam o do curso
+    if (novoEsquemaId !== current.esquemaAvaliacaoId && (await contarNotasLancadas(prisma, { cursoId: id, esquemaAvaliacaoId: null }))) {
+      return NextResponse.json(
+        { message: "Turmas deste curso já têm notas lançadas no esquema atual - não é possível trocar o esquema de avaliação." },
+        { status: 409 }
+      )
+    }
+
     const curso = await prisma.curso.update({
       where: { id },
       data: {
@@ -62,7 +77,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         sigla,
         turnos: turnos || [],
         nivelEnsino: nivelEnsino ?? current.nivelEnsino,
-        esquemaAvaliacaoId: esquemaAvaliacaoId ?? current.esquemaAvaliacaoId
+        esquemaAvaliacaoId: novoEsquemaId
       }
     })
 
@@ -85,7 +100,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
-    if (!session?.user?.escolaId) {
+    if (!session?.user?.escolaId || !can(session.user, "gestao")) {
       return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
     }
     const escolaId = session.user.escolaId

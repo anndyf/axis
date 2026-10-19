@@ -12,16 +12,16 @@ export async function GET(
   try {
     const session = await auth()
     
-    if (!session) {
+    if (!session?.user?.escolaId) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 
     const { id } = await params
 
-    const plano = await prisma.planoEnsino.findUnique({
-      where: { id },
+    const plano = await prisma.planoEnsino.findFirst({
+      where: { id, professor: { escolaId: session.user.escolaId } },
       include: {
-        professor: { select: { name: true } },
+        professor: { select: { name: true, escola: { select: { nome: true } } } },
         turmas: { select: { nome: true } }
       }
     })
@@ -30,13 +30,18 @@ export async function GET(
       return NextResponse.json({ message: 'Plano de ensino não encontrado' }, { status: 404 })
     }
 
+    // Mesma regra do GET de detalhe: só o dono ou a gestão
+    if (!session.user.isSuperuser && !session.user.isDirecao && plano.professorId !== session.user.id) {
+      return NextResponse.json({ message: 'Acesso negado' }, { status: 403 })
+    }
+
     const doc = new jsPDF()
 
     // Cabeçalho Institucional Completo
     doc.setFontSize(8)
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(0)
-    doc.text('CENTRO TERRITORIAL DE EDUCAÇÃO PROFISSIONAL DO LITORAL NORTE E AGRESTE BAIANO', 105, 12, { align: 'center' })
+    doc.text(plano.professor.escola.nome.toUpperCase(), 105, 12, { align: 'center' })
 
     doc.setFontSize(20)
     doc.setTextColor(0, 0, 0)

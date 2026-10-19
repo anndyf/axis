@@ -1,7 +1,18 @@
-
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { can } from "@/lib/rbac"
+
+// O [id] da rota é a MATRÍCULA (é o que o front envia). AEEProfile.estudanteId
+// guarda o id técnico do estudante desde a troca de PK (Fase 3 multi-tenant),
+// então a matrícula precisa ser resolvida dentro da escola da sessão.
+async function resolverEstudanteId(escolaId: string, matricula: string) {
+  const estudante = await prisma.estudante.findUnique({
+    where: { escolaId_matricula: { escolaId, matricula } },
+    select: { id: true }
+  })
+  return estudante?.id ?? null
+}
 
 export async function POST(
   request: NextRequest,
@@ -9,22 +20,26 @@ export async function POST(
 ) {
   const { id: matricula } = await params
   const session = await auth()
-  const isAEE = (session?.user as any)?.isAEE
 
-  if (!session?.user.isDirecao && !session?.user.isSuperuser && !isAEE) {
+  if (!session?.user?.escolaId || !can(session.user, 'aee')) {
     return NextResponse.json({ message: "Não autorizado" }, { status: 403 })
   }
 
   try {
+    const estudanteId = await resolverEstudanteId(session.user.escolaId, matricula)
+    if (!estudanteId) {
+      return NextResponse.json({ message: "Estudante não encontrado" }, { status: 404 })
+    }
+
     const data = await request.json()
-    const { 
-      cids, condicao, recomendacoes, notasDirecao, 
+    const {
+      cids, condicao, recomendacoes, notasDirecao,
       contatoNome, contatoTelefone,
-      precisaProvaAdaptada, precisaProvaSalaEspecial 
+      precisaProvaAdaptada, precisaProvaSalaEspecial
     } = data
 
     const profile = await prisma.aEEProfile.upsert({
-      where: { estudanteId: matricula },
+      where: { estudanteId },
       update: {
         cids: cids || [],
         condicao,
@@ -37,7 +52,7 @@ export async function POST(
         fotoUrl: data.fotoUrl
       },
       create: {
-        estudanteId: matricula,
+        estudanteId,
         cids: cids || [],
         condicao,
         recomendacoes,
@@ -63,22 +78,22 @@ export async function DELETE(
 ) {
   const { id: matricula } = await params
   const session = await auth()
-  const isAEE = (session?.user as any)?.isAEE
 
-  if (!session?.user.isDirecao && !session?.user.isSuperuser && !isAEE) {
+  if (!session?.user?.escolaId || !can(session.user, 'aee')) {
     return NextResponse.json({ message: "Não autorizado" }, { status: 403 })
   }
 
   try {
-    // Primeiro deletar os acknowledgements (ciências) relacionados
-    await prisma.aEEAcknowledgement.deleteMany({
-      where: { profile: { estudanteId: matricula } }
-    })
+    const estudanteId = await resolverEstudanteId(session.user.escolaId, matricula)
+    const profile = estudanteId
+      ? await prisma.aEEProfile.findUnique({ where: { estudanteId }, select: { id: true } })
+      : null
+    if (!profile) {
+      return NextResponse.json({ message: "Ficha não encontrada" }, { status: 404 })
+    }
 
-    // Depois deletar o perfil
-    await prisma.aEEProfile.delete({
-      where: { estudanteId: matricula }
-    })
+    // Acknowledgements (ciências) saem em cascata junto com o perfil
+    await prisma.aEEProfile.delete({ where: { id: profile.id } })
 
     return NextResponse.json({ message: "Ficha excluída com sucesso" })
   } catch (error: any) {

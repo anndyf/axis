@@ -21,7 +21,7 @@ function MarkdownContent({ content }: { content: string }) {
         // Handle lists
         if (line.trim().startsWith('- ')) {
             return (
-                <li key={lineIndex} className="ml-4 list-disc text-slate-700 font-medium">
+                <li key={lineIndex} className="ml-4 list-disc text-fg-muted font-medium">
                     {parseInline(line.trim().substring(2))}
                 </li>
             );
@@ -56,16 +56,16 @@ function MarkdownContent({ content }: { content: string }) {
     
     return parts.map((part, index) => {
         if (part.startsWith('**') && part.endsWith('**')) {
-            return <strong key={index} className="font-semibold text-slate-800">{part.slice(2, -2)}</strong>;
+            return <strong key={index} className="font-semibold text-fg">{part.slice(2, -2)}</strong>;
         }
         if (part.startsWith('*') && part.endsWith('*')) {
-            return <em key={index} className="italic text-slate-700">{part.slice(1, -1)}</em>;
+            return <em key={index} className="italic text-fg-muted">{part.slice(1, -1)}</em>;
         }
         if (part.startsWith('[') && part.includes('](') && part.endsWith(')')) {
             const match = part.match(/\[(.*?)\]\((.*?)\)/);
             if (match) {
                 return (
-                    <a key={index} href={match[2]} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-semibold">
+                    <a key={index} href={match[2]} target="_blank" rel="noopener noreferrer" className="text-accent-fg hover:underline font-semibold">
                         {match[1]}
                     </a>
                 );

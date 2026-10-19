@@ -3,8 +3,11 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { StatusNota } from '@prisma/client'
 import { logAudit } from '@/lib/audit'
+import { reportarErro } from '@/lib/monitoramento'
 import { can } from '@/lib/rbac'
-import { calcularMediaFinal, resolverEsquemaAvaliacaoId, type EsquemaConfig, type UnidadeInput } from '@/lib/services/notas'
+import { calcularMediaFinal, resolverEsquemaAvaliacaoId, paraEsquemaConfig, unidadesDeNotasSalvas, notaRecuperacaoValida, type EsquemaConfig } from '@/lib/services/notas'
+
+class ErroValidacao extends Error {}
 
 export const runtime = 'nodejs'
 
@@ -58,120 +61,105 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ message: 'Sessão expirada ou usuário não encontrado. Por favor, saia e entre novamente no sistema.' }, { status: 401 })
     }
 
-    // Processar cada decisão do conselho
-    const results = await Promise.all(
-      decisoes.map(async ({ notaId, novoStatus, novaNotaRec }: { notaId: string, novoStatus: string, novaNotaRec?: number | null }) => {
-        // Validação de range para nota de recuperação (se fornecida) - Permite -1 para "Não Realizou"
-        if (novaNotaRec !== undefined && novaNotaRec !== null && novaNotaRec !== -1 && (novaNotaRec < 0 || novaNotaRec > 10)) {
-          throw new Error(`Nota de recuperação inválida: deve estar entre 0 e 10`)
-        }
+    // 1) Valida o lote inteiro antes de gravar: nota da escola, decisão
+    // permitida e nota de recuperação na escala do esquema da turma (0 a
+    // notaMaxima - 10 ou 100), não em 0-10 fixo.
+    type Decisao = { notaId: string; novoStatus: string; novaNotaRec?: number | null }
+    const esquemaPorTurma = new Map<string, Awaited<ReturnType<typeof carregarEsquema>>>()
+    async function carregarEsquema(turma: { cursoId: string | null; esquemaAvaliacaoId: string | null }) {
+      const curso = turma.cursoId
+        ? await prisma.curso.findFirst({ where: { id: turma.cursoId, escolaId }, select: { esquemaAvaliacaoId: true } })
+        : null
+      const esquemaId = resolverEsquemaAvaliacaoId(turma, curso)
+      return esquemaId
+        ? prisma.esquemaAvaliacao.findFirst({ where: { id: esquemaId, escolaId }, include: { unidades: { orderBy: { ordem: 'asc' } } } })
+        : null
+    }
 
-        const status = novoStatus as StatusNota
-        if (!DECISOES_CONSELHO_VALIDAS.includes(status)) {
-          throw new Error(`Decisão de conselho inválida: ${novoStatus}`)
-        }
+    const buscarNota = (notaId: string) => prisma.notaFinal.findFirst({
+      where: { id: notaId, estudante: { escolaId } },
+      include: {
+        unidades: { select: { esquemaUnidadeId: true, notaCalculada: true, notaRecuperacao: true } },
+        estudante: { select: { nome: true, turmaId: true, turma: { select: { cursoId: true, esquemaAvaliacaoId: true } } } },
+        disciplina: { select: { nome: true } },
+      },
+    })
+    const validadas: {
+      notaOriginal: NonNullable<Awaited<ReturnType<typeof buscarNota>>>
+      status: StatusNota
+      novaNotaRec: number | null | undefined
+      sugestaoAutomatica: string | null
+    }[] = []
+    for (const { notaId, novoStatus, novaNotaRec } of decisoes as Decisao[]) {
+      const status = novoStatus as StatusNota
+      if (!DECISOES_CONSELHO_VALIDAS.includes(status)) {
+        throw new Error(`Decisão de conselho inválida: ${novoStatus}`)
+      }
 
-        // Buscar nota original, escopada a escola do chamador
-        const notaOriginal = await prisma.notaFinal.findFirst({
-          where: { id: notaId, estudante: { escolaId } }
-        })
+      const notaOriginal = await buscarNota(notaId)
+      if (!notaOriginal) {
+        throw new Error(`Nota ${notaId} não encontrada`)
+      }
 
-        if (!notaOriginal) {
-          throw new Error(`Nota ${notaId} não encontrada`)
-        }
+      const turmaId = notaOriginal.estudante.turmaId
+      if (!esquemaPorTurma.has(turmaId)) esquemaPorTurma.set(turmaId, await carregarEsquema(notaOriginal.estudante.turma))
+      const esquema = esquemaPorTurma.get(turmaId) ?? null
+      const notaMaxima = esquema?.notaMaxima ?? 10
 
-        const [student, discipline] = await Promise.all([
-          prisma.estudante.findUnique({
-            where: { id: notaOriginal.estudanteId },
-            select: { nome: true, turma: { select: { cursoId: true, esquemaAvaliacaoId: true } } }
-          }),
-          prisma.disciplina.findUnique({ where: { id: notaOriginal.disciplinaId }, select: { nome: true } })
-        ])
+      if (typeof novaNotaRec === 'number' ? !notaRecuperacaoValida(novaNotaRec, notaMaxima) : (novaNotaRec !== undefined && novaNotaRec !== null)) {
+        throw new ErroValidacao(`Nota de recuperação inválida: deve estar entre 0 e ${notaMaxima}`)
+      }
 
-        const targetName = student?.nome || 'Estudante desconhecido'
-        const disciplineName = discipline?.nome || 'Disciplina desconhecida'
+      // O que o motor sugeriria a partir das etapas - só para registro no log
+      // de auditoria: o Conselho é discricionário, a decisão recebida prevalece.
+      let sugestaoAutomatica: string | null = null
+      if (esquema) {
+        const esquemaConfig: EsquemaConfig = paraEsquemaConfig(esquema)
+        const resultado = calcularMediaFinal(unidadesDeNotasSalvas(esquema.unidades, notaOriginal.unidades), esquemaConfig)
+        sugestaoAutomatica = resultado.completo
+          ? (resultado.media !== null && resultado.media >= esquemaConfig.notaMinimaAprovacao ? 'APROVADO' : 'RECUPERACAO')
+          : 'incompleto'
+      }
 
-        // Calcula o que o motor sugeriria a partir da média das unidades,
-        // só pra registro/transparência no log de auditoria - o Conselho é
-        // um processo discricionário do comitê, então a decisão recebida
-        // (`status`) sempre prevalece, nunca é sobrescrita automaticamente.
-        let sugestaoAutomatica: string | null = null
-        if (student?.turma) {
-          const curso = student.turma.cursoId
-            ? await prisma.curso.findUnique({ where: { id: student.turma.cursoId }, select: { esquemaAvaliacaoId: true } })
-            : null
-          const esquemaId = resolverEsquemaAvaliacaoId(student.turma, curso)
-          const esquema = esquemaId
-            ? await prisma.esquemaAvaliacao.findUnique({
-                where: { id: esquemaId },
-                include: { unidades: { orderBy: { ordem: 'asc' } } }
-              })
-            : null
-          if (esquema) {
-            const esquemaConfig: EsquemaConfig = {
-              numUnidades: esquema.numUnidades,
-              notaMinimaAprovacao: esquema.notaMinimaAprovacao,
-              recuperacaoUnidadeAtiva: esquema.recuperacaoUnidadeAtiva,
-              modoRecuperacaoUnidade: esquema.modoRecuperacaoUnidade,
-              recuperacaoFinalAtiva: esquema.recuperacaoFinalAtiva,
-              modoRecuperacaoFinal: esquema.modoRecuperacaoFinal,
-            }
-            const notasPorOrdem: Record<number, number | null> = {
-              1: notaOriginal.nota1,
-              2: notaOriginal.nota2,
-              3: notaOriginal.nota3,
-            }
-            const unidadesInput: UnidadeInput[] = esquema.unidades.map((eu) => ({
-              esquemaUnidadeId: eu.id,
-              atividades: [{ peso: 10, valor: notasPorOrdem[eu.ordem] ?? null }],
-            }))
-            const resultado = calcularMediaFinal(unidadesInput, esquemaConfig)
-            sugestaoAutomatica = resultado.completo
-              ? (resultado.media !== null && resultado.media >= esquemaConfig.notaMinimaAprovacao ? 'APROVADO' : 'RECUPERACAO')
-              : 'incompleto'
-          }
-        }
+      validadas.push({ notaOriginal, status, novaNotaRec, sugestaoAutomatica })
+    }
 
-        // Criar auditoria
-        await prisma.notaFinalAudit.create({
+    // 2) Grava tudo numa transação
+    const results = await prisma.$transaction(async (tx) => {
+      const atualizadas = []
+      for (const { notaOriginal, status, novaNotaRec } of validadas) {
+        await tx.notaFinalAudit.create({
           data: {
             notaFinalId: notaOriginal.id,
             notaAnterior: notaOriginal.nota,
             notaAtual: notaOriginal.nota, // Mantém a nota original
-            status: status,
-            modifiedById: userId
-          }
+            status,
+            modifiedById: userId,
+          },
         })
-
-        // Atualizar status e nota de recuperação se fornecida
-        const updated = await prisma.notaFinal.update({
-          where: { id: notaId },
+        atualizadas.push(await tx.notaFinal.update({
+          where: { id: notaOriginal.id },
           data: {
-            status: status,
+            status,
             notaRecuperacao: novaNotaRec !== undefined ? novaNotaRec : notaOriginal.notaRecuperacao,
             modifiedById: userId,
-            modifiedAt: new Date()
-          }
-        })
+            modifiedAt: new Date(),
+          },
+        }))
+      }
+      return atualizadas
+    })
 
-        await logAudit(
-          userId,
-          'NOTA',
-          notaId,
-          'UPDATE',
-          { 
-            alvo: targetName,
-            disciplina: disciplineName,
-            anterior: { st: notaOriginal.status, rec: notaOriginal.notaRecuperacao },
-            atual: { st: status, rec: novaNotaRec },
-            sugestaoAutomatica,
-            context: 'CONSELHO'
-          }
-        )
-        
-        return updated
+    for (const { notaOriginal, status, novaNotaRec, sugestaoAutomatica } of validadas) {
+      await logAudit(userId, 'NOTA', notaOriginal.id, 'UPDATE', {
+        alvo: notaOriginal.estudante.nome,
+        disciplina: notaOriginal.disciplina.nome,
+        anterior: { st: notaOriginal.status, rec: notaOriginal.notaRecuperacao },
+        atual: { st: status, rec: novaNotaRec },
+        sugestaoAutomatica,
+        context: 'CONSELHO',
       })
-    )
+    }
 
     return NextResponse.json({
       message: 'Decisões do conselho salvas com sucesso',
@@ -181,16 +169,17 @@ export async function POST(request: NextRequest) {
     console.error('Erro ao salvar conselho:', error)
     
     // Mensagens mais específicas para erros de validação
-    if (error.message.includes('Decisão de conselho inválida')) {
+    if (error?.message?.includes('Decisão de conselho inválida')) {
       return NextResponse.json({ message: error.message }, { status: 400 })
     }
-    if (error.message.includes('deve estar entre 0 e 10')) {
+    if (error instanceof ErroValidacao) {
       return NextResponse.json({ message: error.message }, { status: 400 })
     }
-    if (error.message.includes('não encontrada')) {
+    if (error?.message?.includes('não encontrada')) {
       return NextResponse.json({ message: error.message }, { status: 404 })
     }
     
+    await reportarErro(error, { metodo: 'POST', caminho: '/api/conselho-classe' })
     return NextResponse.json(
       { message: 'Erro ao salvar decisões do conselho' },
       { status: 500 }

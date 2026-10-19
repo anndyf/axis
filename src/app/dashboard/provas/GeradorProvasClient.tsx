@@ -246,14 +246,14 @@ const ManualSelectorModal = ({ isOpen, onClose, onSelect, questions, selectedIds
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="bg-white w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl relative z-10 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
-        <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white">
+      <div className="absolute inset-0 bg-zinc-900/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="bg-surface w-full max-w-4xl max-h-[90vh] rounded-xl shadow-card relative z-10 flex flex-col overflow-hidden animate-pop-in">
+        <div className="p-6 border-b border-line-subtle flex items-center justify-between bg-surface">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Selecionar Questões</h2>
+            <h2 className="text-xl font-bold text-fg">Selecionar Questões</h2>
             <div className="flex items-center gap-2">
-              <p className="text-sm text-gray-500">{disciplinaNome}</p>
-              <span className="text-gray-300">•</span>
+              <p className="text-sm text-fg-subtle">{disciplinaNome}</p>
+              <span className="text-fg-disabled">•</span>
               <button 
                 onClick={async () => {
                   setLoadingSerie(true)
@@ -261,33 +261,33 @@ const ManualSelectorModal = ({ isOpen, onClose, onSelect, questions, selectedIds
                   setLoadingSerie(false)
                 }}
                 disabled={loadingSerie}
-                className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 uppercase tracking-tight disabled:opacity-50"
+                className="text-xs font-bold text-accent-fg hover:text-accent-fg flex items-center gap-1 disabled:opacity-50"
               >
                 {loadingSerie ? "Buscando..." : "Buscar em outras turmas do mesmo ano"}
               </button>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-            <X size={24} className="text-gray-400" />
+          <button onClick={onClose} className="p-2 hover:bg-subtle rounded-xl transition-colors">
+            <X size={24} className="text-fg-subtle" />
           </button>
         </div>
 
-        <div className="p-4 bg-gray-50 border-b border-gray-100">
+        <div className="p-4 bg-canvas border-b border-line-subtle">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-subtle" size={20} />
             <input 
               type="text"
               placeholder="Pesquisar por conteúdo da questão..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-white border border-gray-200 rounded-2xl pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              className="w-full bg-surface border border-line rounded-lg pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-ring outline-none transition-all"
             />
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {filtered.length === 0 ? (
-            <div className="py-20 text-center text-gray-400">
+            <div className="py-20 text-center text-fg-subtle">
               <Search size={48} className="mx-auto mb-4 opacity-20" />
               <p>Nenhuma questão encontrada para os critérios.</p>
             </div>
@@ -295,53 +295,53 @@ const ManualSelectorModal = ({ isOpen, onClose, onSelect, questions, selectedIds
             filtered.map((q: any) => (
               <div 
                 key={q.id} 
-                className={`p-4 rounded-2xl border transition-all cursor-pointer group ${
+                className={`p-4 rounded-lg border transition-all cursor-pointer group ${
                   selectedIds.includes(q.id) 
-                  ? 'border-blue-500 bg-blue-50/50' 
-                  : 'border-gray-100 hover:border-blue-200 hover:shadow-md'
+                  ? 'border-accent bg-accent-subtle' 
+                  : 'border-line-subtle hover:border-accent/25 hover:shadow-card'
                 }`}
                 onClick={() => onSelect(q)}
               >
                 <div className="flex justify-between gap-4 mb-2">
-                  <div className="text-sm text-gray-800 font-medium line-clamp-3 leading-relaxed" dangerouslySetInnerHTML={{ __html: q.enunciado }} />
+                  <div className="text-sm text-fg font-medium line-clamp-3 leading-relaxed" dangerouslySetInnerHTML={{ __html: q.enunciado }} />
                   <div className={`mt-1 shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
                     selectedIds.includes(q.id) 
-                    ? 'bg-blue-600 border-blue-600' 
-                    : 'border-gray-200 bg-white'
+                    ? 'bg-accent border-accent' 
+                    : 'border-line bg-surface'
                   }`}>
                     {selectedIds.includes(q.id) && <CheckCircle2 size={14} className="text-white" />}
                   </div>
                 </div>
                 <div className="flex items-center flex-wrap gap-2 mt-2">
                   {q._count?.provas > 0 && (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 uppercase tracking-widest border border-purple-200">
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-accent-subtle text-accent-fg border border-accent/25">
                       Usada em {q._count.provas} prova{q._count.provas > 1 ? 's' : ''}
                     </span>
                   )}
                   <div 
-                    className={`w-2 h-2 rounded-full shrink-0 ${q.tipo === 'RECUPERACAO' ? 'bg-orange-500' : 'bg-blue-400'}`} 
+                    className={`w-2 h-2 rounded-full shrink-0 ${q.tipo === 'RECUPERACAO' ? 'bg-warning' : 'bg-accent'}`} 
                     title={q.tipo === 'RECUPERACAO' ? 'Questão de Segunda Chamada' : 'Questão Normal'}
                   />
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-white border border-gray-100 text-gray-400 uppercase tracking-widest">{q.dificuldade}</span>
+                  <span className="text-xs font-bold px-2 py-0.5 rounded bg-surface border border-line-subtle text-fg-subtle">{q.dificuldade}</span>
                   {q.turmas && q.turmas.length > 0 && (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-50 border border-blue-100 text-blue-500 uppercase tracking-widest">
+                    <span className="text-xs font-bold px-2 py-0.5 rounded bg-accent-subtle border border-accent/25 text-accent-fg">
                       {q.turmas[0].nome}
                     </span>
                   )}
-                  {selectedIds.includes(q.id) && <span className="text-[10px] font-bold text-blue-600 ml-auto">Selecionada</span>}
+                  {selectedIds.includes(q.id) && <span className="text-xs font-bold text-accent-fg ml-auto">Selecionada</span>}
                 </div>
               </div>
             ))
           )}
         </div>
 
-        <div className="p-6 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
-          <p className="text-sm font-medium text-gray-500">
-            <span className="text-blue-600 font-bold">{selectedIds.length}</span> questões selecionadas
+        <div className="p-6 border-t border-line-subtle bg-canvas flex items-center justify-between">
+          <p className="text-sm font-medium text-fg-subtle">
+            <span className="text-accent-fg font-bold">{selectedIds.length}</span> questões selecionadas
           </p>
           <button 
             onClick={onClose}
-            className="bg-slate-900 text-white px-8 py-3 rounded-2xl font-bold shadow-lg active:scale-95 transition-all"
+            className="bg-accent text-on-accent px-8 py-3 rounded-lg font-bold shadow-card active:scale-95 transition-all"
           >
             Concluir Seleção
           </button>
@@ -877,20 +877,20 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
       <div className="max-w-6xl mx-auto space-y-8 px-4 sm:px-0">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <Scissors className="text-indigo-600" />
+          <h1 className="text-2xl sm:text-3xl font-bold text-fg flex items-center gap-3">
+            <Scissors className="text-accent-fg" />
             Gerador de Provas
           </h1>
-          <p className="text-gray-500 mt-2 text-sm">Crie ou gerencie suas avaliações profissionais.</p>
+          <p className="text-fg-subtle mt-2 text-sm">Crie ou gerencie suas avaliações profissionais.</p>
         </div>
 
-        <div className="flex flex-wrap bg-gray-100 p-1.5 rounded-2xl shadow-inner gap-1 w-full sm:w-auto overflow-x-auto no-scrollbar">
+        <div className="flex flex-wrap bg-subtle p-1.5 rounded-lg shadow-card gap-1 w-full sm:w-auto overflow-x-auto no-scrollbar">
           <button
             onClick={() => setActiveTab('gerador')}
             className={`flex-1 sm:flex-none px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 whitespace-nowrap ${
               activeTab === 'gerador'
-              ? 'bg-white text-indigo-600 shadow-sm'
-              : 'text-gray-500 hover:text-gray-700'
+              ? 'bg-surface text-accent-fg shadow-sm'
+              : 'text-fg-subtle hover:text-fg-muted'
             }`}
           >
             <Plus size={18} />
@@ -900,8 +900,8 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
             onClick={() => setActiveTab('historico')}
             className={`flex-1 sm:flex-none px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 whitespace-nowrap ${
               activeTab === 'historico'
-              ? 'bg-white text-indigo-600 shadow-sm'
-              : 'text-gray-500 hover:text-gray-700'
+              ? 'bg-surface text-accent-fg shadow-sm'
+              : 'text-fg-subtle hover:text-fg-muted'
             }`}
           >
             <HistoryIcon size={18} />
@@ -912,27 +912,27 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
       </div>
 
       {activeTab === 'gerador' && (
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 xl:gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500 items-start">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 xl:gap-8 animate-slide-up items-start">
         {/* Lado Esquerdo: Configurações + Disciplinas */}
         <div className="xl:col-span-5 space-y-6">
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 space-y-6">
+          <div className="bg-surface p-6 rounded-xl shadow-sm border border-line-subtle space-y-6">
             <div className="space-y-2">
-              <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Título da Prova</label>
+              <label className="text-xs font-semibold text-fg-subtle ml-1">Título da Prova</label>
               <input 
                 value={titulo}
                 onChange={(e) => setTitulo(e.target.value)}
-                className="w-full bg-gray-50 border-none rounded-xl px-4 py-3 font-bold text-gray-800 focus:ring-2 focus:ring-blue-500 transition-all"
+                className="w-full bg-canvas border-none rounded-xl px-4 py-3 font-bold text-fg focus:ring-2 focus:ring-ring transition-all"
                 placeholder="Ex: AVALIAÇÃO BIMESTRAL"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Tipo de Prova</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1">Tipo de Prova</label>
                 <select 
                   value={tipoProva}
                   onChange={(e) => setTipoProva(e.target.value)}
-                  className="w-full bg-gray-50 border-none rounded-xl px-4 py-3 font-bold text-gray-800 focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full bg-canvas border-none rounded-xl px-4 py-3 font-bold text-fg focus:ring-2 focus:ring-ring transition-all"
                 >
                   <option value="SIMULADO">Simulado</option>
                   <option value="RECUPERAÇÃO">Recuperação</option>
@@ -942,11 +942,11 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Área (Preset)</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1">Área (Preset)</label>
                 <select 
                   value={areaConhecimento}
                   onChange={(e) => setAreaConhecimento(e.target.value)}
-                  className="w-full bg-gray-50 border-none rounded-xl px-4 py-3 font-bold text-gray-800 focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full bg-canvas border-none rounded-xl px-4 py-3 font-bold text-fg focus:ring-2 focus:ring-ring transition-all"
                 >
                   <option value="">Livre (Todas)</option>
                   <option value="CIÊNCIAS DA NATUREZA">Ciências da Natureza</option>
@@ -960,13 +960,13 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
             </div>
 
             {/* Filtros de Turma */}
-            <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-100 space-y-3">
-              <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Filtrar Turmas</label>
+            <div className="bg-canvas/50 p-4 rounded-xl border border-line-subtle space-y-3">
+              <label className="text-xs font-semibold text-fg-subtle ml-1">Filtrar Turmas</label>
               <div className="grid grid-cols-2 gap-3">
                 <select 
                   value={filterCurso}
                   onChange={(e) => setFilterCurso(e.target.value)}
-                  className="bg-white border-none rounded-lg px-3 py-2 text-xs font-bold text-gray-600 focus:ring-2 focus:ring-blue-500"
+                  className="bg-surface border-none rounded-lg px-3 py-2 text-xs font-bold text-fg-muted focus:ring-2 focus:ring-ring"
                 >
                   <option value="">Todos os Cursos</option>
                   {uniqueCursos.map(c => <option key={c} value={c}>{c}</option>)}
@@ -975,7 +975,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                 <select 
                   value={filterTurno}
                   onChange={(e) => setFilterTurno(e.target.value)}
-                  className="bg-white border-none rounded-lg px-3 py-2 text-xs font-bold text-gray-600 focus:ring-2 focus:ring-blue-500"
+                  className="bg-surface border-none rounded-lg px-3 py-2 text-xs font-bold text-fg-muted focus:ring-2 focus:ring-ring"
                 >
                   <option value="">Todos os Turnos</option>
                   {uniqueTurnos.map(t => <option key={t} value={t}>{t}</option>)}
@@ -985,16 +985,16 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                 value={filterNomeTurma}
                 onChange={(e) => setFilterNomeTurma(e.target.value)}
                 placeholder="Filtrar por nome..."
-                className="w-full bg-white border-none rounded-lg px-3 py-2 text-xs font-bold text-gray-600 focus:ring-2 focus:ring-blue-500 placeholder:font-normal"
+                className="w-full bg-surface border-none rounded-lg px-3 py-2 text-xs font-bold text-fg-muted focus:ring-2 focus:ring-ring placeholder:font-normal"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">
-                Selecionar Turma {filteredTurmas.length < turmas.length && <span className="text-blue-500">({filteredTurmas.length} encontradas)</span>}
+              <label className="text-xs font-semibold text-fg-subtle ml-1">
+                Selecionar Turma {filteredTurmas.length < turmas.length && <span className="text-accent-fg">({filteredTurmas.length} encontradas)</span>}
               </label>
               <select 
-                className="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 transition-all font-medium"
+                className="w-full bg-canvas border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-ring transition-all font-medium"
                 onChange={(e) => setSelectedTurma(turmas.find((t: any) => t.id === e.target.value))}
                 value={selectedTurma?.id || ""}
               >
@@ -1007,17 +1007,17 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
               </select>
               {selectedTurma && (
                   <div className="flex items-center justify-between gap-2 mt-1">
-                    <p className="text-xs text-blue-600 font-bold ml-1 flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                    <p className="text-xs text-accent-fg font-bold ml-1 flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-accent" />
                         {selectedTurma._count?.questoes || 0} questões específicas
                     </p>
                     {tipoProva !== 'DEPENDÊNCIA' && tipoProva !== 'OUTRO' && (
-                      <div className="flex items-center gap-2 animate-in fade-in zoom-in duration-300">
-                        <span className="text-[10px] font-bold text-gray-400 uppercase">Unidade:</span>
+                      <div className="flex items-center gap-2 animate-fade-in zoom-in duration-300">
+                        <span className="text-xs font-bold text-fg-subtle">Unidade:</span>
                         <select 
                           value={unidade}
                           onChange={(e) => setUnidade(e.target.value)}
-                          className="bg-white border border-gray-200 rounded-lg px-2 py-1 text-[10px] font-bold text-indigo-600 focus:ring-1 focus:ring-indigo-500"
+                          className="bg-surface border border-line rounded-lg px-2 py-1 text-xs font-bold text-accent-fg focus:ring-1 focus:ring-ring"
                         >
                           <option value="">1ª e 2ª Unidades</option>
                           <option value="1">1ª Unidade</option>
@@ -1029,22 +1029,22 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
               )}
             </div>
 
-            <div className="space-y-2 mt-4 border-t border-gray-100 pt-4">
+            <div className="space-y-2 mt-4 border-t border-line-subtle pt-4">
               <div className="flex items-center justify-between ml-1">
-                <label className="text-xs font-black text-gray-400 uppercase tracking-widest">Filtro de Questões (Banco)</label>
+                <label className="text-xs font-semibold text-fg-subtle">Filtro de Questões (Banco)</label>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-1.5" title="Questão Normal">
-                    <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                    <div className="w-2 h-2 rounded-full bg-accent"></div>
                   </div>
                   <div className="flex items-center gap-1.5" title="Questão de Segunda Chamada">
-                    <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                    <div className="w-2 h-2 rounded-full bg-warning"></div>
                   </div>
                 </div>
               </div>
               <select 
                 value={filterQuestaoTipo}
                 onChange={(e) => setFilterQuestaoTipo(e.target.value)}
-                className="w-full bg-gray-50 border-none rounded-xl px-4 py-3 font-bold text-gray-800 focus:ring-2 focus:ring-blue-500 transition-all"
+                className="w-full bg-canvas border-none rounded-xl px-4 py-3 font-bold text-fg focus:ring-2 focus:ring-ring transition-all"
               >
                 <option value="TODAS">Todas as Questões (Misto)</option>
                 <option value="NORMAL">Somente Prova Normal</option>
@@ -1053,16 +1053,16 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
             </div>
 
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Formato e Acessibilidade</label>
+              <label className="text-xs font-semibold text-fg-subtle ml-1">Formato e Acessibilidade</label>
               <div className="flex flex-wrap items-center gap-3">
-                <div className="flex bg-gray-100 p-1 rounded-xl">
+                <div className="flex bg-subtle p-1 rounded-xl">
                   <button 
                     onClick={() => setLayoutColunas(1)}
                     disabled={isAmpliada}
                     className={`py-1.5 px-3 rounded-lg text-xs font-bold transition-all ${
                       layoutColunas === 1 && !isAmpliada
-                      ? 'bg-white text-blue-600 shadow-sm' 
-                      : 'text-gray-400 hover:text-gray-600'
+                      ? 'bg-surface text-accent-fg shadow-sm' 
+                      : 'text-fg-subtle hover:text-fg-muted'
                     } disabled:opacity-30`}
                   >
                     1 Coluna
@@ -1072,8 +1072,8 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                     disabled={isAmpliada}
                     className={`py-1.5 px-3 rounded-lg text-xs font-bold transition-all ${
                       layoutColunas === 2 && !isAmpliada
-                      ? 'bg-white text-blue-600 shadow-sm' 
-                      : 'text-gray-400 hover:text-gray-600'
+                      ? 'bg-surface text-accent-fg shadow-sm' 
+                      : 'text-fg-subtle hover:text-fg-muted'
                     } disabled:opacity-30`}
                   >
                     2 Colunas
@@ -1084,30 +1084,30 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                   onClick={() => setIsAmpliada(!isAmpliada)}
                   className={`flex-1 flex items-center justify-between gap-3 px-4 py-2 rounded-xl border-2 transition-all group ${
                     isAmpliada 
-                    ? 'bg-amber-50 border-amber-500 text-amber-700 shadow-sm' 
-                    : 'bg-gray-50 border-gray-100 text-gray-400 hover:border-amber-200 hover:text-amber-500'
+                    ? 'bg-warning-subtle border-warning text-warning-fg shadow-sm' 
+                    : 'bg-canvas border-line-subtle text-fg-subtle hover:border-warning-line hover:text-warning-fg'
                   }`}
                 >
                   <div className="flex items-center gap-2 text-left">
-                    <Eye size={16} className={isAmpliada ? 'text-amber-600' : 'text-gray-400 group-hover:text-amber-500'} />
+                    <Eye size={16} className={isAmpliada ? 'text-warning-fg' : 'text-fg-subtle group-hover:text-warning-fg'} />
                     <div>
-                      <p className="text-[11px] font-bold leading-tight">Prova Ampliada</p>
-                      <p className="text-[9px] font-medium opacity-70 leading-tight">Acessibilidade</p>
+                      <p className="text-xs font-bold leading-tight">Prova Ampliada</p>
+                      <p className="text-xs font-medium opacity-70 leading-tight">Acessibilidade</p>
                     </div>
                   </div>
-                  <div className={`w-8 h-4 rounded-full relative transition-colors ${isAmpliada ? 'bg-amber-500' : 'bg-gray-200'}`}>
-                    <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${isAmpliada ? 'right-0.5' : 'left-0.5'}`} />
+                  <div className={`w-8 h-4 rounded-full relative transition-colors ${isAmpliada ? 'bg-warning' : 'bg-subtle-hover'}`}>
+                    <div className={`absolute top-0.5 w-3 h-3 bg-surface rounded-full transition-all ${isAmpliada ? 'right-0.5' : 'left-0.5'}`} />
                   </div>
                 </button>
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Valor por Questão no PDF</label>
+              <label className="text-xs font-semibold text-fg-subtle ml-1">Valor por Questão no PDF</label>
               <input 
                 value={valorQuestao}
                 onChange={(e) => setValorQuestao(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-2.5 text-sm font-bold text-gray-700 focus:ring-1 focus:ring-blue-500 transition-all placeholder:font-normal"
+                className="w-full bg-canvas border border-line-subtle rounded-xl px-4 py-2.5 text-sm font-bold text-fg-muted focus:ring-1 focus:ring-ring transition-all placeholder:font-normal"
                 placeholder="Ex: 0,5 pts"
               />
             </div>
@@ -1116,9 +1116,9 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
 
           {/* Configuração de Disciplinas (Agora logo abaixo dos filtros na mesma coluna) */}
           {selectedTurma && (
-            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 space-y-4">
+            <div className="bg-surface p-6 rounded-xl shadow-sm border border-line-subtle space-y-4">
               <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Questões por Disciplina</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1">Questões por Disciplina</label>
                 <button 
                   onClick={() => {
                     const qtd = prompt("Quantidade de questões para cada disciplina:")
@@ -1132,7 +1132,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                       }))
                     }
                   }}
-                  className="text-[10px] font-bold text-indigo-600 hover:underline uppercase"
+                  className="text-xs font-bold text-accent-fg hover:underline"
                 >
                   Definir p/ Todas
                 </button>
@@ -1143,12 +1143,12 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                   const isHighlighted = isDisciplinaInArea(c.nome, areaConhecimento);
                   return (
                   <div key={idx} className={`flex items-center justify-between p-3 rounded-xl border transition-colors ${
-                    isHighlighted ? 'bg-emerald-50 border-emerald-200 hover:border-emerald-300' : 'bg-gray-50/50 border-gray-100 hover:border-blue-100'
+                    isHighlighted ? 'bg-success-subtle border-success-line hover:border-success-line' : 'bg-canvas/50 border-line-subtle hover:border-accent/25'
                   }`}>
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
-                         <span className={`text-sm font-medium truncate max-w-[200px] ${isHighlighted ? 'text-emerald-800' : 'text-gray-700'}`}>{c.nome}</span>
-                         <span className={`text-[10px] font-bold bg-white px-1.5 py-0.5 rounded border ${isHighlighted ? 'text-emerald-600 border-emerald-100' : 'text-gray-400 border-gray-200'}`} title="Questões disponíveis nesta turma">
+                         <span className={`text-sm font-medium truncate max-w-[200px] ${isHighlighted ? 'text-success-fg' : 'text-fg-muted'}`}>{c.nome}</span>
+                         <span className={`text-xs font-bold bg-surface px-1.5 py-0.5 rounded border ${isHighlighted ? 'text-success-fg border-success-line' : 'text-fg-subtle border-line'}`} title="Questões disponíveis nesta turma">
                            {filteredAvailableQuestions.filter((q: any) => 
                              q.disciplinas?.some((d: any) => normalizeText(d.nome || "") === normalizeText(c.nome || ""))
                            ).length}
@@ -1170,23 +1170,23 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                             setLoading(false)
                           }
                         }}
-                        className="text-[10px] font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 uppercase tracking-tighter mt-1"
+                        className="text-xs font-bold text-accent-fg hover:text-accent-fg flex items-center gap-1 mt-1"
                       >
                         <Search size={10} /> Selecionar Manuais
                       </button>
                     </div>
-                    <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg p-1 shadow-sm shrink-0">
+                    <div className="flex items-center gap-2 bg-surface border border-line rounded-lg p-1 shadow-sm shrink-0">
                       <button 
                         onClick={() => {
                           const newConfig = [...config]
                           newConfig[idx].qtd = Math.max(0, newConfig[idx].qtd - 1)
                           setConfig(newConfig)
                         }}
-                        className="w-7 h-7 flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-600 rounded transition-colors font-black"
+                        className="w-7 h-7 flex items-center justify-center text-fg-subtle hover:bg-subtle hover:text-fg-muted rounded transition-colors font-semibold"
                       >
                         -
                       </button>
-                      <span className="w-6 text-center font-bold text-sm text-blue-600">{c.qtd}</span>
+                      <span className="w-6 text-center font-bold text-sm text-accent-fg">{c.qtd}</span>
                       <button 
                         onClick={() => {
                           const maxAvailable = filteredAvailableQuestions.filter((q: any) => 
@@ -1200,7 +1200,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                             alert(`Você já atingiu o máximo de questões disponíveis (${maxAvailable}) para esta disciplina com o filtro atual.`)
                           }
                         }}
-                        className="w-7 h-7 flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-600 rounded transition-colors font-black"
+                        className="w-7 h-7 flex items-center justify-center text-fg-subtle hover:bg-subtle hover:text-fg-muted rounded transition-colors font-semibold"
                       >
                         +
                       </button>
@@ -1209,12 +1209,12 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                 )})}
               </div>
 
-              <div className="pt-4 border-t border-gray-50 mt-4">
-                <p className="text-xs text-center text-gray-400 mb-4">Total de Questões: <span className="font-bold text-indigo-600">{config.reduce((acc, c) => acc + c.qtd, 0)}</span></p>
+              <div className="pt-4 border-t border-line-subtle mt-4">
+                <p className="text-xs text-center text-fg-subtle mb-4">Total de Questões: <span className="font-bold text-accent-fg">{config.reduce((acc, c) => acc + c.qtd, 0)}</span></p>
                 <button
                   onClick={handleGenerateDraft}
                   disabled={loading || config.reduce((acc, c) => acc + c.qtd, 0) === 0}
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-100 active:scale-95"
+                  className="w-full bg-accent hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed text-on-accent py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-card active:scale-95"
                 >
                   {loading ? <RefreshCw className="animate-spin" size={20} /> : <FileText size={20} />}
                   {config.reduce((acc, c) => acc + c.qtd, 0) === 0 ? "Adicione questões acima" : "Gerar Rascunho"}
@@ -1228,14 +1228,14 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
         <div className="xl:col-span-7 space-y-6 xl:sticky xl:top-6 self-start">
           {draftQuestions.length > 0 ? (
             <>
-              <div className="flex items-center justify-between bg-blue-50 p-4 rounded-2xl border border-blue-100">
+              <div className="flex items-center justify-between bg-accent-subtle p-4 rounded-lg border border-accent/25">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold shadow-lg">
+                  <div className="w-10 h-10 bg-accent text-on-accent rounded-full flex items-center justify-center font-bold shadow-card">
                     {draftQuestions.length}
                   </div>
                   <div>
-                    <h3 className="font-bold text-blue-900 leading-tight text-sm">Rascunho Gerado</h3>
-                    <p className="text-blue-700 text-xs">Você pode trocar questões individuais ou baixar o PDF.</p>
+                    <h3 className="font-bold text-fg leading-tight text-sm">Rascunho Gerado</h3>
+                    <p className="text-accent-fg text-xs">Você pode trocar questões individuais ou baixar o PDF.</p>
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -1247,8 +1247,8 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                     disabled={loading || !!lastSavedProva}
                     className={`px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-sm active:scale-95 disabled:opacity-50 ${
                         lastSavedProva 
-                        ? "bg-green-50 text-green-600 border border-green-200 cursor-not-allowed" 
-                        : "bg-white hover:bg-gray-50 text-indigo-600 border border-indigo-200"
+                        ? "bg-success-subtle text-success-fg border border-success-line cursor-not-allowed" 
+                        : "bg-surface hover:bg-canvas text-accent-fg border border-accent/25"
                     }`}
                   >
                     {lastSavedProva ? <CheckCircle2 size={18} /> : <Save size={18} />}
@@ -1263,8 +1263,8 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                         generatePDF(null)
                     }}
                     disabled={loading}
-                    className={`px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg active:scale-95 disabled:opacity-50 ${
-                        !lastSavedProva ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                    className={`px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-card active:scale-95 disabled:opacity-50 ${
+                        !lastSavedProva ? 'bg-zinc-300 text-fg-subtle cursor-not-allowed' : 'bg-accent hover:bg-accent-hover text-on-accent'
                     }`}
                   >
                     <Printer size={18} />
@@ -1276,19 +1276,19 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
 
               <div className="space-y-4">
                 {draftQuestions.map((q, idx) => (
-                  <div key={`${q.id}-${idx}`} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm group hover:border-blue-200 transition-all">
+                  <div key={`${q.id}-${idx}`} className="bg-surface border border-line-subtle rounded-lg p-6 shadow-sm group hover:border-accent/25 transition-all">
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-black text-blue-500 uppercase tracking-widest">Questão {idx + 1} • {q.disciplinas[0]?.nome}</span>
+                        <span className="text-xs font-semibold text-accent-fg">Questão {idx + 1} • {q.disciplinas[0]?.nome}</span>
                         <div 
-                          className={`w-2 h-2 rounded-full ${q.tipo === 'RECUPERACAO' ? 'bg-orange-500' : 'bg-blue-400'}`} 
+                          className={`w-2 h-2 rounded-full ${q.tipo === 'RECUPERACAO' ? 'bg-warning' : 'bg-accent'}`} 
                           title={q.tipo === 'RECUPERACAO' ? 'Questão de Segunda Chamada' : 'Questão Normal'}
                         />
                       </div>
                       <div className="flex gap-2">
                         <button 
                           onClick={() => swapQuestion(idx)}
-                          className="flex items-center gap-1.5 text-xs font-bold text-gray-400 hover:text-blue-600 transition-colors bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100"
+                          className="flex items-center gap-1.5 text-xs font-bold text-fg-subtle hover:text-accent-fg transition-colors bg-canvas px-3 py-1.5 rounded-lg border border-line-subtle"
                         >
                           <RefreshCw size={14} /> Trocar
                         </button>
@@ -1303,15 +1303,15 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                             if (discIdx > -1) newConfig[discIdx].qtd = Math.max(0, newConfig[discIdx].qtd - 1)
                             setConfig(newConfig)
                           }}
-                          className="flex items-center gap-1.5 text-xs font-bold text-gray-400 hover:text-red-600 transition-colors bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100"
+                          className="flex items-center gap-1.5 text-xs font-bold text-fg-subtle hover:text-danger-fg transition-colors bg-canvas px-3 py-1.5 rounded-lg border border-line-subtle"
                         >
                           <Trash2 size={14} /> Remover
                         </button>
                       </div>
                     </div>
-                    <div className="text-gray-800 font-medium mb-4 overflow-hidden break-words" dangerouslySetInnerHTML={{ __html: q.enunciado }} />
+                    <div className="text-fg font-medium mb-4 overflow-hidden break-words" dangerouslySetInnerHTML={{ __html: q.enunciado }} />
                     {q.imagemUrl && (
-                      <div className="mb-4 rounded-xl overflow-hidden border border-gray-100 bg-gray-50 flex justify-center">
+                      <div className="mb-4 rounded-xl overflow-hidden border border-line-subtle bg-canvas flex justify-center">
                         <img 
                           src={q.imagemUrl} 
                           alt="Imagem da questão" 
@@ -1319,22 +1319,22 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                         />
                       </div>
                     )}
-                    <div className="mt-4 pt-4 border-t border-gray-50 flex items-center gap-2 flex-wrap">
+                    <div className="mt-4 pt-4 border-t border-line-subtle flex items-center gap-2 flex-wrap">
                       {q._count?.provas > 0 && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-50 text-purple-600 uppercase tracking-widest border border-purple-100" title="Já utilizada em outras avaliações">
+                        <span className="text-xs font-bold px-2 py-0.5 rounded bg-accent-subtle text-accent-fg border border-accent/25" title="Já utilizada em outras avaliações">
                           Usada em {q._count.provas} prova{q._count.provas > 1 ? 's' : ''}
                         </span>
                       )}
                       {q.unidade && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-50 text-indigo-600 uppercase tracking-widest border border-indigo-100">
+                        <span className="text-xs font-bold px-2 py-0.5 rounded bg-accent-subtle text-accent-fg border border-accent/25">
                           {q.unidade}ª Unidade
                         </span>
                       )}
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-600 uppercase tracking-widest border border-blue-100">
+                      <span className="text-xs font-bold px-2 py-0.5 rounded bg-accent-subtle text-accent-fg border border-accent/25">
                         {q.disciplinas[0]?.nome}
                       </span>
                       {q.turmas?.[0] && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-500 uppercase tracking-widest border border-slate-200">
+                        <span className="text-xs font-bold px-2 py-0.5 rounded bg-subtle text-fg-subtle border border-line">
                           {q.turmas[0].nome}
                         </span>
                       )}
@@ -1344,19 +1344,19 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
               </div>
             </>
           ) : (
-            <div className="bg-gradient-to-br from-indigo-50/60 via-white to-blue-50/40 rounded-3xl border border-indigo-100/50 p-12 lg:p-20 text-center flex flex-col items-center justify-center min-h-[500px] shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 transform translate-x-1/2 -translate-y-1/2"></div>
-              <div className="absolute bottom-0 left-0 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 transform -translate-x-1/2 translate-y-1/2"></div>
+            <div className="bg-accent-subtle via-white rounded-xl border border-accent/25 p-12 lg:p-20 text-center flex flex-col items-center justify-center min-h-[500px] shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-72 h-72 bg-accent-subtle rounded-full mix-blend-multiply filter blur-3xl opacity-20 transform translate-x-1/2 -translate-y-1/2"></div>
+              <div className="absolute bottom-0 left-0 w-72 h-72 bg-accent-subtle rounded-full mix-blend-multiply filter blur-3xl opacity-20 transform -translate-x-1/2 translate-y-1/2"></div>
               
-              <div className="relative z-10 w-24 h-24 bg-white shadow-xl shadow-indigo-200/40 rounded-3xl flex items-center justify-center mb-8 rotate-3 hover:rotate-0 transition-transform duration-300 border border-indigo-50">
-                <Layout size={40} className="text-indigo-600" />
-                <div className="absolute -bottom-3 -right-3 bg-amber-400 text-white p-2.5 rounded-xl shadow-lg rotate-12 border-2 border-white">
+              <div className="relative z-10 w-24 h-24 bg-surface shadow-card rounded-xl flex items-center justify-center mb-8 rotate-3 hover:rotate-0 transition-transform duration-300 border border-accent/25">
+                <Layout size={40} className="text-accent-fg" />
+                <div className="absolute -bottom-3 -right-3 bg-warning text-white p-2.5 rounded-xl shadow-overlay rotate-12 border-2 border-white">
                   <FileText size={18} />
                 </div>
               </div>
-              <h3 className="text-2xl font-black text-gray-900 tracking-tight relative z-10">Sua prova está vazia</h3>
-              <p className="text-gray-500 mt-3 max-w-md leading-relaxed relative z-10 text-sm">
-                Siga os passos na barra lateral: escolha uma turma, defina a quantidade de questões por disciplina e clique em <b className="text-gray-700">Gerar Rascunho</b> para visualizar e editar sua avaliação.
+              <h3 className="text-2xl font-semibold text-fg tracking-tight relative z-10">Sua prova está vazia</h3>
+              <p className="text-fg-subtle mt-3 max-w-md leading-relaxed relative z-10 text-sm">
+                Siga os passos na barra lateral: escolha uma turma, defina a quantidade de questões por disciplina e clique em <b className="text-fg-muted">Gerar Rascunho</b> para visualizar e editar sua avaliação.
               </p>
             </div>
             )}
@@ -1365,22 +1365,22 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
       )}
 
       {activeTab === 'historico' && (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-8 animate-slide-up">
           <div className="flex flex-col gap-6 mb-8">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center shadow-sm">
+              <div className="w-12 h-12 bg-warning-subtle text-warning-fg rounded-lg flex items-center justify-center shadow-sm">
                 <HistoryIcon size={24} />
               </div>
               <div>
                 <div className="flex items-center gap-3">
-                  <h2 className="text-2xl font-bold text-gray-900 leading-tight">Avaliações Recentes</h2>
+                  <h2 className="text-2xl font-bold text-fg leading-tight">Avaliações Recentes</h2>
                   {!loadingHistory && Array.isArray(displayedProvas) && (
-                    <span className="bg-amber-100 text-amber-700 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest hidden sm:block border border-amber-200">
+                    <span className="bg-warning-subtle text-warning-fg text-xs font-semibold px-2.5 py-1 rounded-full hidden sm:block border border-warning-line">
                       {displayedProvas.length} {displayedProvas.length === 1 ? 'Prova' : 'Provas'}
                     </span>
                   )}
                 </div>
-                <p className="text-gray-500 text-sm">Registro das últimas provas geradas no sistema.</p>
+                <p className="text-fg-subtle text-sm">Registro das últimas provas geradas no sistema.</p>
               </div>
             </div>
 
@@ -1388,7 +1388,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
               <select
                 value={historyFilterTurmaId}
                 onChange={(e) => setHistoryFilterTurmaId(e.target.value)}
-                className="bg-white border border-gray-200 text-gray-700 rounded-2xl px-4 py-2.5 text-sm outline-none shadow-sm focus:ring-2 focus:ring-blue-500 w-full md:w-auto flex-1 appearance-none"
+                className="bg-surface border border-line text-fg-muted rounded-lg px-4 py-2.5 text-sm outline-none shadow-sm focus:ring-2 focus:ring-ring w-full md:w-auto flex-1 appearance-none"
               >
                 <option value="">Todas as Turmas</option>
                 {turmas?.map((t: any) => (
@@ -1399,7 +1399,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
               <select
                 value={historyFilterTipo}
                 onChange={(e) => setHistoryFilterTipo(e.target.value)}
-                className="bg-white border border-gray-200 text-gray-700 rounded-2xl px-4 py-2.5 text-sm outline-none shadow-sm focus:ring-2 focus:ring-blue-500 w-full md:w-auto flex-1 appearance-none"
+                className="bg-surface border border-line text-fg-muted rounded-lg px-4 py-2.5 text-sm outline-none shadow-sm focus:ring-2 focus:ring-ring w-full md:w-auto flex-1 appearance-none"
               >
                 <option value="">Todos os Tipos</option>
                 <option value="SIMULADO">Simulado</option>
@@ -1411,7 +1411,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
               <select
                 value={historyFilterAreaId}
                 onChange={(e) => setHistoryFilterAreaId(e.target.value)}
-                className="bg-white border border-gray-200 text-gray-700 rounded-2xl px-4 py-2.5 text-sm outline-none shadow-sm focus:ring-2 focus:ring-blue-500 w-full md:w-auto flex-1 appearance-none"
+                className="bg-surface border border-line text-fg-muted rounded-lg px-4 py-2.5 text-sm outline-none shadow-sm focus:ring-2 focus:ring-ring w-full md:w-auto flex-1 appearance-none"
               >
                 <option value="">Todas as Áreas</option>
                 {globalAreas.map((a) => (
@@ -1422,7 +1422,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
               <select
                 value={historyFilterCriadorId}
                 onChange={(e) => setHistoryFilterCriadorId(e.target.value)}
-                className="bg-white border border-gray-200 text-gray-700 rounded-2xl px-4 py-2.5 text-sm outline-none shadow-sm focus:ring-2 focus:ring-blue-500 w-full md:w-auto flex-1 appearance-none"
+                className="bg-surface border border-line text-fg-muted rounded-lg px-4 py-2.5 text-sm outline-none shadow-sm focus:ring-2 focus:ring-ring w-full md:w-auto flex-1 appearance-none"
               >
                 <option value="">Todos os Criadores</option>
                 {globalCriadores.map((c) => (
@@ -1431,66 +1431,66 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
               </select>
 
               <div className="relative w-full md:w-72">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-subtle" size={18} />
                 <input 
                   type="text"
                   placeholder="Buscar por título ou turma..."
                   value={searchHistory}
                   onChange={(e) => setSearchHistory(e.target.value)}
-                  className="w-full bg-white border border-gray-200 rounded-2xl pl-12 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm"
+                  className="w-full bg-surface border border-line rounded-lg pl-12 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-ring outline-none transition-all shadow-sm"
                 />
               </div>
             </div>
           </div>
 
           {loadingHistory ? (
-            <div className="bg-gray-50 rounded-3xl p-12 flex flex-col items-center justify-center border-2 border-dashed border-gray-200">
-              <RefreshCw size={40} className="text-gray-300 animate-spin mb-4" />
-              <p className="text-gray-400 font-medium">Carregando avaliações...</p>
+            <div className="bg-canvas rounded-xl p-12 flex flex-col items-center justify-center border-2 border-dashed border-line">
+              <RefreshCw size={40} className="text-fg-disabled animate-spin mb-4" />
+              <p className="text-fg-subtle font-medium">Carregando avaliações...</p>
             </div>
           ) : (!Array.isArray(displayedProvas) || displayedProvas.length === 0) ? (
-            <div className="bg-gray-50 rounded-3xl p-12 text-center border-2 border-dashed border-gray-200">
-              <p className="text-gray-400 font-medium">Nenhuma avaliação encontrada.</p>
+            <div className="bg-canvas rounded-xl p-12 text-center border-2 border-dashed border-line">
+              <p className="text-fg-subtle font-medium">Nenhuma avaliação encontrada.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20">
               {displayedProvas.map((p: any) => (
-                <div key={p.id} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all group">
+                <div key={p.id} className="bg-surface p-6 rounded-xl border border-line-subtle shadow-sm hover:shadow-card transition-all group">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex flex-wrap gap-2">
-                      <span className="bg-emerald-50 text-emerald-600 text-[10px] font-black px-2 py-1 rounded uppercase tracking-widest border border-emerald-100">
+                      <span className="bg-success-subtle text-success-fg text-xs font-semibold px-2 py-1 rounded border border-success-line">
                         {p.turma?.nome}
                       </span>
                       {p.turma?.curso && (
-                        <span title={p.turma.curso} className="bg-blue-50 text-blue-600 text-[10px] font-black px-2 py-1 rounded uppercase tracking-widest border border-blue-100 flex items-center justify-center">
+                        <span title={p.turma.curso} className="bg-accent-subtle text-accent-fg text-xs font-semibold px-2 py-1 rounded border border-accent/25 flex items-center justify-center">
                           {getCourseIcon(p.turma.curso)}
                         </span>
                       )}
                       {p.area?.nome && (
-                        <span className="bg-purple-50 text-purple-600 text-[10px] font-black px-2 py-1 rounded uppercase tracking-widest border border-purple-100">
+                        <span className="bg-accent-subtle text-accent-fg text-xs font-semibold px-2 py-1 rounded border border-accent/25">
                           {p.area.nome}
                         </span>
                       )}
                     </div>
-                    <div className="text-[10px] text-gray-400 font-bold flex items-center gap-1">
+                    <div className="text-xs text-fg-subtle font-bold flex items-center gap-1">
                       <Calendar size={12} />
                       {new Date(p.createdAt).toLocaleDateString('pt-BR')}
                     </div>
                   </div>
                   
-                  <h3 className="font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-1">{p.titulo}</h3>
+                  <h3 className="font-bold text-fg mb-2 group-hover:text-accent-fg transition-colors line-clamp-1">{p.titulo}</h3>
                   
                   <div className="space-y-2 mb-6">
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <FileText size={14} className="text-gray-400" />
+                    <div className="flex items-center gap-2 text-xs text-fg-subtle">
+                      <FileText size={14} className="text-fg-subtle" />
                       <span>{p.questoes.length} Questões</span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <UserIcon size={14} className="text-gray-400" />
+                    <div className="flex items-center gap-2 text-xs text-fg-subtle">
+                      <UserIcon size={14} className="text-fg-subtle" />
                       <span>Criado por: {p.professorCriador?.name || 'Sistema'}</span>
                     </div>
                     {p.savedByUser && (
-                        <div className="flex items-center gap-2 text-xs text-blue-600 bg-blue-50 px-2 py-1.5 rounded-md mt-1 font-medium border border-blue-100">
+                        <div className="flex items-center gap-2 text-xs text-accent-fg bg-accent-subtle px-2 py-1.5 rounded-md mt-1 font-medium border border-accent/25">
                           <Save size={12} />
                           <span>Salvo por <b className="font-bold">{p.savedByUser.name}</b> às {new Date(p.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
@@ -1503,7 +1503,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                         editExistingProva(p)
                         setActiveTab('gerador')
                       }}
-                      className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-sm font-bold transition-all border border-blue-100"
+                      className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-accent-subtle hover:bg-accent-subtle text-accent-fg rounded-xl text-sm font-bold transition-all border border-accent/25"
                       title="Criar cópia para editar"
                     >
                       <Copy size={16} />
@@ -1524,7 +1524,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                           setLoading(false)
                         }
                       }}
-                      className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-sm font-bold transition-all border border-indigo-100"
+                      className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-accent-subtle hover:bg-accent-subtle text-accent-fg rounded-xl text-sm font-bold transition-all border border-accent/25"
                     >
                       <Eye size={16} />
                       Ver
@@ -1532,7 +1532,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
 
                     <button 
                       onClick={() => deleteProva(p.id)}
-                      className="p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition-all border border-red-100"
+                      className="p-2 bg-danger-subtle hover:bg-danger-subtle text-danger-fg rounded-xl transition-all border border-danger-line"
                       title="Excluir prova"
                     >
                       <Trash2 size={18} />
@@ -1550,17 +1550,17 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
               <button 
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                 disabled={currentPage === 1 || loadingHistory}
-                className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                className="px-4 py-2 bg-surface border border-line rounded-xl text-sm font-bold text-fg-muted hover:bg-canvas disabled:opacity-50 transition-colors"
               >
                 Anterior
               </button>
-              <div className="text-sm font-medium text-gray-500">
-                Página <span className="font-bold text-gray-900">{currentPage}</span> de <span className="font-bold text-gray-900">{totalPages}</span>
+              <div className="text-sm font-medium text-fg-subtle">
+                Página <span className="font-bold text-fg">{currentPage}</span> de <span className="font-bold text-fg">{totalPages}</span>
               </div>
               <button 
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages || loadingHistory}
-                className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                className="px-4 py-2 bg-surface border border-line rounded-xl text-sm font-bold text-fg-muted hover:bg-canvas disabled:opacity-50 transition-colors"
               >
                 Próxima
               </button>
@@ -1647,32 +1647,32 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="bg-white w-full max-w-5xl max-h-[90vh] rounded-3xl shadow-2xl relative z-10 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
-        <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white text-gray-900">
+      <div className="absolute inset-0 bg-zinc-900/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="bg-surface w-full max-w-5xl max-h-[90vh] rounded-xl shadow-card relative z-10 flex flex-col overflow-hidden animate-pop-in">
+        <div className="p-6 border-b border-line-subtle flex items-center justify-between bg-surface text-fg">
           <div>
             <h2 className="text-xl font-bold">{prova.titulo}</h2>
-            <p className="text-sm text-gray-500">{prova.turma?.nome} • {questoes.length} Questões</p>
+            <p className="text-sm text-fg-subtle">{prova.turma?.nome} • {questoes.length} Questões</p>
           </div>
           <div className="flex items-center gap-4">
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-              <X size={24} className="text-gray-400" />
+            <button onClick={onClose} className="p-2 hover:bg-subtle rounded-xl transition-colors">
+              <X size={24} className="text-fg-subtle" />
             </button>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-8 space-y-8 bg-gray-50/30">
+        <div className="flex-1 overflow-y-auto p-8 space-y-8 bg-canvas/30">
           {questoes.length === 0 ? (
-            <div className="py-20 text-center text-gray-400">
+            <div className="py-20 text-center text-fg-subtle">
               <p>Carregando detalhes das questões...</p>
             </div>
           ) : (
             questoes.map((q: any, idx: number) => (
-              <div key={q.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-2 block">Questão {idx + 1}</span>
-                <div className="text-gray-800 font-medium mb-4 leading-relaxed overflow-hidden break-words w-full" dangerouslySetInnerHTML={{ __html: q.enunciado }} />
+              <div key={q.id} className="bg-surface p-6 rounded-lg border border-line-subtle shadow-sm">
+                <span className="text-xs font-semibold text-accent-fg mb-2 block">Questão {idx + 1}</span>
+                <div className="text-fg font-medium mb-4 leading-relaxed overflow-hidden break-words w-full" dangerouslySetInnerHTML={{ __html: q.enunciado }} />
                 {q.imagemUrl && (
-                  <div className="mb-4 rounded-xl overflow-hidden border border-gray-100 bg-gray-50 flex justify-center">
+                  <div className="mb-4 rounded-xl overflow-hidden border border-line-subtle bg-canvas flex justify-center">
                     <img 
                       src={q.imagemUrl} 
                       alt="Imagem da questão" 
@@ -1685,11 +1685,11 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
                   {['A', 'B', 'C', 'D', 'E'].map(letter => (
                     <div key={letter} className={`p-3 rounded-xl border flex gap-3 ${
                       q.correta === letter 
-                      ? 'bg-emerald-50 border-emerald-100 text-emerald-700 font-bold' 
-                      : 'bg-gray-50 border-gray-50 text-gray-500'
+                      ? 'bg-success-subtle border-success-line text-success-fg font-bold' 
+                      : 'bg-canvas border-line-subtle text-fg-subtle'
                     }`}>
-                      <span className={`w-5 h-5 rounded-full shrink-0 flex items-center justify-center text-[10px] ${
-                        q.correta === letter ? 'bg-emerald-600 text-white' : 'bg-gray-200 text-gray-500'
+                      <span className={`w-5 h-5 rounded-full shrink-0 flex items-center justify-center text-xs ${
+                        q.correta === letter ? 'bg-success text-white' : 'bg-subtle-hover text-fg-subtle'
                       }`}>
                         {letter}
                       </span>
@@ -1704,18 +1704,18 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
           )}
         </div>
 
-        <div className="p-6 border-t border-gray-100 bg-white flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="p-6 border-t border-line-subtle bg-surface flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-wrap items-end gap-3">
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Formato</label>
-              <div className="flex gap-1 bg-gray-100 p-1 rounded-xl">
+              <label className="text-xs font-semibold text-fg-subtle">Formato</label>
+              <div className="flex gap-1 bg-subtle p-1 rounded-xl">
                 <button 
                   onClick={() => setLocalLayout(1)}
                   disabled={localAmpliada}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                     localLayout === 1 && !localAmpliada
-                    ? 'bg-white text-blue-600 shadow-sm' 
-                    : 'text-gray-400 hover:text-gray-600'
+                    ? 'bg-surface text-accent-fg shadow-sm' 
+                    : 'text-fg-subtle hover:text-fg-muted'
                   } disabled:opacity-30`}
                 >
                   1 Coluna
@@ -1725,8 +1725,8 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
                   disabled={localAmpliada}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                     localLayout === 2 && !localAmpliada
-                    ? 'bg-white text-blue-600 shadow-sm' 
-                    : 'text-gray-400 hover:text-gray-600'
+                    ? 'bg-surface text-accent-fg shadow-sm' 
+                    : 'text-fg-subtle hover:text-fg-muted'
                   } disabled:opacity-30`}
                 >
                   2 Colunas
@@ -1738,19 +1738,19 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
               onClick={() => setLocalAmpliada(!localAmpliada)}
               className={`flex items-center gap-3 px-4 py-1.5 rounded-xl border-2 transition-all group ${
                 localAmpliada 
-                ? 'bg-amber-50 border-amber-500 text-amber-700' 
-                : 'bg-gray-50 border-gray-100 text-gray-400 hover:border-amber-200'
+                ? 'bg-warning-subtle border-warning text-warning-fg' 
+                : 'bg-canvas border-line-subtle text-fg-subtle hover:border-warning-line'
               }`}
             >
               <div className="flex items-center gap-2 text-left">
-                <Eye size={16} className={localAmpliada ? 'text-amber-600' : 'text-gray-400 group-hover:text-amber-500'} />
+                <Eye size={16} className={localAmpliada ? 'text-warning-fg' : 'text-fg-subtle group-hover:text-warning-fg'} />
                 <div>
-                  <p className="text-[11px] font-bold leading-tight">Prova Ampliada</p>
-                  <p className="text-[9px] font-medium opacity-70 leading-tight">Acessibilidade</p>
+                  <p className="text-xs font-bold leading-tight">Prova Ampliada</p>
+                  <p className="text-xs font-medium opacity-70 leading-tight">Acessibilidade</p>
                 </div>
               </div>
-              <div className={`w-8 h-4 rounded-full relative transition-colors ${localAmpliada ? 'bg-amber-500' : 'bg-gray-200'}`}>
-                <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${localAmpliada ? 'right-0.5' : 'left-0.5'}`} />
+              <div className={`w-8 h-4 rounded-full relative transition-colors ${localAmpliada ? 'bg-warning' : 'bg-subtle-hover'}`}>
+                <div className={`absolute top-0.5 w-3 h-3 bg-surface rounded-full transition-all ${localAmpliada ? 'right-0.5' : 'left-0.5'}`} />
               </div>
             </button>
           </div>
@@ -1758,14 +1758,14 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
           <div className="flex flex-wrap items-center justify-end gap-3 w-full md:w-auto">
             <button 
               onClick={onDelete}
-              className="px-3 py-2 text-xs font-bold text-red-500 hover:text-red-700 transition-colors flex items-center gap-1.5"
+              className="px-3 py-2 text-xs font-bold text-danger-fg hover:text-danger-fg transition-colors flex items-center gap-1.5"
             >
               <Trash2 size={16} />
               Excluir
             </button>
             <button 
               onClick={onClose}
-              className="px-4 py-2 text-xs font-bold text-gray-500 hover:text-gray-700 transition-colors mr-2"
+              className="px-4 py-2 text-xs font-bold text-fg-subtle hover:text-fg-muted transition-colors mr-2"
             >
               Fechar
             </button>
@@ -1773,7 +1773,7 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
             <div className="flex flex-wrap gap-2">
               <button 
                 onClick={() => onDownload({ layout: localLayout, ampliada: localAmpliada })}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-lg shadow-emerald-100 active:scale-95 transition-all flex items-center justify-center gap-2"
+                className="bg-accent hover:bg-accent-hover text-on-accent px-4 py-2.5 rounded-xl text-xs font-bold shadow-card active:scale-95 transition-all flex items-center justify-center gap-2"
               >
                 <FileDown size={16} />
                 Gerar PDF
@@ -1781,7 +1781,7 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
               
               <button 
                 onClick={() => onDownload({ layout: localLayout, ampliada: localAmpliada, apenasGabarito: true })}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-lg shadow-blue-100 active:scale-95 transition-all flex items-center justify-center gap-2"
+                className="bg-accent hover:bg-accent-hover text-on-accent px-4 py-2.5 rounded-xl text-xs font-bold shadow-card active:scale-95 transition-all flex items-center justify-center gap-2"
                 title="Gerar apenas o Gabarito do Professor"
               >
                 <ClipboardCheck size={16} />

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
+import { turmasSaoDaEscola } from '@/lib/data-fetching'
 
 export const runtime = 'nodejs'
 
@@ -9,11 +11,12 @@ export async function GET() {
   try {
     const session = await auth()
     
-    if (!session) {
+    if (!session?.user?.escolaId) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 
     const disciplinas = await prisma.disciplina.findMany({
+      where: { turma: { escolaId: session.user.escolaId } },
       include: {
         turma: {
           select: { nome: true }
@@ -40,7 +43,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await auth()
     
-    if (!session) {
+    if (!session?.user?.escolaId || !can(session.user, 'gestao')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 
@@ -59,6 +62,10 @@ export async function POST(request: NextRequest) {
         { message: 'Pelo menos uma turma é obrigatória' },
         { status: 400 }
       )
+    }
+
+    if (!(await turmasSaoDaEscola(targetTurmaIds, session.user.escolaId))) {
+      return NextResponse.json({ message: 'Turma não encontrada' }, { status: 404 })
     }
 
     // Determine the list of names

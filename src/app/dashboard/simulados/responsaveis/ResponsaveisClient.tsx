@@ -140,19 +140,19 @@ export default function ResponsaveisClient({
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-500">
+    <div className="max-w-6xl mx-auto space-y-8 animate-fade-in">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
           <Link 
             href="/dashboard/simulados"
-            className="p-2 hover:bg-white rounded-xl transition-all border border-transparent hover:border-slate-300"
+            className="p-2 hover:bg-surface rounded-xl transition-all border border-transparent hover:border-line-strong"
           >
-            <ArrowLeft className="w-5 h-5 text-slate-700" />
+            <ArrowLeft className="w-5 h-5 text-fg-muted" />
           </Link>
           <div>
-            <h1 className="text-2xl font-medium text-slate-900 tracking-tight">Responsáveis de Simulado</h1>
-            <p className="text-slate-600 text-sm">Designar professores para lançamento de notas por turma</p>
+            <h1 className="text-2xl font-medium text-fg tracking-tight">Responsáveis de Simulado</h1>
+            <p className="text-fg-muted text-sm">Designar professores para lançamento de notas por turma</p>
           </div>
         </div>
       </div>
@@ -160,22 +160,22 @@ export default function ResponsaveisClient({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Formulário lateral */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-300 p-6 space-y-6 sticky top-24">
+          <div className="bg-surface rounded-lg shadow-sm border border-line-strong p-6 space-y-6 sticky top-24">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-slate-50 rounded-lg">
-                <Plus className="w-5 h-5 text-slate-700" />
+              <div className="p-2 bg-canvas rounded-lg">
+                <Plus className="w-5 h-5 text-fg-muted" />
               </div>
-              <h3 className="font-medium text-slate-800">Nova Designação</h3>
+              <h3 className="font-medium text-fg">Nova Designação</h3>
             </div>
 
             <form onSubmit={handleAdd} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Turma</label>
+                <label className="text-xs font-medium text-fg-subtle ml-1">Turma</label>
                 <select
                   required
                   value={formData.turmaId}
                   onChange={e => setFormData(p => ({ ...p, turmaId: e.target.value, provaId: "" }))}
-                  className="w-full bg-slate-50 border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-slate-500 outline-none"
+                  className="w-full bg-canvas border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-zinc-500 outline-none"
                 >
                   <option value="">Selecione a Turma...</option>
                   {turmas.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
@@ -183,12 +183,12 @@ export default function ResponsaveisClient({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Unidade</label>
+                <label className="text-xs font-medium text-fg-subtle ml-1">Unidade</label>
                 <select
                   required
                   value={formData.unidade}
                   onChange={e => setFormData(p => ({ ...p, unidade: e.target.value, provaId: "" }))}
-                  className="w-full bg-slate-50 border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-slate-500 outline-none"
+                  className="w-full bg-canvas border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-zinc-500 outline-none"
                 >
                   <option value="1">1ª Unidade</option>
                   <option value="2">2ª Unidade</option>
@@ -196,12 +196,12 @@ export default function ResponsaveisClient({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Prova</label>
+                <label className="text-xs font-medium text-fg-subtle ml-1">Prova</label>
                 <select
                   required
                   value={formData.provaId}
                   onChange={e => setFormData(p => ({ ...p, provaId: e.target.value, areaId: "" }))}
-                  className="w-full bg-slate-50 border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-slate-500 outline-none"
+                  className="w-full bg-canvas border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-zinc-500 outline-none"
                   disabled={!formData.turmaId}
                 >
                   <option value="">Selecione a Prova...</option>
@@ -220,12 +220,12 @@ export default function ResponsaveisClient({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Professor Responsável</label>
+                <label className="text-xs font-medium text-fg-subtle ml-1">Professor Responsável</label>
                 <select
                   required
                   value={formData.userId}
                   onChange={e => setFormData(p => ({ ...p, userId: e.target.value }))}
-                  className="w-full bg-slate-50 border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-slate-500 outline-none"
+                  className="w-full bg-canvas border-none rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-zinc-500 outline-none"
                 >
                   <option value="">Selecione o Professor...</option>
                   {professores.map(p => <option key={p.id} value={p.id}>{p.name || p.email}</option>)}
@@ -233,8 +233,8 @@ export default function ResponsaveisClient({
               </div>
 
               {message && (
-                <div className={`p-3 rounded-xl flex items-center gap-2 text-xs font-medium animate-in slide-in-from-top-1 ${
-                  message.type === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
+                <div className={`p-3 rounded-xl flex items-center gap-2 text-xs font-medium animate-slide-up ${
+                  message.type === 'success' ? 'bg-success-subtle text-success-fg' : 'bg-danger-subtle text-danger-fg'
                 }`}>
                   {message.type === 'success' ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
                   <span>{message.text}</span>
@@ -244,7 +244,7 @@ export default function ResponsaveisClient({
               <button
                 type="submit"
                 disabled={saving}
-                className="w-full bg-slate-600 hover:bg-slate-700 text-white font-medium py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 disabled:opacity-50"
+                className="w-full bg-zinc-600 hover:bg-zinc-700 text-white font-medium py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-card active:scale-95 disabled:opacity-50"
               >
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 Designar Professor
@@ -255,44 +255,44 @@ export default function ResponsaveisClient({
 
         {/* Lista de Responsáveis */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-300 overflow-hidden">
-            <div className="p-4 border-b border-slate-200 bg-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-               <h3 className="font-medium text-slate-800">Professores Designados</h3>
+          <div className="bg-surface rounded-lg shadow-sm border border-line-strong overflow-hidden">
+            <div className="p-4 border-b border-line bg-canvas flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+               <h3 className="font-medium text-fg">Professores Designados</h3>
                <div className="relative max-w-xs w-full">
-                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-subtle" />
                  <input
                    type="text"
                    placeholder="Buscar por professor ou turma..."
                    value={searchTerm}
                    onChange={(e) => setSearchTerm(e.target.value)}
-                   className="w-full bg-white border border-slate-300 rounded-xl pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-500/10 focus:border-slate-400 transition-all shadow-sm"
+                   className="w-full bg-surface border border-line-strong rounded-xl pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-zinc-500/10 focus:border-zinc-400 transition-all shadow-sm"
                  />
                </div>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
-                <thead className="bg-slate-50 border-b border-slate-300">
+                <thead className="bg-canvas border-b border-line-strong">
                   <tr>
-                    <th className="px-6 py-4 text-[10px] font-medium text-slate-400 uppercase tracking-widest">Professor / Prova</th>
-                    <th className="px-6 py-4 text-[10px] font-medium text-slate-400 uppercase tracking-widest text-center">Unidade</th>
-                    <th className="px-6 py-4 text-[10px] font-medium text-slate-400 uppercase tracking-widest text-center">Turma</th>
-                    <th className="px-6 py-4 text-[10px] font-medium text-slate-400 uppercase tracking-widest text-right">Ação</th>
+                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle">Professor / Prova</th>
+                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center">Unidade</th>
+                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center">Turma</th>
+                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-right">Ação</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200">
+                <tbody className="divide-y divide-line">
                   {loading ? (
                     <tr>
                       <td colSpan={4} className="px-6 py-20 text-center">
-                        <Loader2 className="w-8 h-8 text-slate-700 animate-spin mx-auto mb-2" />
-                        <span className="text-sm text-slate-600 font-medium tracking-tight">Carregando designações...</span>
+                        <Loader2 className="w-8 h-8 text-fg-muted animate-spin mx-auto mb-2" />
+                        <span className="text-sm text-fg-muted font-medium tracking-tight">Carregando designações...</span>
                       </td>
                     </tr>
                   ) : responsaveis.length === 0 ? (
                     <tr>
                       <td colSpan={4} className="px-6 py-20 text-center">
                         <div className="flex flex-col items-center gap-3">
-                          <Users className="w-10 h-10 text-slate-200" />
-                          <p className="text-slate-400 text-sm font-medium">Nenhum professor designado.</p>
+                          <Users className="w-10 h-10 text-fg-disabled" />
+                          <p className="text-fg-subtle text-sm font-medium">Nenhum professor designado.</p>
                         </div>
                       </td>
                     </tr>
@@ -302,17 +302,17 @@ export default function ResponsaveisClient({
                       item.turma.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
                       item.area?.nome.toLowerCase().includes(searchTerm.toLowerCase())
                     ).map((item) => (
-                      <tr key={item.id} className="hover:bg-slate-50 transition-colors group">
+                      <tr key={item.id} className="hover:bg-canvas transition-colors group">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center shadow-sm">
-                              <Award className="w-5 h-5 text-slate-700" />
+                            <div className="w-10 h-10 bg-canvas rounded-xl flex items-center justify-center shadow-sm">
+                              <Award className="w-5 h-5 text-fg-muted" />
                             </div>
                             <div>
-                                <h4 className="text-sm font-medium text-slate-800 tracking-tight">{item.user.name || item.user.email}</h4>
+                                <h4 className="text-sm font-medium text-fg tracking-tight">{item.user.name || item.user.email}</h4>
                                 <div className="flex items-center gap-1.5 mt-1">
-                                    <BookOpen className="w-3 h-3 text-slate-400" />
-                                    <span className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">
+                                    <BookOpen className="w-3 h-3 text-fg-subtle" />
+                                    <span className="text-xs font-medium text-fg-subtle">
                                         {item.prova ? `#${item.prova.codigo} - ${item.prova.titulo}` : item.area?.nome}
                                     </span>
                                 </div>
@@ -320,19 +320,19 @@ export default function ResponsaveisClient({
                           </div>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-lg text-[10px] font-medium tracking-tighter">
+                          <span className="px-2.5 py-1 bg-accent-subtle text-accent-fg border border-accent/25 rounded-lg text-xs font-medium tracking-tighter">
                             {item.unidade ? `${item.unidade}ª Und` : item.prova?.unidade ? `${item.prova.unidade}ª Und` : 'Ambas'}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <span className="px-2.5 py-1 bg-slate-900 text-white rounded-lg text-[10px] font-medium tracking-tighter">
+                          <span className="px-2.5 py-1 bg-subtle border border-line text-fg rounded-lg text-xs font-medium tracking-tighter">
                             {item.turma.nome}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-right">
                           <button
                             onClick={() => handleDelete(item.id)}
-                            className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                            className="p-2 text-fg-disabled hover:text-danger-fg hover:bg-danger-subtle rounded-xl transition-all"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>

@@ -107,65 +107,67 @@ export default function UserActions({
   }
 
   return (
-    <div className="flex items-center justify-end space-x-2">
+    <div className="flex items-center justify-end gap-0.5">
       {loading ? (
-        <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
+        <Loader2 size={16} strokeWidth={1.75} className="text-fg-subtle animate-spin" />
       ) : (
         <>
           {!isApproved && (
             <button
               onClick={handleApprove}
-              className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors animate-pulse"
-              title="Aprovar Cadastro"
+              className="p-1.5 rounded-md text-success-fg transition-colors duration-150 hover:bg-success-subtle"
+              title="Aprovar cadastro"
+              aria-label="Aprovar cadastro"
             >
-              <CheckCircle className="w-5 h-5" />
+              <CheckCircle size={16} strokeWidth={1.75} />
             </button>
           )}
 
           {isStaff && !isSuperuser && isApproved && (
             <Link
               href={`/dashboard/usuarios/${userId}/disciplinas`}
-              className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors title='Disciplinas'"
-              title="Gerenciar Disciplinas"
+              className="p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg"
+              title="Gerenciar disciplinas"
+              aria-label="Gerenciar disciplinas"
             >
-              <Plus className="w-5 h-5" />
+              <Plus size={16} strokeWidth={1.75} />
             </Link>
           )}
 
           <button
             onClick={() => setIsTransferModalOpen(true)}
-            className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-            title="Transferir Posse de Dados"
+            className="p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg"
+            title="Transferir posse dos dados"
+            aria-label="Transferir posse dos dados"
           >
-            <Share2 className="w-5 h-5" />
+            <Share2 size={16} strokeWidth={1.75} />
           </button>
           
           <button
             onClick={handleToggleActive}
-            className={`p-2 rounded-lg transition-colors ${
-              isActive 
-                ? 'text-amber-600 hover:bg-amber-50' 
-                : 'text-emerald-600 hover:bg-emerald-50'
-            }`}
-            title={isActive ? 'Pausar Acesso' : 'Reativar Acesso'}
+            className="p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg"
+            title={isActive ? 'Pausar acesso' : 'Reativar acesso'}
+            aria-label={isActive ? 'Pausar acesso' : 'Reativar acesso'}
           >
-            {isActive ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+            {isActive ? <Pause size={16} strokeWidth={1.75} /> : <Play size={16} strokeWidth={1.75} />}
           </button>
 
           <Link
             href={`/dashboard/usuarios/${userId}/editar`}
-            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-            title="Editar Usuário"
+            className="p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg"
+            title="Editar usuário"
+            aria-label="Editar usuário"
           >
-            <Edit className="w-5 h-5" />
+            <Edit size={16} strokeWidth={1.75} />
           </Link>
 
           <button
             onClick={handleDelete}
-            className="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-            title="Excluir Usuário"
+            className="p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-danger-subtle hover:text-danger-fg"
+            title="Excluir usuário"
+            aria-label="Excluir usuário"
           >
-            <Trash2 className="w-5 h-5" />
+            <Trash2 size={16} strokeWidth={1.75} />
           </button>
         </>
       )}

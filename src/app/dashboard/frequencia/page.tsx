@@ -1,0 +1,133 @@
+import { auth } from "@/lib/auth"
+import { redirect } from "next/navigation"
+import Link from "next/link"
+import { prisma } from "@/lib/prisma"
+import { can } from "@/lib/rbac"
+import { getTurmasPermitidas } from "@/lib/data-fetching"
+import { carregarFrequenciaDaTurma } from "@/lib/services/frequencia-leitura"
+import { linhasInfrequencia, formatarFrequencia } from "@/lib/services/frequencia"
+import { chaveData } from "@/lib/services/calendario"
+import { UserX, ClipboardCheck, CheckCircle2 } from "lucide-react"
+import { Alert, Badge, Card, CardHeader, EmptyState, PageHeader, buttonClasses, type BadgeTone } from "@/components/ui"
+import SeletorTurma from "./SeletorTurma"
+import JustificativasClient from "./JustificativasClient"
+
+export const metadata = { title: 'Áxis - Frequência' }
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+
+const TOM_RISCO: Record<string, BadgeTone> = { CRITICAL: "danger", HIGH: "danger", MEDIUM: "warning", LOW: "success", NONE: "neutral" }
+
+export default async function FrequenciaPage({ searchParams }: { searchParams: Promise<{ turma?: string; todos?: string }> }) {
+  const session = await auth()
+  if (!session?.user?.escolaId || session.user.isPortalUser || !can(session.user, 'gestao')) redirect("/dashboard")
+  const escolaId = session.user.escolaId
+  const { turma: turmaId, todos } = await searchParams
+
+  const turmas = (await getTurmasPermitidas(session)).map((t) => ({ id: t.id, nome: t.nome }))
+  const turma = turmaId ? await prisma.turma.findFirst({ where: { id: turmaId, escolaId }, select: { id: true, nome: true } }) : null
+
+  let conteudo: React.ReactNode = (
+    <Card><EmptyState icon={UserX} title="Escolha uma turma" description="Veja quem está abaixo ou perto da frequência mínima e registre atestados e justificativas." /></Card>
+  )
+
+  if (turma) {
+    const [frequencia, alunos, disciplinas, justificativas] = await Promise.all([
+      carregarFrequenciaDaTurma(escolaId, turma.id),
+      prisma.estudante.findMany({ where: { turmaId: turma.id, escolaId }, orderBy: { nome: 'asc' }, select: { id: true, nome: true, matricula: true } }),
+      prisma.disciplina.findMany({ where: { turmaId: turma.id }, select: { id: true, nome: true } }),
+      prisma.justificativa.findMany({
+        where: { escolaId, estudante: { turmaId: turma.id } },
+        orderBy: { inicio: 'desc' },
+        take: 100,
+        select: { id: true, estudanteId: true, inicio: true, fim: true, tipo: true, efeito: true, descricao: true, registradoPor: { select: { name: true, username: true } } },
+      }),
+    ])
+    const nomeAluno = new Map(alunos.map((a) => [a.id, a]))
+    const nomeDisc = new Map(disciplinas.map((d) => [d.id, d.nome]))
+    const linhas = frequencia ? linhasInfrequencia(alunos.map((a) => a.id), frequencia.porAluno, frequencia.regra, frequencia.aulasRestantes, todos === "1") : []
+
+    conteudo = (
+      <>
+        <Card className="overflow-hidden">
+          <CardHeader
+            title={`Infrequência — ${turma.nome}`}
+            description={frequencia ? `Mínimo de ${frequencia.regra.minimo}% ${frequencia.regra.apuracao === "GERAL" ? "do total de aulas" : "em cada disciplina"} · ${frequencia.aulasRestantes.total} ${frequencia.registro === "POR_DIA" ? "dias letivos" : "aulas"} ainda previstas até o fim do ano letivo` : undefined}
+            actions={
+              <Link href={`/dashboard/frequencia?turma=${turma.id}${todos === "1" ? "" : "&todos=1"}`} className={buttonClasses({ variant: "secondary", size: "sm" })}>
+                {todos === "1" ? "Só abaixo ou perto do mínimo" : "Mostrar a turma toda"}
+              </Link>
+            }
+          />
+          {!frequencia?.temChamada && <EmptyState icon={ClipboardCheck} title="Nenhuma chamada salva nesta turma ainda" description="A frequência aparece depois que os professores salvarem as primeiras chamadas." />}
+          {frequencia?.temChamada && linhas.length === 0 && <EmptyState icon={CheckCircle2} title="Ninguém abaixo ou perto da frequência mínima" description="Use “Mostrar a turma toda” para ver todos os alunos." />}
+          {linhas.length > 0 && (
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[40rem] text-13">
+                <thead>
+                  <tr className="border-b border-line text-xs text-fg-subtle">
+                    <th scope="col" className="h-9 px-4 text-left font-medium sm:px-5">Aluno</th>
+                    <th scope="col" className="h-9 px-3 text-right font-medium">Freq.</th>
+                    <th scope="col" className="h-9 px-3 text-right font-medium" title="Faltas que contam / aulas">Faltas</th>
+                    <th scope="col" className="h-9 px-3 text-right font-medium" title="Faltas sem atestado nem justificativa (ECA, art. 56)">Sem justificativa</th>
+                    <th scope="col" className="h-9 px-3 text-right font-medium" title="Quantas faltas ainda cabem até o fim do ano letivo">Pode faltar</th>
+                    <th scope="col" className="h-9 px-4 text-left font-medium sm:px-5">Risco</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {linhas.map((l) => {
+                    const aluno = nomeAluno.get(l.estudanteId)
+                    const abaixo = l.percentual !== null && !!frequencia && l.percentual < frequencia.regra.minimo
+                    return (
+                      <tr key={l.estudanteId} className="border-b border-line-subtle transition-colors duration-150 last:border-0 hover:bg-subtle/60">
+                        <td className="h-10 px-4 sm:px-5">
+                          <Link href={`/dashboard/estudantes/${aluno?.matricula}/boletim`} className="text-fg hover:underline">{aluno?.nome}</Link>
+                          {l.disciplinaId && <span className="block text-xs text-fg-subtle">{nomeDisc.get(l.disciplinaId)}</span>}
+                        </td>
+                        <td className={`h-10 px-3 text-right tabular-nums ${abaixo ? "font-medium text-danger-fg" : "text-fg"}`}>{formatarFrequencia(l.percentual)}</td>
+                        <td className="h-10 px-3 text-right tabular-nums text-fg-muted">{l.faltas - l.faltasAbonadas} / {l.aulas}</td>
+                        <td className="h-10 px-3 text-right tabular-nums text-fg-muted">{l.faltasSemJustificativa}</td>
+                        <td className="h-10 px-3 text-right tabular-nums text-fg-muted">{l.faltasRestantesPermitidas === null ? "—" : Math.max(0, l.faltasRestantesPermitidas)}</td>
+                        <td className="h-10 px-4 sm:px-5"><Badge tone={TOM_RISCO[l.risco.level]} dot>{l.risco.message}</Badge></td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+          {linhas.some((l) => l.faltasSemJustificativa >= 5) && (
+            <div className="border-t border-line-subtle p-4 sm:px-5">
+              <Alert tone="warning">Faltas reiteradas sem justificativa devem ser comunicadas ao Conselho Tutelar depois de esgotados os recursos da escola (ECA, art. 56, II).</Alert>
+            </div>
+          )}
+        </Card>
+
+        <JustificativasClient
+          alunos={alunos.map((a) => ({ id: a.id, nome: a.nome, matricula: a.matricula }))}
+          justificativas={justificativas.map((j) => ({
+            id: j.id,
+            aluno: nomeAluno.get(j.estudanteId)?.nome ?? "",
+            inicio: chaveData(j.inicio),
+            fim: chaveData(j.fim),
+            tipo: j.tipo,
+            efeito: j.efeito,
+            descricao: j.descricao ?? "",
+            registradoPor: j.registradoPor ? (j.registradoPor.name || j.registradoPor.username) : "",
+          }))}
+        />
+      </>
+    )
+  }
+
+  return (
+    <div className="mx-auto max-w-5xl space-y-6">
+      <PageHeader
+        title="Frequência"
+        description="Infrequência por turma e cadastro de atestados e justificativas."
+        actions={<SeletorTurma turmas={turmas} atual={turma?.id ?? ""} />}
+      />
+      {conteudo}
+    </div>
+  )
+}

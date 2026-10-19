@@ -1,32 +1,33 @@
 "use client"
 
 import { useState } from "react"
+import { buttonClasses } from "@/components/ui"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Save, AlertCircle, Gavel, Loader2, ChevronDown, ChevronUp, CheckCircle2, Printer, X } from "lucide-react"
+import { calcularMediaFinal, type EsquemaConfig, type EtapaDaNota, type UnidadeInput } from "@/lib/services/notas"
+import { formatarFrequencia } from "@/lib/services/frequencia"
 
 interface NotaConselho {
   id: string
   nota: number
-  nota1?: number | null
-  nota2?: number | null
-  nota3?: number | null
   notaRecuperacao: number | null
   status: string
   estudanteId: string
   estudanteNome: string
   disciplinaId: string
   disciplinaNome: string
-  isDesistenteUnid1?: boolean
-  isDesistenteUnid2?: boolean
-  isDesistenteUnid3?: boolean
+  etapas: EtapaDaNota[]
+  /** frequência que vale para aprovação na disciplina; null = sem chamada */
+  frequencia?: number | null
+  abaixoMinimoFrequencia?: boolean
 }
 
 const STATUS_OPTIONS = [
-  { value: 'APROVADO_RECUPERACAO', label: 'Aprovado na Recuperação', color: 'text-emerald-700' },
-  { value: 'APROVADO_CONSELHO', label: 'Aprovado pelo Conselho', color: 'text-emerald-700' },
-  { value: 'DEPENDENCIA', label: 'Dependência', color: 'text-slate-800' },
-  { value: 'CONSERVADO', label: 'Conservado', color: 'text-rose-700' }
+  { value: 'APROVADO_RECUPERACAO', label: 'Aprovado na Recuperação', color: 'text-success-fg' },
+  { value: 'APROVADO_CONSELHO', label: 'Aprovado pelo Conselho', color: 'text-success-fg' },
+  { value: 'DEPENDENCIA', label: 'Dependência', color: 'text-fg' },
+  { value: 'CONSERVADO', label: 'Conservado', color: 'text-danger-fg' }
 ]
 
 export default function ConselhoClasseClient({
@@ -34,17 +35,21 @@ export default function ConselhoClasseClient({
   turmaNome,
   turmaCurso,
   turmaTurno,
-  turmaModalidade,
-  notasConselho
+  notasConselho,
+  esquemaConfig,
+  pesosEtapas,
+  frequenciaMinima = 75
 }: {
   turmaId: string
   turmaNome: string
   turmaCurso?: string | null
   turmaTurno?: string | null
-  turmaModalidade?: string | null
   notasConselho: NotaConselho[]
+  esquemaConfig: EsquemaConfig
+  pesosEtapas: number[]
+  frequenciaMinima?: number
 }) {
-  const isSemestral = turmaModalidade === 'PROEJA' || turmaModalidade === 'SUBSEQUENTE'
+  const notaMinima = esquemaConfig.notaMinimaAprovacao
   const router = useRouter()
   const [decisoes, setDecisoes] = useState<Record<string, string>>(() => {
     // Inicializar com decisões já existentes no banco
@@ -69,37 +74,34 @@ export default function ConselhoClasseClient({
   const [showInstructions, setShowInstructions] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   
-  // Função para calcular a média real baseada nas unidades
-  const calcularMediaReal = (n: any) => {
+  // Média "real" para o comitê: média das unidades pelo motor (com os pesos
+  // e a forma de cálculo do esquema da turma); se houver recuperação e a
+  // média estiver abaixo do mínimo, simula a recuperação substituindo a
+  // menor unidade. Heurística só de exibição - a decisão é do Conselho
+  // (ver api/conselho-classe, que só valida o status escolhido).
+  const calcularMediaReal = (n: NotaConselho) => {
     if (n.nota === -1) return 0;
-    
-    const n1 = n.nota1 || 0;
-    const n2 = n.nota2 || 0;
-    const n3 = n.nota3 || 0;
-    
-    let media = isSemestral ? (n1 + n2) / 2 : (n1 + n2 + n3) / 3;
-    
+
+    const comoUnidades = (notas: number[]): UnidadeInput[] =>
+      notas.map((valor, i) => ({ esquemaUnidadeId: String(i), peso: pesosEtapas[i] ?? 1, atividades: [{ valor }] }))
+    const mediaDe = (notas: number[]) => calcularMediaFinal(comoUnidades(notas), esquemaConfig).media ?? 0
+
+    const notas = n.etapas.map(e => e.nota ?? 0);
+    let media = mediaDe(notas);
+
     // Pegar a nota de recuperação atual (do estado ou da nota)
     const notaRecVal = notasRec[n.id] !== undefined ? notasRec[n.id] : n.notaRecuperacao;
-    
-    // Se houver recuperação e a média for < 5, a recuperação pode ajudar
-    if (notaRecVal !== null && media < 5) {
-      if (isSemestral) {
-        // Para semestral, substitui a menor das 2
-        const menor = Math.min(n1, n2);
-        if (notaRecVal > menor) {
-          media = (notaRecVal + Math.max(n1, n2)) / 2;
-        }
-      } else {
-        // Regra anual: Recuperação substitui a menor das 3
-        const notasArray = [n1, n2, n3].sort((a, b) => a - b);
-        if (notaRecVal > (notasArray[0] || 0)) {
-          media = (notaRecVal + (notasArray[1] || 0) + (notasArray[2] || 0)) / 3;
-        }
+
+    if (notaRecVal !== null && notas.length > 0 && media < notaMinima) {
+      const iMenor = notas.indexOf(Math.min(...notas));
+      if (notaRecVal > notas[iMenor]) {
+        const substituidas = [...notas];
+        substituidas[iMenor] = notaRecVal;
+        media = mediaDe(substituidas);
       }
     }
-    
-    return Math.round(media * 10) / 10;
+
+    return media;
   }
 
   const toggleStudent = (id: string) => {
@@ -156,7 +158,7 @@ export default function ConselhoClasseClient({
       const nota = notasConselho.find(n => n.id === notaId)
       if (nota) {
         const media = calcularMediaReal(nota)
-        if (media >= 5) {
+        if (media >= notaMinima && !nota.abaixoMinimoFrequencia) {
           setDecisoes(prev => ({
             ...prev,
             [notaId]: 'APROVADO_RECUPERACAO'
@@ -183,7 +185,8 @@ export default function ConselhoClasseClient({
         const notaRecValue = notasRec[n.id]
         let statusFinal = decisoes[n.id] || n.status
 
-        if (media >= 5) {
+        // Abaixo da frequência mínima a nota não aprova sozinha: vale a decisão do conselho
+        if (media >= notaMinima && !n.abaixoMinimoFrequencia) {
           statusFinal = 'APROVADO_RECUPERACAO'
         }
 
@@ -239,15 +242,15 @@ export default function ConselhoClasseClient({
       case 'APROVADO':
       case 'APROVADO_RECUPERACAO':
       case 'APROVADO_CONSELHO':
-        return 'text-emerald-700 bg-emerald-100'
+        return 'text-success-fg bg-success-subtle'
       case 'RECUPERACAO':
-        return 'text-orange-700 bg-orange-100'
+        return 'text-warning-fg bg-warning-subtle'
       case 'DEPENDENCIA':
-        return 'text-slate-800 bg-slate-200'
+        return 'text-fg bg-zinc-200'
       case 'CONSERVADO':
-        return 'text-rose-700 bg-rose-100'
+        return 'text-danger-fg bg-danger-subtle'
       default:
-        return 'text-slate-800 bg-slate-200'
+        return 'text-fg bg-zinc-200'
     }
   }
 
@@ -351,7 +354,7 @@ export default function ConselhoClasseClient({
       `}</style>
 
       {/* Versão para impressão - Tabela */}
-      <div className="print-only p-6 bg-white">
+      <div className="print-only p-6 bg-surface">
         {/* Marca d'água */}
         <div className="print-watermark">
           Powered by Áxis
@@ -361,57 +364,57 @@ export default function ConselhoClasseClient({
         <div className="mb-3 flex items-start justify-between gap-6">
           {/* Identificação - Esquerda */}
           <div className="flex-1">
-            <p className="text-[9px] font-medium text-slate-700 mb-1 uppercase leading-tight">
+            <p className="text-xs font-medium text-fg-muted mb-1 leading-tight">
               Centro Territorial de Educação Profissional do Litoral Norte e Agreste Baiano
             </p>
             <div className="flex items-center gap-2 mb-1">
-              <div className="text-slate-800 font-medium text-lg">Áxis</div>
-              <div className="text-slate-300">|</div>
-              <h1 className="text-xl font-medium text-slate-900">Conselho de Classe Final</h1>
+              <div className="text-fg font-medium text-lg">Áxis</div>
+              <div className="text-fg-disabled">|</div>
+              <h1 className="text-xl font-medium text-fg">Conselho de Classe Final</h1>
             </div>
-            <h2 className="text-lg font-medium text-slate-900 mb-0.5">{turmaNome}</h2>
-            {turmaCurso && <p className="text-sm font-medium text-slate-700">{turmaCurso} {turmaTurno && `- ${turmaTurno}`}</p>}
-            <p className="text-xs text-slate-400 mt-0.5">Impresso em: {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+            <h2 className="text-lg font-medium text-fg mb-0.5">{turmaNome}</h2>
+            {turmaCurso && <p className="text-sm font-medium text-fg-muted">{turmaCurso} {turmaTurno && `- ${turmaTurno}`}</p>}
+            <p className="text-xs text-fg-subtle mt-0.5">Impresso em: {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
           </div>
           
           {/* Legenda - Direita */}
-          <div className="bg-white rounded px-3 py-2 border border-slate-300" style={{minWidth: '450px'}}>
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[8px]">
-              <span className="font-medium text-blue-800 text-[9px] mr-1">LEGENDA:</span>
+          <div className="bg-surface rounded px-3 py-2 border border-line-strong" style={{minWidth: '450px'}}>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs">
+              <span className="font-medium text-accent-fg text-xs mr-1">LEGENDA:</span>
               <div className="flex items-center gap-1">
-                <span className="px-2 py-1 bg-emerald-100 border border-emerald-400 font-medium rounded text-emerald-900 text-[7px]">AR</span>
+                <span className="px-2 py-1 bg-success-subtle border border-success font-medium rounded text-success-fg text-[7px]">AR</span>
                 <span className="font-medium">Aprov. Recup.</span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="px-2 py-1 bg-emerald-200 border border-emerald-500 font-medium rounded text-emerald-900 text-[7px]">AC</span>
+                <span className="px-2 py-1 bg-success-subtle border border-success font-medium rounded text-success-fg text-[7px]">AC</span>
                 <span className="font-medium">Aprov. Conselho</span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="px-2 py-1 bg-slate-200 border border-blue-400 font-medium rounded text-blue-900 text-[7px]">DP</span>
+                <span className="px-2 py-1 bg-subtle-hover border border-zinc-400 font-medium rounded text-accent-fg text-[7px]">DP</span>
                 <span className="font-medium">Dependência</span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="px-2 py-1 bg-rose-100 border border-rose-400 font-medium rounded text-rose-900 text-[7px]">CO</span>
+                <span className="px-2 py-1 bg-danger-subtle border border-danger font-medium rounded text-danger-fg text-[7px]">CO</span>
                 <span className="font-medium">Conservado</span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="px-2 py-1 bg-amber-100 border border-amber-400 font-medium rounded text-amber-900 text-[7px]">RC</span>
+                <span className="px-2 py-1 bg-warning-subtle border border-warning font-medium rounded text-warning-fg text-[7px]">RC</span>
                 <span className="font-medium">Recuperação</span>
               </div>
             </div>
           </div>
         </div>
         
-        <table className="print-table w-full border-collapse text-[9px]">
+        <table className="print-table w-full border-collapse text-xs">
           <thead>
             <tr>
-              <th className="border border-blue-400 px-2 bg-white font-medium text-center text-[8px]" style={{minWidth: '120px', maxWidth: '120px', width: '120px', height: '100px', verticalAlign: 'middle'}}>
+              <th className="border border-zinc-400 px-2 bg-surface font-medium text-center text-xs" style={{minWidth: '120px', maxWidth: '120px', width: '120px', height: '100px', verticalAlign: 'middle'}}>
                 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%'}}>
                   ESTUDANTE
                 </div>
               </th>
               {disciplinas.map((disc) => (
-                <th key={disc} className="border border-blue-400 bg-white font-medium text-center" style={{minWidth: '20px', maxWidth: '20px', width: '20px', height: '100px', padding: '8px 0'}}>
+                <th key={disc} className="border border-zinc-400 bg-surface font-medium text-center" style={{minWidth: '20px', maxWidth: '20px', width: '20px', height: '100px', padding: '8px 0'}}>
                   <div style={{
                     writingMode: 'vertical-rl',
                     transform: 'rotate(180deg)',
@@ -441,14 +444,14 @@ export default function ConselhoClasseClient({
 
                 return (
                   <tr key={estudanteId}>
-                    <td className="border border-blue-400 px-2 py-0.5 font-medium text-left bg-white text-[10px] leading-tight" style={{maxWidth: '120px', width: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
-                      <span className="text-slate-600 mr-1 text-[8px]">{String(idx + 1).padStart(2, '0')}</span>
+                    <td className="border border-zinc-400 px-2 py-0.5 font-medium text-left bg-surface text-xs leading-tight" style={{maxWidth: '120px', width: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
+                      <span className="text-fg-muted mr-1 text-xs">{String(idx + 1).padStart(2, '0')}</span>
                       <span>{data.nome}</span>
                     </td>
                     {disciplinas.map((disc) => {
                       const nota = notasPorDisciplina[disc]
                       if (!nota) {
-                        return <td key={disc} className="border border-blue-400 px-1 py-1 text-center bg-white">-</td>
+                        return <td key={disc} className="border border-zinc-400 px-1 py-1 text-center bg-surface">-</td>
                       }
                       
                       const statusAtual = decisoes[nota.id] || nota.status
@@ -457,43 +460,43 @@ export default function ConselhoClasseClient({
                         : nota.notaRecuperacao
                       
                       let bgColor = 'bg-white'
-                      let textColor = 'text-blue-900'
+                      let textColor = 'text-accent-fg'
                       let statusAbrev = ''
                       
                       switch(statusAtual) {
                         case 'APROVADO_RECUPERACAO':
-                          bgColor = 'bg-emerald-100'
-                          textColor = 'text-emerald-900'
+                          bgColor = 'bg-success-subtle'
+                          textColor = 'text-success-fg'
                           statusAbrev = 'AR'
                           break
                         case 'APROVADO_CONSELHO':
-                          bgColor = 'bg-emerald-200'
-                          textColor = 'text-emerald-900'
+                          bgColor = 'bg-success-subtle'
+                          textColor = 'text-success-fg'
                           statusAbrev = 'AC'
                           break
                         case 'DEPENDENCIA':
-                          bgColor = 'bg-slate-200'
-                          textColor = 'text-blue-900'
+                          bgColor = 'bg-zinc-200'
+                          textColor = 'text-accent-fg'
                           statusAbrev = 'DP'
                           break
                         case 'CONSERVADO':
-                          bgColor = 'bg-rose-100'
-                          textColor = 'text-rose-900'
+                          bgColor = 'bg-danger-subtle'
+                          textColor = 'text-danger-fg'
                           statusAbrev = 'CO'
                           break
                         case 'RECUPERACAO':
-                          bgColor = 'bg-amber-50'
-                          textColor = 'text-amber-900'
+                          bgColor = 'bg-warning-subtle'
+                          textColor = 'text-warning-fg'
                           statusAbrev = 'RC'
                           break
                       }
                       
                       return (
-                        <td key={disc} className={`border border-blue-400 px-1 py-1 text-center font-medium ${bgColor} ${textColor}`}>
+                        <td key={disc} className={`border border-zinc-400 px-1 py-1 text-center font-medium ${bgColor} ${textColor}`}>
                           <div className="flex flex-col items-center leading-tight">
-                            <span className="text-[8px] font-medium">{statusAbrev}</span>
+                            <span className="text-xs font-medium">{statusAbrev}</span>
                             {notaFinal !== null && notaFinal !== undefined && (
-                              <span className="text-[10px]">{notaFinal.toFixed(1)}</span>
+                              <span className="text-xs">{notaFinal.toFixed(1)}</span>
                             )}
                           </div>
                         </td>
@@ -506,28 +509,28 @@ export default function ConselhoClasseClient({
         </table>
       </div>
 
-    <div className="min-h-screen bg-white no-print">
+    <div className="no-print">
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
-      <header className="bg-white/80 backdrop-blur-xl border-b border-slate-300 sticky top-0 z-50 -mx-4 -mt-4 md:-mx-8 md:-mt-8 mb-4 px-4 sm:px-6 lg:px-8 no-print">
+      <header className="mb-6 border-b border-line pb-4 no-print">
         <div className="max-w-7xl mx-auto py-4">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="flex items-center space-x-5">
               <Link
                 href="/dashboard/conselho-classe"
-                className="p-2 hover:bg-slate-200 rounded-lg transition-colors text-slate-400 hover:text-slate-700"
+                className="p-2 hover:bg-subtle-hover rounded-lg transition-colors text-fg-subtle hover:text-fg-muted"
               >
                 <ArrowLeft size={20} />
               </Link>
               <div>
                 <div className="flex items-center space-x-2 mb-0.5">
-                  <h1 className="text-2xl font-bold text-slate-800 tracking-tight">{turmaNome}</h1>
+                  <h1 className="text-2xl font-bold text-fg tracking-tight">{turmaNome}</h1>
                   {turmaTurno && (
-                    <span className="px-2.5 py-1 bg-slate-900 text-white text-[10px] font-medium rounded-md uppercase tracking-widest leading-none">
+                    <span className="px-2.5 py-1 bg-subtle border border-line text-fg text-xs font-medium rounded-md leading-none">
                       {turmaTurno}
                     </span>
                   )}
                 </div>
-                <p className="text-base text-slate-600 font-medium">Conselho de Classe Final • {turmaCurso || 'Análise Pedagógica'}</p>
+                <p className="text-base text-fg-muted font-medium">Conselho de Classe Final • {turmaCurso || 'Análise Pedagógica'}</p>
               </div>
             </div>
           </div>
@@ -539,13 +542,13 @@ export default function ConselhoClasseClient({
         <form onSubmit={handleSubmit}>
           {/* Mensagem */}
           {message && (
-            <div className={`mb-8 p-5 rounded-3xl animate-in fade-in slide-in-from-top-4 duration-300 ${
+            <div className={`mb-8 p-5 rounded-xl animate-slide-up ${
               message.type === 'success' 
-                ? 'bg-emerald-50 border border-emerald-100 text-emerald-900 shadow-sm' 
-                : 'bg-rose-50 border border-rose-100 text-rose-900 shadow-sm'
+                ? 'bg-success-subtle border border-success-line text-success-fg shadow-sm' 
+                : 'bg-danger-subtle border border-danger-line text-danger-fg shadow-sm'
             }`}>
               <div className="flex items-center space-x-3">
-                <div className={`p-1.5 rounded-xl ${message.type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'}`}>
+                <div className={`p-1.5 rounded-xl ${message.type === 'success' ? 'bg-success' : 'bg-danger'}`}>
                   <AlertCircle className="w-5 h-5 text-white" />
                 </div>
                 <span className="font-medium text-sm tracking-tight">{message.text}</span>
@@ -554,7 +557,7 @@ export default function ConselhoClasseClient({
           )}
 
           {/* Dashboard de Visão Geral */}
-          <div className="mb-6 bg-white p-1.5 rounded-3xl border border-slate-300 shadow-lg shadow-slate-300/30 overflow-hidden">
+          <div className="mb-6 bg-surface p-1.5 rounded-xl border border-line-strong shadow-card overflow-hidden">
             <div className="p-4">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 {/* Métricas Rápidas */}
@@ -573,17 +576,17 @@ export default function ConselhoClasseClient({
 
                   return (
                     <div className="flex flex-wrap items-center gap-2">
-                      <div className="px-3 py-1.5 bg-white rounded-xl border border-slate-200 flex items-center space-x-2">
-                        <div className="w-1 h-1 bg-slate-400 rounded-full" />
-                        <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">{total} Alunos</span>
+                      <div className="px-3 py-1.5 bg-surface rounded-xl border border-line flex items-center space-x-2">
+                        <div className="w-1 h-1 bg-zinc-400 rounded-full" />
+                        <span className="text-xs font-medium text-fg-subtle">{total} Alunos</span>
                       </div>
-                      <div className="px-3 py-1.5 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center space-x-2">
-                        <div className="w-1 h-1 bg-emerald-500 rounded-full" />
-                        <span className="text-[10px] font-medium text-emerald-700 uppercase tracking-wider">{concluidos} Concluídos</span>
+                      <div className="px-3 py-1.5 bg-success-subtle rounded-xl border border-success-line flex items-center space-x-2">
+                        <div className="w-1 h-1 bg-success rounded-full" />
+                        <span className="text-xs font-medium text-success-fg">{concluidos} Concluídos</span>
                       </div>
-                      <div className="px-3 py-1.5 bg-amber-50 rounded-xl border border-amber-100 flex items-center space-x-2">
-                        <div className="w-1 h-1 bg-amber-500 rounded-full animate-pulse" />
-                        <span className="text-[10px] font-medium text-amber-700 uppercase tracking-wider">{pendentes} Pendentes</span>
+                      <div className="px-3 py-1.5 bg-warning-subtle rounded-xl border border-warning-line flex items-center space-x-2">
+                        <div className="w-1 h-1 bg-warning rounded-full animate-pulse" />
+                        <span className="text-xs font-medium text-warning-fg">{pendentes} Pendentes</span>
                       </div>
                     </div>
                   )
@@ -594,7 +597,7 @@ export default function ConselhoClasseClient({
                   <button 
                     type="button"
                     onClick={handlePrint}
-                    className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all bg-white text-slate-700 border border-slate-300 hover:border-slate-500 hover:text-slate-700 hover:bg-slate-100"
+                    className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-medium transition-all bg-surface text-fg-muted border border-line-strong hover:border-zinc-500 hover:text-fg-muted hover:bg-subtle"
                   >
                     <Printer className="w-3 h-3" />
                     <span>Imprimir</span>
@@ -603,10 +606,10 @@ export default function ConselhoClasseClient({
                   <button 
                     type="button"
                     onClick={() => setShowInstructions(!showInstructions)}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all ${
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
                       showInstructions 
-                      ? 'bg-slate-800 text-white shadow-md' 
-                      : 'bg-white text-slate-400 border border-slate-300 hover:border-pink-300 hover:text-pink-500 font-medium'
+                      ? 'bg-zinc-800 text-white shadow-card' 
+                      : 'bg-surface text-fg-subtle border border-line-strong hover:border-accent/25 hover:text-accent-fg font-medium'
                     }`}
                   >
                     <AlertCircle className="w-3 h-3" />
@@ -617,25 +620,25 @@ export default function ConselhoClasseClient({
 
               {/* Instruções Expansíveis */}
               {showInstructions && (
-                <div className="mt-8 p-8 bg-white rounded-[2rem] border border-slate-200 animate-in fade-in slide-in-from-top-4 duration-300">
+                <div className="mt-8 p-8 bg-surface rounded-xl border border-line animate-slide-up">
                   <div className="flex items-start space-x-5">
-                    <div className="p-3 bg-pink-500 rounded-2xl shadow-lg shadow-pink-200">
+                    <div className="p-3 bg-accent rounded-lg shadow-card">
                       <Gavel className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-base font-medium text-slate-800 tracking-tight">Guia Rápido do Conselho</h3>
+                      <h3 className="text-base font-medium text-fg tracking-tight">Guia Rápido do Conselho</h3>
                       <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div className="space-y-2">
-                          <span className="text-[10px] font-medium text-pink-500 uppercase tracking-widest">Passo 01</span>
-                          <p className="text-xs text-slate-500 leading-relaxed font-medium">Clique no nome do aluno para abrir a lista de matérias com pendência.</p>
+                          <span className="text-xs font-medium text-accent-fg">Passo 01</span>
+                          <p className="text-xs text-fg-subtle leading-relaxed font-medium">Clique no nome do aluno para abrir a lista de matérias com pendência.</p>
                         </div>
                         <div className="space-y-2">
-                          <span className="text-[10px] font-medium text-pink-500 uppercase tracking-widest">Passo 02</span>
-                          <p className="text-xs text-slate-500 leading-relaxed font-medium">Ajuste a <b>Nota Rec.</b> se necessário. Notas acima de 5.0 aprovam na hora.</p>
+                          <span className="text-xs font-medium text-accent-fg">Passo 02</span>
+                          <p className="text-xs text-fg-subtle leading-relaxed font-medium">Ajuste a <b>Nota Rec.</b> se necessário. Notas acima de 5.0 aprovam na hora.</p>
                         </div>
                         <div className="space-y-2">
-                          <span className="text-[10px] font-medium text-pink-500 uppercase tracking-widest">Passo 03</span>
-                          <p className="text-xs text-slate-500 leading-relaxed font-medium">Defina a <b>Decisão Final</b> e use o botão <b>Gravar</b> no rodapé fixo.</p>
+                          <span className="text-xs font-medium text-accent-fg">Passo 03</span>
+                          <p className="text-xs text-fg-subtle leading-relaxed font-medium">Defina a <b>Decisão Final</b> e use o botão <b>Gravar</b> no rodapé fixo.</p>
                         </div>
                       </div>
                     </div>
@@ -644,27 +647,27 @@ export default function ConselhoClasseClient({
               )}
 
               {/* Legenda Minimalista */}
-              <div className="mt-8 pt-6 border-t border-slate-50 flex flex-wrap items-center gap-8 px-2">
-                <span className="text-[10px] font-medium text-slate-300 uppercase tracking-widest">Legenda de Estados:</span>
+              <div className="mt-8 pt-6 border-t border-line-subtle flex flex-wrap items-center gap-8 px-2">
+                <span className="text-xs font-medium text-fg-disabled">Legenda de Estados:</span>
                 <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <span className="text-[10px] font-medium text-slate-600 uppercase tracking-wider">Aprovado</span>
+                  <div className="w-2 h-2 rounded-full bg-success" />
+                  <span className="text-xs font-medium text-fg-muted">Aprovado</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 rounded-full bg-white0" />
-                  <span className="text-[10px] font-medium text-slate-600 uppercase tracking-wider">Dependência</span>
+                  <span className="text-xs font-medium text-fg-muted">Dependência</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 rounded-full bg-rose-500" />
-                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Conservado</span>
+                  <div className="w-2 h-2 rounded-full bg-danger" />
+                  <span className="text-xs font-medium text-fg-subtle">Conservado</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 rounded-full bg-orange-500" />
-                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Recuperação</span>
+                  <div className="w-2 h-2 rounded-full bg-warning" />
+                  <span className="text-xs font-medium text-fg-subtle">Recuperação</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 rounded-sm bg-orange-100 border border-orange-200" />
-                  <span className="text-[10px] font-medium text-orange-600 uppercase tracking-wider">Infrequente (INF)</span>
+                  <div className="w-2 h-2 rounded-sm bg-warning-subtle border border-warning-line" />
+                  <span className="text-xs font-medium text-warning-fg">Infrequente (INF)</span>
                 </div>
               </div>
             </div>
@@ -701,54 +704,54 @@ export default function ConselhoClasseClient({
               const recAprovado = data.notas.filter(n => {
                 const statusFinal = decisoes[n.id] || n.status
                 const notaAtual = notasRec[n.id]
-                return (statusFinal === 'APROVADO_RECUPERACAO' || (notaAtual !== null && notaAtual >= 5))
+                return (statusFinal === 'APROVADO_RECUPERACAO' || (notaAtual !== null && notaAtual >= notaMinima))
               }).length
 
               return (
                 <div 
                   key={estudanteId} 
-                  className={`bg-white rounded-2xl shadow-sm transition-all duration-300 border ${
-                    isExpanded ? 'shadow-md border-slate-300' : 'border-slate-200'
+                  className={`bg-surface rounded-lg shadow-sm transition-all duration-300 border ${
+                    isExpanded ? 'shadow-card border-line-strong' : 'border-line'
                   } ${
-                    todasResolvidas ? 'bg-emerald-50/10 border-emerald-100' : ''
+                    todasResolvidas ? 'bg-success-subtle border-success-line' : ''
                   }`}
                 >
                   {/* Cabeçalho do Card (Toggle) */}
                   <button
                     type="button"
                     onClick={() => toggleStudent(estudanteId)}
-                    className={`w-full px-6 py-5 flex items-center justify-between text-left transition-colors rounded-2xl ${
-                      isExpanded ? 'bg-white' : 'hover:bg-white/30'
+                    className={`w-full px-4 py-3 flex items-center justify-between text-left transition-colors rounded-lg ${
+                      isExpanded ? 'bg-surface' : 'hover:bg-surface/30'
                     }`}
                   >
                     <div className="flex items-center space-x-4">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-medium text-base transition-all ${
-                        todasResolvidas ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600 border border-slate-300'
+                      <div className={`size-8 rounded-full flex items-center justify-center font-medium text-xs transition-all ${
+                        todasResolvidas ? 'bg-success text-white' : 'bg-subtle-hover text-fg-muted border border-line-strong'
                       }`}>
                         {todasResolvidas ? <CheckCircle2 className="w-5 h-5" /> : data.nome.charAt(0)}
                       </div>
                       <div>
                         <h3 className={`text-base font-medium tracking-tight ${
-                          todasResolvidas ? 'text-emerald-900' : 'text-slate-800'
+                          todasResolvidas ? 'text-success-fg' : 'text-fg'
                         }`}>
                           {data.nome}
                         </h3>
                         {/* Status Detalhado */}
                         <div className="flex flex-wrap items-center gap-2 mt-1.5">
                           {recTotal > 0 && (
-                            <span className="text-[10px] font-medium uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
+                            <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-subtle text-fg-muted border border-line">
                               {recTotal} {recTotal === 1 ? 'Recuperação' : 'Recuperações'} ({recAprovado} Passou)
                             </span>
                           )}
                           
-                          <span className={`text-[10px] font-medium uppercase tracking-wider px-2 py-0.5 rounded-md ${
-                             todasResolvidas ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-pink-100 text-pink-600 border border-pink-200'
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded-md ${
+                             todasResolvidas ? 'bg-success-subtle text-success-fg border border-success-line' : 'bg-accent-subtle text-accent-fg border border-accent/25'
                           }`}>
                             {levadasAoConselho} {levadasAoConselho === 1 ? 'Matéria' : 'Matérias'} analit.
                           </span>
 
                           {!isExpanded && (
-                             <span className="text-[10px] font-medium text-slate-400 ml-1">
+                             <span className="text-xs font-medium text-fg-subtle ml-1">
                                {resolvidasCount}/{data.notas.length} Resolvidas
                              </span>
                           )}
@@ -758,12 +761,12 @@ export default function ConselhoClasseClient({
                     
                     <div className="flex items-center space-x-4">
                        {todasResolvidas && !isExpanded && (
-                          <div className="hidden md:flex items-center space-x-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-lg border border-emerald-100">
+                          <div className="hidden md:flex items-center space-x-1.5 px-3 py-1 bg-success-subtle text-success-fg rounded-lg border border-success-line">
                              <CheckCircle2 className="w-3.5 h-3.5" />
-                             <span className="text-[10px] font-medium uppercase tracking-wider">Concluído</span>
+                             <span className="text-xs font-medium">Concluído</span>
                           </div>
                        )}
-                       <div className={`p-1.5 rounded-lg border transition-all ${isExpanded ? 'bg-white border-pink-200 text-pink-500 shadow-sm' : 'bg-white border-slate-200 text-slate-400'}`}>
+                       <div className={`p-1.5 rounded-lg border transition-all ${isExpanded ? 'bg-surface border-accent/25 text-accent-fg shadow-sm' : 'bg-surface border-line text-fg-subtle'}`}>
                          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                        </div>
                     </div>
@@ -771,16 +774,16 @@ export default function ConselhoClasseClient({
 
                   {/* Listagem de Disciplinas (Sanfonado) */}
                   {isExpanded && (
-                    <div className="px-6 pb-6 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="px-6 pb-6 pt-2 animate-slide-up">
                       <div className="overflow-x-auto">
                         <table className="w-full">
                           <thead>
-                            <tr className="border-b border-slate-200">
-                               <th className="px-4 py-3 text-left text-sm font-medium text-slate-400 uppercase tracking-widest w-10">#</th>
-                              <th className="px-4 py-3 text-left text-sm font-medium text-slate-400 uppercase tracking-widest text-nowrap">Disciplina</th>
-                              <th className="px-4 py-3 text-center text-sm font-medium text-slate-400 uppercase tracking-widest">Média Anual</th>
-                              <th className="px-4 py-3 text-center text-sm font-medium text-slate-400 uppercase tracking-widest text-nowrap">Nota Rec.</th>
-                              <th className="px-4 py-3 text-left text-sm font-medium text-pink-500 uppercase tracking-widest">Decisão</th>
+                            <tr className="border-b border-line">
+                               <th className="px-4 py-3 text-left text-sm font-medium text-fg-subtle w-10">#</th>
+                              <th className="px-4 py-3 text-left text-sm font-medium text-fg-subtle text-nowrap">Disciplina</th>
+                              <th className="px-4 py-3 text-center text-sm font-medium text-fg-subtle">Média Anual</th>
+                              <th className="px-4 py-3 text-center text-sm font-medium text-fg-subtle text-nowrap">Nota Rec.</th>
+                              <th className="px-4 py-3 text-left text-sm font-medium text-accent-fg">Decisão</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y-0">
@@ -797,52 +800,47 @@ export default function ConselhoClasseClient({
                                 const statusValue = decisoes[nota.id] || ''
                                 const notaRecVal = notasRec[nota.id] !== undefined ? (notasRec[nota.id] || null) : (nota.notaRecuperacao || null)
                                 const mediaCalculada = calcularMediaReal(nota)
-                                const isApproved = (notaRecVal !== null && notaRecVal >= 5) || mediaCalculada >= 5
+                                const isApproved = ((notaRecVal !== null && notaRecVal >= notaMinima) || mediaCalculada >= notaMinima) && !nota.abaixoMinimoFrequencia
                                 const isResolvida = isApproved || ['APROVADO_CONSELHO', 'DEPENDENCIA', 'CONSERVADO'].includes(statusValue || nota.status)
                                 
                                 // Definir cores dinâmicas para o select
-                                let selectBg = 'bg-white border-slate-200 text-slate-700'
-                                let iconColor = 'text-slate-300'
+                                let selectBg = 'bg-white border-zinc-200 text-fg-muted'
+                                let iconColor = 'text-zinc-300'
                                 
                                 if (statusValue.includes('APROVADO')) {
-                                  selectBg = 'bg-emerald-50 border-emerald-100 text-emerald-700'
-                                  iconColor = 'text-emerald-500'
+                                  selectBg = 'bg-success-subtle border-success-line text-success-fg'
+                                  iconColor = 'text-success-fg'
                                 } else if (statusValue === 'DEPENDENCIA') {
-                                  selectBg = 'bg-slate-100 border-slate-200 text-slate-800'
-                                  iconColor = 'text-slate-600'
+                                  selectBg = 'bg-zinc-100 border-zinc-200 text-fg'
+                                  iconColor = 'text-fg-muted'
                                 } else if (statusValue === 'CONSERVADO') {
-                                  selectBg = 'bg-rose-50 border-rose-100 text-rose-700'
-                                  iconColor = 'text-rose-500'
+                                  selectBg = 'bg-danger-subtle border-danger-line text-danger-fg'
+                                  iconColor = 'text-danger-fg'
                                 }
 
                                 return (
-                                  <tr key={nota.id} className={`group transition-all hover:bg-slate-100/50 even:bg-white ${isResolvida ? 'opacity-70' : ''}`}>
-                                     <td className="px-4 py-4 rounded-l-xl text-sm font-medium text-slate-300">
+                                  <tr key={nota.id} className={`group transition-all hover:bg-subtle/50 even:bg-surface ${isResolvida ? 'opacity-70' : ''}`}>
+                                     <td className="px-4 py-4 rounded-l-xl text-sm font-medium text-fg-disabled">
                                       {nota.originalIndex + 1}
                                     </td>
                                     <td className="px-4 py-4">
                                       <div className="flex items-center gap-2">
-                                        <div className="text-lg font-medium text-slate-900">
+                                        <div className="text-lg font-medium text-fg">
                                           {nota.disciplinaNome}
                                         </div>
                                         <div className="flex gap-1">
-                                          {nota.isDesistenteUnid1 && (
-                                            <span className="px-1.5 py-0.5 bg-rose-50 text-[8px] font-medium text-rose-600 border border-rose-100 rounded uppercase tracking-tighter" title="Infrequente na Unidade 1">
-                                              INF U1
+                                          {nota.etapas.map((etapa: EtapaDaNota, i: number) => etapa.desistente && (
+                                            <span key={i} className="px-1.5 py-0.5 bg-danger-subtle text-xs font-medium text-danger-fg border border-danger-line rounded" title={`Infrequente na Unidade ${i + 1}`}>
+                                              INF U{i + 1}
+                                            </span>
+                                          ))}
+                                          {nota.frequencia !== null && nota.frequencia !== undefined && (
+                                            <span className={`px-1.5 py-0.5 text-xs font-medium border rounded ${nota.abaixoMinimoFrequencia ? 'bg-danger-subtle text-danger-fg border-danger-line' : 'bg-canvas text-fg-subtle border-line'}`} title={`Frequência mínima: ${frequenciaMinima}%`}>
+                                              FREQ {formatarFrequencia(nota.frequencia)}{nota.abaixoMinimoFrequencia && ' · abaixo do mínimo'}
                                             </span>
                                           )}
-                                          {nota.isDesistenteUnid2 && (
-                                            <span className="px-1.5 py-0.5 bg-rose-50 text-[8px] font-medium text-rose-600 border border-rose-100 rounded uppercase tracking-tighter" title="Infrequente na Unidade 2">
-                                              INF U2
-                                            </span>
-                                          )}
-                                          {nota.isDesistenteUnid3 && (
-                                            <span className="px-1.5 py-0.5 bg-rose-50 text-[8px] font-medium text-rose-600 border border-rose-100 rounded uppercase tracking-tighter" title="Infrequente na Unidade 3">
-                                              INF U3
-                                            </span>
-                                          )}
-                                          {nota.status === 'DESISTENTE' && !nota.isDesistenteUnid1 && !nota.isDesistenteUnid2 && !nota.isDesistenteUnid3 && (
-                                            <span className="px-1.5 py-0.5 bg-slate-100 text-[8px] font-medium text-slate-700 border border-slate-200 rounded uppercase tracking-tighter">
+                                          {nota.status === 'DESISTENTE' && !nota.etapas.some((e: EtapaDaNota) => e.desistente) && (
+                                            <span className="px-1.5 py-0.5 bg-subtle text-xs font-medium text-fg-muted border border-line rounded">
                                               INFREQUENTE
                                             </span>
                                           )}
@@ -850,7 +848,7 @@ export default function ConselhoClasseClient({
                                       </div>
                                     </td>
                                      <td className="px-4 py-4 text-center">
-                                        <span className={`text-lg font-medium font-mono ${mediaCalculada < 5 ? 'text-rose-600' : 'text-slate-700'}`}>
+                                        <span className={`text-lg font-medium font-mono ${mediaCalculada < notaMinima ? 'text-danger-fg' : 'text-fg-muted'}`}>
                                           {mediaCalculada.toFixed(1)}
                                         </span>
                                     </td>
@@ -863,8 +861,8 @@ export default function ConselhoClasseClient({
                                          disabled={isApproved}
                                          className={`w-16 h-9 text-center rounded-md text-base font-medium border outline-none transition-all ${
                                            isApproved 
-                                           ? 'bg-emerald-50 text-emerald-700 border-emerald-100 cursor-not-allowed font-medium' 
-                                           : 'bg-rose-50 text-rose-700 border-rose-100 focus:border-rose-300 focus:ring-2 focus:ring-rose-50'
+                                           ? 'bg-success-subtle text-success-fg border-success-line cursor-not-allowed font-medium' 
+                                           : 'bg-danger-subtle text-danger-fg border-danger-line focus:border-danger-line focus:ring-2 focus:ring-danger/30'
                                          }`}
                                          placeholder="---"
                                        />
@@ -877,19 +875,19 @@ export default function ConselhoClasseClient({
                                            disabled={isApproved}
                                            className={`w-[212px] h-10 px-4 pr-8 rounded-lg outline-none font-medium text-xs uppercase tracking-wider transition-all appearance-none border ${
                                              isApproved 
-                                             ? 'bg-emerald-50 border-emerald-200 text-emerald-700 cursor-not-allowed' 
-                                             : `${selectBg} cursor-pointer ${!statusValue ? 'focus:border-pink-300 focus:ring-2 focus:ring-pink-50' : ''}`
+                                             ? 'bg-success-subtle border-success-line text-success-fg cursor-not-allowed' 
+                                             : `${selectBg} cursor-pointer ${!statusValue ? 'focus:border-accent/25 focus:ring-2 focus:ring-ring' : ''}`
                                            }`}
                                          >
-                                           <option value="" className="text-slate-400">Definir decisão...</option>
+                                           <option value="" className="text-fg-subtle">Definir decisão...</option>
                                            <option value="APROVADO_RECUPERACAO">Aprovado na Recuperação</option>
                                            {STATUS_OPTIONS.filter(opt => opt.value !== 'APROVADO_RECUPERACAO').map((opt) => (
-                                              <option key={opt.value} value={opt.value} className="text-slate-800 font-medium">
+                                              <option key={opt.value} value={opt.value} className="text-fg font-medium">
                                                 {opt.label}
                                               </option>
                                             ))}
                                           </select>
-                                          <div className={`absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none ${isApproved ? 'text-emerald-500' : iconColor}`}>
+                                          <div className={`absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none ${isApproved ? 'text-success-fg' : iconColor}`}>
                                             <ChevronDown className="w-3.5 h-3.5" />
                                           </div>
                                         </div>
@@ -908,28 +906,23 @@ export default function ConselhoClasseClient({
           </div>
 
           {/* Footer Fixo */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-slate-200 px-4 py-6 z-50 shadow-[0_-10px_40px_rgba(15,23,42,0.1)]">
-            <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="sticky bottom-4 z-20 mt-6 rounded-lg border border-line bg-elevated/95 px-4 py-3 shadow-overlay backdrop-blur">
+            <div className="flex flex-col items-center justify-between gap-3 md:flex-row">
               <div className="flex items-center space-x-4">
-                <div className="bg-slate-100 p-3 rounded-2xl border border-slate-200 shadow-inner">
-                  <Gavel className="w-5 h-5 text-slate-700" />
-                </div>
+                <Gavel size={16} strokeWidth={1.75} className="text-fg-subtle" aria-hidden />
                 <div>
-                   <p className="text-[10px] font-medium text-slate-900 uppercase tracking-widest leading-none">Fechamento de Conselhos</p>
-                   <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest mt-1.5 flex items-center">
-                     <span className="w-2 h-2 bg-pink-500 rounded-full mr-2 animate-pulse" />
-                     {notasConselho.length} Registros totais nesta turma
-                   </p>
+                   <p className="text-13 font-medium text-fg">Fechamento do conselho</p>
+                   <p className="text-xs text-fg-subtle">{notasConselho.length} registros nesta turma</p>
                 </div>
               </div>
               <div className="flex items-center space-x-4 w-full md:w-auto">
                 <button
                   type="submit"
                   disabled={loading || Object.keys(decisoes).length === 0}
-                  className="flex-1 md:flex-none flex items-center justify-center space-x-4 bg-pink-600 text-white px-10 py-4 rounded-[1.5rem] font-medium uppercase tracking-widest hover:bg-pink-700 transition-all shadow-xl shadow-pink-200 active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed group border-b-4 border-pink-800"
+                  className={buttonClasses({ className: "flex-1 md:flex-none" })}
                 >
-                  {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5 group-hover:rotate-12 transition-transform" />}
-                  <span className="text-xs">{loading ? 'Sincronizando...' : 'Gravar Decisões Agora'}</span>
+                  {loading ? <Loader2 size={16} strokeWidth={1.75} className="animate-spin" /> : <Save size={16} strokeWidth={1.75} />}
+                  {loading ? 'Salvando…' : 'Gravar decisões'}
                 </button>
               </div>
             </div>
@@ -937,33 +930,33 @@ export default function ConselhoClasseClient({
         </form>
         {/* Modal de Confirmação */}
         {showConfirmModal && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 animate-in fade-in duration-300">
-            <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300">
-              <div className="p-8 border-b border-slate-50 flex items-center justify-between">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-900/40 backdrop-blur-sm p-4 animate-fade-in">
+            <div className="bg-surface rounded-xl shadow-overlay max-w-2xl w-full flex flex-col max-h-[90vh] animate-pop-in">
+              <div className="p-8 border-b border-line-subtle flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-medium text-slate-900 uppercase tracking-tight">Revisar Decisões</h3>
-                  <p className="text-xs font-medium text-slate-400 mt-1">Confira os dados antes de consolidar no sistema</p>
+                  <h3 className="text-xl font-medium text-fg">Revisar Decisões</h3>
+                  <p className="text-xs font-medium text-fg-subtle mt-1">Confira os dados antes de consolidar no sistema</p>
                 </div>
                 <button 
                   type="button"
                   onClick={() => setShowConfirmModal(false)}
-                  className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+                  className="p-2 hover:bg-subtle rounded-full transition-colors"
                 >
-                  <X className="w-6 h-6 text-slate-300" />
+                  <X className="w-6 h-6 text-fg-disabled" />
                 </button>
               </div>
               
               <div className="p-8 overflow-y-auto flex-1 custom-scrollbar">
-                <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-inner font-mono">
+                <div className="bg-surface rounded-xl border border-line overflow-hidden shadow-card font-mono">
                   <table className="w-full text-left">
-                    <thead className="bg-slate-200/50 text-slate-400 font-medium uppercase text-[10px] tracking-widest">
+                    <thead className="bg-subtle-hover/50 text-fg-subtle font-medium text-xs">
                       <tr>
                         <th className="px-6 py-4">Estudante / Disciplina</th>
                         <th className="px-6 py-4 text-center">Nota Rec.</th>
                         <th className="px-6 py-4 text-center">Decisão</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-50 bg-white">
+                    <tbody className="divide-y divide-line-subtle bg-surface">
                       {Object.entries(decisoes).map(([notaId, status]) => {
                         const nota = notasConselho.find(n => n.id === notaId)
                         if (!nota) return null
@@ -974,13 +967,13 @@ export default function ConselhoClasseClient({
                         return (
                           <tr key={notaId}>
                             <td className="px-6 py-4">
-                              <p className="font-medium text-slate-900 text-xs uppercase">{nota.estudanteNome}</p>
-                              <p className="text-[10px] text-slate-400 font-medium uppercase mt-0.5">{nota.disciplinaNome}</p>
+                              <p className="font-medium text-fg text-xs">{nota.estudanteNome}</p>
+                              <p className="text-xs text-fg-subtle font-medium mt-0.5">{nota.disciplinaNome}</p>
                             </td>
-                            <td className="px-6 py-4 text-center font-medium text-slate-700 text-xs">
+                            <td className="px-6 py-4 text-center font-medium text-fg-muted text-xs">
                               {notaRecVal !== null && notaRecVal !== undefined ? notaRecVal.toFixed(1) : '-'}
                             </td>
-                            <td className={`px-6 py-4 text-center text-[10px] font-medium uppercase tracking-widest ${statusOpt?.color || 'text-slate-900'}`}>
+                            <td className={`px-6 py-4 text-center text-xs font-medium ${statusOpt?.color || 'text-fg'}`}>
                               {statusOpt?.label || status}
                             </td>
                           </tr>
@@ -991,18 +984,18 @@ export default function ConselhoClasseClient({
                 </div>
               </div>
 
-              <div className="p-8 border-t border-slate-50 flex justify-end space-x-4 bg-slate-100/50 rounded-b-[2.5rem]">
+              <div className="p-8 border-t border-line-subtle flex justify-end space-x-4 bg-subtle/50 rounded-b-[2.5rem]">
                 <button
                   type="button"
                   onClick={() => setShowConfirmModal(false)}
-                  className="px-8 py-3 rounded-2xl font-medium text-slate-400 hover:bg-white transition-all text-sm uppercase tracking-widest"
+                  className="px-8 py-3 rounded-lg font-medium text-fg-subtle hover:bg-surface transition-all text-sm"
                 >
                   Voltar
                 </button>
                 <button
                   type="button"
                   onClick={handleConfirmSave}
-                  className="px-10 py-3 rounded-2xl bg-pink-600 text-white font-medium uppercase tracking-widest hover:bg-pink-700 shadow-xl shadow-pink-200 transition-all flex items-center space-x-3 active:scale-95 text-xs"
+                  className="px-10 py-3 rounded-lg bg-accent text-on-accent font-medium hover:bg-accent-hover shadow-card transition-all flex items-center space-x-3 active:scale-95 text-xs"
                 >
                   <Save className="w-4 h-4" />
                   <span>Gravar Permanentemente</span>

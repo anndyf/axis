@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
+import { resolverEsquemaAvaliacaoId } from '@/lib/services/notas'
+import { contarNotasLancadas } from '@/lib/services/esquemas-padrao'
 
 export const runtime = 'nodejs'
 
@@ -54,13 +56,32 @@ export async function PUT(
       return NextResponse.json({ message: 'Turma não encontrada' }, { status: 404 })
     }
 
-    const { nome, curso, turno, modalidade, serie, numero } = await request.json()
+    const { nome, curso, turno, modalidade, serie, numero, esquemaAvaliacaoId } = await request.json()
 
     if (!nome || nome.trim() === '') {
       return NextResponse.json(
         { message: 'Nome da turma é obrigatório' },
         { status: 400 }
       )
+    }
+
+    // esquemaAvaliacaoId: undefined = não enviado (mantém), null/"" = herdar do curso
+    const novoEsquemaId = esquemaAvaliacaoId === undefined ? turmaExistente.esquemaAvaliacaoId : (esquemaAvaliacaoId || null)
+    if (novoEsquemaId !== turmaExistente.esquemaAvaliacaoId) {
+      if (novoEsquemaId && !(await prisma.esquemaAvaliacao.findUnique({ where: { id: novoEsquemaId, escolaId: session.user.escolaId }, select: { id: true } }))) {
+        return NextResponse.json({ message: 'Esquema de avaliação inválido' }, { status: 400 })
+      }
+      const cursoDaTurma = turmaExistente.cursoId
+        ? await prisma.curso.findUnique({ where: { id: turmaExistente.cursoId }, select: { esquemaAvaliacaoId: true } })
+        : null
+      const esquemaAtual = resolverEsquemaAvaliacaoId(turmaExistente, cursoDaTurma)
+      const esquemaNovo = resolverEsquemaAvaliacaoId({ esquemaAvaliacaoId: novoEsquemaId }, cursoDaTurma)
+      if (esquemaNovo !== esquemaAtual && (await contarNotasLancadas(prisma, { id }))) {
+        return NextResponse.json(
+          { message: 'Esta turma já tem notas lançadas no esquema atual - não é possível trocar o esquema de avaliação.' },
+          { status: 409 }
+        )
+      }
     }
 
     try {
@@ -72,7 +93,8 @@ export async function PUT(
           turno: turno?.trim(),
           modalidade: modalidade?.trim(),
           serie: serie?.toString(),
-          numero: numero ? parseInt(numero.toString()) : null
+          numero: numero ? parseInt(numero.toString()) : null,
+          esquemaAvaliacaoId: novoEsquemaId
         }
       })
       revalidatePath('/dashboard/turmas')

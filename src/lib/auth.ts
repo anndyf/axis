@@ -1,12 +1,31 @@
 import NextAuth from "next-auth"
 import type { NextAuthConfig } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
+import { CredentialsSignin } from "next-auth"
+import { excedeuLimite, registrarTentativa, limparTentativas } from "@/lib/limitador"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { headers } from "next/headers"
 
 // Force Node.js runtime (not Edge)
 export const runtime = 'nodejs'
+
+const MAX_TENTATIVAS_LOGIN = 5
+const JANELA_LOGIN_MINUTOS = 15
+const HASH_FICTICIO = bcrypt.hashSync('usuario-inexistente', 10)
+
+/**
+ * No NextAuth v5 só o `code` de um CredentialsSignin chega ao client
+ * (signIn() devolve result.code); um `throw new Error(...)` vira um
+ * "Configuration" genérico. Códigos: credenciais | inativo | pendente |
+ * bloqueado | escola - tratados em app/login/LoginForm.tsx.
+ */
+class ErroLogin extends CredentialsSignin {
+  constructor(code: string) {
+    super()
+    this.code = code
+  }
+}
 
 export const authConfig: NextAuthConfig = {
   providers: [
@@ -24,7 +43,7 @@ export const authConfig: NextAuthConfig = {
         // nunca de input do client) - sem ele, não sabemos em qual escola autenticar.
         const escolaId = (await headers()).get('x-escola-id')
         if (!escolaId) {
-          throw new Error('ESCOLA_NAO_IDENTIFICADA')
+          throw new ErroLogin('escola')
         }
 
         const loginUsername = (credentials.username as string).trim()
@@ -54,27 +73,34 @@ export const authConfig: NextAuthConfig = {
           }
         })
 
-        if (!user) {
-          throw new Error('USER_NOT_FOUND')
+        // Limite de tentativas erradas por usuário digitado (existente ou não)
+        const chaveLimite = `login:${escolaId}:${loginUsername.toLowerCase()}`
+        if (await excedeuLimite(chaveLimite, MAX_TENTATIVAS_LOGIN, JANELA_LOGIN_MINUTOS)) {
+          throw new ErroLogin('bloqueado')
+        }
+
+        // Usuário inexistente e senha errada dão o MESMO erro (não revela quais
+        // usuários/e-mails existem), e o status da conta (inativa/pendente) só
+        // é revelado depois que a senha confere.
+        const passwordToTry = (credentials.password as string).trim()
+        // Compara contra um hash fictício quando o usuário não existe, pra
+        // resposta levar o mesmo tempo nos dois casos.
+        const passwordMatch = await bcrypt.compare(passwordToTry, user?.password ?? HASH_FICTICIO) && !!user
+
+        if (!user || !passwordMatch) {
+          await registrarTentativa(chaveLimite)
+          throw new ErroLogin('credenciais')
         }
 
         if (!user.isActive) {
-          throw new Error('USER_INACTIVE')
+          throw new ErroLogin('inativo')
         }
 
         if (!user.isApproved) {
-          throw new Error('USER_NOT_APPROVED')
+          throw new ErroLogin('pendente')
         }
 
-        const passwordToTry = (credentials.password as string).trim()
-        const passwordMatch = await bcrypt.compare(
-          passwordToTry,
-          user.password
-        )
-
-        if (!passwordMatch) {
-          throw new Error('INVALID_PASSWORD')
-        }
+        await limparTentativas(chaveLimite)
 
         // Atualizar data do último acesso via SQL para contornar cache de schema
         // Envolvido em try/catch para que falha no update não impeça o login

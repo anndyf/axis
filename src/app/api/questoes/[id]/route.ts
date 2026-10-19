@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { logAudit } from '@/lib/audit'
+import { turmasSaoDaEscola } from '@/lib/data-fetching'
 
 export const runtime = 'nodejs'
 
@@ -12,13 +13,25 @@ export async function PUT(
   const { id } = await params
   try {
     const session = await auth()
-    if (!session) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+    if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+    const escolaId = session.user.escolaId
 
     const body = await request.json()
     const { status, feedbackAdmin, enunciado, alternativaA, alternativaB, alternativaC, alternativaD, alternativaE, correta, dificuldade, muleta, imagemUrl, unidade, disciplinasIds, turmasIds, tipo } = body
 
-    const questao = await prisma.questao.findUnique({ where: { id } })
+    // Questao não tem escolaId próprio - o escopo vem do professor autor
+    const questao = await prisma.questao.findFirst({ where: { id, professor: { escolaId } } })
     if (!questao) return NextResponse.json({ message: 'Questão não encontrada' }, { status: 404 })
+
+    if (disciplinasIds) {
+      const count = await prisma.disciplina.count({ where: { id: { in: disciplinasIds }, turma: { escolaId } } })
+      if (count !== new Set(disciplinasIds).size) {
+        return NextResponse.json({ message: 'Disciplina não encontrada' }, { status: 404 })
+      }
+    }
+    if (turmasIds && !(await turmasSaoDaEscola(turmasIds, escolaId))) {
+      return NextResponse.json({ message: 'Turma não encontrada' }, { status: 404 })
+    }
 
     // Se nâo for admin, só pode editar se for o dono
     if (!session.user.isSuperuser && !session.user.isDirecao) {
@@ -95,9 +108,9 @@ export async function DELETE(
   const { id } = await params
   try {
     const session = await auth()
-    if (!session) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+    if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
 
-    const questao = await prisma.questao.findUnique({ where: { id } })
+    const questao = await prisma.questao.findFirst({ where: { id, professor: { escolaId: session.user.escolaId } } })
     if (!questao) return NextResponse.json({ message: 'Questão não encontrada' }, { status: 404 })
 
     // Apenas dono ou admin, e professor não pode deletar se já estiver aprovada

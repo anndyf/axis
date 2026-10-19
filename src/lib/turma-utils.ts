@@ -52,57 +52,57 @@ type CorTurma = { bg: string; shadow: string }
 
 const CORES: Record<string, CorTurma> = {
   // TI — Vermelho/ Rosa
-  "Informática":                           { bg: "bg-rose-600",    shadow: "shadow-rose-200" },
-  "Técnico em Informática":               { bg: "bg-rose-600",    shadow: "shadow-rose-200" },
-  "Redes de Computadores":                { bg: "bg-red-500",     shadow: "shadow-red-200"  },
-  "Técnico em Redes de Computadores":     { bg: "bg-red-500",     shadow: "shadow-red-200"  },
+  "Informática":                           { bg: "bg-danger",    shadow: "" },
+  "Técnico em Informática":               { bg: "bg-danger",    shadow: "" },
+  "Redes de Computadores":                { bg: "bg-danger",     shadow: ""  },
+  "Técnico em Redes de Computadores":     { bg: "bg-danger",     shadow: ""  },
 
   // Saúde — Azul
-  "Análises Clínicas":                    { bg: "bg-blue-600",    shadow: "shadow-blue-200" },
-  "Técnico em Análises Clínicas":         { bg: "bg-blue-600",    shadow: "shadow-blue-200" },
-  "Vigilância Sanitária":                 { bg: "bg-cyan-500",    shadow: "shadow-cyan-200" },
-  "Vigilância em Saúde":                  { bg: "bg-cyan-500",    shadow: "shadow-cyan-200" },
-  "Técnica em Vigilância em Saúde":       { bg: "bg-cyan-500",    shadow: "shadow-cyan-200" },
-  "Técnico em Vigilância em Saúde":       { bg: "bg-cyan-500",    shadow: "shadow-cyan-200" },
-  "Enfermagem":                           { bg: "bg-sky-500",     shadow: "shadow-sky-200"  },
-  "Técnico em Enfermagem":                { bg: "bg-sky-500",     shadow: "shadow-sky-200"  },
-  "Nutrição e Dietética":                 { bg: "bg-blue-400",    shadow: "shadow-blue-100" },
-  "Técnico em Nutrição e Dietética":      { bg: "bg-blue-400",    shadow: "shadow-blue-100" },
+  "Análises Clínicas":                    { bg: "bg-accent",    shadow: "" },
+  "Técnico em Análises Clínicas":         { bg: "bg-accent",    shadow: "" },
+  "Vigilância Sanitária":                 { bg: "bg-accent",    shadow: "" },
+  "Vigilância em Saúde":                  { bg: "bg-accent",    shadow: "" },
+  "Técnica em Vigilância em Saúde":       { bg: "bg-accent",    shadow: "" },
+  "Técnico em Vigilância em Saúde":       { bg: "bg-accent",    shadow: "" },
+  "Enfermagem":                           { bg: "bg-accent",     shadow: ""  },
+  "Técnico em Enfermagem":                { bg: "bg-accent",     shadow: ""  },
+  "Nutrição e Dietética":                 { bg: "bg-accent",    shadow: "" },
+  "Técnico em Nutrição e Dietética":      { bg: "bg-accent",    shadow: "" },
 
   // Meio Ambiente / Agronomia — Verde
-  "Agroecologia":                         { bg: "bg-green-600",   shadow: "shadow-green-200"   },
-  "Técnico em Agroecologia":              { bg: "bg-green-600",   shadow: "shadow-green-200"   },
-  "Meio Ambiente":                        { bg: "bg-emerald-600", shadow: "shadow-emerald-200" },
-  "Técnico em Meio Ambiente":             { bg: "bg-emerald-600", shadow: "shadow-emerald-200" },
+  "Agroecologia":                         { bg: "bg-success",   shadow: ""   },
+  "Técnico em Agroecologia":              { bg: "bg-success",   shadow: ""   },
+  "Meio Ambiente":                        { bg: "bg-success", shadow: "" },
+  "Técnico em Meio Ambiente":             { bg: "bg-success", shadow: "" },
 
   // Administração / Logística — Âmbar / Laranja
-  "Administração":                        { bg: "bg-amber-500",   shadow: "shadow-amber-200"  },
-  "Técnico em Administração":             { bg: "bg-amber-500",   shadow: "shadow-amber-200"  },
-  "Logística":                            { bg: "bg-orange-500",  shadow: "shadow-orange-200" },
-  "Técnico em Logística":                 { bg: "bg-orange-500",  shadow: "shadow-orange-200" },
-  "Planejamento e Controle de Produção":  { bg: "bg-yellow-500",  shadow: "shadow-yellow-200" },
-  "Técnico em Planejamento e Controle de Produção": { bg: "bg-yellow-500", shadow: "shadow-yellow-200" },
-  "Técnico em Planejamento e Controle de Produção ": { bg: "bg-yellow-500", shadow: "shadow-yellow-200" }, // trailing space
+  "Administração":                        { bg: "bg-warning",   shadow: ""  },
+  "Técnico em Administração":             { bg: "bg-warning",   shadow: ""  },
+  "Logística":                            { bg: "bg-warning",  shadow: "" },
+  "Técnico em Logística":                 { bg: "bg-warning",  shadow: "" },
+  "Planejamento e Controle de Produção":  { bg: "bg-warning",  shadow: "" },
+  "Técnico em Planejamento e Controle de Produção": { bg: "bg-warning", shadow: "" },
+  "Técnico em Planejamento e Controle de Produção ": { bg: "bg-warning", shadow: "" }, // trailing space
 
   // Engenharia / Construção — Teal / Ciano
-  "Edificações":                          { bg: "bg-teal-600",    shadow: "shadow-teal-200"    },
-  "Técnico em Edificações":               { bg: "bg-teal-600",    shadow: "shadow-teal-200"    },
-  "Eletromecânica":                       { bg: "bg-teal-500",    shadow: "shadow-teal-200"    },
-  "Técnico em Eletromecânica":            { bg: "bg-teal-500",    shadow: "shadow-teal-200"    },
-  "Química":                              { bg: "bg-violet-600",  shadow: "shadow-violet-200"  },
-  "Técnico em Química":                   { bg: "bg-violet-600",  shadow: "shadow-violet-200"  },
+  "Edificações":                          { bg: "bg-success",    shadow: ""    },
+  "Técnico em Edificações":               { bg: "bg-success",    shadow: ""    },
+  "Eletromecânica":                       { bg: "bg-success",    shadow: ""    },
+  "Técnico em Eletromecânica":            { bg: "bg-success",    shadow: ""    },
+  "Química":                              { bg: "bg-accent",  shadow: ""  },
+  "Técnico em Química":                   { bg: "bg-accent",  shadow: ""  },
 
   // Criativo / Cultural — Índigo / Roxo
-  "Produção de Áudio e Vídeo":            { bg: "bg-indigo-500",  shadow: "shadow-indigo-200" },
-  "Técnico em Produção de Áudio e Vídeo": { bg: "bg-indigo-500",  shadow: "shadow-indigo-200" },
+  "Produção de Áudio e Vídeo":            { bg: "bg-accent",  shadow: "" },
+  "Técnico em Produção de Áudio e Vídeo": { bg: "bg-accent",  shadow: "" },
 
   // Jurídico — Índigo Escuro
-  "Serviços Jurídicos":                   { bg: "bg-indigo-700",  shadow: "shadow-indigo-200" },
-  "Técnico em Serviços Jurídicos":        { bg: "bg-indigo-700",  shadow: "shadow-indigo-200" },
+  "Serviços Jurídicos":                   { bg: "bg-accent",  shadow: "" },
+  "Técnico em Serviços Jurídicos":        { bg: "bg-accent",  shadow: "" },
 
   // Segurança — Slate Escuro
-  "Segurança do Trabalho":                { bg: "bg-slate-700",   shadow: "shadow-slate-200" },
-  "Técnico em Segurança do Trabalho":     { bg: "bg-slate-700",   shadow: "shadow-slate-200" },
+  "Segurança do Trabalho":                { bg: "bg-zinc-700",   shadow: "" },
+  "Técnico em Segurança do Trabalho":     { bg: "bg-zinc-700",   shadow: "" },
 }
 
 // ── Ícones por Curso ───────────────────────────────────────────────────────
@@ -190,7 +190,7 @@ function buscarPorPalavraChave(nome: string): string | null {
 }
 
 export function getTurmaColor(curso: string | null): CorTurma {
-  const fallback = { bg: "bg-blue-600", shadow: "shadow-blue-200" }
+  const fallback = { bg: "bg-accent", shadow: "" }
   if (!curso) return fallback
 
   const nome = normalizarCurso(curso)

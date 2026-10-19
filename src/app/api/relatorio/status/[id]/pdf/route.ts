@@ -4,6 +4,9 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import { adicionarLogoNoPdf } from '@/lib/pdf-logo'
+import { etapasDaNota, desistenteEmTodas } from '@/lib/services/notas'
+import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from '@/lib/services/notas-leitura'
 
 export const runtime = 'nodejs'
 
@@ -69,7 +72,8 @@ export async function GET(
           include: {
             notas: {
               include: {
-                disciplina: true
+                disciplina: true,
+                unidades: SELECT_ETAPAS_DA_NOTA
               }
             }
           },
@@ -82,8 +86,13 @@ export async function GET(
       return NextResponse.json({ message: 'Turma não encontrada' }, { status: 404 })
     }
 
+    const etapas = (await carregarEsquemaDaTurma(turma))?.etapas ?? []
+    const matchEtapa = /^UNIDADE_(\d+)$/.exec(unit)
+    const indiceEtapa = matchEtapa ? Number(matchEtapa[1]) - 1 : null
+
     // Criar PDF em formato paisagem
     const doc = new jsPDF('landscape')
+    await adicionarLogoNoPdf(doc, session.user.escolaId)
 
     // Preparar dados da tabela
     const headers = ['Nº', 'NOME DO ALUNO', ...turma.disciplinas.map(d => abreviarNome(d.nome))]
@@ -100,29 +109,18 @@ export async function GET(
           const n = notasMap.get(disc.id) as any
           if (!n) return '-'
           
-          if (unit === 'UNIDADE_1') {
-            if (n.isDesistenteUnid1) {
-              return n.nota1 !== null ? `${n.nota1.toFixed(1).replace('.', ',')}\n(INF)` : 'DS'
-            }
-            return n.nota1 !== null ? n.nota1.toFixed(1).replace('.', ',') : '-'
-          }
-          if (unit === 'UNIDADE_2') {
-            if (n.isDesistenteUnid2) {
-              return n.nota2 !== null ? `${n.nota2.toFixed(1).replace('.', ',')}\n(INF)` : 'DS'
-            }
-            return n.nota2 !== null ? n.nota2.toFixed(1).replace('.', ',') : '-'
-          }
-          if (unit === 'UNIDADE_3') {
-            if (n.isDesistenteUnid3) {
-              return n.nota3 !== null ? `${n.nota3.toFixed(1).replace('.', ',')}\n(INF)` : 'DS'
-            }
-            return n.nota3 !== null ? n.nota3.toFixed(1).replace('.', ',') : '-'
+          const etapasDoAluno = etapasDaNota(etapas, n.unidades)
+
+          // ?unit=UNIDADE_N -> etapa N do esquema da turma (qualquer número de etapas)
+          if (indiceEtapa !== null) {
+            const etapa = etapasDoAluno[indiceEtapa]
+            if (!etapa) return '-'
+            const texto = etapa.nota !== null ? etapa.nota.toFixed(1).replace('.', ',') : null
+            if (etapa.desistente) return texto ? `${texto}\n(INF)` : 'DS'
+            return texto ?? '-'
           }
 
-          const isActuallyDS = n.isDesistenteUnid1 && n.isDesistenteUnid2 && n.isDesistenteUnid3 && 
-                               n.nota1 === null && n.nota2 === null && n.nota3 === null;
-
-          if (isActuallyDS) return 'DS'
+          if (desistenteEmTodas(etapasDoAluno)) return 'DS'
           
           return getStatusAbbr(n.status)
         })
@@ -239,9 +237,7 @@ export async function GET(
             doc.text("|", 45, 23);
 
             let tituloRelatorio = "Relatório de Status Geral";
-            if (unit === 'UNIDADE_1') tituloRelatorio = "Relatório de Status - 1ª Unidade";
-            else if (unit === 'UNIDADE_2') tituloRelatorio = "Relatório de Status - 2ª Unidade";
-            else if (unit === 'UNIDADE_3') tituloRelatorio = "Relatório de Status - 3ª Unidade";
+            if (indiceEtapa !== null) tituloRelatorio = `Relatório de Status - ${etapas[indiceEtapa]?.nome ?? `${indiceEtapa + 1}ª Unidade`}`;
 
             doc.setTextColor(15, 23, 42); // Black
             doc.text(tituloRelatorio, 50, 23);

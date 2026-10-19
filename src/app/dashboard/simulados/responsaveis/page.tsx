@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
+import { provaDaEscola } from "@/lib/data-fetching"
 import ResponsaveisClient from "./ResponsaveisClient"
 import { prisma } from "@/lib/prisma"
 
@@ -9,7 +10,8 @@ export const metadata = {
 
 export default async function ResponsaveisSimuladoPage() {
   const session = await auth()
-  if (!session) redirect("/login")
+  if (!session?.user?.escolaId) redirect("/login")
+  const escolaId = session.user.escolaId
 
   const user = session.user as any
   if (!user.isSuperuser && !user.isDirecao) {
@@ -18,14 +20,16 @@ export default async function ResponsaveisSimuladoPage() {
 
   const [turmas, areas, professores, provas] = await Promise.all([
     prisma.turma.findMany({ 
-        where: { anoLetivo: 2026 },
+        where: { escolaId, anoLetivo: 2026 },
         orderBy: { nome: 'asc' } 
     }),
-    prisma.areaConhecimento.findMany({ 
+    prisma.areaConhecimento.findMany({
+        where: { escolaId },
         orderBy: { nome: 'asc' } 
     }),
     prisma.user.findMany({
       where: { 
+        escolaId,
         isPortalUser: false,
         name: {
             notIn: [
@@ -42,7 +46,8 @@ export default async function ResponsaveisSimuladoPage() {
     }),
     prisma.prova.findMany({
       where: {
-        tipo: 'SIMULADO'
+        tipo: 'SIMULADO',
+        ...provaDaEscola(escolaId)
       },
       select: { id: true, titulo: true, codigo: true, turmaId: true, createdAt: true, unidade: true },
       orderBy: { createdAt: 'desc' }

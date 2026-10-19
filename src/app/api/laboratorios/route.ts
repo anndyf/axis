@@ -48,7 +48,7 @@ export async function PATCH(request: Request) {
     if (!id) return NextResponse.json({ message: "ID do laboratório não informado" }, { status: 400 })
 
     const lab = await prisma.laboratorio.update({
-      where: { id },
+      where: { id, escolaId: session.user.escolaId },
       data: { nome, descricao }
     })
 

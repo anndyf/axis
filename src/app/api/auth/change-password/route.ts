@@ -7,7 +7,7 @@ import { z } from "zod"
 
 const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, "Senha atual é obrigatória"),
-  newPassword: z.string().min(6, "Nova senha deve ter pelo menos 6 caracteres")
+  newPassword: z.string().min(8, "Nova senha deve ter pelo menos 8 caracteres")
 })
 
 export async function PUT(req: Request) {
@@ -53,11 +53,18 @@ export async function PUT(req: Request) {
       )
     }
 
+    if (await bcrypt.compare(newPassword, user.password)) {
+      return NextResponse.json(
+        { message: "A nova senha precisa ser diferente da atual" },
+        { status: 400 }
+      )
+    }
+
     const hashedPassword = await bcrypt.hash(newPassword, 10)
 
     await prisma.user.update({
       where: { id: user.id },
-      data: { password: hashedPassword }
+      data: { password: hashedPassword, deveTrocarSenha: false }
     })
 
     return NextResponse.json({ message: "Senha alterada com sucesso" })

@@ -9,9 +9,9 @@ export const metadata = {
 
 export const runtime = 'nodejs'
 
-async function getTurma(id: string) {
+async function getTurma(id: string, escolaId: string) {
   return await prisma.turma.findUnique({
-    where: { id }
+    where: { id, escolaId }
   })
 }
 
@@ -22,18 +22,19 @@ export default async function EditarTurmaPage({
 }) {
   const session = await auth()
   
-  if (!session) {
+  if (!session?.user?.escolaId) {
     redirect("/login")
   }
 
   const { id } = await params
-  const turma = await getTurma(id)
+  const turma = await getTurma(id, session.user.escolaId)
 
   if (!turma) {
     redirect("/dashboard/turmas")
   }
 
   const cursos = await prisma.curso.findMany({
+    where: { escolaId: session.user.escolaId },
     orderBy: { nome: 'asc' }
   })
 

@@ -183,34 +183,34 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-300">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm animate-fade-in">
+      <div className="bg-surface rounded-xl w-full max-w-lg shadow-overlay border border-line-subtle overflow-hidden animate-pop-in">
 
         {/* Header */}
-        <div className={`px-8 py-6 border-b border-slate-100 flex items-center justify-between ${isEdit ? 'bg-amber-50' : 'bg-slate-50'}`}>
+        <div className={`px-8 py-6 border-b border-line-subtle flex items-center justify-between ${isEdit ? 'bg-warning-subtle' : 'bg-canvas'}`}>
           <div className="flex items-center space-x-3">
-            <div className={`p-2 rounded-xl ${isEdit ? 'bg-amber-500' : 'bg-blue-500'}`}>
+            <div className={`p-2 rounded-xl ${isEdit ? 'bg-warning' : 'bg-accent'}`}>
               {isEdit ? <Pencil className="w-5 h-5 text-white" /> : <GraduationCap className="w-5 h-5 text-white" />}
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-slate-800 tracking-tight">
+              <h2 className="text-xl font-semibold text-fg tracking-tight">
                 {isEdit ? 'Editar Curso' : 'Novo Curso'}
               </h2>
-              <p className="text-xs text-slate-400 font-medium">
+              <p className="text-xs text-fg-subtle font-medium">
                 {isEdit
                   ? `Modificando: ${cursoParaEditar?.nome} — ${cursoParaEditar?.modalidade}`
                   : 'Cadastre em uma ou mais modalidades'}
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full transition-colors">
-            <X className="w-5 h-5 text-slate-500" />
+          <button onClick={onClose} className="p-2 hover:bg-subtle-hover rounded-full transition-colors">
+            <X className="w-5 h-5 text-fg-subtle" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
           {error && (
-            <div className="p-4 bg-rose-50 border border-rose-100 rounded-xl text-rose-600 text-xs font-semibold animate-in slide-in-from-top-2">
+            <div className="p-4 bg-danger-subtle border border-danger-line rounded-xl text-danger-fg text-xs font-semibold animate-slide-up">
               {error}
             </div>
           )}
@@ -218,7 +218,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
           <div className="space-y-5">
             {/* Nome */}
             <div className="group">
-              <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Nome do Curso</label>
+              <label className="block text-xs font-semibold text-fg-subtle mb-1.5 ml-1">Nome do Curso</label>
               <input
                 required type="text" placeholder="Ex: Técnico em Meio Ambiente"
                 value={formData.nome}
@@ -237,24 +237,24 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
                     setFormData({ ...formData, nome })
                   }
                 }}
-                className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-slate-700 focus:bg-white focus:border-blue-500 transition-all"
+                className="w-full px-5 py-4 bg-canvas border border-line rounded-lg outline-none font-semibold text-fg-muted focus:bg-surface focus:border-accent transition-all"
               />
             </div>
 
             {/* Sigla */}
             <div className="group">
-              <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Sigla</label>
+              <label className="block text-xs font-semibold text-fg-subtle mb-1.5 ml-1">Sigla</label>
               <div className="relative">
                 <input
                   required type="text" placeholder="Ex: MA" maxLength={8}
                   value={formData.sigla}
                   onChange={e => setFormData({ ...formData, sigla: e.target.value.toUpperCase() })}
-                  className="w-full pl-10 pr-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-slate-700 focus:bg-white focus:border-blue-500 transition-all"
+                  className="w-full pl-10 pr-5 py-4 bg-canvas border border-line rounded-lg outline-none font-semibold text-fg-muted focus:bg-surface focus:border-accent transition-all"
                 />
-                <Hash className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                <Hash className="w-4 h-4 text-fg-subtle absolute left-4 top-1/2 -translate-y-1/2" />
               </div>
               {!isEdit && formData.modalidades.length > 1 && (
-                <p className="text-[10px] text-slate-400 mt-1.5 ml-1">
+                <p className="text-xs text-fg-subtle mt-1.5 ml-1">
                   💡 Será combinada com cada modalidade (ex: {formData.sigla || "MA"}_EPTM)
                 </p>
               )}
@@ -262,10 +262,10 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
 
             {/* Modalidades */}
             <div className="space-y-2">
-              <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2 ml-1">
+              <label className="block text-xs font-semibold text-fg-subtle mb-2 ml-1">
                 Modalidade{!isEdit && 's'}
                 {!isEdit && formData.modalidades.length > 1 && (
-                  <span className="ml-2 text-blue-500 normal-case font-bold">
+                  <span className="ml-2 text-accent-fg normal-case font-bold">
                     ({formData.modalidades.length} selecionadas)
                   </span>
                 )}
@@ -276,10 +276,10 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
                     key={m} type="button"
                     onClick={() => handleToggleModalidade(m)}
                     disabled={isEdit}
-                    className={`px-4 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wide transition-all border ${
+                    className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all border ${
                       formData.modalidades.includes(m)
-                        ? 'bg-blue-500 text-white border-blue-500 shadow-lg shadow-blue-200'
-                        : 'bg-slate-50 text-slate-400 border-slate-200 hover:border-slate-300 hover:text-slate-600'
+                        ? 'bg-accent text-on-accent border-accent shadow-card '
+                        : 'bg-canvas text-fg-subtle border-line hover:border-line-strong hover:text-fg-muted'
                     } ${isEdit ? 'opacity-60 cursor-not-allowed' : ''}`}
                   >
                     {labelModalidade[m]}
@@ -287,21 +287,21 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
                 ))}
               </div>
               {isEdit && (
-                <p className="text-[10px] text-slate-400 ml-1">
+                <p className="text-xs text-fg-subtle ml-1">
                   ⚠️ A modalidade não pode ser alterada após a criação.
                 </p>
               )}
 
               {/* Preview de criação */}
               {!isEdit && formData.modalidades.length > 1 && formData.nome && (
-                <div className="mt-3 p-3 bg-blue-50 border border-blue-100 rounded-xl space-y-1">
-                  <p className="text-[10px] font-bold text-blue-600 uppercase tracking-wider mb-1.5">Serão criados:</p>
+                <div className="mt-3 p-3 bg-accent-subtle border border-accent/25 rounded-xl space-y-1">
+                  <p className="text-xs font-bold text-accent-fg mb-1.5">Serão criados:</p>
                   {formData.modalidades.map(m => (
-                    <div key={m} className="flex items-center gap-2 text-xs text-blue-700">
-                      <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" />
+                    <div key={m} className="flex items-center gap-2 text-xs text-accent-fg">
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
                       <span className="font-semibold">{formData.nome}</span>
-                      <span className="text-blue-400">–</span>
-                      <span className="font-bold text-[10px] bg-blue-100 px-1.5 py-0.5 rounded">{m}</span>
+                      <span className="text-accent">–</span>
+                      <span className="font-bold text-xs bg-accent-subtle px-1.5 py-0.5 rounded">{m}</span>
                     </div>
                   ))}
                 </div>
@@ -310,18 +310,18 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
 
             {/* Nível de Ensino */}
             <div className="space-y-2">
-              <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2 ml-1">
-                Nível de Ensino <span className="normal-case font-medium text-slate-300">(opcional)</span>
+              <label className="block text-xs font-semibold text-fg-subtle mb-2 ml-1">
+                Nível de Ensino <span className="normal-case font-medium text-fg-disabled">(opcional)</span>
               </label>
               <div className="flex flex-wrap gap-2">
                 {NIVEIS_ENSINO.map(n => (
                   <button
                     key={n} type="button"
                     onClick={() => setFormData(prev => ({ ...prev, nivelEnsino: prev.nivelEnsino === n ? "" : n }))}
-                    className={`px-4 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wide transition-all border ${
+                    className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all border ${
                       formData.nivelEnsino === n
-                        ? 'bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-200'
-                        : 'bg-slate-50 text-slate-400 border-slate-200 hover:border-slate-300 hover:text-slate-600'
+                        ? 'bg-success-subtle text-success-fg border-success-line shadow-card '
+                        : 'bg-canvas text-fg-subtle border-line hover:border-line-strong hover:text-fg-muted'
                     }`}
                   >
                     {labelNivelEnsino[n]}
@@ -332,13 +332,13 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
 
             {/* Esquema de Avaliação */}
             <div className="group">
-              <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">
-                Esquema de Avaliação <span className="normal-case font-medium text-slate-300">(opcional)</span>
+              <label className="block text-xs font-semibold text-fg-subtle mb-1.5 ml-1">
+                Esquema de Avaliação <span className="normal-case font-medium text-fg-disabled">(opcional)</span>
               </label>
               <select
                 value={formData.esquemaAvaliacaoId}
                 onChange={e => setFormData({ ...formData, esquemaAvaliacaoId: e.target.value })}
-                className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-slate-700 focus:bg-white focus:border-blue-500 transition-all"
+                className="w-full px-5 py-4 bg-canvas border border-line rounded-lg outline-none font-semibold text-fg-muted focus:bg-surface focus:border-accent transition-all"
               >
                 <option value="">Padrão da escola</option>
                 {esquemas.map(esq => (
@@ -349,16 +349,16 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
 
             {/* Turnos */}
             <div className="space-y-2">
-              <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2 ml-1">Turnos Disponíveis</label>
+              <label className="block text-xs font-semibold text-fg-subtle mb-2 ml-1">Turnos Disponíveis</label>
               <div className="flex flex-wrap gap-2">
                 {TURNOS.map(t => (
                   <button
                     key={t} type="button"
                     onClick={() => handleToggleTurno(t)}
-                    className={`px-4 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wide transition-all border ${
+                    className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all border ${
                       formData.turnos.includes(t)
-                        ? 'bg-indigo-500 text-white border-indigo-500 shadow-lg shadow-indigo-200'
-                        : 'bg-slate-50 text-slate-400 border-slate-200 hover:border-slate-300 hover:text-slate-600'
+                        ? 'bg-accent text-on-accent border-accent shadow-card '
+                        : 'bg-canvas text-fg-subtle border-line hover:border-line-strong hover:text-fg-muted'
                     }`}
                   >
                     {t}
@@ -371,16 +371,16 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
           <div className="pt-2 flex gap-3">
             <button
               type="button" onClick={onClose}
-              className="px-6 py-4 rounded-2xl font-semibold text-sm text-slate-500 hover:bg-slate-100 transition-all"
+              className="px-6 py-4 rounded-lg font-semibold text-sm text-fg-subtle hover:bg-subtle transition-all"
             >
               Cancelar
             </button>
             <button
               type="submit" disabled={loading}
-              className={`flex-1 text-white py-4 rounded-2xl font-semibold text-sm flex items-center justify-center space-x-2 transition-all disabled:opacity-50 ${
+              className={`flex-1 text-on-accent py-4 rounded-lg font-semibold text-sm flex items-center justify-center space-x-2 transition-all disabled:opacity-50 ${
                 isEdit
-                  ? 'bg-amber-500 hover:bg-amber-600'
-                  : 'bg-slate-900 hover:bg-slate-800'
+                  ? 'bg-warning hover:bg-warning'
+                  : 'bg-accent hover:bg-accent-hover'
               }`}
             >
               {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}

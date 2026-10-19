@@ -2,6 +2,10 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import ConselhoClasseClient from "./ConselhoClasseClient"
+import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from "@/lib/services/notas-leitura"
+import { etapasDaNota } from "@/lib/services/notas"
+import { carregarFrequenciaDaTurma } from "@/lib/services/frequencia-leitura"
+import { frequenciaConsiderada } from "@/lib/services/frequencia"
 
 export const metadata = {
   title: 'Áxis - Conselho classe'
@@ -18,7 +22,7 @@ async function getNotasConselho(turmaId: string, escolaId: string) {
           notas: {
             include: {
               disciplina: true,
-              unidades: { select: { notaCalculada: true, isDesistente: true } }
+              unidades: SELECT_ETAPAS_DA_NOTA
             }
           }
         }
@@ -27,6 +31,20 @@ async function getNotasConselho(turmaId: string, escolaId: string) {
   })
 
   if (!turma) return null
+
+  const esquema = await carregarEsquemaDaTurma(turma)
+  const etapas = esquema?.etapas ?? []
+
+  // Frequência que vale para aprovação em cada disciplina (regra do esquema)
+  const frequencia = await carregarFrequenciaDaTurma(escolaId, turma.id)
+  const freqDa = (estudanteId: string, disciplinaId: string) => {
+    const f = frequencia?.temChamada ? frequencia.porAluno.get(estudanteId) : undefined
+    return f && frequencia ? frequenciaConsiderada(f, frequencia.regra, disciplinaId) : null
+  }
+  const abaixoDoMinimo = (estudanteId: string, disciplinaId: string) => {
+    const p = freqDa(estudanteId, disciplinaId)
+    return p !== null && p < (frequencia?.regra.minimo ?? 75)
+  }
 
   // Filtrar notas que precisam de conselho. Não usa mais
   // Turma.modalidade (sempre NULL nos dados reais, regra nunca funcionou
@@ -46,6 +64,9 @@ async function getNotasConselho(turmaId: string, escolaId: string) {
       ]
       if (statusConselho.includes(nota.status)) return true
 
+      // 3. Frequência abaixo do mínimo: o conselho precisa decidir, mesmo com nota para aprovar
+      if (abaixoDoMinimo(estudante.id, nota.disciplinaId)) return true
+
       // 2. Todas as unidades do esquema preenchidas (ou marcadas desistente) e ainda não aprovado
       const completa = nota.unidades.length > 0 &&
         nota.unidades.every((u: any) => u.notaCalculada !== null || u.isDesistente)
@@ -53,24 +74,25 @@ async function getNotasConselho(turmaId: string, escolaId: string) {
     }).map((nota: any) => ({
       id: nota.id,
       nota: nota.nota,
-      nota1: nota.nota1,
-      nota2: nota.nota2,
-      nota3: nota.nota3,
       notaRecuperacao: nota.notaRecuperacao,
       status: nota.status,
-      isDesistenteUnid1: nota.isDesistenteUnid1,
-      isDesistenteUnid2: nota.isDesistenteUnid2,
-      isDesistenteUnid3: nota.isDesistenteUnid3,
+      etapas: etapasDaNota(etapas, nota.unidades),
       estudanteId: estudante.matricula,
       estudanteNome: estudante.nome,
       disciplinaId: nota.disciplinaId,
-      disciplinaNome: nota.disciplina.nome
+      disciplinaNome: nota.disciplina.nome,
+      frequencia: freqDa(estudante.id, nota.disciplinaId),
+      abaixoMinimoFrequencia: abaixoDoMinimo(estudante.id, nota.disciplinaId)
     }))
   )
 
   return {
     turma,
-    notasConselho: notasFiltradas
+    notasConselho: notasFiltradas,
+    // Sem esquema resolvido, cai no comportamento legado (média simples, mínimo 5)
+    esquemaConfig: esquema?.config ?? { numUnidades: etapas.length, notaMinimaAprovacao: 5, recuperacaoUnidadeAtiva: false, recuperacaoFinalAtiva: true },
+    pesosEtapas: etapas.map((e) => e.peso),
+    frequenciaMinima: frequencia?.regra.minimo ?? 75
   }
 }
 
@@ -98,8 +120,10 @@ export default async function ConselhoClasseTurmaPage({
       turmaNome={data.turma.nome}
       turmaCurso={data.turma.curso}
       turmaTurno={data.turma.turno}
-      turmaModalidade={data.turma.modalidade}
       notasConselho={data.notasConselho}
+      esquemaConfig={data.esquemaConfig}
+      pesosEtapas={data.pesosEtapas}
+      frequenciaMinima={data.frequenciaMinima}
     />
   )
 }

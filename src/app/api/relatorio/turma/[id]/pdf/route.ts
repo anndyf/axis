@@ -3,6 +3,11 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import { adicionarLogoNoPdf } from '@/lib/pdf-logo'
+import { etapasDaNota, desistenteEmTodas } from '@/lib/services/notas'
+import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from '@/lib/services/notas-leitura'
+import { carregarFrequenciaDaTurma } from '@/lib/services/frequencia-leitura'
+import { frequenciaConsiderada, formatarFrequencia, ROTULO_REPROVADO_FALTA } from '@/lib/services/frequencia'
 
 export const runtime = 'nodejs'
 
@@ -31,7 +36,8 @@ export async function GET(
           include: {
             notas: {
               include: {
-                disciplina: true
+                disciplina: true,
+                unidades: SELECT_ETAPAS_DA_NOTA
               }
             }
           },
@@ -58,6 +64,7 @@ export async function GET(
 
     // Criar PDF
     const doc = new jsPDF()
+    await adicionarLogoNoPdf(doc, session.user.escolaId)
 
     // Cabeçalho
     doc.setFontSize(20)
@@ -94,21 +101,15 @@ export async function GET(
     let totalRecuperacao = 0
     let totalDesistentes = 0
 
-    const isSemestral = turma.modalidade === 'PROEJA' || turma.modalidade === 'SUBSEQUENTE'
+    // Etapas do esquema da turma (2, 3, 4...) - antes "isSemestral" por
+    // Turma.modalidade, que nunca foi preenchida nos dados reais.
+    const etapas = (await carregarEsquemaDaTurma(turma))?.etapas ?? []
 
     turma.estudantes.forEach(estudante => {
       const aprovadas = estudante.notas.filter(n => n.status === 'APROVADO').length
       const recuperacao = estudante.notas.filter(n => n.status === 'RECUPERACAO').length
       
-      const desistente = isSemestral 
-        ? estudante.notas.some((n: any) => 
-            n.isDesistenteUnid1 && n.isDesistenteUnid2 &&
-            n.nota1 === null && n.nota2 === null
-          )
-        : estudante.notas.some((n: any) => 
-            n.isDesistenteUnid1 && n.isDesistenteUnid2 && n.isDesistenteUnid3 && 
-            n.nota1 === null && n.nota2 === null && n.nota3 === null
-          )
+      const desistente = estudante.notas.some((n) => desistenteEmTodas(etapasDaNota(etapas, n.unidades)))
 
       if (desistente) {
         totalDesistentes++
@@ -130,6 +131,11 @@ export async function GET(
     doc.text(`Em Recuperação: ${totalRecuperacao}`, 70, 80)
     doc.text(`Desistentes: ${totalDesistentes}`, 130, 80)
 
+    // Frequência geral de cada aluno (coluna só aparece se já houve chamada)
+    const frequencia = await carregarFrequenciaDaTurma(session.user.escolaId, turma.id)
+    const comFrequencia = !!frequencia?.temChamada
+    const fmtFreq = (p: number | null) => (p === null ? '-' : formatarFrequencia(p))
+
     // Tabela de Estudantes
     const tableData = turma.estudantes.map(estudante => {
       const aprovadas = estudante.notas.filter(n => n.status === 'APROVADO').length
@@ -148,17 +154,25 @@ export async function GET(
         status = 'Aprovado'
       }
 
-      return [
+      const freqAluno = frequencia?.porAluno.get(estudante.id)
+      const freqConsiderada = freqAluno && frequencia ? frequenciaConsiderada(freqAluno, frequencia.regra) : null
+      if (frequencia?.anoEncerrado && !desistente && freqConsiderada !== null && freqConsiderada < frequencia.regra.minimo) {
+        status = ROTULO_REPROVADO_FALTA
+      }
+
+      const linha = [
         estudante.nome,
         estudante.notas.length.toString(),
         media >= 5 ? 'AP' : 'RC',
         status
       ]
+      if (comFrequencia) linha.splice(3, 0, fmtFreq(freqAluno?.geral.percentual ?? null))
+      return linha
     })
 
     autoTable(doc, {
       startY: 90,
-      head: [['Estudante', 'Disciplinas', 'Média Geral', 'Status Final']],
+      head: [comFrequencia ? ['Estudante', 'Disciplinas', 'Média Geral', 'Freq.', 'Status Final'] : ['Estudante', 'Disciplinas', 'Média Geral', 'Status Final']],
       body: tableData,
       theme: 'grid',
       headStyles: {
@@ -172,16 +186,25 @@ export async function GET(
       bodyStyles: {
         fontSize: 9
       },
-      columnStyles: {
+      columnStyles: comFrequencia ? {
+        0: { halign: 'left', cellWidth: 75 },
+        1: { halign: 'center', cellWidth: 25 },
+        2: { halign: 'center', cellWidth: 30 },
+        3: { halign: 'center', cellWidth: 25 },
+        4: { halign: 'center', cellWidth: 35 }
+      } : {
         0: { halign: 'left', cellWidth: 90 },
         1: { halign: 'center', cellWidth: 30 },
         2: { halign: 'center', cellWidth: 30 },
         3: { halign: 'center', cellWidth: 40 }
       },
       didParseCell: function(data: any) {
-        if (data.section === 'body' && data.column.index === 3) {
+        if (data.section === 'body' && data.column.index === (comFrequencia ? 4 : 3)) {
           const status = data.cell.raw
-          if (status === 'Aprovado') {
+          if (status === ROTULO_REPROVADO_FALTA) {
+            data.cell.styles.textColor = [225, 29, 72]
+            data.cell.styles.fontStyle = 'bold'
+          } else if (status === 'Aprovado') {
             data.cell.styles.textColor = [22, 163, 74]
             data.cell.styles.fontStyle = 'bold'
           } else if (status === 'Recuperação') {

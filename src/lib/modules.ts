@@ -18,6 +18,8 @@ import {
   Shield,
   Settings,
   DollarSign,
+  ClipboardCheck,
+  UserX,
   type LucideIcon,
 } from 'lucide-react'
 import { PlanoTipo } from '@prisma/client'
@@ -46,10 +48,12 @@ export const MODULOS: Modulo[] = [
   { id: 'aee', nome: 'Atendimento AEE', grupo: 'Gestão Acadêmica', icone: Accessibility, rota: '/dashboard/aee', permissao: (u) => can(u, 'aee') },
 
   { id: 'simulados', nome: 'Simulados', grupo: 'Diário e Avaliações', icone: Target, rota: '/dashboard/simulados', permissao: (u) => !u.isAEE && can(u, 'staff'), planoMinimo: 'PRO' },
+  { id: 'chamada', nome: 'Chamada e Diário', grupo: 'Diário e Avaliações', icone: ClipboardCheck, rota: '/dashboard/chamada', permissao: (u) => !u.isAEE && can(u, 'staff') },
   { id: 'notas', nome: 'Lançar Notas', grupo: 'Diário e Avaliações', icone: FileText, rota: '/dashboard/notas', permissao: (u) => !u.isAEE && (u.isStaff || u.isSuperuser) },
   { id: 'notas-recuperacao', nome: 'Recuperação Final', grupo: 'Diário e Avaliações', icone: TrendingUp, rota: '/dashboard/notas/recuperacao', permissao: (u) => !u.isAEE && (u.isStaff || u.isSuperuser) },
   { id: 'planos-ensino', nome: 'Planos de Ensino', grupo: 'Diário e Avaliações', icone: ClipboardList, rota: '/dashboard/planos', permissao: (u) => !u.isAEE && can(u, 'staff') },
   { id: 'resultados', nome: 'Resultados', grupo: 'Diário e Avaliações', icone: Award, rota: '/dashboard/resultados', permissao: (u) => !u.isAEE && can(u, 'gestao') },
+  { id: 'frequencia', nome: 'Frequência', grupo: 'Diário e Avaliações', icone: UserX, rota: '/dashboard/frequencia', permissao: (u) => !u.isAEE && can(u, 'gestao') },
   { id: 'conselho-classe', nome: 'Conselho de Classe', grupo: 'Diário e Avaliações', icone: Users, rota: '/dashboard/conselho-classe', permissao: (u) => !u.isAEE && can(u, 'gestao') },
 
   { id: 'banco-questoes', nome: 'Banco de Questões', grupo: 'Ferramentas', icone: Database, rota: '/dashboard/questoes', permissao: (u) => !u.isAEE && can(u, 'staff'), planoMinimo: 'PRO' },
@@ -75,4 +79,11 @@ export const LIMITE_USUARIOS: Record<PlanoTipo, number> = {
   BASICO: 15,
   PRO: 50,
   ENTERPRISE: Infinity,
+}
+
+/** Módulos que o usuário vê (menu lateral e paleta Ctrl+K): permissão do papel E, se exigir plano, módulo ativo na escola. */
+export function modulosVisiveis(user: RbacUser, modulosAtivos: string[]): Modulo[] {
+  return MODULOS
+    .filter((m) => m.permissao(user))
+    .filter((m) => !m.planoMinimo || modulosAtivos.includes(m.id))
 }

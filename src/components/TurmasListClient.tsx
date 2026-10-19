@@ -1,11 +1,12 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import { normalizarTurno } from "@/lib/services/calendario"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { Users, FileText, Pencil, Search, Filter, Copy, Loader2, X, Calendar } from "lucide-react"
-import { decodeTurma, getTurmaColor, getTurmaIcon } from "@/lib/turma-utils"
+import { decodeTurma, getTurmaIcon } from "@/lib/turma-utils"
 import ConfirmModal from "./ConfirmModal"
 import CloneTurmaModal from "./CloneTurmaModal"
 import PromoverTurmaModal from "./PromoverTurmaModal"
@@ -154,11 +155,18 @@ export default function TurmasListClient({
     setSelectedSerie(null)
   }
 
+  // Turno gravado como "MATUTINO" ou "Matutino": agrupa sempre pelo rótulo
+  const rotuloTurno = (t?: string | null) => {
+    const n = normalizarTurno(t)
+    const rotulo = { MATUTINO: "Matutino", VESPERTINO: "Vespertino", NOTURNO: "Noturno", INTEGRAL: "Integral" }[n]
+    return rotulo ?? "Outros"
+  }
+
   const filteredTurmas = useMemo(() => {
     return turmas.filter(t => {
       const decoded = decodeTurma(t.nome)
       const nomeCurso = t.curso || decoded.curso || "Outros"
-      const turno = t.turno || decoded.turno || "Outros"
+      const turno = rotuloTurno(t.turno || decoded.turno)
       const serieMatch = t.nome.match(/^(\d+)/)
       const serie = serieMatch ? serieMatch[1] : null
 
@@ -175,7 +183,7 @@ export default function TurmasListClient({
   const turmasAgrupadas = useMemo(() => {
     return filteredTurmas.reduce((acc, turma) => {
       const decoded = decodeTurma(turma.nome)
-      const turno = turma.turno || decoded.turno || "Outros"
+      const turno = rotuloTurno(turma.turno || decoded.turno)
       if (!acc[turno]) acc[turno] = []
       acc[turno].push(turma)
       return acc
@@ -187,25 +195,20 @@ export default function TurmasListClient({
   return (
     <div className="space-y-4">
       {/* Top Row */}
-      <div className="flex flex-col md:flex-row items-center gap-4 bg-white p-2 rounded-[2rem] border border-slate-200 shadow-sm">
+      <div className="flex flex-col items-center gap-2 rounded-lg border border-line bg-surface p-1.5 shadow-card md:flex-row">
         {/* Total Badge */}
-        <div className="bg-slate-900 rounded-2xl py-2 px-4 flex items-center gap-3 shrink-0 self-stretch md:self-auto">
-          <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center">
-            <Users className="w-4 h-4 text-white" />
-          </div>
-          <div className="text-white pr-2">
-            <p className="text-[10px] font-semibold uppercase tracking-widest opacity-50 leading-none mb-1">Turmas</p>
-            <p className="text-lg font-semibold leading-none">{filteredTurmas.length}</p>
-          </div>
+        <div className="flex shrink-0 items-center gap-2 self-stretch px-3 md:self-auto">
+          <Users size={16} strokeWidth={1.75} className="text-fg-subtle" aria-hidden />
+          <p className="text-13 text-fg-muted"><span className="font-semibold tabular-nums text-fg">{filteredTurmas.length}</span> turmas</p>
         </div>
 
         {/* Search Input */}
         <div className="flex-1 relative group self-stretch md:self-auto min-w-[200px]">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 group-focus-within:text-blue-600 transition-colors" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-subtle w-4 h-4 group-focus-within:text-accent-fg transition-colors" />
           <input
             type="text"
             placeholder="Buscar por nome ou curso..."
-            className="w-full pl-11 pr-4 py-3 bg-slate-50 border-transparent rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+            className="w-full pl-11 pr-4 py-3 bg-canvas border-transparent rounded-lg text-sm focus:bg-surface focus:ring-2 focus:ring-ring transition-all outline-none"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -216,7 +219,7 @@ export default function TurmasListClient({
           <select 
             value={selectedTurno || ""}
             onChange={(e) => setSelectedTurno(e.target.value || null)}
-            className="px-3 py-2 bg-slate-50 border-none rounded-xl text-xs font-semibold text-slate-600 focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer hover:bg-slate-100 transition-colors"
+            className="px-3 py-2 bg-canvas border-none rounded-xl text-xs font-semibold text-fg-muted focus:ring-2 focus:ring-ring outline-none cursor-pointer hover:bg-subtle transition-colors"
           >
             <option value="">Turnos</option>
             {turnosOptions.map(t => <option key={t} value={t}>{t}</option>)}
@@ -225,7 +228,7 @@ export default function TurmasListClient({
           <select 
             value={selectedSerie || ""}
             onChange={(e) => setSelectedSerie(e.target.value || null)}
-            className="px-3 py-2 bg-slate-50 border-none rounded-xl text-xs font-semibold text-slate-600 focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer hover:bg-slate-100 transition-colors"
+            className="px-3 py-2 bg-canvas border-none rounded-xl text-xs font-semibold text-fg-muted focus:ring-2 focus:ring-ring outline-none cursor-pointer hover:bg-subtle transition-colors"
           >
             <option value="">Séries</option>
             {seriesOptions.map(s => <option key={s} value={s}>{s}ª Série</option>)}
@@ -234,11 +237,11 @@ export default function TurmasListClient({
           {(searchTerm || selectedTurno || selectedSerie || selectedCurso) && (
             <button 
               onClick={clearFilters}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-xl transition-all group"
+              className="flex h-9 items-center gap-1.5 px-3 text-fg-muted hover:bg-subtle hover:text-fg rounded-md transition-colors duration-150"
               title="Limpar filtros"
             >
-              <X className="w-4 h-4 group-hover:rotate-90 transition-transform" />
-              <span className="text-[10px] font-semibold uppercase tracking-widest">Limpar</span>
+              <X className="w-4 h-4" strokeWidth={1.75} />
+              <span className="text-13 font-medium">Limpar</span>
             </button>
           )}
         </div>
@@ -246,46 +249,45 @@ export default function TurmasListClient({
 
       {/* Lista */}
       {turnosOrdenados.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-[2rem] border border-dashed border-slate-200">
-           <p className="text-slate-400 font-semibold uppercase tracking-widest text-sm">Nenhuma turma encontrada com esses filtros</p>
+        <div className="text-center py-20 bg-surface rounded-xl border border-dashed border-line">
+           <p className="text-fg-subtle font-semibold text-sm">Nenhuma turma encontrada com esses filtros</p>
         </div>
       ) : (
-        <div className="space-y-12">
+        <div className="space-y-10">
           {turnosOrdenados.map(turno => (
-            <div key={turno} className="space-y-6">
-              <div className="flex items-center space-x-4">
-                <h2 className="text-sm font-medium text-black uppercase tracking-widest bg-white px-4 py-1 rounded-full shadow-sm border border-slate-100">
+            <div key={turno} className="space-y-3">
+              <div className="flex items-center gap-3">
+                <h2 className="text-13 font-semibold text-fg">
                   {turno}
                 </h2>
-                <div className="h-px bg-slate-200 flex-1"></div>
-                <span className="text-[10px] font-semibold text-slate-400 bg-slate-100 px-2 py-0.5 rounded uppercase">
-                  {turmasAgrupadas[turno].length} {turmasAgrupadas[turno].length === 1 ? 'Turma' : 'Turmas'}
+                <div className="h-px bg-line flex-1"></div>
+                <span className="text-xs tabular-nums text-fg-subtle">
+                  {turmasAgrupadas[turno].length} {turmasAgrupadas[turno].length === 1 ? 'turma' : 'turmas'}
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                 {turmasAgrupadas[turno].map((turma) => {
                   const decoded = decodeTurma(turma.nome)
                   const cursoExibicao = turma.curso || decoded.curso || "---"
-                  const colors = getTurmaColor(cursoExibicao)
                   const Icon = getTurmaIcon(cursoExibicao)
                   const isCloning = cloningId === turma.id
                   
                   return (
                     <div
                       key={turma.id}
-                      className="bg-white rounded-[1.25rem] shadow-lg shadow-slate-200/40 border border-slate-100 p-5 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 flex flex-col"
+                      className="flex flex-col rounded-lg border border-line bg-surface p-4 shadow-card transition-colors duration-150 hover:border-line-strong"
                     >
                       <div className="flex items-start justify-between mb-5">
                         <div className="flex items-center space-x-4 min-w-0 flex-1">
-                          <div className={`w-11 h-11 ${colors.bg} rounded-xl flex items-center justify-center shrink-0 shadow-md ${colors.shadow}`}>
-                            <Icon className="w-6 h-6 text-white" />
+                          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-line bg-subtle text-fg-muted">
+                            <Icon size={16} strokeWidth={1.75} />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <h3 className="text-lg font-semibold text-black uppercase tracking-tight leading-none whitespace-nowrap truncate">
+                            <h3 className="text-base font-semibold text-fg leading-none whitespace-nowrap truncate">
                               {turma.nome}
                             </h3>
-                            <p className="text-[11px] text-black/40 font-semibold uppercase tracking-wide mt-1 whitespace-nowrap truncate">
+                            <p className="text-xs text-fg-subtle mt-1 whitespace-nowrap truncate">
                               {cursoExibicao}
                             </p>
                           </div>
@@ -295,7 +297,8 @@ export default function TurmasListClient({
                            <Link
                               href={`/dashboard/turmas/${turma.id}/relatorio`}
                               title="Relatório Geral"
-                              className="p-1 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              aria-label="Relatório Geral"
+                              className="p-1.5 text-fg-subtle hover:bg-subtle hover:text-fg rounded-md transition-colors duration-150"
                            >
                              <FileText className="w-3.5 h-3.5" />
                            </Link>
@@ -303,7 +306,8 @@ export default function TurmasListClient({
                              <Link
                                 href={`/dashboard/turmas/${turma.id}/horario`}
                                 title="Horário de Aulas"
-                                className="p-1 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                                aria-label="Horário de Aulas"
+                                className="p-1.5 text-fg-subtle hover:bg-subtle hover:text-fg rounded-md transition-colors duration-150"
                              >
                                <Calendar className="w-3.5 h-3.5" />
                              </Link>
@@ -315,7 +319,8 @@ export default function TurmasListClient({
                                   onClick={() => handlePromoteClick(turma)}
                                   disabled={!!promotingId || !!cloningId}
                                   title="Promover para Próxima Etapa (Move Alunos)"
-                                  className="p-1 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-30"
+                                  aria-label="Promover para Próxima Etapa (Move Alunos)"
+                                  className="p-1.5 text-fg-subtle hover:bg-subtle hover:text-fg rounded-md transition-colors duration-150 disabled:opacity-30"
                                 >
                                   {promotingId === turma.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ArrowUpCircle className="w-3.5 h-3.5" />}
                                 </button>
@@ -323,7 +328,8 @@ export default function TurmasListClient({
                                   onClick={() => handleCloneClick(turma)}
                                   disabled={!!cloningId || !!promotingId}
                                   title="Clonar Estrutura (sem alunos)"
-                                  className="p-1 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors disabled:opacity-30"
+                                  aria-label="Clonar Estrutura (sem alunos)"
+                                  className="p-1.5 text-fg-subtle hover:bg-subtle hover:text-fg rounded-md transition-colors duration-150 disabled:opacity-30"
                                 >
                                   {cloningId === turma.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Copy className="w-3.5 h-3.5" />}
                                 </button>
@@ -334,7 +340,8 @@ export default function TurmasListClient({
                              <Link
                                 href={`/dashboard/turmas/${turma.id}/editar`}
                                 title="Editar Turma"
-                                className="p-1 text-slate-400 hover:bg-slate-100 hover:text-black rounded-lg transition-all"
+                                aria-label="Editar Turma"
+                                className="p-1.5 text-fg-subtle hover:bg-subtle hover:text-fg rounded-md transition-colors duration-150"
                              >
                                <Pencil className="w-3.5 h-3.5" />
                              </Link>
@@ -345,29 +352,29 @@ export default function TurmasListClient({
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                            {turma.modalidade && (
-                             <span className="px-1.5 py-0.5 bg-slate-50 text-slate-400 text-[10px] rounded font-semibold uppercase tracking-widest border border-slate-100">
+                             <span className="px-1.5 py-0.5 bg-canvas text-fg-subtle text-xs rounded font-semibold border border-line-subtle">
                                {turma.modalidade}
                              </span>
                            )}
                         </div>
                         <div className="flex items-center space-x-3">
-                           <div className="flex items-center text-[10px] font-semibold text-black/60">
-                             <Users className="w-3 h-3 mr-1 text-slate-300" />
+                           <div className="flex items-center text-xs font-semibold text-fg/60">
+                             <Users className="w-3 h-3 mr-1 text-fg-disabled" />
                              {turma._count.estudantes}
                            </div>
-                            <div className="flex items-center text-[10px] font-semibold text-black/60">
-                             <FileText className="w-3 h-3 mr-1 text-slate-300" />
+                            <div className="flex items-center text-xs font-semibold text-fg/60">
+                             <FileText className="w-3 h-3 mr-1 text-fg-disabled" />
                              {turma._count.disciplinas}
                            </div>
                         </div>
                       </div>
 
                       {turma.minhasDisciplinas && turma.minhasDisciplinas.length > 0 && (
-                        <div className="mt-4 pt-4 border-t border-slate-100">
-                          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2">Suas Disciplinas</p>
+                        <div className="mt-4 pt-4 border-t border-line-subtle">
+                          <p className="text-xs font-bold text-fg-subtle mb-2">Suas Disciplinas</p>
                           <div className="flex flex-wrap gap-1.5">
                             {turma.minhasDisciplinas.map((d: any) => (
-                              <span key={d.id} className="inline-flex items-center px-2 py-1 bg-blue-50 text-blue-700 text-[10px] font-bold rounded-lg border border-blue-100 uppercase tracking-tight">
+                              <span key={d.id} className="inline-flex items-center px-2 py-0.5 bg-subtle text-fg-muted text-xs font-medium rounded-md border border-line">
                                 {d.nome}
                               </span>
                             ))}

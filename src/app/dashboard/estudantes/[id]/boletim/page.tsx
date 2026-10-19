@@ -3,7 +3,11 @@ import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 import { ArrowLeft, Download, FileText } from "lucide-react"
-import { calcularMediaFinal, resolverEsquemaAvaliacaoId, type EsquemaConfig, type UnidadeInput } from "@/lib/services/notas"
+import { Badge, Card, CardHeader, EmptyState, PageHeader, Stat, buttonClasses, type BadgeTone } from "@/components/ui"
+import { calcularMediaFinal, unidadesDeNotasSalvas, etapasDaNota } from "@/lib/services/notas"
+import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from "@/lib/services/notas-leitura"
+import { carregarFrequenciaDaTurma } from "@/lib/services/frequencia-leitura"
+import { situacaoComFrequencia, formatarFrequencia, ROTULO_REPROVADO_FALTA } from "@/lib/services/frequencia"
 
 export const metadata = {
   title: 'Áxis - Estudantes'
@@ -19,10 +23,7 @@ async function getEstudanteBoletim(escolaId: string, matricula: string) {
       notas: {
         include: {
           disciplina: true,
-          unidades: {
-            orderBy: { esquemaUnidade: { ordem: 'asc' } },
-            select: { esquemaUnidadeId: true, notaCalculada: true, notaRecuperacao: true }
-          }
+          unidades: SELECT_ETAPAS_DA_NOTA
         },
         orderBy: {
           disciplina: {
@@ -34,43 +35,22 @@ async function getEstudanteBoletim(escolaId: string, matricula: string) {
   })
 }
 
-/** Resolve o EsquemaConfig da turma do estudante (override) ou do seu curso (padrão). */
-async function getEsquemaConfigDaTurma(turma: { cursoId: string | null; esquemaAvaliacaoId: string | null }): Promise<EsquemaConfig | null> {
-  const curso = turma.cursoId
-    ? await prisma.curso.findUnique({ where: { id: turma.cursoId }, select: { esquemaAvaliacaoId: true } })
-    : null
-  const esquemaId = resolverEsquemaAvaliacaoId(turma, curso)
-  if (!esquemaId) return null
-  const esquema = await prisma.esquemaAvaliacao.findUnique({ where: { id: esquemaId } })
-  if (!esquema) return null
-  return {
-    numUnidades: esquema.numUnidades,
-    notaMinimaAprovacao: esquema.notaMinimaAprovacao,
-    recuperacaoUnidadeAtiva: esquema.recuperacaoUnidadeAtiva,
-    modoRecuperacaoUnidade: esquema.modoRecuperacaoUnidade,
-    recuperacaoFinalAtiva: esquema.recuperacaoFinalAtiva,
-    modoRecuperacaoFinal: esquema.modoRecuperacaoFinal,
-  }
-}
 
-function getStatusColor(status: string) {
+// Situação em tom semântico suave (Badge)
+function tomDoStatus(status: string): BadgeTone {
   switch (status) {
     case 'APROVADO':
     case 'APROVADO_RECUPERACAO':
     case 'APROVADO_CONSELHO':
-      return 'text-green-700 bg-green-100 shadow-sm border border-green-200'
+      return 'success'
     case 'RECUPERACAO':
-      return 'text-orange-700 bg-orange-100 shadow-sm border border-orange-200'
     case 'EM_CONSELHO':
-      return 'text-amber-700 bg-amber-100 shadow-sm border border-amber-200 animate-pulse'
-    case 'DEPENDENCIA':
-      return 'text-slate-800 bg-slate-200 shadow-sm border border-slate-300'
+      return 'warning'
     case 'CONSERVADO':
-      return 'text-rose-700 bg-rose-100 shadow-sm border border-rose-200'
-    case 'DESISTENTE':
-      return 'text-blue-800 bg-slate-200 shadow-sm border border-slate-300'
+    case 'REPROVADO_FALTA':
+      return 'danger'
     default:
-      return 'text-slate-800 bg-slate-100'
+      return 'neutral'
   }
 }
 
@@ -92,6 +72,8 @@ function getStatusText(status: string) {
       return 'Dependência'
     case 'CONSERVADO':
       return 'Conservado'
+    case 'REPROVADO_FALTA':
+      return ROTULO_REPROVADO_FALTA
     default:
       return status
   }
@@ -121,18 +103,20 @@ export default async function BoletimPage({
   // esquema de avaliação da turma (que na prática nem existia antes desta
   // frente). Lê de NotaUnidade (populado desde a Fase 3 do backfill),
   // não mais das colunas fixas nota1/nota2/nota3.
-  const esquemaConfig = await getEsquemaConfigDaTurma(estudante.turma)
+  const esquema = await carregarEsquemaDaTurma(estudante.turma)
+  const etapas = esquema?.etapas ?? []
+  const notaMinima = esquema?.config.notaMinimaAprovacao ?? 5
+
+  // Frequência (chamada): por disciplina e geral, regra do esquema da turma
+  const frequencia = await carregarFrequenciaDaTurma(session.user.escolaId, estudante.turma.id, [estudante.id])
+  const freqAluno = frequencia?.porAluno.get(estudante.id)
+  const freqMinima = frequencia?.regra.minimo ?? 75
 
   const calcularMediaReal = (n: (typeof estudante.notas)[number]) => {
     if (n.nota === -1) return 0
-    if (!esquemaConfig) return n.nota
+    if (!esquema) return n.nota
 
-    const unidadesInput: UnidadeInput[] = n.unidades.map((u) => ({
-      esquemaUnidadeId: u.esquemaUnidadeId,
-      atividades: [{ peso: 10, valor: u.notaCalculada }],
-      notaRecuperacao: u.notaRecuperacao,
-    }))
-    const resultado = calcularMediaFinal(unidadesInput, esquemaConfig)
+    const resultado = calcularMediaFinal(unidadesDeNotasSalvas(etapas, n.unidades), esquema.config)
     return resultado.media ?? 0
   }
 
@@ -147,184 +131,99 @@ export default async function BoletimPage({
     ? (notasValidas.reduce((acc, n) => acc + calcularMediaReal(n), 0) / notasValidas.length).toFixed(2)
     : '0.00'
 
+  const fmt = (n: number | null | undefined) => (n === null || n === undefined ? '—' : n.toFixed(1).replace('.', ','))
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link
-                href="/dashboard/estudantes"
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5 text-slate-700" />
-              </Link>
-              <div>
-                <h1 className="text-2xl font-bold text-slate-900">Boletim</h1>
-                <p className="text-sm text-slate-500 font-medium">{estudante.nome}</p>
-              </div>
-            </div>
-            <a
-              href={`/api/boletim/${estudante.matricula}/pdf`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center space-x-2 bg-gradient-to-r from-slate-700 to-slate-600 text-white px-4 py-2 rounded-lg hover:from-slate-800 hover:to-slate-700 transition-all shadow-lg"
-            >
-              <Download className="w-5 h-5" />
-              <span>Baixar PDF</span>
+    <div className="mx-auto max-w-5xl space-y-6">
+      <PageHeader
+        title={estudante.nome}
+        description={<>Boletim · {estudante.turma.nome} · <span className="font-mono">{estudante.matricula}</span></>}
+        actions={
+          <>
+            <Link href="/dashboard/estudantes" className={buttonClasses({ variant: 'ghost' })}><ArrowLeft size={16} strokeWidth={1.75} /> Estudantes</Link>
+            <a href={`/api/boletim/${estudante.matricula}/pdf`} target="_blank" rel="noopener noreferrer" className={buttonClasses({ variant: 'secondary' })}>
+              <Download size={16} strokeWidth={1.75} /> Baixar PDF
             </a>
-          </div>
-        </div>
-      </header>
+          </>
+        }
+      />
 
-      {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Informações do Estudante */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-50 p-6 mb-6">
-          <div className="flex items-start space-x-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-slate-500 to-slate-700 rounded-full flex items-center justify-center text-white text-2xl font-medium">
-              {estudante.nome.charAt(0).toUpperCase()}
-            </div>
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold text-slate-900 mb-2">{estudante.nome}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <p className="text-sm text-slate-400 font-medium uppercase tracking-wider">Turma</p>
-                  <p className="font-medium text-slate-900">{estudante.turma.nome}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-400 font-medium uppercase tracking-wider">Média Geral</p>
-                  <p className="font-medium text-slate-900">{mediaGeral}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-400 font-medium uppercase tracking-wider">Total de Disciplinas</p>
-                  <p className="font-medium text-slate-900">{estudante.notas.length}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Stat label="Média geral" value={mediaGeral.replace('.', ',')} hint={`${estudante.notas.length} disciplinas`} />
+        <Stat label="Aprovado" value={aprovadas} hint="disciplinas" />
+        <Stat label="Recuperação" value={recuperacao} hint="disciplinas" />
+        {frequencia?.temChamada ? (
+          <Stat
+            label="Frequência"
+            value={formatarFrequencia(freqAluno?.geral.percentual ?? null)}
+            hint={`${freqAluno?.geral.faltasConsideradas ?? 0} faltas · mínimo ${freqMinima}%`}
+            className={(freqAluno?.geral.percentual ?? 100) < freqMinima ? 'border-danger-line' : undefined}
+          />
+        ) : (
+          <Stat label="Frequência" value="—" hint="Nenhuma chamada salva" />
+        )}
+      </div>
 
-        {/* Resumo */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div className="bg-green-50 border border-green-200 rounded-xl p-6">
-            <p className="text-sm text-green-700 mb-1">Aprovado</p>
-            <p className="text-3xl font-medium text-green-900">{aprovadas}</p>
-          </div>
-          <div className="bg-orange-50 border border-orange-200 rounded-xl p-6">
-            <p className="text-sm text-orange-700 mb-1">Recuperação</p>
-            <p className="text-3xl font-medium text-orange-900">{recuperacao}</p>
-          </div>
-          <div className="bg-slate-100 border border-slate-300 rounded-xl p-6">
-            <p className="text-sm text-slate-800 mb-1">Média</p>
-            <p className="text-3xl font-medium text-blue-900">{mediaGeral}</p>
-          </div>
-        </div>
+      <Card className="overflow-hidden">
+        <CardHeader title="Notas por disciplina" />
+        {estudante.notas.length === 0 ? (
+          <EmptyState icon={FileText} title="Nenhuma nota lançada ainda" description="As notas aparecem aqui assim que os professores lançarem a primeira unidade." />
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[36rem] text-13">
+              <thead>
+                <tr className="border-b border-line text-xs text-fg-subtle">
+                  <th scope="col" className="h-9 px-4 text-left font-medium sm:px-5">Disciplina</th>
+                  {etapas.map((etapa, i) => (
+                    <th key={etapa.id} scope="col" title={etapa.nome} className="h-9 px-3 text-right font-medium">U{i + 1}</th>
+                  ))}
+                  <th scope="col" className="h-9 px-3 text-right font-medium">Rec.</th>
+                  <th scope="col" className="h-9 px-3 text-right font-medium text-fg-muted">Média</th>
+                  {frequencia?.temChamada && <th scope="col" title="Frequência na disciplina" className="h-9 px-3 text-right font-medium">Freq.</th>}
+                  <th scope="col" className="h-9 px-4 text-left font-medium sm:px-5">Situação</th>
+                </tr>
+              </thead>
+              <tbody>
+                {estudante.notas.map((nota) => {
+                  const mediaCalculada = calcularMediaReal(nota)
+                  const etapasDoAluno = etapasDaNota(etapas, nota.unidades)
+                  const isInfrequente = nota.status === 'DESISTENTE' || etapasDoAluno.some(e => e.desistente)
+                  const freqDisc = freqAluno?.porDisciplina[nota.disciplinaId]
+                  let statusParaExibir: string = nota.status
+                  if (statusParaExibir === 'DESISTENTE') {
+                    statusParaExibir = mediaCalculada >= notaMinima ? 'APROVADO' : 'RECUPERACAO'
+                  }
+                  if (frequencia) {
+                    statusParaExibir = situacaoComFrequencia(statusParaExibir as any, freqAluno, frequencia.regra, nota.disciplinaId, frequencia.anoEncerrado)
+                  }
 
-        {/* Notas por Disciplina */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="px-6 py-4 bg-gradient-to-r from-slate-50 to-slate-50 border-b border-slate-200">
-            <h3 className="text-lg font-medium text-slate-900">Notas por Disciplina</h3>
+                  return (
+                    <tr key={nota.id} className="border-b border-line-subtle transition-colors duration-150 last:border-0 hover:bg-subtle/60">
+                      <td className="h-10 px-4 sm:px-5">
+                        <span className="font-medium text-fg">{nota.disciplina.nome}</span>
+                        {isInfrequente && <Badge className="ml-2">Infrequente</Badge>}
+                      </td>
+                      {etapasDoAluno.map((etapa, i) => (
+                        <td key={i} className="h-10 px-3 text-right tabular-nums text-fg-muted">{fmt(etapa.nota)}</td>
+                      ))}
+                      <td className="h-10 px-3 text-right tabular-nums text-fg-muted">{fmt(nota.notaRecuperacao)}</td>
+                      <td className={`h-10 px-3 text-right font-semibold tabular-nums ${mediaCalculada < notaMinima ? 'text-danger-fg' : 'text-fg'}`}>
+                        {nota.nota === -1 ? '—' : fmt(mediaCalculada)}
+                      </td>
+                      {frequencia?.temChamada && (
+                        <td className={`h-10 px-3 text-right tabular-nums ${(freqDisc?.percentual ?? 100) < freqMinima ? 'font-medium text-danger-fg' : 'text-fg-muted'}`} title={freqDisc ? `${freqDisc.faltasConsideradas} faltas em ${freqDisc.aulas} aulas` : undefined}>
+                          {formatarFrequencia(freqDisc?.percentual ?? null)}
+                        </td>
+                      )}
+                      <td className="h-10 px-4 sm:px-5"><Badge tone={tomDoStatus(statusParaExibir)} dot>{getStatusText(statusParaExibir)}</Badge></td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
           </div>
-
-          {estudante.notas.length === 0 ? (
-            <div className="p-12 text-center">
-              <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-              <p className="text-slate-400">Nenhuma nota lançada ainda</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-slate-100/50 border-b border-slate-200">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
-                      Disciplina
-                    </th>
-                    <th className="px-4 py-4 text-center text-xs font-medium text-slate-400 uppercase tracking-wider">
-                      U1
-                    </th>
-                    <th className="px-4 py-4 text-center text-xs font-medium text-slate-400 uppercase tracking-wider">
-                      U2
-                    </th>
-                    <th className="px-4 py-4 text-center text-xs font-medium text-slate-400 uppercase tracking-wider">
-                      U3
-                    </th>
-                    <th className="px-4 py-4 text-center text-xs font-medium text-slate-400 uppercase tracking-wider">
-                      Rec.
-                    </th>
-                    <th className="px-6 py-4 text-center text-xs font-medium text-slate-400 uppercase tracking-wider bg-slate-100/50">
-                      Média
-                    </th>
-                    <th className="px-6 py-4 text-center text-xs font-medium text-slate-400 uppercase tracking-wider">
-                      Status
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-slate-50">
-                  {estudante.notas.map((nota) => {
-                    const mediaCalculada = calcularMediaReal(nota);
-                    const isInfrequente = nota.status === 'DESISTENTE' || nota.isDesistenteUnid1 || nota.isDesistenteUnid2 || nota.isDesistenteUnid3;
-                    
-                    return (
-                      <tr key={nota.id} className="hover:bg-slate-100/50 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex flex-col">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-sm font-medium text-slate-900">
-                                {nota.disciplina.nome}
-                              </span>
-                              {isInfrequente && (
-                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200 uppercase tracking-tight">
-                                  Infrequente
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-4 text-center text-sm text-slate-700 font-medium">
-                          {nota.nota1 !== null ? nota.nota1.toFixed(1) : '-'}
-                        </td>
-                        <td className="px-4 py-4 text-center text-sm text-slate-700 font-medium">
-                          {nota.nota2 !== null ? nota.nota2.toFixed(1) : '-'}
-                        </td>
-                        <td className="px-4 py-4 text-center text-sm text-slate-700 font-medium">
-                          {nota.nota3 !== null ? nota.nota3.toFixed(1) : '-'}
-                        </td>
-                        <td className="px-4 py-4 text-center">
-                          {nota.notaRecuperacao !== null ? (
-                            <span className="text-sm font-medium text-slate-700">
-                              {nota.notaRecuperacao.toFixed(1)}
-                            </span>
-                          ) : '-'}
-                        </td>
-                        <td className="px-6 py-4 text-center bg-slate-50">
-                          <span className={`text-base font-medium ${mediaCalculada < 5 ? 'text-red-600' : 'text-slate-800'}`}>
-                            {nota.nota === -1 ? '-' : mediaCalculada.toFixed(1)}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          {(() => {
-                            let statusParaExibir = nota.status;
-                            if (statusParaExibir === 'DESISTENTE') {
-                              statusParaExibir = mediaCalculada >= 5 ? 'APROVADO' : 'RECUPERACAO';
-                            }
-                            return (
-                              <span className={`px-3 py-1 inline-flex text-[10px] leading-5 font-medium rounded-full uppercase tracking-wider ${getStatusColor(statusParaExibir)}`}>
-                                {getStatusText(statusParaExibir)}
-                              </span>
-                            );
-                          })()}
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </main>
+        )}
+      </Card>
     </div>
   )
 }

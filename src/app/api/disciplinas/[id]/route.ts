@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
 
 export const runtime = 'nodejs'
 
@@ -13,9 +14,10 @@ export async function PUT(
   try {
     const session = await auth()
     
-    if (!session) {
+    if (!session?.user?.escolaId || !can(session.user, 'gestao')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
+    const escolaId = session.user.escolaId
 
     const { nome, turmaId, areaId } = await request.json()
 
@@ -31,6 +33,15 @@ export async function PUT(
         { message: 'Turma é obrigatória' },
         { status: 400 }
       )
+    }
+
+    const [atual, turmaDestino, area] = await Promise.all([
+      prisma.disciplina.findFirst({ where: { id, turma: { escolaId } }, select: { id: true } }),
+      prisma.turma.findUnique({ where: { id: turmaId, escolaId }, select: { id: true } }),
+      areaId ? prisma.areaConhecimento.findUnique({ where: { id: areaId, escolaId }, select: { id: true } }) : null
+    ])
+    if (!atual || !turmaDestino || (areaId && !area)) {
+      return NextResponse.json({ message: 'Disciplina não encontrada' }, { status: 404 })
     }
 
     // Check for duplicate name in the same turma (excluding the current discipline)
@@ -79,13 +90,13 @@ export async function DELETE(
   try {
     const session = await auth()
     
-    if (!session) {
+    if (!session?.user?.escolaId || !can(session.user, 'gestao')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 
     // Verificar se há notas vinculadas
-    const disciplina = await prisma.disciplina.findUnique({
-      where: { id },
+    const disciplina = await prisma.disciplina.findFirst({
+      where: { id, turma: { escolaId: session.user.escolaId } },
       include: {
         _count: {
           select: {

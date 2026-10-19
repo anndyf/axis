@@ -9,9 +9,9 @@ export const metadata = {
 
 export const runtime = 'nodejs'
 
-async function getDisciplina(id: string) {
-  return await prisma.disciplina.findUnique({
-    where: { id }
+async function getDisciplina(id: string, escolaId: string) {
+  return await prisma.disciplina.findFirst({
+    where: { id, turma: { escolaId } }
   })
 }
 
@@ -22,12 +22,12 @@ export default async function EditarDisciplinaPage({
 }) {
   const session = await auth()
   
-  if (!session) {
+  if (!session?.user?.escolaId) {
     redirect("/login")
   }
 
   const { id } = await params
-  const disciplina = await getDisciplina(id)
+  const disciplina = await getDisciplina(id, session.user.escolaId)
 
   if (!disciplina) {
     redirect("/dashboard/disciplinas")

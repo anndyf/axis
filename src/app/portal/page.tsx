@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import PortalClient from "./PortalClient"
 import { getStudentPortalData } from "./actions"
 import { prisma } from "@/lib/prisma"
+import { precisaTrocarSenha } from "@/lib/data-fetching"
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -19,11 +20,16 @@ export default async function PortalPage() {
     redirect("/dashboard")
   }
 
+  if (await precisaTrocarSenha(session.user.id)) {
+    redirect("/trocar-senha")
+  }
+
   const data = await getStudentPortalData()
   const escola = await prisma.escola.findUnique({
     where: { id: session.user.escolaId },
-    select: { nome: true }
+    select: { nome: true, logoUrl: true }
   })
 
-  return <PortalClient initialData={data} user={session.user} nomeEscola={escola?.nome || 'Áxis'} />
+  // Só o id vai ao navegador (chave local das mensagens lidas)
+  return <PortalClient initialData={data} user={{ id: session.user.id }} escola={{ nome: escola?.nome || 'Áxis', logoUrl: escola?.logoUrl ?? null }} />
 }

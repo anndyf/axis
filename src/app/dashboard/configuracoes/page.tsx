@@ -2,7 +2,15 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Shield, Database, Check, AlertCircle, Save, ClipboardList, ChevronRight } from "lucide-react"
+import { Check, AlertCircle, Save, ClipboardList, ChevronRight, CalendarDays, Palette, type LucideIcon } from "lucide-react"
+import { Button, Card, CardBody, CardFooter, CardHeader, PageHeader, Select, Skeleton, Switch } from "@/components/ui"
+import ConfirmModal from "@/components/ConfirmModal"
+
+const ATALHOS: { href: string; icon: LucideIcon; titulo: string; descricao: string }[] = [
+  { href: "/dashboard/configuracoes/avaliacao", icon: ClipboardList, titulo: "Esquemas de avaliação", descricao: "Unidades, atividades e regras de recuperação da escola." },
+  { href: "/dashboard/configuracoes/calendario", icon: CalendarDays, titulo: "Calendário letivo", descricao: "Início e fim do ano, datas das unidades, feriados, sábados letivos e tempos de aula." },
+  { href: "/dashboard/configuracoes/identidade", icon: Palette, titulo: "Identidade visual", descricao: "Logo e cor de destaque da escola no sistema, no login e nos PDFs." },
+]
 
 export default function ConfiguracoesPage() {
   const [loading, setLoading] = useState(true)
@@ -58,141 +66,82 @@ export default function ConfiguracoesPage() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-700"></div>
-      </div>
-    )
-  }
-
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-3xl font-medium text-blue-900 flex items-center gap-3">
-          <Shield className="text-slate-700" />
-          Configurações do Sistema
-        </h1>
-        <p className="text-slate-600 mt-2">Gerencie as funcionalidades globais e acessos dos professores.</p>
-      </div>
+    <div className="mx-auto max-w-3xl space-y-6">
+      <PageHeader title="Configurações" description="Funcionalidades globais da escola e acesso dos professores." />
 
-      <Link
-        href="/dashboard/configuracoes/avaliacao"
-        className="flex items-center justify-between bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:border-slate-300 hover:shadow-md transition-all group"
-      >
-        <div className="flex items-center gap-4">
-          <div className="p-3 rounded-xl bg-slate-100 text-slate-700 group-hover:bg-slate-700 group-hover:text-white transition-colors">
-            <ClipboardList className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="font-medium text-blue-900">Esquemas de Avaliação</p>
-            <p className="text-sm text-slate-600">Configure unidades, atividades e regras de recuperação por escola.</p>
-          </div>
-        </div>
-        <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-slate-600 transition-colors" />
-      </Link>
+      <Card>
+        <ul className="divide-y divide-line-subtle">
+          {ATALHOS.map(({ href, icon: Icon, titulo, descricao }) => (
+            <li key={href}>
+              <Link href={href} className="group flex items-center gap-3 px-4 py-3.5 transition-colors duration-150 hover:bg-subtle/60 sm:px-5">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-subtle text-fg-muted" aria-hidden>
+                  <Icon size={16} strokeWidth={1.75} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-medium text-fg">{titulo}</span>
+                  <span className="block text-13 text-fg-muted">{descricao}</span>
+                </span>
+                <ChevronRight size={16} strokeWidth={1.75} className="shrink-0 text-fg-disabled transition-colors duration-150 group-hover:text-fg-muted" aria-hidden />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </Card>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="p-6 border-b border-slate-200 bg-slate-100/50">
-          <h2 className="text-lg font-medium flex items-center gap-2">
-            <Database className="w-5 h-5 text-slate-700" />
-            Módulos Pedagógicos
-          </h2>
-        </div>
-        
-        <div className="p-6 space-y-6">
-          <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors">
-            <div className="space-y-1">
-              <p className="font-medium text-blue-900">Banco de Questões</p>
-              <p className="text-sm text-slate-600">Permitir que professores enviem e visualizem o banco de questões.</p>
-            </div>
-            <button
-              onClick={() => setIsBancoAtivo(!isBancoAtivo)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ring-2 ring-offset-2 ${
-                isBancoAtivo ? 'bg-slate-700 ring-slate-500' : 'bg-slate-300 ring-transparent'
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  isBancoAtivo ? 'translate-x-6' : 'translate-x-1'
-                }`}
-              />
-            </button>
-          </div>
-
-          <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors">
-            <div className="space-y-1">
-              <p className="font-medium text-blue-900">Ano Letivo Ativo</p>
-              <p className="text-sm text-slate-600">Define qual ano letivo será exibido e gerenciado no sistema.</p>
-            </div>
-            <select
-              value={anoLetivo}
-              onChange={(e) => setAnoLetivo(Number(e.target.value))}
-              className="bg-white border border-blue-300 text-blue-900 text-sm rounded-lg focus:ring-slate-500 focus:border-slate-500 block w-32 p-2.5"
-            >
-              {availableYears.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="p-6 bg-slate-100 border-t border-slate-200 flex items-center justify-between">
-          <div>
-            {message && (
-              <div className={`flex items-center gap-2 text-sm font-medium ${
-                message.type === 'success' ? 'text-green-600' : 'text-red-600'
-              }`}>
-                {message.type === 'success' ? <Check size={16} /> : <AlertCircle size={16} />}
-                {message.text}
+      <Card>
+        <CardHeader title="Módulos pedagógicos" description="Valem para todos os usuários da escola." />
+        {loading ? (
+          <CardBody className="space-y-4">
+            <Skeleton className="h-10" />
+            <Skeleton className="h-10" />
+          </CardBody>
+        ) : (
+          <ul className="divide-y divide-line-subtle">
+            <li className="flex items-center justify-between gap-4 px-4 py-3.5 sm:px-5">
+              <div className="min-w-0">
+                <label htmlFor="cfg-banco" className="block text-sm font-medium text-fg">Banco de questões</label>
+                <p className="text-13 text-fg-muted">Permitir que professores enviem e consultem o banco de questões.</p>
               </div>
+              <Switch id="cfg-banco" checked={isBancoAtivo} onChange={setIsBancoAtivo} />
+            </li>
+            <li className="flex items-center justify-between gap-4 px-4 py-3.5 sm:px-5">
+              <div className="min-w-0">
+                <label htmlFor="cfg-ano" className="block text-sm font-medium text-fg">Ano letivo ativo</label>
+                <p className="text-13 text-fg-muted">Ano exibido e gerenciado no sistema.</p>
+              </div>
+              <Select id="cfg-ano" value={anoLetivo} onChange={(e) => setAnoLetivo(Number(e.target.value))} className="w-28 tabular-nums">
+                {availableYears.map((year) => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </Select>
+            </li>
+          </ul>
+        )}
+        <CardFooter className="justify-between">
+          <div role="status">
+            {message && (
+              <p className={`flex items-center gap-1.5 text-13 font-medium ${message.type === 'success' ? 'text-success-fg' : 'text-danger-fg'}`}>
+                {message.type === 'success' ? <Check size={16} strokeWidth={1.75} /> : <AlertCircle size={16} strokeWidth={1.75} />}
+                {message.text}
+              </p>
             )}
           </div>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="bg-slate-700 hover:bg-slate-800 disabled:opacity-50 text-white px-6 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-all shadow-md active:scale-95"
-          >
-            {saving ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              <Save size={20} />
-            )}
-            Salvar Alterações
-          </button>
-        </div>
-      </div>
+          <Button onClick={handleSave} loading={saving} disabled={loading}>
+            {!saving && <Save size={16} strokeWidth={1.75} />} Salvar alterações
+          </Button>
+        </CardFooter>
+      </Card>
 
-      {/* Modal de Confirmação para Configurações */}
-      {showConfirm && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-sm rounded-3xl p-8 shadow-2xl animate-in zoom-in-95 duration-300">
-            <div className="w-16 h-16 bg-slate-100 text-slate-700 rounded-2xl flex items-center justify-center mb-6">
-              <Shield className="w-8 h-8" />
-            </div>
-            <h3 className="text-2xl font-medium text-slate-800 mb-2">Salvar Configurações?</h3>
-            <p className="text-slate-600 font-medium mb-8">
-              Estas alterações afetarão o comportamento global do sistema para todos os usuários. Deseja confirmar?
-            </p>
-            <div className="grid grid-cols-2 gap-4">
-              <button 
-                onClick={() => setShowConfirm(false)}
-                className="py-4 rounded-2xl font-medium text-slate-600 hover:bg-slate-50 transition-all"
-              >
-                Cancelar
-              </button>
-              <button 
-                onClick={() => handleSave()}
-                className="py-4 rounded-2xl font-medium bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg"
-              >
-                Confirmar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmModal
+        isOpen={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        onConfirm={handleSave}
+        title="Salvar configurações?"
+        message="Estas alterações afetam o comportamento do sistema para todos os usuários da escola."
+        confirmText="Salvar"
+        variant="info"
+      />
     </div>
   )
 }

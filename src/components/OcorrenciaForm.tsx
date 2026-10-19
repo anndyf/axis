@@ -107,24 +107,24 @@ export default function OcorrenciaForm({
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-4xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/80 backdrop-blur-sm animate-fade-in">
+      <div className="bg-surface rounded-xl shadow-overlay w-full max-w-4xl overflow-hidden animate-pop-in flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+        <div className="px-8 py-6 border-b border-line-subtle flex justify-between items-center bg-canvas/50">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-slate-900 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-slate-900/20">
+            <div className="w-12 h-12 bg-subtle border border-line text-fg rounded-lg flex items-center justify-center shadow-card">
               <UserPlus size={22} />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-slate-900 tracking-tight">
+              <h3 className="text-xl font-bold text-fg tracking-tight">
                 {ocorrencia ? 'Editar Registro' : 'Novo Registro de Ocorrência'}
               </h3>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Preencha os dados do evento</p>
+              <p className="text-xs font-bold text-fg-subtle">Preencha os dados do evento</p>
             </div>
           </div>
           <button 
             onClick={onClose} 
-            className="p-3 hover:bg-slate-200 rounded-2xl transition-all text-slate-400"
+            className="p-3 hover:bg-subtle-hover rounded-lg transition-all text-fg-subtle"
           >
             <X size={20} />
           </button>
@@ -135,23 +135,23 @@ export default function OcorrenciaForm({
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Título da Ocorrência</label>
+              <label className="text-xs font-bold text-fg-subtle ml-1">Título da Ocorrência</label>
               <input
                 required
                 type="text"
                 value={formData.titulo}
                 onChange={e => setFormData({ ...formData, titulo: e.target.value })}
                 placeholder="Ex: Entrega de documentação pendente"
-                className="w-full bg-slate-50 border-transparent rounded-2xl px-6 py-4 text-sm focus:ring-4 focus:ring-slate-900/5 focus:bg-white focus:border-slate-200 transition-all font-medium placeholder:text-slate-300 shadow-inner"
+                className="w-full bg-canvas border-transparent rounded-lg px-6 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium placeholder:text-fg-disabled shadow-card"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Tipo de Evento</label>
+              <label className="text-xs font-bold text-fg-subtle ml-1">Tipo de Evento</label>
               <select
                 value={formData.tipo}
                 onChange={e => setFormData({ ...formData, tipo: e.target.value })}
-                className="w-full bg-slate-50 border-transparent rounded-2xl px-6 py-4 text-sm focus:ring-4 focus:ring-slate-900/5 focus:bg-white focus:border-slate-200 transition-all font-medium shadow-inner appearance-none cursor-pointer"
+                className="w-full bg-canvas border-transparent rounded-lg px-6 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium shadow-card appearance-none cursor-pointer"
               >
                 <option value="Comportamental">Comportamental</option>
                 <option value="Pedagógica">Pedagógica</option>
@@ -163,76 +163,76 @@ export default function OcorrenciaForm({
             </div>
 
             <div className="space-y-2">
-              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Data do Evento</label>
+              <label className="text-xs font-bold text-fg-subtle ml-1">Data do Evento</label>
               <input
                 type="date"
                 value={formData.data}
                 onChange={e => setFormData({ ...formData, data: e.target.value })}
-                className="w-full bg-slate-50 border-transparent rounded-2xl px-6 py-4 text-sm focus:ring-4 focus:ring-slate-900/5 focus:bg-white focus:border-slate-200 transition-all font-medium shadow-inner cursor-pointer"
+                className="w-full bg-canvas border-transparent rounded-lg px-6 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium shadow-card cursor-pointer"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Estudantes Envolvidos</label>
+            <label className="text-xs font-bold text-fg-subtle ml-1">Estudantes Envolvidos</label>
             
             {/* Multi-select students */}
             <div className="space-y-4">
               <div className="relative group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-slate-900" size={18} />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-disabled group-focus-within:text-fg" size={18} />
                 <input
                   type="text"
                   placeholder="Pesquise para adicionar estudantes..."
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
-                  className="w-full bg-slate-50 border-transparent rounded-2xl pl-12 pr-6 py-4 text-sm focus:ring-4 focus:ring-slate-900/5 focus:bg-white focus:border-slate-200 transition-all font-medium placeholder:text-slate-300 shadow-inner"
+                  className="w-full bg-canvas border-transparent rounded-lg pl-12 pr-6 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium placeholder:text-fg-disabled shadow-card"
                 />
                 
                 {/* Search Results Dropdown */}
                 {searchResults.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-line rounded-lg shadow-overlay z-50 overflow-hidden animate-slide-up">
                     {searchResults.map(est => (
                       <button
                         key={est.matricula}
                         type="button"
                         onClick={() => toggleEstudante(est)}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0"
+                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-canvas transition-colors border-b border-line-subtle last:border-0"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 bg-slate-100 rounded-xl flex items-center justify-center font-bold text-slate-500">
+                          <div className="w-9 h-9 bg-subtle rounded-xl flex items-center justify-center font-bold text-fg-subtle">
                             {est.nome.charAt(0)}
                           </div>
                           <div className="text-left">
-                            <p className="text-sm font-bold text-slate-900">{est.nome}</p>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase">{est.turma?.nome}</p>
+                            <p className="text-sm font-bold text-fg">{est.nome}</p>
+                            <p className="text-xs font-bold text-fg-subtle">{est.turma?.nome}</p>
                           </div>
                         </div>
-                        <Hash size={16} className="text-slate-300" />
+                        <Hash size={16} className="text-fg-disabled" />
                       </button>
                     ))}
                   </div>
                 )}
-                {loading && <div className="absolute right-4 top-1/2 -translate-y-1/2"><Loader2 className="w-4 h-4 animate-spin text-slate-400" /></div>}
+                {loading && <div className="absolute right-4 top-1/2 -translate-y-1/2"><Loader2 className="w-4 h-4 animate-spin text-fg-subtle" /></div>}
               </div>
 
               {/* Selected Chips */}
               <div className="flex flex-wrap gap-2">
                 {selectedEstudantes.map(est => (
-                  <div key={est.matricula} className="flex items-center gap-2 bg-slate-900 text-white pl-4 pr-2 py-2 rounded-xl shadow-lg shadow-slate-900/10 group">
-                    <span className="text-xs font-bold uppercase tracking-tight">{est.nome}</span>
+                  <div key={est.matricula} className="flex items-center gap-1.5 bg-subtle border border-line text-fg pl-3 pr-1 py-1 rounded-md group">
+                    <span className="text-xs font-bold">{est.nome}</span>
                     <button 
                       type="button"
                       onClick={() => toggleEstudante(est)}
-                      className="p-1 hover:bg-white/20 rounded-lg transition-colors"
+                      className="p-1 text-fg-subtle hover:bg-line hover:text-fg rounded transition-colors duration-150"
                     >
                       <X size={14} />
                     </button>
                   </div>
                 ))}
                 {selectedEstudantes.length === 0 && (
-                  <div className="flex items-center gap-3 text-amber-600 bg-amber-50 px-5 py-3 rounded-2xl border border-amber-100">
+                  <div className="flex items-center gap-3 text-warning-fg bg-warning-subtle px-5 py-3 rounded-lg border border-warning-line">
                     <AlertCircle size={16} />
-                    <p className="text-xs font-bold uppercase">Nenhum estudante selecionado ainda</p>
+                    <p className="text-xs font-bold">Nenhum estudante selecionado ainda</p>
                   </div>
                 )}
               </div>
@@ -240,25 +240,25 @@ export default function OcorrenciaForm({
           </div>
 
           <div className="space-y-2">
-            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Descrição Detalhada</label>
+            <label className="text-xs font-bold text-fg-subtle ml-1">Descrição Detalhada</label>
             <textarea
               required
               rows={12}
               value={formData.descricao}
               onChange={e => setFormData({ ...formData, descricao: e.target.value })}
               placeholder="Descreva detalhadamente o ocorrido..."
-              className="w-full bg-slate-50 border-transparent rounded-[2rem] px-8 py-6 text-base focus:ring-4 focus:ring-slate-900/5 focus:bg-white focus:border-slate-200 transition-all font-medium placeholder:text-slate-300 shadow-inner resize-none"
+              className="w-full bg-canvas border-transparent rounded-xl px-8 py-6 text-base focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium placeholder:text-fg-disabled shadow-card resize-none"
             />
           </div>
 
         </form>
 
         {/* Footer */}
-        <div className="px-8 py-6 border-t border-slate-100 bg-slate-50/50 flex gap-4">
+        <div className="px-8 py-6 border-t border-line-subtle bg-canvas/50 flex gap-4">
           <button 
             type="button"
             onClick={onClose}
-            className="flex-1 py-4 text-sm font-bold text-slate-400 hover:text-slate-900 hover:bg-white rounded-2xl transition-all"
+            className="flex-1 py-4 text-sm font-bold text-fg-subtle hover:text-fg hover:bg-surface rounded-lg transition-all"
           >
             CANCELAR
           </button>
@@ -266,7 +266,7 @@ export default function OcorrenciaForm({
             type="button"
             onClick={handleSubmit}
             disabled={saving}
-            className="flex-3 py-4 bg-slate-900 text-white text-sm font-bold rounded-2xl shadow-xl shadow-slate-900/20 hover:bg-slate-800 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3 px-10"
+            className="flex-3 py-4 bg-accent text-on-accent text-sm font-bold rounded-lg shadow-card hover:bg-accent-hover transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3 px-10"
           >
             {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save size={18} />}
             {saving ? 'SALVANDO...' : 'CONFIRMAR E REGISTRAR'}

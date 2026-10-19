@@ -1,14 +1,22 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { auth } from '@/lib/auth';
+import { can } from '@/lib/rbac';
 
 export async function GET(request: Request) {
   try {
+    const session = await auth();
+    if (!session?.user?.escolaId || !can(session.user, 'gestao')) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const unidade = searchParams.get('unidade') || 'II'; // Padrão: II
 
     // Buscar todos os professores (pessoas que já enviaram alguma questão para o sistema)
     const users = await prisma.user.findMany({
       where: {
+        escolaId: session.user.escolaId,
         questoes: {
           some: {} // ter alguma questão criada valida que é professor
         }

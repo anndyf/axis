@@ -3,6 +3,7 @@
 import { useState, useEffect, Fragment } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { Button, EmptyState, PageHeader, buttonClasses } from "@/components/ui"
 import {
   ArrowLeft,
   Save,
@@ -18,9 +19,11 @@ import {
   Search,
   Loader2,
   Accessibility,
-  Printer
+  Printer,
+  Info,
+  ChevronDown
 } from "lucide-react"
-import { calcularNotaUnidade, calcularMediaFinal, type EsquemaConfig, type UnidadeInput } from "@/lib/services/notas"
+import { calcularNotaUnidade, calcularMediaFinal, paraEsquemaConfig, type EsquemaConfig, type UnidadeInput, type FormaCalculo } from "@/lib/services/notas"
 
 interface Estudante {
   matricula: string
@@ -40,6 +43,7 @@ interface EsquemaAtividade {
   id: string
   ordem: number
   nome: string
+  notaMaxima: number
   peso: number
 }
 
@@ -47,6 +51,9 @@ interface EsquemaUnidade {
   id: string
   ordem: number
   nome: string
+  peso: number
+  formaCalculo: FormaCalculo
+  divisor: number | null
   atividades: EsquemaAtividade[]
 }
 
@@ -57,6 +64,11 @@ interface EsquemaInfo {
   modoRecuperacaoUnidade: string | null
   recuperacaoFinalAtiva: boolean
   modoRecuperacaoFinal: string | null
+  formaCalculoFinal: FormaCalculo
+  divisorFinal: number | null
+  notaMinimaExameFinal: number | null
+  casasDecimais: number
+  definicaoAtividades?: 'ESCOLA' | 'PROFESSOR'
   unidades: EsquemaUnidade[]
 }
 
@@ -102,14 +114,13 @@ export default function LancarNotasTurmaClient({
   const [feedbackModal, setFeedbackModal] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
 
-  const esquemaConfig: EsquemaConfig | null = esquema ? {
+  const esquemaConfig: EsquemaConfig | null = esquema ? paraEsquemaConfig({
+    ...esquema,
     numUnidades: esquema.unidades.length,
-    notaMinimaAprovacao: esquema.notaMinimaAprovacao,
-    recuperacaoUnidadeAtiva: esquema.recuperacaoUnidadeAtiva,
     modoRecuperacaoUnidade: esquema.modoRecuperacaoUnidade as any,
-    recuperacaoFinalAtiva: esquema.recuperacaoFinalAtiva,
     modoRecuperacaoFinal: esquema.modoRecuperacaoFinal as any,
-  } : null
+  }) : null
+  const casas = esquema?.casasDecimais ?? 1
 
   // Esquema legado (1 atividade por unidade) renderiza como uma tabela
   // simples - 1 input por unidade, sem sub-colunas de atividade nem coluna
@@ -169,7 +180,7 @@ export default function LancarNotasTurmaClient({
     return calcularNotaUnidade(unidade.atividades.map(a => ({
       peso: a.peso,
       valor: estado.atividades[a.id] !== '' ? parseFloat(estado.atividades[a.id]) : null
-    })))
+    })), unidade.formaCalculo, unidade.divisor, casas)
   }
 
   const calcularMedia = (estudanteId: string): { texto: string, valor: number | null } => {
@@ -182,6 +193,9 @@ export default function LancarNotasTurmaClient({
 
     const unidadesInput: UnidadeInput[] = esquema.unidades.map(u => ({
       esquemaUnidadeId: u.id,
+      peso: u.peso,
+      formaCalculo: u.formaCalculo,
+      divisor: u.divisor,
       atividades: u.atividades.map(a => ({
         peso: a.peso,
         valor: estado[u.id]?.atividades[a.id] !== '' && estado[u.id]?.atividades[a.id] !== undefined
@@ -191,13 +205,13 @@ export default function LancarNotasTurmaClient({
     }))
     const resultado = calcularMediaFinal(unidadesInput, esquemaConfig)
     if (resultado.media === null) return { texto: '-', valor: null }
-    return { texto: resultado.media.toFixed(1), valor: resultado.media }
+    return { texto: resultado.media.toFixed(casas), valor: resultado.media }
   }
 
   const getStatusColor = (media: { texto: string, valor: number | null }) => {
-    if (media.texto === 'DE') return 'text-slate-400'
-    if (media.texto === '-') return 'text-slate-300'
-    return (media.valor ?? 0) >= (esquema?.notaMinimaAprovacao ?? 5) ? 'text-emerald-600' : 'text-rose-600'
+    if (media.texto === 'DE') return 'text-fg-subtle'
+    if (media.texto === '-') return 'text-zinc-300'
+    return (media.valor ?? 0) >= (esquema?.notaMinimaAprovacao ?? 5) ? 'text-success-fg' : 'text-danger-fg'
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -277,19 +291,19 @@ export default function LancarNotasTurmaClient({
     {
       title: "Lançamento Ágil",
       description: "As notas são salvas por unidade e a média é calculada em tempo real.",
-      icon: <FileText className="w-5 h-5 text-emerald-600" />,
+      icon: <FileText className="w-5 h-5 text-success-fg" />,
       color: "emerald"
     },
     {
       title: "Status de Aluno",
       description: "Marque como infrequente aquele aluno que não frequenta ou só apareceu para fazer a prova, clicando no ícone lateral (👥).",
-      icon: <UserMinus className="w-5 h-5 text-slate-700" />,
+      icon: <UserMinus className="w-5 h-5 text-fg-muted" />,
       color: "blue"
     },
     {
       title: "Acompanhamento",
       description: "Médias abaixo de 5.0 são destacadas em vermelho para intervenção pedagógica.",
-      icon: <TrendingUp className="w-5 h-5 text-orange-600" />,
+      icon: <TrendingUp className="w-5 h-5 text-warning-fg" />,
       color: "orange"
     }
   ]
@@ -303,79 +317,64 @@ export default function LancarNotasTurmaClient({
     : 6
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header Estilo Simulados - Ajustado para ser Flush com o Layout */}
-      <header className="bg-white shadow-sm border-b border-slate-300 sticky top-0 z-50 -mx-4 -mt-4 md:-mx-8 md:-mt-8 mb-4 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link href="/dashboard/notas" className="p-2 hover:bg-slate-200 rounded-lg transition-colors text-slate-400 hover:text-slate-700">
-                <ArrowLeft size={20}/>
-              </Link>
-              <div>
-                <h1 className="text-2xl font-medium text-slate-800 tracking-tight">
-                  {disciplinaSelecionada ? selectedDiscName : "Lançar Notas"}
-                </h1>
-                <p className="text-base text-slate-700 font-medium">{disciplinaSelecionada ? `Turma: ${turmaNome}` : `Turma Selecionada: ${turmaNome}`}</p>
-              </div>
-            </div>
+    <div className="mx-auto max-w-7xl">
+      <PageHeader
+        title={disciplinaSelecionada ? selectedDiscName : "Lançar notas"}
+        description={`Turma ${turmaNome}`}
+        actions={
+          <>
+            <Link href="/dashboard/notas" className={buttonClasses({ variant: "ghost" })}><ArrowLeft size={16} strokeWidth={1.75} /> Turmas</Link>
+            {disciplinaSelecionada && (
+              <a
+                href={`/api/relatorio/turma/${turmaId}/disciplina/${disciplinaSelecionada}/pdf`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={buttonClasses({ variant: "secondary" })}
+                title="Imprimir o mapa de notas desta disciplina"
+              >
+                <Printer size={16} strokeWidth={1.75} /> <span className="hidden md:inline">Imprimir mapa</span>
+              </a>
+            )}
+            {hasUnsavedChanges() && (
+              <Button onClick={handleSubmit} loading={saving}>
+                {!saving && <Save size={16} strokeWidth={1.75} />} {saving ? "Salvando…" : "Salvar notas"}
+              </Button>
+            )}
+          </>
+        }
+      />
 
-            <div className="flex items-center gap-3">
-              {disciplinaSelecionada && (
-                <a
-                  href={`/api/relatorio/turma/${turmaId}/disciplina/${disciplinaSelecionada}/pdf`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 bg-white text-slate-700 px-4 py-2.5 rounded-xl font-bold border border-slate-200 hover:bg-slate-50 transition-all text-xs active:scale-95 shadow-sm"
-                  title="Imprimir Mapa de Notas desta Disciplina"
-                >
-                  <Printer size={16} />
-                  <span className="hidden md:inline">IMPRIMIR MAPA</span>
-                </a>
-              )}
+      <main className="space-y-6">
 
-              {hasUnsavedChanges() && (
-                <button
-                  onClick={handleSubmit}
-                  disabled={saving}
-                  className="flex items-center gap-2 bg-slate-900 border border-slate-900 text-white px-5 py-2.5 rounded-xl font-medium hover:bg-slate-800 transition-all text-sm active:scale-95 shadow-lg shadow-slate-300"
-                >
-                  {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save size={16} />}
-                  {saving ? 'SALVANDO...' : 'SALVAR NOTAS'}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-
-        {/* Dicas Estilo Simulados */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {launchTips.map((tip, index) => (
-             <div key={index} className="bg-white/60 border border-slate-300/60 p-4 rounded-2xl flex items-start space-x-4 hover:bg-white hover:border-slate-300 hover:shadow-sm transition-all">
-                <div className={`p-2.5 rounded-xl bg-${tip.color}-50 text-${tip.color}-600`}>
-                   {tip.icon}
-                </div>
+        {/* Dicas de uso: recolhidas para não competir com a tabela */}
+        <details className="group rounded-lg border border-line bg-surface shadow-card">
+          <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-13 font-medium text-fg-muted hover:text-fg">
+            <Info size={16} strokeWidth={1.75} className="text-fg-subtle" aria-hidden /> Como funciona o lançamento
+            <ChevronDown size={14} strokeWidth={1.75} className="ml-auto transition-transform duration-150 group-open:rotate-180" aria-hidden />
+          </summary>
+          <ul className="grid gap-4 border-t border-line-subtle px-4 py-4 md:grid-cols-3">
+            {launchTips.map((tip, index) => (
+              <li key={index} className="flex gap-3">
+                <span className="mt-0.5 text-fg-subtle [&_svg]:size-4">{tip.icon}</span>
                 <div>
-                  <h3 className="text-base font-medium text-slate-800 mb-1">{tip.title}</h3>
-                  <p className="text-sm text-slate-600 leading-relaxed">{tip.description}</p>
+                  <p className="text-13 font-medium text-fg">{tip.title}</p>
+                  <p className="text-13 text-fg-muted">{tip.description}</p>
                 </div>
-             </div>
-          ))}
-        </div>
+              </li>
+            ))}
+          </ul>
+        </details>
 
         {/* Filtros Estilo Simulados */}
-        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap gap-5 items-end">
+        <div className="bg-surface p-5 rounded-lg shadow-sm border border-line flex flex-wrap gap-5 items-end">
             <div className="flex-1 min-w-[300px] space-y-1.5">
-                <label className="text-sm font-medium text-slate-400 uppercase tracking-wider ml-1">Disciplina</label>
+                <label className="text-sm font-medium text-fg-subtle ml-1">Disciplina</label>
                 <div className="relative">
-                  <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                  <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-subtle" size={16} />
                   <select
                     value={disciplinaSelecionada}
                     onChange={(e) => setDisciplinaSelecionada(e.target.value)}
-                    className="w-full bg-slate-50 border-none rounded-xl pl-11 pr-4 py-3 text-base focus:ring-2 focus:ring-slate-500 transition-all font-medium appearance-none cursor-pointer"
+                    className="w-full bg-canvas border-none rounded-xl pl-11 pr-4 py-3 text-base focus:ring-2 focus:ring-zinc-500 transition-all font-medium appearance-none cursor-pointer"
                   >
                     <option value="">Selecione a disciplina para lançamento...</option>
                     {disciplinas.map((disc) => <option key={disc.id} value={disc.id}>{disc.nome}</option>)}
@@ -383,64 +382,75 @@ export default function LancarNotasTurmaClient({
                 </div>
             </div>
 
-            <div className="hidden lg:flex items-center gap-3 pb-1 border-l pl-5 border-slate-200 flex-1">
-               <div className="bg-orange-50/50 p-2.5 rounded-xl text-orange-600 border border-orange-100/50"><UserMinus size={18}/></div>
-               <p className="text-[11px] text-slate-600 leading-tight font-medium max-w-[450px]">
-                 <strong className="text-slate-700">Aluno sem nota?</strong> Marque como <strong className="text-slate-700">Infrequente</strong> aquele aluno que não frequenta ou só apareceu para fazer a prova, clicando no ícone <span className="inline-flex mx-1 p-1 bg-white border border-slate-300 rounded text-slate-400"><UserMinus size={10}/></span> ao lado da nota para não afetar cálculos indevidos.
+            <div className="hidden lg:flex items-center gap-3 pb-1 border-l pl-5 border-line flex-1">
+               <div className="bg-warning-subtle p-2.5 rounded-xl text-warning-fg border border-warning-line"><UserMinus size={18}/></div>
+               <p className="text-xs text-fg-muted leading-tight font-medium max-w-[450px]">
+                 <strong className="text-fg-muted">Aluno sem nota?</strong> Marque como <strong className="text-fg-muted">Infrequente</strong> aquele aluno que não frequenta ou só apareceu para fazer a prova, clicando no ícone <span className="inline-flex mx-1 p-1 bg-surface border border-line-strong rounded text-fg-subtle"><UserMinus size={10}/></span> ao lado da nota para não afetar cálculos indevidos.
                </p>
             </div>
         </div>
 
         {/* Lançamento Estilo Simulados */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-300 overflow-hidden">
-          <div className="p-4 border-b border-slate-200 bg-slate-50/10 flex items-center justify-between">
-            <h2 className="text-lg font-medium text-slate-800 flex items-center gap-2">
-              <Users size={20} className="text-slate-400" />
+        <div className="bg-surface rounded-lg shadow-sm border border-line-strong overflow-hidden">
+          <div className="p-4 border-b border-line bg-canvas/10 flex items-center justify-between">
+            <h2 className="text-lg font-medium text-fg flex items-center gap-2">
+              <Users size={20} className="text-fg-subtle" />
               Matriz de Rendimento Acadêmico
             </h2>
             <div className="relative max-w-xs w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-subtle" />
               <input
                 type="text"
                 placeholder="Filtrar por nome..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-white border border-slate-300 rounded-lg pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-500/10 focus:border-slate-400 transition-all shadow-sm"
+                className="w-full bg-surface border border-line-strong rounded-lg pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-zinc-500/10 focus:border-zinc-400 transition-all shadow-sm"
               />
             </div>
           </div>
 
           {message && (
-            <div className={`p-3 flex items-center gap-2 border-b ${message.type === 'success' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-red-50 text-red-700 border-red-100'}`}>
+            <div className={`p-3 flex items-center gap-2 border-b ${message.type === 'success' ? 'bg-success-subtle text-success-fg border-success-line' : 'bg-danger-subtle text-danger-fg border-danger-line'}`}>
               {message.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
               <span className="text-sm font-medium">{message.text}</span>
             </div>
           )}
 
+          {esquema?.definicaoAtividades === 'PROFESSOR' && disciplinaSelecionada && (
+            <div className="p-3 flex flex-wrap items-center gap-2 border-b bg-accent-subtle text-accent-fg border-accent/25 text-sm">
+              <AlertCircle size={16} />
+              <span>
+                Nesta turma o professor define as avaliações de cada unidade.
+                {esquema.unidades.some(u => u.atividades.length === 0) && ' Unidades sem avaliação ainda não recebem nota.'}
+              </span>
+              <Link href={`/dashboard/notas/avaliacoes?disciplina=${disciplinaSelecionada}`} className="font-medium underline">Minhas avaliações</Link>
+            </div>
+          )}
+
           <div className="overflow-x-auto">
             <table className="w-full text-left">
-              <thead className="bg-slate-50 border-b border-slate-300">
+              <thead className="bg-canvas border-b border-line-strong">
                 {esquema && !isSimples ? (
                   <>
                     <tr>
-                      <th rowSpan={2} className="px-6 py-4 text-xs font-medium text-slate-400 uppercase tracking-widest w-12 text-center align-bottom">#</th>
-                      <th rowSpan={2} className="px-6 py-4 text-xs font-medium text-slate-400 uppercase tracking-widest align-bottom">Estudante</th>
+                      <th rowSpan={2} className="px-6 py-4 text-xs font-medium text-fg-subtle w-12 text-center align-bottom">#</th>
+                      <th rowSpan={2} className="px-6 py-4 text-xs font-medium text-fg-subtle align-bottom">Estudante</th>
                       {esquema.unidades.map(u => (
-                        <th key={u.id} colSpan={u.atividades.length + 1} className="px-4 py-2 text-xs font-medium text-slate-500 uppercase tracking-widest text-center border-l border-slate-200">
+                        <th key={u.id} colSpan={u.atividades.length + 1} className="px-4 py-2 text-xs font-medium text-fg-subtle text-center border-l border-line">
                           {u.nome}
                         </th>
                       ))}
-                      <th rowSpan={2} className="px-6 py-4 text-xs font-medium text-slate-400 uppercase tracking-widest w-24 text-center align-bottom">Média</th>
+                      <th rowSpan={2} className="px-6 py-4 text-xs font-medium text-fg-subtle w-24 text-center align-bottom">Média</th>
                     </tr>
                     <tr>
                       {esquema.unidades.map(u => (
                         <Fragment key={u.id}>
                           {u.atividades.map(a => (
-                            <th key={a.id} className="px-2 py-2 text-[10px] font-medium text-slate-400 uppercase tracking-wide text-center border-l border-slate-100 w-20">
-                              {a.nome} <span className="text-slate-300">({a.peso})</span>
+                            <th key={a.id} className="px-2 py-2 text-xs font-medium text-fg-subtle text-center border-l border-line-subtle w-20">
+                              {a.nome} <span className="text-fg-disabled">({a.notaMaxima})</span>
                             </th>
                           ))}
-                          <th key={`${u.id}-subtotal`} className="px-2 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wide text-center bg-slate-100/60 w-16">
+                          <th key={`${u.id}-subtotal`} className="px-2 py-2 text-xs font-bold text-fg-subtle text-center bg-subtle/60 w-16">
                             Subtotal
                           </th>
                         </Fragment>
@@ -449,37 +459,35 @@ export default function LancarNotasTurmaClient({
                   </>
                 ) : (
                   <tr>
-                    <th className="px-6 py-4 text-xs font-medium text-slate-400 uppercase tracking-widest w-12 text-center">#</th>
-                    <th className="px-6 py-4 text-xs font-medium text-slate-400 uppercase tracking-widest">Estudante</th>
+                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle w-12 text-center">#</th>
+                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle">Estudante</th>
                     {(esquema?.unidades ?? []).map(u => (
-                      <th key={u.id} className="px-4 py-4 text-xs font-medium text-slate-400 uppercase tracking-widest w-32 text-center">{u.nome}</th>
+                      <th key={u.id} className="px-4 py-4 text-xs font-medium text-fg-subtle w-32 text-center">{u.nome}</th>
                     ))}
-                    <th className="px-6 py-4 text-xs font-medium text-slate-400 uppercase tracking-widest w-24 text-center">Média</th>
+                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle w-24 text-center">Média</th>
                   </tr>
                 )}
               </thead>
-              <tbody className="divide-y divide-slate-200/80">
+              <tbody className="divide-y divide-line/80">
                 {loading ? (
                    <tr>
                      <td colSpan={totalColunas} className="px-6 py-16 text-center">
                        <div className="flex flex-col items-center gap-2">
-                         <Loader2 className="w-8 h-8 text-slate-700 animate-spin" />
-                         <p className="text-slate-400 text-sm font-medium uppercase tracking-widest animate-pulse">Sincronizando...</p>
+                         <Loader2 className="w-8 h-8 text-fg-muted animate-spin" />
+                         <p className="text-fg-subtle text-sm font-medium animate-pulse">Sincronizando...</p>
                        </div>
                      </td>
                    </tr>
                 ) : !disciplinaSelecionada ? (
                    <tr>
-                      <td colSpan={totalColunas} className="px-6 py-16 text-center text-slate-300">
-                        <BarChart2 className="w-12 h-12 opacity-20 mx-auto mb-3" />
-                        <p className="text-sm font-medium uppercase tracking-widest">Selecione uma disciplina para iniciar o lançamento</p>
+                      <td colSpan={totalColunas}>
+                        <EmptyState icon={BarChart2} title="Escolha a disciplina" description="Selecione a disciplina acima para abrir a tabela de notas da turma." />
                       </td>
                    </tr>
                 ) : filteredEstudantes.length === 0 ? (
                    <tr>
-                      <td colSpan={totalColunas} className="px-6 py-16 text-center text-slate-300">
-                        <Search className="w-12 h-12 opacity-20 mx-auto mb-3" />
-                        <p className="text-sm font-medium uppercase tracking-widest">Nenhum estudante encontrado</p>
+                      <td colSpan={totalColunas}>
+                        <EmptyState icon={Search} title="Nenhum estudante encontrado" description="Confira o filtro por nome." />
                       </td>
                    </tr>
                 ) : (
@@ -489,19 +497,19 @@ export default function LancarNotasTurmaClient({
                     const isDesistenteGeral = statusMap[estudante.matricula] === 'DESISTENTE'
 
                     return (
-                      <tr key={estudante.matricula} className={`hover:bg-slate-50 transition-colors ${isDesistenteGeral ? 'bg-amber-50/20 grayscale-[0.5]' : ''}`}>
-                        <td className="px-6 py-4 text-sm text-slate-400 font-medium text-center">{index + 1}</td>
+                      <tr key={estudante.matricula} className={`hover:bg-canvas transition-colors ${isDesistenteGeral ? 'bg-warning-subtle grayscale-[0.5]' : ''}`}>
+                        <td className="px-6 py-4 text-sm text-fg-subtle font-medium text-center">{index + 1}</td>
                         <td className="px-6 py-4">
                           <div className="flex flex-col relative group/name">
                              <div className="flex items-center gap-2">
-                                <span className={`text-base font-medium uppercase ${isDesistenteGeral ? 'text-amber-700' : 'text-slate-700'}`}>{estudante.nome}</span>
+                                <span className={`text-base font-medium ${isDesistenteGeral ? 'text-warning-fg' : 'text-fg-muted'}`}>{estudante.nome}</span>
                                 {estudante.aeeProfile && (
                                    <Link
                                      href={`/dashboard/aee/${estudante.matricula}`}
                                      className={`p-1.5 rounded-full border-2 transition-all flex items-center justify-center hover:scale-110 active:scale-95 ${
                                        estudante.aeeProfile.acknowledgements.length > 0
-                                       ? 'bg-emerald-50 border-emerald-500 text-emerald-600'
-                                       : 'bg-amber-50 border-amber-500 text-amber-600 animate-pulse'
+                                       ? 'bg-success-subtle border-success text-success-fg'
+                                       : 'bg-warning-subtle border-warning text-warning-fg animate-pulse'
                                      }`}
                                      title={estudante.aeeProfile.acknowledgements.length > 0 ? "Ficha AEE: Lida" : "Ficha AEE: LEITURA PENDENTE!"}
                                    >
@@ -509,7 +517,7 @@ export default function LancarNotasTurmaClient({
                                    </Link>
                                 )}
                              </div>
-                            <span className="text-[11px] font-medium text-slate-400 tracking-widest uppercase">Matrícula: {estudante.matricula}</span>
+                            <span className="text-xs font-medium text-fg-subtle">Matrícula: {estudante.matricula}</span>
                           </div>
                         </td>
                         {(esquema?.unidades ?? []).map((u) => {
@@ -527,10 +535,10 @@ export default function LancarNotasTurmaClient({
                                   <input
                                     type="number" step="0.1"
                                     value={val}
-                                    onChange={(e) => atividade && handleAtividadeChange(estudante.matricula, u.id, atividade.id, e.target.value, atividade.peso)}
+                                    onChange={(e) => atividade && handleAtividadeChange(estudante.matricula, u.id, atividade.id, e.target.value, atividade.notaMaxima)}
                                     className={`w-14 h-9 text-center border-2 rounded-xl text-base font-medium transition-all outline-none ${
-                                      unidadeEstado.isDesistente ? 'bg-orange-50 border-orange-200 text-orange-600' :
-                                      isModified ? 'border-slate-400 bg-white ring-4 ring-slate-500/5' : 'border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400'
+                                      unidadeEstado.isDesistente ? 'bg-warning-subtle border-warning-line text-warning-fg' :
+                                      isModified ? 'border-zinc-400 bg-surface ring-4 ring-zinc-500/5' : 'border-line bg-canvas focus:bg-surface focus:border-zinc-400'
                                     }`}
                                     placeholder="0.0"
                                   />
@@ -539,8 +547,8 @@ export default function LancarNotasTurmaClient({
                                       onClick={() => handleDesistenteChange(estudante.matricula, u.id, !unidadeEstado.isDesistente)}
                                       className={`absolute -right-3 -bottom-2 p-1.5 rounded-full transition-all shadow-sm flex items-center justify-center ${
                                           unidadeEstado.isDesistente
-                                          ? 'bg-orange-100 text-orange-600 scale-100 z-10 ring-2 ring-white'
-                                          : 'bg-white text-slate-300 hover:text-orange-500 hover:bg-orange-50 scale-100 opacity-60 hover:opacity-100 group-hover:opacity-100 border border-slate-300 z-10'
+                                          ? 'bg-warning-subtle text-warning-fg scale-100 z-10 ring-2 ring-white'
+                                          : 'bg-surface text-fg-disabled hover:text-warning-fg hover:bg-warning-subtle scale-100 opacity-60 hover:opacity-100 group-hover:opacity-100 border border-line-strong z-10'
                                       }`}
                                       title={unidadeEstado.isDesistente ? "Desmarcar infrequente" : "Marcar como Infrequente (não frequenta ou só veio fazer prova)"}
                                   >
@@ -561,15 +569,15 @@ export default function LancarNotasTurmaClient({
                                 const isModified = val !== origVal && !saving
 
                                 return (
-                                  <td key={a.id} className="px-2 py-4 text-center border-l border-slate-100">
+                                  <td key={a.id} className="px-2 py-4 text-center border-l border-line-subtle">
                                     <div className="flex flex-col items-center gap-1.5 group relative">
                                       <input
                                         type="number" step="0.1"
                                         value={val}
-                                        onChange={(e) => handleAtividadeChange(estudante.matricula, u.id, a.id, e.target.value, a.peso)}
+                                        onChange={(e) => handleAtividadeChange(estudante.matricula, u.id, a.id, e.target.value, a.notaMaxima)}
                                         className={`w-14 h-9 text-center border-2 rounded-xl text-sm font-medium transition-all outline-none ${
-                                          unidadeEstado.isDesistente ? 'bg-orange-50 border-orange-200 text-orange-600' :
-                                          isModified ? 'border-slate-400 bg-white ring-4 ring-slate-500/5' : 'border-slate-200 bg-slate-50 focus:bg-white focus:border-slate-400'
+                                          unidadeEstado.isDesistente ? 'bg-warning-subtle border-warning-line text-warning-fg' :
+                                          isModified ? 'border-zinc-400 bg-surface ring-4 ring-zinc-500/5' : 'border-line bg-canvas focus:bg-surface focus:border-zinc-400'
                                         }`}
                                         placeholder="0.0"
                                       />
@@ -579,8 +587,8 @@ export default function LancarNotasTurmaClient({
                                             onClick={() => handleDesistenteChange(estudante.matricula, u.id, !unidadeEstado.isDesistente)}
                                             className={`absolute -right-3 -bottom-2 p-1.5 rounded-full transition-all shadow-sm flex items-center justify-center ${
                                                 unidadeEstado.isDesistente
-                                                ? 'bg-orange-100 text-orange-600 scale-100 z-10 ring-2 ring-white'
-                                                : 'bg-white text-slate-300 hover:text-orange-500 hover:bg-orange-50 scale-100 opacity-60 hover:opacity-100 group-hover:opacity-100 border border-slate-300 z-10'
+                                                ? 'bg-warning-subtle text-warning-fg scale-100 z-10 ring-2 ring-white'
+                                                : 'bg-surface text-fg-disabled hover:text-warning-fg hover:bg-warning-subtle scale-100 opacity-60 hover:opacity-100 group-hover:opacity-100 border border-line-strong z-10'
                                             }`}
                                             title={unidadeEstado.isDesistente ? "Desmarcar infrequente (toda a unidade)" : "Marcar unidade como Infrequente"}
                                         >
@@ -591,8 +599,8 @@ export default function LancarNotasTurmaClient({
                                   </td>
                                 )
                               })}
-                              <td key={`${u.id}-subtotal`} className="px-2 py-4 text-center bg-slate-50/60">
-                                <span className={`text-sm font-bold ${subtotal !== null && subtotal < 5 ? 'text-rose-500' : 'text-slate-600'}`}>
+                              <td key={`${u.id}-subtotal`} className="px-2 py-4 text-center bg-canvas/60">
+                                <span className={`text-sm font-bold ${subtotal !== null && subtotal < 5 ? 'text-danger-fg' : 'text-fg-muted'}`}>
                                   {subtotal !== null ? subtotal.toFixed(1) : '-'}
                                 </span>
                               </td>
@@ -611,14 +619,14 @@ export default function LancarNotasTurmaClient({
           </div>
 
           {disciplinaSelecionada && filteredEstudantes.length > 0 && (
-            <div className="p-5 bg-slate-50 border-t border-slate-200 flex justify-end items-center gap-4">
+            <div className="p-5 bg-canvas border-t border-line flex justify-end items-center gap-4">
               <div className="hidden md:block">
-                 <p className="text-[11px] font-medium text-slate-400 uppercase tracking-widest">Confira todas as notas antes de salvar o fechamento.</p>
+                 <p className="text-xs font-medium text-fg-subtle">Confira todas as notas antes de salvar o fechamento.</p>
               </div>
                <button
                 onClick={handleSubmit}
                 disabled={saving || !hasUnsavedChanges()}
-                className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-8 py-3 rounded-2xl font-medium text-sm shadow-xl shadow-slate-300 transition-all active:scale-95 disabled:opacity-50"
+                className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-8 py-3 rounded-lg font-medium text-sm shadow-card transition-all active:scale-95 disabled:opacity-50"
               >
                 {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save size={18} />}
                 {saving ? 'SINCRONIZANDO...' : 'SALVAR NOTAS'}
@@ -629,22 +637,22 @@ export default function LancarNotasTurmaClient({
       </main>
 
       {showModal && esquema && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 border border-white">
-            <div className="px-6 py-5 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-surface rounded-xl shadow-overlay w-full max-w-lg overflow-hidden animate-pop-in border border-white">
+            <div className="px-6 py-5 border-b border-line flex justify-between items-center bg-canvas">
               <div className="flex items-center gap-3">
-                 <div className="w-10 h-10 bg-slate-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-slate-300"><Save size={20}/></div>
+                 <div className="w-10 h-10 bg-zinc-600 text-white rounded-xl flex items-center justify-center shadow-card"><Save size={20}/></div>
                   <div>
-                     <h3 className="text-lg font-medium text-slate-800 uppercase tracking-tight">Consolidar Dados</h3>
-                    <p className="text-xs font-medium text-slate-400 uppercase tracking-widest">Revise as alterações da turma</p>
+                     <h3 className="text-lg font-medium text-fg">Consolidar Dados</h3>
+                    <p className="text-xs font-medium text-fg-subtle">Revise as alterações da turma</p>
                   </div>
               </div>
-              <button onClick={() => setShowModal(false)} className="p-2 hover:bg-slate-300 rounded-xl transition-all"><X size={20}/></button>
+              <button onClick={() => setShowModal(false)} className="p-2 hover:bg-zinc-300 rounded-xl transition-all"><X size={20}/></button>
             </div>
-            <div className="p-6 max-h-[60vh] overflow-y-auto space-y-3 bg-slate-50/20 custom-scrollbar">
+            <div className="p-6 max-h-[60vh] overflow-y-auto space-y-3 bg-canvas/20 custom-scrollbar">
               {estudantes.filter(e => JSON.stringify(notas[e.matricula]) !== JSON.stringify(originalNotas[e.matricula] || {})).map((est, i) => (
-                 <div key={i} className="flex items-center justify-between bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
-                   <span className="text-sm font-medium text-slate-700 uppercase truncate pr-4">{est.nome}</span>
+                 <div key={i} className="flex items-center justify-between bg-surface p-3 rounded-lg border border-line shadow-sm">
+                   <span className="text-sm font-medium text-fg-muted truncate pr-4">{est.nome}</span>
                    <div className="flex gap-2 flex-wrap justify-end">
                        {esquema.unidades.map(u => {
                         const subtotal = calcularSubtotalUnidade(est.matricula, u)
@@ -652,8 +660,8 @@ export default function LancarNotasTurmaClient({
                         const estadoOriginal = originalNotas[est.matricula]?.[u.id]
                         if (JSON.stringify(estadoAtual) === JSON.stringify(estadoOriginal)) return null
                         return (
-                          <span key={u.id} className="text-[11px] font-medium bg-slate-50 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200">
-                            {u.nome}: {subtotal !== null ? subtotal.toFixed(1) : '0'} {estadoAtual?.isDesistente && <span className="text-amber-600 ml-1">(INF)</span>}
+                          <span key={u.id} className="text-xs font-medium bg-canvas text-fg-muted px-2.5 py-1 rounded-lg border border-line">
+                            {u.nome}: {subtotal !== null ? subtotal.toFixed(1) : '0'} {estadoAtual?.isDesistente && <span className="text-warning-fg ml-1">(INF)</span>}
                           </span>
                         )
                       })}
@@ -661,41 +669,41 @@ export default function LancarNotasTurmaClient({
                 </div>
               ))}
             </div>
-            <div className="px-6 py-5 bg-slate-50 border-t border-slate-200 flex gap-4">
-              <button onClick={() => setShowModal(false)} className="flex-1 py-3 text-sm font-medium text-slate-400 hover:bg-white rounded-2xl transition-all">Cancelar</button>
-              <button onClick={confirmSave} className="flex-1 py-3 bg-slate-600 text-white text-sm font-medium rounded-2xl shadow-xl shadow-slate-300 hover:bg-slate-700 transition-all active:scale-95">Confirmar e Gravar</button>
+            <div className="px-6 py-5 bg-canvas border-t border-line flex gap-4">
+              <button onClick={() => setShowModal(false)} className="flex-1 py-3 text-sm font-medium text-fg-subtle hover:bg-surface rounded-lg transition-all">Cancelar</button>
+              <button onClick={confirmSave} className="flex-1 py-3 bg-zinc-600 text-white text-sm font-medium rounded-lg shadow-card hover:bg-zinc-700 transition-all active:scale-95">Confirmar e Gravar</button>
             </div>
           </div>
         </div>
       )}
 
       {feedbackModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-sm overflow-hidden p-8 flex flex-col items-center text-center animate-in zoom-in-95 duration-200 border border-slate-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-surface rounded-[32px] shadow-overlay w-full max-w-sm overflow-hidden p-8 flex flex-col items-center text-center animate-pop-in border border-line-subtle">
             {feedbackModal.type === 'success' ? (
-              <div className="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mb-5 ring-8 ring-emerald-50/50">
+              <div className="w-16 h-16 bg-success-subtle text-success-fg rounded-full flex items-center justify-center mb-5 ring-8 ring-success/30">
                 <CheckCircle2 size={36} className="animate-bounce" />
               </div>
             ) : (
-              <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-5 ring-8 ring-red-50/50">
+              <div className="w-16 h-16 bg-danger-subtle text-danger-fg rounded-full flex items-center justify-center mb-5 ring-8 ring-danger/30">
                 <AlertCircle size={36} className="animate-pulse" />
               </div>
             )}
 
-            <h3 className="text-xl font-bold text-slate-800 mb-2">
+            <h3 className="text-xl font-bold text-fg mb-2">
               {feedbackModal.type === 'success' ? 'Salvo com Sucesso!' : 'Ocorreu um Erro'}
             </h3>
 
-            <p className="text-sm text-slate-500 leading-relaxed mb-6">
+            <p className="text-sm text-fg-subtle leading-relaxed mb-6">
               {feedbackModal.text}
             </p>
 
             <button
               onClick={() => setFeedbackModal(null)}
-              className={`w-full py-3.5 rounded-2xl font-semibold text-sm transition-all active:scale-95 shadow-lg ${
+              className={`w-full py-3.5 rounded-lg font-semibold text-sm transition-all active:scale-95 shadow-card ${
                 feedbackModal.type === 'success'
-                  ? 'bg-slate-900 text-white hover:bg-slate-800 shadow-slate-200'
-                  : 'bg-rose-600 text-white hover:bg-rose-700 shadow-rose-200'
+                  ? 'bg-accent text-on-accent hover:bg-accent-hover '
+                  : 'bg-danger text-on-accent hover:bg-danger '
               }`}
             >
               Entendi

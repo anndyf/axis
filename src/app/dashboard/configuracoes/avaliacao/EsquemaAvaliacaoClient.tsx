@@ -6,18 +6,8 @@ import { ArrowLeft, Plus, Pencil, Trash2, ClipboardList, Layers } from "lucide-r
 import EsquemaAvaliacaoModal, { type EsquemaParaEditar } from "@/components/EsquemaAvaliacaoModal"
 import ConfirmModal from "@/components/ConfirmModal"
 
-interface Atividade { id: string; nome: string; peso: number }
-interface Unidade { id: string; nome: string; atividades: Atividade[] }
-interface Esquema {
-  id: string
-  nome: string
+type Esquema = EsquemaParaEditar & {
   numUnidades: number
-  notaMinimaAprovacao: number
-  recuperacaoUnidadeAtiva: boolean
-  modoRecuperacaoUnidade: string | null
-  recuperacaoFinalAtiva: boolean
-  modoRecuperacaoFinal: string | null
-  unidades: Unidade[]
   _count: { cursos: number; turmas: number }
 }
 
@@ -35,19 +25,7 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
   }
 
   const abrirEdicao = (esquema: Esquema) => {
-    setEsquemaParaEditar({
-      id: esquema.id,
-      nome: esquema.nome,
-      notaMinimaAprovacao: esquema.notaMinimaAprovacao,
-      recuperacaoUnidadeAtiva: esquema.recuperacaoUnidadeAtiva,
-      modoRecuperacaoUnidade: esquema.modoRecuperacaoUnidade,
-      recuperacaoFinalAtiva: esquema.recuperacaoFinalAtiva,
-      modoRecuperacaoFinal: esquema.modoRecuperacaoFinal,
-      unidades: esquema.unidades.map(u => ({
-        nome: u.nome,
-        atividades: u.atividades.map(a => ({ nome: a.nome, peso: a.peso }))
-      }))
-    })
+    setEsquemaParaEditar(esquema)
     setIsModalOpen(true)
   }
 
@@ -80,23 +58,23 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white/80 backdrop-blur-xl border-b border-slate-300 sticky top-0 z-40 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-5">
-            <Link href="/dashboard/configuracoes" className="p-2 hover:bg-slate-200 rounded-lg transition-colors text-slate-400 hover:text-slate-700">
-              <ArrowLeft size={20} />
+    <div className="">
+      <header className="mb-6">
+        <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <Link href="/dashboard/configuracoes" aria-label="Voltar" className="hidden sm:inline-flex p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg">
+              <ArrowLeft size={16} strokeWidth={1.75} />
             </Link>
             <div>
-              <h1 className="text-2xl font-medium text-slate-800 tracking-tight">Esquemas de Avaliação</h1>
-              <p className="text-sm text-slate-600 font-medium">Unidades, atividades e regras de recuperação por escola</p>
+              <h1 className="text-2xl font-semibold tracking-tight text-fg">Esquemas de Avaliação</h1>
+              <p className="text-sm text-fg-muted">Unidades, atividades e regras de recuperação por escola</p>
             </div>
           </div>
           <button
             onClick={abrirNovo}
-            className="flex items-center space-x-2 bg-slate-900 text-white px-5 py-3 rounded-2xl font-medium hover:bg-slate-800 transition-all text-xs uppercase tracking-widest active:scale-95 shadow-lg"
+            className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
           >
-            <Plus size={16} />
+            <Plus size={16} strokeWidth={1.75} />
             <span>Novo Esquema</span>
           </button>
         </div>
@@ -104,17 +82,17 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {esquemas.length === 0 ? (
-          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-300/50 border border-slate-200 p-20 text-center">
-            <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
-              <ClipboardList className="w-10 h-10 text-slate-300" />
+          <div className="bg-surface rounded-xl shadow-card border border-line p-20 text-center">
+            <div className="w-20 h-20 bg-canvas rounded-xl flex items-center justify-center mx-auto mb-6">
+              <ClipboardList className="w-10 h-10 text-fg-disabled" />
             </div>
-            <h3 className="text-2xl font-medium text-slate-800 mb-2">Nenhum esquema cadastrado</h3>
-            <p className="text-slate-700 font-medium mb-8 max-w-xs mx-auto text-sm">
+            <h3 className="text-2xl font-medium text-fg mb-2">Nenhum esquema cadastrado</h3>
+            <p className="text-fg-muted font-medium mb-8 max-w-xs mx-auto text-sm">
               Crie o primeiro esquema de avaliação da escola.
             </p>
             <button
               onClick={abrirNovo}
-              className="inline-flex items-center space-x-2 bg-slate-900 text-white px-8 py-4 rounded-2xl hover:bg-slate-800 transition-all font-medium text-xs uppercase tracking-widest shadow-xl active:scale-95"
+              className="inline-flex items-center space-x-2 bg-accent text-on-accent px-8 py-4 rounded-lg hover:bg-accent-hover transition-all font-medium text-xs shadow-card active:scale-95"
             >
               <Plus size={16} />
               <span>Criar Esquema</span>
@@ -123,24 +101,24 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {esquemas.map(esquema => (
-              <div key={esquema.id} className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm hover:shadow-lg transition-all">
+              <div key={esquema.id} className="bg-surface border border-line rounded-xl p-6 shadow-sm hover:shadow-card transition-all">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-2xl bg-slate-100 text-slate-600">
+                    <div className="p-2.5 rounded-lg bg-subtle text-fg-muted">
                       <Layers className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-slate-800">{esquema.nome}</h3>
-                      <p className="text-[11px] text-slate-400 font-medium uppercase tracking-wide">
+                      <h3 className="font-semibold text-fg">{esquema.nome}</h3>
+                      <p className="text-xs text-fg-subtle font-medium">
                         {esquema.numUnidades} {esquema.numUnidades === 1 ? 'unidade' : 'unidades'} · nota mín. {esquema.notaMinimaAprovacao}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-1">
-                    <button onClick={() => abrirEdicao(esquema)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors">
+                    <button onClick={() => abrirEdicao(esquema)} className="p-2 text-fg-subtle hover:text-accent-fg hover:bg-accent-subtle rounded-xl transition-colors">
                       <Pencil className="w-4 h-4" />
                     </button>
-                    <button onClick={() => { setEsquemaParaExcluir(esquema); setErroExclusao("") }} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors">
+                    <button onClick={() => { setEsquemaParaExcluir(esquema); setErroExclusao("") }} className="p-2 text-fg-subtle hover:text-danger-fg hover:bg-danger-subtle rounded-xl transition-colors">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -148,18 +126,18 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
 
                 <div className="flex flex-wrap gap-1.5 mb-4">
                   {esquema.unidades.map(u => (
-                    <span key={u.id} className="px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-medium text-slate-600">
+                    <span key={u.id} className="px-2.5 py-1 bg-canvas border border-line rounded-lg text-xs font-medium text-fg-muted">
                       {u.nome} ({u.atividades.length} {u.atividades.length === 1 ? 'atividade' : 'atividades'})
                     </span>
                   ))}
                 </div>
 
-                <div className="flex items-center gap-3 text-[10px] font-medium text-slate-400 uppercase tracking-wide">
+                <div className="flex items-center gap-3 text-xs font-medium text-fg-subtle">
                   <span>{esquema._count.cursos} {esquema._count.cursos === 1 ? 'curso' : 'cursos'}</span>
                   <span>·</span>
                   <span>{esquema._count.turmas} {esquema._count.turmas === 1 ? 'turma' : 'turmas'}</span>
-                  {esquema.recuperacaoUnidadeAtiva && <span className="text-blue-500">· Rec. unidade</span>}
-                  {esquema.recuperacaoFinalAtiva && <span className="text-emerald-500">· Rec. final</span>}
+                  {esquema.recuperacaoUnidadeAtiva && <span className="text-accent-fg">· Rec. unidade</span>}
+                  {esquema.recuperacaoFinalAtiva && <span className="text-success-fg">· Rec. final</span>}
                 </div>
               </div>
             ))}

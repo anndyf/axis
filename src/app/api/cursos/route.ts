@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
+import { can } from "@/lib/rbac"
+import { garantirEsquemasPadrao, esquemaPadraoParaModalidade } from "@/lib/services/esquemas-padrao"
 
 export async function POST(req: Request) {
   try {
     const session = await auth()
-    if (!session?.user?.escolaId) {
+    if (!session?.user?.escolaId || !can(session.user, "gestao")) {
       return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
     }
     const escolaId = session.user.escolaId
@@ -37,6 +39,10 @@ export async function POST(req: Request) {
         return NextResponse.json({ message: "Esquema de avaliação inválido." }, { status: 400 })
       }
     }
+
+    // Sem esquema escolhido, o curso cai no padrão da escola pela modalidade -
+    // curso sem esquema bloqueia o lançamento de notas de todas as suas turmas.
+    const esquemasPadrao = esquemaAvaliacaoId ? null : await garantirEsquemasPadrao(prisma, escolaId)
 
     const criados: any[] = []
     const erros: string[] = []
@@ -81,7 +87,7 @@ export async function POST(req: Request) {
             sigla: siglaFinal,
             modalidade: mod,
             nivelEnsino: nivelEnsino || null,
-            esquemaAvaliacaoId: esquemaAvaliacaoId || null,
+            esquemaAvaliacaoId: esquemaAvaliacaoId || esquemaPadraoParaModalidade(esquemasPadrao!, mod),
             turnos: turnos || []
           }
         })

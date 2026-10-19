@@ -11,36 +11,27 @@ export const metadata = {
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
-import { 
-  Users, 
-  BookOpen, 
-  GraduationCap, 
-  FileText, 
-  TrendingUp,
-  Award,
-  Scissors,
-  MessageSquare,
-  Shield,
-  ChevronRight,
-  Bell,
-  Megaphone,
-  Info,
-  ArrowRight,
-  Database,
-  AlertTriangle,
-  Fingerprint,
-  History,
-  Monitor,
-  ClipboardList,
-  FileWarning,
-  UserPlus
+import {
+  Users, BookOpen, GraduationCap, FileText, TrendingUp, Award, Scissors, MessageSquare, ClipboardCheck,
+  UserX, History, Monitor, ClipboardList, FileWarning, UserPlus, ChevronRight, Megaphone,
 } from "lucide-react"
 import Link from "next/link"
 import TeacherTipsModal from "@/components/TeacherTipsModal"
+import { Badge, Card, CardHeader, PageHeader, Stat, EmptyState, buttonClasses } from "@/components/ui"
+import { resumoGestao, resumoProfessor } from "@/lib/services/painel-leitura"
+import { formatarFrequencia } from "@/lib/services/frequencia"
 
 import { Session } from "next-auth"
 
 import { unstable_cache } from "next/cache"
+
+// Painel por turma (frequência e chamadas pendentes): mesmo cuidado com a
+// chave do cache - escolaId como argumento.
+const getCachedResumoGestao = unstable_cache(
+  async (escolaId: string, anoLetivo: number) => resumoGestao(escolaId, anoLetivo),
+  ['dashboard-resumo-gestao-v1'],
+  { revalidate: 300 }
+)
 
 // escolaId como argumento (nao so no keyParts) e proposital: o unstable_cache do
 // Next.js deriva a chave de cache dos argumentos serializaveis da funcao, entao
@@ -204,381 +195,227 @@ export default async function DashboardPage() {
   })
   const isGestao = can(session.user, 'gestao')
   const modulosAtivos = await getModulosAtivos(session.user.escolaId, escola?.plano || 'BASICO')
+  const config = await getGlobalConfig(session.user.escolaId)
+  const anoLetivo = config?.anoLetivoAtual || new Date().getFullYear()
 
   const supportTips = [
     {
       title: "Suporte e Ajuda",
       description: "Olá! Caso encontre qualquer dificuldade ou problema técnico ao navegar pelo sistema, utilize a seção de 'Mensagens' para entrar em contato diretamente com a equipe de suporte.",
-      icon: <MessageSquare className="w-10 h-10 text-slate-700" />,
-      color: "bg-slate-700"
+      icon: <MessageSquare size={32} strokeWidth={1.5} className="text-fg-muted" />,
+      color: "bg-subtle"
     }
   ]
 
-  const allCards = [
-    {
-      title: isGestao ? "Total de Turmas" : "Minhas Turmas",
-      value: stats.turmas,
-      icon: Users,
-      color: "from-slate-500 to-slate-700",
-      href: "/dashboard/turmas",
-      visible: true
-    },
-    {
-      title: isGestao ? "Disciplinas" : "Minhas Disciplinas",
-      value: stats.disciplinas,
-      icon: BookOpen,
-      color: "from-purple-500 to-purple-600",
-      href: isGestao ? "/dashboard/disciplinas" : "/dashboard/notas",
-      visible: true
-    },
-    {
-      title: "Estudantes",
-      value: stats.estudantes,
-      icon: GraduationCap,
-      color: "from-emerald-500 to-emerald-600",
-      href: "/dashboard/estudantes",
-      visible: isGestao
-    },
-    {
-      title: "Notas Lançadas",
-      value: stats.notas,
-      icon: FileText,
-      color: "from-amber-500 to-amber-600",
-      href: "/dashboard/notas",
-      visible: true
-    }
-  ]
+  const atalhos = [
+    { title: "Chamada e diário", icon: ClipboardCheck, href: "/dashboard/chamada", visible: can(session.user, 'staff') },
+    { title: "Lançar notas", icon: FileText, href: "/dashboard/notas", visible: session.user.isStaff || session.user.isSuperuser },
+    { title: "Recuperação final", icon: TrendingUp, href: "/dashboard/notas/recuperacao", visible: session.user.isStaff || session.user.isSuperuser },
+    { title: "Frequência", icon: UserX, href: "/dashboard/frequencia", visible: isGestao },
+    { title: "Conselho de classe", icon: Award, href: "/dashboard/conselho-classe", visible: isGestao },
+    { title: "Resultados", icon: Users, href: "/dashboard/resultados", visible: isGestao },
+    { title: isGestao ? "Turmas" : "Minhas turmas", icon: Users, href: "/dashboard/turmas", visible: can(session.user, 'staff') },
+    { title: "Estudantes", icon: GraduationCap, href: "/dashboard/estudantes", visible: isGestao },
+    { title: "Ocorrências", icon: FileWarning, href: "/dashboard/ocorrencias", visible: isGestao },
+    { title: "Planos de ensino", icon: ClipboardList, href: "/dashboard/planos", visible: can(session.user, 'staff') },
+    { title: "Gerador de provas", icon: Scissors, href: "/dashboard/provas", visible: isGestao && modulosAtivos.includes('provas') },
+    { title: "Reserva de laboratórios", icon: Monitor, href: "/dashboard/laboratorios", visible: true },
+    { title: "Mensagens", icon: MessageSquare, href: "/dashboard/mensagens", visible: true },
+    { title: "Auditoria", icon: History, href: "/dashboard/auditoria", visible: can(session.user, 'superuser') },
+    { title: "Aluno fora da lista?", icon: UserPlus, href: "/dashboard/reportar-estudante", visible: true },
+  ].filter((a) => a.visible)
 
-  const cards = allCards.filter(c => c.visible)
+  const primeiroNome = session.user.name?.split(' ')[0] ?? ''
+  const cabecalho = (
+    <PageHeader
+      title={`Olá, ${primeiroNome}`}
+      description={`${escola?.nome ?? 'Áxis'} · Ano letivo ${anoLetivo}`}
+    />
+  )
 
-  const allQuickActions = [
-    {
-      title: "Lançar Notas",
-      description: "Lançar notas finais por turma",
-      icon: Award,
-      href: "/dashboard/notas",
-      color: "bg-slate-700 hover:bg-slate-800",
-      visible: session.user.isStaff || session.user.isSuperuser
-    },
-    {
-      title: "Recuperação Final",
-      description: "Registrar notas de recuperação",
-      icon: TrendingUp,
-      href: "/dashboard/notas/recuperacao",
-      color: "bg-purple-600 hover:bg-purple-700",
-      visible: session.user.isStaff || session.user.isSuperuser
-    },
-    {
-      title: "Resultados",
-      description: "Visualizar desempenho por unidade",
-      icon: Users,
-      href: "/dashboard/resultados",
-      color: "bg-slate-600 hover:bg-slate-700",
-      visible: isGestao
-    },
-    {
-      title: "Ocorrências",
-      description: "Livro de registro escolar",
-      icon: FileWarning,
-      href: "/dashboard/ocorrencias",
-      color: "bg-rose-600 hover:bg-rose-700",
-      visible: isGestao
-    },
-    {
-      title: "Conselho de Classe",
-      description: "Definir situação de alunos em recuperação",
-      icon: Award,
-      href: "/dashboard/conselho-classe",
-      color: "bg-pink-600 hover:bg-pink-700",
-      visible: isGestao
-    },
-    {
-      title: isGestao ? "Gerenciar Turmas" : "Minhas Turmas",
-      description: isGestao ? "Visualizar e organizar turmas" : "Visualizar turmas e disciplinas",
-      icon: Users,
-      href: "/dashboard/turmas",
-      color: "bg-emerald-600 hover:bg-emerald-700",
-      visible: can(session.user, 'staff')
-    },
-    {
-      title: "Gerenciar Estudantes",
-      description: "Cadastro e dados dos alunos",
-      icon: GraduationCap,
-      href: "/dashboard/estudantes",
-      color: "bg-orange-600 hover:bg-orange-700",
-      visible: isGestao
-    },
-    {
-      title: "Gerador de Provas",
-      description: "Criar avaliações e histórico",
-      icon: Scissors,
-      href: "/dashboard/provas",
-      color: "bg-slate-800 hover:bg-blue-800",
-      visible: isGestao && modulosAtivos.includes('provas')
-    },
-    {
-      title: "Planos de Ensino",
-      description: "Cronogramas e conteúdos quinzenais",
-      icon: ClipboardList,
-      href: "/dashboard/planos",
-      color: "bg-emerald-700 hover:bg-emerald-800",
-      visible: can(session.user, 'staff')
-    },
-    {
-      title: "Reserva de Labs",
-      description: "Agendar laboratórios",
-      icon: Monitor,
-      href: "/dashboard/laboratorios",
-      color: "bg-blue-600 hover:bg-blue-700",
-      visible: true
-    },
-    {
-      title: "Mensagens",
-      description: "Comunicados e avisos",
-      icon: MessageSquare,
-      href: "/dashboard/mensagens",
-      color: "bg-slate-500 hover:bg-slate-600",
-      visible: true
-    },
-    {
-      title: "Auditoria",
-      description: "Logs de alterações",
-      icon: History,
-      href: "/dashboard/auditoria",
-      color: "bg-slate-900 hover:bg-slate-800",
-      visible: can(session.user, 'superuser')
-    },
-    {
-      title: "Aluno Ausente?",
-      description: "Reportar estudante fora da lista",
-      icon: UserPlus,
-      href: "/dashboard/reportar-estudante",
-      color: "bg-indigo-600 hover:bg-indigo-700",
-      visible: true
-    }
-  ]
-
-  const quickActions = allQuickActions.filter(a => a.visible)
-
-  return (
-    <div className="max-w-7xl mx-auto space-y-10 pb-12 animate-in fade-in duration-500">
-      <TeacherTipsModal 
-        storageKey="seen_support_popup_v1"
-        title="Dica de Suporte"
-        tips={supportTips}
-      />
-
-      {/* Dynamic Greeting Section - Highlighted & Elegant */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-900 to-blue-800 border-none rounded-3xl p-8 shadow-lg">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl -mr-32 -mt-32"></div>
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-400/10 rounded-full blur-2xl -ml-24 -mb-24"></div>
-        
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-blue-200 text-[10px] font-medium uppercase tracking-[0.2em] mb-1">
-              <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></div>
-              <span>Painel de Controle Áxis{escola?.nome ? ` - ${escola.nome}` : ''}</span>
-            </div>
-            <h1 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
-              Olá, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-white">{session.user.name?.split(' ')[0]}</span>.
-            </h1>
-            <p className="text-blue-100 text-base md:text-lg font-medium leading-relaxed max-w-xl">
-              Seu ambiente de gestão acadêmica está pronto. <span className="text-white font-medium">Confira os novos comunicados</span> e as métricas atualizadas.
-            </p>
-          </div>
-          
-          <div className="flex flex-wrap items-center gap-3">
-             <div className="px-5 py-3 bg-white/10 border border-white/10 rounded-2xl flex items-center gap-3 shadow-sm backdrop-blur-md">
-                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-                  <Bell className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-[10px] font-medium text-blue-200 uppercase leading-none mb-1">Ano Letivo</p>
-                  <p className="text-sm font-medium text-white">Áxis 2026</p>
-                </div>
-             </div>
-             
-             <div className="px-5 py-3 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center gap-3 shadow-sm backdrop-blur-md">
-                <div className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse"></div>
-                <div>
-                  <p className="text-[10px] font-medium text-emerald-300 uppercase leading-none mb-1">Sistemas</p>
-                  <p className="text-sm font-medium text-emerald-50">Online</p>
-                </div>
-             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* System Highlights Bar - Visible only for Management */}
-      {isGestao && (
-        <section className="bg-slate-50 border border-slate-300 rounded-[2rem] p-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 divide-y md:divide-y-0 md:divide-x divide-slate-300">
-            <div className="flex items-center gap-4 px-4 py-2">
-              <div className="w-12 h-12 rounded-2xl bg-white border border-slate-300 flex items-center justify-center text-slate-700 shadow-sm shrink-0">
-                 <FileText className="w-5 h-5" />
+  const comunicados = (
+    <Card>
+      <CardHeader title="Comunicados" actions={<Link href="/dashboard/mensagens" className="text-13 text-accent-fg hover:underline">Ver todos</Link>} />
+      {stats.announcements && stats.announcements.length > 0 ? (
+        <ul className="divide-y divide-line-subtle">
+          {stats.announcements.map((msg: any) => (
+            <li key={msg.id} className="px-4 py-3 sm:px-5">
+              <div className="flex items-baseline justify-between gap-3">
+                <p className="truncate text-13 font-medium text-fg">{msg.subject}</p>
+                <time className="shrink-0 text-xs text-fg-subtle tabular-nums">{new Date(msg.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}</time>
               </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-[10px] font-medium text-slate-700 uppercase tracking-widest">Adesão de Notas</p>
-                  <span className="text-[10px] font-medium text-slate-800">{stats.adesao}%</span>
-                </div>
-                <div className="h-1.5 w-full bg-slate-300 rounded-full overflow-hidden">
-                  <div className="h-full bg-slate-500 rounded-full transition-all duration-1000" style={{ width: `${stats.adesao}%` }}></div>
-                </div>
-                <p className="text-[9px] text-slate-500 font-medium mt-1 truncate">
-                  Disciplinas com lançamentos
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 px-4 py-2">
-              <div className="w-12 h-12 rounded-2xl bg-white border border-slate-300 flex items-center justify-center text-emerald-600 shadow-sm shrink-0">
-                 <Database className="w-5 h-5" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] font-medium text-emerald-600 uppercase tracking-widest mb-0.5">Banco de Questões</p>
-                <p className="text-xs font-medium text-slate-800 truncate">+{stats.novasQuestoes} novas questões</p>
-                <p className="text-[9px] text-slate-600 font-medium whitespace-nowrap">Criadas nos últimos 7 dias</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4 px-4 py-2">
-              <div className="w-12 h-12 rounded-2xl bg-white border border-slate-300 flex items-center justify-center text-rose-600 shadow-sm shrink-0">
-                 <AlertTriangle className="w-5 h-5" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] font-medium text-rose-600 uppercase tracking-widest mb-0.5">Recuperação</p>
-                <p className="text-xs font-medium text-slate-800 truncate">{stats.recuperacao} Alunos Pendentes</p>
-                <p className="text-[9px] text-rose-600 font-medium whitespace-nowrap flex items-center gap-1">
-                  <span className="w-1 h-1 bg-rose-500 rounded-full"></span>
-                  Atenção necessária
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
+              <p className="mt-0.5 line-clamp-2 text-13 text-fg-muted">{msg.content.replace(/<[^>]*>?/gm, '')}</p>
+              {msg.sender?.name && <p className="mt-1 text-xs text-fg-subtle">{msg.sender.name}</p>}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <EmptyState icon={Megaphone} title="Nenhum comunicado recente" className="py-8" />
       )}
+    </Card>
+  )
 
-      {/* Comunicados Gerais - Above Metrics */}
+  const listaAtalhos = (
+    <Card>
+      <CardHeader title="Atalhos" />
+      <ul className="grid grid-cols-1 p-1.5 sm:grid-cols-2 lg:grid-cols-1">
+        {atalhos.map((a) => (
+          <li key={a.href}>
+            <Link href={a.href} className="group flex h-9 items-center gap-2.5 rounded-md px-2.5 text-13 text-fg-muted transition-colors duration-150 hover:bg-subtle hover:text-fg">
+              <a.icon size={16} strokeWidth={1.75} className="shrink-0 text-fg-subtle group-hover:text-fg-muted" />
+              <span className="flex-1 truncate">{a.title}</span>
+              <ChevronRight size={14} strokeWidth={1.75} className="text-fg-disabled opacity-0 transition-opacity duration-150 group-hover:opacity-100" aria-hidden />
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </Card>
+  )
+
+  const dicas = <TeacherTipsModal storageKey="seen_support_popup_v1" title="Dica de Suporte" tips={supportTips} />
+
+  if (isGestao) {
+    const resumo = await getCachedResumoGestao(session.user.escolaId, anoLetivo)
+    const emRecuperacao = await prisma.estudante.findMany({
+      where: { escolaId: session.user.escolaId, turma: { anoLetivo }, notas: { some: { status: 'RECUPERACAO' } } },
+      select: { id: true },
+    })
+    const emRisco = new Set([...emRecuperacao.map((e) => e.id), ...resumo.idsAbaixoDoMinimo]).size
+
+    return (
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Megaphone className="w-4 h-4 text-slate-700" />
-            <h3 className="text-xs font-medium text-slate-400 uppercase tracking-[0.2em]">Comunicados Gerais</h3>
-          </div>
-          <div className="h-px bg-slate-300 flex-1 mx-6"></div>
-          <Link href="/dashboard/mensagens" className="text-[10px] font-medium text-slate-700 uppercase tracking-widest hover:underline">Ver Todos</Link>
+        {dicas}
+        {cabecalho}
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <Stat label="Alunos" value={stats.estudantes.toLocaleString('pt-BR')} hint={`${stats.turmas} turmas · ${stats.disciplinas} disciplinas`} href="/dashboard/estudantes" />
+          <Stat label="Frequência média" value={formatarFrequencia(resumo.frequenciaMedia)} hint={resumo.frequenciaMedia === null ? "Nenhuma chamada salva ainda" : "Todas as turmas"} href="/dashboard/frequencia" />
+          <Stat label="Alunos em risco" value={emRisco} hint={`${emRecuperacao.length} em recuperação · ${resumo.abaixoDoMinimo} abaixo da frequência`} href="/dashboard/conselho-classe" />
+          <Stat label="Chamadas pendentes" value={resumo.chamadasPendentes.toLocaleString('pt-BR')} hint="Dias com aula sem chamada salva" href="/dashboard/chamada" />
         </div>
 
-        <div className="space-y-6">
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {stats.announcements && stats.announcements.length > 0 ? (
-              stats.announcements.map((msg: any) => (
-                <div key={msg.id} className="bg-white border-2 border-slate-200 p-6 rounded-[2rem] group hover:border-slate-500/20 hover:shadow-xl hover:shadow-slate-500/5 transition-all duration-500 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-slate-500/5 rounded-full blur-3xl -mr-16 -mt-16 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  
-                  <div className="flex items-start gap-5 relative z-10">
-                    <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center shrink-0 shadow-sm group-hover:bg-slate-700 group-hover:text-white transition-all duration-500">
-                      <Info className="w-6 h-6 text-slate-700 group-hover:text-white" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="text-base font-medium text-slate-800 truncate group-hover:text-slate-700 transition-colors uppercase tracking-tight">{msg.subject}</h4>
-                        <span className="text-[10px] font-medium text-slate-400 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-full whitespace-nowrap">
-                          {new Date(msg.createdAt).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
-                      <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed mb-4 font-medium italic opacity-80">
-                        "{msg.content.replace(/<[^>]*>?/gm, '')}"
-                      </p>
-                      <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-50">
-                         <div className="flex items-center gap-2">
-                           <div className="w-6 h-6 rounded-lg bg-slate-900 flex items-center justify-center text-[10px] font-medium text-white">
-                             {msg.sender.name?.charAt(0)}
-                           </div>
-                           <span className="text-[11px] text-slate-400 font-medium tracking-tight">Postado por <span className="text-slate-800">{msg.sender.name}</span></span>
-                         </div>
-                         <Link href={`/dashboard/mensagens`} className="text-[10px] font-medium text-slate-700 uppercase tracking-widest hover:translate-x-1 transition-transform flex items-center gap-1">
-                           Ler Tudo <ChevronRight size={12} />
-                         </Link>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <Card className="min-w-0 overflow-hidden">
+            <CardHeader title="Turmas" description={`Frequência e chamadas de ${anoLetivo}`} actions={<Link href="/dashboard/turmas" className={buttonClasses({ variant: 'secondary', size: 'sm' })}>Ver turmas</Link>} />
+            {resumo.turmas.length === 0 ? (
+              <EmptyState icon={Users} title="Nenhuma turma neste ano letivo" description="Cadastre as turmas para começar a lançar notas e fazer chamadas." action={<Link href="/dashboard/turmas" className={buttonClasses({ size: 'sm' })}>Ir para turmas</Link>} />
             ) : (
-              <div className="md:col-span-2 p-12 text-center bg-slate-50 border-2 border-dashed border-slate-300 rounded-3xl">
-                <Megaphone className="w-10 h-10 text-slate-300 mx-auto mb-4 opacity-50" />
-                <p className="text-sm font-medium text-slate-400 uppercase tracking-widest">Nenhum comunicado recente no sistema</p>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[32rem] text-13">
+                  <thead>
+                    <tr className="border-b border-line text-xs text-fg-subtle">
+                      <th scope="col" className="h-9 px-4 text-left font-medium sm:px-5">Turma</th>
+                      <th scope="col" className="h-9 px-3 text-right font-medium">Freq. média</th>
+                      <th scope="col" className="h-9 px-3 text-right font-medium">Abaixo do mínimo</th>
+                      <th scope="col" className="h-9 px-4 text-right font-medium sm:px-5">Chamadas pendentes</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {resumo.turmas.map((t) => (
+                      <tr key={t.turmaId} className="border-b border-line-subtle last:border-0 transition-colors duration-150 hover:bg-subtle/60">
+                        <td className="h-10 px-4 sm:px-5"><Link href={`/dashboard/frequencia?turma=${t.turmaId}`} className="font-medium text-fg hover:underline">{t.nome}</Link></td>
+                        <td className="h-10 px-3 text-right tabular-nums text-fg-muted">{formatarFrequencia(t.frequenciaMedia)}</td>
+                        <td className="h-10 px-3 text-right tabular-nums">{t.abaixoDoMinimo > 0 ? <Badge tone="danger">{t.abaixoDoMinimo}</Badge> : <span className="text-fg-subtle">0</span>}</td>
+                        <td className="h-10 px-4 text-right tabular-nums text-fg-muted sm:px-5">{t.chamadasPendentes}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
-           </div>
+          </Card>
+          <div className="space-y-6">
+            {listaAtalhos}
+            {comunicados}
+          </div>
         </div>
       </div>
+    )
+  }
 
-      {/* Metrics Separator */}
-      <div className="flex items-center justify-between pt-4">
-        <h3 className="text-xs font-medium text-slate-400 uppercase tracking-[0.2em]">Métricas do Sistema</h3>
-        <div className="h-px bg-slate-300 flex-1 mx-6"></div>
+  // Professor
+  const prof = await resumoProfessor(session.user.escolaId, session.user.id, anoLetivo)
+  const pendentesNotas = prof.disciplinas.filter((d) => d.semNota > 0)
+  const turmasDoProf = [...new Map(prof.disciplinas.map((d) => [d.turmaId, { id: d.turmaId, nome: d.turmaNome, alunos: d.alunos, disciplinas: prof.disciplinas.filter((x) => x.turmaId === d.turmaId).map((x) => x.nome) }])).values()]
+  const linkChamada = (a: { turmaId: string; disciplinaId: string | null }) => `/dashboard/chamada/fazer?turma=${a.turmaId}${a.disciplinaId ? `&disciplina=${a.disciplinaId}` : ''}&data=${prof.hoje}`
+
+  return (
+    <div className="space-y-6">
+      {dicas}
+      {cabecalho}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Stat label="Aulas hoje" value={prof.aulasDeHoje.length} hint={`${prof.aulasDeHoje.filter((a) => a.feita).length} com chamada feita`} href="/dashboard/chamada" />
+        <Stat label="Minhas turmas" value={stats.turmas} hint={`${stats.disciplinas} disciplinas`} href="/dashboard/turmas" />
+        <Stat label="Alunos" value={stats.estudantes} />
+        <Stat label="Notas pendentes" value={pendentesNotas.reduce((s, d) => s + d.semNota, 0)} hint="Alunos sem nota lançada" href="/dashboard/notas" />
       </div>
 
-      {/* Stats Grid - Symmetric Columns */}
-      <div className={`grid grid-cols-1 md:grid-cols-2 ${isGestao ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-6`}>
-        {cards.map((card) => {
-          const Icon = card.icon
-          return (
-            <Link
-              key={card.title}
-              href={card.href}
-              className="group bg-white border border-slate-300 p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-300"
-            >
-              <div className="flex items-start justify-between">
-                <div className="space-y-3">
-                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">{card.title}</span>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-medium text-slate-800 tracking-tight">{card.value}</span>
-                  </div>
-                </div>
-                <div className={`p-2.5 rounded-xl bg-slate-50 text-slate-400 group-hover:bg-slate-100 group-hover:text-slate-700 transition-colors shadow-sm`}>
-                  <Icon size={18} strokeWidth={2.5} />
-                </div>
-              </div>
-            </Link>
-          )
-        })}
-      </div>
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="min-w-0 space-y-6">
+          <Card>
+            <CardHeader title="Aulas de hoje" description={new Date(`${prof.hoje}T12:00:00Z`).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })} actions={<Link href="/dashboard/chamada" className="text-13 text-accent-fg hover:underline">Todas as chamadas</Link>} />
+            {prof.aulasDeHoje.length === 0 ? (
+              <EmptyState icon={ClipboardCheck} title="Nenhuma aula sua hoje" description="Dias não letivos e disciplinas fora do horário de hoje não aparecem aqui." className="py-8" />
+            ) : (
+              <ul className="divide-y divide-line-subtle">
+                {prof.aulasDeHoje.map((a) => (
+                  <li key={`${a.turmaId}-${a.disciplinaId}`} className="flex flex-wrap items-center gap-3 px-4 py-2.5 sm:px-5">
+                    <span className="w-14 shrink-0 text-xs tabular-nums text-fg-subtle">{a.tempos.length ? a.tempos.map((t) => `${t}º`).join(', ') : 'Dia'}</span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-13 font-medium text-fg">{a.nome}</p>
+                      <p className="text-xs text-fg-subtle">{a.turmaNome}</p>
+                    </div>
+                    {a.feita ? <Badge tone="success" dot>Chamada feita</Badge> : null}
+                    <Link href={linkChamada(a)} className={buttonClasses({ size: 'sm', variant: a.feita ? 'secondary' : 'primary' })}>{a.feita ? 'Ver chamada' : 'Fazer chamada'}</Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
 
-      {/* Main Content Sections */}
-      <div className="space-y-12">
-        {/* Operations Hub - Symmetric Tiles */}
+          <Card>
+            <CardHeader title="Notas pendentes" description="Disciplinas com alunos ainda sem nota lançada" />
+            {pendentesNotas.length === 0 ? (
+              <EmptyState icon={FileText} title="Nenhuma nota pendente" className="py-8" />
+            ) : (
+              <ul className="divide-y divide-line-subtle">
+                {pendentesNotas.map((d) => (
+                  <li key={d.id}>
+                    <Link href={`/dashboard/notas/lancar/${d.turmaId}`} className="flex items-center gap-3 px-4 py-2.5 transition-colors duration-150 hover:bg-subtle/60 sm:px-5">
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-13 font-medium text-fg">{d.nome}</p>
+                        <p className="text-xs text-fg-subtle">{d.turmaNome}</p>
+                      </div>
+                      <span className="text-xs tabular-nums text-fg-muted">{d.semNota} de {d.alunos} alunos</span>
+                      <ChevronRight size={14} strokeWidth={1.75} className="text-fg-disabled" aria-hidden />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
+        </div>
+
         <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-medium text-slate-400 uppercase tracking-[0.2em]">Centro de Operações</h3>
-            <div className="h-px bg-slate-300 flex-1 mx-6"></div>
-          </div>
-          
-          <div className={`grid grid-cols-1 sm:grid-cols-2 ${isGestao ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-4`}>
-            {quickActions.map((action) => {
-              const Icon = action.icon
-              return (
-                <Link
-                  key={action.title}
-                  href={action.href}
-                  className="group flex items-center gap-4 p-5 bg-white border border-slate-300 rounded-3xl hover:border-blue-300 hover:shadow-lg transition-all active:scale-[0.98]"
-                >
-                  <div className={`w-12 h-12 ${action.color} rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300 shrink-0`}>
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h4 className="text-[13px] font-medium text-slate-900 leading-tight mb-0.5 group-hover:text-slate-700 transition-colors uppercase tracking-tight">{action.title}</h4>
-                    <p className="text-[11px] text-slate-400 font-medium truncate">
-                      {action.description}
-                    </p>
-                  </div>
-                </Link>
-              )
-            })}
-          </div>
+          <Card>
+            <CardHeader title="Minhas turmas" />
+            {turmasDoProf.length === 0 ? (
+              <EmptyState icon={BookOpen} title="Nenhuma disciplina vinculada" description="Peça à gestão para vincular você às suas disciplinas." className="py-8" />
+            ) : (
+              <ul className="divide-y divide-line-subtle">
+                {turmasDoProf.map((t) => (
+                  <li key={t.id} className="px-4 py-2.5 sm:px-5">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <p className="text-13 font-medium text-fg">{t.nome}</p>
+                      <span className="text-xs tabular-nums text-fg-subtle">{t.alunos} alunos</span>
+                    </div>
+                    <p className="truncate text-xs text-fg-subtle">{t.disciplinas.join(' · ')}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
+          {listaAtalhos}
+          {comunicados}
         </div>
       </div>
     </div>

@@ -8,13 +8,13 @@ export async function resolvePendencia(messageId: string) {
   const session = await auth()
   const user = session?.user as any
   
-  if (!user || (!user.isSuperuser && !user.isDirecao)) {
+  if (!user?.escolaId || (!user.isSuperuser && !user.isDirecao)) {
     return { error: "Não autorizado" }
   }
 
   try {
     const originalMessage = await prisma.message.findUnique({
-      where: { id: messageId },
+      where: { id: messageId, escolaId: user.escolaId },
       select: { senderId: true, subject: true }
     })
 
@@ -22,7 +22,7 @@ export async function resolvePendencia(messageId: string) {
 
     // Mark as resolved
     await prisma.message.update({
-      where: { id: messageId },
+      where: { id: messageId, escolaId: user.escolaId },
       data: { 
         isResolved: true,
         status: "RESOLVIDO"
@@ -68,14 +68,17 @@ export async function atribuirChamado(messageId: string, assignedToId: string | 
   const session = await auth()
   const user = session?.user as any
   
-  if (!user || (!user.isSuperuser && !user.isDirecao)) {
+  if (!user?.escolaId || (!user.isSuperuser && !user.isDirecao)) {
     return { error: "Não autorizado" }
   }
 
   try {
+    if (assignedToId && !(await prisma.user.findUnique({ where: { id: assignedToId, escolaId: user.escolaId }, select: { id: true } }))) {
+      return { error: "Usuário não encontrado" }
+    }
     await prisma.message.update({
-      where: { id: messageId },
-      data: { 
+      where: { id: messageId, escolaId: user.escolaId },
+      data: {
         assignedToId,
         status: assignedToId ? "EM_ATENDIMENTO" : "ABERTO"
       }
@@ -91,13 +94,13 @@ export async function mudarStatusChamado(messageId: string, status: any) {
   const session = await auth()
   const user = session?.user as any
   
-  if (!user || (!user.isSuperuser && !user.isDirecao)) {
+  if (!user?.escolaId || (!user.isSuperuser && !user.isDirecao)) {
     return { error: "Não autorizado" }
   }
 
   try {
     await prisma.message.update({
-      where: { id: messageId },
+      where: { id: messageId, escolaId: user.escolaId },
       data: { 
         status,
         isResolved: status === "RESOLVIDO"
@@ -114,13 +117,13 @@ export async function mudarPrioridadeChamado(messageId: string, priority: any) {
   const session = await auth()
   const user = session?.user as any
   
-  if (!user || (!user.isSuperuser && !user.isDirecao)) {
+  if (!user?.escolaId || (!user.isSuperuser && !user.isDirecao)) {
     return { error: "Não autorizado" }
   }
 
   try {
     await prisma.message.update({
-      where: { id: messageId },
+      where: { id: messageId, escolaId: user.escolaId },
       data: { priority }
     })
     revalidatePath("/dashboard/admin/pendencias")
@@ -134,7 +137,7 @@ export async function enviarComunicadoGeral(subject: string, content: string, pr
   const session = await auth()
   const user = session?.user as any
   
-  if (!user || (!user.isSuperuser && !user.isDirecao)) {
+  if (!user?.escolaId || (!user.isSuperuser && !user.isDirecao)) {
     return { error: "Não autorizado" }
   }
 
@@ -162,13 +165,13 @@ export async function responderPendencia(parentId: string, content: string) {
   const session = await auth()
   const user = session?.user as any
   
-  if (!user || (!user.isSuperuser && !user.isDirecao)) {
+  if (!user?.escolaId || (!user.isSuperuser && !user.isDirecao)) {
     return { error: "Não autorizado" }
   }
 
   try {
     const originalMessage = await prisma.message.findUnique({
-      where: { id: parentId },
+      where: { id: parentId, escolaId: user.escolaId },
       select: { senderId: true, subject: true }
     })
 
@@ -207,7 +210,7 @@ export async function resolvePendenciasBulk(messageIds: string[]) {
   const session = await auth()
   const user = session?.user as any
   
-  if (!user || (!user.isSuperuser && !user.isDirecao)) {
+  if (!user?.escolaId || (!user.isSuperuser && !user.isDirecao)) {
     return { error: "Não autorizado" }
   }
 
@@ -231,13 +234,13 @@ export async function atualizarStatusPendencia(messageId: string, status: string
   const session = await auth()
   const user = session?.user as any
   
-  if (!user || (!user.isSuperuser && !user.isDirecao)) {
+  if (!user?.escolaId || (!user.isSuperuser && !user.isDirecao)) {
     return { error: "Não autorizado" }
   }
 
   try {
     await prisma.message.update({
-      where: { id: messageId },
+      where: { id: messageId, escolaId: user.escolaId },
       data: { internalStatus: status }
     })
     

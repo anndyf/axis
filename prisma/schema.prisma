@@ -32,6 +32,12 @@ model Escola {
   ocorrencias       Ocorrencia[]
   escolaModulos     EscolaModulo[]
   esquemasAvaliacao EsquemaAvaliacao[]
+  periodoLetivos    PeriodoLetivo[]
+  diaNaoLetivos     DiaNaoLetivo[]
+  diaLetivoExtras   DiaLetivoExtra[]
+  tempoAulas        TempoAula[]
+  aulas             Aula[]
+  justificativas    Justificativa[]
 
   @@map("escolas")
 }
@@ -57,44 +63,52 @@ enum PlanoTipo {
 }
 
 model User {
-  id                    String                @id @default(cuid())
+  id                    String                  @id @default(cuid())
   email                 String
   username              String
   password              String
   name                  String?
-  escolaId              String                @map("escola_id")
-  escola                Escola                @relation(fields: [escolaId], references: [id])
-  isSuperuser           Boolean               @default(false) @map("is_superuser")
-  isStaff               Boolean               @default(false) @map("is_staff")
-  isActive              Boolean               @default(true) @map("is_active")
-  isApproved            Boolean               @default(false) @map("is_approved")
-  createdAt             DateTime              @default(now()) @map("created_at")
-  updatedAt             DateTime              @updatedAt @map("updated_at")
-  lastLogin             DateTime?             @map("last_login")
-  isDirecao             Boolean               @default(false) @map("is_direcao")
-  isPortalUser          Boolean               @default(false) @map("is_portal_user")
-  estudanteId           String?               @map("estudante_id")
-  isAEE                 Boolean               @default(false) @map("is_aee")
+  escolaId              String                  @map("escola_id")
+  escola                Escola                  @relation(fields: [escolaId], references: [id])
+  isSuperuser           Boolean                 @default(false) @map("is_superuser")
+  isStaff               Boolean                 @default(false) @map("is_staff")
+  isActive              Boolean                 @default(true) @map("is_active")
+  isApproved            Boolean                 @default(false) @map("is_approved")
+  createdAt             DateTime                @default(now()) @map("created_at")
+  updatedAt             DateTime                @updatedAt @map("updated_at")
+  lastLogin             DateTime?               @map("last_login")
+  isDirecao             Boolean                 @default(false) @map("is_direcao")
+  isPortalUser          Boolean                 @default(false) @map("is_portal_user")
+  estudanteId           String?                 @map("estudante_id")
+  isAEE                 Boolean                 @default(false) @map("is_aee")
+  // Senha provisória (e-mail de acesso) ou igual à matrícula (portal):
+  // obriga a troca no próximo acesso.
+  deveTrocarSenha       Boolean                 @default(false) @map("deve_trocar_senha")
+  tokensRedefinicao     TokenRedefinicaoSenha[]
+  horariosLecionados    HorarioAula[]           @relation("HorarioProfessor")
   aeeAcknowledgements   AEEAcknowledgement[]
-  assignedTickets       Message[]             @relation("AssignedTickets")
+  assignedTickets       Message[]               @relation("AssignedTickets")
   auditLogs             AuditLog[]
   deletedMessages       MessageDelete[]
   readMessages          MessageRead[]
-  sentMessages          Message[]             @relation("SentMessages")
-  notasModificadas      NotaFinal[]           @relation("NotaModificador")
+  sentMessages          Message[]               @relation("SentMessages")
+  notasModificadas      NotaFinal[]             @relation("NotaModificador")
   auditorias            NotaFinalAudit[]
-  simuladosLancados     NotaSimulado[]        @relation("SimuladoLancador")
-  ocorrenciasCriadas    Ocorrencia[]          @relation("OcorrenciaAutor")
-  planosEnsino          PlanoEnsino[]         @relation("ProfessorPlanos")
-  provasCriadas         Prova[]               @relation("ProfessorProvas")
-  provasSalvas          Prova[]               @relation("ProvasSalvas")
-  questoesComFeedback   Questao[]             @relation("AdminFeedback")
-  questoes              Questao[]             @relation("ProfessorQuestoes")
+  simuladosLancados     NotaSimulado[]          @relation("SimuladoLancador")
+  ocorrenciasCriadas    Ocorrencia[]            @relation("OcorrenciaAutor")
+  planosEnsino          PlanoEnsino[]           @relation("ProfessorPlanos")
+  provasCriadas         Prova[]                 @relation("ProfessorProvas")
+  provasSalvas          Prova[]                 @relation("ProvasSalvas")
+  questoesComFeedback   Questao[]               @relation("AdminFeedback")
+  questoes              Questao[]               @relation("ProfessorQuestoes")
   reservasLaboratorio   ReservaLaboratorio[]
   responsavelSimulados  ResponsavelSimulado[]
-  estudante             Estudante?            @relation("UserEstudante", fields: [estudanteId], references: [id])
-  disciplinasPermitidas Disciplina[]          @relation("DisciplinaUsuarios")
-  turmasPermitidas      Turma[]               @relation("TurmaUsuarios")
+  estudante             Estudante?              @relation("UserEstudante", fields: [estudanteId], references: [id])
+  disciplinasPermitidas Disciplina[]            @relation("DisciplinaUsuarios")
+  turmasPermitidas      Turma[]                 @relation("TurmaUsuarios")
+  aulasRegistradas      Aula[]                  @relation("AulaProfessor")
+  justificativas        Justificativa[]         @relation("JustificativaAutor")
+  avaliacoesCriadas     AvaliacaoDisciplina[]   @relation("AvaliacaoCriador")
 
   @@unique([escolaId, email])
   @@unique([escolaId, username])
@@ -231,24 +245,24 @@ model Questao {
 }
 
 model Prova {
-  id                 String    @id @default(cuid())
-  codigo             Int       @default(autoincrement())
-  titulo             String
-  turmaId            String?   @map("turma_id")
-  professorCriadorId String?   @map("professor_criador_id")
-  savedByUserId      String?   @map("saved_by_user_id")
-  createdAt          DateTime  @default(now()) @map("created_at")
-  observacao         String?
-  questoesSnapshot   Json?     @map("questoes_snapshot")
-  unidade            Int?
-  tipo               String?   @default("BIMESTRAL")
-  areaId             String?   @map("area_id")
-  professorCriador   User?     @relation("ProfessorProvas", fields: [professorCriadorId], references: [id])
-  savedByUser        User?     @relation("ProvasSalvas", fields: [savedByUserId], references: [id])
-  turma              Turma?    @relation(fields: [turmaId], references: [id])
-  area               AreaConhecimento? @relation(fields: [areaId], references: [id])
-  questoes           Questao[] @relation("ProvaQuestoes")
-  notasSimulado      NotaSimulado[]
+  id                   String                @id @default(cuid())
+  codigo               Int                   @default(autoincrement())
+  titulo               String
+  turmaId              String?               @map("turma_id")
+  professorCriadorId   String?               @map("professor_criador_id")
+  savedByUserId        String?               @map("saved_by_user_id")
+  createdAt            DateTime              @default(now()) @map("created_at")
+  observacao           String?
+  questoesSnapshot     Json?                 @map("questoes_snapshot")
+  unidade              Int?
+  tipo                 String?               @default("BIMESTRAL")
+  areaId               String?               @map("area_id")
+  professorCriador     User?                 @relation("ProfessorProvas", fields: [professorCriadorId], references: [id])
+  savedByUser          User?                 @relation("ProvasSalvas", fields: [savedByUserId], references: [id])
+  turma                Turma?                @relation(fields: [turmaId], references: [id])
+  area                 AreaConhecimento?     @relation(fields: [areaId], references: [id])
+  questoes             Questao[]             @relation("ProvaQuestoes")
+  notasSimulado        NotaSimulado[]
   responsaveisSimulado ResponsavelSimulado[]
 
   @@map("provas")
@@ -279,22 +293,32 @@ model Turma {
   planosEnsino         PlanoEnsino[]         @relation("PlanoTurmas")
   questoes             Questao[]             @relation("QuestaoTurmas")
   usuariosPermitidos   User[]                @relation("TurmaUsuarios")
+  diaNaoLetivos        DiaNaoLetivo[]
+  aulas                Aula[]
+
   @@index([anoLetivo])
   @@index([escolaId])
   @@map("turmas")
 }
 
 model HorarioAula {
-  id         String   @id @default(cuid())
-  turmaId    String   @map("turma_id")
-  diaSemana  Int      @map("dia_semana")
-  horario    Int
-  disciplina String
-  professor  String?
-  updatedAt  DateTime @updatedAt @map("updated_at")
-  turma      Turma    @relation(fields: [turmaId], references: [id], onDelete: Cascade)
+  id            String      @id @default(cuid())
+  turmaId       String      @map("turma_id")
+  diaSemana     Int         @map("dia_semana")
+  horario       Int // = TempoAula.ordem no turno da turma
+  // disciplina/professor em texto: legado e rótulo de exibição. As chaves
+  // abaixo são a fonte de verdade para aulas previstas e chamada.
+  disciplina    String
+  professor     String?
+  disciplinaId  String?     @map("disciplina_id")
+  disciplinaRel Disciplina? @relation(fields: [disciplinaId], references: [id], onDelete: SetNull)
+  professorId   String?     @map("professor_id")
+  professorRel  User?       @relation("HorarioProfessor", fields: [professorId], references: [id], onDelete: SetNull)
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  turma         Turma       @relation(fields: [turmaId], references: [id], onDelete: Cascade)
 
   @@unique([turmaId, diaSemana, horario])
+  @@index([disciplinaId])
   @@map("horarios_aula")
 }
 
@@ -331,25 +355,27 @@ model Curso {
 }
 
 model Estudante {
-  id             String         @id @default(cuid())
-  matricula      String
-  nome           String
-  turmaId        String         @map("turma_id")
-  escolaId       String         @map("escola_id")
-  status         String?        @default("ATIVO")
-  turmaAnteriorId String?       @map("turma_anterior_id")
-  createdAt      DateTime       @default(now()) @map("created_at")
-  updatedAt      DateTime       @updatedAt @map("updated_at")
-  dataNascimento DateTime?      @map("data_nascimento")
-  sexo           String?        @map("sexo")
-  aeeProfile     AEEProfile?    @relation("EstudanteAEE")
-  escola         Escola         @relation(fields: [escolaId], references: [id])
-  turma          Turma          @relation(fields: [turmaId], references: [id], onDelete: Cascade)
-  turmaAnterior  Turma?         @relation("TurmaAnteriorEstudante", fields: [turmaAnteriorId], references: [id])
-  notas          NotaFinal[]
-  notasSimulado  NotaSimulado[]
-  portalAccess   User[]         @relation("UserEstudante")
-  ocorrencias    OcorrenciaEstudante[]
+  id              String                @id @default(cuid())
+  matricula       String
+  nome            String
+  turmaId         String                @map("turma_id")
+  escolaId        String                @map("escola_id")
+  status          String?               @default("ATIVO")
+  turmaAnteriorId String?               @map("turma_anterior_id")
+  createdAt       DateTime              @default(now()) @map("created_at")
+  updatedAt       DateTime              @updatedAt @map("updated_at")
+  dataNascimento  DateTime?             @map("data_nascimento")
+  sexo            String?               @map("sexo")
+  aeeProfile      AEEProfile?           @relation("EstudanteAEE")
+  escola          Escola                @relation(fields: [escolaId], references: [id])
+  turma           Turma                 @relation(fields: [turmaId], references: [id], onDelete: Cascade)
+  turmaAnterior   Turma?                @relation("TurmaAnteriorEstudante", fields: [turmaAnteriorId], references: [id])
+  notas           NotaFinal[]
+  notasSimulado   NotaSimulado[]
+  portalAccess    User[]                @relation("UserEstudante")
+  ocorrencias     OcorrenciaEstudante[]
+  faltas          Falta[]
+  justificativas  Justificativa[]
 
   @@unique([escolaId, matricula])
   @@index([nome])
@@ -359,17 +385,17 @@ model Estudante {
 }
 
 model Ocorrencia {
-  id              String      @id @default(cuid())
+  id              String                @id @default(cuid())
   titulo          String
   descricao       String
   tipo            String
-  data            DateTime    @default(now())
-  registradoPorId String      @map("registrado_por_id")
-  escolaId        String      @map("escola_id")
-  createdAt       DateTime    @default(now()) @map("created_at")
-  updatedAt       DateTime    @updatedAt @map("updated_at")
-  autor           User        @relation("OcorrenciaAutor", fields: [registradoPorId], references: [id])
-  escola          Escola      @relation(fields: [escolaId], references: [id])
+  data            DateTime              @default(now())
+  registradoPorId String                @map("registrado_por_id")
+  escolaId        String                @map("escola_id")
+  createdAt       DateTime              @default(now()) @map("created_at")
+  updatedAt       DateTime              @updatedAt @map("updated_at")
+  autor           User                  @relation("OcorrenciaAutor", fields: [registradoPorId], references: [id])
+  escola          Escola                @relation(fields: [escolaId], references: [id])
   estudantes      OcorrenciaEstudante[]
 
   @@index([data])
@@ -389,43 +415,44 @@ model OcorrenciaEstudante {
 }
 
 model Disciplina {
-  id                 String            @id @default(cuid())
+  id                 String                @id @default(cuid())
   nome               String
-  turmaId            String            @map("turma_id")
-  createdAt          DateTime          @default(now()) @map("created_at")
-  updatedAt          DateTime          @updatedAt @map("updated_at")
-  areaId             String?           @map("area_id")
-  area               AreaConhecimento? @relation(fields: [areaId], references: [id])
-  turma              Turma             @relation(fields: [turmaId], references: [id], onDelete: Cascade)
+  turmaId            String                @map("turma_id")
+  createdAt          DateTime              @default(now()) @map("created_at")
+  updatedAt          DateTime              @updatedAt @map("updated_at")
+  areaId             String?               @map("area_id")
+  area               AreaConhecimento?     @relation(fields: [areaId], references: [id])
+  // Carga horária prevista no período (em aulas), para comparar com as
+  // aulas previstas pelo horário × calendário
+  cargaHoraria       Int?                  @map("carga_horaria")
+  horarios           HorarioAula[]
+  turma              Turma                 @relation(fields: [turmaId], references: [id], onDelete: Cascade)
   notas              NotaFinal[]
-  usuariosPermitidos User[]            @relation("DisciplinaUsuarios")
-  questoes           Questao[]         @relation("QuestaoDisciplinas")
+  usuariosPermitidos User[]                @relation("DisciplinaUsuarios")
+  questoes           Questao[]             @relation("QuestaoDisciplinas")
+  aulas              Aula[]
+  avaliacoes         AvaliacaoDisciplina[]
+
   @@index([turmaId])
   @@map("disciplinas")
 }
 
 model NotaFinal {
-  id                String           @id @default(cuid())
-  estudanteId       String           @map("estudante_id")
-  disciplinaId      String           @map("disciplina_id")
-  nota              Float
-  notaRecuperacao   Float?           @map("nota_recuperacao")
-  status            StatusNota
-  modifiedById      String?          @map("modified_by_id")
-  modifiedAt        DateTime         @default(now()) @map("modified_at")
-  createdAt         DateTime         @default(now()) @map("created_at")
-  updatedAt         DateTime         @updatedAt @map("updated_at")
-  nota1             Float?           @map("nota_1")
-  nota2             Float?           @map("nota_2")
-  nota3             Float?           @map("nota_3")
-  isDesistenteUnid1 Boolean          @default(false) @map("is_desistente_unid1")
-  isDesistenteUnid2 Boolean          @default(false) @map("is_desistente_unid2")
-  isDesistenteUnid3 Boolean          @default(false) @map("is_desistente_unid3")
-  disciplina        Disciplina       @relation(fields: [disciplinaId], references: [id], onDelete: Cascade)
-  estudante         Estudante        @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
-  modifiedBy        User?            @relation("NotaModificador", fields: [modifiedById], references: [id])
-  auditorias        NotaFinalAudit[]
-  unidades          NotaUnidade[]
+  id              String           @id @default(cuid())
+  estudanteId     String           @map("estudante_id")
+  disciplinaId    String           @map("disciplina_id")
+  nota            Float
+  notaRecuperacao Float?           @map("nota_recuperacao")
+  status          StatusNota
+  modifiedById    String?          @map("modified_by_id")
+  modifiedAt      DateTime         @default(now()) @map("modified_at")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  disciplina      Disciplina       @relation(fields: [disciplinaId], references: [id], onDelete: Cascade)
+  estudante       Estudante        @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  modifiedBy      User?            @relation("NotaModificador", fields: [modifiedById], references: [id])
+  auditorias      NotaFinalAudit[]
+  unidades        NotaUnidade[]
 
   @@unique([estudanteId, disciplinaId])
   @@index([status])
@@ -449,11 +476,44 @@ model NotaFinalAudit {
 
 enum ModoRecuperacaoUnidade {
   SUBSTITUI_SE_MAIOR
+  MEDIA_COM_UNIDADE // vale a maior entre a nota e (nota + recuperação) / 2
 }
 
 enum ModoRecuperacaoFinal {
   SUBSTITUI_MENOR_UNIDADE
   NOTA_MINIMA_ISOLADA
+  MEDIA_COM_FINAL // (média + exame final) / 2 >= notaMinimaExameFinal
+}
+
+// Ver plano-avaliacao-frequencia.md, seção 3.1.
+enum TipoNota {
+  NUMERICA
+  CONCEITUAL // reservado - só NUMERICA está implementado
+}
+
+// Como notas se combinam: atividades -> nota da etapa (EsquemaUnidade.formaCalculo)
+// e etapas -> média final (EsquemaAvaliacao.formaCalculoFinal).
+enum FormaCalculo {
+  SOMA
+  MEDIA_ARITMETICA
+  MEDIA_PONDERADA
+  SOMA_COM_DIVISOR
+  MAIOR_NOTA
+}
+
+enum DefinicaoAtividades {
+  ESCOLA // atividades fixas no esquema (template)
+  PROFESSOR // professor cria as avaliações de cada etapa no diário
+}
+
+enum RegistroFrequencia {
+  POR_AULA
+  POR_DIA
+}
+
+enum ApuracaoFrequencia {
+  GERAL // LDB art. 24, VI: % do total de horas letivas
+  POR_COMPONENTE
 }
 
 // Modelo de avaliação configurável por escola (frente "regras de negócio"
@@ -473,6 +533,16 @@ model EsquemaAvaliacao {
   modoRecuperacaoUnidade  ModoRecuperacaoUnidade? @map("modo_recuperacao_unidade")
   recuperacaoFinalAtiva   Boolean                 @default(true) @map("recuperacao_final_ativa")
   modoRecuperacaoFinal    ModoRecuperacaoFinal?   @default(NOTA_MINIMA_ISOLADA) @map("modo_recuperacao_final")
+  notaMinimaExameFinal    Float?                  @map("nota_minima_exame_final")
+  tipoNota                TipoNota                @default(NUMERICA) @map("tipo_nota")
+  notaMaxima              Float                   @default(10) @map("nota_maxima")
+  casasDecimais           Int                     @default(1) @map("casas_decimais")
+  formaCalculoFinal       FormaCalculo            @default(MEDIA_ARITMETICA) @map("forma_calculo_final")
+  divisorFinal            Float?                  @map("divisor_final")
+  definicaoAtividades     DefinicaoAtividades     @default(ESCOLA) @map("definicao_atividades")
+  registroFrequencia      RegistroFrequencia      @default(POR_AULA) @map("registro_frequencia")
+  apuracaoFrequencia      ApuracaoFrequencia      @default(GERAL) @map("apuracao_frequencia")
+  frequenciaMinima        Float                   @default(75) @map("frequencia_minima")
   createdAt               DateTime                @default(now()) @map("created_at")
   updatedAt               DateTime                @updatedAt @map("updated_at")
   unidades                EsquemaUnidade[]
@@ -484,24 +554,30 @@ model EsquemaAvaliacao {
 }
 
 model EsquemaUnidade {
-  id         String             @id @default(cuid())
-  esquemaId  String             @map("esquema_id")
-  esquema    EsquemaAvaliacao   @relation(fields: [esquemaId], references: [id], onDelete: Cascade)
-  ordem      Int
-  nome       String
-  atividades EsquemaAtividade[]
-  notas      NotaUnidade[]
+  id                   String                @id @default(cuid())
+  esquemaId            String                @map("esquema_id")
+  esquema              EsquemaAvaliacao      @relation(fields: [esquemaId], references: [id], onDelete: Cascade)
+  ordem                Int
+  nome                 String
+  peso                 Float                 @default(1) // peso da etapa na média final ponderada
+  formaCalculo         FormaCalculo          @default(SOMA) @map("forma_calculo") // atividades -> nota da etapa
+  divisor              Float? // SOMA_COM_DIVISOR
+  atividades           EsquemaAtividade[]
+  notas                NotaUnidade[]
+  etapaCalendarios     EtapaCalendario[]
+  avaliacoesDisciplina AvaliacaoDisciplina[]
 
   @@unique([esquemaId, ordem])
   @@map("esquema_unidades")
 }
 
 model EsquemaAtividade {
-  id               String         @id @default(cuid())
-  esquemaUnidadeId String         @map("esquema_unidade_id")
-  esquemaUnidade   EsquemaUnidade @relation(fields: [esquemaUnidadeId], references: [id], onDelete: Cascade)
+  id               String          @id @default(cuid())
+  esquemaUnidadeId String          @map("esquema_unidade_id")
+  esquemaUnidade   EsquemaUnidade  @relation(fields: [esquemaUnidadeId], references: [id], onDelete: Cascade)
   nome             String
-  peso             Float
+  notaMaxima       Float           @map("nota_maxima") // quanto a atividade vale (teto do lançamento)
+  peso             Float           @default(1) // quanto pesa na MEDIA_PONDERADA da etapa
   ordem            Int
   notas            NotaAtividade[]
 
@@ -521,6 +597,7 @@ model NotaUnidade {
   notaRecuperacao  Float?          @map("nota_recuperacao")
   isDesistente     Boolean         @default(false) @map("is_desistente")
   atividades       NotaAtividade[]
+  avaliacoes       NotaAvaliacao[]
 
   @@unique([notaFinalId, esquemaUnidadeId])
   @@map("notas_unidades")
@@ -591,22 +668,22 @@ model AreaConhecimento {
 }
 
 model NotaSimulado {
-  id                 String           @id @default(cuid())
-  estudanteId        String           @map("estudante_id")
-  areaId             String?          @map("area_id")
-  provaId            String?          @map("prova_id")
+  id                 String            @id @default(cuid())
+  estudanteId        String            @map("estudante_id")
+  areaId             String?           @map("area_id")
+  provaId            String?           @map("prova_id")
   unidade            Int
   nota               Float?
-  ausente            Boolean          @default(false)
-  notaSegundaChamada Float?           @map("nota_segunda_chamada")
-  anoLetivo          Int              @default(2026) @map("ano_letivo")
-  lancadoById        String           @map("lancado_by_id")
-  createdAt          DateTime         @default(now()) @map("created_at")
-  updatedAt          DateTime         @updatedAt @map("updated_at")
+  ausente            Boolean           @default(false)
+  notaSegundaChamada Float?            @map("nota_segunda_chamada")
+  anoLetivo          Int               @default(2026) @map("ano_letivo")
+  lancadoById        String            @map("lancado_by_id")
+  createdAt          DateTime          @default(now()) @map("created_at")
+  updatedAt          DateTime          @updatedAt @map("updated_at")
   area               AreaConhecimento? @relation(fields: [areaId], references: [id])
   prova              Prova?            @relation(fields: [provaId], references: [id])
-  estudante          Estudante        @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
-  lancadoBy          User             @relation("SimuladoLancador", fields: [lancadoById], references: [id])
+  estudante          Estudante         @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  lancadoBy          User              @relation("SimuladoLancador", fields: [lancadoById], references: [id])
 
   // Removida a constraint de UNIQUE anterior que dependia de areaId, 
   // agora a aplicação precisará gerenciar a unicidade via Prova ou Área
@@ -628,18 +705,18 @@ model MatrizCurricular {
 }
 
 model ResponsavelSimulado {
-  id        String           @id @default(cuid())
-  userId    String           @map("user_id")
-  turmaId   String           @map("turma_id")
-  areaId    String?          @map("area_id")
-  provaId   String?          @map("prova_id")
+  id        String            @id @default(cuid())
+  userId    String            @map("user_id")
+  turmaId   String            @map("turma_id")
+  areaId    String?           @map("area_id")
+  provaId   String?           @map("prova_id")
   unidade   Int?
-  anoLetivo Int              @default(2026) @map("ano_letivo")
-  createdAt DateTime         @default(now()) @map("created_at")
+  anoLetivo Int               @default(2026) @map("ano_letivo")
+  createdAt DateTime          @default(now()) @map("created_at")
   area      AreaConhecimento? @relation(fields: [areaId], references: [id], onDelete: Cascade)
   prova     Prova?            @relation(fields: [provaId], references: [id], onDelete: Cascade)
-  turma     Turma            @relation(fields: [turmaId], references: [id], onDelete: Cascade)
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  turma     Turma             @relation(fields: [turmaId], references: [id], onDelete: Cascade)
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("responsaveis_simulados")
 }
@@ -728,4 +805,251 @@ enum StatusNota {
   CONSERVADO
 
   @@map("status_nota")
+}
+
+// Link de "esqueci minha senha": guarda só o hash SHA-256 do token (o token
+// em si só existe no e-mail), expira e só pode ser usado uma vez.
+model TokenRedefinicaoSenha {
+  id        String    @id @default(cuid())
+  userId    String    @map("user_id")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique @map("token_hash")
+  expiraEm  DateTime  @map("expira_em")
+  usadoEm   DateTime? @map("usado_em")
+  criadoEm  DateTime  @default(now()) @map("criado_em")
+
+  @@index([userId])
+  @@map("tokens_redefinicao_senha")
+}
+
+// Limitador de tentativas (login errado, pedidos de redefinição de senha):
+// uma linha por tentativa, contada numa janela de tempo por `chave`. Fica no
+// banco (não em memória) porque o app roda em várias instâncias serverless.
+model TentativaAcesso {
+  id       String   @id @default(cuid())
+  chave    String
+  criadoEm DateTime @default(now()) @map("criado_em")
+
+  @@index([chave, criadoEm])
+  @@map("tentativas_acesso")
+}
+
+// ---------------------------------------------------------------------------
+// Calendário letivo e tempos de aula (plano-avaliacao-frequencia.md, passo 6).
+// Base das "aulas previstas": horário da turma × dias letivos do período.
+// ---------------------------------------------------------------------------
+
+// Ano (ou semestre) letivo da escola, com início e fim reais.
+model PeriodoLetivo {
+  id        String            @id @default(cuid())
+  escolaId  String            @map("escola_id")
+  escola    Escola            @relation(fields: [escolaId], references: [id])
+  anoLetivo Int               @map("ano_letivo")
+  inicio    DateTime          @db.Date
+  fim       DateTime          @db.Date
+  etapas    EtapaCalendario[]
+
+  @@unique([escolaId, anoLetivo])
+  @@map("periodos_letivos")
+}
+
+// Datas de cada etapa (unidade/bimestre) de um esquema naquele ano.
+model EtapaCalendario {
+  id               String         @id @default(cuid())
+  periodoLetivoId  String         @map("periodo_letivo_id")
+  periodoLetivo    PeriodoLetivo  @relation(fields: [periodoLetivoId], references: [id], onDelete: Cascade)
+  esquemaUnidadeId String         @map("esquema_unidade_id")
+  esquemaUnidade   EsquemaUnidade @relation(fields: [esquemaUnidadeId], references: [id], onDelete: Cascade)
+  inicio           DateTime       @db.Date
+  fim              DateTime       @db.Date
+  prazoLancamento  DateTime?      @map("prazo_lancamento") @db.Date
+
+  @@unique([periodoLetivoId, esquemaUnidadeId])
+  @@map("etapas_calendario")
+}
+
+enum TipoDiaNaoLetivo {
+  FERIADO
+  RECESSO
+  PLANEJAMENTO
+  OUTRO
+}
+
+// Dia sem aula (feriado, recesso...). turmaId preenchido = só aquela turma.
+model DiaNaoLetivo {
+  id        String           @id @default(cuid())
+  escolaId  String           @map("escola_id")
+  escola    Escola           @relation(fields: [escolaId], references: [id])
+  data      DateTime         @db.Date
+  tipo      TipoDiaNaoLetivo
+  descricao String
+  turmaId   String?          @map("turma_id")
+  turma     Turma?           @relation(fields: [turmaId], references: [id], onDelete: Cascade)
+
+  @@index([escolaId, data])
+  @@map("dias_nao_letivos")
+}
+
+// Dia letivo fora da grade normal (sábado letivo, reposição): segue o
+// horário de um dia da semana (1 = segunda ... 5 = sexta).
+model DiaLetivoExtra {
+  id              String   @id @default(cuid())
+  escolaId        String   @map("escola_id")
+  escola          Escola   @relation(fields: [escolaId], references: [id])
+  data            DateTime @db.Date
+  seguirHorarioDe Int      @map("seguir_horario_de")
+  descricao       String
+
+  @@unique([escolaId, data])
+  @@map("dias_letivos_extras")
+}
+
+// Grade de tempos da escola por turno: o "horario" (1º, 2º...) de
+// HorarioAula é a `ordem` aqui, no turno da turma.
+model TempoAula {
+  id       String @id @default(cuid())
+  escolaId String @map("escola_id")
+  escola   Escola @relation(fields: [escolaId], references: [id])
+  turno    String // normalizado: MATUTINO | VESPERTINO | NOTURNO | INTEGRAL
+  ordem    Int
+  inicio   String // "07:00"
+  fim      String // "07:50"
+
+  @@unique([escolaId, turno, ordem])
+  @@map("tempos_aula")
+}
+
+// ---------------------------------------------------------------------------
+// Chamada e frequência (plano-avaliacao-frequencia.md, seção 3.4, passos 7-9).
+// ---------------------------------------------------------------------------
+
+enum SituacaoAula {
+  PREVISTA // chamada aberta, ainda não salva - não conta na frequência
+  REALIZADA // chamada salva: conta na frequência
+  CANCELADA // aula não dada (ex.: atividade extra, falta do professor)
+}
+
+// Registro de aula do diário de classe. Criado sob demanda quando o
+// professor abre a chamada, a partir do horário da turma e do calendário.
+// POR_AULA: uma linha por (turma, disciplina, dia), com `quantidade` = nº de
+// tempos da disciplina naquele dia. POR_DIA: disciplinaId null, quantidade 1.
+model Aula {
+  id           String       @id @default(cuid())
+  escolaId     String       @map("escola_id")
+  escola       Escola       @relation(fields: [escolaId], references: [id])
+  turmaId      String       @map("turma_id")
+  turma        Turma        @relation(fields: [turmaId], references: [id], onDelete: Cascade)
+  disciplinaId String?      @map("disciplina_id")
+  disciplina   Disciplina?  @relation(fields: [disciplinaId], references: [id], onDelete: Cascade)
+  professorId  String?      @map("professor_id")
+  professor    User?        @relation("AulaProfessor", fields: [professorId], references: [id], onDelete: SetNull)
+  data         DateTime     @db.Date
+  // Tempos do horário cobertos (HorarioAula.horario); vazio na chamada diária
+  tempos       Int[]
+  quantidade   Int          @default(1)
+  conteudo     String? // conteúdo ministrado
+  situacao     SituacaoAula @default(PREVISTA)
+  // turmaId|data|disciplinaId (ou DIA): garante uma aula por disciplina/dia
+  // mesmo com disciplinaId nulo (unique composto não trata null como igual)
+  chave        String       @unique
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+  faltas       Falta[]
+
+  @@index([escolaId])
+  @@index([turmaId, data])
+  @@index([disciplinaId])
+  @@map("aulas")
+}
+
+// Só a exceção é gravada: aluno sem Falta numa aula REALIZADA estava presente.
+model Falta {
+  id          String    @id @default(cuid())
+  aulaId      String    @map("aula_id")
+  aula        Aula      @relation(fields: [aulaId], references: [id], onDelete: Cascade)
+  estudanteId String    @map("estudante_id")
+  estudante   Estudante @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  // nº de tempos perdidos (1..aula.quantidade)
+  quantidade  Int       @default(1)
+
+  @@unique([aulaId, estudanteId])
+  @@index([estudanteId])
+  @@map("faltas")
+}
+
+enum TipoJustificativa {
+  ATESTADO
+  ABONO_LEGAL // ex.: serviço militar, Lei 6.202 (gestante), convocação judicial
+  OUTRO
+}
+
+enum EfeitoJustificativa {
+  ABONA // falta não conta na frequência
+  SO_JUSTIFICA // conta, mas fica registrada como justificada
+}
+
+// Vale para todas as faltas do aluno no intervalo [inicio, fim] - aplicada
+// na hora do cálculo, então cobre faltas lançadas antes ou depois dela.
+model Justificativa {
+  id              String              @id @default(cuid())
+  escolaId        String              @map("escola_id")
+  escola          Escola              @relation(fields: [escolaId], references: [id])
+  estudanteId     String              @map("estudante_id")
+  estudante       Estudante           @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  inicio          DateTime            @db.Date
+  fim             DateTime            @db.Date
+  tipo            TipoJustificativa
+  efeito          EfeitoJustificativa
+  descricao       String?
+  documentoUrl    String?             @map("documento_url")
+  registradoPorId String?             @map("registrado_por_id")
+  registradoPor   User?               @relation("JustificativaAutor", fields: [registradoPorId], references: [id], onDelete: SetNull)
+  createdAt       DateTime            @default(now()) @map("created_at")
+
+  @@index([escolaId])
+  @@index([estudanteId])
+  @@map("justificativas")
+}
+
+// ---------------------------------------------------------------------------
+// Atividades criadas pelo professor (plano-avaliacao-frequencia.md, passo 5).
+// Valem quando o esquema da turma tem definicaoAtividades = PROFESSOR: no
+// lugar das atividades do template, cada disciplina tem as próprias
+// avaliações por etapa. As atividades do template continuam definindo o
+// teto da etapa (a nota máxima que a etapa pode valer).
+// ---------------------------------------------------------------------------
+
+model AvaliacaoDisciplina {
+  id               String          @id @default(cuid())
+  disciplinaId     String          @map("disciplina_id")
+  disciplina       Disciplina      @relation(fields: [disciplinaId], references: [id], onDelete: Cascade)
+  esquemaUnidadeId String          @map("esquema_unidade_id")
+  // Restrict: apagar a etapa não pode levar junto as avaliações do professor
+  esquemaUnidade   EsquemaUnidade  @relation(fields: [esquemaUnidadeId], references: [id], onDelete: Restrict)
+  nome             String
+  data             DateTime?       @db.Date
+  notaMaxima       Float           @map("nota_maxima")
+  peso             Float           @default(1)
+  ordem            Int
+  criadoPorId      String?         @map("criado_por_id")
+  criadoPor        User?           @relation("AvaliacaoCriador", fields: [criadoPorId], references: [id], onDelete: SetNull)
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+  notas            NotaAvaliacao[]
+
+  @@index([disciplinaId, esquemaUnidadeId])
+  @@map("avaliacoes_disciplina")
+}
+
+model NotaAvaliacao {
+  id            String              @id @default(cuid())
+  notaUnidadeId String              @map("nota_unidade_id")
+  notaUnidade   NotaUnidade         @relation(fields: [notaUnidadeId], references: [id], onDelete: Cascade)
+  avaliacaoId   String              @map("avaliacao_id")
+  avaliacao     AvaliacaoDisciplina @relation(fields: [avaliacaoId], references: [id], onDelete: Cascade)
+  valor         Float?
+
+  @@unique([notaUnidadeId, avaliacaoId])
+  @@index([avaliacaoId])
+  @@map("notas_avaliacoes")
 }

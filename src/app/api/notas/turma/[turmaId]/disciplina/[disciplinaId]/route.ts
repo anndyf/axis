@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { resolverEsquemaAvaliacaoId } from '@/lib/services/notas'
+import { atividadesDaDisciplina } from '@/lib/services/notas-leitura'
+import { can } from '@/lib/rbac'
 
 export const runtime = 'nodejs'
 
@@ -11,11 +13,25 @@ export async function GET(
 ) {
   try {
     const session = await auth()
-    if (!session?.user?.escolaId) {
+    if (!session?.user?.escolaId || session.user.isPortalUser || !can(session.user, 'staff')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
     const escolaId = session.user.escolaId
     const { turmaId, disciplinaId } = await params
+
+    // A disciplina precisa ser da turma; professor só vê as notas das disciplinas dele
+    const disciplina = await prisma.disciplina.findFirst({
+      where: {
+        id: disciplinaId,
+        turmaId,
+        turma: { escolaId },
+        ...(can(session.user, 'gestao') ? {} : { usuariosPermitidos: { some: { id: session.user.id } } }),
+      },
+      select: { id: true },
+    })
+    if (!disciplina) {
+      return NextResponse.json({ message: 'Disciplina não encontrada' }, { status: 404 })
+    }
 
     const turma = await prisma.turma.findUnique({
       where: { id: turmaId, escolaId },
@@ -26,15 +42,15 @@ export async function GET(
     }
 
     const curso = turma.cursoId
-      ? await prisma.curso.findUnique({ where: { id: turma.cursoId }, select: { esquemaAvaliacaoId: true } })
+      ? await prisma.curso.findFirst({ where: { id: turma.cursoId, escolaId }, select: { esquemaAvaliacaoId: true } })
       : null
     const esquemaId = resolverEsquemaAvaliacaoId(turma, curso)
     if (!esquemaId) {
       return NextResponse.json({ message: 'Esquema de avaliação não configurado para esta turma' }, { status: 400 })
     }
 
-    const esquema = await prisma.esquemaAvaliacao.findUnique({
-      where: { id: esquemaId },
+    const esquema = await prisma.esquemaAvaliacao.findFirst({
+      where: { id: esquemaId, escolaId },
       include: { unidades: { orderBy: { ordem: 'asc' }, include: { atividades: { orderBy: { ordem: 'asc' } } } } }
     })
     if (!esquema) {
@@ -48,9 +64,11 @@ export async function GET(
       where: { disciplinaId, estudante: { turmaId, escolaId } },
       include: {
         estudante: { select: { matricula: true } },
-        unidades: { include: { atividades: true } }
+        unidades: { include: { atividades: true, avaliacoes: true } }
       }
     })
+    const porProfessor = esquema.definicaoAtividades === 'PROFESSOR'
+    const atividades = await atividadesDaDisciplina(esquema, disciplinaId)
 
     return NextResponse.json({
       esquema: {
@@ -60,11 +78,21 @@ export async function GET(
         modoRecuperacaoUnidade: esquema.modoRecuperacaoUnidade,
         recuperacaoFinalAtiva: esquema.recuperacaoFinalAtiva,
         modoRecuperacaoFinal: esquema.modoRecuperacaoFinal,
+        formaCalculoFinal: esquema.formaCalculoFinal,
+        divisorFinal: esquema.divisorFinal,
+        notaMinimaExameFinal: esquema.notaMinimaExameFinal,
+        casasDecimais: esquema.casasDecimais,
+        // PROFESSOR: as "atividades" de cada etapa são as avaliações que o
+        // professor criou para esta disciplina (mesmo formato do template)
+        definicaoAtividades: esquema.definicaoAtividades,
         unidades: esquema.unidades.map((u) => ({
           id: u.id,
           ordem: u.ordem,
           nome: u.nome,
-          atividades: u.atividades.map((a) => ({ id: a.id, ordem: a.ordem, nome: a.nome, peso: a.peso }))
+          peso: u.peso,
+          formaCalculo: u.formaCalculo,
+          divisor: u.divisor,
+          atividades: (atividades.get(u.id) ?? []).map((a) => ({ id: a.id, ordem: a.ordem, nome: a.nome, notaMaxima: a.notaMaxima, peso: a.peso }))
         }))
       },
       notas: notasFinais.map((nf) => ({
@@ -74,7 +102,9 @@ export async function GET(
           esquemaUnidadeId: u.esquemaUnidadeId,
           notaRecuperacao: u.notaRecuperacao,
           isDesistente: u.isDesistente,
-          atividades: u.atividades.map((a) => ({ esquemaAtividadeId: a.esquemaAtividadeId, valor: a.valor }))
+          atividades: porProfessor
+            ? u.avaliacoes.map((a) => ({ esquemaAtividadeId: a.avaliacaoId, valor: a.valor }))
+            : u.atividades.map((a) => ({ esquemaAtividadeId: a.esquemaAtividadeId, valor: a.valor }))
         }))
       }))
     })

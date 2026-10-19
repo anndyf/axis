@@ -56,6 +56,7 @@ export async function createPortalUser(matricula: string) {
         username: estudante.matricula,
         email: `${estudante.matricula}@axis.com`, // Email dummy
         password: hashedPassword,
+        deveTrocarSenha: true,
         name: estudante.nome,
         isPortalUser: true,
         estudanteId: estudante.id,
@@ -133,6 +134,7 @@ export async function activateAllPortals() {
                     username: estudante.matricula,
                     email: `${estudante.matricula}@axis.com`,
                     password: hashedPassword,
+                    deveTrocarSenha: true,
                     name: estudante.nome,
                     isPortalUser: true,
                     estudanteId: estudante.id,

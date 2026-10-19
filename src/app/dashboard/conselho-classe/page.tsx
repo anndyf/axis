@@ -98,39 +98,39 @@ export default async function ConselhoClassePage() {
     {
       title: "Conselho Ativo",
       description: "Delibere sobre o futuro acadêmico de alunos retidos na recuperação final.",
-      icon: <ShieldCheck className="w-5 h-5 text-slate-700" />,
+      icon: <ShieldCheck className="w-5 h-5 text-fg-muted" />,
       color: "indigo"
     },
     {
       title: "Votos e Decisões",
       description: "As deliberações registradas aqui geram as atas automáticas de fechamento.",
-      icon: <ListFilter className="w-5 h-5 text-slate-700" />,
+      icon: <ListFilter className="w-5 h-5 text-fg-muted" />,
       color: "blue"
     },
     {
       title: "Caminho Crítico",
       description: "Alunos com pendências na recuperação final requerem atenção imediata.",
-      icon: <TrendingUp className="w-5 h-5 text-rose-600" />,
+      icon: <TrendingUp className="w-5 h-5 text-danger-fg" />,
       color: "rose"
     }
   ]
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="">
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
-      <header className="bg-white/80 backdrop-blur-xl border-b border-slate-300 sticky top-0 z-50 -mx-4 -mt-4 md:-mx-8 md:-mt-8 mb-4 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto py-4">
+      <header className="mb-6">
+        <div className="max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="flex items-center space-x-5">
+            <div className="flex min-w-0 items-center gap-3">
               <Link
                 href="/dashboard"
-                className="p-2 hover:bg-slate-200 rounded-lg transition-colors text-slate-400 hover:text-slate-700"
+                aria-label="Voltar" className="hidden sm:inline-flex p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg"
               >
-                <ArrowLeft size={20} />
+                <ArrowLeft size={16} strokeWidth={1.75} />
               </Link>
               <div>
-                <h1 className="text-2xl font-medium text-slate-800 tracking-tight">Conselho de Classe</h1>
-                <p className="text-base text-slate-700 font-medium">Gestão de deliberações e fechamento das turmas</p>
+                <h1 className="text-2xl font-semibold tracking-tight text-fg">Conselho de Classe</h1>
+                <p className="text-sm text-fg-muted">Gestão de deliberações e fechamento das turmas</p>
               </div>
             </div>
           </div>
@@ -142,25 +142,25 @@ export default async function ConselhoClassePage() {
         {/* Dicas Fixas - Estilo Resultados */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {conselhoTips.map((tip, index) => (
-             <div key={index} className="bg-white/60 border border-slate-300/60 p-5 rounded-3xl flex items-start space-x-4 hover:bg-white hover:border-slate-300 hover:shadow-xl hover:shadow-slate-300/30 transition-all group">
-                <div className={`p-3 rounded-2xl bg-${tip.color}-50 text-${tip.color}-600 group-hover:bg-${tip.color}-600 group-hover:text-white transition-all shadow-inner`}>
+             <div key={index} className="bg-surface border border-line p-4 rounded-lg flex items-start gap-3">
+                <div className={`p-3 rounded-lg bg-subtle text-fg-muted transition-all shadow-card`}>
                    {tip.icon}
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-slate-800 uppercase tracking-widest mb-1">{tip.title}</h3>
-                  <p className="text-[11px] font-medium text-slate-400 uppercase leading-relaxed">{tip.description}</p>
+                  <h3 className="text-sm font-medium text-fg mb-1">{tip.title}</h3>
+                  <p className="text-xs font-medium text-fg-subtle leading-relaxed">{tip.description}</p>
                 </div>
              </div>
           ))}
         </div>
 
         {turnos.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-300 p-20 text-center">
-              <div className="bg-emerald-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-100">
-                <CheckCircle2 className="w-8 h-8 text-emerald-500" />
+          <div className="bg-surface rounded-lg shadow-sm border border-line-strong p-20 text-center">
+              <div className="bg-success-subtle w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-success-line">
+                <CheckCircle2 className="w-8 h-8 text-success-fg" />
               </div>
-              <h2 className="text-lg font-medium text-slate-800 mb-1">Tudo em dia!</h2>
-              <p className="text-slate-600 max-w-xs mx-auto text-sm">
+              <h2 className="text-lg font-medium text-fg mb-1">Tudo em dia!</h2>
+              <p className="text-fg-muted max-w-xs mx-auto text-sm">
                 Não existem turmas aguardando deliberação de conselho.
               </p>
           </div>

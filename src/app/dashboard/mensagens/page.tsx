@@ -35,43 +35,43 @@ export default async function MessagesPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 min-h-screen">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-1">
-          <h1 className="text-4xl font-medium text-slate-800 tracking-tighter">Mensagens</h1>
-          <p className="text-slate-600 font-medium">Central de comunicação e comunicados oficiais.</p>
+          <h1 className="text-4xl font-medium text-fg tracking-tighter">Mensagens</h1>
+          <p className="text-fg-muted font-medium">Central de comunicação e comunicados oficiais.</p>
         </div>
         
-        <div className="flex flex-wrap items-center gap-6 bg-white border border-slate-200 px-6 py-3 rounded-3xl shadow-sm">
+        <div className="flex flex-wrap items-center gap-6 bg-surface border border-line px-6 py-3 rounded-xl shadow-sm">
            <div className="flex items-center gap-2 group">
-              <span className="w-2 h-2 rounded-full bg-slate-500 shadow-lg shadow-slate-300 group-hover:scale-125 transition-transform"></span>
-              <p className="text-[10px] font-medium text-slate-600 uppercase tracking-widest">Suporte</p>
+              <span className="w-2 h-2 rounded-full bg-zinc-500 shadow-card group-hover:scale-125 transition-transform"></span>
+              <p className="text-xs font-medium text-fg-muted">Suporte</p>
            </div>
            <div className="flex items-center gap-2 group">
-              <span className="w-2 h-2 rounded-full bg-purple-500 shadow-lg shadow-purple-200 group-hover:scale-125 transition-transform"></span>
-              <p className="text-[10px] font-medium text-slate-600 uppercase tracking-widest">Direção</p>
+              <span className="w-2 h-2 rounded-full bg-accent shadow-card group-hover:scale-125 transition-transform"></span>
+              <p className="text-xs font-medium text-fg-muted">Direção</p>
            </div>
            <div className="flex items-center gap-2 group">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-lg shadow-emerald-200 group-hover:scale-125 transition-transform"></span>
-              <p className="text-[10px] font-medium text-slate-600 uppercase tracking-widest">Geral</p>
+              <span className="w-2 h-2 rounded-full bg-success shadow-card group-hover:scale-125 transition-transform"></span>
+              <p className="text-xs font-medium text-fg-muted">Geral</p>
            </div>
         </div>
       </div>
 
       {/* Alerta de Suporte Fixo */}
-      <div className="bg-slate-100 border border-slate-200 rounded-3xl p-6 flex flex-col md:flex-row items-center gap-6 animate-in fade-in slide-in-from-top-4 duration-700">
-        <div className="w-14 h-14 bg-white rounded-2xl shadow-xl shadow-slate-300/50 flex items-center justify-center shrink-0">
-          <LifeBuoy className="text-slate-700 w-7 h-7" />
+      <div className="bg-subtle border border-line rounded-xl p-6 flex flex-col md:flex-row items-center gap-6 animate-slide-up">
+        <div className="w-14 h-14 bg-surface rounded-lg shadow-card flex items-center justify-center shrink-0">
+          <LifeBuoy className="text-fg-muted w-7 h-7" />
         </div>
         <div className="flex-1 text-center md:text-left">
-          <p className="text-xs font-medium text-blue-900 uppercase tracking-widest mb-1">
+          <p className="text-xs font-medium text-accent-fg mb-1">
              Precisa de ajuda com os dados?
           </p>
-          <p className="text-sm font-medium text-slate-800 leading-relaxed">
-            Se não estiver visualizando uma <span className="underline decoration-blue-300 decoration-2 underline-offset-4">turma</span>, 
-            <span className="ml-1 underline decoration-blue-300 decoration-2 underline-offset-4">disciplina</span> ou 
-            <span className="ml-1 underline decoration-blue-300 decoration-2 underline-offset-4">estudante</span>, 
-            selecione a categoria <span className="px-2 py-0.5 bg-slate-700 text-white rounded-md text-[10px] uppercase font-medium">Suporte Técnico</span> ao enviar sua mensagem.
+          <p className="text-sm font-medium text-fg leading-relaxed">
+            Se não estiver visualizando uma <span className="underline decoration-accent decoration-2 underline-offset-4">turma</span>, 
+            <span className="ml-1 underline decoration-accent decoration-2 underline-offset-4">disciplina</span> ou 
+            <span className="ml-1 underline decoration-accent decoration-2 underline-offset-4">estudante</span>, 
+            selecione a categoria <span className="px-2 py-0.5 bg-zinc-700 text-white rounded-md text-xs font-medium">Suporte Técnico</span> ao enviar sua mensagem.
           </p>
         </div>
       </div>
