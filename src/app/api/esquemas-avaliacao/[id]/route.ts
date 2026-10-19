@@ -40,8 +40,21 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       // incremental. NotaUnidade referencia EsquemaUnidade sem cascade: se o
       // esquema já tem notas lançadas, o deleteMany falha com P2003 e a edição
       // inteira é desfeita (tratado abaixo como 409).
+      // As datas das etapas no calendário (EtapaCalendario) caem em cascata
+      // com as unidades: guardadas pela ordem e religadas às unidades novas.
+      const datas = await tx.etapaCalendario.findMany({
+        where: { esquemaUnidade: { esquemaId: id } },
+        select: { periodoLetivoId: true, inicio: true, fim: true, prazoLancamento: true, esquemaUnidade: { select: { ordem: true } } },
+      })
       await tx.esquemaUnidade.deleteMany({ where: { esquemaId: id } })
       await criarEstruturaEsquema(tx, id, validado.unidades)
+      const novas = await tx.esquemaUnidade.findMany({ where: { esquemaId: id }, select: { id: true, ordem: true } })
+      const porOrdem = new Map(novas.map((u) => [u.ordem, u.id]))
+      const religadas = datas.flatMap(({ esquemaUnidade, ...d }) => {
+        const esquemaUnidadeId = porOrdem.get(esquemaUnidade.ordem)
+        return esquemaUnidadeId ? [{ ...d, esquemaUnidadeId }] : []
+      })
+      if (religadas.length) await tx.etapaCalendario.createMany({ data: religadas })
 
       return tx.esquemaAvaliacao.findUnique({
         where: { id },

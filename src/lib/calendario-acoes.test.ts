@@ -4,6 +4,7 @@
  * Mesmo esquema de isolamento-escolas.test.ts: sessão da escola B.
  */
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest'
+import { NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { vincularCursosSemEsquema } from '@/lib/services/esquemas-padrao'
 
@@ -24,6 +25,7 @@ async function criarEscola(dest: Record<string, string>, letra: string) {
   const curso = await prisma.curso.create({ data: { escolaId: escola.id, nome: `Curso ${letra}`, sigla: `C${letra}`, modalidade: 'EPI', turnos: ['MATUTINO'] } })
   await vincularCursosSemEsquema(prisma, escola.id)
   const esquema = await prisma.esquemaAvaliacao.findFirstOrThrow({ where: { escolaId: escola.id, numUnidades: 3 }, include: { unidades: { orderBy: { ordem: 'asc' } } } })
+  dest.esquema = esquema.id
   dest.unidade1 = esquema.unidades[0].id
   dest.turma = (await prisma.turma.create({ data: { escolaId: escola.id, nome: `T${letra}`, cursoId: curso.id, turno: 'Matutino', anoLetivo: 2026 } })).id
   dest.disciplina = (await prisma.disciplina.create({ data: { nome: `Mat ${letra}`, turmaId: dest.turma, usuariosPermitidos: { connect: { id: dest.prof } } } })).id
@@ -105,5 +107,27 @@ describe('horário da turma - saveSchedule', () => {
     expect(await saveSchedule(B.turma, [{ diaSemana: 1, horario: 2, disciplinaId: A.disciplina }])).toHaveProperty('error')
     expect(await saveSchedule(A.turma, [{ diaSemana: 1, horario: 1, disciplinaId: A.disciplina }])).toHaveProperty('error')
     expect(await prisma.horarioAula.count({ where: { turmaId: A.turma } })).toBe(0)
+  })
+})
+
+describe('editar esquema preserva as datas do calendário', () => {
+  it('religa as etapas pela ordem das unidades', async () => {
+    // Pré-condição: o primeiro teste salvou as datas da unidade 1 da escola B
+    const { PUT } = await import('@/app/api/esquemas-avaliacao/[id]/route')
+    const req = new NextRequest('http://localhost/x', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome: 'Editado', unidades: [
+        { nome: 'Bimestre 1', atividades: [{ nome: 'Prova', notaMaxima: 10 }] },
+        { nome: 'Bimestre 2', atividades: [{ nome: 'Prova', notaMaxima: 10 }] },
+      ] }),
+    })
+    const res = await PUT(req, { params: Promise.resolve({ id: B.esquema }) })
+    expect(res.status).toBe(200)
+
+    const etapas = await prisma.etapaCalendario.findMany({ where: { esquemaUnidade: { esquemaId: B.esquema } }, include: { esquemaUnidade: true } })
+    expect(etapas).toHaveLength(1)
+    expect(etapas[0].esquemaUnidade.ordem).toBe(1)
+    expect(etapas[0].esquemaUnidade.nome).toBe('Bimestre 1')
+    expect(etapas[0].fim.toISOString().slice(0, 10)).toBe('2026-05-08')
   })
 })

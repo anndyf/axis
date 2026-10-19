@@ -100,7 +100,7 @@ Estão marcadas com **[decisão]** nos itens acima. As principais:
 - `api/boletim/[id]/pdf`: aluno do portal baixava o boletim de colegas.
 
 ### Achados não corrigidos (fora do escopo, para decidir)
-- Editar um esquema de avaliação sem notas apaga e recria as unidades, e com isso **apaga as datas das unidades no calendário letivo** (`EtapaCalendario` tem `onDelete: Cascade`). Quem editar um esquema precisa salvar as datas de novo.
+- ~~Editar um esquema apagava as datas das unidades no calendário letivo~~ — corrigido: as datas são religadas pela ordem das unidades (teste em `calendario-acoes.test.ts`).
 - `api/relatorio/turma/[id]/pdf` e outras telas antigas ainda calculam "média geral" pela média simples de `NotaFinal.nota` e fixam 5 como mínimo (`AP`/`RC`).
 - O antigo "DS/INF" (`isDesistente` por etapa) continua manual; poderia ser derivado da frequência.
 
