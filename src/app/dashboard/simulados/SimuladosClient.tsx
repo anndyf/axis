@@ -402,10 +402,10 @@ export default function SimuladosClient({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 print:hidden">
           {simuTips.map((tip, index) => (
              <div key={index} className="bg-surface border border-line p-4 rounded-2xl flex items-start gap-3">
-                <div className={`p-3 rounded-lg bg-subtle text-fg-muted transition-all shadow-card`}>
+                <div className={`shrink-0 p-3 rounded-lg bg-subtle text-fg-muted transition-all shadow-card`}>
                    {tip.icon}
                 </div>
-                <div>
+                <div className="min-w-0 break-words">
                   <h3 className="text-sm font-medium text-fg mb-1">{tip.title}</h3>
                   <p className="text-xs font-medium text-fg-subtle leading-relaxed">{tip.description}</p>
                 </div>
@@ -415,7 +415,6 @@ export default function SimuladosClient({
 
         {/* Filtros Premium */}
         <div className="bg-surface p-6 rounded-xl shadow-card border border-line flex flex-wrap gap-6 items-end relative overflow-hidden print:hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-danger-subtle rounded-full -mr-16 -mt-16 opacity-50 blur-3xl"></div>
             
             <div className="flex-1 min-w-[200px] space-y-2">
                 <label className="text-xs font-medium text-fg-subtle ml-2">Filtrar por Turma</label>

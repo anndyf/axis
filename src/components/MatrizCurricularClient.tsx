@@ -291,7 +291,6 @@ export default function MatrizCurricularClient({
         
         {/* Filtros Premium */}
         <div className="bg-surface p-5 rounded-xl shadow-card border border-line-subtle flex flex-wrap gap-4 items-end relative overflow-visible">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-accent-subtle rounded-full -mr-16 -mt-16 opacity-40 blur-3xl pointer-events-none" />
 
             {/* Modalidade */}
             <div className="flex-1 min-w-[130px] max-w-[180px] space-y-1.5">
