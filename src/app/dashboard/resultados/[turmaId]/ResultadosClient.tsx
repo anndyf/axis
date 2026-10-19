@@ -4,6 +4,7 @@ import { useState, useMemo } from "react"
 import Link from "next/link"
 import { ArrowLeft, Download, CheckCircle2, FileText, GraduationCap, AlertTriangle, TrendingDown, Info, Printer } from "lucide-react"
 import TeacherTipsModal from "@/components/TeacherTipsModal"
+import { buttonClasses } from "@/components/ui"
 import { analyzeRisk } from "@/lib/risk-analysis"
 import type { EtapaDaNota } from "@/lib/services/notas"
 
@@ -83,27 +84,27 @@ export default function ResultadosTurmaClient({
     switch (status) {
       case 'AP':
       case 'APROVADO':
-        return { color: 'bg-success', text: 'text-white', label: 'AP' }
+        return { color: 'bg-success-subtle border border-success-line', text: 'text-success-fg', label: 'AP' }
       case 'RC':
       case 'RECUPERACAO':
       case 'RECU_FINAL':
-        return { color: 'bg-warning', text: 'text-white', label: 'RC' }
+        return { color: 'bg-warning-subtle border border-warning-line', text: 'text-warning-fg', label: 'RC' }
       case 'AR':
       case 'APROVADO_RECUPERACAO':
-        return { color: 'bg-success', text: 'text-white', label: 'AR' }
+        return { color: 'bg-success-subtle border border-success-line', text: 'text-success-fg', label: 'AR' }
       case 'AC':
       case 'APROVADO_CONSELHO':
       case 'CONSELHO':
-        return { color: 'bg-zinc-700', text: 'text-white', label: 'AC' }
+        return { color: 'bg-subtle border border-line-strong', text: 'text-fg', label: 'AC' }
       case 'DP':
       case 'DEPENDENCIA':
-        return { color: 'bg-danger', text: 'text-white', label: 'DP' }
+        return { color: 'bg-danger-subtle border border-danger-line', text: 'text-danger-fg', label: 'DP' }
       case 'DS':
       case 'DESISTENTE':
         return { color: 'bg-warning-subtle border border-warning-line', text: 'text-warning-fg', label: 'INF' }
       case 'CO':
       case 'CONSERVADO':
-        return { color: 'bg-zinc-400', text: 'text-white', label: 'CO' }
+        return { color: 'bg-danger-subtle border border-danger-line', text: 'text-danger-fg', label: 'CO' }
       default:
         return { color: 'bg-zinc-200', text: 'text-fg-subtle', label: '-' }
     }
@@ -243,10 +244,7 @@ export default function ResultadosTurmaClient({
               </Link>
               <div>
                 <div className="flex items-center space-x-2 mb-0.5">
-                  <h1 className="text-3xl font-medium text-black">RESULTADO - {turmaNome}</h1>
-                  <span className="px-2.5 py-1 bg-zinc-700 text-white text-xs font-medium rounded-md leading-none">
-                    Realtime
-                  </span>
+                  <h1 className="text-2xl font-semibold tracking-tight text-fg">Resultado — {turmaNome}</h1>
                 </div>
                 <p className="text-xs font-medium text-fg-subtle flex items-center">
                   <span className="text-fg-muted mr-2 font-medium">{turmaNome}</span>
@@ -256,7 +254,7 @@ export default function ResultadosTurmaClient({
             </div>
             
             <div className="flex flex-wrap items-center gap-3">
-              <div className="bg-zinc-200/50 p-1 rounded-lg flex items-center border border-zinc-300/50 shadow-card">
+              <div role="group" aria-label="Visualização" className="flex items-center gap-0.5 rounded-lg border border-line bg-subtle p-0.5">
                 {[
                   { id: 'FINAL', label: 'Status', icon: CheckCircle2 },
                   ...nomesEtapas.map((_, i) => ({ id: `UNIDADE_${i + 1}`, label: `Und ${i + 1}`, icon: FileText }))
@@ -267,13 +265,14 @@ export default function ResultadosTurmaClient({
                     <button
                       key={item.id}
                       onClick={() => setSelectedUnit(item.id as UnitOption)}
-                      className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                        active 
-                        ? 'bg-black text-white shadow-card active:scale-95' 
-                        : 'text-fg-muted hover:text-black hover:bg-white/50'
+                      aria-pressed={active}
+                      className={`flex h-8 items-center gap-1.5 rounded-md px-3 text-13 font-medium transition-colors duration-150 ${
+                        active
+                        ? 'bg-surface text-fg shadow-card'
+                        : 'text-fg-muted hover:text-fg'
                       }`}
                     >
-                      <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-fg-subtle'}`} />
+                      <Icon size={16} strokeWidth={1.75} className={active ? 'text-accent' : 'text-fg-subtle'} />
                       <span className="">{item.label}</span>
                     </button>
                   )
@@ -284,9 +283,9 @@ export default function ResultadosTurmaClient({
                 href={`/api/relatorio/resultados/${turmaId}/pdf?unit=${selectedUnit}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center space-x-2 bg-zinc-700 text-white px-5 py-2.5 rounded-lg hover:bg-zinc-800 transition-all shadow-card active:scale-95 font-medium text-xs"
+                className={buttonClasses({ variant: 'secondary' })}
               >
-                <Download className="w-4 h-4" />
+                <Download size={16} strokeWidth={1.75} />
                 <span>PDF</span>
               </a>
             </div>
@@ -314,18 +313,18 @@ export default function ResultadosTurmaClient({
           {/* Compact Legend */}
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
              {[
-               { id: 'AP', label: 'Aprovado', color: 'bg-success' },
-               { id: 'RC', label: 'Recup', color: 'bg-warning' },
-               { id: 'AR', label: 'Apr.Rec', color: 'bg-success' },
-               { id: 'AC', label: 'Conselho', color: 'bg-zinc-700' },
-               { id: 'DP', label: 'Dep', color: 'bg-danger' },
+               { id: 'AP', label: 'Aprovado', color: 'bg-success-subtle border border-success-line', text: 'text-success-fg' },
+               { id: 'RC', label: 'Recup', color: 'bg-warning-subtle border border-warning-line', text: 'text-warning-fg' },
+               { id: 'AR', label: 'Apr.Rec', color: 'bg-success-subtle border border-success-line', text: 'text-success-fg' },
+               { id: 'AC', label: 'Conselho', color: 'bg-subtle border border-line-strong', text: 'text-fg' },
+               { id: 'DP', label: 'Dep', color: 'bg-danger-subtle border border-danger-line', text: 'text-danger-fg' },
                { id: 'INF', badge: 'INF', label: 'Infrequente', color: 'bg-warning-subtle border border-warning-line', text: 'text-warning-fg' }
              ].map((item) => (
                <div key={item.id} className="flex items-center space-x-1.5" title={item.label}>
                  <span className={`w-5 h-5 rounded flex items-center justify-center text-xs font-medium ${item.color} ${(item as any).text || 'text-white'}`}>
                    {(item as any).badge || item.id}
                  </span>
-                 <span className="text-xs font-medium text-fg-muted uppercase">{item.label}</span>
+                 <span className="text-xs font-medium text-fg-muted">{item.label}</span>
                </div>
              ))}
           </div>
