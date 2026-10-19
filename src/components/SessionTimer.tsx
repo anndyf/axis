@@ -30,7 +30,7 @@ export default function SessionTimer() {
         
         <button
           onClick={resetTimer}
-          className="w-full bg-zinc-900 text-white font-semibold py-3 px-4 rounded-xl hover:bg-zinc-800 transition-all active:scale-95 shadow-card"
+          className="w-full bg-accent text-on-accent font-semibold py-3 px-4 rounded-xl hover:bg-accent-hover transition-all active:scale-95 shadow-card"
         >
           Continuar Conectado
         </button>

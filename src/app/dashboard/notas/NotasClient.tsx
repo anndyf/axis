@@ -40,7 +40,7 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
   ]
 
   return (
-    <div className="bg-zinc-50">
+    <div className="">
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
       <header className="mb-6 border-b border-line pb-4">
         <div className="max-w-7xl mx-auto py-4">
@@ -61,7 +61,7 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
             <div className="flex items-center gap-2">
               <Link 
                   href="/dashboard/notas/recuperacao"
-                  className="flex items-center gap-2 bg-zinc-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-zinc-800 transition-all text-xs active:scale-95 shadow-card"
+                  className="flex items-center gap-2 bg-accent text-on-accent px-6 py-3 rounded-lg font-medium hover:bg-accent-hover transition-all text-xs active:scale-95 shadow-card"
               >
                   <TrendingUp size={16} /> Lançar Recuperação Final
               </Link>

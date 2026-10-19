@@ -195,7 +195,7 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
   };
 
   return (
-    <div className="bg-zinc-50/50 pb-20">
+    <div className="pb-20">
       <TeacherTipsModal 
         storageKey="seen_tips_questoes"
         title="Dicas do Banco"

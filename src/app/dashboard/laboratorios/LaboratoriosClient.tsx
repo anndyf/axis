@@ -580,7 +580,7 @@ export default function LaboratoriosClient({
                     <button 
                       onClick={handleReserve}
                       disabled={submitting || (!isAdmin && (!selectedTurmaId || !selectedDisciplinaId))}
-                      className="flex-1 py-4 bg-zinc-900 text-white text-sm font-bold rounded-lg shadow-card hover:bg-zinc-800 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                      className="flex-1 py-4 bg-accent text-on-accent text-sm font-bold rounded-lg shadow-card hover:bg-accent-hover transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                        {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 size={18} />}
                        CONFIRMAR
@@ -639,7 +639,7 @@ export default function LaboratoriosClient({
                     <button 
                       onClick={handleSaveLab}
                       disabled={submitting || !formLab.nome}
-                      className="flex-1 py-4 bg-zinc-900 text-white text-sm font-bold rounded-lg shadow-card hover:bg-zinc-800 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                      className="flex-1 py-4 bg-accent text-on-accent text-sm font-bold rounded-lg shadow-card hover:bg-accent-hover transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                        {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 size={18} />}
                        {editingLabId ? 'ATUALIZAR' : 'CADASTRAR'}

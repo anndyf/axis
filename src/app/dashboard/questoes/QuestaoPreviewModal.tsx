@@ -100,7 +100,7 @@ export default function QuestaoPreviewModal({ questao, onClose, nomeEscola = 'Á
           </div>
           <button 
             onClick={onClose}
-            className="px-6 py-2 bg-zinc-800 text-white text-sm font-bold rounded-xl hover:bg-zinc-700 transition-colors"
+            className="px-6 py-2 bg-surface border border-line text-fg text-sm font-bold rounded-xl hover:bg-subtle transition-colors"
           >
             Fechar Visualização
           </button>

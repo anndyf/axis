@@ -38,7 +38,7 @@ export default function ErrorModal({ isOpen, onClose, title = "Atenção", messa
           <div className="mt-8">
             <button
               onClick={onClose}
-              className="w-full bg-zinc-900 text-white py-4 rounded-lg font-semibold text-sm flex items-center justify-center space-x-2 hover:bg-zinc-800 transition-all shadow-card"
+              className="w-full bg-accent text-on-accent py-4 rounded-lg font-semibold text-sm flex items-center justify-center space-x-2 hover:bg-accent-hover transition-all shadow-card"
             >
               <span>Entendido</span>
             </button>

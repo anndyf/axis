@@ -105,9 +105,9 @@ export default async function RelatorioTurmaPage({
   const isProfessorOnly = session.user.isStaff && !session.user.isDirecao && !session.user.isSuperuser
 
   return (
-    <div className="bg-zinc-100">
+    <div className="">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-zinc-300">
+      <header className="mb-6 border-b border-line pb-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -119,7 +119,7 @@ export default async function RelatorioTurmaPage({
                 <ArrowLeft className="w-5 h-5 text-fg-muted" />
               </Link>
               <div>
-                <h1 className="text-2xl font-medium text-accent-fg">
+                <h1 className="text-2xl font-medium text-fg">
                   {isProfessorOnly ? 'Relação de Estudantes' : 'Relatório da Turma'}
                 </h1>
                 <p className="text-sm text-fg-muted">{turma.nome}</p>
@@ -131,7 +131,7 @@ export default async function RelatorioTurmaPage({
                 href={`/api/relatorio/turma/${turma.id}/pdf`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center space-x-2 bg-zinc-700 text-white px-4 py-2 rounded-lg hover:bg-zinc-800 transition-all shadow-card"
+                className="flex items-center space-x-2 bg-surface border border-line text-fg px-4 py-2 rounded-lg hover:bg-subtle transition-all shadow-card"
               >
                 <Download className="w-5 h-5" />
                 <span>Baixar PDF Global</span>

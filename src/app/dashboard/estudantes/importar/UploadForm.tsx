@@ -238,15 +238,15 @@ export default function UploadForm({ turmas }: UploadFormProps) {
   }
 
   return (
-    <div className="bg-zinc-100">
-      <header className="bg-white shadow-sm border-b border-zinc-300">
+    <div className="">
+      <header className="mb-6 border-b border-line pb-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center space-x-4">
             <Link href="/dashboard/estudantes" className="p-2 hover:bg-zinc-200 rounded-lg transition-colors">
               <ArrowLeft className="w-5 h-5 text-fg-muted" />
             </Link>
             <div>
-              <h1 className="text-2xl font-medium text-accent-fg">Importar Estudantes</h1>
+              <h1 className="text-2xl font-medium text-fg">Importar Estudantes</h1>
               <p className="text-sm text-fg-muted">Importe via CSV ou PDF (Relação de Alunos)</p>
             </div>
           </div>
@@ -260,7 +260,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
               <FileType className="w-6 h-6 text-fg" />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-medium text-accent-fg mb-2">Instruções de Importação</h3>
+              <h3 className="text-lg font-medium text-fg mb-2">Instruções de Importação</h3>
               <div className="space-y-4 text-accent-fg text-sm">
                 <p>
                   Para importar vários alunos de uma vez, utilize o arquivo PDF <strong>"Relação de Estudantes na Turma"</strong> baixado diretamente do <strong>SIGEDUC</strong>.
@@ -453,7 +453,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
 
           {preview.length > 0 && (
             <div className="mb-6">
-              <h3 className="text-lg font-medium text-accent-fg mb-4">Preview ({preview.length} alunos)</h3>
+              <h3 className="text-lg font-medium text-fg mb-4">Preview ({preview.length} alunos)</h3>
               <div className="border border-zinc-300 rounded-lg overflow-hidden max-h-96 overflow-y-auto">
                 <table className="w-full">
                   <thead className="bg-zinc-100 border-b border-zinc-300 sticky top-0">
@@ -498,7 +498,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
               <Link href="/dashboard/estudantes" className="px-6 py-3 text-fg hover:bg-zinc-200 rounded-lg transition-colors">Cancelar</Link>
               <button 
                 type="submit" disabled={loading || preview.length === 0 || !manualTurma.trim()}
-                className={`flex items-center space-x-2 text-white px-6 py-3 rounded-lg transition-all shadow-card disabled:opacity-50 disabled:cursor-not-allowed ${syncMode ? ' bg-danger hover:bg-danger ' : ' bg-zinc-700 hover:bg-zinc-800'}`}
+                className={`flex items-center space-x-2 text-fg px-6 py-3 rounded-lg transition-all shadow-card disabled:opacity-50 disabled:cursor-not-allowed ${syncMode ? ' bg-danger hover:bg-danger ' : ' bg-surface border border-line hover:bg-subtle'}`}
               >
                 <Upload className="w-5 h-5" />
                 <span>{loading ? 'Importando...' : (syncMode ? 'Sincronizar Turma' : 'Importar Turma')}</span>

@@ -27,7 +27,7 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
   }, [turmas, filterCurso, filterTurno, filterNome])
 
   return (
-    <div className="bg-zinc-50">
+    <div className="">
 
 
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}

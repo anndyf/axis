@@ -163,7 +163,7 @@ export default function AEEDashboardClient({
   }
 
   return (
-    <div className="bg-zinc-50 pb-10 text-fg antialiased">
+    <div className="pb-10 text-fg antialiased">
       {/* Header Dinâmico */}
       <header className="mb-6 border-b border-line pb-4">
         <div className="max-w-7xl mx-auto py-4">
@@ -208,7 +208,7 @@ export default function AEEDashboardClient({
                {(activePanel === 'create' || (isDirecao && isEditing)) && (
                  <button 
                     onClick={handleSave} disabled={saving}
-                    className="flex items-center gap-2 bg-black text-white px-6 py-2 rounded-lg text-xs font-semibold hover:bg-zinc-800 transition-all disabled:opacity-50 shadow-sm"
+                    className="flex items-center gap-2 bg-accent text-on-accent px-6 py-2 rounded-lg text-xs font-semibold hover:bg-accent-hover transition-all disabled:opacity-50 shadow-sm"
                  >
                     {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                     {saving ? 'Gravando...' : 'Salvar Alterações'}

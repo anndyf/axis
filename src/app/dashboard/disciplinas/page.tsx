@@ -21,7 +21,7 @@ export default async function DisciplinasPage() {
   const disciplinas = await getDisciplinasPermitidas(session)
 
   return (
-    <div className="bg-zinc-50">
+    <div className="">
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
       <header className="mb-6 border-b border-line pb-4">
         <div className="max-w-7xl mx-auto py-4">
@@ -40,7 +40,7 @@ export default async function DisciplinasPage() {
             </div>
             <Link
               href="/dashboard/disciplinas/nova"
-              className={`flex items-center space-x-2 bg-zinc-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-zinc-800 transition-all text-xs active:scale-95 shadow-card ${!session.user.isSuperuser ? 'hidden' : ''}`}
+              className={`flex items-center space-x-2 bg-accent text-on-accent px-6 py-3 rounded-lg font-medium hover:bg-accent-hover transition-all text-xs active:scale-95 shadow-card ${!session.user.isSuperuser ? 'hidden' : ''}`}
             >
               <Plus size={16} />
               <span>Nova Disciplina</span>

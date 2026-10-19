@@ -120,7 +120,7 @@ export default function PlanoView({ planoId, onClose }: PlanoViewProps) {
         {/* Footer Compact */}
         <div className="p-4 border-t border-zinc-50 bg-white flex items-center justify-end gap-3 shrink-0">
             <button onClick={onClose} className="px-6 py-2 rounded-xl text-xs font-bold text-fg-subtle hover:bg-zinc-50 transition-all">Fechar</button>
-            <button onClick={handleDownload} className="px-8 py-2 bg-zinc-900 text-white rounded-xl text-xs font-bold shadow-card hover:bg-zinc-800 transition-all flex items-center gap-2 active:scale-95">
+            <button onClick={handleDownload} className="px-8 py-2 bg-accent text-on-accent rounded-xl text-xs font-bold shadow-card hover:bg-accent-hover transition-all flex items-center gap-2 active:scale-95">
                 <Download size={14} /> Exportar (PDF)
             </button>
         </div>

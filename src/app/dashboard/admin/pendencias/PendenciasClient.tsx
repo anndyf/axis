@@ -163,7 +163,7 @@ export default function PendenciasClient({
   ]
 
   return (
-    <div className="bg-zinc-50 p-4 sm:p-8">
+    <div className="p-4 sm:p-8">
       <div className="max-w-6xl mx-auto space-y-8">
         
         {/* Header */}

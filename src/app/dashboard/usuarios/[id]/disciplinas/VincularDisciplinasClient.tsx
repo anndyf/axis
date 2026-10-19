@@ -149,7 +149,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
               </Link>
               <button
                 onClick={handleSave} disabled={loading}
-                className="flex items-center space-x-2 bg-zinc-900 text-white px-6 py-3 rounded-xl font-medium text-sm hover:bg-zinc-800 shadow-card active:scale-95 transition-all disabled:opacity-50"
+                className="flex items-center space-x-2 bg-accent text-on-accent px-6 py-3 rounded-xl font-medium text-sm hover:bg-accent-hover shadow-card active:scale-95 transition-all disabled:opacity-50"
               >
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 <span>Salvar Alterações</span>

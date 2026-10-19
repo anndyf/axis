@@ -113,7 +113,7 @@ export default function PortalActivationAction({
                    <button 
                     onClick={handleCreate}
                     disabled={loading || !matricula}
-                    className="w-full bg-zinc-900 text-white py-4 rounded-lg font-bold text-xs hover:bg-zinc-800 transition-all flex items-center justify-center gap-2 shadow-card disabled:opacity-50"
+                    className="w-full bg-accent text-on-accent py-4 rounded-lg font-bold text-xs hover:bg-accent-hover transition-all flex items-center justify-center gap-2 shadow-card disabled:opacity-50"
                    >
                      {loading ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={16} />}
                      Ativar Acesso Agora

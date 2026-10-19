@@ -89,7 +89,7 @@ export default async function AuditoriaPage({
   }
 
   return (
-    <div className="bg-zinc-50 p-8">
+    <div className="p-8">
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* Header */}
@@ -144,7 +144,7 @@ export default async function AuditoriaPage({
               </select>
             </div>
             
-            <button type="submit" className="w-full md:w-auto px-6 py-4 bg-zinc-800 text-white rounded-lg text-sm font-medium hover:bg-zinc-700 transition-colors">
+            <button type="submit" className="w-full md:w-auto px-6 py-4 bg-surface border border-line text-fg rounded-lg text-sm font-medium hover:bg-subtle transition-colors">
               Filtrar
             </button>
             {entityFilter && <input type="hidden" name="entity" value={entityFilter} />}
@@ -156,7 +156,7 @@ export default async function AuditoriaPage({
             <Link 
               href={`/dashboard/auditoria?${userFilter ? `user=${userFilter}&` : ''}${query ? `q=${query}` : ''}`} 
               className={`px-4 py-2 rounded-xl text-xs font-medium border transition-all ${
-                !entityFilter ? 'bg-zinc-700 border-zinc-700 text-white' : 'border-zinc-300 text-fg-muted hover:bg-zinc-50'
+                !entityFilter ? 'bg-surface border border-line border-zinc-700 text-fg' : 'border-zinc-300 text-fg-muted hover:bg-zinc-50'
               }`}
             >
               Todos
@@ -166,7 +166,7 @@ export default async function AuditoriaPage({
                 key={filter} 
                 href={`/dashboard/auditoria?entity=${filter}${query ? `&q=${query}` : ''}${userFilter ? `&user=${userFilter}` : ''}`}
                 className={`px-4 py-2 rounded-xl text-xs font-medium border transition-all ${
-                  entityFilter === filter ? 'bg-zinc-700 border-zinc-700 text-white' : 'border-zinc-300 text-fg-muted hover:bg-zinc-50'
+                  entityFilter === filter ? 'bg-surface border border-line border-zinc-700 text-fg' : 'border-zinc-300 text-fg-muted hover:bg-zinc-50'
                 }`}
               >
                 {filter}

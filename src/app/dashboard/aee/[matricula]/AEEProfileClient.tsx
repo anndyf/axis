@@ -143,7 +143,7 @@ export default function AEEProfileClient({
           {isDirecao && (
             <button
               onClick={handleSave} disabled={loading}
-              className="flex items-center gap-2 bg-zinc-900 text-white px-6 py-2.5 rounded-lg font-bold text-sm hover:bg-zinc-800 shadow-card transition-all disabled:opacity-50"
+              className="flex items-center gap-2 bg-accent text-on-accent px-6 py-2.5 rounded-lg font-bold text-sm hover:bg-accent-hover shadow-card transition-all disabled:opacity-50"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               Salvar Alterações

@@ -130,7 +130,7 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
   }
 
   return (
-    <div className="bg-zinc-50">
+    <div className="">
       {/* Header Premium */}
       <header className="mb-6 border-b border-line pb-4">
         <div className="max-w-[1600px] mx-auto px-6 py-4">
@@ -187,7 +187,7 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
                 href={`/api/relatorio/status/${turma.id}/pdf`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center space-x-2 bg-zinc-700 text-white px-5 py-2.5 rounded-lg hover:bg-zinc-800 transition-all shadow-card active:scale-95 font-medium text-xs"
+                className="flex items-center space-x-2 bg-surface border border-line text-fg px-5 py-2.5 rounded-lg hover:bg-subtle transition-all shadow-card active:scale-95 font-medium text-xs"
               >
                 <Download className="w-4 h-4" />
                 <span>PDF</span>

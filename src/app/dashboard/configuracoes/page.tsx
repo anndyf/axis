@@ -69,7 +69,7 @@ export default function ConfiguracoesPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
-        <h1 className="text-3xl font-medium text-accent-fg flex items-center gap-3">
+        <h1 className="text-3xl font-medium text-fg flex items-center gap-3">
           <Shield className="text-fg-muted" />
           Configurações do Sistema
         </h1>
@@ -185,7 +185,7 @@ export default function ConfiguracoesPage() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="bg-zinc-700 hover:bg-zinc-800 disabled:opacity-50 text-white px-6 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-all shadow-card active:scale-95"
+            className="bg-surface border border-line hover:bg-subtle disabled:opacity-50 text-fg px-6 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-all shadow-card active:scale-95"
           >
             {saving ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

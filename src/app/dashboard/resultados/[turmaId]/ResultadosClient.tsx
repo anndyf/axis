@@ -228,7 +228,7 @@ export default function ResultadosTurmaClient({
   ]
 
   return (
-    <div className="bg-zinc-50">
+    <div className="">
       <TeacherTipsModal storageKey="seen_tips_resultados_v2" title="Novo Visual de Resultados" tips={resultTips} />
       
       {/* Header Premium */}

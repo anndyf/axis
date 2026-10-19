@@ -6,7 +6,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { Users, FileText, Pencil, Search, Filter, Copy, Loader2, X, Calendar } from "lucide-react"
-import { decodeTurma, getTurmaColor, getTurmaIcon } from "@/lib/turma-utils"
+import { decodeTurma, getTurmaIcon } from "@/lib/turma-utils"
 import ConfirmModal from "./ConfirmModal"
 import CloneTurmaModal from "./CloneTurmaModal"
 import PromoverTurmaModal from "./PromoverTurmaModal"
@@ -195,16 +195,11 @@ export default function TurmasListClient({
   return (
     <div className="space-y-4">
       {/* Top Row */}
-      <div className="flex flex-col md:flex-row items-center gap-4 bg-white p-2 rounded-xl border border-zinc-200 shadow-sm">
+      <div className="flex flex-col items-center gap-2 rounded-lg border border-line bg-surface p-1.5 shadow-card md:flex-row">
         {/* Total Badge */}
-        <div className="bg-zinc-900 rounded-lg py-2 px-4 flex items-center gap-3 shrink-0 self-stretch md:self-auto">
-          <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center">
-            <Users className="w-4 h-4 text-white" />
-          </div>
-          <div className="text-white pr-2">
-            <p className="text-xs font-semibold opacity-50 leading-none mb-1">Turmas</p>
-            <p className="text-lg font-semibold leading-none">{filteredTurmas.length}</p>
-          </div>
+        <div className="flex shrink-0 items-center gap-2 self-stretch px-3 md:self-auto">
+          <Users size={16} strokeWidth={1.75} className="text-fg-subtle" aria-hidden />
+          <p className="text-13 text-fg-muted"><span className="font-semibold tabular-nums text-fg">{filteredTurmas.length}</span> turmas</p>
         </div>
 
         {/* Search Input */}
@@ -242,11 +237,11 @@ export default function TurmasListClient({
           {(searchTerm || selectedTurno || selectedSerie || selectedCurso) && (
             <button 
               onClick={clearFilters}
-              className="flex items-center gap-2 px-4 py-2 bg-accent-subtle hover:bg-accent-subtle text-accent-fg rounded-xl transition-all group"
+              className="flex h-9 items-center gap-1.5 px-3 text-fg-muted hover:bg-subtle hover:text-fg rounded-md transition-colors duration-150"
               title="Limpar filtros"
             >
-              <X className="w-4 h-4 group-hover:rotate-90 transition-transform" />
-              <span className="text-xs font-semibold">Limpar</span>
+              <X className="w-4 h-4" strokeWidth={1.75} />
+              <span className="text-13 font-medium">Limpar</span>
             </button>
           )}
         </div>
@@ -258,42 +253,41 @@ export default function TurmasListClient({
            <p className="text-fg-subtle font-semibold text-sm">Nenhuma turma encontrada com esses filtros</p>
         </div>
       ) : (
-        <div className="space-y-12">
+        <div className="space-y-10">
           {turnosOrdenados.map(turno => (
-            <div key={turno} className="space-y-6">
-              <div className="flex items-center space-x-4">
-                <h2 className="text-sm font-medium text-black bg-white px-4 py-1 rounded-full shadow-sm border border-zinc-100">
+            <div key={turno} className="space-y-3">
+              <div className="flex items-center gap-3">
+                <h2 className="text-13 font-semibold text-fg">
                   {turno}
                 </h2>
-                <div className="h-px bg-zinc-200 flex-1"></div>
-                <span className="text-xs font-semibold text-fg-subtle bg-zinc-100 px-2 py-0.5 rounded uppercase">
-                  {turmasAgrupadas[turno].length} {turmasAgrupadas[turno].length === 1 ? 'Turma' : 'Turmas'}
+                <div className="h-px bg-line flex-1"></div>
+                <span className="text-xs tabular-nums text-fg-subtle">
+                  {turmasAgrupadas[turno].length} {turmasAgrupadas[turno].length === 1 ? 'turma' : 'turmas'}
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                 {turmasAgrupadas[turno].map((turma) => {
                   const decoded = decodeTurma(turma.nome)
                   const cursoExibicao = turma.curso || decoded.curso || "---"
-                  const colors = getTurmaColor(cursoExibicao)
                   const Icon = getTurmaIcon(cursoExibicao)
                   const isCloning = cloningId === turma.id
                   
                   return (
                     <div
                       key={turma.id}
-                      className="bg-white rounded-xl shadow-card border border-zinc-100 p-5 hover:shadow-card transition-all duration-300 flex flex-col"
+                      className="flex flex-col rounded-lg border border-line bg-surface p-4 shadow-card transition-colors duration-150 hover:border-line-strong"
                     >
                       <div className="flex items-start justify-between mb-5">
                         <div className="flex items-center space-x-4 min-w-0 flex-1">
-                          <div className={`w-11 h-11 ${colors.bg} rounded-xl flex items-center justify-center shrink-0 shadow-card ${colors.shadow}`}>
-                            <Icon className="w-6 h-6 text-white" />
+                          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-line bg-subtle text-fg-muted">
+                            <Icon size={16} strokeWidth={1.75} />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <h3 className="text-lg font-semibold text-black leading-none whitespace-nowrap truncate">
+                            <h3 className="text-base font-semibold text-fg leading-none whitespace-nowrap truncate">
                               {turma.nome}
                             </h3>
-                            <p className="text-xs text-black/40 font-semibold mt-1 whitespace-nowrap truncate">
+                            <p className="text-xs text-fg-subtle mt-1 whitespace-nowrap truncate">
                               {cursoExibicao}
                             </p>
                           </div>
@@ -303,7 +297,8 @@ export default function TurmasListClient({
                            <Link
                               href={`/dashboard/turmas/${turma.id}/relatorio`}
                               title="Relatório Geral"
-                              className="p-1 text-accent-fg hover:bg-accent-subtle rounded-lg transition-colors"
+                              aria-label="Relatório Geral"
+                              className="p-1.5 text-fg-subtle hover:bg-subtle hover:text-fg rounded-md transition-colors duration-150"
                            >
                              <FileText className="w-3.5 h-3.5" />
                            </Link>
@@ -311,7 +306,8 @@ export default function TurmasListClient({
                              <Link
                                 href={`/dashboard/turmas/${turma.id}/horario`}
                                 title="Horário de Aulas"
-                                className="p-1 text-accent-fg hover:bg-accent-subtle rounded-lg transition-colors"
+                                aria-label="Horário de Aulas"
+                                className="p-1.5 text-fg-subtle hover:bg-subtle hover:text-fg rounded-md transition-colors duration-150"
                              >
                                <Calendar className="w-3.5 h-3.5" />
                              </Link>
@@ -323,7 +319,8 @@ export default function TurmasListClient({
                                   onClick={() => handlePromoteClick(turma)}
                                   disabled={!!promotingId || !!cloningId}
                                   title="Promover para Próxima Etapa (Move Alunos)"
-                                  className="p-1 text-accent-fg hover:bg-accent-subtle rounded-lg transition-colors disabled:opacity-30"
+                                  aria-label="Promover para Próxima Etapa (Move Alunos)"
+                                  className="p-1.5 text-fg-subtle hover:bg-subtle hover:text-fg rounded-md transition-colors duration-150 disabled:opacity-30"
                                 >
                                   {promotingId === turma.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ArrowUpCircle className="w-3.5 h-3.5" />}
                                 </button>
@@ -331,7 +328,8 @@ export default function TurmasListClient({
                                   onClick={() => handleCloneClick(turma)}
                                   disabled={!!cloningId || !!promotingId}
                                   title="Clonar Estrutura (sem alunos)"
-                                  className="p-1 text-success-fg hover:bg-success-subtle rounded-lg transition-colors disabled:opacity-30"
+                                  aria-label="Clonar Estrutura (sem alunos)"
+                                  className="p-1.5 text-fg-subtle hover:bg-subtle hover:text-fg rounded-md transition-colors duration-150 disabled:opacity-30"
                                 >
                                   {cloningId === turma.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Copy className="w-3.5 h-3.5" />}
                                 </button>
@@ -342,7 +340,8 @@ export default function TurmasListClient({
                              <Link
                                 href={`/dashboard/turmas/${turma.id}/editar`}
                                 title="Editar Turma"
-                                className="p-1 text-fg-subtle hover:bg-zinc-100 hover:text-black rounded-lg transition-all"
+                                aria-label="Editar Turma"
+                                className="p-1.5 text-fg-subtle hover:bg-subtle hover:text-fg rounded-md transition-colors duration-150"
                              >
                                <Pencil className="w-3.5 h-3.5" />
                              </Link>
@@ -375,7 +374,7 @@ export default function TurmasListClient({
                           <p className="text-xs font-bold text-fg-subtle mb-2">Suas Disciplinas</p>
                           <div className="flex flex-wrap gap-1.5">
                             {turma.minhasDisciplinas.map((d: any) => (
-                              <span key={d.id} className="inline-flex items-center px-2 py-1 bg-accent-subtle text-accent-fg text-xs font-bold rounded-lg border border-accent/25">
+                              <span key={d.id} className="inline-flex items-center px-2 py-0.5 bg-subtle text-fg-muted text-xs font-medium rounded-md border border-line">
                                 {d.nome}
                               </span>
                             ))}

@@ -118,7 +118,7 @@ export default function RecuperacaoTurmaClient({
   }
 
   return (
-    <div className="bg-zinc-50">
+    <div className="">
       {/* Header Estilo Simulados */}
       <header className="mb-6 border-b border-line pb-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -139,7 +139,7 @@ export default function RecuperacaoTurmaClient({
               <button
                 onClick={handleSubmit}
                 disabled={saving}
-                className="flex items-center gap-2 bg-zinc-900 border border-zinc-900 text-white px-5 py-2.5 rounded-xl font-medium hover:bg-zinc-800 transition-all text-sm active:scale-95 shadow-card"
+                className="flex items-center gap-2 bg-accent border border-accent text-on-accent px-5 py-2.5 rounded-xl font-medium hover:bg-accent-hover transition-all text-sm active:scale-95 shadow-card"
               >
                 {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save size={16} />}
                 {saving ? 'SALVANDO...' : 'SALVAR RECUPERAÇÃO FINAL'}
@@ -318,7 +318,7 @@ export default function RecuperacaoTurmaClient({
                <button
                 onClick={handleSubmit}
                 disabled={saving || !hasUnsavedChanges()}
-                className="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white px-8 py-3 rounded-lg font-medium text-sm shadow-card transition-all active:scale-95 disabled:opacity-50"
+                className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-8 py-3 rounded-lg font-medium text-sm shadow-card transition-all active:scale-95 disabled:opacity-50"
               >
                 {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save size={18} />}
                 {saving ? 'SINCRONIZANDO...' : 'SALVAR RECUPERAÇÃO FINAL'}

@@ -341,7 +341,7 @@ const ManualSelectorModal = ({ isOpen, onClose, onSelect, questions, selectedIds
           </p>
           <button 
             onClick={onClose}
-            className="bg-zinc-900 text-white px-8 py-3 rounded-lg font-bold shadow-card active:scale-95 transition-all"
+            className="bg-accent text-on-accent px-8 py-3 rounded-lg font-bold shadow-card active:scale-95 transition-all"
           >
             Concluir Seleção
           </button>
@@ -1234,7 +1234,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                     {draftQuestions.length}
                   </div>
                   <div>
-                    <h3 className="font-bold text-accent-fg leading-tight text-sm">Rascunho Gerado</h3>
+                    <h3 className="font-bold text-fg leading-tight text-sm">Rascunho Gerado</h3>
                     <p className="text-accent-fg text-xs">Você pode trocar questões individuais ou baixar o PDF.</p>
                   </div>
                 </div>

@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Users, BookOpen, ChevronDown, ChevronUp, AlertCircle, FileText, X } from "lucide-react"
 import type { EtapaDaNota } from "@/lib/services/notas"
 import { formatarFrequencia } from "@/lib/services/frequencia"
+import { Avatar, Button, Stat } from "@/components/ui"
 
 export default function RelatorioClient({
   turma,
@@ -55,57 +56,36 @@ export default function RelatorioClient({
   }
 
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      
+    <main className="mx-auto max-w-7xl">
+
       {/* Botão para Modal de Professores */}
-      <div className="flex justify-end mb-6">
-        <button
-          onClick={() => setShowProfessorsModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-accent-subtle text-accent-fg hover:bg-accent-subtle rounded-lg font-semibold transition-colors border border-accent/25 shadow-sm"
-        >
-          <Users className="w-5 h-5" />
-          Ver Professores da Turma
-        </button>
+      <div className="mb-4 flex justify-end">
+        <Button variant="secondary" onClick={() => setShowProfessorsModal(true)}>
+          <Users size={16} strokeWidth={1.75} />
+          Professores da turma
+        </Button>
       </div>
 
       {/* Estatísticas - Apenas para Direção/Superuser */}
       {!isProfessorOnly && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-zinc-100 border border-zinc-300 rounded-xl p-6">
-            <p className="text-sm text-fg mb-1">Total de Estudantes</p>
-            <p className="text-3xl font-medium text-accent-fg">{totalEstudantes}</p>
-          </div>
-          <div className="bg-success-subtle border border-success-line rounded-xl p-6">
-            <p className="text-sm text-success-fg mb-1">Aprovados</p>
-            <p className="text-3xl font-medium text-success-fg">{totalAprovados}</p>
-          </div>
-          <div className="bg-warning-subtle border border-warning-line rounded-xl p-6">
-            <p className="text-sm text-warning-fg mb-1">Em Recuperação</p>
-            <p className="text-3xl font-medium text-warning-fg">{totalRecuperacao}</p>
-          </div>
-          <div className="bg-zinc-100 border border-zinc-300 rounded-xl p-6">
-            <p className="text-sm text-fg mb-1">Desistentes</p>
-            <p className="text-3xl font-medium text-accent-fg">{totalDesistentes}</p>
-          </div>
+        <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <Stat label="Estudantes" value={totalEstudantes} />
+          <Stat label="Aprovados" value={totalAprovados} />
+          <Stat label="Em recuperação" value={totalRecuperacao} />
+          <Stat label="Desistentes" value={totalDesistentes} />
         </div>
       )}
 
       {isProfessorOnly && (
-        <div className="mb-8 p-6 bg-accent-subtle border border-accent/25 rounded-lg flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-bold text-accent-fg">Contagem de Alunos</h2>
-            <p className="text-sm text-accent-fg">Total de estudantes matriculados nesta turma</p>
-          </div>
-          <div className="text-4xl font-semibold text-accent-fg pr-4">
-            {totalEstudantes}
-          </div>
+        <div className="mb-6 max-w-xs">
+          <Stat label="Estudantes matriculados" value={totalEstudantes} />
         </div>
       )}
 
       {/* Lista de Estudantes (Accordion) */}
       <div className="bg-white rounded-xl shadow-sm border border-zinc-300 overflow-hidden">
         <div className="px-6 py-4 bg-zinc-50 border-b border-zinc-300">
-          <h3 className="text-lg font-medium text-accent-fg">
+          <h3 className="text-lg font-medium text-fg">
             {isProfessorOnly ? 'Estudantes Matriculados' : 'Desempenho Detalhado dos Estudantes'}
           </h3>
         </div>
@@ -150,9 +130,7 @@ export default function RelatorioClient({
                   >
                     <div className="flex items-center gap-4 flex-1">
                       <span className="text-xs font-bold text-fg-subtle w-6">{index + 1}</span>
-                      <div className="w-10 h-10 bg-zinc-800 rounded-lg flex items-center justify-center text-white font-bold shadow-card shrink-0">
-                        {estudante.nome.charAt(0).toUpperCase()}
-                      </div>
+                      <Avatar nome={estudante.nome} />
                       <div className="flex-1">
                         <div className="text-sm font-bold text-fg">
                           {estudante.nome}

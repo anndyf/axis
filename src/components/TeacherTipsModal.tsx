@@ -115,7 +115,7 @@ export default function TeacherTipsModal({ storageKey, tips, title }: TeacherTip
             )}
             <button
               onClick={nextStep}
-              className={`flex-[2] py-4 px-6 rounded-lg text-sm font-semibold text-white transition-all flex items-center justify-center gap-2 shadow-card ${currentStep === tips.length - 1 ? "bg-success " : "bg-zinc-900 "}`}
+              className={`flex-[2] py-4 px-6 rounded-lg text-sm font-semibold text-on-accent transition-all flex items-center justify-center gap-2 shadow-card ${currentStep === tips.length - 1 ? "bg-accent " : "bg-accent "}`}
             >
               {currentStep === tips.length - 1 ? (
                 <>

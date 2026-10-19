@@ -179,7 +179,7 @@ export default async function EstudantesPage({
     .sort((a, b) => a.nome.localeCompare(b.nome))
 
   return (
-    <div className="bg-zinc-50">
+    <div className="">
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
       <header className="mb-6 border-b border-line pb-4">
         <div className="max-w-7xl mx-auto py-4">
@@ -212,14 +212,14 @@ export default async function EstudantesPage({
               <div className="hidden md:block w-px h-6 bg-zinc-300 mx-1" />
               <Link
                 href="/dashboard/estudantes/importar"
-                className="flex items-center justify-center space-x-2 bg-zinc-700 text-white px-3 md:px-4 py-2.5 rounded-lg hover:bg-zinc-800 transition-all shadow-sm text-sm font-medium"
+                className="flex items-center justify-center space-x-2 bg-surface border border-line text-fg px-3 md:px-4 py-2.5 rounded-lg hover:bg-subtle transition-all shadow-sm text-sm font-medium"
               >
                 <Upload className="w-4 h-4" />
                 <span className="whitespace-nowrap">Importar</span>
               </Link>
               <Link
                 href="/dashboard/estudantes/novo"
-                className="flex items-center justify-center space-x-2 bg-success text-white px-3 md:px-4 py-2.5 rounded-lg hover:bg-success transition-all shadow-sm text-sm font-medium"
+                className="flex items-center justify-center space-x-2 bg-accent text-on-accent px-3 md:px-4 py-2.5 rounded-lg hover:bg-accent-hover transition-all shadow-sm text-sm font-medium"
               >
                 <Plus className="w-4 h-4" />
                 <span className="whitespace-nowrap">Novo Aluno</span>
@@ -279,7 +279,7 @@ export default async function EstudantesPage({
                 <div className="flex justify-center gap-4">
                   <Link
                     href="/dashboard/estudantes/novo"
-                    className="inline-flex items-center space-x-2 bg-success text-white px-6 py-3 rounded-lg hover:bg-success transition-colors"
+                    className="inline-flex items-center space-x-2 bg-accent text-on-accent px-6 py-3 rounded-lg hover:bg-accent-hover transition-colors"
                   >
                     <Plus className="w-5 h-5" />
                     <span>Adicionar Estudante</span>

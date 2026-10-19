@@ -626,7 +626,7 @@ export default function LancarNotasTurmaClient({
                <button
                 onClick={handleSubmit}
                 disabled={saving || !hasUnsavedChanges()}
-                className="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white px-8 py-3 rounded-lg font-medium text-sm shadow-card transition-all active:scale-95 disabled:opacity-50"
+                className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-8 py-3 rounded-lg font-medium text-sm shadow-card transition-all active:scale-95 disabled:opacity-50"
               >
                 {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save size={18} />}
                 {saving ? 'SINCRONIZANDO...' : 'SALVAR NOTAS'}

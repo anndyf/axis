@@ -7,6 +7,7 @@ import {
   Shield, GraduationCap, PauseCircle, Clock, CheckCircle2,
   CheckCheck, Loader2, X, Users, Search, Filter, Accessibility
 } from "lucide-react"
+import { Avatar } from "@/components/ui"
 import UserActions from "./UserActions"
 
 interface Usuario {
@@ -122,13 +123,13 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
           onClick={() => setFiltroStatus('todos')}
           className={`p-4 rounded-lg border text-left transition-all ${
             filtroStatus === 'todos'
-              ? 'bg-zinc-900 border-zinc-900 text-white shadow-card '
+              ? 'bg-accent-subtle border-accent'
               : 'bg-white border-zinc-200 hover:border-zinc-300 hover:shadow-sm'
           }`}
         >
-          <Users className={`w-4 h-4 mb-2 ${filtroStatus === 'todos' ? 'text-white/60' : 'text-fg-subtle'}`} />
-          <p className={`text-2xl font-semibold leading-none ${filtroStatus === 'todos' ? 'text-white' : 'text-fg'}`}>{stats.total}</p>
-          <p className={`text-xs font-bold mt-1 ${filtroStatus === 'todos' ? 'text-white/60' : 'text-fg-subtle'}`}>Total</p>
+          <Users className={`w-4 h-4 mb-2 ${filtroStatus === 'todos' ? 'text-fg-muted' : 'text-fg-subtle'}`} />
+          <p className={`text-2xl font-semibold leading-none ${filtroStatus === 'todos' ? 'text-fg' : 'text-fg'}`}>{stats.total}</p>
+          <p className={`text-xs font-bold mt-1 ${filtroStatus === 'todos' ? 'text-fg-muted' : 'text-fg-subtle'}`}>Total</p>
         </button>
 
         {/* Ativos */}
@@ -136,13 +137,13 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
           onClick={() => setFiltroStatus('ativos')}
           className={`p-4 rounded-lg border text-left transition-all ${
             filtroStatus === 'ativos'
-              ? 'bg-success border-success text-white shadow-card '
+              ? 'bg-success-subtle border-success'
               : 'bg-white border-zinc-200 hover:border-success-line hover:shadow-sm'
           }`}
         >
-          <CheckCircle2 className={`w-4 h-4 mb-2 ${filtroStatus === 'ativos' ? 'text-white/70' : 'text-success-fg'}`} />
-          <p className={`text-2xl font-semibold leading-none ${filtroStatus === 'ativos' ? 'text-white' : 'text-fg'}`}>{stats.ativos}</p>
-          <p className={`text-xs font-bold mt-1 ${filtroStatus === 'ativos' ? 'text-white/60' : 'text-fg-subtle'}`}>Ativos</p>
+          <CheckCircle2 className={`w-4 h-4 mb-2 ${filtroStatus === 'ativos' ? 'text-fg-muted' : 'text-success-fg'}`} />
+          <p className={`text-2xl font-semibold leading-none ${filtroStatus === 'ativos' ? 'text-fg' : 'text-fg'}`}>{stats.ativos}</p>
+          <p className={`text-xs font-bold mt-1 ${filtroStatus === 'ativos' ? 'text-fg-muted' : 'text-fg-subtle'}`}>Ativos</p>
         </button>
 
         {/* Pendentes */}
@@ -150,16 +151,16 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
           onClick={() => setFiltroStatus('pendentes')}
           className={`p-4 rounded-lg border text-left transition-all relative ${
             filtroStatus === 'pendentes'
-              ? 'bg-warning border-warning text-white shadow-card '
+              ? 'bg-warning-subtle border-warning'
               : 'bg-white border-zinc-200 hover:border-warning-line hover:shadow-sm'
           }`}
         >
           {stats.pendentes > 0 && filtroStatus !== 'pendentes' && (
             <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-warning animate-ping" />
           )}
-          <Clock className={`w-4 h-4 mb-2 ${filtroStatus === 'pendentes' ? 'text-white/70' : 'text-warning-fg'}`} />
-          <p className={`text-2xl font-semibold leading-none ${filtroStatus === 'pendentes' ? 'text-white' : 'text-fg'}`}>{stats.pendentes}</p>
-          <p className={`text-xs font-bold mt-1 ${filtroStatus === 'pendentes' ? 'text-white/60' : 'text-fg-subtle'}`}>Pendentes</p>
+          <Clock className={`w-4 h-4 mb-2 ${filtroStatus === 'pendentes' ? 'text-fg-muted' : 'text-warning-fg'}`} />
+          <p className={`text-2xl font-semibold leading-none ${filtroStatus === 'pendentes' ? 'text-fg' : 'text-fg'}`}>{stats.pendentes}</p>
+          <p className={`text-xs font-bold mt-1 ${filtroStatus === 'pendentes' ? 'text-fg-muted' : 'text-fg-subtle'}`}>Pendentes</p>
         </button>
 
         {/* Pausados */}
@@ -271,18 +272,8 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
 
                   <td className="px-4 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-white font-medium text-lg shadow-card ${
-                        !usuario.isApproved
-                          ? 'bg-warning'
-                          : !usuario.isActive
-                            ? 'bg-zinc-300'
-                            : usuario.isSuperuser
-                              ? ' bg-zinc-500 '
-                              : ' bg-zinc-500'
-                      }`}>
-                        {usuario.name?.charAt(0).toUpperCase() || 'U'}
-                      </div>
-                      <div className="ml-4">
+                      <Avatar nome={usuario.name} className={!usuario.isActive ? 'opacity-50' : undefined} />
+                      <div className="ml-3">
                         <div className="flex items-center gap-2">
                           <div className={`text-sm font-medium tracking-tight ${!usuario.isActive ? 'text-fg-muted' : 'text-fg'}`}>
                             {usuario.name || 'Sem nome'}
@@ -381,23 +372,23 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
       {/* Barra flutuante de aprovação em massa */}
       {selectedIds.size > 0 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-slide-up">
-          <div className="flex items-center gap-4 bg-zinc-900 text-white px-5 py-3.5 rounded-lg shadow-card border border-white/10">
+          <div className="flex items-center gap-4 bg-elevated text-fg px-4 py-2.5 rounded-xl shadow-overlay border border-line">
             {/* Contagem */}
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-accent flex items-center justify-center text-xs font-semibold shrink-0">
+              <div className="w-6 h-6 rounded-full bg-accent text-on-accent flex items-center justify-center text-xs font-semibold tabular-nums shrink-0">
                 {selectedIds.size}
               </div>
-              <span className="text-sm font-semibold whitespace-nowrap">
+              <span className="text-13 font-medium whitespace-nowrap">
                 {selectedIds.size === 1 ? 'usuário selecionado' : 'usuários selecionados'}
               </span>
             </div>
 
-            <div className="w-px h-5 bg-white/20" />
+            <div className="w-px h-5 bg-line" />
 
             {/* Cancelar */}
             <button
               onClick={() => setSelectedIds(new Set())}
-              className="text-xs font-semibold text-white/50 hover:text-white transition-colors"
+              className="text-13 font-medium text-fg-muted hover:text-fg transition-colors duration-150"
             >
               Cancelar
             </button>
@@ -407,7 +398,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
               <button
                 onClick={handleAprovarEmMassa}
                 disabled={aprovando}
-                className="flex items-center gap-2 bg-success hover:bg-success text-white text-xs font-bold px-4 py-2 rounded-xl transition-all disabled:opacity-50 active:scale-95"
+                className="flex h-8 items-center gap-2 bg-accent hover:bg-accent-hover text-on-accent text-13 font-medium px-3 rounded-md transition-colors duration-150 disabled:opacity-50"
               >
                 {aprovando
                   ? <Loader2 size={14} className="animate-spin" />
@@ -424,18 +415,15 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
       {/* Toast de resultado */}
       {resultMsg && (
         <div className="fixed bottom-6 right-6 z-50 animate-slide-up">
-          <div className={`flex items-center gap-3 text-white px-5 py-3.5 rounded-lg shadow-card max-w-sm border ${
-            resultMsg.ok
-              ? 'bg-success border-success '
-              : 'bg-danger border-danger '
-          }`}>
-            <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
+          <div className={`flex items-center gap-3 bg-elevated text-fg px-4 py-3 rounded-lg shadow-overlay max-w-sm border border-line`} role="status">
+            <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${resultMsg.ok ? 'bg-success-subtle text-success-fg' : 'bg-danger-subtle text-danger-fg'}`}>
               {resultMsg.ok ? <CheckCheck size={16} /> : <X size={16} />}
             </div>
-            <p className="text-sm font-semibold leading-tight flex-1">{resultMsg.text}</p>
+            <p className="text-13 font-medium leading-tight flex-1">{resultMsg.text}</p>
             <button
               onClick={() => setResultMsg(null)}
-              className="shrink-0 text-white/60 hover:text-white transition-colors"
+              aria-label="Fechar aviso"
+              className="shrink-0 rounded-md p-1 text-fg-subtle hover:bg-subtle hover:text-fg transition-colors duration-150"
             >
               <X size={14} />
             </button>

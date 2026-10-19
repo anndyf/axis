@@ -157,7 +157,7 @@ export default function CloneTurmaModal({
             <button
               type="submit"
               disabled={loading || !nome}
-              className="flex-1 py-3 px-4 bg-success hover:bg-success text-white rounded-xl text-sm font-semibold shadow-card transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="flex-1 py-3 px-4 bg-accent hover:bg-accent-hover text-on-accent rounded-xl text-sm font-semibold shadow-card transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {loading ? <Loader2 size={18} className="animate-spin" /> : <Copy size={18} />}
               Confirmar Clone

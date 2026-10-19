@@ -155,7 +155,7 @@ export default function PlanosClient() {
   ]
 
   return (
-    <div className="bg-zinc-50">
+    <div className="">
       <TeacherTipsModal storageKey="seen_tips_planos_v1" title="Planos de Ensino" tips={planoTips} />
       
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}

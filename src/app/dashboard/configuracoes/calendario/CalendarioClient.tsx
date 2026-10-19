@@ -80,7 +80,7 @@ export default function CalendarioClient(props: Props) {
           <ArrowLeft className="w-5 h-5 text-fg-muted" />
         </Link>
         <div>
-          <h1 className="text-2xl font-medium text-accent-fg flex items-center gap-2">
+          <h1 className="text-2xl font-medium text-fg flex items-center gap-2">
             <CalendarDays className="w-6 h-6 text-fg-muted" /> Calendário letivo {props.anoLetivo}
           </h1>
           <p className="text-sm text-fg-muted">Base das aulas previstas e da frequência: dias letivos × horário das turmas.</p>

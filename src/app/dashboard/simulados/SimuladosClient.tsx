@@ -342,7 +342,7 @@ export default function SimuladosClient({
   ]
 
   return (
-    <div className="bg-zinc-50 print:bg-white print:min-h-0">
+    <div className="print:bg-white print:min-h-0">
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
       <header className="mb-6 border-b border-line pb-4 print:hidden">
         <div className="max-w-7xl mx-auto py-4">
@@ -364,7 +364,7 @@ export default function SimuladosClient({
               {(user.isSuperuser || user.isDirecao) && (
                 <Link 
                   href="/dashboard/simulados/responsaveis"
-                  className="flex items-center gap-2 bg-zinc-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-zinc-800 transition-all text-xs active:scale-95 shadow-card"
+                  className="flex items-center gap-2 bg-accent text-on-accent px-6 py-3 rounded-lg font-medium hover:bg-accent-hover transition-all text-xs active:scale-95 shadow-card"
                 >
                   <Users size={16} /> Designar Responsáveis
                 </Link>
@@ -724,7 +724,7 @@ export default function SimuladosClient({
                <button
                  onClick={handleSubmit}
                  disabled={saving || !hasUnsavedChanges()}
-                  className="w-full md:w-auto flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white px-8 py-3 rounded-lg font-medium text-xs shadow-card transition-all active:scale-95 disabled:opacity-50"
+                  className="w-full md:w-auto flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-8 py-3 rounded-lg font-medium text-xs shadow-card transition-all active:scale-95 disabled:opacity-50"
                >
                  {saving ? <Loader2 className="w-4 h-4 animate-spin text-white" /> : <Save size={16} />}
                  {saving ? 'SINCRONIZANDO...' : 'SALVAR RESULTADO'}

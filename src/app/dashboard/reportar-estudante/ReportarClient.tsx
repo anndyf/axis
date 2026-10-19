@@ -40,7 +40,7 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
 
   if (success) {
     return (
-      <div className="bg-zinc-50 p-4 sm:p-8 flex items-center justify-center">
+      <div className="p-4 sm:p-8 flex items-center justify-center">
         <div className="max-w-md w-full bg-white rounded-xl p-8 text-center shadow-card border border-zinc-100">
           <div className="w-20 h-20 bg-success-subtle text-success-fg rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 size={40} />
@@ -72,7 +72,7 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
   }
 
   return (
-    <div className="bg-zinc-50 p-4 sm:p-8">
+    <div className="p-4 sm:p-8">
       <div className="max-w-3xl mx-auto space-y-8">
         
         {/* Header */}

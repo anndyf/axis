@@ -448,7 +448,7 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
           </button>
           <button
             type="button" onClick={handleSubmit} disabled={loading}
-            className={`flex-1 text-white py-4 rounded-lg font-semibold text-sm flex items-center justify-center space-x-2 transition-all disabled:opacity-50 ${isEdit ? 'bg-warning hover:bg-warning' : 'bg-zinc-900 hover:bg-zinc-800'}`}
+            className={`flex-1 text-on-accent py-4 rounded-lg font-semibold text-sm flex items-center justify-center space-x-2 transition-all disabled:opacity-50 ${isEdit ? 'bg-warning hover:bg-warning' : 'bg-accent hover:bg-accent-hover'}`}
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
             <span>{isEdit ? 'Salvar Alterações' : 'Criar Esquema'}</span>

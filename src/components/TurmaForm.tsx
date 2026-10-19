@@ -280,7 +280,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                 <Layers className="w-3.5 h-3.5 text-white" />
               </div>
               <div>
-                <h4 className="text-xs font-semibold text-accent-fg mb-1">Modalidades</h4>
+                <h4 className="text-xs font-semibold text-fg mb-1">Modalidades</h4>
                 <p className="text-xs text-accent-fg font-medium leading-tight">
                   <b>EPTM:</b> Cursos integrados ao Médio.<br/>
                   <b>SUBSEQUENTE/PROEJA:</b> Módulos ou Semestres.

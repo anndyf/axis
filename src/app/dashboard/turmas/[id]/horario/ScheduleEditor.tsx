@@ -78,7 +78,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
   }
 
   return (
-    <div className="bg-zinc-50">
+    <div className="">
       <header className="mb-6 border-b border-line pb-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between gap-4">
@@ -99,7 +99,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
             <button
               onClick={handleSave}
               disabled={saving}
-              className="flex items-center gap-2 bg-zinc-900 text-white px-6 py-3 rounded-xl hover:bg-zinc-800 transition-all shadow-card active:scale-95 disabled:opacity-50"
+              className="flex items-center gap-2 bg-accent text-on-accent px-6 py-3 rounded-xl hover:bg-accent-hover transition-all shadow-card active:scale-95 disabled:opacity-50"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               <span className="text-xs font-medium">Salvar Alterações</span>
@@ -121,7 +121,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
             <Info className="w-5 h-5 text-fg-muted" />
           </div>
           <div>
-            <h4 className="text-sm font-medium text-accent-fg mb-1">Como preencher</h4>
+            <h4 className="text-sm font-medium text-fg mb-1">Como preencher</h4>
             <p className="text-xs text-fg-muted font-medium leading-relaxed">
               Selecione a <span className="font-medium">disciplina</span> de cada horário. O professor vem do vínculo da disciplina com a turma.
               Este horário, junto com o <Link href="/dashboard/configuracoes/calendario" className="underline">calendário letivo</Link>,

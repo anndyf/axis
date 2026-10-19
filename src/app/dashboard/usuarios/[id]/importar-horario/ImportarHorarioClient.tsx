@@ -109,7 +109,7 @@ export default function ImportarHorarioClient({
   const jaVinculadas = resultado?.encontrados.filter(e => e.jaVinculada) ?? []
 
   return (
-    <div className="bg-zinc-50">
+    <div className="">
       {/* Header */}
       <header className="mb-6 border-b border-line pb-4">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -132,7 +132,7 @@ export default function ImportarHorarioClient({
             <button
               onClick={handleImportar}
               disabled={importando}
-              className="flex items-center gap-2 bg-success hover:bg-success text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-card disabled:opacity-50 active:scale-95"
+              className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-5 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-card disabled:opacity-50 active:scale-95"
             >
               {importando
                 ? <Loader2 size={16} className="animate-spin" />
@@ -196,7 +196,7 @@ export default function ImportarHorarioClient({
               <button
                 onClick={handleVerificar}
                 disabled={!texto.trim() || verificando}
-                className="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all disabled:opacity-40 active:scale-95"
+                className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-5 py-2.5 rounded-xl font-semibold text-sm transition-all disabled:opacity-40 active:scale-95"
               >
                 {verificando
                   ? <Loader2 size={16} className="animate-spin" />

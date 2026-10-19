@@ -43,7 +43,7 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
   ]
 
   return (
-    <div className="bg-zinc-50">
+    <div className="">
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
       <header className="mb-6 border-b border-line pb-4">
         <div className="max-w-7xl mx-auto py-4">

@@ -229,7 +229,7 @@ export default function EstudanteForm({ estudante, isEdit = false }: EstudanteFo
               <button
                 type="submit"
                 disabled={loading}
-                className="flex items-center space-x-2 bg-success text-white px-6 py-3 rounded-lg hover:bg-success transition-all shadow-card disabled:opacity-50"
+                className="flex items-center space-x-2 bg-accent text-on-accent px-6 py-3 rounded-lg hover:bg-accent-hover transition-all shadow-card disabled:opacity-50"
               >
                 {loading ? (
                   <>

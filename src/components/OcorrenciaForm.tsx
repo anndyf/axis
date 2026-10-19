@@ -266,7 +266,7 @@ export default function OcorrenciaForm({
             type="button"
             onClick={handleSubmit}
             disabled={saving}
-            className="flex-3 py-4 bg-zinc-900 text-white text-sm font-bold rounded-lg shadow-card hover:bg-zinc-800 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3 px-10"
+            className="flex-3 py-4 bg-accent text-on-accent text-sm font-bold rounded-lg shadow-card hover:bg-accent-hover transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3 px-10"
           >
             {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save size={18} />}
             {saving ? 'SALVANDO...' : 'CONFIRMAR E REGISTRAR'}

@@ -58,7 +58,7 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
   }
 
   return (
-    <div className="bg-zinc-50">
+    <div className="">
       <header className="mb-6 border-b border-line pb-4">
         <div className="max-w-5xl mx-auto py-4 flex items-center justify-between">
           <div className="flex items-center space-x-5">
@@ -72,7 +72,7 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
           </div>
           <button
             onClick={abrirNovo}
-            className="flex items-center space-x-2 bg-zinc-900 text-white px-5 py-3 rounded-lg font-medium hover:bg-zinc-800 transition-all text-xs active:scale-95 shadow-card"
+            className="flex items-center space-x-2 bg-accent text-on-accent px-5 py-3 rounded-lg font-medium hover:bg-accent-hover transition-all text-xs active:scale-95 shadow-card"
           >
             <Plus size={16} />
             <span>Novo Esquema</span>
@@ -92,7 +92,7 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
             </p>
             <button
               onClick={abrirNovo}
-              className="inline-flex items-center space-x-2 bg-zinc-900 text-white px-8 py-4 rounded-lg hover:bg-zinc-800 transition-all font-medium text-xs shadow-card active:scale-95"
+              className="inline-flex items-center space-x-2 bg-accent text-on-accent px-8 py-4 rounded-lg hover:bg-accent-hover transition-all font-medium text-xs shadow-card active:scale-95"
             >
               <Plus size={16} />
               <span>Criar Esquema</span>

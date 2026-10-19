@@ -508,7 +508,7 @@ export default function MatrizCurricularClient({
                 <button
                   type="submit"
                   disabled={saving || !novoNome}
-                  className="w-full bg-zinc-900 border border-zinc-900 text-white font-semibold h-[60px] rounded-xl shadow-card transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95 text-sm"
+                  className="w-full bg-accent border border-accent text-on-accent font-semibold h-[60px] rounded-xl shadow-card transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95 text-sm"
                 >
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                   Lançar na Matriz
