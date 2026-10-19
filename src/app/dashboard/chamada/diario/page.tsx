@@ -87,7 +87,7 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
       <PageHeader
         title={`Diário de classe — ${acesso.disciplina?.nome ?? "Chamada diária"}`}
         description={`${turma.nome} · ${ano}`}
-        actions={<Link href="/dashboard/chamada" className={buttonClasses({ variant: "ghost" })}><ArrowLeft size={16} strokeWidth={1.75} /> Chamada</Link>}
+        actions={<Link href="/dashboard/chamada" className={buttonClasses({ variant: "ghost", className: "max-md:hidden" })}><ArrowLeft size={16} strokeWidth={1.75} /> Chamada</Link>}
       />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

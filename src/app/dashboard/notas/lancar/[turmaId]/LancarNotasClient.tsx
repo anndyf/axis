@@ -162,6 +162,10 @@ export default function LancarNotasTurmaClient({
     })
   }
 
+  // Teclado do celular (inputMode="decimal") pode mandar vírgula: vira ponto
+  const onNota = (estudanteId: string, unidadeId: string, atividadeId: string, valor: string, max?: number) =>
+    handleAtividadeChange(estudanteId, unidadeId, atividadeId, valor.replace(',', '.'), max)
+
   const handleDesistenteChange = (estudanteId: string, unidadeId: string, checked: boolean) => {
     setNotas(prev => {
       const base = prev[estudanteId] || estadoVazio(esquema)
@@ -325,7 +329,7 @@ export default function LancarNotasTurmaClient({
         description={`Turma ${turmaNome}`}
         actions={
           <>
-            <Link href="/dashboard/notas" className={buttonClasses({ variant: "ghost" })}><ArrowLeft size={16} strokeWidth={1.75} /> Turmas</Link>
+            <Link href="/dashboard/notas" className={buttonClasses({ variant: "ghost", className: "max-md:hidden" })}><ArrowLeft size={16} strokeWidth={1.75} /> Turmas</Link>
             {disciplinaSelecionada && (
               <a
                 href={`/api/relatorio/turma/${turmaId}/disciplina/${disciplinaSelecionada}/pdf`}
@@ -338,7 +342,7 @@ export default function LancarNotasTurmaClient({
               </a>
             )}
             {hasUnsavedChanges() && (
-              <Button onClick={handleSubmit} loading={saving}>
+              <Button onClick={handleSubmit} loading={saving} className="hidden md:inline-flex">
                 {!saving && <Save size={16} strokeWidth={1.75} />} {saving ? "Salvando…" : "Salvar notas"}
               </Button>
             )}
@@ -369,7 +373,7 @@ export default function LancarNotasTurmaClient({
 
         {/* Filtros Estilo Simulados */}
         <div className="bg-surface p-5 rounded-2xl shadow-sm border border-line flex flex-wrap gap-5 items-end">
-            <div className="flex-1 min-w-[300px] space-y-1.5">
+            <div className="flex-1 min-w-[min(100%,300px)] space-y-1.5">
                 <label className="text-sm font-medium text-fg-subtle ml-1">Disciplina</label>
                 <div className="relative">
                   <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-subtle" size={16} />
@@ -394,12 +398,12 @@ export default function LancarNotasTurmaClient({
 
         {/* Lançamento Estilo Simulados */}
         <div className="bg-surface rounded-2xl shadow-sm border border-line-strong overflow-hidden">
-          <div className="p-4 border-b border-line bg-canvas/10 flex items-center justify-between">
+          <div className="p-4 border-b border-line bg-canvas/10 flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-medium text-fg flex items-center gap-2">
               <Users size={20} className="text-fg-subtle" />
-              Matriz de Rendimento Acadêmico
+              <span className="hidden md:inline">Matriz de Rendimento Acadêmico</span><span className="md:hidden">Alunos</span>
             </h2>
-            <div className="relative max-w-xs w-full">
+            <div className="relative w-full md:max-w-xs">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-subtle" />
               <input
                 type="text"
@@ -429,7 +433,7 @@ export default function LancarNotasTurmaClient({
             </div>
           )}
 
-          <div className="overflow-x-auto">
+          <div className="hidden overflow-x-auto md:block">
             <table className="w-full text-left">
               <thead className="bg-canvas border-b border-line-strong">
                 {esquema && !isSimples ? (
@@ -535,7 +539,7 @@ export default function LancarNotasTurmaClient({
                               <td key={u.id} className="px-4 py-4 text-center">
                                 <div className="flex flex-col items-center gap-1.5 group relative">
                                   <input
-                                    type="number" step="0.1"
+                                    type="number" step="0.1" inputMode="decimal"
                                     value={val}
                                     onChange={(e) => atividade && handleAtividadeChange(estudante.matricula, u.id, atividade.id, e.target.value, atividade.notaMaxima)}
                                     className={`w-14 h-9 text-center border-2 rounded-xl text-base font-medium transition-all outline-none ${
@@ -574,7 +578,7 @@ export default function LancarNotasTurmaClient({
                                   <td key={a.id} className="px-2 py-4 text-center border-l border-line-subtle">
                                     <div className="flex flex-col items-center gap-1.5 group relative">
                                       <input
-                                        type="number" step="0.1"
+                                        type="number" step="0.1" inputMode="decimal"
                                         value={val}
                                         onChange={(e) => handleAtividadeChange(estudante.matricula, u.id, a.id, e.target.value, a.notaMaxima)}
                                         className={`w-14 h-9 text-center border-2 rounded-xl text-sm font-medium transition-all outline-none ${
@@ -620,8 +624,103 @@ export default function LancarNotasTurmaClient({
             </table>
           </div>
 
+          {/* Celular: um cartão por aluno, teclado numérico e salvar fixo no rodapé */}
+          <div className="md:hidden">
+            {loading ? (
+              <div className="flex flex-col items-center gap-2 px-4 py-12"><Loader2 className="size-8 animate-spin text-fg-muted" /><p className="text-sm text-fg-subtle">Carregando notas...</p></div>
+            ) : !disciplinaSelecionada ? (
+              <EmptyState icon={BarChart2} title="Escolha a disciplina" description="Selecione a disciplina acima para lançar as notas da turma." />
+            ) : filteredEstudantes.length === 0 ? (
+              <EmptyState icon={Search} title="Nenhum estudante encontrado" description="Confira o filtro por nome." />
+            ) : (
+              <ul className="space-y-3 p-3 pb-28">
+                {filteredEstudantes.map((estudante) => {
+                  const estado = notas[estudante.matricula] || estadoVazio(esquema)
+                  const media = calcularMedia(estudante.matricula)
+                  return (
+                    <li key={estudante.matricula} className="rounded-2xl border border-line bg-surface p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="min-w-0 flex-1">
+                          <p className="flex flex-wrap items-center gap-2 break-words text-base font-medium text-fg">
+                            {estudante.nome}
+                            {estudante.aeeProfile && (
+                              <Link href={`/dashboard/aee/${estudante.matricula}`} aria-label={estudante.aeeProfile.acknowledgements.length > 0 ? "Ficha AEE (lida)" : "Ficha AEE: leitura pendente"} className={`flex size-8 items-center justify-center rounded-full border-2 ${estudante.aeeProfile.acknowledgements.length > 0 ? 'border-success bg-success-subtle text-success-fg' : 'border-warning bg-warning-subtle text-warning-fg'}`}>
+                                <Accessibility className="size-4" />
+                              </Link>
+                            )}
+                          </p>
+                          <p className="font-mono text-xs text-fg-subtle">{estudante.matricula}</p>
+                        </div>
+                        <div className="shrink-0 text-right">
+                          <p className="text-xs text-fg-subtle">Média</p>
+                          <p className={`text-lg font-semibold tabular-nums ${getStatusColor(media)}`}>{media.texto}</p>
+                        </div>
+                      </div>
+                      <div className="mt-3 space-y-3">
+                        {(esquema?.unidades ?? []).map((u) => {
+                          const ue = estado[u.id] || { isDesistente: false, atividades: {} }
+                          const subtotal = isSimples ? null : calcularSubtotalUnidade(estudante.matricula, u)
+                          return (
+                            <fieldset key={u.id} className={`rounded-xl p-3 ${ue.isDesistente ? 'bg-warning-subtle' : 'bg-subtle'}`}>
+                              <legend className="sr-only">{u.nome}</legend>
+                              <div className="flex items-center gap-2">
+                                <span className="min-w-0 flex-1 text-13 font-medium text-fg">{u.nome}</span>
+                                {subtotal !== null && <span className={`text-13 font-semibold tabular-nums ${subtotal < 5 ? 'text-danger-fg' : 'text-fg-muted'}`}>Subtotal {subtotal.toFixed(1)}</span>}
+                                <button
+                                  type="button"
+                                  aria-pressed={ue.isDesistente}
+                                  onClick={() => handleDesistenteChange(estudante.matricula, u.id, !ue.isDesistente)}
+                                  className={`flex min-h-9 items-center gap-1 rounded-full px-3 text-xs font-medium ${ue.isDesistente ? 'bg-surface text-warning-fg' : 'text-fg-subtle'}`}
+                                >
+                                  <UserMinus size={14} aria-hidden /> Infrequente
+                                </button>
+                              </div>
+                              {u.atividades.length === 0 ? (
+                                <p className="mt-1 text-xs text-fg-subtle">Sem avaliação nesta unidade.</p>
+                              ) : (
+                                <div className="mt-2 grid grid-cols-[repeat(auto-fill,minmax(6.5rem,1fr))] gap-2">
+                                  {u.atividades.map((a) => {
+                                    const val = ue.atividades[a.id] ?? ''
+                                    const orig = originalNotas[estudante.matricula]?.[u.id]?.atividades[a.id] ?? ''
+                                    return (
+                                      <label key={a.id} className="block">
+                                        <span className="block truncate text-xs text-fg-subtle" title={a.nome}>{isSimples ? 'Nota' : a.nome} <span className="text-fg-disabled">(até {a.notaMaxima})</span></span>
+                                        <input
+                                          type="text"
+                                          inputMode="decimal"
+                                          autoComplete="off"
+                                          value={val}
+                                          onChange={(e) => onNota(estudante.matricula, u.id, a.id, e.target.value, a.notaMaxima)}
+                                          aria-label={`${u.nome}, ${a.nome}: nota de ${estudante.nome}`}
+                                          className={`mt-1 h-11 w-full rounded-lg border px-3 text-center text-base font-medium tabular-nums outline-none focus:border-accent focus:ring-3 focus:ring-ring/40 ${val !== orig && !saving ? 'border-accent bg-surface' : 'border-transparent bg-surface'}`}
+                                          placeholder="—"
+                                        />
+                                      </label>
+                                    )
+                                  })}
+                                </div>
+                              )}
+                            </fieldset>
+                          )
+                        })}
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
+            {disciplinaSelecionada && filteredEstudantes.length > 0 && (
+              <div className="fixed inset-x-0 bottom-[var(--barra-inferior)] z-30 border-t border-line bg-surface/95 px-4 pt-2 pb-3 backdrop-blur">
+                <p className="mb-2 text-center text-13 text-fg-muted" aria-live="polite">{hasUnsavedChanges() ? 'Há notas alteradas sem salvar' : 'Nenhuma alteração'}</p>
+                <Button onClick={handleSubmit} loading={saving} disabled={!hasUnsavedChanges()} className="h-12 w-full text-base">
+                  {!saving && <Save size={18} strokeWidth={1.75} />} {saving ? 'Salvando…' : 'Salvar notas'}
+                </Button>
+              </div>
+            )}
+          </div>
+
           {disciplinaSelecionada && filteredEstudantes.length > 0 && (
-            <div className="p-5 bg-canvas border-t border-line flex justify-end items-center gap-4">
+            <div className="hidden p-5 bg-canvas border-t border-line md:flex justify-end items-center gap-4">
               <div className="hidden md:block">
                  <p className="text-xs font-medium text-fg-subtle">Confira todas as notas antes de salvar o fechamento.</p>
               </div>
