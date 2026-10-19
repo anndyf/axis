@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* scripts/ (codemod, capturas) e docs/ não são telas: fora da varredura de classes */
+@source not "../../scripts";
+@source not "../../docs";
+
 /*
  * Design system do Áxis - tokens (PROGRESSO-VISUAL.md, fase 1).
  *
