@@ -1,51 +1,35 @@
-
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { logAudit } from '@/lib/audit'
+import { can } from '@/lib/rbac'
+import { resolverEsquemaAvaliacaoId, paraEsquemaConfig, type StatusNota } from '@/lib/services/notas'
 import {
-  calcularNotaUnidade,
-  calcularMediaFinal,
-  calcularStatus,
-  resolverEsquemaAvaliacaoId,
-  paraEsquemaConfig,
-  type EsquemaConfig,
-  type StatusNota,
-  type UnidadeInput,
-  type FormaCalculo,
-} from '@/lib/services/notas'
+  montarLancamentoAluno,
+  ErroLancamento,
+  type UnidadePayload,
+  type LancamentoAluno,
+} from '@/lib/services/lancamento-notas'
 
 export const runtime = 'nodejs'
-
-interface AtividadeInputPayload {
-  esquemaAtividadeId: string
-  valor: number | string | null
-}
-
-interface UnidadeInputPayload {
-  esquemaUnidadeId: string
-  notaRecuperacao?: number | string | null
-  isDesistente?: boolean
-  atividades: AtividadeInputPayload[]
-}
 
 interface NotaInputPayload {
   estudanteId: string // matrícula
   disciplinaId: string
-  unidades: UnidadeInputPayload[]
+  unidades: UnidadePayload[]
 }
 
-function parseNota(val: any): number | null {
-  if (val === undefined || val === null || val === '') return null
-  const parsed = parseFloat(String(val).replace(',', '.'))
-  return isNaN(parsed) ? null : parsed
-}
-
+/**
+ * Lança notas de um lote de alunos de UMA disciplina. Atômico: o lote é
+ * todo validado antes de gravar, e a gravação roda numa única transação -
+ * um item inválido (nota fora do limite, aluno de outra turma/escola,
+ * disciplina diferente) não salva nada.
+ */
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
 
-    if (!session?.user?.escolaId) {
+    if (!session?.user?.escolaId || !can(session.user, 'staff')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
     const escolaId = session.user.escolaId
@@ -56,250 +40,134 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Dados inválidos' }, { status: 400 })
     }
 
-    // Otimização: Obter informações da disciplina e turma uma única vez
-    // Assumindo que todas as notas no lote são da mesma disciplina (conforme o frontend envia)
     const disciplinaId = notas[0].disciplinaId
+    if (notas.some((n) => n.disciplinaId !== disciplinaId)) {
+      return NextResponse.json({ message: 'Um lançamento deve ser de uma única disciplina' }, { status: 400 })
+    }
 
-    const disciplina = await prisma.disciplina.findUnique({
+    const disciplina = await prisma.disciplina.findFirst({
       where: { id: disciplinaId, turma: { escolaId } },
       include: {
-        turma: { select: { cursoId: true, esquemaAvaliacaoId: true } }
-      }
+        turma: { select: { id: true, cursoId: true, esquemaAvaliacaoId: true } },
+        usuariosPermitidos: { where: { id: session.user.id }, select: { id: true } },
+      },
     })
 
     if (!disciplina) {
       return NextResponse.json({ message: 'Disciplina não encontrada' }, { status: 404 })
     }
+    // Professor só lança nas disciplinas dele; gestão lança em qualquer uma da escola
+    if (!can(session.user, 'gestao') && disciplina.usuariosPermitidos.length === 0) {
+      return NextResponse.json({ message: 'Você não leciona esta disciplina' }, { status: 403 })
+    }
 
-    const disciplineName = disciplina?.nome || 'Disciplina desconhecida'
-
-    // Resolve o esquema de avaliação da turma (override) ou do curso (padrão),
-    // populado desde a Fase 2 do modelo de avaliação configurável.
     const curso = disciplina.turma.cursoId
-      ? await prisma.curso.findUnique({ where: { id: disciplina.turma.cursoId }, select: { esquemaAvaliacaoId: true } })
+      ? await prisma.curso.findFirst({ where: { id: disciplina.turma.cursoId, escolaId }, select: { esquemaAvaliacaoId: true } })
       : null
     const esquemaId = resolverEsquemaAvaliacaoId(disciplina.turma, curso)
     if (!esquemaId) {
       return NextResponse.json({ message: 'Esquema de avaliação não configurado para esta turma' }, { status: 400 })
     }
-    const esquema = await prisma.esquemaAvaliacao.findUnique({
-      where: { id: esquemaId },
-      include: { unidades: { orderBy: { ordem: 'asc' }, include: { atividades: { orderBy: { ordem: 'asc' } } } } }
+    const esquema = await prisma.esquemaAvaliacao.findFirst({
+      where: { id: esquemaId, escolaId },
+      include: { unidades: { orderBy: { ordem: 'asc' }, include: { atividades: { orderBy: { ordem: 'asc' } } } } },
     })
     if (!esquema) {
       return NextResponse.json({ message: 'Esquema de avaliação inválido' }, { status: 400 })
     }
-    const esquemaConfig: EsquemaConfig = paraEsquemaConfig(esquema)
-    const casas = esquema.casasDecimais
+    const esquemaLancamento = {
+      config: paraEsquemaConfig(esquema),
+      notaMaxima: esquema.notaMaxima,
+      casasDecimais: esquema.casasDecimais,
+      unidades: esquema.unidades,
+    }
 
-    // Otimização: Buscar todos os estudantes do lote de uma vez para os logs de auditoria.
-    // O frontend envia a matricula (LancarNotasClient.tsx usa estudante.matricula como chave),
-    // mas "notas_finais.estudante_id" guarda o id tecnico desde a Migration 3b - precisa
-    // resolver matricula -> id antes de qualquer SELECT/UPDATE/INSERT na tabela.
+    // O frontend envia a matrícula; notas_finais.estudante_id guarda o id técnico.
+    // Só valem alunos da turma da disciplina, na escola da sessão.
     const matriculas = notas.map((n) => n.estudanteId)
     const estudantes = await prisma.estudante.findMany({
-      where: { escolaId, matricula: { in: matriculas } },
-      select: { id: true, matricula: true, nome: true }
+      where: { escolaId, turmaId: disciplina.turma.id, matricula: { in: matriculas } },
+      select: { id: true, matricula: true, nome: true },
     })
-    const studentNamesMap = new Map(estudantes.map((e) => [e.matricula, e.nome]))
-    const matriculaToIdMap = new Map(estudantes.map((e) => [e.matricula, e.id]))
-
-    const results: any[] = []
-
-    // Processar sequencialmente para evitar exaustão do pool de conexões
-    for (const notaData of notas) {
-      const { estudanteId, unidades: unidadesPayload } = notaData
-
-      // estudanteId aqui e a matricula (nome mantido por compatibilidade com o
-      // payload do frontend) - resolve para o id tecnico real da tabela estudantes.
-      const estudanteRealId = matriculaToIdMap.get(estudanteId)
-      if (!estudanteRealId) {
-        results.push({ skipped: true, estudanteId, error: 'Estudante não encontrado nesta escola' })
-        continue
-      }
-
-      const existing = await prisma.notaFinal.findUnique({
-        where: { estudanteId_disciplinaId: { estudanteId: estudanteRealId, disciplinaId } },
-        include: { unidades: { include: { atividades: true } } }
-      })
-      const existingUnidadeMap = new Map((existing?.unidades ?? []).map((u) => [u.esquemaUnidadeId, u]))
-
-      // Monta, pra cada unidade do esquema, o valor final de cada atividade -
-      // usa o que veio no payload, ou preserva o que já estava salvo se o
-      // campo vier vazio/ausente (mesmo comportamento do fluxo legado de
-      // nota1/nota2/nota3).
-      let algumCampoTocado = false
-      const unidadesParaSalvar: {
-        esquemaUnidadeId: string
-        isDesistente: boolean
-        notaRecuperacao: number | null
-        peso: number
-        formaCalculo: FormaCalculo
-        divisor: number | null
-        atividades: { esquemaAtividadeId: string; peso: number; valor: number | null }[]
-      }[] = []
-
-      for (const eu of esquema.unidades) {
-        const payloadUnidade = unidadesPayload?.find((u) => u.esquemaUnidadeId === eu.id)
-        const existingUnidade = existingUnidadeMap.get(eu.id)
-        const existingAtividadeMap = new Map((existingUnidade?.atividades ?? []).map((a) => [a.esquemaAtividadeId, a.valor]))
-
-        if (payloadUnidade) {
-          const temValor = payloadUnidade.atividades.some((a) => a.valor !== null && a.valor !== undefined && a.valor !== '')
-          if (temValor || payloadUnidade.isDesistente || payloadUnidade.notaRecuperacao !== undefined) {
-            algumCampoTocado = true
-          }
-        }
-
-        const isDesistente = payloadUnidade?.isDesistente ?? existingUnidade?.isDesistente ?? false
-        const notaRecuperacao = payloadUnidade
-          ? (parseNota(payloadUnidade.notaRecuperacao) ?? existingUnidade?.notaRecuperacao ?? null)
-          : (existingUnidade?.notaRecuperacao ?? null)
-
-        const atividadesFinal = eu.atividades.map((ea) => {
-          const payloadAtividade = payloadUnidade?.atividades.find((a) => a.esquemaAtividadeId === ea.id)
-          const valor = parseNota(payloadAtividade?.valor) ?? existingAtividadeMap.get(ea.id) ?? null
-          if (valor !== null && (valor < 0 || valor > ea.notaMaxima)) {
-            throw new Error(`Nota inválida para estudante ${estudanteId}: ${ea.nome} deve estar entre 0 e ${ea.notaMaxima}`)
-          }
-          return { esquemaAtividadeId: ea.id, peso: ea.peso, valor }
-        })
-
-        unidadesParaSalvar.push({
-          esquemaUnidadeId: eu.id,
-          peso: eu.peso,
-          formaCalculo: eu.formaCalculo,
-          divisor: eu.divisor,
-          isDesistente,
-          notaRecuperacao,
-          atividades: atividadesFinal
-        })
-      }
-
-      // Se nada foi de fato tocado neste lote para este estudante, ignora -
-      // evita reescrever um registro sem nenhuma mudança real.
-      if (!algumCampoTocado) {
-        results.push({ skipped: true, estudanteId })
-        continue
-      }
-
-      const targetName = studentNamesMap.get(estudanteId) || 'Estudante desconhecido'
-
-      const unidadesInput: UnidadeInput[] = unidadesParaSalvar.map((u) => ({
-        esquemaUnidadeId: u.esquemaUnidadeId,
-        peso: u.peso,
-        formaCalculo: u.formaCalculo,
-        divisor: u.divisor,
-        atividades: u.atividades.map((a) => ({ peso: a.peso, valor: a.valor })),
-        notaRecuperacao: u.notaRecuperacao,
-      }))
-      const resultado = calcularMediaFinal(unidadesInput, esquemaConfig)
-      const currentStatus = existing?.status as StatusNota | undefined
-      // Passa null pra recuperação final aqui de propósito: essa rota não
-      // mexe em recuperação final (isso é papel exclusivo de
-      // api/notas/recuperacao) - a proteção de STATUS_ESPECIAIS do motor
-      // já garante que uma aprovação por recuperação existente não regride
-      // por causa de uma edição de nota normal.
-      const finalStatus = calcularStatus(resultado, esquemaConfig, null, currentStatus)
-      const notaCalculadaFinal = resultado.media ?? 0
-
-      // Nota de cada etapa, na ordem do esquema - gravada em NotaUnidade
-      // abaixo. As colunas legadas nota_1/2/3 e is_desistente_unidN não são
-      // mais escritas: todos os leitores migraram para NotaUnidade
-      // (plano-avaliacao-frequencia.md, passo 4).
-      const notasEtapas = unidadesParaSalvar.map((u) => calcularNotaUnidade(u.atividades, u.formaCalculo, u.divisor, casas))
-      const notasEtapasAnteriores = esquema.unidades.map((eu) => existingUnidadeMap.get(eu.id)?.notaCalculada ?? null)
-
-      const dataComum = {
-        nota: notaCalculadaFinal,
-        status: finalStatus,
-      }
-
-      let notaId: string
-      if (existing) {
-        notaId = existing.id
-
-        await prisma.notaFinal.update({
-          where: { id: notaId },
-          data: { ...dataComum, modifiedById: session.user.id, modifiedAt: new Date() }
-        })
-
-        await logAudit(
-          session.user.id,
-          'NOTA',
-          notaId,
-          'UPDATE',
-          {
-            alvo: targetName,
-            disciplina: disciplineName,
-            anterior: { etapas: notasEtapasAnteriores, st: existing.status },
-            atual: { etapas: notasEtapas, st: finalStatus }
-          }
-        )
-
-        results.push({ id: notaId, updated: true })
-      } else {
-        const criada = await prisma.notaFinal.create({
-          data: { ...dataComum, estudanteId: estudanteRealId, disciplinaId, modifiedById: session.user.id }
-        })
-        notaId = criada.id
-
-        await logAudit(
-          session.user.id,
-          'NOTA',
-          notaId,
-          'INSERT',
-          {
-            alvo: targetName,
-            disciplina: disciplineName,
-            etapas: notasEtapas,
-            status: finalStatus
-          }
-        )
-
-        results.push({ id: notaId, created: true })
-      }
-
-      // Grava as etapas (NotaUnidade) e atividades (NotaAtividade) - fonte
-      // de verdade das notas por etapa.
-      for (const [i, u] of unidadesParaSalvar.entries()) {
-        const notaUnidade = await prisma.notaUnidade.upsert({
-          where: { notaFinalId_esquemaUnidadeId: { notaFinalId: notaId, esquemaUnidadeId: u.esquemaUnidadeId } },
-          update: {
-            notaCalculada: notasEtapas[i],
-            notaRecuperacao: u.notaRecuperacao,
-            isDesistente: u.isDesistente
-          },
-          create: {
-            notaFinalId: notaId,
-            esquemaUnidadeId: u.esquemaUnidadeId,
-            notaCalculada: notasEtapas[i],
-            notaRecuperacao: u.notaRecuperacao,
-            isDesistente: u.isDesistente
-          }
-        })
-
-        for (const a of u.atividades) {
-          await prisma.notaAtividade.upsert({
-            where: { notaUnidadeId_esquemaAtividadeId: { notaUnidadeId: notaUnidade.id, esquemaAtividadeId: a.esquemaAtividadeId } },
-            update: { valor: a.valor },
-            create: { notaUnidadeId: notaUnidade.id, esquemaAtividadeId: a.esquemaAtividadeId, valor: a.valor }
-          })
-        }
-      }
+    const porMatricula = new Map(estudantes.map((e) => [e.matricula, e]))
+    const naoEncontrado = matriculas.find((m) => !porMatricula.has(m))
+    if (naoEncontrado !== undefined) {
+      return NextResponse.json({ message: `Estudante ${naoEncontrado} não encontrado nesta turma` }, { status: 400 })
     }
 
-    return NextResponse.json({ message: 'Processamento concluído', count: results.length })
-  } catch (error: any) {
-    console.error('Erro crítico ao lançar notas:', error.message || error)
+    const existentes = await prisma.notaFinal.findMany({
+      where: { disciplinaId, estudanteId: { in: estudantes.map((e) => e.id) } },
+      include: { unidades: { include: { atividades: true } } },
+    })
+    const existentePorAluno = new Map(existentes.map((n) => [n.estudanteId, n]))
 
-    if (error.message?.startsWith('Nota inválida')) {
+    // 1) Valida e calcula o lote inteiro, sem gravar nada
+    const plano: { estudante: (typeof estudantes)[number]; lancamento: LancamentoAluno; existente: (typeof existentes)[number] | undefined }[] = []
+    for (const item of notas) {
+      const estudante = porMatricula.get(item.estudanteId)!
+      const existente = existentePorAluno.get(estudante.id)
+      const lancamento = montarLancamentoAluno(
+        esquemaLancamento,
+        item.unidades,
+        existente?.unidades ?? [],
+        existente?.status as StatusNota | undefined,
+        item.estudanteId
+      )
+      if (lancamento.tocado) plano.push({ estudante, lancamento, existente })
+    }
+
+    // 2) Grava tudo numa transação
+    const etapasAnteriores = (e: (typeof existentes)[number] | undefined) =>
+      esquema.unidades.map((eu) => e?.unidades.find((u) => u.esquemaUnidadeId === eu.id)?.notaCalculada ?? null)
+
+    const gravados = await prisma.$transaction(async (tx) => {
+      const ids: { notaId: string; criado: boolean }[] = []
+      for (const { estudante, lancamento, existente } of plano) {
+        const dados = { nota: lancamento.media, status: lancamento.status, modifiedById: session.user.id, modifiedAt: new Date() }
+        const notaId = existente
+          ? (await tx.notaFinal.update({ where: { id: existente.id }, data: dados })).id
+          : (await tx.notaFinal.create({ data: { ...dados, estudanteId: estudante.id, disciplinaId } })).id
+        ids.push({ notaId, criado: !existente })
+
+        for (const u of lancamento.unidades) {
+          const campos = { notaCalculada: u.notaCalculada, notaRecuperacao: u.notaRecuperacao, isDesistente: u.isDesistente }
+          const notaUnidade = await tx.notaUnidade.upsert({
+            where: { notaFinalId_esquemaUnidadeId: { notaFinalId: notaId, esquemaUnidadeId: u.esquemaUnidadeId } },
+            update: campos,
+            create: { notaFinalId: notaId, esquemaUnidadeId: u.esquemaUnidadeId, ...campos },
+          })
+          for (const a of u.atividades) {
+            await tx.notaAtividade.upsert({
+              where: { notaUnidadeId_esquemaAtividadeId: { notaUnidadeId: notaUnidade.id, esquemaAtividadeId: a.esquemaAtividadeId } },
+              update: { valor: a.valor },
+              create: { notaUnidadeId: notaUnidade.id, esquemaAtividadeId: a.esquemaAtividadeId, valor: a.valor },
+            })
+          }
+        }
+      }
+      return ids
+    }, { timeout: 30_000 })
+
+    // 3) Auditoria depois do commit (logAudit nunca derruba a operação)
+    for (const [i, { estudante, lancamento, existente }] of plano.entries()) {
+      const etapas = lancamento.unidades.map((u) => u.notaCalculada)
+      await logAudit(
+        session.user.id,
+        'NOTA',
+        gravados[i].notaId,
+        existente ? 'UPDATE' : 'INSERT',
+        existente
+          ? { alvo: estudante.nome, disciplina: disciplina.nome, anterior: { etapas: etapasAnteriores(existente), st: existente.status }, atual: { etapas, st: lancamento.status } }
+          : { alvo: estudante.nome, disciplina: disciplina.nome, etapas, status: lancamento.status }
+      )
+    }
+
+    return NextResponse.json({ message: 'Processamento concluído', count: gravados.length })
+  } catch (error: any) {
+    if (error instanceof ErroLancamento) {
       return NextResponse.json({ message: error.message }, { status: 400 })
     }
-
-    return NextResponse.json({
-      message: 'Erro ao processar notas',
-      error: error.message
-    }, { status: 500 })
+    console.error('Erro crítico ao lançar notas:', error?.message || error)
+    return NextResponse.json({ message: 'Erro ao processar notas' }, { status: 500 })
   }
 }
