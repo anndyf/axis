@@ -135,7 +135,7 @@ function ViewSection({ icon, title, content, full = false }: any) {
             <label className="text-xs font-bold text-fg-subtle ml-1 flex items-center gap-1.5">
                 {icon} {title}
             </label>
-            <div className="w-full p-4 bg-surface border border-line-subtle rounded-lg shadow-sm text-xs font-medium text-fg-muted leading-relaxed whitespace-pre-wrap">
+            <div className="w-full p-4 bg-surface border border-line-subtle rounded-2xl shadow-sm text-xs font-medium text-fg-muted leading-relaxed whitespace-pre-wrap">
                 {content}
             </div>
         </div>

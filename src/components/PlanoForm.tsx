@@ -126,7 +126,7 @@ export default function PlanoForm({ plano, onSuccess, onClose }: PlanoFormProps)
                <Users size={12} /> Turmas e Período
             </h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-surface p-4 rounded-lg border border-line-subtle shadow-sm">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-surface p-4 rounded-2xl border border-line-subtle shadow-sm">
               <div className="space-y-1.5 text-left">
                 <label className="text-xs font-bold text-fg-subtle ml-1">Disciplina</label>
                 <select 

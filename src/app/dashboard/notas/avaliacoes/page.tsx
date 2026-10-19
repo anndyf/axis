@@ -37,7 +37,7 @@ export default async function AvaliacoesPage({ searchParams }: { searchParams: P
     return (
       <div className="max-w-3xl mx-auto space-y-6 pb-16">
         {cabecalho("Minhas avaliações", "Provas, trabalhos e atividades de cada unidade, quando o esquema da turma deixa o professor definir.", "/dashboard/notas")}
-        <section className="bg-surface rounded-lg shadow-sm border border-line p-6 divide-y divide-line-subtle">
+        <section className="bg-surface rounded-2xl shadow-sm border border-line p-6 divide-y divide-line-subtle">
           {disciplinas.length === 0 && <p className="text-sm text-fg-subtle">Nenhuma disciplina.</p>}
           {disciplinas.map((d) => (
             <Link key={d.id} href={`/dashboard/notas/avaliacoes?disciplina=${d.id}`} className="flex items-center justify-between py-3 text-sm text-fg hover:text-accent-fg">
@@ -67,7 +67,7 @@ export default async function AvaliacoesPage({ searchParams }: { searchParams: P
     <div className="max-w-3xl mx-auto space-y-6 pb-16">
       {cabecalho(`Avaliações — ${disciplina.nome}`, `${disciplina.turma.nome}${esquema ? ` · ${esquema.nome}` : ""}`, "/dashboard/notas/avaliacoes")}
       {!porProfessor ? (
-        <p className="text-sm text-fg-muted bg-surface rounded-lg border border-line p-6">
+        <p className="text-sm text-fg-muted bg-surface rounded-2xl border border-line p-6">
           No esquema desta turma as atividades de cada unidade são definidas pela escola. Para o professor criar as próprias avaliações, a gestão precisa marcar &quot;Atividades definidas pelo professor&quot; no esquema de avaliação.
         </p>
       ) : (

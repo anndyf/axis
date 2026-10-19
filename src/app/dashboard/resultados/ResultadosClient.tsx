@@ -143,7 +143,7 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
                 <Link
                   key={turma.id}
                   href={`/dashboard/resultados/${turma.id}`}
-                  className="border border-line-strong rounded-lg p-4 hover:border-zinc-500 hover:bg-subtle transition-all group bg-surface shadow-sm hover:shadow-card h-full flex flex-col justify-between"
+                  className="border border-line-strong rounded-2xl p-4 hover:border-zinc-500 hover:bg-subtle transition-all group bg-surface shadow-sm hover:shadow-card h-full flex flex-col justify-between"
                 >
                   <div>
                     <h3 className="font-medium text-fg mb-3 group-hover:text-fg whitespace-nowrap truncate text-base tracking-tight" title={turma.nome}>

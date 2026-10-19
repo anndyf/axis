@@ -345,7 +345,7 @@ export default function AEEProfileClient({
             </div>
 
             {/* Contato de Emergência */}
-            <div className="bg-surface border border-line text-fg p-5 rounded-lg space-y-4">
+            <div className="bg-surface border border-line text-fg p-5 rounded-2xl space-y-4">
               <h2 className="text-xs font-semibold text-fg-subtle flex items-center gap-2">
                 <Phone className="w-3.5 h-3.5" />
                 Contato de Emergência

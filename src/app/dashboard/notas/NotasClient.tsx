@@ -76,7 +76,7 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
         {/* Dicas Fixas - Estilo Resultados */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {launchTips.map((tip, index) => (
-             <div key={index} className="bg-surface border border-line p-4 rounded-lg flex items-start gap-3">
+             <div key={index} className="bg-surface border border-line p-4 rounded-2xl flex items-start gap-3">
                 <div className={`p-3 rounded-lg bg-subtle text-fg-muted transition-all shadow-card`}>
                    {tip.icon}
                 </div>

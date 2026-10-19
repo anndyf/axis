@@ -533,7 +533,7 @@ export default function AEEDashboardClient({
                                {formData.cids.length > 0 ? formData.cids.map(code => {
                                   const cid = CIDS_AEE.find(c => c.code === code)
                                   return (
-                                     <div key={code} className="bg-canvas border border-line-subtle p-4 rounded-lg flex items-center gap-4 transition-all hover:bg-surface hover:border-line hover:shadow-card group">
+                                     <div key={code} className="bg-canvas border border-line-subtle p-4 rounded-2xl flex items-center gap-4 transition-all hover:bg-surface hover:border-line hover:shadow-card group">
                                         <div className="bg-subtle border border-line text-fg px-2.5 py-1 rounded-lg text-xs font-semibold shrink-0 shadow-sm">
                                            {code}
                                         </div>

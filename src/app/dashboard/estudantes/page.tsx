@@ -203,7 +203,7 @@ export default async function EstudantesPage({
         ) : undefined}
       />
 
-      <div className="bg-surface rounded-lg border border-line overflow-hidden">
+      <div className="bg-surface rounded-2xl border border-line overflow-hidden">
          <EstudantesFilter cursos={cursos} turmas={turmas} totalResults={estudantes.length} />
          {estudantes.length > 0 && (
            <p className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2 text-xs text-fg-subtle sm:px-5">
@@ -239,7 +239,7 @@ export default async function EstudantesPage({
               return acc
             }, {})
           ).sort(([a], [b]) => a.localeCompare(b)).map(([turmaNome, estudantesDaTurma]: [string, any]) => (
-            <section key={turmaNome} className="bg-surface rounded-lg border border-line overflow-hidden" aria-label={turmaNome}>
+            <section key={turmaNome} className="bg-surface rounded-2xl border border-line overflow-hidden" aria-label={turmaNome}>
               <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3 sm:px-5">
                 <h2 className="text-sm font-semibold text-fg">{turmaNome}</h2>
                 <span className="text-xs tabular-nums text-fg-subtle">{estudantesDaTurma.length} {estudantesDaTurma.length === 1 ? 'estudante' : 'estudantes'}</span>

@@ -160,7 +160,7 @@ export default function ResponsaveisClient({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Formulário lateral */}
         <div className="lg:col-span-1">
-          <div className="bg-surface rounded-lg shadow-sm border border-line-strong p-6 space-y-6 sticky top-24">
+          <div className="bg-surface rounded-2xl shadow-sm border border-line-strong p-6 space-y-6 sticky top-24">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-canvas rounded-lg">
                 <Plus className="w-5 h-5 text-fg-muted" />
@@ -255,7 +255,7 @@ export default function ResponsaveisClient({
 
         {/* Lista de Responsáveis */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="bg-surface rounded-lg shadow-sm border border-line-strong overflow-hidden">
+          <div className="bg-surface rounded-2xl shadow-sm border border-line-strong overflow-hidden">
             <div className="p-4 border-b border-line bg-canvas flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                <h3 className="font-medium text-fg">Professores Designados</h3>
                <div className="relative max-w-xs w-full">

@@ -1276,7 +1276,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
 
               <div className="space-y-4">
                 {draftQuestions.map((q, idx) => (
-                  <div key={`${q.id}-${idx}`} className="bg-surface border border-line-subtle rounded-lg p-6 shadow-sm group hover:border-accent/25 transition-all">
+                  <div key={`${q.id}-${idx}`} className="bg-surface border border-line-subtle rounded-2xl p-6 shadow-sm group hover:border-accent/25 transition-all">
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-semibold text-accent-fg">Questão {idx + 1} • {q.disciplinas[0]?.nome}</span>
@@ -1668,7 +1668,7 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
             </div>
           ) : (
             questoes.map((q: any, idx: number) => (
-              <div key={q.id} className="bg-surface p-6 rounded-lg border border-line-subtle shadow-sm">
+              <div key={q.id} className="bg-surface p-6 rounded-2xl border border-line-subtle shadow-sm">
                 <span className="text-xs font-semibold text-accent-fg mb-2 block">Questão {idx + 1}</span>
                 <div className="text-fg font-medium mb-4 leading-relaxed overflow-hidden break-words w-full" dangerouslySetInnerHTML={{ __html: q.enunciado }} />
                 {q.imagemUrl && (

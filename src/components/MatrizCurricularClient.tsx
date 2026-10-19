@@ -366,7 +366,7 @@ export default function MatrizCurricularClient({
                   </button>
 
                   {showCursoDropdown && (
-                    <div className="absolute z-40 top-full mt-1.5 w-full min-w-[260px] bg-surface border border-line-subtle rounded-lg shadow-overlay overflow-hidden">
+                    <div className="absolute z-40 top-full mt-1.5 w-full min-w-[260px] bg-surface border border-line-subtle rounded-2xl shadow-overlay overflow-hidden">
                       <div className="max-h-60 overflow-y-auto">
                         <button
                           type="button"
@@ -477,7 +477,7 @@ export default function MatrizCurricularClient({
 
         {/* Formulário de Lançamento em Lote */}
         {selectedCurso && (
-          <div className="bg-surface p-6 rounded-lg shadow-sm border border-line">
+          <div className="bg-surface p-6 rounded-2xl shadow-sm border border-line">
             <h2 className="text-base font-semibold text-fg mb-4 flex items-center gap-2">
                <Plus size={20} className="text-accent-fg" />
                Adicionar Disciplinas à Matriz
@@ -519,7 +519,7 @@ export default function MatrizCurricularClient({
         )}
 
         {/* Listagem da Matriz */}
-        <div className="bg-surface rounded-lg shadow-sm border border-line overflow-hidden">
+        <div className="bg-surface rounded-2xl shadow-sm border border-line overflow-hidden">
           <div className="p-4 border-b border-line-subtle bg-canvas/50 flex flex-col sm:flex-row items-center justify-between gap-4">
             <h2 className="text-lg font-semibold text-fg-muted flex items-center gap-2">
                <BookOpen size={20} className="text-fg-subtle" />

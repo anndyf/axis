@@ -401,7 +401,7 @@ export default function SimuladosClient({
         {/* Dicas Fixas - Estilo Resultados */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 print:hidden">
           {simuTips.map((tip, index) => (
-             <div key={index} className="bg-surface border border-line p-4 rounded-lg flex items-start gap-3">
+             <div key={index} className="bg-surface border border-line p-4 rounded-2xl flex items-start gap-3">
                 <div className={`p-3 rounded-lg bg-subtle text-fg-muted transition-all shadow-card`}>
                    {tip.icon}
                 </div>
@@ -507,7 +507,7 @@ export default function SimuladosClient({
         
         
         {/* Lançamento Estilo Resultados */}
-        <div className="bg-surface rounded-lg shadow-sm border border-line-strong overflow-hidden print:shadow-none print:border-none print:rounded-none">
+        <div className="bg-surface rounded-2xl shadow-sm border border-line-strong overflow-hidden print:shadow-none print:border-none print:rounded-none">
           <div className="p-4 border-b border-line bg-canvas/10 flex flex-col md:flex-row md:items-center justify-between gap-4 print:hidden">
             <div>
                <h2 className="text-lg font-medium text-fg flex items-center gap-2">
@@ -749,7 +749,7 @@ export default function SimuladosClient({
             </div>
             <div className="p-6 max-h-[60vh] overflow-y-auto space-y-3 bg-canvas/20 custom-scrollbar">
               {estudantes.filter(e => notasTemp[e.matricula] !== originalNotas[e.matricula]).map((est, i) => (
-                 <div key={i} className="flex items-center justify-between bg-surface p-3 rounded-lg border border-line shadow-sm">
+                 <div key={i} className="flex items-center justify-between bg-surface p-3 rounded-2xl border border-line shadow-sm">
                    <span className="text-sm font-medium text-fg-muted truncate pr-4">{est.nome}</span>
                    <div className="flex gap-2">
                       <span className="text-xs font-medium bg-canvas text-fg-muted px-2.5 py-1 rounded-lg border border-line">

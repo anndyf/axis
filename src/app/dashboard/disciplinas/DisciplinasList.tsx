@@ -98,7 +98,7 @@ export default function DisciplinasList({ disciplinas }: DisciplinasListProps) {
   return (
     <div className="space-y-6">
       {/* Filtros */}
-      <div className="bg-surface p-4 rounded-lg border border-line flex flex-col md:flex-row gap-3 md:items-end">
+      <div className="bg-surface p-4 rounded-2xl border border-line flex flex-col md:flex-row gap-3 md:items-end">
         <div className="flex-1 w-full space-y-1.5">
             <label htmlFor="disc-busca" className="text-xs font-medium text-fg-muted">Pesquisar</label>
             <div className="relative">
@@ -143,7 +143,7 @@ export default function DisciplinasList({ disciplinas }: DisciplinasListProps) {
             <div className="h-px flex-1 bg-line" aria-hidden />
           </div>
 
-          <div className="overflow-hidden rounded-lg border border-line bg-surface divide-y divide-line-subtle">
+          <div className="overflow-hidden rounded-2xl border border-line bg-surface divide-y divide-line-subtle">
             {Object.values(porTurno[turno])
             .sort((a, b) => a.turma.nome.localeCompare(b.turma.nome))
             .map(({ turma, disciplinas: discs }) => {
