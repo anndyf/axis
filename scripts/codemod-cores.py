@@ -254,6 +254,37 @@ def casca(texto, caminho):
 ALVO = re.compile(r'(?<![\w/-])(?:[a-z0-9\[\]&_-]+:)*(?:bg|text|border|ring|from|to|via|shadow|divide|outline|fill|stroke|accent|placeholder|decoration)-(?:blue|indigo|emerald|rose|amber|orange|purple|green|red|yellow|pink|violet|cyan|teal|sky|lime|fuchsia)-\d{2,3}')
 
 
+def cabecalhos(texto):
+    """Cabeçalho de página legado (<header> que a casca() já limpou): sem borda,
+    título 24/600, seta de voltar discreta (some no celular: a migalha da barra
+    superior já orienta) e ações que quebram linha em telas estreitas."""
+    def um(m):
+        h = m.group(0)
+        trocas = [
+            ('<header className="mb-6 border-b border-line pb-4">', '<header className="mb-6">'),
+            ('max-w-7xl mx-auto py-4', 'max-w-7xl mx-auto'),
+            ('className="flex items-center justify-between"', 'className="flex flex-wrap items-center justify-between gap-3"'),
+            ('flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0', 'flex flex-wrap items-center justify-between gap-3'),
+            ('flex items-center space-x-5', 'flex min-w-0 items-center gap-3'),
+            ('flex items-center space-x-4', 'flex min-w-0 items-center gap-3'),
+            ('<ArrowLeft size={20} />', '<ArrowLeft size={16} strokeWidth={1.75} />'),
+        ]
+        for a, b in trocas:
+            h = h.replace(a, b)
+        h = re.sub(r'className="p-2 hover:bg-zinc-200 rounded-lg transition-colors[^"]*"',
+                   'aria-label="Voltar" className="hidden sm:inline-flex p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg"', h)
+        h = re.sub(r'<h1 className="[^"]*"', '<h1 className="text-2xl font-semibold tracking-tight text-fg"', h)
+        h = re.sub(r'(</h1>\s*<p className=)"[^"]*"', r'\1"text-sm text-fg-muted"', h)
+        h = h.replace('py-4 flex items-center justify-between', 'flex flex-wrap items-center justify-between gap-3')
+        # ação primária do cabeçalho no tamanho padrão do Button (md)
+        h = re.sub(r'className="[^"]*\bbg-accent\b(?!-)[^"]*\btext-on-accent\b[^"]*"',
+                   'className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"', h)
+        h = re.sub(r'(hover:bg-accent-hover disabled:opacity-50"[^<]{0,80}?)<([A-Z]\w+) (?:className="w-[45] h-[45]"|size=\{(?:14|16|18|20)\})\s*/>',
+                   r'\1<\2 size={16} strokeWidth={1.75} />', h)
+        return h
+    return re.sub(r'<header className="mb-6(?: border-b border-line pb-4)?">[\s\S]*?</header>', um, texto)
+
+
 def arquivos(raiz):
     for p in Path(raiz).rglob('*'):
         if p.suffix in ('.tsx', '.ts') and '.test.' not in p.name and 'components/ui' not in str(p):
@@ -270,7 +301,7 @@ if __name__ == '__main__':
         if contar:
             total += len(ALVO.findall(texto))
             continue
-        novo = limpar_espacos(titulos(botoes(acabamento(sombras(casca(migrar(texto), str(p)))))))
+        novo = limpar_espacos(cabecalhos(titulos(botoes(acabamento(sombras(casca(migrar(texto), str(p))))))))
         if novo != texto:
             p.write_text(novo)
             mudados += 1
