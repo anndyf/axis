@@ -191,7 +191,7 @@ export default function PendenciasClient({
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-xl border border-zinc-200 shadow-sm flex items-center gap-5">
+          <div className="bg-surface p-6 rounded-xl border border-line shadow-sm flex items-center gap-5">
             <div className="w-14 h-14 bg-accent-subtle text-accent-fg rounded-lg flex items-center justify-center shrink-0">
               <FileText size={28} />
             </div>
@@ -201,7 +201,7 @@ export default function PendenciasClient({
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-xl border border-zinc-200 shadow-sm flex items-center gap-5">
+          <div className="bg-surface p-6 rounded-xl border border-line shadow-sm flex items-center gap-5">
             <div className="w-14 h-14 bg-danger-subtle text-danger-fg rounded-lg flex items-center justify-center shrink-0">
               <Clock size={28} />
             </div>
@@ -211,7 +211,7 @@ export default function PendenciasClient({
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-xl border border-zinc-200 shadow-sm flex items-center gap-5">
+          <div className="bg-surface p-6 rounded-xl border border-line shadow-sm flex items-center gap-5">
             <div className="w-14 h-14 bg-success-subtle text-success-fg rounded-lg flex items-center justify-center shrink-0">
               <CheckCircle2 size={28} />
             </div>
@@ -224,16 +224,16 @@ export default function PendenciasClient({
 
         {/* Filters and Search */}
         <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
-          <div className="flex bg-white p-1 rounded-lg border border-zinc-200 shadow-sm">
+          <div className="flex bg-surface p-1 rounded-lg border border-line shadow-sm">
             <button 
               onClick={() => updateFilters({ status: 'pendente' })}
-              className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${!serverFilters.showResolved ? 'bg-accent text-on-accent shadow-card' : 'text-fg-subtle hover:bg-zinc-50'}`}
+              className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${!serverFilters.showResolved ? 'bg-accent text-on-accent shadow-card' : 'text-fg-subtle hover:bg-canvas'}`}
             >
               Pendências
             </button>
             <button 
               onClick={() => updateFilters({ status: 'resolvido' })}
-              className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${serverFilters.showResolved ? 'bg-accent text-on-accent shadow-card' : 'text-fg-subtle hover:bg-zinc-50'}`}
+              className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${serverFilters.showResolved ? 'bg-accent text-on-accent shadow-card' : 'text-fg-subtle hover:bg-canvas'}`}
             >
               Histórico / Resolvidos
             </button>
@@ -250,7 +250,7 @@ export default function PendenciasClient({
                 if (e.key === 'Enter') updateFilters({ q: searchTerm })
               }}
               onBlur={() => updateFilters({ q: searchTerm })}
-              className="w-full bg-white border border-zinc-200 rounded-lg pl-12 pr-4 py-3.5 text-sm focus:ring-2 focus:ring-ring outline-none text-fg-muted font-medium transition-all shadow-sm"
+              className="w-full bg-surface border border-line rounded-lg pl-12 pr-4 py-3.5 text-sm focus:ring-2 focus:ring-ring outline-none text-fg-muted font-medium transition-all shadow-sm"
             />
             {isPending && (
               <div className="absolute right-4 top-1/2 -translate-y-1/2">
@@ -263,9 +263,9 @@ export default function PendenciasClient({
         {/* Grouped List */}
         <div className="space-y-8">
           {finalGroupedArray.length === 0 ? (
-            <div className="bg-white rounded-xl p-16 text-center border border-zinc-200 border-dashed">
-              <div className="w-20 h-20 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                <CheckCircle2 className="w-10 h-10 text-zinc-300" />
+            <div className="bg-surface rounded-xl p-16 text-center border border-line border-dashed">
+              <div className="w-20 h-20 bg-canvas rounded-full flex items-center justify-center mx-auto mb-6">
+                <CheckCircle2 className="w-10 h-10 text-fg-disabled" />
               </div>
               <h3 className="text-xl font-bold text-fg-muted">Nenhum chamado encontrado</h3>
               <p className="text-fg-subtle mt-2">
@@ -280,7 +280,7 @@ export default function PendenciasClient({
                   <div className="flex items-center gap-3">
                     <div className="w-1.5 h-6 bg-accent rounded-full"></div>
                     <h2 className="text-xl font-semibold text-fg">{group.nome}</h2>
-                    <span className="bg-zinc-200 text-fg-muted px-2 py-0.5 rounded-lg text-xs font-semibold">
+                    <span className="bg-subtle-hover text-fg-muted px-2 py-0.5 rounded-lg text-xs font-semibold">
                       {group.items.length} {group.items.length === 1 ? 'solicitação' : 'solicitações'}
                     </span>
                   </div>
@@ -300,7 +300,7 @@ export default function PendenciasClient({
                   {group.items.map((item) => {
                     const isExpanded = expandedPendencies.has(item.id)
                     return (
-                      <div key={item.id} className={`bg-white rounded-xl shadow-sm border border-zinc-200 overflow-hidden hover:shadow-card transition-all ${item.isResolved ? 'opacity-75 grayscale-[0.3]' : ''}`}>
+                      <div key={item.id} className={`bg-surface rounded-xl shadow-sm border border-line overflow-hidden hover:shadow-card transition-all ${item.isResolved ? 'opacity-75 grayscale-[0.3]' : ''}`}>
                         <div className="p-6 flex flex-col md:flex-row gap-6 items-start md:items-center">
                           <div className="flex-1 space-y-4">
                             <div className="flex flex-wrap items-center gap-3">
@@ -308,7 +308,7 @@ export default function PendenciasClient({
                                 <Clock size={14} /> {item.date}
                               </span>
                               {item.internalStatus && (
-                                <span className={`px-3 py-1 text-xs font-semibold rounded-lg border flex items-center gap-1.5 ${statusOptions.find(s => s.label === item.internalStatus)?.color || 'bg-zinc-100 text-fg-muted border-zinc-200'}`}>
+                                <span className={`px-3 py-1 text-xs font-semibold rounded-lg border flex items-center gap-1.5 ${statusOptions.find(s => s.label === item.internalStatus)?.color || 'bg-subtle text-fg-muted border-line'}`}>
                                   <Tag size={10} /> {item.internalStatus}
                                 </span>
                               )}
@@ -350,7 +350,7 @@ export default function PendenciasClient({
                           </div>
 
                           {!item.isResolved && (
-                            <div className="w-full md:w-auto shrink-0 border-t md:border-t-0 md:border-l border-zinc-100 pt-5 md:pt-0 md:pl-8 flex flex-col gap-3">
+                            <div className="w-full md:w-auto shrink-0 border-t md:border-t-0 md:border-l border-line-subtle pt-5 md:pt-0 md:pl-8 flex flex-col gap-3">
                               <button
                                 onClick={() => handleResolve(item.id)}
                                 disabled={resolvingId === item.id}
@@ -361,7 +361,7 @@ export default function PendenciasClient({
                               </button>
                               <button
                                 onClick={() => setReplyingTo(item)}
-                                className="w-full md:w-64 flex items-center justify-center gap-2 bg-white hover:bg-zinc-50 text-fg-muted border border-zinc-200 px-6 py-3.5 rounded-lg font-bold text-sm transition-all shadow-sm active:scale-95"
+                                className="w-full md:w-64 flex items-center justify-center gap-2 bg-surface hover:bg-canvas text-fg-muted border border-line px-6 py-3.5 rounded-lg font-bold text-sm transition-all shadow-sm active:scale-95"
                               >
                                 <MessageSquare className="w-5 h-5 text-accent-fg" />
                                 Responder Professor
@@ -376,7 +376,7 @@ export default function PendenciasClient({
                                       <select 
                                         value={item.internalStatus || ""}
                                         onChange={(e) => handleStatusUpdate(item.id, e.target.value || null)}
-                                        className="w-full bg-zinc-100 border-none rounded-xl px-3 py-2 text-xs font-bold text-fg-muted outline-none focus:ring-2 focus:ring-ring"
+                                        className="w-full bg-subtle border-none rounded-xl px-3 py-2 text-xs font-bold text-fg-muted outline-none focus:ring-2 focus:ring-ring"
                                       >
                                         <option value="">Sem Status</option>
                                         {statusOptions.map(opt => (
@@ -393,12 +393,12 @@ export default function PendenciasClient({
 
                         {/* Details and Conversation History */}
                         {isExpanded && (
-                          <div className="bg-zinc-50 border-t border-zinc-100 p-6 space-y-6 animate-slide-up">
+                          <div className="bg-canvas border-t border-line-subtle p-6 space-y-6 animate-slide-up">
                             {/* Original Observation */}
                             {item.observacao && (
                               <div className="space-y-2">
                                 <h4 className="text-xs font-semibold text-fg-subtle">Solicitação Original</h4>
-                                <div className="bg-white p-4 rounded-lg border border-zinc-200 text-sm text-fg-muted">
+                                <div className="bg-surface p-4 rounded-lg border border-line text-sm text-fg-muted">
                                   {item.observacao}
                                 </div>
                               </div>
@@ -412,10 +412,10 @@ export default function PendenciasClient({
                                 <div className="space-y-4">
                                   {item.replies.map((reply: any) => (
                                     <div key={reply.id} className="flex gap-3 items-start">
-                                      <div className="w-8 h-8 rounded-xl bg-white border border-zinc-200 flex items-center justify-center text-xs font-bold text-fg-subtle shrink-0">
+                                      <div className="w-8 h-8 rounded-xl bg-surface border border-line flex items-center justify-center text-xs font-bold text-fg-subtle shrink-0">
                                         {reply.sender.name?.charAt(0) || reply.sender.username.charAt(0)}
                                       </div>
-                                      <div className="bg-white p-4 rounded-lg border border-zinc-200 shadow-sm flex-1">
+                                      <div className="bg-surface p-4 rounded-lg border border-line shadow-sm flex-1">
                                         <div className="flex justify-between items-center mb-2">
                                           <span className="text-xs font-bold text-fg-muted">{reply.sender.name || reply.sender.username}</span>
                                           <span className="text-xs text-fg-subtle font-medium">{new Date(reply.createdAt).toLocaleString('pt-BR')}</span>
@@ -443,8 +443,8 @@ export default function PendenciasClient({
       {/* Reply Modal */}
       {replyingTo && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-[32px] w-full max-w-2xl shadow-overlay border border-zinc-100 overflow-hidden animate-pop-in">
-            <div className="px-8 py-6 flex items-center justify-between border-b bg-zinc-50/50 border-zinc-100">
+          <div className="bg-surface rounded-[32px] w-full max-w-2xl shadow-overlay border border-line-subtle overflow-hidden animate-pop-in">
+            <div className="px-8 py-6 flex items-center justify-between border-b bg-canvas/50 border-line-subtle">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 bg-accent-subtle text-accent-fg rounded-xl">
                   <MessageSquare size={20} />
@@ -456,7 +456,7 @@ export default function PendenciasClient({
               </div>
               <button 
                 onClick={() => setReplyingTo(null)} 
-                className="p-2 hover:bg-zinc-200/50 rounded-full transition-colors text-fg-subtle hover:text-fg-muted"
+                className="p-2 hover:bg-subtle-hover/50 rounded-full transition-colors text-fg-subtle hover:text-fg-muted"
               >
                 <X size={20} />
               </button>
@@ -484,7 +484,7 @@ export default function PendenciasClient({
                 <textarea
                   autoFocus
                   placeholder="Escreva aqui sua resposta para o professor..."
-                  className="w-full h-40 bg-zinc-50 border-2 border-zinc-100 rounded-lg p-5 text-sm font-medium text-fg-muted focus:border-accent focus:ring-0 outline-none transition-all placeholder:text-fg-subtle resize-none"
+                  className="w-full h-40 bg-canvas border-2 border-line-subtle rounded-lg p-5 text-sm font-medium text-fg-muted focus:border-accent focus:ring-0 outline-none transition-all placeholder:text-fg-subtle resize-none"
                   value={replyContent}
                   onChange={e => setReplyContent(e.target.value)}
                 />
@@ -493,7 +493,7 @@ export default function PendenciasClient({
               <div className="flex gap-3 pt-2">
                 <button
                   onClick={() => setReplyingTo(null)}
-                  className="flex-1 px-6 py-4 bg-zinc-100 text-fg-muted rounded-lg font-bold text-sm hover:bg-zinc-200 transition-all active:scale-95"
+                  className="flex-1 px-6 py-4 bg-subtle text-fg-muted rounded-lg font-bold text-sm hover:bg-subtle-hover transition-all active:scale-95"
                 >
                   Cancelar
                 </button>

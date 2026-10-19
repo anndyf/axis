@@ -116,7 +116,7 @@ export default function ImportarHorarioClient({
           <div className="flex items-center gap-4">
             <Link
               href={`/dashboard/usuarios/${usuario.id}/disciplinas`}
-              className="p-2 hover:bg-zinc-100 rounded-xl transition-colors"
+              className="p-2 hover:bg-subtle rounded-xl transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-fg-muted" />
             </Link>
@@ -160,21 +160,21 @@ export default function ImportarHorarioClient({
 
         {/* Área de cola */}
         {!sucesso && (
-          <div className="bg-white rounded-lg border border-zinc-200 shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-zinc-100 flex items-center justify-between">
+          <div className="bg-surface rounded-lg border border-line shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-line-subtle flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-accent-subtle rounded-lg flex items-center justify-center">
                   <ClipboardPaste className="w-4 h-4 text-accent-fg" />
                 </div>
                 <div>
                   <h2 className="text-sm font-bold text-fg">Cole o horário do professor</h2>
-                  <p className="text-xs text-fg-subtle">Formato: <code className="bg-zinc-100 px-1 rounded">TURMA(Disciplina)</code> — ex: <code className="bg-zinc-100 px-1 rounded">2TIM2(Inst Manu Computadores)</code></p>
+                  <p className="text-xs text-fg-subtle">Formato: <code className="bg-subtle px-1 rounded">TURMA(Disciplina)</code> — ex: <code className="bg-subtle px-1 rounded">2TIM2(Inst Manu Computadores)</code></p>
                 </div>
               </div>
               {texto && (
                 <button
                   onClick={() => { setTexto(""); setResultado(null); setErro(null) }}
-                  className="p-1.5 hover:bg-zinc-100 rounded-lg transition-colors"
+                  className="p-1.5 hover:bg-subtle rounded-lg transition-colors"
                 >
                   <RotateCcw size={14} className="text-fg-subtle" />
                 </button>
@@ -186,10 +186,10 @@ export default function ImportarHorarioClient({
               onChange={e => { setTexto(e.target.value); setResultado(null) }}
               placeholder={"2TIM2(Inst Manu Computadores)\n2TIM3(Inst Manu Computadores)\n2TNDV1(MATEMATICA)\n2TIN1E(INST MANUT COMPUTADORES)\n..."}
               rows={8}
-              className="w-full px-6 py-4 font-mono text-sm text-fg-muted bg-zinc-50/50 focus:outline-none focus:bg-white resize-none transition-colors"
+              className="w-full px-6 py-4 font-mono text-sm text-fg-muted bg-canvas/50 focus:outline-none focus:bg-surface resize-none transition-colors"
             />
 
-            <div className="px-6 py-4 border-t border-zinc-100 flex items-center justify-between">
+            <div className="px-6 py-4 border-t border-line-subtle flex items-center justify-between">
               <p className="text-xs text-fg-subtle">
                 {texto.match(/\w+\([^)]+\)/g)?.length ?? 0} par(es) identificado(s) no texto
               </p>
@@ -220,7 +220,7 @@ export default function ImportarHorarioClient({
           <div className="space-y-4">
             {/* Resumo */}
             <div className="grid grid-cols-3 gap-3">
-              <div className="bg-white rounded-lg border border-zinc-200 p-4 text-center">
+              <div className="bg-surface rounded-lg border border-line p-4 text-center">
                 <p className="text-2xl font-semibold text-fg">{resultado.totalPares}</p>
                 <p className="text-xs font-bold text-fg-subtle mt-1">Pares lidos</p>
               </div>
@@ -228,7 +228,7 @@ export default function ImportarHorarioClient({
                 <p className="text-2xl font-semibold text-success-fg">{resultado.encontrados.length}</p>
                 <p className="text-xs font-bold text-success-fg mt-1">Encontrados</p>
               </div>
-              <div className={`rounded-lg border p-4 text-center ${resultado.naoEncontrados.length > 0 ? 'bg-danger-subtle border-danger-line' : 'bg-zinc-50 border-zinc-200'}`}>
+              <div className={`rounded-lg border p-4 text-center ${resultado.naoEncontrados.length > 0 ? 'bg-danger-subtle border-danger-line' : 'bg-canvas border-line'}`}>
                 <p className={`text-2xl font-semibold ${resultado.naoEncontrados.length > 0 ? 'text-danger-fg' : 'text-fg-subtle'}`}>
                   {resultado.naoEncontrados.length}
                 </p>
@@ -238,8 +238,8 @@ export default function ImportarHorarioClient({
 
             {/* Novas para vincular */}
             {novasParaVincular.length > 0 && (
-              <div className="bg-white rounded-lg border border-zinc-200 shadow-sm overflow-hidden">
-                <div className="px-6 py-4 border-b border-zinc-100 flex items-center justify-between">
+              <div className="bg-surface rounded-lg border border-line shadow-sm overflow-hidden">
+                <div className="px-6 py-4 border-b border-line-subtle flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-success-fg" />
                     <h3 className="text-sm font-bold text-fg">
@@ -259,12 +259,12 @@ export default function ImportarHorarioClient({
                     {confirmados.size === novasParaVincular.length ? 'Desmarcar todos' : 'Marcar todos'}
                   </button>
                 </div>
-                <div className="divide-y divide-zinc-100">
+                <div className="divide-y divide-line-subtle">
                   {novasParaVincular.map((e, i) => (
                     <label
                       key={i}
                       className={`flex items-center gap-4 px-6 py-3.5 cursor-pointer transition-colors ${
-                        confirmados.has(e.discId) ? 'bg-success-subtle' : 'hover:bg-zinc-50'
+                        confirmados.has(e.discId) ? 'bg-success-subtle' : 'hover:bg-canvas'
                       }`}
                     >
                       <input
@@ -274,7 +274,7 @@ export default function ImportarHorarioClient({
                         className="w-4 h-4 rounded accent-[var(--success)] cursor-pointer"
                       />
                       <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-xs font-semibold text-fg-subtle bg-zinc-100 px-2 py-1 rounded-lg font-mono">
+                        <span className="text-xs font-semibold text-fg-subtle bg-subtle px-2 py-1 rounded-lg font-mono">
                           {e.turmaCode}
                         </span>
                       </div>
@@ -286,7 +286,7 @@ export default function ImportarHorarioClient({
                           </p>
                         )}
                       </div>
-                      <CheckCircle2 className={`w-4 h-4 shrink-0 ${confirmados.has(e.discId) ? 'text-success-fg' : 'text-zinc-200'}`} />
+                      <CheckCircle2 className={`w-4 h-4 shrink-0 ${confirmados.has(e.discId) ? 'text-success-fg' : 'text-fg-disabled'}`} />
                     </label>
                   ))}
                 </div>
@@ -295,17 +295,17 @@ export default function ImportarHorarioClient({
 
             {/* Já vinculadas */}
             {jaVinculadas.length > 0 && (
-              <div className="bg-white rounded-lg border border-zinc-200 overflow-hidden">
-                <div className="px-6 py-4 border-b border-zinc-100 flex items-center gap-2">
+              <div className="bg-surface rounded-lg border border-line overflow-hidden">
+                <div className="px-6 py-4 border-b border-line-subtle flex items-center gap-2">
                   <BookOpen className="w-4 h-4 text-accent" />
                   <h3 className="text-sm font-bold text-fg">
                     Já vinculadas ({jaVinculadas.length})
                   </h3>
                 </div>
-                <div className="divide-y divide-zinc-100">
+                <div className="divide-y divide-line-subtle">
                   {jaVinculadas.map((e, i) => (
                     <div key={i} className="flex items-center gap-4 px-6 py-3 opacity-60">
-                      <span className="text-xs font-semibold text-fg-subtle bg-zinc-100 px-2 py-1 rounded-lg font-mono">
+                      <span className="text-xs font-semibold text-fg-subtle bg-subtle px-2 py-1 rounded-lg font-mono">
                         {e.turmaCode}
                       </span>
                       <p className="text-sm text-fg-muted flex-1">{e.discNomeBanco}</p>
@@ -320,7 +320,7 @@ export default function ImportarHorarioClient({
 
             {/* Não encontrados */}
             {resultado.naoEncontrados.length > 0 && (
-              <div className="bg-white rounded-lg border border-danger-line overflow-hidden">
+              <div className="bg-surface rounded-lg border border-danger-line overflow-hidden">
                 <div className="px-6 py-4 border-b border-danger-line flex items-center gap-2">
                   <XCircle className="w-4 h-4 text-danger" />
                   <h3 className="text-sm font-bold text-fg">
@@ -344,7 +344,7 @@ export default function ImportarHorarioClient({
                               </p>
                               <div className="flex flex-wrap gap-1">
                                 {n.sugestoes.map((s, j) => (
-                                  <span key={j} className="text-xs bg-zinc-100 text-fg-muted px-2 py-0.5 rounded-lg">
+                                  <span key={j} className="text-xs bg-subtle text-fg-muted px-2 py-0.5 rounded-lg">
                                     {s}
                                   </span>
                                 ))}

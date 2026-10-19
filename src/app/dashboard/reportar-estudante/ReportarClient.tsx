@@ -41,7 +41,7 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
   if (success) {
     return (
       <div className="p-4 sm:p-8 flex items-center justify-center">
-        <div className="max-w-md w-full bg-white rounded-xl p-8 text-center shadow-card border border-zinc-100">
+        <div className="max-w-md w-full bg-surface rounded-xl p-8 text-center shadow-card border border-line-subtle">
           <div className="w-20 h-20 bg-success-subtle text-success-fg rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 size={40} />
           </div>
@@ -55,7 +55,7 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
                 setSuccess(false)
                 setForm({ turmaId: "", nome: "", matricula: "", observacao: "" })
               }}
-              className="px-6 py-3 bg-zinc-100 text-fg-muted font-medium rounded-xl hover:bg-zinc-200 transition-all"
+              className="px-6 py-3 bg-subtle text-fg-muted font-medium rounded-xl hover:bg-subtle-hover transition-all"
             >
               Reportar Outro Aluno
             </button>
@@ -92,7 +92,7 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
         </div>
 
         {/* Form */}
-        <div className="bg-white p-6 sm:p-8 rounded-xl shadow-sm border border-zinc-200">
+        <div className="bg-surface p-6 sm:p-8 rounded-xl shadow-sm border border-line">
           <form onSubmit={handleSubmit} className="space-y-6">
             
             {error && (
@@ -107,7 +107,7 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
                 required
                 value={form.turmaId}
                 onChange={e => setForm(p => ({ ...p, turmaId: e.target.value }))}
-                className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-ring focus:border-accent outline-none transition-all text-fg-muted appearance-none"
+                className="w-full bg-canvas border border-line rounded-xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-ring focus:border-accent outline-none transition-all text-fg-muted appearance-none"
               >
                 <option value="" disabled>Selecione a turma...</option>
                 {turmas.map(t => (
@@ -124,7 +124,7 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
                 value={form.nome}
                 onChange={e => setForm(p => ({ ...p, nome: e.target.value }))}
                 placeholder="Ex: Maria Clara Silva Oliveira"
-                className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-ring focus:border-accent outline-none transition-all text-fg-muted"
+                className="w-full bg-canvas border border-line rounded-xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-ring focus:border-accent outline-none transition-all text-fg-muted"
               />
             </div>
 
@@ -137,7 +137,7 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
                   value={form.matricula}
                   onChange={e => setForm(p => ({ ...p, matricula: e.target.value }))}
                   placeholder="Informe a matrícula"
-                  className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-ring focus:border-accent outline-none transition-all text-fg-muted"
+                  className="w-full bg-canvas border border-line rounded-xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-ring focus:border-accent outline-none transition-all text-fg-muted"
                 />
               </div>
 
@@ -149,7 +149,7 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
                   value={form.observacao}
                   onChange={e => setForm(p => ({ ...p, observacao: e.target.value }))}
                   placeholder="Ex: Aluno novo no sistema"
-                  className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-ring focus:border-accent outline-none transition-all text-fg-muted"
+                  className="w-full bg-canvas border border-line rounded-xl px-4 py-3.5 text-sm focus:ring-2 focus:ring-ring focus:border-accent outline-none transition-all text-fg-muted"
                 />
                 
                 {/* Sugestões de Motivos */}
@@ -165,7 +165,7 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
                       key={motivo}
                       type="button"
                       onClick={() => setForm(p => ({ ...p, observacao: motivo }))}
-                      className="text-xs font-bold bg-zinc-100 hover:bg-accent-subtle hover:text-accent-fg text-fg-subtle px-3 py-1.5 rounded-lg border border-zinc-200 hover:border-accent/25 transition-all cursor-pointer"
+                      className="text-xs font-bold bg-subtle hover:bg-accent-subtle hover:text-accent-fg text-fg-subtle px-3 py-1.5 rounded-lg border border-line hover:border-accent/25 transition-all cursor-pointer"
                     >
                       {motivo}
                     </button>
@@ -174,7 +174,7 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
               </div>
             </div>
 
-            <div className="pt-6 border-t border-zinc-100 flex justify-end">
+            <div className="pt-6 border-t border-line-subtle flex justify-end">
               <button
                 type="submit"
                 disabled={submitting || !form.turmaId || !form.nome}

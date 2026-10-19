@@ -167,7 +167,7 @@ export default function RecuperacaoTurmaClient({
         </div>
 
         {/* Filtros Estilo Simulados */}
-        <div className="bg-white p-5 rounded-lg shadow-sm border border-zinc-200 flex flex-wrap gap-5 items-end">
+        <div className="bg-surface p-5 rounded-lg shadow-sm border border-line flex flex-wrap gap-5 items-end">
             <div className="flex-1 min-w-[300px] space-y-1.5">
                 <label className="text-sm font-medium text-fg-subtle ml-1">Disciplina Alvo</label>
                 <div className="relative">
@@ -175,7 +175,7 @@ export default function RecuperacaoTurmaClient({
                   <select
                     value={disciplinaSelecionada}
                     onChange={(e) => setDisciplinaSelecionada(e.target.value)}
-                    className="w-full bg-zinc-50 border-none rounded-xl pl-11 pr-4 py-3 text-base focus:ring-2 focus:ring-danger/30 transition-all font-medium appearance-none cursor-pointer"
+                    className="w-full bg-canvas border-none rounded-xl pl-11 pr-4 py-3 text-base focus:ring-2 focus:ring-danger/30 transition-all font-medium appearance-none cursor-pointer"
                   >
                     <option value="">Selecione a disciplina para recuperação final...</option>
                     {disciplinas.map((disc) => <option key={disc.id} value={disc.id}>{disc.nome}</option>)}
@@ -196,8 +196,8 @@ export default function RecuperacaoTurmaClient({
         </div>
 
         {/* Lançamento Estilo Simulados */}
-        <div className="bg-white rounded-lg shadow-sm border border-zinc-300 overflow-hidden">
-          <div className="p-4 border-b border-zinc-200 bg-zinc-50/10 flex items-center justify-between">
+        <div className="bg-surface rounded-lg shadow-sm border border-line-strong overflow-hidden">
+          <div className="p-4 border-b border-line bg-canvas/10 flex items-center justify-between">
             <h2 className="text-lg font-medium text-fg flex items-center gap-2">
                <Users size={20} className="text-fg-subtle" />
                Painel de Recuperação Final
@@ -209,7 +209,7 @@ export default function RecuperacaoTurmaClient({
                 placeholder="Filtrar por nome..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-white border border-zinc-300 rounded-lg pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-danger/30 focus:border-danger transition-all shadow-sm"
+                className="w-full bg-surface border border-line-strong rounded-lg pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-danger/30 focus:border-danger transition-all shadow-sm"
               />
             </div>
           </div>
@@ -223,7 +223,7 @@ export default function RecuperacaoTurmaClient({
 
           <div className="overflow-x-auto">
             <table className="w-full text-left">
-              <thead className="bg-zinc-50 border-b border-zinc-300">
+              <thead className="bg-canvas border-b border-line-strong">
                 <tr>
                   <th className="px-6 py-4 text-xs font-medium text-fg-subtle w-12 text-center">#</th>
                   <th className="px-6 py-4 text-xs font-medium text-fg-subtle">Estudante</th>
@@ -233,17 +233,17 @@ export default function RecuperacaoTurmaClient({
                   <th className="px-6 py-4 text-xs font-medium text-fg-subtle w-32 text-center">Resultado</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-200/80">
+              <tbody className="divide-y divide-line/80">
                 {!disciplinaSelecionada ? (
                    <tr>
-                      <td colSpan={6} className="px-6 py-16 text-center text-zinc-300">
+                      <td colSpan={6} className="px-6 py-16 text-center text-fg-disabled">
                         <TrendingDown className="w-12 h-12 opacity-20 mx-auto mb-3" />
                         <p className="text-sm font-medium">Selecione uma disciplina para iniciar</p>
                       </td>
                    </tr>
                 ) : filteredNotas.length === 0 ? (
                    <tr>
-                      <td colSpan={6} className="px-6 py-16 text-center text-zinc-300">
+                      <td colSpan={6} className="px-6 py-16 text-center text-fg-disabled">
                         <Search className="w-12 h-12 opacity-20 mx-auto mb-3" />
                         <p className="text-sm font-medium">Nenhum estudante sob recuperação final nesta disciplina</p>
                       </td>
@@ -263,7 +263,7 @@ export default function RecuperacaoTurmaClient({
                     }
 
                     return (
-                       <tr key={nota.id} className="hover:bg-zinc-50 transition-colors">
+                       <tr key={nota.id} className="hover:bg-canvas transition-colors">
                         <td className="px-6 py-4 text-sm text-fg-subtle font-medium text-center">{index + 1}</td>
                         <td className="px-6 py-4">
                           <div className="flex flex-col">
@@ -286,14 +286,14 @@ export default function RecuperacaoTurmaClient({
                             disabled={isFaltou || nota.status === 'DESISTENTE'}
                             onChange={(e) => handleNotaChange(nota.id, e.target.value)}
                              className={`w-16 h-9 text-center border-2 rounded-xl text-base font-medium transition-all outline-none ${
-                                 isFaltou || nota.status === 'DESISTENTE' ? 'bg-zinc-200 border-zinc-200 text-zinc-300 pointer-events-none' : 
-                                 isModified ? 'border-danger bg-white ring-4 ring-danger/30 shadow-sm' : 'border-zinc-200 bg-zinc-50 focus:bg-white focus:border-danger'
+                                 isFaltou || nota.status === 'DESISTENTE' ? 'bg-subtle-hover border-line text-fg-disabled pointer-events-none' : 
+                                 isModified ? 'border-danger bg-surface ring-4 ring-danger/30 shadow-sm' : 'border-line bg-canvas focus:bg-surface focus:border-danger'
                              }`}
                              placeholder={nota.status === 'DESISTENTE' ? "-" : "0.0"}
                           />
                         </td>
                         <td className="px-4 py-4 text-center">
-                           <input type="checkbox" checked={isFaltou} onChange={(e) => toggleNaoRealizou(nota.id, e.target.checked)} className="w-5 h-5 text-danger-fg border-zinc-300 rounded-lg cursor-pointer transition-all active:scale-90" />
+                           <input type="checkbox" checked={isFaltou} onChange={(e) => toggleNaoRealizou(nota.id, e.target.checked)} className="w-5 h-5 text-danger-fg border-line-strong rounded-lg cursor-pointer transition-all active:scale-90" />
                         </td>
                         <td className="px-6 py-4 text-center">
                             <span className={`inline-block whitespace-nowrap px-3 py-1 rounded-full text-xs font-medium border ${
@@ -311,7 +311,7 @@ export default function RecuperacaoTurmaClient({
           </div>
 
           {disciplinaSelecionada && filteredNotas.length > 0 && (
-            <div className="p-5 bg-zinc-50 border-t border-zinc-200 flex justify-end items-center gap-4">
+            <div className="p-5 bg-canvas border-t border-line flex justify-end items-center gap-4">
               <div className="hidden md:block">
                  <p className="text-xs font-medium text-fg-subtle">Confirme o lançamento para substituir a média anual automática.</p>
               </div>
@@ -330,8 +330,8 @@ export default function RecuperacaoTurmaClient({
 
       {showConfirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-xl shadow-overlay w-full max-w-md overflow-hidden animate-pop-in border border-white">
-            <div className="px-6 py-5 border-b border-zinc-200 flex justify-between items-center bg-zinc-50">
+          <div className="bg-surface rounded-xl shadow-overlay w-full max-w-md overflow-hidden animate-pop-in border border-white">
+            <div className="px-6 py-5 border-b border-line flex justify-between items-center bg-canvas">
               <div className="flex items-center gap-3">
                  <div className="w-10 h-10 bg-danger text-white rounded-xl flex items-center justify-center shadow-card"><TrendingUp size={20}/></div>
                   <div>
@@ -341,16 +341,16 @@ export default function RecuperacaoTurmaClient({
               </div>
               <button onClick={() => setShowConfirmModal(false)} className="p-2 hover:bg-zinc-300 rounded-xl transition-all"><X size={20}/></button>
             </div>
-            <div className="p-6 max-h-[50vh] overflow-y-auto space-y-2 bg-zinc-50/20 custom-scrollbar">
+            <div className="p-6 max-h-[50vh] overflow-y-auto space-y-2 bg-canvas/20 custom-scrollbar">
               {notasRecuperacao.filter(n => n.disciplinaId === disciplinaSelecionada && notas[n.id] !== originalNotas[n.id]).map(n => (
-                 <div key={n.id} className="flex items-center justify-between bg-white p-3 rounded-lg border border-zinc-200 shadow-sm">
+                 <div key={n.id} className="flex items-center justify-between bg-surface p-3 rounded-lg border border-line shadow-sm">
                   <span className="text-sm font-medium text-fg-muted truncate pr-4">{n.estudanteNome}</span>
                   <span className="text-sm font-medium text-danger-fg min-w-max">{notas[n.id] === '-1' ? 'FALTOU' : `NOTA: ${notas[n.id]}`}</span>
                 </div>
               ))}
             </div>
-             <div className="px-6 py-5 bg-zinc-50 border-t border-zinc-200 flex gap-4">
-              <button onClick={() => setShowConfirmModal(false)} className="flex-1 py-3 text-sm font-medium text-fg-subtle hover:bg-white rounded-lg transition-all">Cancelar</button>
+             <div className="px-6 py-5 bg-canvas border-t border-line flex gap-4">
+              <button onClick={() => setShowConfirmModal(false)} className="flex-1 py-3 text-sm font-medium text-fg-subtle hover:bg-surface rounded-lg transition-all">Cancelar</button>
               <button onClick={handleConfirmSave} className="flex-1 py-3 bg-danger text-white text-sm font-medium rounded-lg shadow-card hover:bg-danger transition-all active:scale-95">Finalizar Envio</button>
             </div>
           </div>

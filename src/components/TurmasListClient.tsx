@@ -208,7 +208,7 @@ export default function TurmasListClient({
           <input
             type="text"
             placeholder="Buscar por nome ou curso..."
-            className="w-full pl-11 pr-4 py-3 bg-zinc-50 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-ring transition-all outline-none"
+            className="w-full pl-11 pr-4 py-3 bg-canvas border-transparent rounded-lg text-sm focus:bg-surface focus:ring-2 focus:ring-ring transition-all outline-none"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -219,7 +219,7 @@ export default function TurmasListClient({
           <select 
             value={selectedTurno || ""}
             onChange={(e) => setSelectedTurno(e.target.value || null)}
-            className="px-3 py-2 bg-zinc-50 border-none rounded-xl text-xs font-semibold text-fg-muted focus:ring-2 focus:ring-ring outline-none cursor-pointer hover:bg-zinc-100 transition-colors"
+            className="px-3 py-2 bg-canvas border-none rounded-xl text-xs font-semibold text-fg-muted focus:ring-2 focus:ring-ring outline-none cursor-pointer hover:bg-subtle transition-colors"
           >
             <option value="">Turnos</option>
             {turnosOptions.map(t => <option key={t} value={t}>{t}</option>)}
@@ -228,7 +228,7 @@ export default function TurmasListClient({
           <select 
             value={selectedSerie || ""}
             onChange={(e) => setSelectedSerie(e.target.value || null)}
-            className="px-3 py-2 bg-zinc-50 border-none rounded-xl text-xs font-semibold text-fg-muted focus:ring-2 focus:ring-ring outline-none cursor-pointer hover:bg-zinc-100 transition-colors"
+            className="px-3 py-2 bg-canvas border-none rounded-xl text-xs font-semibold text-fg-muted focus:ring-2 focus:ring-ring outline-none cursor-pointer hover:bg-subtle transition-colors"
           >
             <option value="">Séries</option>
             {seriesOptions.map(s => <option key={s} value={s}>{s}ª Série</option>)}
@@ -249,7 +249,7 @@ export default function TurmasListClient({
 
       {/* Lista */}
       {turnosOrdenados.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-xl border border-dashed border-zinc-200">
+        <div className="text-center py-20 bg-surface rounded-xl border border-dashed border-line">
            <p className="text-fg-subtle font-semibold text-sm">Nenhuma turma encontrada com esses filtros</p>
         </div>
       ) : (
@@ -352,25 +352,25 @@ export default function TurmasListClient({
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                            {turma.modalidade && (
-                             <span className="px-1.5 py-0.5 bg-zinc-50 text-fg-subtle text-xs rounded font-semibold border border-zinc-100">
+                             <span className="px-1.5 py-0.5 bg-canvas text-fg-subtle text-xs rounded font-semibold border border-line-subtle">
                                {turma.modalidade}
                              </span>
                            )}
                         </div>
                         <div className="flex items-center space-x-3">
-                           <div className="flex items-center text-xs font-semibold text-black/60">
-                             <Users className="w-3 h-3 mr-1 text-zinc-300" />
+                           <div className="flex items-center text-xs font-semibold text-fg/60">
+                             <Users className="w-3 h-3 mr-1 text-fg-disabled" />
                              {turma._count.estudantes}
                            </div>
-                            <div className="flex items-center text-xs font-semibold text-black/60">
-                             <FileText className="w-3 h-3 mr-1 text-zinc-300" />
+                            <div className="flex items-center text-xs font-semibold text-fg/60">
+                             <FileText className="w-3 h-3 mr-1 text-fg-disabled" />
                              {turma._count.disciplinas}
                            </div>
                         </div>
                       </div>
 
                       {turma.minhasDisciplinas && turma.minhasDisciplinas.length > 0 && (
-                        <div className="mt-4 pt-4 border-t border-zinc-100">
+                        <div className="mt-4 pt-4 border-t border-line-subtle">
                           <p className="text-xs font-bold text-fg-subtle mb-2">Suas Disciplinas</p>
                           <div className="flex flex-wrap gap-1.5">
                             {turma.minhasDisciplinas.map((d: any) => (

@@ -124,7 +124,7 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
             <div className="flex items-center space-x-6">
               <Link
                 href="/dashboard"
-                className="p-3 hover:bg-zinc-100 rounded-lg transition-all text-fg-subtle hover:text-fg border border-transparent hover:border-zinc-200 shadow-sm"
+                className="p-3 hover:bg-subtle rounded-lg transition-all text-fg-subtle hover:text-fg border border-transparent hover:border-line shadow-sm"
               >
                 <ArrowLeft size={16} strokeWidth={1.75} />
               </Link>
@@ -137,7 +137,7 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
             <div className="flex items-center gap-3">
               <button 
                 onClick={handlePrint}
-                className="flex items-center gap-2 bg-white border border-zinc-200 text-fg-muted px-6 py-3 rounded-lg font-semibold hover:bg-zinc-50 transition-all shadow-sm active:scale-95"
+                className="flex items-center gap-2 bg-surface border border-line text-fg-muted px-6 py-3 rounded-lg font-semibold hover:bg-canvas transition-all shadow-sm active:scale-95"
               >
                 <Printer size={18} />
                 <span className="hidden sm:inline">Imprimir Tudo</span>
@@ -155,18 +155,18 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
       </header>
 
       {/* Seção de Filtros */}
-      <section className="bg-white p-6 md:p-8 rounded-xl shadow-card border border-zinc-100">
+      <section className="bg-surface p-6 md:p-8 rounded-xl shadow-card border border-line-subtle">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="space-y-2">
             <label className="text-xs font-bold text-fg-subtle ml-1">Estudante</label>
             <div className="relative group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-fg transition-colors" size={18} />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-disabled group-focus-within:text-fg transition-colors" size={18} />
               <input 
                 type="text" 
                 placeholder="Buscar por nome..."
                 value={filters.studentName}
                 onChange={e => setFilters({...filters, studentName: e.target.value})}
-                className="w-full bg-zinc-50 border-transparent rounded-lg pl-12 pr-6 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-white focus:border-zinc-200 transition-all font-medium placeholder:text-zinc-300 shadow-card"
+                className="w-full bg-canvas border-transparent rounded-lg pl-12 pr-6 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium placeholder:text-fg-disabled shadow-card"
               />
             </div>
           </div>
@@ -174,12 +174,12 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
           <div className="space-y-2">
             <label className="text-xs font-bold text-fg-subtle ml-1">Período Inicial</label>
             <div className="relative group">
-              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-fg transition-colors" size={18} />
+              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-disabled group-focus-within:text-fg transition-colors" size={18} />
               <input 
                 type="date"
                 value={filters.startDate}
                 onChange={e => setFilters({...filters, startDate: e.target.value})}
-                className="w-full bg-zinc-50 border-transparent rounded-lg pl-12 pr-6 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-white focus:border-zinc-200 transition-all font-medium shadow-card cursor-pointer"
+                className="w-full bg-canvas border-transparent rounded-lg pl-12 pr-6 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium shadow-card cursor-pointer"
               />
             </div>
           </div>
@@ -187,12 +187,12 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
           <div className="space-y-2">
             <label className="text-xs font-bold text-fg-subtle ml-1">Período Final</label>
             <div className="relative group">
-              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-fg transition-colors" size={18} />
+              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-disabled group-focus-within:text-fg transition-colors" size={18} />
               <input 
                 type="date"
                 value={filters.endDate}
                 onChange={e => setFilters({...filters, endDate: e.target.value})}
-                className="w-full bg-zinc-50 border-transparent rounded-lg pl-12 pr-6 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-white focus:border-zinc-200 transition-all font-medium shadow-card cursor-pointer"
+                className="w-full bg-canvas border-transparent rounded-lg pl-12 pr-6 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium shadow-card cursor-pointer"
               />
             </div>
           </div>
@@ -200,11 +200,11 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
           <div className="space-y-2">
             <label className="text-xs font-bold text-fg-subtle ml-1">Turma</label>
             <div className="relative group">
-              <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-fg transition-colors" size={18} />
+              <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-disabled group-focus-within:text-fg transition-colors" size={18} />
               <select 
                 value={filters.turmaId}
                 onChange={e => setFilters({...filters, turmaId: e.target.value})}
-                className="w-full bg-zinc-50 border-transparent rounded-lg pl-12 pr-10 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-white focus:border-zinc-200 transition-all font-medium shadow-card cursor-pointer appearance-none"
+                className="w-full bg-canvas border-transparent rounded-lg pl-12 pr-10 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium shadow-card cursor-pointer appearance-none"
               >
                 <option value="">Todas as turmas</option>
                 {turmas.map(t => (
@@ -217,11 +217,11 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
           <div className="space-y-2">
             <label className="text-xs font-bold text-fg-subtle ml-1">Tipo de Ocorrência</label>
             <div className="relative group">
-              <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-fg transition-colors" size={18} />
+              <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-disabled group-focus-within:text-fg transition-colors" size={18} />
               <select 
                 value={filters.type}
                 onChange={e => setFilters({...filters, type: e.target.value})}
-                className="w-full bg-zinc-50 border-transparent rounded-lg pl-12 pr-10 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-white focus:border-zinc-200 transition-all font-medium shadow-card cursor-pointer appearance-none"
+                className="w-full bg-canvas border-transparent rounded-lg pl-12 pr-10 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium shadow-card cursor-pointer appearance-none"
               >
                 <option value="">Todos os tipos</option>
                 <option value="Comportamental">Comportamental</option>
@@ -238,12 +238,12 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
       <section className="space-y-6 print:space-y-8">
         {loading ? (
           <div className="py-32 text-center">
-            <div className="w-12 h-12 border-4 border-zinc-200 border-t-zinc-900 rounded-full animate-spin mx-auto mb-4"></div>
+            <div className="w-12 h-12 border-4 border-line border-t-zinc-900 rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-fg-subtle font-bold animate-pulse">Consultando Registros...</p>
           </div>
         ) : ocorrencias.length === 0 ? (
-          <div className="py-32 text-center bg-white border border-dashed border-zinc-200 rounded-xl">
-            <div className="w-20 h-20 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-6 text-zinc-200">
+          <div className="py-32 text-center bg-surface border border-dashed border-line rounded-xl">
+            <div className="w-20 h-20 bg-canvas rounded-full flex items-center justify-center mx-auto mb-6 text-fg-disabled">
               <FileWarning size={40} />
             </div>
             <h3 className="text-xl font-bold text-fg mb-2">Nenhum registro localizado</h3>
@@ -253,9 +253,9 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
           ocorrencias.map((item) => (
             <div 
               key={item.id} 
-              className="group bg-white border border-zinc-100 rounded-xl p-8 md:p-10 shadow-card hover:shadow-card transition-all duration-500 relative overflow-hidden print:shadow-none print:border-zinc-200 print:mb-8"
+              className="group bg-surface border border-line-subtle rounded-xl p-8 md:p-10 shadow-card hover:shadow-card transition-all duration-500 relative overflow-hidden print:shadow-none print:border-line print:mb-8"
             >
-              <div className="absolute top-0 right-0 w-64 h-64 bg-zinc-50 rounded-full -mr-32 -mt-32 opacity-0 group-hover:opacity-100 blur-3xl transition-opacity duration-1000 print:hidden"></div>
+              <div className="absolute top-0 right-0 w-64 h-64 bg-canvas rounded-full -mr-32 -mt-32 opacity-0 group-hover:opacity-100 blur-3xl transition-opacity duration-1000 print:hidden"></div>
               
               <div className="relative z-10 space-y-8">
                 {/* Header do Registro */}
@@ -278,13 +278,13 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
                   <div className="flex items-center gap-2 print:hidden">
                     <button 
                       onClick={() => { setSelectedOcorrencia(item); setShowForm(true); }}
-                      className="p-3 bg-zinc-50 text-fg-subtle hover:text-fg hover:bg-zinc-100 rounded-lg transition-all border border-transparent hover:border-zinc-200"
+                      className="p-3 bg-canvas text-fg-subtle hover:text-fg hover:bg-subtle rounded-lg transition-all border border-transparent hover:border-line"
                     >
                       <Edit3 size={18} />
                     </button>
                     <button 
                       onClick={() => handleDelete(item.id)}
-                      className="p-3 bg-zinc-50 text-fg-subtle hover:text-danger-fg hover:bg-danger-subtle rounded-lg transition-all border border-transparent hover:border-danger-line"
+                      className="p-3 bg-canvas text-fg-subtle hover:text-danger-fg hover:bg-danger-subtle rounded-lg transition-all border border-transparent hover:border-danger-line"
                     >
                       <Trash2 size={18} />
                     </button>
@@ -292,7 +292,7 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
                 </div>
 
                 {/* Conteúdo */}
-                <div className="bg-zinc-50/50 p-8 rounded-xl border border-zinc-100 group-hover:bg-white group-hover:shadow-card transition-all duration-500 print:bg-white print:border-zinc-200">
+                <div className="bg-canvas/50 p-8 rounded-xl border border-line-subtle group-hover:bg-surface group-hover:shadow-card transition-all duration-500 print:bg-surface print:border-line">
                   <p className="text-fg-muted text-lg leading-relaxed font-medium whitespace-pre-wrap">
                     {item.descricao}
                   </p>
@@ -302,7 +302,7 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pt-4">
                   <div className="flex flex-wrap gap-4">
                     {item.estudantes.map(est => (
-                      <div key={est.matricula} className="flex items-center gap-3 bg-white border border-zinc-200 pl-2 pr-5 py-2 rounded-lg shadow-sm hover:border-zinc-900 transition-colors cursor-default">
+                      <div key={est.matricula} className="flex items-center gap-3 bg-surface border border-line pl-2 pr-5 py-2 rounded-lg shadow-sm hover:border-zinc-900 transition-colors cursor-default">
                         <div className="w-9 h-9 bg-subtle border border-line text-fg rounded-xl flex items-center justify-center font-bold text-xs ring-4 ring-zinc-50">
                           {est.nome.charAt(0)}
                         </div>
@@ -314,12 +314,12 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
                     ))}
                   </div>
 
-                  <div className="flex items-center gap-4 border-l border-zinc-100 pl-8 md:pl-10 print:border-zinc-200">
+                  <div className="flex items-center gap-4 border-l border-line-subtle pl-8 md:pl-10 print:border-line">
                     <div className="text-right">
                       <p className="text-xs font-semibold text-fg-subtle leading-none mb-2">Registrado por</p>
                       <p className="font-bold text-fg text-sm whitespace-nowrap">{item.autor.name || "Sistema"}</p>
                     </div>
-                    <div className="w-12 h-12 bg-zinc-100 rounded-lg flex items-center justify-center text-fg-subtle border border-zinc-200">
+                    <div className="w-12 h-12 bg-subtle rounded-lg flex items-center justify-center text-fg-subtle border border-line">
                       <User size={20} />
                     </div>
                   </div>
@@ -331,9 +331,9 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
       </section>
 
       {/* Footer Info */}
-      <section className="py-12 border-t border-zinc-200 print:hidden">
+      <section className="py-12 border-t border-line print:hidden">
         <div className="flex flex-col items-center text-center space-y-4">
-          <div className="w-14 h-14 bg-zinc-50 rounded-xl flex items-center justify-center text-zinc-200">
+          <div className="w-14 h-14 bg-canvas rounded-xl flex items-center justify-center text-fg-disabled">
             <Printer size={24} />
           </div>
           <h4 className="text-fg font-bold">Configuração de Impressão</h4>

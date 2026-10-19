@@ -208,19 +208,19 @@ export default function PlanosClient() {
         </div>
 
         {/* Filtros Premium */}
-        <div className="bg-white p-6 rounded-xl shadow-card border border-zinc-200 flex flex-wrap gap-6 items-end relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-zinc-50 rounded-full -mr-16 -mt-16 opacity-50 blur-3xl"></div>
+        <div className="bg-surface p-6 rounded-xl shadow-card border border-line flex flex-wrap gap-6 items-end relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-canvas rounded-full -mr-16 -mt-16 opacity-50 blur-3xl"></div>
             
             <div className="flex-1 min-w-[200px] space-y-2">
                 <label className="text-xs font-medium text-fg-subtle ml-2">Filtrar por Turma</label>
                 <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-zinc-50 rounded-lg text-fg-subtle group-focus-within:text-fg-muted group-focus-within:bg-zinc-50 transition-all">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-canvas rounded-lg text-fg-subtle group-focus-within:text-fg-muted group-focus-within:bg-canvas transition-all">
                     <Users size={16} />
                   </div>
                   <select 
                       value={filters.turmaId} 
                       onChange={e => setFilters({...filters, turmaId: e.target.value})}
-                      className="w-full bg-zinc-50 hover:bg-zinc-200 border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-zinc-500 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
+                      className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-zinc-500 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
                   >
                       <option value="">Selecione a Turma...</option>
                       {turmas.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
@@ -231,7 +231,7 @@ export default function PlanosClient() {
             <div className="flex-1 min-w-[200px] space-y-2">
                 <label className="text-xs font-medium text-fg-subtle ml-2">Disciplina</label>
                 <div className="relative group">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-zinc-50 rounded-lg text-fg-subtle group-focus-within:text-fg-muted group-focus-within:bg-zinc-50 transition-all">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-canvas rounded-lg text-fg-subtle group-focus-within:text-fg-muted group-focus-within:bg-canvas transition-all">
                         <Search size={16} />
                     </div>
                     <input 
@@ -239,7 +239,7 @@ export default function PlanosClient() {
                         placeholder="Buscar matéria..." 
                         value={filters.disciplinaNome} 
                         onChange={e => setFilters({...filters, disciplinaNome: e.target.value})} 
-                        className="w-full bg-zinc-50 hover:bg-zinc-200 border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-zinc-500 transition-all font-medium text-fg-muted shadow-card placeholder:text-zinc-300" 
+                        className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-zinc-500 transition-all font-medium text-fg-muted shadow-card placeholder:text-fg-disabled" 
                     />
                 </div>
             </div>
@@ -248,13 +248,13 @@ export default function PlanosClient() {
                 <div className="flex-1 min-w-[200px] space-y-2">
                     <label className="text-xs font-medium text-fg-subtle ml-2">Professor</label>
                     <div className="relative group">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-zinc-50 rounded-lg text-fg-subtle group-focus-within:text-fg-muted group-focus-within:bg-zinc-50 transition-all">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-canvas rounded-lg text-fg-subtle group-focus-within:text-fg-muted group-focus-within:bg-canvas transition-all">
                         <BookOpen size={16} />
                       </div>
                       <select 
                         value={filters.professorId} 
                         onChange={e => setFilters({...filters, professorId: e.target.value})}
-                        className="w-full bg-zinc-50 hover:bg-zinc-200 border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-zinc-500 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
+                        className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-zinc-500 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
                       >
                           <option value="">Todos os Professores</option>
                           {professores.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -265,10 +265,10 @@ export default function PlanosClient() {
         </div>
 
         {/* Matriz de Planos Estilo Resultados (Cards Table) */}
-        <div className="bg-white rounded-xl shadow-card border border-zinc-200 overflow-hidden relative">
-          <div className="p-6 border-b border-zinc-50 bg-zinc-50/10 flex items-center justify-between">
+        <div className="bg-surface rounded-xl shadow-card border border-line overflow-hidden relative">
+          <div className="p-6 border-b border-line-subtle bg-canvas/10 flex items-center justify-between">
             <h2 className="text-sm font-medium text-fg-subtle flex items-center gap-3 ml-2">
-              <div className="w-8 h-8 rounded-lg bg-zinc-50 text-fg-muted flex items-center justify-center shadow-card">
+              <div className="w-8 h-8 rounded-lg bg-canvas text-fg-muted flex items-center justify-center shadow-card">
                 <Users size={16} />
               </div>
               Matriz de Planos Quinzenais
@@ -285,24 +285,24 @@ export default function PlanosClient() {
                  <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-success mx-auto"></div>
               </div>
             ) : turmasNomes.length === 0 ? (
-              <div className="text-center py-20 text-zinc-300">
+              <div className="text-center py-20 text-fg-disabled">
                   <BarChart3 className="w-12 h-12 opacity-20 mx-auto mb-3" />
                   <p className="text-sm font-medium">Nenhum plano localizado</p>
               </div>
             ) : (
-                <div className="divide-y divide-zinc-200">
+                <div className="divide-y divide-line">
                     {turmasNomes.map(turmaNome => {
                         const isExpanded = expandedTurmas.includes(turmaNome)
                         const matches = Object.values(groupedData[turmaNome]).flat()
                         
                         return (
-                            <div key={turmaNome} className="bg-white">
+                            <div key={turmaNome} className="bg-surface">
                                 <button 
                                     onClick={() => toggleTurmaExpansion(turmaNome)}
-                                    className={`w-full px-8 py-5 flex items-center justify-between transition-all hover:bg-zinc-50/80 group ${isExpanded ? 'bg-zinc-50 border-b border-zinc-200' : ''}`}
+                                    className={`w-full px-8 py-5 flex items-center justify-between transition-all hover:bg-canvas/80 group ${isExpanded ? 'bg-canvas border-b border-line' : ''}`}
                                 >
                                     <div className="flex items-center gap-5">
-                                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-500 ${isExpanded ? 'bg-zinc-600 text-white shadow-card rotate-6' : 'bg-zinc-200 text-fg-subtle group-hover:bg-white group-hover:shadow-card'}`}>
+                                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-500 ${isExpanded ? 'bg-zinc-600 text-white shadow-card rotate-6' : 'bg-subtle-hover text-fg-subtle group-hover:bg-surface group-hover:shadow-card'}`}>
                                             <Users size={20} />
                                         </div>
                                         <div className="text-left">
@@ -313,35 +313,35 @@ export default function PlanosClient() {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all duration-300 ${isExpanded ? 'bg-zinc-50 border-zinc-300 text-fg-muted rotate-90' : 'bg-white border-zinc-200 text-zinc-300 group-hover:border-zinc-300'}`}>
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all duration-300 ${isExpanded ? 'bg-canvas border-line-strong text-fg-muted rotate-90' : 'bg-surface border-line text-fg-disabled group-hover:border-line-strong'}`}>
                                         <ChevronRight size={16} />
                                     </div>
                                 </button>
 
                                 {isExpanded && (
-                                    <div className="bg-zinc-50/20 border-t border-zinc-200/50 animate-slide-up pb-2">
+                                    <div className="bg-canvas/20 border-t border-line/50 animate-slide-up pb-2">
                                         {Object.keys(groupedData[turmaNome]).map(month => (
                                             <div key={month} className="space-y-0">
-                                                <div className="px-8 py-3 bg-zinc-50 border-b border-zinc-200 flex items-center gap-3">
+                                                <div className="px-8 py-3 bg-canvas border-b border-line flex items-center gap-3">
                                                    <div className="w-1 h-3 bg-zinc-500 rounded-full"></div>
                                                    <span className="text-xs font-medium text-fg-muted">{month}</span>
                                                 </div>
                                                 <table className="w-full text-left border-collapse">
                                                     <thead>
-                                                        <tr className="bg-white">
-                                                            <th className="px-8 py-4 text-xs font-medium text-fg-subtle border-b border-zinc-50">Disciplina / Matéria</th>
-                                                            <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center border-b border-zinc-50">Período de Vigência</th>
-                                                            <th className="px-8 py-4 text-xs font-medium text-fg-subtle text-center border-b border-zinc-50">Ações</th>
+                                                        <tr className="bg-surface">
+                                                            <th className="px-8 py-4 text-xs font-medium text-fg-subtle border-b border-line-subtle">Disciplina / Matéria</th>
+                                                            <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center border-b border-line-subtle">Período de Vigência</th>
+                                                            <th className="px-8 py-4 text-xs font-medium text-fg-subtle text-center border-b border-line-subtle">Ações</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody className="divide-y divide-zinc-50">
+                                                    <tbody className="divide-y divide-line-subtle">
                                                         {groupedData[turmaNome][month].map((plano) => {
                                                             const current = isCurrentFortnight(plano.periodoInicio, plano.periodoFim)
                                                             return (
-                                                                <tr key={plano.id} className="group hover:bg-zinc-50/30 transition-all">
+                                                                <tr key={plano.id} className="group hover:bg-canvas/30 transition-all">
                                                                     <td className="px-8 py-5">
                                                                         <div className="flex items-center gap-4">
-                                                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${current ? 'bg-success-subtle text-success-fg shadow-sm border border-success-line' : 'bg-zinc-50 text-fg-subtle border border-zinc-200 group-hover:bg-white'}`}>
+                                                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${current ? 'bg-success-subtle text-success-fg shadow-sm border border-success-line' : 'bg-canvas text-fg-subtle border border-line group-hover:bg-surface'}`}>
                                                                                 <FileText size={18} />
                                                                             </div>
                                                                             <div className="flex flex-col">
@@ -353,7 +353,7 @@ export default function PlanosClient() {
                                                                         </div>
                                                                     </td>
                                                                     <td className="px-6 py-5 text-center">
-                                                                        <div className="inline-flex items-center gap-2 bg-zinc-50 px-4 py-2 rounded-xl border border-zinc-200 shadow-sm group-hover:bg-white transition-all">
+                                                                        <div className="inline-flex items-center gap-2 bg-canvas px-4 py-2 rounded-xl border border-line shadow-sm group-hover:bg-surface transition-all">
                                                                             <Calendar size={14} className="text-fg-subtle" />
                                                                             <span className="text-xs font-medium text-fg-muted">
                                                                                 {new Date(plano.periodoInicio).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', timeZone: 'UTC'})} — {new Date(plano.periodoFim).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', timeZone: 'UTC'})}
@@ -362,9 +362,9 @@ export default function PlanosClient() {
                                                                     </td>
                                                                     <td className="px-8 py-5 text-center">
                                                                         <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all -translate-y-1 group-hover:translate-y-0">
-                                                                            <button onClick={() => { setViewPlanoId(plano.id); setShowView(true); }} className="w-9 h-9 flex items-center justify-center bg-white border border-zinc-300 text-fg-subtle rounded-xl hover:bg-zinc-50 hover:text-fg-muted hover:border-zinc-300 transition-all shadow-sm" title="Ver Detalhes"><Eye size={16} /></button>
-                                                                            <button onClick={() => { setSelectedPlano(plano); setShowForm(true); }} className="w-9 h-9 flex items-center justify-center bg-white border border-zinc-300 text-fg-subtle rounded-xl hover:bg-zinc-900 hover:text-white hover:border-zinc-900 transition-all shadow-sm" title="Editar"><Edit3 size={16} /></button>
-                                                                            <button onClick={() => handleDelete(plano.id)} className="w-9 h-9 flex items-center justify-center bg-white border border-zinc-300 text-fg-subtle rounded-xl hover:bg-danger-subtle hover:text-danger-fg hover:border-danger-line transition-all shadow-sm" title="Remover"><Trash2 size={16} /></button>
+                                                                            <button onClick={() => { setViewPlanoId(plano.id); setShowView(true); }} className="w-9 h-9 flex items-center justify-center bg-surface border border-line-strong text-fg-subtle rounded-xl hover:bg-canvas hover:text-fg-muted hover:border-line-strong transition-all shadow-sm" title="Ver Detalhes"><Eye size={16} /></button>
+                                                                            <button onClick={() => { setSelectedPlano(plano); setShowForm(true); }} className="w-9 h-9 flex items-center justify-center bg-surface border border-line-strong text-fg-subtle rounded-xl hover:bg-zinc-900 hover:text-white hover:border-zinc-900 transition-all shadow-sm" title="Editar"><Edit3 size={16} /></button>
+                                                                            <button onClick={() => handleDelete(plano.id)} className="w-9 h-9 flex items-center justify-center bg-surface border border-line-strong text-fg-subtle rounded-xl hover:bg-danger-subtle hover:text-danger-fg hover:border-danger-line transition-all shadow-sm" title="Remover"><Trash2 size={16} /></button>
                                                                         </div>
                                                                     </td>
                                                                 </tr>

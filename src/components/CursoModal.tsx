@@ -184,10 +184,10 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-xl w-full max-w-lg shadow-overlay border border-zinc-100 overflow-hidden animate-pop-in">
+      <div className="bg-surface rounded-xl w-full max-w-lg shadow-overlay border border-line-subtle overflow-hidden animate-pop-in">
 
         {/* Header */}
-        <div className={`px-8 py-6 border-b border-zinc-100 flex items-center justify-between ${isEdit ? 'bg-warning-subtle' : 'bg-zinc-50'}`}>
+        <div className={`px-8 py-6 border-b border-line-subtle flex items-center justify-between ${isEdit ? 'bg-warning-subtle' : 'bg-canvas'}`}>
           <div className="flex items-center space-x-3">
             <div className={`p-2 rounded-xl ${isEdit ? 'bg-warning' : 'bg-accent'}`}>
               {isEdit ? <Pencil className="w-5 h-5 text-white" /> : <GraduationCap className="w-5 h-5 text-white" />}
@@ -203,7 +203,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-zinc-200 rounded-full transition-colors">
+          <button onClick={onClose} className="p-2 hover:bg-subtle-hover rounded-full transition-colors">
             <X className="w-5 h-5 text-fg-subtle" />
           </button>
         </div>
@@ -237,7 +237,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
                     setFormData({ ...formData, nome })
                   }
                 }}
-                className="w-full px-5 py-4 bg-zinc-50 border border-zinc-200 rounded-lg outline-none font-semibold text-fg-muted focus:bg-white focus:border-accent transition-all"
+                className="w-full px-5 py-4 bg-canvas border border-line rounded-lg outline-none font-semibold text-fg-muted focus:bg-surface focus:border-accent transition-all"
               />
             </div>
 
@@ -249,7 +249,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
                   required type="text" placeholder="Ex: MA" maxLength={8}
                   value={formData.sigla}
                   onChange={e => setFormData({ ...formData, sigla: e.target.value.toUpperCase() })}
-                  className="w-full pl-10 pr-5 py-4 bg-zinc-50 border border-zinc-200 rounded-lg outline-none font-semibold text-fg-muted focus:bg-white focus:border-accent transition-all"
+                  className="w-full pl-10 pr-5 py-4 bg-canvas border border-line rounded-lg outline-none font-semibold text-fg-muted focus:bg-surface focus:border-accent transition-all"
                 />
                 <Hash className="w-4 h-4 text-fg-subtle absolute left-4 top-1/2 -translate-y-1/2" />
               </div>
@@ -279,7 +279,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
                     className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all border ${
                       formData.modalidades.includes(m)
                         ? 'bg-accent text-on-accent border-accent shadow-card '
-                        : 'bg-zinc-50 text-fg-subtle border-zinc-200 hover:border-zinc-300 hover:text-fg-muted'
+                        : 'bg-canvas text-fg-subtle border-line hover:border-line-strong hover:text-fg-muted'
                     } ${isEdit ? 'opacity-60 cursor-not-allowed' : ''}`}
                   >
                     {labelModalidade[m]}
@@ -311,7 +311,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
             {/* Nível de Ensino */}
             <div className="space-y-2">
               <label className="block text-xs font-semibold text-fg-subtle mb-2 ml-1">
-                Nível de Ensino <span className="normal-case font-medium text-zinc-300">(opcional)</span>
+                Nível de Ensino <span className="normal-case font-medium text-fg-disabled">(opcional)</span>
               </label>
               <div className="flex flex-wrap gap-2">
                 {NIVEIS_ENSINO.map(n => (
@@ -321,7 +321,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
                     className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all border ${
                       formData.nivelEnsino === n
                         ? 'bg-success-subtle text-success-fg border-success-line shadow-card '
-                        : 'bg-zinc-50 text-fg-subtle border-zinc-200 hover:border-zinc-300 hover:text-fg-muted'
+                        : 'bg-canvas text-fg-subtle border-line hover:border-line-strong hover:text-fg-muted'
                     }`}
                   >
                     {labelNivelEnsino[n]}
@@ -333,12 +333,12 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
             {/* Esquema de Avaliação */}
             <div className="group">
               <label className="block text-xs font-semibold text-fg-subtle mb-1.5 ml-1">
-                Esquema de Avaliação <span className="normal-case font-medium text-zinc-300">(opcional)</span>
+                Esquema de Avaliação <span className="normal-case font-medium text-fg-disabled">(opcional)</span>
               </label>
               <select
                 value={formData.esquemaAvaliacaoId}
                 onChange={e => setFormData({ ...formData, esquemaAvaliacaoId: e.target.value })}
-                className="w-full px-5 py-4 bg-zinc-50 border border-zinc-200 rounded-lg outline-none font-semibold text-fg-muted focus:bg-white focus:border-accent transition-all"
+                className="w-full px-5 py-4 bg-canvas border border-line rounded-lg outline-none font-semibold text-fg-muted focus:bg-surface focus:border-accent transition-all"
               >
                 <option value="">Padrão da escola</option>
                 {esquemas.map(esq => (
@@ -358,7 +358,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
                     className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all border ${
                       formData.turnos.includes(t)
                         ? 'bg-accent text-on-accent border-accent shadow-card '
-                        : 'bg-zinc-50 text-fg-subtle border-zinc-200 hover:border-zinc-300 hover:text-fg-muted'
+                        : 'bg-canvas text-fg-subtle border-line hover:border-line-strong hover:text-fg-muted'
                     }`}
                   >
                     {t}
@@ -371,7 +371,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
           <div className="pt-2 flex gap-3">
             <button
               type="button" onClick={onClose}
-              className="px-6 py-4 rounded-lg font-semibold text-sm text-fg-subtle hover:bg-zinc-100 transition-all"
+              className="px-6 py-4 rounded-lg font-semibold text-sm text-fg-subtle hover:bg-subtle transition-all"
             >
               Cancelar
             </button>

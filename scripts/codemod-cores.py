@@ -338,6 +338,30 @@ def estados(texto):
     return re.sub(r'className=(?:"[^"]*"|\{`[^`]*`\})', botao, texto)
 
 
+NEUTROS = [
+    # (classe zinc/branca, token) - mesmos valores no tema claro; no escuro, o token se adapta
+    ('bg-white', 'bg-surface'), ('bg-zinc-50', 'bg-canvas'), ('bg-zinc-100', 'bg-subtle'), ('bg-zinc-200', 'bg-subtle-hover'),
+    ('border-zinc-50', 'border-line-subtle'), ('border-zinc-100', 'border-line-subtle'), ('border-zinc-200', 'border-line'), ('border-zinc-300', 'border-line-strong'),
+    ('divide-zinc-50', 'divide-line-subtle'), ('divide-zinc-100', 'divide-line-subtle'), ('divide-zinc-200', 'divide-line'), ('divide-zinc-300', 'divide-line-strong'),
+    ('text-black', 'text-fg'), ('text-zinc-200', 'text-fg-disabled'), ('text-zinc-300', 'text-fg-disabled'),
+]
+
+
+def neutros(texto, caminho):
+    """Neutros fixos (branco/zinc) → tokens, para o tema escuro funcionar. Fica de
+    fora a impressão (sempre clara) e o "botão" de interruptores (bolinha branca)."""
+    if 'Print' in caminho:
+        return texto
+    def um(m):
+        c = m.group(0)
+        if re.search(r'rounded-full', c) and re.search(r'(?<![\w-])(?:size|h|w)-(?:3|3\.5|4|5)(?![\w.])', c) and 'bg-white' in c and 'translate-x' in c:
+            return c
+        for a, b in NEUTROS:
+            c = re.sub(r'(?<![\w-])' + re.escape(a) + r'(?![\w-])', b, c)
+        return c
+    return re.sub(r'className=(?:"[^"]*"|\{`[^`]*`\})', um, texto)
+
+
 def arquivos(raiz):
     for p in Path(raiz).rglob('*'):
         if p.suffix in ('.tsx', '.ts') and '.test.' not in p.name and 'components/ui' not in str(p):
@@ -354,7 +378,14 @@ if __name__ == '__main__':
         if contar:
             total += len(ALVO.findall(texto))
             continue
-        novo = limpar_espacos(estados(maiusculas(cabecalhos(titulos(botoes(acabamento(sombras(casca(migrar(texto), str(p))))))), str(p))))
+        c = str(p)
+        novo = casca(migrar(texto), c)
+        novo = titulos(botoes(acabamento(sombras(novo))))
+        novo = cabecalhos(novo)
+        novo = maiusculas(novo, c)
+        novo = estados(novo)
+        novo = neutros(novo, c)
+        novo = limpar_espacos(novo)
         if novo != texto:
             p.write_text(novo)
             mudados += 1

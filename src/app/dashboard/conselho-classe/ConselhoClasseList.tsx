@@ -49,13 +49,13 @@ export default function ConselhoClasseList({
     <div className="space-y-8">
 
       {/* Filtros Premium */}
-      <div className="bg-white p-6 rounded-xl shadow-card border border-zinc-200 flex flex-wrap gap-6 items-end relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-zinc-50 rounded-full -mr-16 -mt-16 opacity-50 blur-3xl"></div>
+      <div className="bg-surface p-6 rounded-xl shadow-card border border-line flex flex-wrap gap-6 items-end relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-canvas rounded-full -mr-16 -mt-16 opacity-50 blur-3xl"></div>
           
           <div className="flex-1 min-w-[300px] space-y-2">
               <label className="text-xs font-medium text-fg-subtle ml-2">Turma ou Curso</label>
               <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-zinc-50 rounded-lg text-fg-subtle group-focus-within:text-fg-muted group-focus-within:bg-zinc-50 transition-all">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-canvas rounded-lg text-fg-subtle group-focus-within:text-fg-muted group-focus-within:bg-canvas transition-all">
                       <Search size={18} />
                   </div>
                   <input 
@@ -63,13 +63,13 @@ export default function ConselhoClasseList({
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
                       placeholder="Busque por nome ou curso..."
-                      className="w-full bg-zinc-50 hover:bg-zinc-200 border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-zinc-500 transition-all font-medium text-fg-muted shadow-card placeholder:text-zinc-300"
+                      className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-zinc-500 transition-all font-medium text-fg-muted shadow-card placeholder:text-fg-disabled"
                   />
               </div>
           </div>
 
           <div className="pb-2.5">
-              <div className="flex items-center gap-2 bg-zinc-50 px-4 py-2.5 rounded-lg border border-zinc-200 shadow-sm">
+              <div className="flex items-center gap-2 bg-canvas px-4 py-2.5 rounded-lg border border-line shadow-sm">
                   <span className="w-2 h-2 rounded-full bg-zinc-500 animate-pulse"></span>
                   <span className="text-xs font-semibold text-fg-muted">Sincronização Ativa</span>
               </div>
@@ -77,10 +77,10 @@ export default function ConselhoClasseList({
       </div>
 
       {/* Listagem Estilo Premium */}
-      <div className="bg-white rounded-xl shadow-card border border-zinc-200 overflow-hidden">
-        <div className="p-8 border-b border-zinc-200 bg-zinc-50/10 flex items-center justify-between">
+      <div className="bg-surface rounded-xl shadow-card border border-line overflow-hidden">
+        <div className="p-8 border-b border-line bg-canvas/10 flex items-center justify-between">
            <h2 className="text-xs font-semibold text-fg-subtle flex items-center gap-3">
-             <div className="w-8 h-8 rounded-lg bg-zinc-50 text-fg-muted flex items-center justify-center shadow-card">
+             <div className="w-8 h-8 rounded-lg bg-canvas text-fg-muted flex items-center justify-center shadow-card">
                <Users size={16} />
              </div>
              Turmas em Deliberação de Conselho
@@ -89,7 +89,7 @@ export default function ConselhoClasseList({
 
         <div className="overflow-x-auto">
           {turnos.length === 0 ? (
-            <div className="text-center py-20 text-zinc-300">
+            <div className="text-center py-20 text-fg-disabled">
               <BarChart3 className="w-12 h-12 opacity-20 mx-auto mb-3" />
               <p className="text-xs font-medium">Nenhuma turma para deliberar</p>
             </div>

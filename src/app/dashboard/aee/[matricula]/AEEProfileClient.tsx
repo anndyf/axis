@@ -122,12 +122,12 @@ export default function AEEProfileClient({
   )
 
   return (
-    <div className="bg-canvas pb-24">
+    <div className="pb-24">
       {/* Header Premium */}
       <div className="mb-6 border-b border-line pb-4">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <button onClick={() => router.back()} className="p-2 hover:bg-zinc-100 rounded-xl transition-colors">
+            <button onClick={() => router.back()} className="p-2 hover:bg-subtle rounded-xl transition-colors">
               <ArrowLeft className="w-5 h-5 text-fg-muted" />
             </button>
             <div className="flex items-center gap-3">
@@ -191,26 +191,26 @@ export default function AEEProfileClient({
           <div className="lg:col-span-4 space-y-6">
             
             {/* Card de Identificação Estilo Perfil */}
-            <div className="bg-white rounded-xl shadow-card border border-zinc-200 relative overflow-hidden group">
+            <div className="bg-surface rounded-xl shadow-card border border-line relative overflow-hidden group">
                <div className="absolute top-0 left-0 w-full h-24 bg-subtle border-b border-line" />
                
                <div className="relative flex flex-col items-center mt-8 px-6 pb-8">
-                  <div className="w-24 h-24 bg-white p-1.5 rounded-xl shadow-card relative">
+                  <div className="w-24 h-24 bg-surface p-1.5 rounded-xl shadow-card relative">
                     {formData.fotoUrl ? (
                       <div className="w-full h-full rounded-lg overflow-hidden">
                         <img src={formData.fotoUrl} alt={estudante.nome} className="w-full h-full object-cover" />
                         {isDirecao && (
                           <button 
                             onClick={() => setFormData({...formData, fotoUrl: ""})}
-                            className="absolute -top-2 -right-2 p-1.5 bg-white shadow-overlay text-danger-fg rounded-lg opacity-0 group-hover:opacity-100 transition-all hover:scale-110"
+                            className="absolute -top-2 -right-2 p-1.5 bg-surface shadow-overlay text-danger-fg rounded-lg opacity-0 group-hover:opacity-100 transition-all hover:scale-110"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         )}
                       </div>
                     ) : (
-                      <div className="w-full h-full rounded-lg bg-zinc-100 flex items-center justify-center">
-                        <Users className="w-10 h-10 text-zinc-300" />
+                      <div className="w-full h-full rounded-lg bg-subtle flex items-center justify-center">
+                        <Users className="w-10 h-10 text-fg-disabled" />
                       </div>
                     )}
                     
@@ -229,7 +229,7 @@ export default function AEEProfileClient({
                     Matrícula {estudante.matricula}
                   </p>
                   
-                  <div className="mt-4 inline-flex items-center px-4 py-1.5 rounded-full bg-zinc-50 border border-zinc-100 text-fg-muted text-xs font-semibold">
+                  <div className="mt-4 inline-flex items-center px-4 py-1.5 rounded-full bg-canvas border border-line-subtle text-fg-muted text-xs font-semibold">
                     {estudante.turma.nome}
                   </div>
 
@@ -243,7 +243,7 @@ export default function AEEProfileClient({
             </div>
 
             {/* Necessidades Específicas (TAGS) */}
-            <div className="bg-white p-6 rounded-xl border border-zinc-200 shadow-sm space-y-4">
+            <div className="bg-surface p-6 rounded-xl border border-line shadow-sm space-y-4">
                 <h5 className="text-xs font-semibold text-fg-subtle">Necessidades de Prova</h5>
                 {isDirecao ? (
                   <div className="grid grid-cols-1 gap-3">
@@ -252,10 +252,10 @@ export default function AEEProfileClient({
                       className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
                         formData.precisaProvaAdaptada 
                         ? 'bg-accent-subtle border-accent text-accent-fg shadow-card' 
-                        : 'bg-white border-zinc-100 text-fg-muted grayscale opacity-60'
+                        : 'bg-surface border-line-subtle text-fg-muted grayscale opacity-60'
                       }`}
                     >
-                        <ClipboardCheck className={`w-5 h-5 ${formData.precisaProvaAdaptada ? 'text-white' : 'text-zinc-300'}`} />
+                        <ClipboardCheck className={`w-5 h-5 ${formData.precisaProvaAdaptada ? 'text-white' : 'text-fg-disabled'}`} />
                         <span className="text-xs font-semibold">Prova Adaptada</span>
                     </button>
 
@@ -264,22 +264,22 @@ export default function AEEProfileClient({
                       className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
                         formData.precisaProvaSalaEspecial 
                         ? 'bg-accent-subtle border-accent text-accent-fg shadow-card' 
-                        : 'bg-white border-zinc-100 text-fg-muted grayscale opacity-60'
+                        : 'bg-surface border-line-subtle text-fg-muted grayscale opacity-60'
                       }`}
                     >
-                        <Users className={`w-5 h-5 ${formData.precisaProvaSalaEspecial ? 'text-white' : 'text-zinc-300'}`} />
+                        <Users className={`w-5 h-5 ${formData.precisaProvaSalaEspecial ? 'text-white' : 'text-fg-disabled'}`} />
                         <span className="text-xs font-semibold">Sala Especial</span>
                     </button>
                   </div>
                 ) : (
                   <div className="flex flex-wrap gap-2">
                     {formData.precisaProvaAdaptada && (
-                      <span className="bg-zinc-100 text-fg-muted border border-zinc-200 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2">
+                      <span className="bg-subtle text-fg-muted border border-line px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2">
                         <ClipboardCheck className="w-3 h-3" /> Prova Adaptada
                       </span>
                     )}
                     {formData.precisaProvaSalaEspecial && (
-                      <span className="bg-zinc-100 text-fg-muted border border-zinc-200 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2">
+                      <span className="bg-subtle text-fg-muted border border-line px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-2">
                         <Users className="w-3 h-3" /> Sala Especial
                       </span>
                     )}
@@ -291,7 +291,7 @@ export default function AEEProfileClient({
             </div>
 
             {/* CID Selection (Direção) ou Visualização (Professor) */}
-            <div className="bg-white p-6 rounded-xl border border-zinc-200 shadow-sm">
+            <div className="bg-surface p-6 rounded-xl border border-line shadow-sm">
               <h2 className="text-xs font-semibold text-fg-subtle mb-4 flex items-center gap-2">
                 <AlertCircle className="w-3.5 h-3.5" />
                 Diagnóstico (CIDs)
@@ -304,7 +304,7 @@ export default function AEEProfileClient({
                     <input 
                       type="text" placeholder="Filtrar CIDs..." value={cidSearch}
                       onChange={(e) => setCidSearch(e.target.value)}
-                      className="w-full pl-9 pr-4 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-semibold outline-none focus:ring-4 focus:ring-zinc-900/5 focus:bg-white transition-all"
+                      className="w-full pl-9 pr-4 py-2 bg-canvas border border-line rounded-xl text-xs font-semibold outline-none focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface transition-all"
                     />
                   </div>
                   <div className="max-h-60 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
@@ -314,10 +314,10 @@ export default function AEEProfileClient({
                         className={`w-full text-left p-3 rounded-xl border-2 transition-all flex items-center gap-3 ${
                           formData.cids.includes(c.code) 
                           ? 'bg-accent border-accent' 
-                          : 'bg-white border-zinc-100 hover:border-zinc-200'
+                          : 'bg-surface border-line-subtle hover:border-line'
                         }`}
                       >
-                         <div className={`w-10 h-10 shrink-0 bg-zinc-100 rounded-lg flex items-center justify-center font-semibold text-xs text-fg-subtle ${formData.cids.includes(c.code) ? 'bg-white/10 text-white' : ''}`}>
+                         <div className={`w-10 h-10 shrink-0 bg-subtle rounded-lg flex items-center justify-center font-semibold text-xs text-fg-subtle ${formData.cids.includes(c.code) ? 'bg-surface/10 text-white' : ''}`}>
                             {c.code}
                          </div>
                          <div className="min-w-0">
@@ -332,7 +332,7 @@ export default function AEEProfileClient({
                   {formData.cids.length > 0 ? formData.cids.map((code: string) => {
                     const found = CIDS_AEE.find((c: any) => c.code === code)
                     return (
-                      <div key={code} className="bg-zinc-50 border border-zinc-200 p-3 rounded-xl flex items-center gap-3">
+                      <div key={code} className="bg-canvas border border-line p-3 rounded-xl flex items-center gap-3">
                         <div className="w-10 h-10 bg-subtle border border-line text-fg rounded-lg flex items-center justify-center font-semibold text-xs">
                            {code}
                         </div>
@@ -383,7 +383,7 @@ export default function AEEProfileClient({
           {/* Lado Direito: Recomendações e Condição */}
           <div className="lg:col-span-8 space-y-6">
             
-            <div className="bg-white p-10 rounded-xl border border-zinc-200 shadow-sm space-y-10">
+            <div className="bg-surface p-10 rounded-xl border border-line shadow-sm space-y-10">
               
               {/* Condição do Estudante */}
               <section>
@@ -396,10 +396,10 @@ export default function AEEProfileClient({
                     rows={5} value={formData.condicao}
                     onChange={(e) => setFormData({...formData, condicao: e.target.value})}
                     placeholder="Descreva a condição pedagógica e médica do estudante..."
-                    className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-8 py-6 text-base font-medium focus:ring-4 focus:ring-zinc-900/5 outline-none transition-all shadow-card"
+                    className="w-full bg-canvas border border-line rounded-xl px-8 py-6 text-base font-medium focus:ring-4 focus:ring-zinc-900/5 outline-none transition-all shadow-card"
                   />
                 ) : (
-                  <div className="bg-zinc-50 p-6 rounded-xl border border-zinc-100">
+                  <div className="bg-canvas p-6 rounded-xl border border-line-subtle">
                     <p className="text-fg-muted font-medium leading-relaxed whitespace-pre-wrap">{formData.condicao || 'Sem descrição.'}</p>
                   </div>
                 )}
@@ -416,7 +416,7 @@ export default function AEEProfileClient({
                     rows={8} value={formData.recomendacoes}
                     onChange={(e) => setFormData({...formData, recomendacoes: e.target.value})}
                     placeholder="Instruções sobre avaliações, tempo adicional, fonte ampliada, apoio em sala..."
-                    className="w-full bg-white border border-success-line rounded-xl px-8 py-6 text-base font-medium focus:ring-4 focus:ring-success/30 outline-none transition-all shadow-sm"
+                    className="w-full bg-surface border border-success-line rounded-xl px-8 py-6 text-base font-medium focus:ring-4 focus:ring-success/30 outline-none transition-all shadow-sm"
                   />
                 ) : (
                   <div className="p-2">
@@ -436,7 +436,7 @@ export default function AEEProfileClient({
                     rows={3} value={formData.notasDirecao}
                     onChange={(e) => setFormData({...formData, notasDirecao: e.target.value})}
                     placeholder="Informações administrativas adicionais..."
-                    className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-8 py-6 text-base font-medium focus:ring-4 focus:ring-zinc-900/5 outline-none transition-all"
+                    className="w-full bg-canvas border border-line rounded-xl px-8 py-6 text-base font-medium focus:ring-4 focus:ring-zinc-900/5 outline-none transition-all"
                   />
                 ) : (
                   <p className="text-fg-subtle text-base font-medium italic">{formData.notasDirecao || '--'}</p>
@@ -446,13 +446,13 @@ export default function AEEProfileClient({
 
             {/* Histórico de Ates de Leitura (Só Direção Vê) */}
             {isDirecao && perfilExistente?.acknowledgements?.length > 0 && (
-              <div className="bg-white p-8 rounded-xl border border-zinc-200 shadow-sm">
+              <div className="bg-surface p-8 rounded-xl border border-line shadow-sm">
                 <h3 className="text-xs font-semibold text-fg-subtle mb-6 flex items-center gap-2">
                    <CheckCircle2 className="w-4 h-4 text-success-fg" /> Confirmaram Leitura
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {perfilExistente.acknowledgements.map((ack: any) => (
-                    <div key={ack.id} className="flex items-center gap-4 p-4 bg-zinc-50 rounded-lg border border-zinc-100">
+                    <div key={ack.id} className="flex items-center gap-4 p-4 bg-canvas rounded-lg border border-line-subtle">
                       <div className="w-10 h-10 rounded-full bg-success-subtle text-success-fg flex items-center justify-center font-bold text-sm">
                         {ack.user.name?.charAt(0) || 'P'}
                       </div>

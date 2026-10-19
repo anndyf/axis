@@ -82,8 +82,8 @@ export default function TransferModal({ isOpen, onClose, fromUserId, fromUserNam
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-xl w-full max-w-md shadow-overlay border border-zinc-200 overflow-hidden transform animate-slide-up">
-        <div className="p-6 border-b border-zinc-100 flex items-center justify-between bg-zinc-50">
+      <div className="bg-surface rounded-xl w-full max-w-md shadow-overlay border border-line overflow-hidden transform animate-slide-up">
+        <div className="p-6 border-b border-line-subtle flex items-center justify-between bg-canvas">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-warning-subtle rounded-lg flex items-center justify-center">
               <AlertTriangle className="w-5 h-5 text-warning-fg" />
@@ -93,19 +93,19 @@ export default function TransferModal({ isOpen, onClose, fromUserId, fromUserNam
               <p className="text-xs text-fg-subtle font-semibold">Segurança de Dados</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-zinc-200 rounded-xl transition-colors text-fg-subtle">
+          <button onClick={onClose} className="p-2 hover:bg-subtle-hover rounded-xl transition-colors text-fg-subtle">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <div className="p-6 space-y-6">
-          <div className="flex items-center justify-between p-4 bg-zinc-50 rounded-lg border border-zinc-100">
+          <div className="flex items-center justify-between p-4 bg-canvas rounded-lg border border-line-subtle">
             <div className="text-center flex-1">
               <div className="text-xs font-semibold text-fg-subtle mb-1">Origem</div>
               <div className="text-sm font-semibold text-fg-muted truncate">{fromUserName}</div>
             </div>
             <div className="px-4">
-              <ArrowRight className="w-5 h-5 text-zinc-300" />
+              <ArrowRight className="w-5 h-5 text-fg-disabled" />
             </div>
             <div className="text-center flex-1">
               <div className="text-xs font-semibold text-fg-subtle mb-1">Destino</div>
@@ -114,7 +114,7 @@ export default function TransferModal({ isOpen, onClose, fromUserId, fromUserNam
                   {users.find(u => u.id === selectedToUserId)?.name}
                 </div>
               ) : (
-                <div className="text-sm font-semibold text-zinc-300 italic">Selecionar...</div>
+                <div className="text-sm font-semibold text-fg-disabled italic">Selecionar...</div>
               )}
             </div>
           </div>
@@ -126,7 +126,7 @@ export default function TransferModal({ isOpen, onClose, fromUserId, fromUserNam
             <select
               value={selectedToUserId}
               onChange={(e) => setSelectedToUserId(e.target.value)}
-              className="w-full h-12 px-4 rounded-xl border border-zinc-200 bg-white text-fg-muted font-semibold text-sm focus:ring-4 focus:ring-ring focus:border-accent transition-all outline-none"
+              className="w-full h-12 px-4 rounded-xl border border-line bg-surface text-fg-muted font-semibold text-sm focus:ring-4 focus:ring-ring focus:border-accent transition-all outline-none"
               disabled={fetchingUsers || loading}
             >
               <option value="">Selecione um administrador ou professor...</option>
@@ -150,10 +150,10 @@ export default function TransferModal({ isOpen, onClose, fromUserId, fromUserNam
           </div>
         </div>
 
-        <div className="p-6 bg-zinc-50 border-t border-zinc-100 flex gap-3">
+        <div className="p-6 bg-canvas border-t border-line-subtle flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 h-12 rounded-xl text-fg-subtle font-semibold hover:bg-zinc-200 transition-colors"
+            className="flex-1 h-12 rounded-xl text-fg-subtle font-semibold hover:bg-subtle-hover transition-colors"
           >
             Cancelar
           </button>

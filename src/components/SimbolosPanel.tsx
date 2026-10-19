@@ -197,12 +197,12 @@ export default function SimbolosPanel({ inputRef, onInsertQuill, onInsert }: Sim
   const categoriaAtual = CATEGORIAS.find(c => c.id === aba) ?? CATEGORIAS[0]
 
   return (
-    <div className="rounded-lg border border-zinc-200 bg-zinc-50 overflow-hidden">
+    <div className="rounded-lg border border-line bg-canvas overflow-hidden">
       {/* Header toggle */}
       <button
         type="button"
         onClick={() => setOpen(v => !v)}
-        className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-zinc-100 transition-colors"
+        className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-subtle transition-colors"
       >
         <div className="flex items-center gap-2">
           <span className="text-base">𝛴</span>
@@ -216,9 +216,9 @@ export default function SimbolosPanel({ inputRef, onInsertQuill, onInsert }: Sim
       </button>
 
       {open && (
-        <div className="border-t border-zinc-200">
+        <div className="border-t border-line">
           {/* Abas de categorias */}
-          <div className="flex overflow-x-auto no-scrollbar border-b border-zinc-200 bg-white">
+          <div className="flex overflow-x-auto no-scrollbar border-b border-line bg-surface">
             {CATEGORIAS.map(cat => (
               <button
                 key={cat.id}
@@ -227,7 +227,7 @@ export default function SimbolosPanel({ inputRef, onInsertQuill, onInsert }: Sim
                 className={`px-4 py-2 text-xs font-bold whitespace-nowrap transition-colors border-b-2 -mb-px ${
                   aba === cat.id
                     ? "border-accent text-accent-fg bg-accent-subtle"
-                    : "border-transparent text-fg-subtle hover:text-fg-muted hover:bg-zinc-50"
+                    : "border-transparent text-fg-subtle hover:text-fg-muted hover:bg-canvas"
                 }`}
               >
                 {cat.label}
@@ -243,7 +243,7 @@ export default function SimbolosPanel({ inputRef, onInsertQuill, onInsert }: Sim
                 type="button"
                 title={t}
                 onClick={() => handleClick(s)}
-                className="w-9 h-9 flex items-center justify-center text-base font-medium bg-white border border-zinc-200 rounded-lg hover:border-accent hover:bg-accent-subtle hover:text-accent-fg transition-all active:scale-95 shadow-sm"
+                className="w-9 h-9 flex items-center justify-center text-base font-medium bg-surface border border-line rounded-lg hover:border-accent hover:bg-accent-subtle hover:text-accent-fg transition-all active:scale-95 shadow-sm"
               >
                 {s}
               </button>

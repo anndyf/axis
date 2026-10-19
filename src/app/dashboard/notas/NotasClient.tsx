@@ -89,13 +89,13 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
         </div>
 
         {/* Filtros Premium */}
-        <div className="bg-white p-6 rounded-xl shadow-card border border-zinc-200 flex flex-wrap gap-6 items-end relative overflow-hidden">
+        <div className="bg-surface p-6 rounded-xl shadow-card border border-line flex flex-wrap gap-6 items-end relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-success-subtle rounded-full -mr-16 -mt-16 opacity-50 blur-3xl"></div>
             
             <div className="flex-1 min-w-[250px] space-y-2">
                 <label className="text-xs font-medium text-fg-subtle ml-2">Pesquisar Turma</label>
                 <div className="relative group">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-zinc-50 rounded-lg text-fg-subtle group-focus-within:text-success-fg group-focus-within:bg-success-subtle transition-all">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-canvas rounded-lg text-fg-subtle group-focus-within:text-success-fg group-focus-within:bg-success-subtle transition-all">
                         <Search size={18} />
                     </div>
                     <input 
@@ -103,7 +103,7 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
                         value={filterNome}
                         onChange={(e) => setFilterNome(e.target.value)}
                         placeholder="Ex: 1º Ano, TDS, Enfermagem..."
-                        className="w-full bg-zinc-50 hover:bg-zinc-200 border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-success/30 transition-all font-medium text-fg-muted shadow-card placeholder:text-zinc-300"
+                        className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-success/30 transition-all font-medium text-fg-muted shadow-card placeholder:text-fg-disabled"
                     />
                 </div>
             </div>
@@ -111,13 +111,13 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
             <div className="flex-1 min-w-[200px] space-y-2">
                 <label className="text-xs font-medium text-fg-subtle ml-2">Turno / Período</label>
                 <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-zinc-50 rounded-lg text-fg-subtle group-focus-within:text-success-fg group-focus-within:bg-success-subtle transition-all">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-canvas rounded-lg text-fg-subtle group-focus-within:text-success-fg group-focus-within:bg-success-subtle transition-all">
                     <Filter size={16} />
                   </div>
                   <select 
                       value={filterTurno}
                       onChange={(e) => setFilterTurno(e.target.value)}
-                      className="w-full bg-zinc-50 hover:bg-zinc-200 border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-success/30 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
+                      className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-success/30 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
                   >
                       <option value="">Selecione o Turno...</option>
                       {uniqueTurnos.map((t: any) => <option key={t} value={t}>{t}</option>)}
@@ -134,8 +134,8 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
         </div>
 
         {/* Listagem Estilo Premium */}
-        <div className="bg-white rounded-xl shadow-card border border-zinc-200 overflow-hidden">
-          <div className="p-8 border-b border-zinc-200 bg-zinc-50/10 flex items-center justify-between">
+        <div className="bg-surface rounded-xl shadow-card border border-line overflow-hidden">
+          <div className="p-8 border-b border-line bg-canvas/10 flex items-center justify-between">
             <h2 className="text-xs font-semibold text-fg-subtle flex items-center gap-3">
                <div className="w-8 h-8 rounded-lg bg-success-subtle text-success-fg flex items-center justify-center shadow-card">
                  <Users size={16} />
@@ -143,7 +143,7 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
                Listagem de Turmas para Lançamento
             </h2>
             <div className="hidden md:block">
-              <span className="px-3 py-1 bg-zinc-50 text-fg-subtle text-xs font-semibold rounded-full border border-zinc-200">
+              <span className="px-3 py-1 bg-canvas text-fg-subtle text-xs font-semibold rounded-full border border-line">
                 Acesso Rápido Habilitado
               </span>
             </div>
@@ -151,7 +151,7 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
           
           <div className="overflow-x-auto">
             <table className="w-full text-left">
-              <thead className="bg-zinc-50 border-b border-zinc-300">
+              <thead className="bg-canvas border-b border-line-strong">
                 <tr>
                   <th className="px-6 py-4 text-xs font-medium text-fg-subtle">Turma / Série</th>
                   <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center">Turno</th>
@@ -160,10 +160,10 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
                   <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center w-24">Ação</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-200">
+              <tbody className="divide-y divide-line">
                 {filteredTurmas.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-16 text-center text-zinc-300">
+                    <td colSpan={5} className="px-6 py-16 text-center text-fg-disabled">
                       <BarChart3 className="w-12 h-12 opacity-20 mx-auto mb-3" />
                       <p className="text-sm font-medium">Ajuste os filtros para localizar a turma</p>
                     </td>
@@ -181,19 +181,19 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <span className="px-3 py-1 bg-zinc-200 text-fg-muted text-xs font-medium rounded-lg border border-zinc-300">
+                        <span className="px-3 py-1 bg-subtle-hover text-fg-muted text-xs font-medium rounded-lg border border-line-strong">
                           {turma.turno || 'N/A'}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-center">
-                          <span className="text-sm font-medium text-fg-muted flex items-center justify-center gap-1.5"><Users size={14} className="text-zinc-300" /> {turma._count.estudantes}</span>
+                          <span className="text-sm font-medium text-fg-muted flex items-center justify-center gap-1.5"><Users size={14} className="text-fg-disabled" /> {turma._count.estudantes}</span>
                        </td>
                        <td className="px-6 py-4 text-center">
-                          <span className="text-sm font-medium text-fg-muted flex items-center justify-center gap-1.5"><GraduationCap size={14} className="text-zinc-300" /> {turma._count.disciplinas}</span>
+                          <span className="text-sm font-medium text-fg-muted flex items-center justify-center gap-1.5"><GraduationCap size={14} className="text-fg-disabled" /> {turma._count.disciplinas}</span>
                       </td>
                       <td className="px-6 py-4 text-center">
                          <div className="flex justify-center">
-                            <div className="w-8 h-8 rounded-full bg-zinc-50 group-hover:bg-success group-hover:text-white flex items-center justify-center transition-all">
+                            <div className="w-8 h-8 rounded-full bg-canvas group-hover:bg-success group-hover:text-white flex items-center justify-center transition-all">
                                <ChevronRight size={16} />
                             </div>
                          </div>

@@ -155,7 +155,7 @@ export default async function ConselhoClassePage() {
         </div>
 
         {turnos.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm border border-zinc-300 p-20 text-center">
+          <div className="bg-surface rounded-lg shadow-sm border border-line-strong p-20 text-center">
               <div className="bg-success-subtle w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-success-line">
                 <CheckCircle2 className="w-8 h-8 text-success-fg" />
               </div>

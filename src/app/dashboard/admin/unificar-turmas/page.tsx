@@ -69,12 +69,12 @@ export default function MigracaoPage() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        <div className="bg-white p-6 rounded-xl border border-zinc-200 shadow-sm">
+        <div className="bg-surface p-6 rounded-xl border border-line shadow-sm">
           <label className="block text-sm font-bold text-fg-muted mb-4">
             1. Turma de Origem (A que será esvaziada)
           </label>
           <select 
-            className="w-full p-3 border rounded-lg bg-zinc-50 focus:ring-2 focus:ring-ring"
+            className="w-full p-3 border rounded-lg bg-canvas focus:ring-2 focus:ring-ring"
             value={selection.from}
             onChange={(e) => setSelection({ ...selection, from: e.target.value })}
           >
@@ -88,12 +88,12 @@ export default function MigracaoPage() {
           <p className="text-xs text-fg-subtle mt-2 italic">Dica: Escolha a turma que tem o ID que você deseja descartar.</p>
         </div>
 
-        <div className="bg-white p-6 rounded-xl border border-zinc-200 shadow-sm">
+        <div className="bg-surface p-6 rounded-xl border border-line shadow-sm">
           <label className="block text-sm font-bold text-fg-muted mb-4">
             2. Turma de Destino (A que será mantida)
           </label>
           <select 
-            className="w-full p-3 border rounded-lg bg-zinc-50 focus:ring-2 focus:ring-ring"
+            className="w-full p-3 border rounded-lg bg-canvas focus:ring-2 focus:ring-ring"
             value={selection.to}
             onChange={(e) => setSelection({ ...selection, to: e.target.value })}
           >

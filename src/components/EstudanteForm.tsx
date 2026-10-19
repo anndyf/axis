@@ -119,14 +119,14 @@ export default function EstudanteForm({ estudante, isEdit = false }: EstudanteFo
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50">
+    <div className="min-h-screen bg-canvas">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-zinc-200">
+      <header className="bg-surface shadow-sm border-b border-line">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center space-x-4">
             <Link
               href="/dashboard/estudantes"
-              className="p-2 hover:bg-zinc-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-subtle rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-fg-muted" />
             </Link>
@@ -144,7 +144,7 @@ export default function EstudanteForm({ estudante, isEdit = false }: EstudanteFo
 
       {/* Main Content */}
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+        <form onSubmit={handleSubmit} className="bg-surface rounded-xl shadow-sm border border-line p-6">
           {error && (
             <div className="mb-6 p-4 bg-danger-subtle border border-danger-line rounded-lg text-danger-fg">
               {error}
@@ -162,7 +162,7 @@ export default function EstudanteForm({ estudante, isEdit = false }: EstudanteFo
                 required
                 value={formData.nome}
                 onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                className="w-full px-4 py-3 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-success/30 focus:border-transparent"
+                className="w-full px-4 py-3 border border-line-strong rounded-lg focus:ring-2 focus:ring-success/30 focus:border-transparent"
                 placeholder="Ex: João Silva Santos"
               />
             </div>
@@ -177,7 +177,7 @@ export default function EstudanteForm({ estudante, isEdit = false }: EstudanteFo
                 required
                 value={formData.matricula}
                 onChange={(e) => setFormData({ ...formData, matricula: e.target.value })}
-                className="w-full px-4 py-3 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-success/30 focus:border-transparent"
+                className="w-full px-4 py-3 border border-line-strong rounded-lg focus:ring-2 focus:ring-success/30 focus:border-transparent"
                 placeholder="Ex: 2024001234"
               />
               <p className="mt-1 text-xs text-fg-subtle">
@@ -194,7 +194,7 @@ export default function EstudanteForm({ estudante, isEdit = false }: EstudanteFo
                 required
                 value={formData.turmaId}
                 onChange={(e) => setFormData({ ...formData, turmaId: e.target.value })}
-                className="w-full px-4 py-3 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-success/30 focus:border-transparent"
+                className="w-full px-4 py-3 border border-line-strong rounded-lg focus:ring-2 focus:ring-success/30 focus:border-transparent"
               >
                 <option value="">Selecione uma turma...</option>
                 {turmas.map((turma) => (
@@ -222,7 +222,7 @@ export default function EstudanteForm({ estudante, isEdit = false }: EstudanteFo
             <div className="flex space-x-4">
               <Link
                 href="/dashboard/estudantes"
-                className="px-6 py-3 text-fg-muted hover:bg-zinc-100 rounded-lg transition-colors"
+                className="px-6 py-3 text-fg-muted hover:bg-subtle rounded-lg transition-colors"
               >
                 Cancelar
               </Link>

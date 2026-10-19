@@ -342,7 +342,7 @@ export default function SimuladosClient({
   ]
 
   return (
-    <div className="print:bg-white print:min-h-0">
+    <div className="print:bg-surface print:min-h-0">
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
       <header className="mb-6 border-b border-line pb-4 print:hidden">
         <div className="max-w-7xl mx-auto py-4">
@@ -350,7 +350,7 @@ export default function SimuladosClient({
             <div className="flex items-center space-x-5">
               <Link
                 href="/dashboard"
-                className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-fg-subtle hover:text-fg-muted"
+                className="p-2 hover:bg-subtle-hover rounded-lg transition-colors text-fg-subtle hover:text-fg-muted"
               >
                 <ArrowLeft size={20} />
               </Link>
@@ -414,19 +414,19 @@ export default function SimuladosClient({
         </div>
 
         {/* Filtros Premium */}
-        <div className="bg-white p-6 rounded-xl shadow-card border border-zinc-200 flex flex-wrap gap-6 items-end relative overflow-hidden print:hidden">
+        <div className="bg-surface p-6 rounded-xl shadow-card border border-line flex flex-wrap gap-6 items-end relative overflow-hidden print:hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-danger-subtle rounded-full -mr-16 -mt-16 opacity-50 blur-3xl"></div>
             
             <div className="flex-1 min-w-[200px] space-y-2">
                 <label className="text-xs font-medium text-fg-subtle ml-2">Filtrar por Turma</label>
                 <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-zinc-50 rounded-lg text-fg-subtle group-focus-within:text-danger-fg group-focus-within:bg-danger-subtle transition-all">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-canvas rounded-lg text-fg-subtle group-focus-within:text-danger-fg group-focus-within:bg-danger-subtle transition-all">
                     <Users size={16} />
                   </div>
                   <select
                     value={selectedTurma}
                     onChange={(e) => setSelectedTurma(e.target.value)}
-                    className="w-full bg-zinc-50 hover:bg-zinc-200 border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-danger/30 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
+                    className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-danger/30 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
                   >
                     <option value="">Selecione a Turma...</option>
                     {turmas.map((t) => <option key={t.id} value={t.id}>{t.nome}</option>)}
@@ -439,7 +439,7 @@ export default function SimuladosClient({
                    {selectedUnidade === "1" ? "Área de Conhecimento" : "Prova"}
                 </label>
                 <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-zinc-50 rounded-lg text-fg-subtle group-focus-within:text-danger-fg group-focus-within:bg-danger-subtle transition-all">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-canvas rounded-lg text-fg-subtle group-focus-within:text-danger-fg group-focus-within:bg-danger-subtle transition-all">
                     {selectedUnidade === "1" ? <BookOpen size={16} /> : <FileText size={16} />}
                   </div>
                   
@@ -448,7 +448,7 @@ export default function SimuladosClient({
                       value={selectedArea}
                       onChange={(e) => setSelectedArea(e.target.value)}
                       disabled={!selectedTurma}
-                      className="w-full bg-zinc-50 hover:bg-zinc-200 border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-danger/30 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
+                      className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-danger/30 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
                     >
                       <option value="">Selecione a Área...</option>
                       {areas.map((a) => <option key={a.id} value={a.id}>{a.nome}</option>)}
@@ -458,7 +458,7 @@ export default function SimuladosClient({
                       value={selectedProva}
                       onChange={(e) => setSelectedProva(e.target.value)}
                       disabled={!selectedTurma}
-                      className="w-full bg-zinc-50 hover:bg-zinc-200 border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-danger/30 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
+                      className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-danger/30 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
                     >
                       <option value="">Selecione a Prova...</option>
                       {provas.filter(p => {
@@ -473,11 +473,11 @@ export default function SimuladosClient({
 
                         <div className="flex-1 min-w-[200px] space-y-2">
                 <label className="text-xs font-medium text-fg-subtle ml-2">Unidade / Etapa</label>
-                <div className="flex bg-zinc-50 p-1.5 rounded-lg shadow-card border border-zinc-100">
+                <div className="flex bg-canvas p-1.5 rounded-lg shadow-card border border-line-subtle">
                   <button
                     onClick={() => setSelectedUnidade("1")}
                     className={`flex-1 py-2.5 text-sm font-medium rounded-xl transition-all ${
-                      selectedUnidade === "1" ? 'bg-white text-danger-fg shadow-sm' : 'text-fg-subtle hover:text-fg-muted hover:bg-zinc-200/50'
+                      selectedUnidade === "1" ? 'bg-surface text-danger-fg shadow-sm' : 'text-fg-subtle hover:text-fg-muted hover:bg-subtle-hover/50'
                     }`}
                   >
                     1ª Unidade {user?.isSuperuser || user?.isDirecao ? '' : '(Fechada)'}
@@ -485,7 +485,7 @@ export default function SimuladosClient({
                   <button
                     onClick={() => setSelectedUnidade("2")}
                     className={`flex-1 py-2.5 text-sm font-medium rounded-xl transition-all ${
-                      selectedUnidade === "2" ? 'bg-white text-danger-fg shadow-sm' : 'text-fg-subtle hover:text-fg-muted hover:bg-zinc-200/50'
+                      selectedUnidade === "2" ? 'bg-surface text-danger-fg shadow-sm' : 'text-fg-subtle hover:text-fg-muted hover:bg-subtle-hover/50'
                     }`}
                   >
                     2ª Unidade
@@ -494,7 +494,7 @@ export default function SimuladosClient({
             </div>
 
             <div className="flex items-center gap-3 pb-1">
-                <div className="text-center px-4 py-2 bg-zinc-50 rounded-xl border border-zinc-200">
+                <div className="text-center px-4 py-2 bg-canvas rounded-xl border border-line">
                     <p className="text-xs font-medium text-fg-subtle">Média</p>
                     <p className="text-lg font-semibold text-fg-muted leading-none mt-1">{stats.media}</p>
                 </div>
@@ -507,8 +507,8 @@ export default function SimuladosClient({
         
         
         {/* Lançamento Estilo Resultados */}
-        <div className="bg-white rounded-lg shadow-sm border border-zinc-300 overflow-hidden print:shadow-none print:border-none print:rounded-none">
-          <div className="p-4 border-b border-zinc-200 bg-zinc-50/10 flex flex-col md:flex-row md:items-center justify-between gap-4 print:hidden">
+        <div className="bg-surface rounded-lg shadow-sm border border-line-strong overflow-hidden print:shadow-none print:border-none print:rounded-none">
+          <div className="p-4 border-b border-line bg-canvas/10 flex flex-col md:flex-row md:items-center justify-between gap-4 print:hidden">
             <div>
                <h2 className="text-lg font-medium text-fg flex items-center gap-2">
                  <Users size={20} className="text-fg-subtle" />
@@ -541,7 +541,7 @@ export default function SimuladosClient({
                   placeholder="Filtrar por nome..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full bg-white border border-zinc-300 rounded-lg pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-zinc-500/10 focus:border-zinc-400 transition-all shadow-sm"
+                  className="w-full bg-surface border border-line-strong rounded-lg pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-zinc-500/10 focus:border-zinc-400 transition-all shadow-sm"
                 />
               </div>
               {selectedUnidade === "2" && selectedProva && (
@@ -556,7 +556,7 @@ export default function SimuladosClient({
               )}
               <button
                 onClick={() => window.print()}
-                className="flex items-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-fg-muted px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm border border-zinc-200"
+                className="flex items-center gap-2 bg-subtle hover:bg-subtle-hover text-fg-muted px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm border border-line"
                 title="Imprimir lista"
               >
                 <Printer size={16} />
@@ -593,7 +593,7 @@ export default function SimuladosClient({
 
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
-              <thead className="bg-zinc-50 border-b border-zinc-300">
+              <thead className="bg-canvas border-b border-line-strong">
                 <tr>
                   <th className="px-4 py-4 w-12 text-center text-sm font-medium text-fg-subtle border-b">#</th>
                   <th className="px-6 py-4 print:py-2 print:px-2 text-sm print:text-xs font-medium text-fg-subtle border-b print:border-zinc-800">Estudante</th>
@@ -603,7 +603,7 @@ export default function SimuladosClient({
                   <th className="px-6 py-4 print:py-2 print:px-2 text-sm print:text-xs font-medium text-fg-subtle text-center border-b print:border-zinc-800">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-200">
+              <tbody className="divide-y divide-line">
                 {loading ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-16 text-center">
@@ -615,7 +615,7 @@ export default function SimuladosClient({
                   </tr>
                 ) : filteredEstudantes.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-16 text-center text-zinc-300">
+                    <td colSpan={6} className="px-6 py-16 text-center text-fg-disabled">
                       <BarChart3 className="w-12 h-12 opacity-20 mx-auto mb-3" />
                       <p className="text-xs font-medium">Selecione os filtros para iniciar</p>
                     </td>
@@ -638,7 +638,7 @@ export default function SimuladosClient({
                     const segundaChamadaUnsaved = notaSegundaChamadaTemp[est.matricula] !== originalNotaSegundaChamada[est.matricula]
 
                     return (
-                      <tr key={est.matricula} className="hover:bg-zinc-50 transition-colors print:border-b print:border-zinc-200">
+                      <tr key={est.matricula} className="hover:bg-canvas transition-colors print:border-b print:border-line">
                          <td className="px-4 py-3.5 text-center text-sm font-bold text-fg-subtle">{index + 1}</td>
                          <td className="px-6 py-3.5 print:py-1.5 print:px-2">
                            <div className="flex flex-col">
@@ -653,7 +653,7 @@ export default function SimuladosClient({
                                 checked={isFalta} 
                                 onChange={(e) => handleAusenteChange(est.matricula, e.target.checked)}
                                 disabled={!canLaunch}
-                                className={`w-5 h-5 rounded-md border-2 border-zinc-300 text-warning-fg focus:ring-warning/30 ${ausenteUnsaved ? 'ring-4 ring-warning/30' : ''}`}
+                                className={`w-5 h-5 rounded-md border-2 border-line-strong text-warning-fg focus:ring-warning/30 ${ausenteUnsaved ? 'ring-4 ring-warning/30' : ''}`}
                               />
                             </label>
                          </td>
@@ -665,10 +665,10 @@ export default function SimuladosClient({
                               onChange={(e) => handleNotaChange(est.matricula, e.target.value)}
                               disabled={!canLaunch || isFalta}
                                className={`w-20 text-center py-2 print:py-0 print:w-full border-2 print:border-0 rounded-xl print:rounded-none text-base print:text-sm font-medium outline-none transition-all ${
-                                 isFalta ? 'bg-zinc-100 text-fg-subtle border-zinc-200 cursor-not-allowed' :
-                                 notaUnsaved ? 'border-zinc-400 bg-white ring-4 ring-zinc-500/5' :
-                                 !hasNota ? 'border-zinc-200 bg-zinc-50 focus:bg-white focus:border-zinc-400' :
-                                 'border-zinc-200 bg-zinc-50 focus:border-zinc-400'
+                                 isFalta ? 'bg-subtle text-fg-subtle border-line cursor-not-allowed' :
+                                 notaUnsaved ? 'border-zinc-400 bg-surface ring-4 ring-zinc-500/5' :
+                                 !hasNota ? 'border-line bg-canvas focus:bg-surface focus:border-zinc-400' :
+                                 'border-line bg-canvas focus:border-zinc-400'
                                }`}
                               placeholder="0.0"
                             />
@@ -683,15 +683,15 @@ export default function SimuladosClient({
                                  onChange={(e) => handleSegundaChamadaChange(est.matricula, e.target.value)}
                                  disabled={!canLaunch}
                                  className={`w-20 text-center py-2 print:py-0 print:w-full border-2 print:border-0 rounded-xl print:rounded-none text-base print:text-sm font-medium outline-none transition-all ${
-                                    segundaChamadaUnsaved ? 'border-zinc-400 bg-white ring-4 ring-zinc-500/5' :
-                                    !notaSegundaChamadaTemp[est.matricula] ? 'border-zinc-200 bg-zinc-50 focus:bg-white focus:border-zinc-400' :
-                                    'border-zinc-200 bg-white text-fg focus:border-zinc-400'
+                                    segundaChamadaUnsaved ? 'border-zinc-400 bg-surface ring-4 ring-zinc-500/5' :
+                                    !notaSegundaChamadaTemp[est.matricula] ? 'border-line bg-canvas focus:bg-surface focus:border-zinc-400' :
+                                    'border-line bg-surface text-fg focus:border-zinc-400'
                                  }`}
                                  placeholder="0.0"
                                />
                              </div>
                           ) : (
-                             <span className="text-zinc-300">-</span>
+                             <span className="text-fg-disabled">-</span>
                           )}
                         </td>
                         <td className="px-6 py-3.5 print:py-1.5 print:px-2 text-center">
@@ -699,13 +699,13 @@ export default function SimuladosClient({
                             <span className={`inline-flex px-3 py-1 print:px-0 print:py-0 rounded-full print:rounded-none text-xs print:text-xs font-semibold border print:border-none shadow-sm print:shadow-none print:bg-transparent print:text-fg-muted ${
                               isFalta && nota2 < 0 ? 'bg-warning-subtle text-warning-fg border-warning-line' :
                               isAltaPerformance ? 'bg-success-subtle text-success-fg border-success-line' : 
-                              isNaMedia ? 'bg-zinc-200 text-fg border-zinc-300' :
+                              isNaMedia ? 'bg-subtle-hover text-fg border-line-strong' :
                               'bg-danger-subtle text-danger-fg border-danger-line'
                             }`}>
                               {isFalta && nota2 < 0 ? 'Faltou' : isAltaPerformance ? 'Alta Performance' : isNaMedia ? 'Na Média' : 'Abaixo da Média'}
                             </span>
                           ) : (
-                            <span className="text-zinc-300 text-xs font-medium italic opacity-50">Não Lançado</span>
+                            <span className="text-fg-disabled text-xs font-medium italic opacity-50">Não Lançado</span>
                           )}
                         </td>
                       </tr>
@@ -717,7 +717,7 @@ export default function SimuladosClient({
           </div>
 
           {filteredEstudantes.length > 0 && canLaunch && (
-            <div className="p-5 bg-zinc-50 border-t border-zinc-200 flex justify-end items-center gap-4 print:hidden">
+            <div className="p-5 bg-canvas border-t border-line flex justify-end items-center gap-4 print:hidden">
                <div className="hidden md:block">
                   <p className="text-xs font-medium text-fg-subtle">Verifique se as notas são de 0.0 a 4.0 antes de salvar.</p>
                </div>
@@ -736,8 +736,8 @@ export default function SimuladosClient({
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-xl shadow-overlay w-full max-w-lg overflow-hidden animate-pop-in border border-white">
-            <div className="px-6 py-5 border-b border-zinc-200 flex justify-between items-center bg-zinc-50">
+          <div className="bg-surface rounded-xl shadow-overlay w-full max-w-lg overflow-hidden animate-pop-in border border-white">
+            <div className="px-6 py-5 border-b border-line flex justify-between items-center bg-canvas">
               <div className="flex items-center gap-3">
                  <div className="w-10 h-10 bg-zinc-600 text-white rounded-xl flex items-center justify-center shadow-card"><Save size={20}/></div>
                   <div>
@@ -747,24 +747,24 @@ export default function SimuladosClient({
               </div>
               <button onClick={() => setShowModal(false)} className="p-2 hover:bg-zinc-300 rounded-xl transition-all"><X size={20}/></button>
             </div>
-            <div className="p-6 max-h-[60vh] overflow-y-auto space-y-3 bg-zinc-50/20 custom-scrollbar">
+            <div className="p-6 max-h-[60vh] overflow-y-auto space-y-3 bg-canvas/20 custom-scrollbar">
               {estudantes.filter(e => notasTemp[e.matricula] !== originalNotas[e.matricula]).map((est, i) => (
-                 <div key={i} className="flex items-center justify-between bg-white p-3 rounded-lg border border-zinc-200 shadow-sm">
+                 <div key={i} className="flex items-center justify-between bg-surface p-3 rounded-lg border border-line shadow-sm">
                    <span className="text-sm font-medium text-fg-muted truncate pr-4">{est.nome}</span>
                    <div className="flex gap-2">
-                      <span className="text-xs font-medium bg-zinc-50 text-fg-muted px-2.5 py-1 rounded-lg border border-zinc-200">
+                      <span className="text-xs font-medium bg-canvas text-fg-muted px-2.5 py-1 rounded-lg border border-line">
                         Nova Nota: {notasTemp[est.matricula] || '0.0'}
                       </span>
                    </div>
                 </div>
               ))}
             </div>
-            <div className="p-6 border-t border-zinc-200 bg-white">
+            <div className="p-6 border-t border-line bg-surface">
               <div className="flex justify-end gap-3 w-full">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-6 py-3 rounded-xl font-medium text-fg-muted hover:bg-zinc-200 transition-all text-xs flex-1 md:flex-none text-center"
+                  className="px-6 py-3 rounded-xl font-medium text-fg-muted hover:bg-subtle-hover transition-all text-xs flex-1 md:flex-none text-center"
                 >
                   Continuar Editando
                 </button>
@@ -788,7 +788,7 @@ export default function SimuladosClient({
       {/* Modal de Boas Vindas */}
       {showWelcomeModal && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-xl shadow-overlay w-full max-w-md overflow-hidden animate-pop-in text-center">
+          <div className="bg-surface rounded-xl shadow-overlay w-full max-w-md overflow-hidden animate-pop-in text-center">
             <div className="p-8 pt-10">
               <div className="w-20 h-20 bg-accent-subtle text-accent-fg rounded-full flex items-center justify-center mx-auto mb-6 shadow-card border border-accent/25">
                  <CheckCircle2 size={40} />
@@ -798,7 +798,7 @@ export default function SimuladosClient({
                 Você foi designado(a) como <strong>Responsável</strong> pela correção e lançamento das notas do Simulado desta turma na {selectedUnidade}ª Unidade.
               </p>
             </div>
-            <div className="p-6 bg-zinc-50 border-t border-zinc-100">
+            <div className="p-6 bg-canvas border-t border-line-subtle">
               <button
                 onClick={() => setShowWelcomeModal(false)}
                 className="w-full py-3.5 bg-accent hover:bg-accent-hover text-on-accent rounded-xl font-bold text-xs transition-all shadow-card active:scale-95"
@@ -813,10 +813,10 @@ export default function SimuladosClient({
             {/* Modal do Gabarito Professor */}
       {showGabaritoModal && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-zinc-900/80 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-lg shadow-overlay w-full max-w-5xl max-h-[90vh] overflow-y-auto animate-pop-in relative p-4 custom-scrollbar">
+          <div className="bg-surface rounded-lg shadow-overlay w-full max-w-5xl max-h-[90vh] overflow-y-auto animate-pop-in relative p-4 custom-scrollbar">
             <button 
               onClick={() => setShowGabaritoModal(false)}
-              className="absolute top-6 right-6 p-2 bg-zinc-100 hover:bg-zinc-200 rounded-full transition-colors z-10 print:hidden"
+              className="absolute top-6 right-6 p-2 bg-subtle hover:bg-subtle-hover rounded-full transition-colors z-10 print:hidden"
             >
               <X size={24} className="text-fg-muted" />
             </button>
@@ -834,26 +834,26 @@ export default function SimuladosClient({
       )}
       {showGabaritoModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-xl shadow-overlay w-full max-w-xl overflow-hidden animate-pop-in">
-            <div className="px-6 py-5 border-b border-zinc-200 flex justify-between items-center bg-zinc-50">
+          <div className="bg-surface rounded-xl shadow-overlay w-full max-w-xl overflow-hidden animate-pop-in">
+            <div className="px-6 py-5 border-b border-line flex justify-between items-center bg-canvas">
               <h3 className="text-lg font-medium text-fg flex items-center gap-2">
                 <Target size={20} className="text-accent-fg"/>
                 Gabarito da Prova
               </h3>
-              <button onClick={() => setShowGabaritoModal(false)} className="p-2 hover:bg-zinc-200 rounded-xl transition-all"><X size={20}/></button>
+              <button onClick={() => setShowGabaritoModal(false)} className="p-2 hover:bg-subtle-hover rounded-xl transition-all"><X size={20}/></button>
             </div>
             <div className="p-6 max-h-[60vh] overflow-y-auto space-y-3 custom-scrollbar">
               <table className="w-full text-left border-collapse">
-                <thead className="bg-zinc-50 border-b border-zinc-300">
+                <thead className="bg-canvas border-b border-line-strong">
                   <tr>
                     <th className="px-4 py-3 text-xs font-medium text-fg-subtle border-b">Q.</th>
                     <th className="px-4 py-3 text-xs font-medium text-fg-subtle border-b">Disciplina</th>
                     <th className="px-4 py-3 text-xs font-medium text-fg-subtle border-b text-center">Correta</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-100">
+                <tbody className="divide-y divide-line-subtle">
                   {gabarito?.map((q: any) => (
-                    <tr key={q.numero} className="hover:bg-zinc-50">
+                    <tr key={q.numero} className="hover:bg-canvas">
                       <td className="px-4 py-3 text-sm font-bold text-fg-muted">{q.numero}</td>
                       <td className="px-4 py-3 text-xs font-medium text-fg-subtle">{q.disciplina}</td>
                       <td className="px-4 py-3 text-sm font-semibold text-success-fg text-center">{q.correta}</td>
@@ -869,13 +869,13 @@ export default function SimuladosClient({
       {/* Modal para Estudante Faltando */}
       {showMissingStudentModal && (
         <div className="fixed inset-0 bg-zinc-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-fade-in">
-          <div className="bg-white rounded-xl shadow-overlay max-w-md w-full overflow-hidden animate-pop-in">
-            <div className="p-6 border-b border-zinc-100 flex justify-between items-center bg-zinc-50">
+          <div className="bg-surface rounded-xl shadow-overlay max-w-md w-full overflow-hidden animate-pop-in">
+            <div className="p-6 border-b border-line-subtle flex justify-between items-center bg-canvas">
               <h3 className="text-xl font-bold text-fg flex items-center gap-2">
                 <UserPlus className="w-5 h-5 text-accent-fg" />
                 Reportar Ausência
               </h3>
-              <button onClick={() => setShowMissingStudentModal(false)} className="p-2 text-fg-subtle hover:text-fg-muted hover:bg-zinc-200 rounded-full transition-all">
+              <button onClick={() => setShowMissingStudentModal(false)} className="p-2 text-fg-subtle hover:text-fg-muted hover:bg-subtle-hover rounded-full transition-all">
                 <X size={20} />
               </button>
             </div>
@@ -891,7 +891,7 @@ export default function SimuladosClient({
                   required
                   value={missingStudentForm.turmaId}
                   onChange={e => setMissingStudentForm(p => ({ ...p, turmaId: e.target.value }))}
-                  className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-ring focus:border-accent outline-none transition-all text-fg-muted appearance-none"
+                  className="w-full bg-canvas border border-line rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-ring focus:border-accent outline-none transition-all text-fg-muted appearance-none"
                 >
                   <option value="" disabled>Selecione a turma...</option>
                   {turmas.map(t => (
@@ -908,7 +908,7 @@ export default function SimuladosClient({
                   value={missingStudentForm.nome}
                   onChange={e => setMissingStudentForm(p => ({ ...p, nome: e.target.value }))}
                   placeholder="Ex: João Silva Souza"
-                  className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-ring focus:border-accent outline-none transition-all text-fg-muted"
+                  className="w-full bg-canvas border border-line rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-ring focus:border-accent outline-none transition-all text-fg-muted"
                 />
               </div>
 
@@ -920,7 +920,7 @@ export default function SimuladosClient({
                   value={missingStudentForm.matricula}
                   onChange={e => setMissingStudentForm(p => ({ ...p, matricula: e.target.value }))}
                   placeholder="Informe a matrícula"
-                  className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-ring focus:border-accent outline-none transition-all text-fg-muted"
+                  className="w-full bg-canvas border border-line rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-ring focus:border-accent outline-none transition-all text-fg-muted"
                 />
               </div>
 
@@ -932,7 +932,7 @@ export default function SimuladosClient({
                   onChange={e => setMissingStudentForm(p => ({ ...p, observacao: e.target.value }))}
                   placeholder="Ex: Aluno novo, não consta no sistema."
                   rows={2}
-                  className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-ring focus:border-accent outline-none transition-all text-fg-muted resize-none"
+                  className="w-full bg-canvas border border-line rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-ring focus:border-accent outline-none transition-all text-fg-muted resize-none"
                 />
                 
                 {/* Sugestões de Motivos */}
@@ -948,7 +948,7 @@ export default function SimuladosClient({
                       key={motivo}
                       type="button"
                       onClick={() => setMissingStudentForm(p => ({ ...p, observacao: motivo }))}
-                      className="text-xs font-bold bg-zinc-100 hover:bg-accent-subtle hover:text-accent-fg text-fg-subtle px-2.5 py-1.5 rounded-lg border border-zinc-200 hover:border-accent/25 transition-all cursor-pointer"
+                      className="text-xs font-bold bg-subtle hover:bg-accent-subtle hover:text-accent-fg text-fg-subtle px-2.5 py-1.5 rounded-lg border border-line hover:border-accent/25 transition-all cursor-pointer"
                     >
                       {motivo}
                     </button>
@@ -960,7 +960,7 @@ export default function SimuladosClient({
                 <button
                   type="button"
                   onClick={() => setShowMissingStudentModal(false)}
-                  className="flex-1 py-3 text-sm font-medium text-fg-muted bg-zinc-100 hover:bg-zinc-200 rounded-xl transition-all"
+                  className="flex-1 py-3 text-sm font-medium text-fg-muted bg-subtle hover:bg-subtle-hover rounded-xl transition-all"
                 >
                   Cancelar
                 </button>

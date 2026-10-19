@@ -11,9 +11,9 @@ export function MarcaAcesso({ escola, sobreDestaque }: { escola: EscolaDoAcesso;
     <span className="flex min-w-0 items-center gap-3">
       {escola.logoUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={escola.logoUrl} alt="" className={`size-9 shrink-0 rounded-lg object-contain ${sobreDestaque ? "bg-white/90 p-1" : ""}`} />
+        <img src={escola.logoUrl} alt="" className={`size-9 shrink-0 rounded-lg object-contain ${sobreDestaque ? "bg-surface/90 p-1" : ""}`} />
       ) : (
-        <span aria-hidden className={`flex size-9 shrink-0 items-center justify-center rounded-lg text-sm font-semibold ${sobreDestaque ? "bg-white/15 text-on-accent ring-1 ring-white/25" : "bg-accent text-on-accent"}`}>
+        <span aria-hidden className={`flex size-9 shrink-0 items-center justify-center rounded-lg text-sm font-semibold ${sobreDestaque ? "bg-surface/15 text-on-accent ring-1 ring-white/25" : "bg-accent text-on-accent"}`}>
           {escola.nome.charAt(0).toUpperCase()}
         </span>
       )}

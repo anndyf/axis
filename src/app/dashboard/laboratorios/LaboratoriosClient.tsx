@@ -221,7 +221,7 @@ export default function LaboratoriosClient({
   return (
     <div className="max-w-7xl mx-auto space-y-8 animate-fade-in pb-20">
       {/* Header Centralizado */}
-      <section className="bg-white border border-zinc-200 rounded-xl p-8 shadow-sm relative overflow-hidden">
+      <section className="bg-surface border border-line rounded-xl p-8 shadow-sm relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-zinc-500/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-1">
@@ -230,8 +230,8 @@ export default function LaboratoriosClient({
           </div>
 
           <div className="flex flex-wrap gap-3">
-             <div className="bg-zinc-50 border border-zinc-200 rounded-lg p-4 flex items-center gap-4">
-                <div className="w-10 h-10 bg-white border border-zinc-200 rounded-xl flex items-center justify-center text-fg-muted shadow-sm">
+             <div className="bg-canvas border border-line rounded-lg p-4 flex items-center gap-4">
+                <div className="w-10 h-10 bg-surface border border-line rounded-xl flex items-center justify-center text-fg-muted shadow-sm">
                    <Calendar className="w-5 h-5" />
                 </div>
                 <div>
@@ -242,10 +242,10 @@ export default function LaboratoriosClient({
                 </div>
              </div>
 
-             <div className="flex items-center bg-zinc-100 p-1 rounded-lg border border-zinc-200 shadow-card">
+             <div className="flex items-center bg-subtle p-1 rounded-lg border border-line shadow-card">
                 <button 
                   onClick={() => setSelectedDate(subDays(selectedDate, 7))}
-                  className="p-2.5 rounded-xl text-fg-subtle hover:text-fg-muted hover:bg-white transition-all"
+                  className="p-2.5 rounded-xl text-fg-subtle hover:text-fg-muted hover:bg-surface transition-all"
                   title="Semana Anterior"
                 >
                   <ChevronLeft size={18} />
@@ -253,14 +253,14 @@ export default function LaboratoriosClient({
                 
                 <button 
                   onClick={() => setSelectedDate(new Date())}
-                  className="px-4 py-2.5 rounded-xl text-xs font-bold text-fg bg-white shadow-sm hover:bg-zinc-50 transition-all"
+                  className="px-4 py-2.5 rounded-xl text-xs font-bold text-fg bg-surface shadow-sm hover:bg-canvas transition-all"
                 >
                   HOJE
                 </button>
 
                 <button 
                   onClick={() => setSelectedDate(addDays(selectedDate, 7))}
-                  className="p-2.5 rounded-xl text-fg-subtle hover:text-fg-muted hover:bg-white transition-all"
+                  className="p-2.5 rounded-xl text-fg-subtle hover:text-fg-muted hover:bg-surface transition-all"
                   title="Próxima Semana"
                 >
                   <ChevronRight size={18} />
@@ -279,7 +279,7 @@ export default function LaboratoriosClient({
                  className={`flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-all shadow-card active:scale-95 ${
                    selectedSlots.length > 0 
                      ? 'bg-success text-white ' 
-                     : 'bg-white border-2 border-zinc-200 text-fg-subtle'
+                     : 'bg-surface border-2 border-line text-fg-subtle'
                  }`}
                >
                  <Plus size={18} />
@@ -308,7 +308,7 @@ export default function LaboratoriosClient({
                           setShowLabModal(true)
                         }
                       }}
-                      className="p-1.5 bg-white border border-zinc-200 text-fg-subtle rounded-lg hover:border-zinc-900 hover:text-fg transition-all shadow-sm"
+                      className="p-1.5 bg-surface border border-line text-fg-subtle rounded-lg hover:border-zinc-900 hover:text-fg transition-all shadow-sm"
                       title="Editar Laboratório Atual"
                     >
                       <Pencil size={14} />
@@ -332,7 +332,7 @@ export default function LaboratoriosClient({
                <select
                  value={selectedLab}
                  onChange={(e) => setSelectedLab(e.target.value)}
-                 className="w-full appearance-none bg-white border-2 border-zinc-200 rounded-lg pl-5 pr-12 py-4 text-sm font-bold text-fg focus:border-zinc-900 focus:ring-0 transition-all shadow-sm cursor-pointer"
+                 className="w-full appearance-none bg-surface border-2 border-line rounded-lg pl-5 pr-12 py-4 text-sm font-bold text-fg focus:border-zinc-900 focus:ring-0 transition-all shadow-sm cursor-pointer"
                >
                  {initialLaboratorios.map(lab => (
                    <option key={lab.id} value={lab.id} className="font-medium text-fg-muted py-2">
@@ -346,7 +346,7 @@ export default function LaboratoriosClient({
             </div>
 
             {initialLaboratorios.find(l => l.id === selectedLab)?.descricao && (
-               <div className="p-4 bg-zinc-50 rounded-lg border border-zinc-200 animate-slide-up">
+               <div className="p-4 bg-canvas rounded-lg border border-line animate-slide-up">
                   <div className="flex items-center gap-2 mb-2">
                     <Info size={14} className="text-accent-fg" />
                     <span className="text-xs font-bold text-fg-subtle">Sobre este espaço</span>
@@ -378,15 +378,15 @@ export default function LaboratoriosClient({
                       <h4 className="text-sm font-bold text-fg">{turno.nome}</h4>
                    </div>
 
-                   <div className="overflow-x-auto rounded-xl border border-zinc-200 shadow-sm bg-white">
+                   <div className="overflow-x-auto rounded-xl border border-line shadow-sm bg-surface">
                      <table className="w-full border-collapse table-fixed">
                        <thead>
-                         <tr className="bg-zinc-50/50 text-fg-subtle">
-                           <th className="p-4 text-left text-xs font-bold border-b border-zinc-100 w-24">Horário</th>
+                         <tr className="bg-canvas/50 text-fg-subtle">
+                           <th className="p-4 text-left text-xs font-bold border-b border-line-subtle w-24">Horário</th>
                            {weekDays.map(day => {
                              const isToday = isSameDay(day, new Date())
                              return (
-                               <th key={day.toISOString()} className={`p-4 text-center border-b border-zinc-100 min-w-[140px] ${isToday ? 'bg-accent-subtle' : ''}`}>
+                               <th key={day.toISOString()} className={`p-4 text-center border-b border-line-subtle min-w-[140px] ${isToday ? 'bg-accent-subtle' : ''}`}>
                                  <div className="flex flex-col items-center gap-0.5">
                                    <span className={`text-xs font-bold ${isToday ? 'text-accent-fg' : 'text-fg-subtle'}`}>
                                      {format(day, "EEEE", { locale: ptBR })}
@@ -404,15 +404,15 @@ export default function LaboratoriosClient({
                          {Array.from({ length: turno.slots }).map((_, idx) => {
                            const horario = idx + 1
                            return (
-                             <tr key={horario} className="hover:bg-zinc-50/50 transition-colors">
-                               <td className="p-4 border-b border-zinc-100 font-bold text-fg-muted text-xs">{horario}º Horário</td>
+                             <tr key={horario} className="hover:bg-canvas/50 transition-colors">
+                               <td className="p-4 border-b border-line-subtle font-bold text-fg-muted text-xs">{horario}º Horário</td>
                                {weekDays.map(day => {
                                  const reserva = getReservaForSlot(turno.id, horario, day)
                                  const isMyReserva = reserva?.userId === currentUser.id
                                  return (
-                                   <td key={day.toISOString()} className={`p-2 border-b border-zinc-100 border-l border-zinc-50 ${isSameDay(day, new Date()) ? 'bg-accent-subtle' : ''}`}>
+                                   <td key={day.toISOString()} className={`p-2 border-b border-line-subtle border-l border-line-subtle ${isSameDay(day, new Date()) ? 'bg-accent-subtle' : ''}`}>
                                      {reserva ? (
-                                       <div className={`p-3 rounded-xl border relative group ${isMyReserva ? 'bg-success-subtle border-success-line text-success-fg' : 'bg-white border-zinc-200 text-fg-muted shadow-sm'}`}>
+                                       <div className={`p-3 rounded-xl border relative group ${isMyReserva ? 'bg-success-subtle border-success-line text-success-fg' : 'bg-surface border-line text-fg-muted shadow-sm'}`}>
                                          <p className="text-xs font-bold line-clamp-1">{reserva.user?.name || reserva.user?.username}</p>
                                          <p className={`text-xs font-medium line-clamp-1 ${isMyReserva ? 'text-success-fg/80' : 'text-fg-subtle'}`}>{reserva.disciplina || "Uso Técnico"}</p>
                                          
@@ -447,7 +447,7 @@ export default function LaboratoriosClient({
                                          className={`w-full h-10 rounded-xl border transition-all flex items-center justify-center group ${
                                            selectedSlots.find(s => s.data === format(day, 'yyyy-MM-dd') && s.turno === turno.id && s.horario === horario)
                                              ? 'bg-accent-subtle border-accent text-accent-fg ring-4 ring-zinc-900/10'
-                                             : 'border-dashed border-zinc-200 hover:border-zinc-900 hover:bg-white'
+                                             : 'border-dashed border-line hover:border-zinc-900 hover:bg-surface'
                                          }`}
                                        >
                                          <Plus size={14} className={selectedSlots.find(s => s.data === format(day, 'yyyy-MM-dd') && s.turno === turno.id && s.horario === horario) ? "text-white" : "text-zinc-300 group-hover:text-fg"} />
@@ -477,10 +477,10 @@ export default function LaboratoriosClient({
       {/* Modal de Reserva de Horário */}
       {showModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
-           <div className="bg-white rounded-xl shadow-overlay w-full max-w-md overflow-hidden animate-pop-in">
-              <div className="p-6 border-b border-zinc-100 flex items-center justify-between">
+           <div className="bg-surface rounded-xl shadow-overlay w-full max-w-md overflow-hidden animate-pop-in">
+              <div className="p-6 border-b border-line-subtle flex items-center justify-between">
                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-zinc-100 text-fg rounded-xl flex items-center justify-center"><Clock size={20}/></div>
+                    <div className="w-10 h-10 bg-subtle text-fg rounded-xl flex items-center justify-center"><Clock size={20}/></div>
                     <div>
                         <h3 className="text-lg font-bold text-fg tracking-tight">Nova Reserva</h3>
                         <p className="text-xs font-medium text-fg-subtle">
@@ -491,7 +491,7 @@ export default function LaboratoriosClient({
                         </p>
                     </div>
                  </div>
-                 <button onClick={() => setShowModal(false)} className="p-2 hover:bg-zinc-100 rounded-xl transition-all text-fg-subtle"><X size={20}/></button>
+                 <button onClick={() => setShowModal(false)} className="p-2 hover:bg-subtle rounded-xl transition-all text-fg-subtle"><X size={20}/></button>
               </div>
 
               <div className="p-8 space-y-6">
@@ -514,7 +514,7 @@ export default function LaboratoriosClient({
                            setSelectedTurmaId(e.target.value)
                            setSelectedDisciplinaId("")
                          }}
-                         className="w-full bg-zinc-50 border-none rounded-lg px-6 py-4 text-sm font-medium focus:ring-2 focus:ring-zinc-900 transition-all outline-none shadow-sm"
+                         className="w-full bg-canvas border-none rounded-lg px-6 py-4 text-sm font-medium focus:ring-2 focus:ring-zinc-900 transition-all outline-none shadow-sm"
                        >
                          <option value="">Selecione a Turma</option>
                          {myTurmas.map(t => (
@@ -530,7 +530,7 @@ export default function LaboratoriosClient({
                         <select 
                           value={selectedDisciplinaId}
                           onChange={(e) => setSelectedDisciplinaId(e.target.value)}
-                          className="w-full bg-zinc-50 border-none rounded-lg px-6 py-4 text-sm font-medium focus:ring-2 focus:ring-zinc-900 transition-all outline-none shadow-sm"
+                          className="w-full bg-canvas border-none rounded-lg px-6 py-4 text-sm font-medium focus:ring-2 focus:ring-zinc-900 transition-all outline-none shadow-sm"
                         >
                           <option value="">Selecione a Disciplina</option>
                           {selectedTurma?.disciplinas.map((d: any) => (
@@ -549,7 +549,7 @@ export default function LaboratoriosClient({
                           value={formDisciplina}
                           onChange={(e) => setFormDisciplina(e.target.value)}
                           placeholder="Opcional: Descreva a atividade"
-                          className="w-full bg-zinc-50 border-none rounded-lg px-6 py-4 text-sm font-medium focus:ring-2 focus:ring-zinc-900 transition-all outline-none shadow-sm"
+                          className="w-full bg-canvas border-none rounded-lg px-6 py-4 text-sm font-medium focus:ring-2 focus:ring-zinc-900 transition-all outline-none shadow-sm"
                         />
                       </div>
                     )}
@@ -573,7 +573,7 @@ export default function LaboratoriosClient({
                         setSelectedDisciplinaId("")
                         setFormDisciplina("")
                       }} 
-                      className="flex-1 py-4 text-sm font-bold text-fg-subtle hover:bg-zinc-50 rounded-lg transition-all"
+                      className="flex-1 py-4 text-sm font-bold text-fg-subtle hover:bg-canvas rounded-lg transition-all"
                     >
                       CANCELAR
                     </button>
@@ -594,8 +594,8 @@ export default function LaboratoriosClient({
       {/* Modal de Cadastro de Laboratório (Admin) */}
       {showLabModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
-           <div className="bg-white rounded-xl shadow-overlay w-full max-w-md overflow-hidden animate-pop-in">
-              <div className="p-6 border-b border-zinc-100 flex items-center justify-between bg-zinc-50">
+           <div className="bg-surface rounded-xl shadow-overlay w-full max-w-md overflow-hidden animate-pop-in">
+              <div className="p-6 border-b border-line-subtle flex items-center justify-between bg-canvas">
                  <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-subtle border border-line text-fg rounded-xl flex items-center justify-center shadow-card"><Monitor size={20}/></div>
                     <div>
@@ -603,7 +603,7 @@ export default function LaboratoriosClient({
                         <p className="text-xs font-medium text-fg-subtle">Acesso Administrativo</p>
                     </div>
                  </div>
-                 <button onClick={() => { setShowLabModal(false); setEditingLabId(null); }} className="p-2 hover:bg-zinc-200 rounded-xl transition-all text-fg-subtle"><X size={20}/></button>
+                 <button onClick={() => { setShowLabModal(false); setEditingLabId(null); }} className="p-2 hover:bg-subtle-hover rounded-xl transition-all text-fg-subtle"><X size={20}/></button>
               </div>
 
               <div className="p-8 space-y-6">
@@ -615,7 +615,7 @@ export default function LaboratoriosClient({
                          value={formLab.nome}
                          onChange={(e) => setFormLab(prev => ({ ...prev, nome: e.target.value }))}
                          placeholder="Ex: Laboratório de Redes"
-                         className="w-full bg-zinc-50 border-none rounded-lg px-6 py-4 text-sm font-medium focus:ring-2 focus:ring-zinc-900 transition-all outline-none shadow-sm"
+                         className="w-full bg-canvas border-none rounded-lg px-6 py-4 text-sm font-medium focus:ring-2 focus:ring-zinc-900 transition-all outline-none shadow-sm"
                        />
                     </div>
                     <div className="space-y-2">
@@ -624,7 +624,7 @@ export default function LaboratoriosClient({
                          value={formLab.descricao}
                          onChange={(e) => setFormLab(prev => ({ ...prev, descricao: e.target.value }))}
                          placeholder="Informações sobre equipamentos, capacidade, etc."
-                         className="w-full bg-zinc-50 border-none rounded-lg px-6 py-4 text-sm font-medium focus:ring-2 focus:ring-zinc-900 transition-all outline-none shadow-sm min-h-[100px]"
+                         className="w-full bg-canvas border-none rounded-lg px-6 py-4 text-sm font-medium focus:ring-2 focus:ring-zinc-900 transition-all outline-none shadow-sm min-h-[100px]"
                        />
                     </div>
                  </div>
@@ -632,7 +632,7 @@ export default function LaboratoriosClient({
                   <div className="flex gap-4 pt-4">
                     <button 
                       onClick={() => { setShowLabModal(false); setEditingLabId(null); }} 
-                      className="flex-1 py-4 text-sm font-bold text-fg-subtle hover:bg-zinc-50 rounded-lg transition-all"
+                      className="flex-1 py-4 text-sm font-bold text-fg-subtle hover:bg-canvas rounded-lg transition-all"
                     >
                       CANCELAR
                     </button>

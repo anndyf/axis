@@ -61,7 +61,7 @@ export default function AvaliacoesClient({ disciplinaId, turmaId, etapas }: { di
             </div>
 
             {etapa.avaliacoes.length === 0 && <p className="text-sm text-fg-subtle">Nenhuma avaliação nesta unidade ainda.</p>}
-            <div className="divide-y divide-zinc-100">
+            <div className="divide-y divide-line-subtle">
               {etapa.avaliacoes.map((a) => editando?.id === a.id ? (
                 <div key={a.id} className="flex flex-wrap items-end gap-2 py-2">
                   <input aria-label="Nome" value={editando.dados.nome} onChange={(e) => setEditando({ ...editando, dados: { ...editando.dados, nome: e.target.value } })} className={`${input} flex-1 min-w-[10rem]`} />
@@ -69,7 +69,7 @@ export default function AvaliacoesClient({ disciplinaId, turmaId, etapas }: { di
                   <input aria-label="Vale" value={editando.dados.notaMaxima} disabled={a.temNotas} onChange={(e) => setEditando({ ...editando, dados: { ...editando.dados, notaMaxima: e.target.value } })} className={`${input} w-20`} />
                   <input aria-label="Peso" value={editando.dados.peso} disabled={a.temNotas} onChange={(e) => setEditando({ ...editando, dados: { ...editando.dados, peso: e.target.value } })} className={`${input} w-16`} />
                   <button disabled={pendente} className={botao} onClick={() => executar(() => editarAvaliacao(a.id, editando.dados), "Avaliação atualizada.", () => setEditando(null))}><Save className="w-4 h-4" /> Salvar</button>
-                  <button aria-label="Cancelar" onClick={() => setEditando(null)} className="p-2 rounded-lg hover:bg-zinc-100"><X className="w-4 h-4" /></button>
+                  <button aria-label="Cancelar" onClick={() => setEditando(null)} className="p-2 rounded-lg hover:bg-subtle"><X className="w-4 h-4" /></button>
                 </div>
               ) : (
                 <div key={a.id} className="flex flex-wrap items-center gap-3 py-2">
@@ -79,7 +79,7 @@ export default function AvaliacoesClient({ disciplinaId, turmaId, etapas }: { di
                       vale {num(a.notaMaxima)}{etapa.formaCalculo === "MEDIA_PONDERADA" && ` · peso ${num(a.peso)}`}{a.data && ` · ${dataBR(a.data)}`}{a.temNotas && " · com notas lançadas"}
                     </p>
                   </div>
-                  <button aria-label="Editar" onClick={() => setEditando({ id: a.id, dados: { nome: a.nome, data: a.data, notaMaxima: String(a.notaMaxima), peso: String(a.peso) } })} className="p-2 rounded-lg hover:bg-zinc-100 text-fg-subtle"><Pencil className="w-4 h-4" /></button>
+                  <button aria-label="Editar" onClick={() => setEditando({ id: a.id, dados: { nome: a.nome, data: a.data, notaMaxima: String(a.notaMaxima), peso: String(a.peso) } })} className="p-2 rounded-lg hover:bg-subtle text-fg-subtle"><Pencil className="w-4 h-4" /></button>
                   <button aria-label="Remover" disabled={pendente || a.temNotas} title={a.temNotas ? "Já há notas lançadas" : undefined} onClick={() => {
                     if (window.confirm(`Remover "${a.nome}"?`)) executar(() => removerAvaliacao(a.id), "Avaliação removida.")
                   }} className="p-2 rounded-lg hover:bg-danger-subtle text-fg-subtle hover:text-danger-fg disabled:opacity-30"><Trash2 className="w-4 h-4" /></button>
@@ -87,7 +87,7 @@ export default function AvaliacoesClient({ disciplinaId, turmaId, etapas }: { di
               ))}
             </div>
 
-            <div className="flex flex-wrap items-end gap-2 pt-2 border-t border-zinc-100">
+            <div className="flex flex-wrap items-end gap-2 pt-2 border-t border-line-subtle">
               <label className="text-xs text-fg-subtle space-y-1 flex-1 min-w-[10rem]"><span className="block">Nova avaliação</span>
                 <input value={nova.nome} onChange={(e) => setNova("nome", e.target.value)} className={`${input} w-full`} placeholder="Ex.: Prova 1, Seminário" />
               </label>

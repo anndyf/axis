@@ -124,7 +124,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
           className={`p-4 rounded-lg border text-left transition-all ${
             filtroStatus === 'todos'
               ? 'bg-accent-subtle border-accent'
-              : 'bg-white border-zinc-200 hover:border-zinc-300 hover:shadow-sm'
+              : 'bg-surface border-line hover:border-line-strong hover:shadow-sm'
           }`}
         >
           <Users className={`w-4 h-4 mb-2 ${filtroStatus === 'todos' ? 'text-fg-muted' : 'text-fg-subtle'}`} />
@@ -138,7 +138,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
           className={`p-4 rounded-lg border text-left transition-all ${
             filtroStatus === 'ativos'
               ? 'bg-success-subtle border-success'
-              : 'bg-white border-zinc-200 hover:border-success-line hover:shadow-sm'
+              : 'bg-surface border-line hover:border-success-line hover:shadow-sm'
           }`}
         >
           <CheckCircle2 className={`w-4 h-4 mb-2 ${filtroStatus === 'ativos' ? 'text-fg-muted' : 'text-success-fg'}`} />
@@ -152,7 +152,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
           className={`p-4 rounded-lg border text-left transition-all relative ${
             filtroStatus === 'pendentes'
               ? 'bg-warning-subtle border-warning'
-              : 'bg-white border-zinc-200 hover:border-warning-line hover:shadow-sm'
+              : 'bg-surface border-line hover:border-warning-line hover:shadow-sm'
           }`}
         >
           {stats.pendentes > 0 && filtroStatus !== 'pendentes' && (
@@ -164,21 +164,21 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
         </button>
 
         {/* Pausados */}
-        <div className="p-4 rounded-lg border border-zinc-200 bg-white text-left">
+        <div className="p-4 rounded-lg border border-line bg-surface text-left">
           <PauseCircle className="w-4 h-4 mb-2 text-danger" />
           <p className="text-2xl font-semibold leading-none text-fg">{stats.pausados}</p>
           <p className="text-xs font-bold mt-1 text-fg-subtle">Pausados</p>
         </div>
 
         {/* Professores */}
-        <div className="p-4 rounded-lg border border-zinc-200 bg-white text-left">
+        <div className="p-4 rounded-lg border border-line bg-surface text-left">
           <GraduationCap className="w-4 h-4 mb-2 text-accent-fg" />
           <p className="text-2xl font-semibold leading-none text-fg">{stats.professores}</p>
           <p className="text-xs font-bold mt-1 text-fg-subtle">Professores</p>
         </div>
 
         {/* Admins */}
-        <div className="p-4 rounded-lg border border-zinc-200 bg-white text-left">
+        <div className="p-4 rounded-lg border border-line bg-surface text-left">
           <Shield className="w-4 h-4 mb-2 text-accent-fg" />
           <p className="text-2xl font-semibold leading-none text-fg">{stats.admins}</p>
           <p className="text-xs font-bold mt-1 text-fg-subtle">Admins</p>
@@ -194,7 +194,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
             placeholder="Buscar por nome, e-mail ou @username..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 bg-white border border-zinc-200 rounded-xl text-sm focus:ring-2 focus:ring-ring outline-none transition-all"
+            className="w-full pl-9 pr-4 py-2.5 bg-surface border border-line rounded-xl text-sm focus:ring-2 focus:ring-ring outline-none transition-all"
           />
         </div>
 
@@ -204,7 +204,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
           <select
             value={filtroStatus}
             onChange={e => setFiltroStatus(e.target.value as any)}
-            className="pl-8 pr-4 py-2.5 bg-white border border-zinc-200 rounded-xl text-sm font-semibold text-fg-muted focus:ring-2 focus:ring-ring outline-none appearance-none cursor-pointer transition-all"
+            className="pl-8 pr-4 py-2.5 bg-surface border border-line rounded-xl text-sm font-semibold text-fg-muted focus:ring-2 focus:ring-ring outline-none appearance-none cursor-pointer transition-all"
           >
             <option value="todos">Todos</option>
             <option value="pendentes">Pendentes ({totalPendentes})</option>
@@ -225,10 +225,10 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
       </div>
 
       {/* Tabela */}
-      <div className="bg-white rounded-xl shadow-card border border-zinc-300 overflow-hidden">
+      <div className="bg-surface rounded-xl shadow-card border border-line-strong overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-zinc-50 border-b border-zinc-300">
+            <thead className="bg-canvas border-b border-line-strong">
               <tr>
                 {/* Checkbox selecionar todos */}
                 <th className="pl-6 pr-2 py-4 w-10">
@@ -249,15 +249,15 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
                 <th className="px-6 py-4 text-right text-xs font-medium text-fg-muted">Gerenciamento</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-200">
+            <tbody className="divide-y divide-line">
               {usuariosFiltrados.map((usuario) => (
                 <tr
                   key={usuario.id}
                   onClick={() => toggleSelect(usuario.id)}
                   className={`transition-colors cursor-pointer
                     ${selectedIds.has(usuario.id) ? 'bg-accent-subtle' : ''}
-                    ${!selectedIds.has(usuario.id) && !usuario.isActive ? 'opacity-60 bg-zinc-100' : ''}
-                    ${!selectedIds.has(usuario.id) ? 'hover:bg-zinc-50' : ''}
+                    ${!selectedIds.has(usuario.id) && !usuario.isActive ? 'opacity-60 bg-subtle' : ''}
+                    ${!selectedIds.has(usuario.id) ? 'hover:bg-canvas' : ''}
                   `}
                 >
                   {/* Checkbox */}
@@ -306,7 +306,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
                               </span>
                             )}
                              {usuario.isStaff && (
-                               <span className="px-2.5 py-0.5 inline-flex items-center text-xs font-medium rounded-full bg-zinc-200 text-fg border border-zinc-300">
+                               <span className="px-2.5 py-0.5 inline-flex items-center text-xs font-medium rounded-full bg-subtle-hover text-fg border border-line-strong">
                                  <GraduationCap className="w-3 h-3 mr-1" />Professor
                                </span>
                              )}
@@ -333,7 +333,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
 
                   <td className="px-6 py-4 whitespace-nowrap text-center text-sm">
                     {usuario.isSuperuser ? (
-                      <span className="text-fg-muted font-medium text-xs bg-zinc-50 px-3 py-1 rounded-lg border border-zinc-200">Controle Total</span>
+                      <span className="text-fg-muted font-medium text-xs bg-canvas px-3 py-1 rounded-lg border border-line">Controle Total</span>
                     ) : !usuario.isApproved ? (
                       <span className="text-fg-subtle italic text-xs font-medium">A aguardar</span>
                     ) : (
@@ -359,7 +359,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
               {usuariosFiltrados.length === 0 && (
                 <tr>
                   <td colSpan={5} className="px-6 py-20 text-center">
-                    <Users className="w-10 h-10 text-zinc-200 mx-auto mb-3" />
+                    <Users className="w-10 h-10 text-fg-disabled mx-auto mb-3" />
                     <p className="text-sm font-semibold text-fg-subtle">Nenhum usuário encontrado</p>
                   </td>
                 </tr>

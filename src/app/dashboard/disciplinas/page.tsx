@@ -52,9 +52,9 @@ export default async function DisciplinasPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-32">
         {disciplinas.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-card border border-zinc-200 p-20 text-center">
-            <div className="w-20 h-20 bg-zinc-50 flex items-center justify-center rounded-xl mx-auto mb-6">
-               <BookOpen className="w-10 h-10 text-zinc-300" />
+          <div className="bg-surface rounded-xl shadow-card border border-line p-20 text-center">
+            <div className="w-20 h-20 bg-canvas flex items-center justify-center rounded-xl mx-auto mb-6">
+               <BookOpen className="w-10 h-10 text-fg-disabled" />
             </div>
             <h3 className="text-2xl font-medium text-fg mb-2">
               Nenhuma disciplina cadastrada

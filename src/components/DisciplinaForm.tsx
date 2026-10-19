@@ -177,7 +177,7 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50">
+    <div className="min-h-screen bg-canvas">
       <ErrorModal 
         isOpen={isErrorModalOpen}
         onClose={() => setIsErrorModalOpen(false)}
@@ -194,12 +194,12 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
         loading={deleteLoading}
       />
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-zinc-200">
+      <header className="bg-surface shadow-sm border-b border-line">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center space-x-4">
             <Link
               href="/dashboard/disciplinas"
-              className="p-2 hover:bg-zinc-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-subtle rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5 text-fg-muted" />
             </Link>
@@ -217,7 +217,7 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-zinc-200 p-6">
+        <form onSubmit={handleSubmit} className="bg-surface rounded-xl shadow-sm border border-line p-6">
           <div className="space-y-8">
             {/* Seção 1: Dados da Disciplina */}
             <div>
@@ -234,7 +234,7 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
                       id="bulkMode"
                       checked={bulkMode}
                       onChange={(e) => setBulkMode(e.target.checked)}
-                      className="h-4 w-4 text-accent-fg focus:ring-ring border-zinc-300 rounded cursor-pointer"
+                      className="h-4 w-4 text-accent-fg focus:ring-ring border-line-strong rounded cursor-pointer"
                     />
                     <label htmlFor="bulkMode" className="ml-2 block text-sm text-fg cursor-pointer select-none">
                       Cadastrar múltiplas disciplinas (em lote)
@@ -252,7 +252,7 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
                     rows={5}
                     value={nomesBulk}
                     onChange={(e) => setNomesBulk(e.target.value)}
-                    className="w-full px-4 py-3 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-line-strong rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
                     placeholder="Matemática&#10;Português&#10;História"
                     required
                   />
@@ -263,7 +263,7 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
                     required
                     value={formData.nome}
                     onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                    className="w-full px-4 py-3 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-line-strong rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
                     placeholder="Ex: Programação Web"
                   />
                 )}
@@ -281,7 +281,7 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
                     id="areaId"
                     value={formData.areaId}
                     onChange={(e) => setFormData({ ...formData, areaId: e.target.value })}
-                    className="w-full px-4 py-3 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-line-strong rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
                   >
                     <option value="">Nenhuma área selecionada</option>
                     {areas.map((area) => (
@@ -297,7 +297,7 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
               </div>
             </div>
 
-            <div className="border-t border-zinc-100 pt-6"></div>
+            <div className="border-t border-line-subtle pt-6"></div>
 
             {/* Seção 2: Seleção de Turmas */}
             <div>
@@ -329,7 +329,7 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
                       required
                       value={formData.turmaId}
                       onChange={(e) => setFormData({ ...formData, turmaId: e.target.value })}
-                      className="w-full px-4 py-3 border border-zinc-300 rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent"
+                      className="w-full px-4 py-3 border border-line-strong rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent"
                     >
                       <option value="">Selecione uma turma...</option>
                       {turmas.map((turma) => (
@@ -342,7 +342,7 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
                    <div className="max-h-[500px] overflow-y-auto pr-2 custom-scrollbar space-y-6">
                      {sortedTurnos.map(turno => (
                         <div key={turno}>
-                           <h4 className="flex items-center text-sm font-semibold text-fg mb-3 pb-1 border-b border-zinc-100">
+                           <h4 className="flex items-center text-sm font-semibold text-fg mb-3 pb-1 border-b border-line-subtle">
                                 {turno === 'Matutino' && <Sun className="w-4 h-4 mr-2 text-warning-fg"/>}
                                 {turno === 'Vespertino' && <Sunset className="w-4 h-4 mr-2 text-warning-fg"/>}
                                 {turno === 'Noturno' && <Moon className="w-4 h-4 mr-2 text-accent-fg"/>}
@@ -363,11 +363,11 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
                                                   className={`flex items-center p-2 rounded border cursor-pointer transition-all duration-200 group ${
                                                     isSelected 
                                                       ? 'bg-accent-subtle border-accent/25 ring-1 ring-ring' 
-                                                      : 'hover:bg-zinc-50 border-zinc-200'
+                                                      : 'hover:bg-canvas border-line'
                                                   }`}
                                                 >
                                                   <div className={`flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center mr-2 transition-colors ${
-                                                    isSelected ? 'bg-accent border-accent' : 'border-zinc-300 bg-white'
+                                                    isSelected ? 'bg-accent border-accent' : 'border-line-strong bg-surface'
                                                   }`}>
                                                     {isSelected && <CheckSquare className="w-3 h-3 text-white" />}
                                                     <input
@@ -398,7 +398,7 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
             </div>
           </div>
 
-          <div className="mt-8 flex items-center justify-between pt-6 border-t border-zinc-100">
+          <div className="mt-8 flex items-center justify-between pt-6 border-t border-line-subtle">
             <div>
               {isEdit && (
                 <button
@@ -414,7 +414,7 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
             <div className="flex space-x-4">
               <Link
                 href="/dashboard/disciplinas"
-                className="px-6 py-3 text-fg-muted hover:bg-zinc-100 rounded-lg transition-colors font-medium"
+                className="px-6 py-3 text-fg-muted hover:bg-subtle rounded-lg transition-colors font-medium"
               >
                 Cancelar
               </Link>

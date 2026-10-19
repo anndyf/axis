@@ -119,7 +119,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
   const turmaEntries = Object.entries(disciplinasPorTurma)
 
   return (
-    <div className="bg-canvas">
+    <div className="">
       {/* Header Fixo Premium */}
       <header className="mb-6">
         <div className="max-w-5xl mx-auto px-6 py-4">
@@ -127,7 +127,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
             <div className="flex min-w-0 items-center gap-3">
               <Link 
                 href="/dashboard/usuarios" 
-                className="p-2 hover:bg-zinc-200 rounded-xl transition-colors border border-transparent hover:border-zinc-300"
+                className="p-2 hover:bg-subtle-hover rounded-xl transition-colors border border-transparent hover:border-line-strong"
               >
                 <ArrowLeft className="w-5 h-5 text-fg-muted" />
               </Link>
@@ -142,7 +142,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
             <div className="flex items-center gap-3">
               <Link
                 href={`/dashboard/usuarios/${usuario.id}/importar-horario`}
-                className="flex items-center gap-2 border border-zinc-300 text-fg-muted px-4 py-2.5 rounded-xl font-medium text-sm hover:bg-zinc-50 transition-all"
+                className="flex items-center gap-2 border border-line-strong text-fg-muted px-4 py-2.5 rounded-xl font-medium text-sm hover:bg-canvas transition-all"
               >
                 <ClipboardPaste className="w-4 h-4" />
                 <span>Importar Horário</span>
@@ -171,13 +171,13 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
             placeholder="Buscar por turma ou disciplina..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-14 pr-12 py-5 bg-white border border-zinc-300 rounded-xl shadow-sm focus:ring-4 focus:ring-zinc-500/10 focus:border-zinc-500 outline-none font-medium text-fg-muted transition-all"
+            className="w-full pl-14 pr-12 py-5 bg-surface border border-line-strong rounded-xl shadow-sm focus:ring-4 focus:ring-zinc-500/10 focus:border-zinc-500 outline-none font-medium text-fg-muted transition-all"
           />
           <div className="absolute inset-y-0 right-5 flex items-center gap-2">
             {search && (
               <button 
                 onClick={() => setSearch("")}
-                className="p-1 hover:bg-zinc-100 rounded-lg transition-colors"
+                className="p-1 hover:bg-subtle rounded-lg transition-colors"
                 title="Limpar busca"
               >
                 <X className="w-5 h-5 text-fg-subtle hover:text-fg-muted" />
@@ -188,7 +188,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
                  showOnlySelected 
                  ? 'bg-accent-subtle text-accent-fg border-accent shadow-card' 
-                 : 'bg-white text-fg-subtle border-zinc-200 hover:border-zinc-300'
+                 : 'bg-surface text-fg-subtle border-line hover:border-line-strong'
                }`}
             >
                <Filter className="w-3.5 h-3.5" />
@@ -212,14 +212,14 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
 
         {/* Disciplinas Vinculadas Atualmente */}
         {disciplinasSelecionadasList.length > 0 && (
-          <div className="mb-10 p-6 bg-white rounded-xl border border-zinc-200 shadow-sm">
+          <div className="mb-10 p-6 bg-surface rounded-xl border border-line shadow-sm">
             <h2 className="text-xs font-bold text-fg mb-5 flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-fg-subtle" />
               Disciplinas Já Vinculadas ({disciplinasSelecionadasList.length})
             </h2>
             <div className="flex flex-wrap gap-2.5">
               {disciplinasSelecionadasList.map((disc: any) => (
-                <div key={disc.id} className="flex items-center gap-2 px-3 py-2 bg-zinc-50 text-fg-muted rounded-xl border border-zinc-200">
+                <div key={disc.id} className="flex items-center gap-2 px-3 py-2 bg-canvas text-fg-muted rounded-xl border border-line">
                   <span className="text-xs font-semibold">{disc.nome} <span className="text-fg-subtle font-medium">· {disc.turma}</span></span>
                   <button 
                     onClick={() => toggleDisciplina(disc.id)}
@@ -235,9 +235,9 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
         )}
 
         {turmaEntries.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-xl border border-dashed border-zinc-300">
-            <div className="w-16 h-16 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Filter className="w-8 h-8 text-zinc-300" />
+          <div className="text-center py-20 bg-surface rounded-xl border border-dashed border-line-strong">
+            <div className="w-16 h-16 bg-canvas rounded-full flex items-center justify-center mx-auto mb-4">
+              <Filter className="w-8 h-8 text-fg-disabled" />
             </div>
             <p className="text-fg-muted font-medium">Nenhuma turma encontrada para "{search}"</p>
           </div>
@@ -251,18 +251,18 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
               return (
                 <div 
                   key={turmaKey} 
-                  className={`bg-white rounded-xl border transition-all overflow-hidden ${
-                    isExpanded ? 'ring-2 ring-zinc-900 border-transparent shadow-card' : 'border-zinc-300 hover:border-zinc-400'
+                  className={`bg-surface rounded-xl border transition-all overflow-hidden ${
+                    isExpanded ? 'ring-2 ring-zinc-900 border-transparent shadow-card' : 'border-line-strong hover:border-zinc-400'
                   }`}
                 >
                   {/* Cabeçalho da Turma (Acordeão) */}
                   <button
                     onClick={() => toggleTurma(turmaKey)}
-                    className="w-full px-8 py-6 flex items-center justify-between hover:bg-zinc-50 transition-colors text-left"
+                    className="w-full px-8 py-6 flex items-center justify-between hover:bg-canvas transition-colors text-left"
                   >
                     <div className="flex items-center space-x-4">
                       <div className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all ${
-                        isExpanded ? 'bg-subtle border border-line text-fg' : 'bg-zinc-200 text-fg-muted'
+                        isExpanded ? 'bg-subtle border border-line text-fg' : 'bg-subtle-hover text-fg-muted'
                       }`}>
                         <School className="w-6 h-6" />
                       </div>
@@ -286,7 +286,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
                   {/* Conteúdo das Disciplinas */}
                   {isExpanded && (
                     <div className="px-8 pb-8 animate-slide-up">
-                      <div className="h-px bg-zinc-200 mb-6" />
+                      <div className="h-px bg-subtle-hover mb-6" />
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         {disciplinas.map((disc: any) => {
                           const isSelected = selectedIds.includes(disc.id)
@@ -298,8 +298,8 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
                               key={disc.id} 
                               className={`group flex flex-col p-4 rounded-lg border-2 transition-all cursor-pointer relative ${
                                 isSelected 
-                                  ? 'bg-zinc-100 border-zinc-700 shadow-sm' 
-                                  : 'bg-white border-zinc-200 hover:border-zinc-300'
+                                  ? 'bg-subtle border-zinc-700 shadow-sm' 
+                                  : 'bg-surface border-line hover:border-line-strong'
                               } ${outroProfessor && !isSelected ? 'border-warning-line bg-warning-subtle' : ''}`}
                             >
                               <div className="flex items-center justify-between w-full">
@@ -307,7 +307,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
                                   {disc.nome}
                                 </span>
                                 <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
-                                  isSelected ? 'border-zinc-700 bg-zinc-700' : 'border-zinc-300 group-hover:border-zinc-300'
+                                  isSelected ? 'border-zinc-700 bg-zinc-700' : 'border-line-strong group-hover:border-line-strong'
                                 }`}>
                                   <input
                                     type="checkbox"

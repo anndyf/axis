@@ -42,7 +42,7 @@ export default async function MessagesPage() {
           <p className="text-fg-muted font-medium">Central de comunicação e comunicados oficiais.</p>
         </div>
         
-        <div className="flex flex-wrap items-center gap-6 bg-white border border-zinc-200 px-6 py-3 rounded-xl shadow-sm">
+        <div className="flex flex-wrap items-center gap-6 bg-surface border border-line px-6 py-3 rounded-xl shadow-sm">
            <div className="flex items-center gap-2 group">
               <span className="w-2 h-2 rounded-full bg-zinc-500 shadow-card group-hover:scale-125 transition-transform"></span>
               <p className="text-xs font-medium text-fg-muted">Suporte</p>
@@ -59,8 +59,8 @@ export default async function MessagesPage() {
       </div>
 
       {/* Alerta de Suporte Fixo */}
-      <div className="bg-zinc-100 border border-zinc-200 rounded-xl p-6 flex flex-col md:flex-row items-center gap-6 animate-slide-up">
-        <div className="w-14 h-14 bg-white rounded-lg shadow-card flex items-center justify-center shrink-0">
+      <div className="bg-subtle border border-line rounded-xl p-6 flex flex-col md:flex-row items-center gap-6 animate-slide-up">
+        <div className="w-14 h-14 bg-surface rounded-lg shadow-card flex items-center justify-center shrink-0">
           <LifeBuoy className="text-fg-muted w-7 h-7" />
         </div>
         <div className="flex-1 text-center md:text-left">

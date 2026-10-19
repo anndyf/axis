@@ -354,7 +354,7 @@ export default function ConselhoClasseClient({
       `}</style>
 
       {/* Versão para impressão - Tabela */}
-      <div className="print-only p-6 bg-white">
+      <div className="print-only p-6 bg-surface">
         {/* Marca d'água */}
         <div className="print-watermark">
           Powered by Áxis
@@ -369,7 +369,7 @@ export default function ConselhoClasseClient({
             </p>
             <div className="flex items-center gap-2 mb-1">
               <div className="text-fg font-medium text-lg">Áxis</div>
-              <div className="text-zinc-300">|</div>
+              <div className="text-fg-disabled">|</div>
               <h1 className="text-xl font-medium text-fg">Conselho de Classe Final</h1>
             </div>
             <h2 className="text-lg font-medium text-fg mb-0.5">{turmaNome}</h2>
@@ -378,7 +378,7 @@ export default function ConselhoClasseClient({
           </div>
           
           {/* Legenda - Direita */}
-          <div className="bg-white rounded px-3 py-2 border border-zinc-300" style={{minWidth: '450px'}}>
+          <div className="bg-surface rounded px-3 py-2 border border-line-strong" style={{minWidth: '450px'}}>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs">
               <span className="font-medium text-accent-fg text-xs mr-1">LEGENDA:</span>
               <div className="flex items-center gap-1">
@@ -390,7 +390,7 @@ export default function ConselhoClasseClient({
                 <span className="font-medium">Aprov. Conselho</span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="px-2 py-1 bg-zinc-200 border border-zinc-400 font-medium rounded text-accent-fg text-[7px]">DP</span>
+                <span className="px-2 py-1 bg-subtle-hover border border-zinc-400 font-medium rounded text-accent-fg text-[7px]">DP</span>
                 <span className="font-medium">Dependência</span>
               </div>
               <div className="flex items-center gap-1">
@@ -408,13 +408,13 @@ export default function ConselhoClasseClient({
         <table className="print-table w-full border-collapse text-xs">
           <thead>
             <tr>
-              <th className="border border-zinc-400 px-2 bg-white font-medium text-center text-xs" style={{minWidth: '120px', maxWidth: '120px', width: '120px', height: '100px', verticalAlign: 'middle'}}>
+              <th className="border border-zinc-400 px-2 bg-surface font-medium text-center text-xs" style={{minWidth: '120px', maxWidth: '120px', width: '120px', height: '100px', verticalAlign: 'middle'}}>
                 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%'}}>
                   ESTUDANTE
                 </div>
               </th>
               {disciplinas.map((disc) => (
-                <th key={disc} className="border border-zinc-400 bg-white font-medium text-center" style={{minWidth: '20px', maxWidth: '20px', width: '20px', height: '100px', padding: '8px 0'}}>
+                <th key={disc} className="border border-zinc-400 bg-surface font-medium text-center" style={{minWidth: '20px', maxWidth: '20px', width: '20px', height: '100px', padding: '8px 0'}}>
                   <div style={{
                     writingMode: 'vertical-rl',
                     transform: 'rotate(180deg)',
@@ -444,14 +444,14 @@ export default function ConselhoClasseClient({
 
                 return (
                   <tr key={estudanteId}>
-                    <td className="border border-zinc-400 px-2 py-0.5 font-medium text-left bg-white text-xs leading-tight" style={{maxWidth: '120px', width: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
+                    <td className="border border-zinc-400 px-2 py-0.5 font-medium text-left bg-surface text-xs leading-tight" style={{maxWidth: '120px', width: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
                       <span className="text-fg-muted mr-1 text-xs">{String(idx + 1).padStart(2, '0')}</span>
                       <span>{data.nome}</span>
                     </td>
                     {disciplinas.map((disc) => {
                       const nota = notasPorDisciplina[disc]
                       if (!nota) {
-                        return <td key={disc} className="border border-zinc-400 px-1 py-1 text-center bg-white">-</td>
+                        return <td key={disc} className="border border-zinc-400 px-1 py-1 text-center bg-surface">-</td>
                       }
                       
                       const statusAtual = decisoes[nota.id] || nota.status
@@ -517,7 +517,7 @@ export default function ConselhoClasseClient({
             <div className="flex items-center space-x-5">
               <Link
                 href="/dashboard/conselho-classe"
-                className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-fg-subtle hover:text-fg-muted"
+                className="p-2 hover:bg-subtle-hover rounded-lg transition-colors text-fg-subtle hover:text-fg-muted"
               >
                 <ArrowLeft size={20} />
               </Link>
@@ -557,7 +557,7 @@ export default function ConselhoClasseClient({
           )}
 
           {/* Dashboard de Visão Geral */}
-          <div className="mb-6 bg-white p-1.5 rounded-xl border border-zinc-300 shadow-card overflow-hidden">
+          <div className="mb-6 bg-surface p-1.5 rounded-xl border border-line-strong shadow-card overflow-hidden">
             <div className="p-4">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 {/* Métricas Rápidas */}
@@ -576,7 +576,7 @@ export default function ConselhoClasseClient({
 
                   return (
                     <div className="flex flex-wrap items-center gap-2">
-                      <div className="px-3 py-1.5 bg-white rounded-xl border border-zinc-200 flex items-center space-x-2">
+                      <div className="px-3 py-1.5 bg-surface rounded-xl border border-line flex items-center space-x-2">
                         <div className="w-1 h-1 bg-zinc-400 rounded-full" />
                         <span className="text-xs font-medium text-fg-subtle">{total} Alunos</span>
                       </div>
@@ -597,7 +597,7 @@ export default function ConselhoClasseClient({
                   <button 
                     type="button"
                     onClick={handlePrint}
-                    className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-medium transition-all bg-white text-fg-muted border border-zinc-300 hover:border-zinc-500 hover:text-fg-muted hover:bg-zinc-100"
+                    className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-medium transition-all bg-surface text-fg-muted border border-line-strong hover:border-zinc-500 hover:text-fg-muted hover:bg-subtle"
                   >
                     <Printer className="w-3 h-3" />
                     <span>Imprimir</span>
@@ -609,7 +609,7 @@ export default function ConselhoClasseClient({
                     className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
                       showInstructions 
                       ? 'bg-zinc-800 text-white shadow-card' 
-                      : 'bg-white text-fg-subtle border border-zinc-300 hover:border-accent/25 hover:text-accent-fg font-medium'
+                      : 'bg-surface text-fg-subtle border border-line-strong hover:border-accent/25 hover:text-accent-fg font-medium'
                     }`}
                   >
                     <AlertCircle className="w-3 h-3" />
@@ -620,7 +620,7 @@ export default function ConselhoClasseClient({
 
               {/* Instruções Expansíveis */}
               {showInstructions && (
-                <div className="mt-8 p-8 bg-white rounded-xl border border-zinc-200 animate-slide-up">
+                <div className="mt-8 p-8 bg-surface rounded-xl border border-line animate-slide-up">
                   <div className="flex items-start space-x-5">
                     <div className="p-3 bg-accent rounded-lg shadow-card">
                       <Gavel className="w-6 h-6 text-white" />
@@ -647,8 +647,8 @@ export default function ConselhoClasseClient({
               )}
 
               {/* Legenda Minimalista */}
-              <div className="mt-8 pt-6 border-t border-zinc-50 flex flex-wrap items-center gap-8 px-2">
-                <span className="text-xs font-medium text-zinc-300">Legenda de Estados:</span>
+              <div className="mt-8 pt-6 border-t border-line-subtle flex flex-wrap items-center gap-8 px-2">
+                <span className="text-xs font-medium text-fg-disabled">Legenda de Estados:</span>
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 rounded-full bg-success" />
                   <span className="text-xs font-medium text-fg-muted">Aprovado</span>
@@ -710,8 +710,8 @@ export default function ConselhoClasseClient({
               return (
                 <div 
                   key={estudanteId} 
-                  className={`bg-white rounded-lg shadow-sm transition-all duration-300 border ${
-                    isExpanded ? 'shadow-card border-zinc-300' : 'border-zinc-200'
+                  className={`bg-surface rounded-lg shadow-sm transition-all duration-300 border ${
+                    isExpanded ? 'shadow-card border-line-strong' : 'border-line'
                   } ${
                     todasResolvidas ? 'bg-success-subtle border-success-line' : ''
                   }`}
@@ -721,12 +721,12 @@ export default function ConselhoClasseClient({
                     type="button"
                     onClick={() => toggleStudent(estudanteId)}
                     className={`w-full px-4 py-3 flex items-center justify-between text-left transition-colors rounded-lg ${
-                      isExpanded ? 'bg-white' : 'hover:bg-white/30'
+                      isExpanded ? 'bg-surface' : 'hover:bg-surface/30'
                     }`}
                   >
                     <div className="flex items-center space-x-4">
                       <div className={`size-8 rounded-full flex items-center justify-center font-medium text-xs transition-all ${
-                        todasResolvidas ? 'bg-success text-white' : 'bg-zinc-200 text-fg-muted border border-zinc-300'
+                        todasResolvidas ? 'bg-success text-white' : 'bg-subtle-hover text-fg-muted border border-line-strong'
                       }`}>
                         {todasResolvidas ? <CheckCircle2 className="w-5 h-5" /> : data.nome.charAt(0)}
                       </div>
@@ -739,7 +739,7 @@ export default function ConselhoClasseClient({
                         {/* Status Detalhado */}
                         <div className="flex flex-wrap items-center gap-2 mt-1.5">
                           {recTotal > 0 && (
-                            <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-zinc-100 text-fg-muted border border-zinc-200">
+                            <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-subtle text-fg-muted border border-line">
                               {recTotal} {recTotal === 1 ? 'Recuperação' : 'Recuperações'} ({recAprovado} Passou)
                             </span>
                           )}
@@ -766,7 +766,7 @@ export default function ConselhoClasseClient({
                              <span className="text-xs font-medium">Concluído</span>
                           </div>
                        )}
-                       <div className={`p-1.5 rounded-lg border transition-all ${isExpanded ? 'bg-white border-accent/25 text-accent-fg shadow-sm' : 'bg-white border-zinc-200 text-fg-subtle'}`}>
+                       <div className={`p-1.5 rounded-lg border transition-all ${isExpanded ? 'bg-surface border-accent/25 text-accent-fg shadow-sm' : 'bg-surface border-line text-fg-subtle'}`}>
                          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                        </div>
                     </div>
@@ -778,7 +778,7 @@ export default function ConselhoClasseClient({
                       <div className="overflow-x-auto">
                         <table className="w-full">
                           <thead>
-                            <tr className="border-b border-zinc-200">
+                            <tr className="border-b border-line">
                                <th className="px-4 py-3 text-left text-sm font-medium text-fg-subtle w-10">#</th>
                               <th className="px-4 py-3 text-left text-sm font-medium text-fg-subtle text-nowrap">Disciplina</th>
                               <th className="px-4 py-3 text-center text-sm font-medium text-fg-subtle">Média Anual</th>
@@ -819,8 +819,8 @@ export default function ConselhoClasseClient({
                                 }
 
                                 return (
-                                  <tr key={nota.id} className={`group transition-all hover:bg-zinc-100/50 even:bg-white ${isResolvida ? 'opacity-70' : ''}`}>
-                                     <td className="px-4 py-4 rounded-l-xl text-sm font-medium text-zinc-300">
+                                  <tr key={nota.id} className={`group transition-all hover:bg-subtle/50 even:bg-surface ${isResolvida ? 'opacity-70' : ''}`}>
+                                     <td className="px-4 py-4 rounded-l-xl text-sm font-medium text-fg-disabled">
                                       {nota.originalIndex + 1}
                                     </td>
                                     <td className="px-4 py-4">
@@ -835,12 +835,12 @@ export default function ConselhoClasseClient({
                                             </span>
                                           ))}
                                           {nota.frequencia !== null && nota.frequencia !== undefined && (
-                                            <span className={`px-1.5 py-0.5 text-xs font-medium border rounded ${nota.abaixoMinimoFrequencia ? 'bg-danger-subtle text-danger-fg border-danger-line' : 'bg-zinc-50 text-fg-subtle border-zinc-200'}`} title={`Frequência mínima: ${frequenciaMinima}%`}>
+                                            <span className={`px-1.5 py-0.5 text-xs font-medium border rounded ${nota.abaixoMinimoFrequencia ? 'bg-danger-subtle text-danger-fg border-danger-line' : 'bg-canvas text-fg-subtle border-line'}`} title={`Frequência mínima: ${frequenciaMinima}%`}>
                                               FREQ {formatarFrequencia(nota.frequencia)}{nota.abaixoMinimoFrequencia && ' · abaixo do mínimo'}
                                             </span>
                                           )}
                                           {nota.status === 'DESISTENTE' && !nota.etapas.some((e: EtapaDaNota) => e.desistente) && (
-                                            <span className="px-1.5 py-0.5 bg-zinc-100 text-xs font-medium text-fg-muted border border-zinc-200 rounded">
+                                            <span className="px-1.5 py-0.5 bg-subtle text-xs font-medium text-fg-muted border border-line rounded">
                                               INFREQUENTE
                                             </span>
                                           )}
@@ -931,8 +931,8 @@ export default function ConselhoClasseClient({
         {/* Modal de Confirmação */}
         {showConfirmModal && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-900/40 backdrop-blur-sm p-4 animate-fade-in">
-            <div className="bg-white rounded-xl shadow-overlay max-w-2xl w-full flex flex-col max-h-[90vh] animate-pop-in">
-              <div className="p-8 border-b border-zinc-50 flex items-center justify-between">
+            <div className="bg-surface rounded-xl shadow-overlay max-w-2xl w-full flex flex-col max-h-[90vh] animate-pop-in">
+              <div className="p-8 border-b border-line-subtle flex items-center justify-between">
                 <div>
                   <h3 className="text-xl font-medium text-fg">Revisar Decisões</h3>
                   <p className="text-xs font-medium text-fg-subtle mt-1">Confira os dados antes de consolidar no sistema</p>
@@ -940,23 +940,23 @@ export default function ConselhoClasseClient({
                 <button 
                   type="button"
                   onClick={() => setShowConfirmModal(false)}
-                  className="p-2 hover:bg-zinc-100 rounded-full transition-colors"
+                  className="p-2 hover:bg-subtle rounded-full transition-colors"
                 >
-                  <X className="w-6 h-6 text-zinc-300" />
+                  <X className="w-6 h-6 text-fg-disabled" />
                 </button>
               </div>
               
               <div className="p-8 overflow-y-auto flex-1 custom-scrollbar">
-                <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden shadow-card font-mono">
+                <div className="bg-surface rounded-xl border border-line overflow-hidden shadow-card font-mono">
                   <table className="w-full text-left">
-                    <thead className="bg-zinc-200/50 text-fg-subtle font-medium text-xs">
+                    <thead className="bg-subtle-hover/50 text-fg-subtle font-medium text-xs">
                       <tr>
                         <th className="px-6 py-4">Estudante / Disciplina</th>
                         <th className="px-6 py-4 text-center">Nota Rec.</th>
                         <th className="px-6 py-4 text-center">Decisão</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-zinc-50 bg-white">
+                    <tbody className="divide-y divide-line-subtle bg-surface">
                       {Object.entries(decisoes).map(([notaId, status]) => {
                         const nota = notasConselho.find(n => n.id === notaId)
                         if (!nota) return null
@@ -984,11 +984,11 @@ export default function ConselhoClasseClient({
                 </div>
               </div>
 
-              <div className="p-8 border-t border-zinc-50 flex justify-end space-x-4 bg-zinc-100/50 rounded-b-[2.5rem]">
+              <div className="p-8 border-t border-line-subtle flex justify-end space-x-4 bg-subtle/50 rounded-b-[2.5rem]">
                 <button
                   type="button"
                   onClick={() => setShowConfirmModal(false)}
-                  className="px-8 py-3 rounded-lg font-medium text-fg-subtle hover:bg-white transition-all text-sm"
+                  className="px-8 py-3 rounded-lg font-medium text-fg-subtle hover:bg-surface transition-all text-sm"
                 >
                   Voltar
                 </button>

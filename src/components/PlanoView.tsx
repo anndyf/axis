@@ -58,7 +58,7 @@ export default function PlanoView({ planoId, onClose }: PlanoViewProps) {
   if (loading) {
     return (
       <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm animate-fade-in">
-        <div className="bg-white p-8 rounded-lg shadow-overlay flex flex-col items-center gap-3">
+        <div className="bg-surface p-8 rounded-lg shadow-overlay flex flex-col items-center gap-3">
             <div className="w-8 h-8 border-3 border-accent/25 border-t-accent rounded-full animate-spin" />
             <p className="text-fg-subtle text-xs font-bold animate-pulse">Buscando Detalhes...</p>
         </div>
@@ -72,10 +72,10 @@ export default function PlanoView({ planoId, onClose }: PlanoViewProps) {
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white w-full max-w-4xl max-h-[90vh] rounded-xl shadow-overlay flex flex-col overflow-hidden animate-pop-in border border-zinc-100">
+      <div className="bg-surface w-full max-w-4xl max-h-[90vh] rounded-xl shadow-overlay flex flex-col overflow-hidden animate-pop-in border border-line-subtle">
         
         {/* Header Compact */}
-        <div className="px-6 py-5 border-b border-zinc-50 flex items-center justify-between bg-white relative shrink-0">
+        <div className="px-6 py-5 border-b border-line-subtle flex items-center justify-between bg-surface relative shrink-0">
           <div className="absolute top-0 left-0 w-1.5 bg-accent h-full" />
           <div className="flex items-center gap-4">
             <div className="w-10 h-10 bg-accent-subtle rounded-xl flex items-center justify-center">
@@ -93,17 +93,17 @@ export default function PlanoView({ planoId, onClose }: PlanoViewProps) {
                 </div>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-zinc-50 rounded-lg transition-all text-zinc-300 hover:text-fg-muted"><X size={20} /></button>
+          <button onClick={onClose} className="p-2 hover:bg-canvas rounded-lg transition-all text-fg-disabled hover:text-fg-muted"><X size={20} /></button>
         </div>
 
         {/* Content Compact */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-8 bg-zinc-50/20 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-6 space-y-8 bg-canvas/20 custom-scrollbar">
           <div className="space-y-3 px-1">
             <h3 className="text-xs font-bold text-fg-subtle flex items-center gap-2">
                <Users className="w-3.5 h-3.5" /> Turmas Atendidas
             </h3>
             <div className="flex flex-wrap gap-1.5">
-                {plano.turmas.map(t => <span key={t.id} className="px-3 py-1.5 bg-white border border-zinc-100 shadow-sm rounded-lg font-bold text-fg-muted text-xs">{t.nome}</span>)}
+                {plano.turmas.map(t => <span key={t.id} className="px-3 py-1.5 bg-surface border border-line-subtle shadow-sm rounded-lg font-bold text-fg-muted text-xs">{t.nome}</span>)}
             </div>
           </div>
 
@@ -118,8 +118,8 @@ export default function PlanoView({ planoId, onClose }: PlanoViewProps) {
         </div>
 
         {/* Footer Compact */}
-        <div className="p-4 border-t border-zinc-50 bg-white flex items-center justify-end gap-3 shrink-0">
-            <button onClick={onClose} className="px-6 py-2 rounded-xl text-xs font-bold text-fg-subtle hover:bg-zinc-50 transition-all">Fechar</button>
+        <div className="p-4 border-t border-line-subtle bg-surface flex items-center justify-end gap-3 shrink-0">
+            <button onClick={onClose} className="px-6 py-2 rounded-xl text-xs font-bold text-fg-subtle hover:bg-canvas transition-all">Fechar</button>
             <button onClick={handleDownload} className="px-8 py-2 bg-accent text-on-accent rounded-xl text-xs font-bold shadow-card hover:bg-accent-hover transition-all flex items-center gap-2 active:scale-95">
                 <Download size={14} /> Exportar (PDF)
             </button>
@@ -135,7 +135,7 @@ function ViewSection({ icon, title, content, full = false }: any) {
             <label className="text-xs font-bold text-fg-subtle ml-1 flex items-center gap-1.5">
                 {icon} {title}
             </label>
-            <div className="w-full p-4 bg-white border border-zinc-100 rounded-lg shadow-sm text-xs font-medium text-fg-muted leading-relaxed whitespace-pre-wrap">
+            <div className="w-full p-4 bg-surface border border-line-subtle rounded-lg shadow-sm text-xs font-medium text-fg-muted leading-relaxed whitespace-pre-wrap">
                 {content}
             </div>
         </div>

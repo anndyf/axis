@@ -81,7 +81,7 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
         </div>
 
         {/* Filtros Estilo Simulados */}
-        <div className="bg-white p-5 rounded-lg shadow-sm border border-zinc-200 flex flex-wrap gap-5 items-end">
+        <div className="bg-surface p-5 rounded-lg shadow-sm border border-line flex flex-wrap gap-5 items-end">
             <div className="flex-1 min-w-[250px] space-y-1.5">
                 <label className="text-sm font-medium text-fg-subtle ml-1">Turma</label>
                 <div className="relative">
@@ -91,7 +91,7 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
                         value={filterNome}
                         onChange={(e) => setFilterNome(e.target.value)}
                         placeholder="Ex: 1TIM1, 3TDS..."
-                        className="w-full bg-zinc-50 border-none rounded-xl pl-11 pr-4 py-3 text-base focus:ring-2 focus:ring-danger/30 transition-all font-medium"
+                        className="w-full bg-canvas border-none rounded-xl pl-11 pr-4 py-3 text-base focus:ring-2 focus:ring-danger/30 transition-all font-medium"
                     />
                 </div>
             </div>
@@ -103,7 +103,7 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
                   <select 
                       value={filterTurno}
                       onChange={(e) => setFilterTurno(e.target.value)}
-                      className="w-full bg-zinc-50 border-none rounded-xl pl-11 pr-4 py-3 text-base focus:ring-2 focus:ring-danger/30 transition-all appearance-none cursor-pointer"
+                      className="w-full bg-canvas border-none rounded-xl pl-11 pr-4 py-3 text-base focus:ring-2 focus:ring-danger/30 transition-all appearance-none cursor-pointer"
                   >
                       <option value="">Selecione o Turno...</option>
                       {uniqueTurnos.map((t: any) => <option key={t} value={t}>{t}</option>)}
@@ -120,8 +120,8 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
         </div>
 
         {/* Listagem Estilo Simulados (Table) */}
-        <div className="bg-white rounded-lg shadow-sm border border-zinc-300 overflow-hidden">
-          <div className="p-4 border-b border-zinc-200 bg-zinc-50/10 flex items-center justify-between">
+        <div className="bg-surface rounded-lg shadow-sm border border-line-strong overflow-hidden">
+          <div className="p-4 border-b border-line bg-canvas/10 flex items-center justify-between">
             <h2 className="text-lg font-medium text-fg flex items-center gap-2">
                <TrendingUp size={20} className="text-fg-subtle" />
                Turmas com Pendências (Final)
@@ -130,7 +130,7 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
           
           <div className="overflow-x-auto">
             <table className="w-full text-left">
-              <thead className="bg-zinc-50 border-b border-zinc-300">
+              <thead className="bg-canvas border-b border-line-strong">
                 <tr>
                   <th className="px-6 py-4 text-xs font-medium text-fg-subtle">Turma / Pendência</th>
                   <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center">Turno</th>
@@ -138,10 +138,10 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
                   <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center w-24">Ação</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-200">
+              <tbody className="divide-y divide-line">
                 {filteredTurmas.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="px-6 py-16 text-center text-zinc-300">
+                    <td colSpan={4} className="px-6 py-16 text-center text-fg-disabled">
                       <BarChart3 className="w-12 h-12 opacity-20 mx-auto mb-3" />
                        <p className="text-sm font-medium">Nenhuma turma com pendências encontrada</p>
                     </td>
@@ -160,16 +160,16 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
                         </div>
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <span className="px-3 py-1 bg-zinc-200 text-fg-muted text-xs font-medium rounded-lg border border-zinc-300">
+                        <span className="px-3 py-1 bg-subtle-hover text-fg-muted text-xs font-medium rounded-lg border border-line-strong">
                           {turma.turno || 'N/A'}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-center">
-                          <span className="text-sm font-medium text-fg-muted flex items-center justify-center gap-1.5"><Users size={14} className="text-zinc-300" /> {turma._count.estudantes}</span>
+                          <span className="text-sm font-medium text-fg-muted flex items-center justify-center gap-1.5"><Users size={14} className="text-fg-disabled" /> {turma._count.estudantes}</span>
                       </td>
                       <td className="px-6 py-4 text-center">
                          <div className="flex justify-center">
-                            <div className="w-8 h-8 rounded-full bg-zinc-50 group-hover:bg-danger group-hover:text-white flex items-center justify-center transition-all">
+                            <div className="w-8 h-8 rounded-full bg-canvas group-hover:bg-danger group-hover:text-white flex items-center justify-center transition-all">
                                <ChevronRight size={16} />
                             </div>
                          </div>

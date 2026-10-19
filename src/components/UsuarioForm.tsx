@@ -157,7 +157,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
           )}
 
           {/* Seção 1: Dados do Usuário */}
-          <div className="bg-white rounded-xl p-8 shadow-sm border border-zinc-200">
+          <div className="bg-surface rounded-xl p-8 shadow-sm border border-line">
             <div className="flex items-center space-x-4 mb-8">
                <div className="w-10 h-10 bg-subtle border border-line rounded-lg flex items-center justify-center text-fg">
                   <User className="w-5 h-5" />
@@ -173,7 +173,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
                 <input 
                   type="text" required value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="w-full px-6 py-4 bg-zinc-50 border border-zinc-200 rounded-lg focus:ring-4 focus:ring-ring focus:border-accent focus:bg-white transition-all outline-none font-semibold text-fg-muted"
+                  className="w-full px-6 py-4 bg-canvas border border-line rounded-lg focus:ring-4 focus:ring-ring focus:border-accent focus:bg-surface transition-all outline-none font-semibold text-fg-muted"
                 />
               </div>
 
@@ -185,7 +185,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
                   <input 
                     type="email" required value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    className="w-full px-6 py-4 bg-zinc-50 border border-zinc-200 rounded-lg focus:ring-4 focus:ring-ring focus:border-accent focus:bg-white transition-all outline-none font-semibold text-fg-muted"
+                    className="w-full px-6 py-4 bg-canvas border border-line rounded-lg focus:ring-4 focus:ring-ring focus:border-accent focus:bg-surface transition-all outline-none font-semibold text-fg-muted"
                   />
                 </div>
                 <div>
@@ -197,7 +197,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
                     value={formData.password}
                     onChange={(e) => setFormData({...formData, password: e.target.value})}
                     placeholder={isEdit ? "Deixe em branco..." : "••••••••"}
-                    className="w-full px-6 py-4 bg-zinc-50 border border-zinc-200 rounded-lg focus:ring-4 focus:ring-ring focus:border-accent focus:bg-white transition-all outline-none font-semibold text-fg-muted"
+                    className="w-full px-6 py-4 bg-canvas border border-line rounded-lg focus:ring-4 focus:ring-ring focus:border-accent focus:bg-surface transition-all outline-none font-semibold text-fg-muted"
                   />
                 </div>
               </div>
@@ -205,7 +205,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
           </div>
 
           {/* Seção 2: Níveis de Acesso */}
-          <div className="bg-white rounded-xl p-8 shadow-sm border border-zinc-200">
+          <div className="bg-surface rounded-xl p-8 shadow-sm border border-line">
             <div className="flex items-center space-x-4 mb-8">
                <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center text-on-accent shadow-card">
                   <Settings2 className="w-5 h-5" />
@@ -222,11 +222,11 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
                     className={`flex items-center p-6 rounded-xl border-2 transition-all cursor-pointer ${
                       isActive 
                         ? 'bg-accent-subtle border-accent text-accent-fg'
-                        : 'bg-white border-zinc-100 hover:border-zinc-300'
+                        : 'bg-surface border-line-subtle hover:border-line-strong'
                     }`}
                   >
                     <div className={`w-12 h-12 rounded-lg flex items-center justify-center mr-5 ${
-                      isActive ? 'bg-surface text-accent-fg' : 'bg-zinc-100 text-fg-subtle'
+                      isActive ? 'bg-surface text-accent-fg' : 'bg-subtle text-fg-subtle'
                     }`}>
                       {role.icon}
                     </div>
@@ -239,7 +239,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
                        </p>
                     </div>
                     <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                      isActive ? 'border-accent bg-accent' : 'border-zinc-200'
+                      isActive ? 'border-accent bg-accent' : 'border-line'
                     }`}>
                        {isActive && <CheckCircle2 className="w-4 h-4 text-white" />}
                     </div>
@@ -266,7 +266,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
             )}
 
             {isEdit && (
-              <div className="bg-zinc-100 p-4 rounded-lg flex items-center justify-between">
+              <div className="bg-subtle p-4 rounded-lg flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <Calendar className="w-4 h-4 text-fg-subtle" />
                   <span className="text-xs font-semibold text-fg-subtle">Último Acesso</span>
@@ -292,7 +292,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
       {/* Modal de Confirmação */}
       {showConfirm && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white w-full max-w-md rounded-xl p-8 shadow-overlay animate-pop-in">
+          <div className="bg-surface w-full max-w-md rounded-xl p-8 shadow-overlay animate-pop-in">
             <div className="w-16 h-16 bg-accent-subtle text-accent-fg rounded-lg flex items-center justify-center mb-6">
               <Shield className="w-8 h-8" />
             </div>
@@ -303,7 +303,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
             <div className="grid grid-cols-2 gap-4">
               <button 
                 onClick={() => setShowConfirm(false)}
-                className="py-4 rounded-lg font-semibold text-fg-subtle hover:bg-zinc-50 transition-all"
+                className="py-4 rounded-lg font-semibold text-fg-subtle hover:bg-canvas transition-all"
               >
                 Cancelar
               </button>

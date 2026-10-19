@@ -366,7 +366,7 @@ export default function LancarNotasTurmaClient({
         </details>
 
         {/* Filtros Estilo Simulados */}
-        <div className="bg-white p-5 rounded-lg shadow-sm border border-zinc-200 flex flex-wrap gap-5 items-end">
+        <div className="bg-surface p-5 rounded-lg shadow-sm border border-line flex flex-wrap gap-5 items-end">
             <div className="flex-1 min-w-[300px] space-y-1.5">
                 <label className="text-sm font-medium text-fg-subtle ml-1">Disciplina</label>
                 <div className="relative">
@@ -374,7 +374,7 @@ export default function LancarNotasTurmaClient({
                   <select
                     value={disciplinaSelecionada}
                     onChange={(e) => setDisciplinaSelecionada(e.target.value)}
-                    className="w-full bg-zinc-50 border-none rounded-xl pl-11 pr-4 py-3 text-base focus:ring-2 focus:ring-zinc-500 transition-all font-medium appearance-none cursor-pointer"
+                    className="w-full bg-canvas border-none rounded-xl pl-11 pr-4 py-3 text-base focus:ring-2 focus:ring-zinc-500 transition-all font-medium appearance-none cursor-pointer"
                   >
                     <option value="">Selecione a disciplina para lançamento...</option>
                     {disciplinas.map((disc) => <option key={disc.id} value={disc.id}>{disc.nome}</option>)}
@@ -382,17 +382,17 @@ export default function LancarNotasTurmaClient({
                 </div>
             </div>
 
-            <div className="hidden lg:flex items-center gap-3 pb-1 border-l pl-5 border-zinc-200 flex-1">
+            <div className="hidden lg:flex items-center gap-3 pb-1 border-l pl-5 border-line flex-1">
                <div className="bg-warning-subtle p-2.5 rounded-xl text-warning-fg border border-warning-line"><UserMinus size={18}/></div>
                <p className="text-xs text-fg-muted leading-tight font-medium max-w-[450px]">
-                 <strong className="text-fg-muted">Aluno sem nota?</strong> Marque como <strong className="text-fg-muted">Infrequente</strong> aquele aluno que não frequenta ou só apareceu para fazer a prova, clicando no ícone <span className="inline-flex mx-1 p-1 bg-white border border-zinc-300 rounded text-fg-subtle"><UserMinus size={10}/></span> ao lado da nota para não afetar cálculos indevidos.
+                 <strong className="text-fg-muted">Aluno sem nota?</strong> Marque como <strong className="text-fg-muted">Infrequente</strong> aquele aluno que não frequenta ou só apareceu para fazer a prova, clicando no ícone <span className="inline-flex mx-1 p-1 bg-surface border border-line-strong rounded text-fg-subtle"><UserMinus size={10}/></span> ao lado da nota para não afetar cálculos indevidos.
                </p>
             </div>
         </div>
 
         {/* Lançamento Estilo Simulados */}
-        <div className="bg-white rounded-lg shadow-sm border border-zinc-300 overflow-hidden">
-          <div className="p-4 border-b border-zinc-200 bg-zinc-50/10 flex items-center justify-between">
+        <div className="bg-surface rounded-lg shadow-sm border border-line-strong overflow-hidden">
+          <div className="p-4 border-b border-line bg-canvas/10 flex items-center justify-between">
             <h2 className="text-lg font-medium text-fg flex items-center gap-2">
               <Users size={20} className="text-fg-subtle" />
               Matriz de Rendimento Acadêmico
@@ -404,7 +404,7 @@ export default function LancarNotasTurmaClient({
                 placeholder="Filtrar por nome..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-white border border-zinc-300 rounded-lg pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-zinc-500/10 focus:border-zinc-400 transition-all shadow-sm"
+                className="w-full bg-surface border border-line-strong rounded-lg pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-zinc-500/10 focus:border-zinc-400 transition-all shadow-sm"
               />
             </div>
           </div>
@@ -429,14 +429,14 @@ export default function LancarNotasTurmaClient({
 
           <div className="overflow-x-auto">
             <table className="w-full text-left">
-              <thead className="bg-zinc-50 border-b border-zinc-300">
+              <thead className="bg-canvas border-b border-line-strong">
                 {esquema && !isSimples ? (
                   <>
                     <tr>
                       <th rowSpan={2} className="px-6 py-4 text-xs font-medium text-fg-subtle w-12 text-center align-bottom">#</th>
                       <th rowSpan={2} className="px-6 py-4 text-xs font-medium text-fg-subtle align-bottom">Estudante</th>
                       {esquema.unidades.map(u => (
-                        <th key={u.id} colSpan={u.atividades.length + 1} className="px-4 py-2 text-xs font-medium text-fg-subtle text-center border-l border-zinc-200">
+                        <th key={u.id} colSpan={u.atividades.length + 1} className="px-4 py-2 text-xs font-medium text-fg-subtle text-center border-l border-line">
                           {u.nome}
                         </th>
                       ))}
@@ -446,11 +446,11 @@ export default function LancarNotasTurmaClient({
                       {esquema.unidades.map(u => (
                         <Fragment key={u.id}>
                           {u.atividades.map(a => (
-                            <th key={a.id} className="px-2 py-2 text-xs font-medium text-fg-subtle text-center border-l border-zinc-100 w-20">
-                              {a.nome} <span className="text-zinc-300">({a.notaMaxima})</span>
+                            <th key={a.id} className="px-2 py-2 text-xs font-medium text-fg-subtle text-center border-l border-line-subtle w-20">
+                              {a.nome} <span className="text-fg-disabled">({a.notaMaxima})</span>
                             </th>
                           ))}
-                          <th key={`${u.id}-subtotal`} className="px-2 py-2 text-xs font-bold text-fg-subtle text-center bg-zinc-100/60 w-16">
+                          <th key={`${u.id}-subtotal`} className="px-2 py-2 text-xs font-bold text-fg-subtle text-center bg-subtle/60 w-16">
                             Subtotal
                           </th>
                         </Fragment>
@@ -468,7 +468,7 @@ export default function LancarNotasTurmaClient({
                   </tr>
                 )}
               </thead>
-              <tbody className="divide-y divide-zinc-200/80">
+              <tbody className="divide-y divide-line/80">
                 {loading ? (
                    <tr>
                      <td colSpan={totalColunas} className="px-6 py-16 text-center">
@@ -497,7 +497,7 @@ export default function LancarNotasTurmaClient({
                     const isDesistenteGeral = statusMap[estudante.matricula] === 'DESISTENTE'
 
                     return (
-                      <tr key={estudante.matricula} className={`hover:bg-zinc-50 transition-colors ${isDesistenteGeral ? 'bg-warning-subtle grayscale-[0.5]' : ''}`}>
+                      <tr key={estudante.matricula} className={`hover:bg-canvas transition-colors ${isDesistenteGeral ? 'bg-warning-subtle grayscale-[0.5]' : ''}`}>
                         <td className="px-6 py-4 text-sm text-fg-subtle font-medium text-center">{index + 1}</td>
                         <td className="px-6 py-4">
                           <div className="flex flex-col relative group/name">
@@ -538,7 +538,7 @@ export default function LancarNotasTurmaClient({
                                     onChange={(e) => atividade && handleAtividadeChange(estudante.matricula, u.id, atividade.id, e.target.value, atividade.notaMaxima)}
                                     className={`w-14 h-9 text-center border-2 rounded-xl text-base font-medium transition-all outline-none ${
                                       unidadeEstado.isDesistente ? 'bg-warning-subtle border-warning-line text-warning-fg' :
-                                      isModified ? 'border-zinc-400 bg-white ring-4 ring-zinc-500/5' : 'border-zinc-200 bg-zinc-50 focus:bg-white focus:border-zinc-400'
+                                      isModified ? 'border-zinc-400 bg-surface ring-4 ring-zinc-500/5' : 'border-line bg-canvas focus:bg-surface focus:border-zinc-400'
                                     }`}
                                     placeholder="0.0"
                                   />
@@ -548,7 +548,7 @@ export default function LancarNotasTurmaClient({
                                       className={`absolute -right-3 -bottom-2 p-1.5 rounded-full transition-all shadow-sm flex items-center justify-center ${
                                           unidadeEstado.isDesistente
                                           ? 'bg-warning-subtle text-warning-fg scale-100 z-10 ring-2 ring-white'
-                                          : 'bg-white text-zinc-300 hover:text-warning-fg hover:bg-warning-subtle scale-100 opacity-60 hover:opacity-100 group-hover:opacity-100 border border-zinc-300 z-10'
+                                          : 'bg-surface text-fg-disabled hover:text-warning-fg hover:bg-warning-subtle scale-100 opacity-60 hover:opacity-100 group-hover:opacity-100 border border-line-strong z-10'
                                       }`}
                                       title={unidadeEstado.isDesistente ? "Desmarcar infrequente" : "Marcar como Infrequente (não frequenta ou só veio fazer prova)"}
                                   >
@@ -569,7 +569,7 @@ export default function LancarNotasTurmaClient({
                                 const isModified = val !== origVal && !saving
 
                                 return (
-                                  <td key={a.id} className="px-2 py-4 text-center border-l border-zinc-100">
+                                  <td key={a.id} className="px-2 py-4 text-center border-l border-line-subtle">
                                     <div className="flex flex-col items-center gap-1.5 group relative">
                                       <input
                                         type="number" step="0.1"
@@ -577,7 +577,7 @@ export default function LancarNotasTurmaClient({
                                         onChange={(e) => handleAtividadeChange(estudante.matricula, u.id, a.id, e.target.value, a.notaMaxima)}
                                         className={`w-14 h-9 text-center border-2 rounded-xl text-sm font-medium transition-all outline-none ${
                                           unidadeEstado.isDesistente ? 'bg-warning-subtle border-warning-line text-warning-fg' :
-                                          isModified ? 'border-zinc-400 bg-white ring-4 ring-zinc-500/5' : 'border-zinc-200 bg-zinc-50 focus:bg-white focus:border-zinc-400'
+                                          isModified ? 'border-zinc-400 bg-surface ring-4 ring-zinc-500/5' : 'border-line bg-canvas focus:bg-surface focus:border-zinc-400'
                                         }`}
                                         placeholder="0.0"
                                       />
@@ -588,7 +588,7 @@ export default function LancarNotasTurmaClient({
                                             className={`absolute -right-3 -bottom-2 p-1.5 rounded-full transition-all shadow-sm flex items-center justify-center ${
                                                 unidadeEstado.isDesistente
                                                 ? 'bg-warning-subtle text-warning-fg scale-100 z-10 ring-2 ring-white'
-                                                : 'bg-white text-zinc-300 hover:text-warning-fg hover:bg-warning-subtle scale-100 opacity-60 hover:opacity-100 group-hover:opacity-100 border border-zinc-300 z-10'
+                                                : 'bg-surface text-fg-disabled hover:text-warning-fg hover:bg-warning-subtle scale-100 opacity-60 hover:opacity-100 group-hover:opacity-100 border border-line-strong z-10'
                                             }`}
                                             title={unidadeEstado.isDesistente ? "Desmarcar infrequente (toda a unidade)" : "Marcar unidade como Infrequente"}
                                         >
@@ -599,7 +599,7 @@ export default function LancarNotasTurmaClient({
                                   </td>
                                 )
                               })}
-                              <td key={`${u.id}-subtotal`} className="px-2 py-4 text-center bg-zinc-50/60">
+                              <td key={`${u.id}-subtotal`} className="px-2 py-4 text-center bg-canvas/60">
                                 <span className={`text-sm font-bold ${subtotal !== null && subtotal < 5 ? 'text-danger-fg' : 'text-fg-muted'}`}>
                                   {subtotal !== null ? subtotal.toFixed(1) : '-'}
                                 </span>
@@ -619,7 +619,7 @@ export default function LancarNotasTurmaClient({
           </div>
 
           {disciplinaSelecionada && filteredEstudantes.length > 0 && (
-            <div className="p-5 bg-zinc-50 border-t border-zinc-200 flex justify-end items-center gap-4">
+            <div className="p-5 bg-canvas border-t border-line flex justify-end items-center gap-4">
               <div className="hidden md:block">
                  <p className="text-xs font-medium text-fg-subtle">Confira todas as notas antes de salvar o fechamento.</p>
               </div>
@@ -638,8 +638,8 @@ export default function LancarNotasTurmaClient({
 
       {showModal && esquema && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-xl shadow-overlay w-full max-w-lg overflow-hidden animate-pop-in border border-white">
-            <div className="px-6 py-5 border-b border-zinc-200 flex justify-between items-center bg-zinc-50">
+          <div className="bg-surface rounded-xl shadow-overlay w-full max-w-lg overflow-hidden animate-pop-in border border-white">
+            <div className="px-6 py-5 border-b border-line flex justify-between items-center bg-canvas">
               <div className="flex items-center gap-3">
                  <div className="w-10 h-10 bg-zinc-600 text-white rounded-xl flex items-center justify-center shadow-card"><Save size={20}/></div>
                   <div>
@@ -649,9 +649,9 @@ export default function LancarNotasTurmaClient({
               </div>
               <button onClick={() => setShowModal(false)} className="p-2 hover:bg-zinc-300 rounded-xl transition-all"><X size={20}/></button>
             </div>
-            <div className="p-6 max-h-[60vh] overflow-y-auto space-y-3 bg-zinc-50/20 custom-scrollbar">
+            <div className="p-6 max-h-[60vh] overflow-y-auto space-y-3 bg-canvas/20 custom-scrollbar">
               {estudantes.filter(e => JSON.stringify(notas[e.matricula]) !== JSON.stringify(originalNotas[e.matricula] || {})).map((est, i) => (
-                 <div key={i} className="flex items-center justify-between bg-white p-3 rounded-lg border border-zinc-200 shadow-sm">
+                 <div key={i} className="flex items-center justify-between bg-surface p-3 rounded-lg border border-line shadow-sm">
                    <span className="text-sm font-medium text-fg-muted truncate pr-4">{est.nome}</span>
                    <div className="flex gap-2 flex-wrap justify-end">
                        {esquema.unidades.map(u => {
@@ -660,7 +660,7 @@ export default function LancarNotasTurmaClient({
                         const estadoOriginal = originalNotas[est.matricula]?.[u.id]
                         if (JSON.stringify(estadoAtual) === JSON.stringify(estadoOriginal)) return null
                         return (
-                          <span key={u.id} className="text-xs font-medium bg-zinc-50 text-fg-muted px-2.5 py-1 rounded-lg border border-zinc-200">
+                          <span key={u.id} className="text-xs font-medium bg-canvas text-fg-muted px-2.5 py-1 rounded-lg border border-line">
                             {u.nome}: {subtotal !== null ? subtotal.toFixed(1) : '0'} {estadoAtual?.isDesistente && <span className="text-warning-fg ml-1">(INF)</span>}
                           </span>
                         )
@@ -669,8 +669,8 @@ export default function LancarNotasTurmaClient({
                 </div>
               ))}
             </div>
-            <div className="px-6 py-5 bg-zinc-50 border-t border-zinc-200 flex gap-4">
-              <button onClick={() => setShowModal(false)} className="flex-1 py-3 text-sm font-medium text-fg-subtle hover:bg-white rounded-lg transition-all">Cancelar</button>
+            <div className="px-6 py-5 bg-canvas border-t border-line flex gap-4">
+              <button onClick={() => setShowModal(false)} className="flex-1 py-3 text-sm font-medium text-fg-subtle hover:bg-surface rounded-lg transition-all">Cancelar</button>
               <button onClick={confirmSave} className="flex-1 py-3 bg-zinc-600 text-white text-sm font-medium rounded-lg shadow-card hover:bg-zinc-700 transition-all active:scale-95">Confirmar e Gravar</button>
             </div>
           </div>
@@ -679,7 +679,7 @@ export default function LancarNotasTurmaClient({
 
       {feedbackModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-[32px] shadow-overlay w-full max-w-sm overflow-hidden p-8 flex flex-col items-center text-center animate-pop-in border border-zinc-100">
+          <div className="bg-surface rounded-[32px] shadow-overlay w-full max-w-sm overflow-hidden p-8 flex flex-col items-center text-center animate-pop-in border border-line-subtle">
             {feedbackModal.type === 'success' ? (
               <div className="w-16 h-16 bg-success-subtle text-success-fg rounded-full flex items-center justify-center mb-5 ring-8 ring-success/30">
                 <CheckCircle2 size={36} className="animate-bounce" />

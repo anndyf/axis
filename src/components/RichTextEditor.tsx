@@ -81,12 +81,12 @@ export default function RichTextEditor({ value, onChange, placeholder, required,
   }
 
   return (
-    <div className={`flex flex-col border border-zinc-200 rounded-lg overflow-hidden bg-zinc-50 focus-within:ring-2 focus-within:ring-ring transition-all ${className}`}>
-      <div className="flex items-center gap-1 p-2 border-b border-zinc-200 bg-zinc-100/50">
+    <div className={`flex flex-col border border-line rounded-lg overflow-hidden bg-canvas focus-within:ring-2 focus-within:ring-ring transition-all ${className}`}>
+      <div className="flex items-center gap-1 p-2 border-b border-line bg-subtle/50">
         <button
           type="button"
           onClick={() => insertFormat('**', '**')}
-          className="p-2 hover:bg-white rounded-lg text-fg-muted hover:text-accent-fg transition-colors"
+          className="p-2 hover:bg-surface rounded-lg text-fg-muted hover:text-accent-fg transition-colors"
           title="Negrito"
         >
           <Bold size={16} strokeWidth={3} />
@@ -94,7 +94,7 @@ export default function RichTextEditor({ value, onChange, placeholder, required,
         <button
           type="button"
           onClick={() => insertFormat('*', '*')}
-          className="p-2 hover:bg-white rounded-lg text-fg-muted hover:text-accent-fg transition-colors"
+          className="p-2 hover:bg-surface rounded-lg text-fg-muted hover:text-accent-fg transition-colors"
           title="Itálico"
         >
           <Italic size={16} />
@@ -103,7 +103,7 @@ export default function RichTextEditor({ value, onChange, placeholder, required,
         <button
           type="button"
           onClick={insertList}
-          className="p-2 hover:bg-white rounded-lg text-fg-muted hover:text-accent-fg transition-colors"
+          className="p-2 hover:bg-surface rounded-lg text-fg-muted hover:text-accent-fg transition-colors"
           title="Lista"
         >
           <List size={16} />
@@ -111,7 +111,7 @@ export default function RichTextEditor({ value, onChange, placeholder, required,
         <button
           type="button"
           onClick={insertLink}
-          className="p-2 hover:bg-white rounded-lg text-fg-muted hover:text-accent-fg transition-colors"
+          className="p-2 hover:bg-surface rounded-lg text-fg-muted hover:text-accent-fg transition-colors"
           title="Link"
         >
           <LinkIcon size={16} />

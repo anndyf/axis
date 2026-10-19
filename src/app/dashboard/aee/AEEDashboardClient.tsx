@@ -199,7 +199,7 @@ export default function AEEDashboardClient({
                {activePanel === 'edit' && isDirecao && !isEditing && (
                  <button 
                     onClick={() => setIsEditing(true)}
-                    className="flex items-center gap-2 bg-white border border-zinc-300 px-4 py-2 rounded-lg text-xs font-semibold hover:bg-zinc-50 transition-all shadow-sm"
+                    className="flex items-center gap-2 bg-surface border border-line-strong px-4 py-2 rounded-lg text-xs font-semibold hover:bg-canvas transition-all shadow-sm"
                  >
                     <Edit3 size={14} /> Editar Ficha
                  </button>
@@ -243,8 +243,8 @@ export default function AEEDashboardClient({
           <>
             {/* Stats Row */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-               <div className="bg-white p-4 rounded-xl border border-zinc-200 flex items-center gap-4 shadow-card">
-                  <div className="w-10 h-10 bg-zinc-50 rounded-lg flex items-center justify-center border border-zinc-100 text-fg shadow-sm">
+               <div className="bg-surface p-4 rounded-xl border border-line flex items-center gap-4 shadow-card">
+                  <div className="w-10 h-10 bg-canvas rounded-lg flex items-center justify-center border border-line-subtle text-fg shadow-sm">
                     <Users size={16} />
                   </div>
                   <div>
@@ -252,7 +252,7 @@ export default function AEEDashboardClient({
                     <p className="text-xs text-fg-subtle font-bold mt-1">Mapeados</p>
                   </div>
                </div>
-               <div className="bg-white p-4 rounded-xl border border-zinc-200 flex items-center gap-4 shadow-card">
+               <div className="bg-surface p-4 rounded-xl border border-line flex items-center gap-4 shadow-card">
                   <div className="w-10 h-10 bg-success-subtle rounded-lg flex items-center justify-center border border-success-line text-success-fg shadow-sm">
                     <CheckCircle2 size={16} />
                   </div>
@@ -261,7 +261,7 @@ export default function AEEDashboardClient({
                     <p className="text-xs text-fg-subtle font-bold mt-1">Lidos</p>
                   </div>
                </div>
-               <div className="bg-white p-4 rounded-xl border border-zinc-200 flex items-center gap-4 shadow-card">
+               <div className="bg-surface p-4 rounded-xl border border-line flex items-center gap-4 shadow-card">
                   <div className="w-10 h-10 bg-warning-subtle rounded-lg flex items-center justify-center border border-warning-line text-warning-fg shadow-sm">
                     <AlertCircle size={16} />
                   </div>
@@ -273,20 +273,20 @@ export default function AEEDashboardClient({
             </div>
 
             {/* Filters */}
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-5 rounded-xl border border-zinc-200 shadow-card">
+            <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-surface p-5 rounded-xl border border-line shadow-card">
                <div className="relative w-full md:max-w-md">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-subtle" />
                   <input 
                     type="text" placeholder="Buscar aluno por nome ou matrícula..." 
                     value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg text-sm font-bold focus:bg-white focus:ring-4 focus:ring-zinc-100 outline-none transition-all placeholder:text-fg-subtle"
+                    className="w-full pl-11 pr-4 py-3 bg-canvas border border-line rounded-lg text-sm font-bold focus:bg-surface focus:ring-4 focus:ring-zinc-100 outline-none transition-all placeholder:text-fg-subtle"
                   />
                </div>
                <div className="flex items-center gap-2 w-full md:w-auto">
                   <Filter className="w-4 h-4 text-fg-subtle ml-2" />
                   <select 
                     value={filterTurma} onChange={e => setFilterTurma(e.target.value)}
-                    className="flex-1 md:w-64 bg-zinc-50 border border-zinc-200 rounded-lg px-5 py-3 text-sm font-bold outline-none appearance-none focus:bg-white transition-all cursor-pointer shadow-sm hover:bg-zinc-100"
+                    className="flex-1 md:w-64 bg-canvas border border-line rounded-lg px-5 py-3 text-sm font-bold outline-none appearance-none focus:bg-surface transition-all cursor-pointer shadow-sm hover:bg-subtle"
                   >
                      <option value="">Todas as Turmas</option>
                      {todasTurmas.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
@@ -295,10 +295,10 @@ export default function AEEDashboardClient({
             </div>
 
             {/* LIST */}
-            <div className="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-card">
+            <div className="bg-surface border border-line rounded-xl overflow-hidden shadow-card">
                {filteredAlunos.length === 0 ? (
                  <div className="p-24 text-center">
-                   <div className="w-20 h-20 bg-zinc-50 rounded-xl flex items-center justify-center mx-auto mb-6 text-zinc-200 border border-zinc-100 shadow-card">
+                   <div className="w-20 h-20 bg-canvas rounded-xl flex items-center justify-center mx-auto mb-6 text-fg-disabled border border-line-subtle shadow-card">
                       <Accessibility size={40} />
                    </div>
                    <p className="text-fg-subtle text-xs font-semibold">Nenhum registro encontrado</p>
@@ -308,7 +308,7 @@ export default function AEEDashboardClient({
                  <div className="overflow-x-auto">
                    <table className="w-full text-left">
                      <thead>
-                        <tr className="bg-zinc-50 border-b border-zinc-200">
+                        <tr className="bg-canvas border-b border-line">
                            <th className="px-6 py-3.5 text-xs text-fg font-semibold">Estudante</th>
                            <th className="px-6 py-3.5 text-xs text-fg font-semibold">Turma</th>
                            <th className="px-6 py-3.5 text-xs text-fg font-semibold">Diagnóstico</th>
@@ -316,12 +316,12 @@ export default function AEEDashboardClient({
                            <th className="px-6 py-3.5 text-right"></th>
                         </tr>
                      </thead>
-                     <tbody className="divide-y divide-zinc-100">
+                     <tbody className="divide-y divide-line-subtle">
                         {filteredAlunos.map(a => (
-                          <tr key={a.id} onClick={() => openEdit(a)} className="hover:bg-zinc-50 cursor-pointer transition-colors group">
+                          <tr key={a.id} onClick={() => openEdit(a)} className="hover:bg-canvas cursor-pointer transition-colors group">
                              <td className="px-6 py-4">
                                 <div className="flex items-center gap-3">
-                                   <div className="w-9 h-9 bg-zinc-100 rounded-lg flex items-center justify-center text-fg font-medium text-sm border border-zinc-200 overflow-hidden">
+                                   <div className="w-9 h-9 bg-subtle rounded-lg flex items-center justify-center text-fg font-medium text-sm border border-line overflow-hidden">
                                       {a.fotoUrl ? <img src={a.fotoUrl} className="w-full h-full object-cover" /> : a.estudante.nome.charAt(0)}
                                    </div>
                                    <div>
@@ -334,7 +334,7 @@ export default function AEEDashboardClient({
                              <td className="px-6 py-4">
                                 <div className="flex flex-wrap gap-1">
                                    {a.cids.slice(0, 2).map((c: string) => (
-                                     <span key={c} className="text-xs bg-zinc-100 text-fg px-1.5 py-0.5 rounded border border-zinc-200">{c}</span>
+                                     <span key={c} className="text-xs bg-subtle text-fg px-1.5 py-0.5 rounded border border-line">{c}</span>
                                    ))}
                                    {a.cids.length > 2 && <span className="text-xs text-fg">+{a.cids.length - 2}</span>}
                                 </div>
@@ -376,13 +376,13 @@ export default function AEEDashboardClient({
                                   {isDirecao && (
                                     <button 
                                       onClick={(e) => { e.stopPropagation(); handleDelete(a); }}
-                                      className="p-1.5 text-zinc-300 hover:text-danger-fg transition-colors opacity-0 group-hover:opacity-100"
+                                      className="p-1.5 text-fg-disabled hover:text-danger-fg transition-colors opacity-0 group-hover:opacity-100"
                                       title="Excluir Ficha"
                                     >
                                       <Trash2 size={16} />
                                     </button>
                                   )}
-                                  <ChevronRight size={16} className="inline text-zinc-300 group-hover:text-black transition-colors" />
+                                  <ChevronRight size={16} className="inline text-fg-disabled group-hover:text-fg transition-colors" />
                                 </div>
                              </td>
                           </tr>
@@ -406,23 +406,23 @@ export default function AEEDashboardClient({
                       <input 
                          type="text" value={studentSearch} onChange={e => setStudentSearch(e.target.value)}
                          placeholder="Nome ou Matrícula..."
-                         className="w-full pl-12 pr-6 py-4 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-medium focus:bg-white focus:ring-2 focus:ring-black/5 outline-none transition-all"
+                         className="w-full pl-12 pr-6 py-4 bg-canvas border border-line rounded-xl text-sm font-medium focus:bg-surface focus:ring-2 focus:ring-black/5 outline-none transition-all"
                       />
                    </div>
                    <div className="grid grid-cols-1 gap-2">
                       {estudantesSemAee.filter(s => s.nome.toLowerCase().includes(studentSearch.toLowerCase())).slice(0, 8).map(s => (
                          <button 
                             key={s.matricula} onClick={() => openCreate(s)}
-                            className="flex items-center justify-between p-4 bg-white border border-zinc-200 rounded-xl hover:border-black transition-all group"
+                            className="flex items-center justify-between p-4 bg-surface border border-line rounded-xl hover:border-black transition-all group"
                          >
                             <div className="flex items-center gap-4 text-left">
-                               <div className="w-10 h-10 bg-zinc-100 rounded-lg flex items-center justify-center font-medium text-fg-subtle">{s.nome.charAt(0)}</div>
+                               <div className="w-10 h-10 bg-subtle rounded-lg flex items-center justify-center font-medium text-fg-subtle">{s.nome.charAt(0)}</div>
                                <div>
                                   <p className="text-sm font-semibold text-fg">{s.nome}</p>
                                   <p className="text-xs text-fg">{s.turma.nome}</p>
                                 </div>
                             </div>
-                            <ChevronRight size={18} className="text-zinc-300 group-hover:text-black" />
+                            <ChevronRight size={18} className="text-fg-disabled group-hover:text-fg" />
                          </button>
                       ))}
                    </div>
@@ -430,13 +430,13 @@ export default function AEEDashboardClient({
              ) : (
                 <div className="space-y-12 animate-slide-up">
                    {/* DESKTOP BANNER: Identificação Horizontal */}
-                   <div className="bg-white border border-zinc-200 p-4 rounded-xl flex flex-col md:flex-row items-center gap-6 shadow-card">
+                   <div className="bg-surface border border-line p-4 rounded-xl flex flex-col md:flex-row items-center gap-6 shadow-card">
                       <div className="relative group shrink-0">
-                          <div className="w-16 h-16 bg-zinc-50 rounded-xl overflow-hidden border border-zinc-200 shadow-card flex items-center justify-center">
+                          <div className="w-16 h-16 bg-canvas rounded-xl overflow-hidden border border-line shadow-card flex items-center justify-center">
                             {formData.fotoUrl ? (
                                <img src={formData.fotoUrl} className="w-full h-full object-cover" />
                             ) : (
-                                <Users size={24} className="text-zinc-300" />
+                                <Users size={24} className="text-fg-disabled" />
                             )}
                          </div>
                          {isEditing && (
@@ -463,7 +463,7 @@ export default function AEEDashboardClient({
                                <span className="text-xs text-fg-subtle font-semibold leading-none">Matrícula</span>
                                <span className="text-sm font-bold text-fg-muted">{activePanel === 'create' ? selectedStudent?.matricula : selectedProfile?.estudante.matricula}</span>
                             </div>
-                            <div className="w-px h-4 bg-zinc-200 hidden md:block" />
+                            <div className="w-px h-4 bg-subtle-hover hidden md:block" />
                             <div className="flex items-center gap-2">
                                <span className="text-xs text-fg-subtle font-semibold leading-none">Turma</span>
                                <span className="text-sm font-bold text-fg-muted">{activePanel === 'create' ? selectedStudent?.turma.nome : selectedProfile?.estudante.turma.nome}</span>
@@ -472,7 +472,7 @@ export default function AEEDashboardClient({
                       </div>
                       
                       {activePanel === 'edit' && !isEditing && (
-                         <div className="shrink-0 flex items-center gap-4 bg-zinc-50 px-4 py-2 rounded-xl border border-zinc-100 shadow-card">
+                         <div className="shrink-0 flex items-center gap-4 bg-canvas px-4 py-2 rounded-xl border border-line-subtle shadow-card">
                             <div>
                                <p className="text-xs text-fg-subtle font-semibold mb-1">Status de Ciência</p>
                                {selectedProfile.acknowledgements.length === 0 ? (
@@ -494,7 +494,7 @@ export default function AEEDashboardClient({
                    {/* Grid Superior: Dados Compactos */}
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Diagnóstico (CIDs) */}
-                      <div className="bg-white border border-zinc-200 rounded-xl p-5 shadow-card space-y-4">
+                      <div className="bg-surface border border-line rounded-xl p-5 shadow-card space-y-4">
                          <label className="text-xs text-fg-subtle font-semibold flex items-center gap-3">
                             <div className="p-2 bg-danger-subtle text-danger-fg rounded-xl border border-danger-line">
                                <AlertCircle size={16} />
@@ -508,7 +508,7 @@ export default function AEEDashboardClient({
                                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-subtle" />
                                   <input 
                                     type="text" placeholder="Pesquisar por nome ou código CID..." value={cidSearch} onChange={e => setCidSearch(e.target.value)}
-                                    className="w-full pl-11 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg text-xs font-bold focus:bg-white outline-none"
+                                    className="w-full pl-11 pr-4 py-3 bg-canvas border border-line rounded-lg text-xs font-bold focus:bg-surface outline-none"
                                   />
                                </div>
                                <div className="flex flex-col gap-1.5 max-h-56 overflow-y-auto p-1 custom-scrollbar pr-2">
@@ -520,7 +520,7 @@ export default function AEEDashboardClient({
                                         }`}
                                      >
                                         <div className="flex items-center gap-3">
-                                           <span className={`px-2 py-0.5 rounded font-semibold border ${formData.cids.includes(c.code) ? 'bg-surface border-accent/25' : 'bg-zinc-100 border-zinc-200 text-fg'}`}>{c.code}</span>
+                                           <span className={`px-2 py-0.5 rounded font-semibold border ${formData.cids.includes(c.code) ? 'bg-surface border-accent/25' : 'bg-subtle border-line text-fg'}`}>{c.code}</span>
                                            <span className="opacity-90 line-clamp-1">{c.label}</span>
                                         </div>
                                         {formData.cids.includes(c.code) && <CheckCircle2 size={14} className="text-white" />}
@@ -533,7 +533,7 @@ export default function AEEDashboardClient({
                                {formData.cids.length > 0 ? formData.cids.map(code => {
                                   const cid = CIDS_AEE.find(c => c.code === code)
                                   return (
-                                     <div key={code} className="bg-zinc-50 border border-zinc-100 p-4 rounded-lg flex items-center gap-4 transition-all hover:bg-white hover:border-zinc-200 hover:shadow-card group">
+                                     <div key={code} className="bg-canvas border border-line-subtle p-4 rounded-lg flex items-center gap-4 transition-all hover:bg-surface hover:border-line hover:shadow-card group">
                                         <div className="bg-subtle border border-line text-fg px-2.5 py-1 rounded-lg text-xs font-semibold shrink-0 shadow-sm">
                                            {code}
                                         </div>
@@ -543,7 +543,7 @@ export default function AEEDashboardClient({
                                      </div>
                                   )
                                }) : (
-                                  <div className="py-10 text-center border-2 border-dashed border-zinc-100 rounded-lg">
+                                  <div className="py-10 text-center border-2 border-dashed border-line-subtle rounded-lg">
                                      <p className="text-xs text-fg-subtle italic font-medium">Nenhum diagnóstico registrado.</p>
                                   </div>
                                )}
@@ -552,7 +552,7 @@ export default function AEEDashboardClient({
                       </div>
 
                       {/* Configurações de Prova */}
-                      <div className="bg-white border border-zinc-200 rounded-xl p-5 shadow-card space-y-4">
+                      <div className="bg-surface border border-line rounded-xl p-5 shadow-card space-y-4">
                          <label className="text-xs text-fg-subtle font-semibold flex items-center gap-3">
                             <div className="p-2 bg-accent-subtle text-accent-fg rounded-xl border border-accent/25">
                                <ClipboardCheck size={16} />
@@ -577,7 +577,7 @@ export default function AEEDashboardClient({
                                           : 'bg-surface border-line text-fg-muted hover:border-line-strong'
                                     } ${!isEditing && 'cursor-default opacity-100'}`}
                                  >
-                                    <div className={`p-3 rounded-xl transition-colors ${isSelected ? 'bg-surface text-accent-fg' : 'bg-zinc-50 text-fg-subtle group-hover:text-fg-muted'}`}>
+                                    <div className={`p-3 rounded-xl transition-colors ${isSelected ? 'bg-surface text-accent-fg' : 'bg-canvas text-fg-subtle group-hover:text-fg-muted'}`}>
                                        <Icon size={20} />
                                     </div>
                                     <div>
@@ -601,7 +601,7 @@ export default function AEEDashboardClient({
                       ].map(field => {
                          const Icon = field.icon as any
                          return (
-                            <div key={field.id} className="bg-white border border-zinc-200 rounded-xl p-5 shadow-card space-y-4">
+                            <div key={field.id} className="bg-surface border border-line rounded-xl p-5 shadow-card space-y-4">
                                <label className="text-xs text-fg-subtle font-semibold flex items-center gap-3">
                                   <div className={`p-2 bg-subtle text-fg-muted rounded-xl border border-line`}>
                                      <Icon size={18} />
@@ -612,7 +612,7 @@ export default function AEEDashboardClient({
                                   rows={field.rows} readOnly={!isEditing}
                                   value={(formData as any)[field.id]} onChange={e => setFormData(f => ({ ...f, [field.id]: e.target.value }))}
                                   placeholder={isEditing ? field.placeholder : 'Nenhuma informação cadastrada no prontuário.'}
-                                  className={`w-full bg-zinc-50 border border-zinc-100 rounded-lg px-8 py-6 text-base font-medium text-fg leading-relaxed outline-none transition-all placeholder:text-zinc-300 ${isEditing ? 'focus:bg-white focus:ring-4 focus:ring-zinc-100 focus:border-zinc-300' : 'cursor-default border-transparent'}`}
+                                  className={`w-full bg-canvas border border-line-subtle rounded-lg px-8 py-6 text-base font-medium text-fg leading-relaxed outline-none transition-all placeholder:text-fg-disabled ${isEditing ? 'focus:bg-surface focus:ring-4 focus:ring-zinc-100 focus:border-line-strong' : 'cursor-default border-transparent'}`}
                                />
                             </div>
                          )
@@ -640,8 +640,8 @@ export default function AEEDashboardClient({
                    {/* Rodapé: Contatos e Resumo de Leitura */}
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       {/* Contatos Emergência */}
-                      <div className="bg-white border border-zinc-200 p-5 rounded-xl shadow-card space-y-4">
-                         <div className="flex items-center gap-3 pb-4 border-b border-zinc-50">
+                      <div className="bg-surface border border-line p-5 rounded-xl shadow-card space-y-4">
+                         <div className="flex items-center gap-3 pb-4 border-b border-line-subtle">
                             <div className="p-2 bg-danger-subtle text-danger-fg rounded-xl">
                                <Phone size={16} />
                             </div>
@@ -653,7 +653,7 @@ export default function AEEDashboardClient({
                                <input 
                                   type="text" readOnly={!isEditing} value={formData.contatoNome}
                                   onChange={e => setFormData(f => ({ ...f, contatoNome: e.target.value }))}
-                                  className={`w-full bg-zinc-50 border border-zinc-100 rounded-xl px-4 py-3 text-sm font-bold text-fg-muted outline-none transition-all ${isEditing ? 'focus:bg-white focus:border-zinc-200' : 'border-transparent bg-transparent pl-1 cursor-default'}`}
+                                  className={`w-full bg-canvas border border-line-subtle rounded-xl px-4 py-3 text-sm font-bold text-fg-muted outline-none transition-all ${isEditing ? 'focus:bg-surface focus:border-line' : 'border-transparent bg-transparent pl-1 cursor-default'}`}
                                />
                             </div>
                             <div className="space-y-2">
@@ -661,7 +661,7 @@ export default function AEEDashboardClient({
                                <input 
                                   type="text" readOnly={!isEditing} value={formData.contatoTelefone}
                                   onChange={e => setFormData(f => ({ ...f, contatoTelefone: formatPhone(e.target.value) }))}
-                                  className={`w-full bg-zinc-50 border border-zinc-100 rounded-xl px-4 py-3 text-sm font-bold text-fg-muted outline-none font-mono transition-all ${isEditing ? 'focus:bg-white focus:border-zinc-200' : 'border-transparent bg-transparent pl-1 cursor-default'}`}
+                                  className={`w-full bg-canvas border border-line-subtle rounded-xl px-4 py-3 text-sm font-bold text-fg-muted outline-none font-mono transition-all ${isEditing ? 'focus:bg-surface focus:border-line' : 'border-transparent bg-transparent pl-1 cursor-default'}`}
                                />
                             </div>
                          </div>
@@ -679,7 +679,7 @@ export default function AEEDashboardClient({
                          const totalCont = todosProfessores.length
 
                          return (
-                            <div className="bg-white border border-zinc-200 p-5 rounded-xl shadow-card space-y-4 flex flex-col justify-center">
+                            <div className="bg-surface border border-line p-5 rounded-xl shadow-card space-y-4 flex flex-col justify-center">
                                <div className="flex justify-between items-center">
                                   <div className="flex items-center gap-3">
                                      <div className="p-2 bg-success-subtle text-success-fg rounded-xl">
@@ -692,12 +692,12 @@ export default function AEEDashboardClient({
                                   </div>
                                </div>
                                <div className="space-y-4">
-                                  <div className="w-full h-3 bg-zinc-50 rounded-full overflow-hidden border border-zinc-100 shadow-card">
+                                  <div className="w-full h-3 bg-canvas rounded-full overflow-hidden border border-line-subtle shadow-card">
                                      <div className="h-full bg-success transition-all duration-1000 shadow-[0_0_10px_rgba(16,185,129,0.3)]" style={{ width: `${(lidosCont/totalCont)*100}%` }} />
                                   </div>
                                   <button 
                                      onClick={() => document.getElementById('relatorio-leituras')?.scrollIntoView({ behavior: 'smooth' })}
-                                     className="w-full py-3.5 text-xs text-fg font-semibold border-2 border-zinc-100 rounded-lg hover:bg-zinc-50 hover:border-zinc-200 transition-all active:scale-[0.98]"
+                                     className="w-full py-3.5 text-xs text-fg font-semibold border-2 border-line-subtle rounded-lg hover:bg-canvas hover:border-line transition-all active:scale-[0.98]"
                                   >
                                      Auditoria Nominal de Leituras
                                   </button>
@@ -709,7 +709,7 @@ export default function AEEDashboardClient({
 
                    {/* Relatório de Ciência Nominal */}
                    {activePanel === 'edit' && isDirecao && (
-                      <div id="relatorio-leituras" className="pt-10 border-t border-zinc-200 space-y-8 animate-fade-in">
+                      <div id="relatorio-leituras" className="pt-10 border-t border-line space-y-8 animate-fade-in">
                          <div className="flex items-center justify-between">
                             <h3 className="text-base font-bold text-fg flex items-center gap-3">
                                <div className="w-1.5 h-6 bg-accent rounded-full" />
@@ -717,7 +717,7 @@ export default function AEEDashboardClient({
                             </h3>
                             <div className="flex gap-6">
                                <div className="flex items-center gap-2 text-xs text-fg-subtle font-semibold"><div className="w-2.5 h-2.5 rounded-full bg-success shadow-[0_0_8px_rgba(16,185,129,0.5)]" /> Concluído</div>
-                               <div className="flex items-center gap-2 text-xs text-fg-subtle font-semibold"><div className="w-2.5 h-2.5 rounded-full bg-zinc-200" /> Pendente</div>
+                               <div className="flex items-center gap-2 text-xs text-fg-subtle font-semibold"><div className="w-2.5 h-2.5 rounded-full bg-subtle-hover" /> Pendente</div>
                             </div>
                          </div>
                          
@@ -733,9 +733,9 @@ export default function AEEDashboardClient({
                                return Array.from(profsMap.entries()).map(([id, name]) => {
                                   const lidoAt = lidosMap.get(id)
                                   return (
-                                     <div key={id} className={`p-5 rounded-xl border transition-all ${lidoAt ? 'bg-white border-success-line shadow-card ' : 'bg-zinc-50/50 border-zinc-100 opacity-60'}`}>
+                                     <div key={id} className={`p-5 rounded-xl border transition-all ${lidoAt ? 'bg-surface border-success-line shadow-card ' : 'bg-canvas/50 border-line-subtle opacity-60'}`}>
                                         <div className="flex items-center gap-4">
-                                           <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-semibold text-xs shadow-card ${lidoAt ? 'bg-success text-white' : 'bg-white text-zinc-300 border border-zinc-100'}`}>
+                                           <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-semibold text-xs shadow-card ${lidoAt ? 'bg-success text-white' : 'bg-surface text-fg-disabled border border-line-subtle'}`}>
                                               {name.charAt(0)}
                                            </div>
                                            <div className="min-w-0">

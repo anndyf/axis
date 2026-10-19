@@ -73,7 +73,7 @@ function Opcoes<T extends string>({ valor, opcoes, onChange }: { valor: T; opcoe
       {opcoes.map(o => (
         <button
           key={o.valor} type="button" title={o.ajuda} onClick={() => onChange(o.valor)}
-          className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border ${valor === o.valor ? 'bg-accent text-on-accent border-accent shadow-card ' : 'bg-white text-fg-subtle border-zinc-200 hover:border-zinc-300'}`}
+          className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border ${valor === o.valor ? 'bg-accent text-on-accent border-accent shadow-card ' : 'bg-surface text-fg-subtle border-line hover:border-line-strong'}`}
         >
           {o.rotulo}
         </button>
@@ -231,9 +231,9 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-xl w-full max-w-2xl shadow-overlay border border-zinc-100 overflow-hidden animate-pop-in my-8 flex flex-col max-h-[90vh]">
+      <div className="bg-surface rounded-xl w-full max-w-2xl shadow-overlay border border-line-subtle overflow-hidden animate-pop-in my-8 flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className={`px-8 py-6 border-b border-zinc-100 flex items-center justify-between shrink-0 ${isEdit ? 'bg-warning-subtle' : 'bg-zinc-50'}`}>
+        <div className={`px-8 py-6 border-b border-line-subtle flex items-center justify-between shrink-0 ${isEdit ? 'bg-warning-subtle' : 'bg-canvas'}`}>
           <div className="flex items-center space-x-3">
             <div className={`p-2 rounded-xl ${isEdit ? 'bg-warning' : 'bg-accent'}`}>
               <ClipboardList className="w-5 h-5 text-white" />
@@ -247,7 +247,7 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-zinc-200 rounded-full transition-colors">
+          <button onClick={onClose} className="p-2 hover:bg-subtle-hover rounded-full transition-colors">
             <X className="w-5 h-5 text-fg-subtle" />
           </button>
         </div>
@@ -299,12 +299,12 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
             </div>
 
             {unidades.map((u, uIdx) => (
-              <div key={uIdx} className="p-4 bg-zinc-50 border border-zinc-200 rounded-lg space-y-3">
+              <div key={uIdx} className="p-4 bg-canvas border border-line rounded-lg space-y-3">
                 <div className="flex items-center gap-2">
                   <input
                     type="text" value={u.nome}
                     onChange={e => updateUnidade(uIdx, { nome: e.target.value })}
-                    className="flex-1 px-4 py-2.5 bg-white border border-zinc-200 rounded-xl outline-none font-semibold text-sm text-fg-muted focus:border-accent"
+                    className="flex-1 px-4 py-2.5 bg-surface border border-line rounded-xl outline-none font-semibold text-sm text-fg-muted focus:border-accent"
                     placeholder={`${uIdx + 1}ª Unidade`}
                   />
                   {formaFinal === "MEDIA_PONDERADA" && (
@@ -331,7 +331,7 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
                         type="text" placeholder="Nome (ex: Prova)"
                         value={a.nome}
                         onChange={e => updateAtividade(uIdx, aIdx, 'nome', e.target.value)}
-                        className="flex-1 px-3 py-2 bg-white border border-zinc-200 rounded-lg outline-none text-xs font-medium text-fg-muted focus:border-accent"
+                        className="flex-1 px-3 py-2 bg-surface border border-line rounded-lg outline-none text-xs font-medium text-fg-muted focus:border-accent"
                       />
                       <input type="text" inputMode="decimal" placeholder="Vale" title="Nota máxima da atividade" value={a.notaMaxima} onChange={e => updateAtividade(uIdx, aIdx, 'notaMaxima', e.target.value)} className={`w-20 ${smallInput}`} />
                       {u.formaCalculo === "MEDIA_PONDERADA" && (
@@ -360,7 +360,7 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
           <div className="space-y-3">
             <label className={labelClass}>Recuperação</label>
 
-            <div className="p-4 bg-zinc-50 border border-zinc-200 rounded-lg space-y-3">
+            <div className="p-4 bg-canvas border border-line rounded-lg space-y-3">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-semibold text-fg-muted">Recuperação por unidade (paralela)</p>
@@ -376,7 +376,7 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
               )}
             </div>
 
-            <div className="p-4 bg-zinc-50 border border-zinc-200 rounded-lg space-y-3">
+            <div className="p-4 bg-canvas border border-line rounded-lg space-y-3">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-semibold text-fg-muted">Recuperação final / exame</p>
@@ -405,7 +405,7 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
           {/* Quem define as atividades de cada unidade */}
           <div className="space-y-3">
             <label className={labelClass}>Atividades das unidades</label>
-            <div className="p-4 bg-zinc-50 border border-zinc-200 rounded-lg space-y-2">
+            <div className="p-4 bg-canvas border border-line rounded-lg space-y-2">
               <Opcoes valor={definicaoAtividades} onChange={setDefinicaoAtividades} opcoes={[
                 { valor: "ESCOLA", rotulo: "Definidas pela escola", ajuda: "As atividades abaixo valem para todas as disciplinas" },
                 { valor: "PROFESSOR", rotulo: "Definidas pelo professor", ajuda: "Cada professor cria as avaliações; as atividades abaixo viram o máximo da unidade" },
@@ -416,7 +416,7 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
           {/* Frequência */}
           <div className="space-y-3">
             <label className={labelClass}>Frequência</label>
-            <div className="p-4 bg-zinc-50 border border-zinc-200 rounded-lg space-y-3">
+            <div className="p-4 bg-canvas border border-line rounded-lg space-y-3">
               <div className="space-y-1">
                 <p className="text-xs font-semibold text-fg-subtle">Chamada</p>
                 <Opcoes valor={registroFrequencia} onChange={setRegistroFrequencia} opcoes={[
@@ -439,10 +439,10 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
           </div>
         </div>
 
-        <div className="p-8 pt-4 border-t border-zinc-100 flex gap-3 shrink-0">
+        <div className="p-8 pt-4 border-t border-line-subtle flex gap-3 shrink-0">
           <button
             type="button" onClick={onClose}
-            className="px-6 py-4 rounded-lg font-semibold text-sm text-fg-subtle hover:bg-zinc-100 transition-all"
+            className="px-6 py-4 rounded-lg font-semibold text-sm text-fg-subtle hover:bg-subtle transition-all"
           >
             Cancelar
           </button>

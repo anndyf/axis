@@ -254,20 +254,20 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
     <div className="pb-20">
       <nav className="mb-6 border-b border-line pb-4">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/dashboard/turmas" className="flex items-center space-x-2 text-black hover:opacity-70 font-semibold transition-all text-xs">
+          <Link href="/dashboard/turmas" className="flex items-center space-x-2 text-fg hover:opacity-70 font-semibold transition-all text-xs">
             <ArrowLeft className="w-4 h-4" />
             <span>Voltar</span>
           </Link>
-          <span className="text-xs font-semibold text-black tracking-widest">Áxis Control</span>
+          <span className="text-xs font-semibold text-fg tracking-widest">Áxis Control</span>
         </div>
       </nav>
 
       <main className="max-w-4xl mx-auto px-6 mt-12">
         <div className="mb-10 text-center">
-           <h1 className="text-5xl font-semibold text-black tracking-tight mb-3">
+           <h1 className="text-5xl font-semibold text-fg tracking-tight mb-3">
              {isEdit ? 'Editar Turma' : 'Lançar Turma'}
            </h1>
-           <p className="text-black font-medium text-lg max-w-xl mx-auto leading-relaxed">
+           <p className="text-fg font-medium text-lg max-w-xl mx-auto leading-relaxed">
               Siga os passos abaixo para configurar a turma. O sistema gerará o código de identificação automaticamente.
            </p>
         </div>
@@ -310,15 +310,15 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
               </div>
             )}
 
-            <div className="bg-white rounded-xl p-8 shadow-card border border-zinc-100 space-y-8">
+            <div className="bg-surface rounded-xl p-8 shadow-card border border-line-subtle space-y-8">
               {/* 1. Modalidade */}
               <div className="space-y-3">
                 <div className="ml-1">
-                  <label className="flex items-center text-xs font-semibold text-black">
+                  <label className="flex items-center text-xs font-semibold text-fg">
                     <Layers className="w-4 h-4 mr-2 text-accent-fg" />
                     1. Modalidade
                   </label>
-                  <p className="text-xs text-black/40 font-semibold mt-0.5 ml-6">Define a estrutura de ensino e duração do curso</p>
+                  <p className="text-xs text-fg/40 font-semibold mt-0.5 ml-6">Define a estrutura de ensino e duração do curso</p>
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   {["EPTM", "SUBSEQUENTE", "PROEJA"].map((mod) => (
@@ -329,7 +329,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                       className={`py-2.5 rounded-xl font-semibold text-xs transition-all border-2 ${
                         formData.modalidade === mod 
                         ? 'bg-accent-subtle border-accent text-accent-fg shadow-card' 
-                        : 'bg-zinc-50 border-zinc-50 text-black hover:border-zinc-200 hover:bg-white'
+                        : 'bg-canvas border-line-subtle text-fg hover:border-line hover:bg-surface'
                       }`}
                     >
                       {mod}
@@ -343,11 +343,11 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                 <div className="space-y-2">
                   <div className="flex items-center justify-between ml-1">
                     <div className="flex flex-col ml-1">
-                      <label className="flex items-center text-xs font-semibold text-black">
+                      <label className="flex items-center text-xs font-semibold text-fg">
                         <GraduationCap className="w-4 h-4 mr-2 text-accent-fg" />
                         2. Curso
                       </label>
-                      <p className="text-xs text-black/40 font-semibold mt-0.5 ml-6">Escolha a habilitação técnica</p>
+                      <p className="text-xs text-fg/40 font-semibold mt-0.5 ml-6">Escolha a habilitação técnica</p>
                     </div>
                   </div>
 
@@ -363,7 +363,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                         cursoId: selecionado?.id || "" 
                       }))
                     }}
-                    className="w-full h-12 px-4 bg-zinc-50 border border-zinc-100 rounded-xl outline-none font-semibold text-sm text-black focus:bg-white focus:border-accent transition-all appearance-none disabled:opacity-30"
+                    className="w-full h-12 px-4 bg-canvas border border-line-subtle rounded-xl outline-none font-semibold text-sm text-fg focus:bg-surface focus:border-accent transition-all appearance-none disabled:opacity-30"
                   >
                     <option value="">{formData.modalidade ? "Selecionar..." : "Aguardando modalidade"}</option>
                     {cursosFiltrados.map(c => (
@@ -376,17 +376,17 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
 
                 <div className="space-y-2">
                   <div className="flex flex-col ml-1">
-                    <label className="flex items-center text-xs font-semibold text-black">
+                    <label className="flex items-center text-xs font-semibold text-fg">
                       <Clock className="w-4 h-4 mr-2 text-warning-fg" />
                       3. Turno
                     </label>
-                    <p className="text-xs text-black/40 font-semibold mt-0.5 ml-6">Período de oferta das aulas</p>
+                    <p className="text-xs text-fg/40 font-semibold mt-0.5 ml-6">Período de oferta das aulas</p>
                   </div>
                   <select 
                     disabled={!formData.curso} required
                     value={formData.turno}
                     onChange={(e) => setFormData(prev => ({ ...prev, turno: e.target.value }))}
-                    className="w-full h-12 px-4 bg-zinc-50 border border-zinc-100 rounded-xl outline-none font-semibold text-sm text-black focus:bg-white focus:border-accent transition-all appearance-none disabled:opacity-30"
+                    className="w-full h-12 px-4 bg-canvas border border-line-subtle rounded-xl outline-none font-semibold text-sm text-fg focus:bg-surface focus:border-accent transition-all appearance-none disabled:opacity-30"
                   >
                     <option value="">{formData.curso ? "Escolha..." : "Aguardando curso"}</option>
                     {turnosDisponiveis.map((t: string) => <option key={t} value={t}>{t}</option>)}
@@ -396,11 +396,11 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                 {/* 4. Ano/Série */}
                 <div className="space-y-2">
                   <div className="flex flex-col ml-1">
-                    <label className="flex items-center text-xs font-semibold text-black">
+                    <label className="flex items-center text-xs font-semibold text-fg">
                       <Calendar className="w-4 h-4 mr-2 text-success-fg" />
                       4. {config.label}
                     </label>
-                    <p className="text-xs text-black/40 font-semibold mt-0.5 ml-6">Posição atual da turma no curso</p>
+                    <p className="text-xs text-fg/40 font-semibold mt-0.5 ml-6">Posição atual da turma no curso</p>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {Array.from({ length: config.max }, (_, i) => (i + 1).toString()).map((s) => (
@@ -410,7 +410,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                         className={`flex-1 py-2.5 rounded-lg font-semibold text-sm transition-all border ${
                           formData.serie === s 
                           ? 'bg-success-subtle border-success-line text-success-fg shadow-card' 
-                          : 'bg-zinc-50 border-transparent text-black hover:bg-zinc-100'
+                          : 'bg-canvas border-transparent text-fg hover:bg-subtle'
                         }`}
                       >
                         {s}º
@@ -422,11 +422,11 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                 {/* 5. Número */}
                 <div className="space-y-2">
                   <div className="flex flex-col ml-1">
-                    <label className="flex items-center text-xs font-semibold text-black">
+                    <label className="flex items-center text-xs font-semibold text-fg">
                       <Hash className="w-4 h-4 mr-2 text-accent-fg" />
                       5. ID da Turma
                     </label>
-                    <p className="text-xs text-black/40 font-semibold mt-0.5 ml-6">Diferencia turmas do mesmo ano/turno</p>
+                    <p className="text-xs text-fg/40 font-semibold mt-0.5 ml-6">Diferencia turmas do mesmo ano/turno</p>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {[1, 2, 3, 4].map((n) => (
@@ -436,7 +436,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                         className={`flex-1 py-2.5 rounded-lg font-semibold text-sm transition-all border ${
                           formData.numero === n
                           ? 'bg-accent border-accent text-on-accent shadow-card' 
-                          : 'bg-zinc-50 border-transparent text-black hover:bg-zinc-100'
+                          : 'bg-canvas border-transparent text-fg hover:bg-subtle'
                         }`}
                       >
                         {n}
@@ -448,16 +448,16 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                 {/* 6. Esquema de Avaliação */}
                 <div className="md:col-span-2 space-y-2">
                   <div className="flex flex-col ml-1">
-                    <label className="flex items-center text-xs font-semibold text-black">
+                    <label className="flex items-center text-xs font-semibold text-fg">
                       <Calculator className="w-4 h-4 mr-2 text-accent-fg" />
                       6. Esquema de Avaliação
                     </label>
-                    <p className="text-xs text-black/40 font-semibold mt-0.5 ml-6">Unidades e atividades usadas no lançamento de notas</p>
+                    <p className="text-xs text-fg/40 font-semibold mt-0.5 ml-6">Unidades e atividades usadas no lançamento de notas</p>
                   </div>
                   <select
                     value={formData.esquemaAvaliacaoId}
                     onChange={(e) => setFormData(prev => ({ ...prev, esquemaAvaliacaoId: e.target.value }))}
-                    className="w-full h-12 px-4 bg-zinc-50 border border-zinc-100 rounded-xl outline-none font-semibold text-sm text-black focus:bg-white focus:border-accent transition-all appearance-none"
+                    className="w-full h-12 px-4 bg-canvas border border-line-subtle rounded-xl outline-none font-semibold text-sm text-fg focus:bg-surface focus:border-accent transition-all appearance-none"
                   >
                     <option value="">Herdar do curso{esquemaDoCurso ? ` (${esquemaDoCurso})` : ""}</option>
                     {esquemas.map(esq => (
@@ -468,9 +468,9 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
 
                 {/* Opção de Importar Matriz */}
                 {!isEdit && (
-                  <div className="md:col-span-2 bg-zinc-50 p-4 rounded-lg flex items-center justify-between group cursor-pointer" onClick={() => setImportarMatriz(!importarMatriz)}>
+                  <div className="md:col-span-2 bg-canvas p-4 rounded-lg flex items-center justify-between group cursor-pointer" onClick={() => setImportarMatriz(!importarMatriz)}>
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${importarMatriz ? 'bg-accent shadow-card ' : 'bg-zinc-200'}`}>
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${importarMatriz ? 'bg-accent shadow-card ' : 'bg-subtle-hover'}`}>
                         <Layers className={`w-5 h-5 ${importarMatriz ? 'text-white' : 'text-fg-subtle'}`} />
                       </div>
                       <div>
@@ -478,19 +478,19 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                         <p className="text-xs text-fg-subtle font-medium leading-none">Cadastrar disciplinas padrão automaticamente</p>
                       </div>
                     </div>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${importarMatriz ? 'bg-accent border-accent' : 'border-zinc-300'}`}>
-                      {importarMatriz && <div className="w-2 h-2 bg-white rounded-full" />}
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${importarMatriz ? 'bg-accent border-accent' : 'border-line-strong'}`}>
+                      {importarMatriz && <div className="w-2 h-2 bg-surface rounded-full" />}
                     </div>
                   </div>
                 )}
               </div>
 
               {/* Preview e Ações Integradas */}
-              <div className="pt-6 border-t border-zinc-100 space-y-4">
+              <div className="pt-6 border-t border-line-subtle space-y-4">
                 <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
-                  <div className="flex-1 flex flex-col items-center md:items-start justify-center p-4 bg-zinc-50 rounded-lg border border-zinc-100">
-                    <span className="text-xs font-semibold text-black">Código</span>
-                    <div className="text-xl font-semibold tracking-tighter text-black font-mono">
+                  <div className="flex-1 flex flex-col items-center md:items-start justify-center p-4 bg-canvas rounded-lg border border-line-subtle">
+                    <span className="text-xs font-semibold text-fg">Código</span>
+                    <div className="text-xl font-semibold tracking-tighter text-fg font-mono">
                       {formData.nome || "---"}
                     </div>
                   </div>
@@ -510,7 +510,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                   <button
                     type="button"
                     onClick={() => router.push('/dashboard/turmas')}
-                    className="text-black font-semibold text-xs hover:opacity-70 transition-colors"
+                    className="text-fg font-semibold text-xs hover:opacity-70 transition-colors"
                   >
                     Descartar
                   </button>

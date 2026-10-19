@@ -105,7 +105,7 @@ export default async function AuditoriaPage({
             <p className="text-sm text-fg-muted font-medium">Monitoramento em tempo real de todas as ações críticas do sistema.</p>
           </div>
           
-          <div className="bg-white p-4 rounded-xl border border-zinc-300 shadow-sm flex items-center gap-4">
+          <div className="bg-surface p-4 rounded-xl border border-line-strong shadow-sm flex items-center gap-4">
             <div className="w-10 h-10 rounded-lg bg-warning-subtle flex items-center justify-center text-warning-fg">
               <ShieldAlert size={20} />
             </div>
@@ -117,7 +117,7 @@ export default async function AuditoriaPage({
         </div>
 
         {/* Filters Placeholder */}
-        <div className="bg-white border border-zinc-300 rounded-xl p-6 shadow-sm flex flex-col md:flex-row items-center gap-6">
+        <div className="bg-surface border border-line-strong rounded-xl p-6 shadow-sm flex flex-col md:flex-row items-center gap-6">
           <form className="flex-1 relative flex flex-col md:flex-row w-full items-center gap-3">
             <div className="relative flex-1 w-full">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-subtle" size={18} />
@@ -126,7 +126,7 @@ export default async function AuditoriaPage({
                 type="text" 
                 defaultValue={query}
                 placeholder="Buscar por detalhes ou entidade..." 
-                className="w-full pl-12 pr-6 py-4 bg-zinc-50 border-none rounded-lg text-sm font-medium focus:ring-2 focus:ring-zinc-500/20 transition-all outline-none"
+                className="w-full pl-12 pr-6 py-4 bg-canvas border-none rounded-lg text-sm font-medium focus:ring-2 focus:ring-zinc-500/20 transition-all outline-none"
               />
             </div>
             
@@ -135,7 +135,7 @@ export default async function AuditoriaPage({
               <select 
                 name="user" 
                 defaultValue={userFilter}
-                className="w-full md:w-auto pl-10 pr-10 py-4 bg-zinc-50 border-none rounded-lg text-sm font-medium focus:ring-2 focus:ring-zinc-500/20 transition-all outline-none appearance-none"
+                className="w-full md:w-auto pl-10 pr-10 py-4 bg-canvas border-none rounded-lg text-sm font-medium focus:ring-2 focus:ring-zinc-500/20 transition-all outline-none appearance-none"
               >
                 <option value="">Todos os Usuários</option>
                 {usersList.map((u: any) => (
@@ -150,13 +150,13 @@ export default async function AuditoriaPage({
             {entityFilter && <input type="hidden" name="entity" value={entityFilter} />}
           </form>
           
-          <div className="w-full h-px md:h-10 md:w-px bg-zinc-200 hidden md:block"></div>
+          <div className="w-full h-px md:h-10 md:w-px bg-subtle-hover hidden md:block"></div>
           
           <div className="flex flex-wrap gap-2 w-full md:w-auto">
             <Link 
               href={`/dashboard/auditoria?${userFilter ? `user=${userFilter}&` : ''}${query ? `q=${query}` : ''}`} 
               className={`px-4 py-2 rounded-xl text-xs font-medium border transition-all ${
-                !entityFilter ? 'bg-surface border border-line border-zinc-700 text-fg' : 'border-zinc-300 text-fg-muted hover:bg-zinc-50'
+                !entityFilter ? 'bg-surface border border-line border-zinc-700 text-fg' : 'border-line-strong text-fg-muted hover:bg-canvas'
               }`}
             >
               Todos
@@ -166,7 +166,7 @@ export default async function AuditoriaPage({
                 key={filter} 
                 href={`/dashboard/auditoria?entity=${filter}${query ? `&q=${query}` : ''}${userFilter ? `&user=${userFilter}` : ''}`}
                 className={`px-4 py-2 rounded-xl text-xs font-medium border transition-all ${
-                  entityFilter === filter ? 'bg-surface border border-line border-zinc-700 text-fg' : 'border-zinc-300 text-fg-muted hover:bg-zinc-50'
+                  entityFilter === filter ? 'bg-surface border border-line border-zinc-700 text-fg' : 'border-line-strong text-fg-muted hover:bg-canvas'
                 }`}
               >
                 {filter}
@@ -176,10 +176,10 @@ export default async function AuditoriaPage({
         </div>
 
         {/* Logs Table */}
-        <div className="bg-white border border-zinc-300 rounded-xl overflow-hidden shadow-card">
+        <div className="bg-surface border border-line-strong rounded-xl overflow-hidden shadow-card">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="bg-zinc-50 border-b border-zinc-200 text-left">
+              <tr className="bg-canvas border-b border-line text-left">
                 <th className="px-8 py-5 text-xs font-medium text-fg-subtle">Data / Hora</th>
                 <th className="px-8 py-5 text-xs font-medium text-fg-subtle">Autor</th>
                 <th className="px-8 py-5 text-xs font-medium text-fg-subtle">Ação</th>
@@ -188,12 +188,12 @@ export default async function AuditoriaPage({
                 <th className="px-8 py-5 text-xs font-medium text-fg-subtle">Alterações</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-50">
+            <tbody className="divide-y divide-line-subtle">
               {logs.length > 0 ? logs.map((log) => (
-                <tr key={log.id} className="hover:bg-zinc-50/30 transition-colors group">
+                <tr key={log.id} className="hover:bg-canvas/30 transition-colors group">
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-zinc-200 flex items-center justify-center text-fg-subtle">
+                      <div className="w-8 h-8 rounded-lg bg-subtle-hover flex items-center justify-center text-fg-subtle">
                         <Clock size={14} />
                       </div>
                       <div className="min-w-0">
@@ -208,7 +208,7 @@ export default async function AuditoriaPage({
                   </td>
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-zinc-200 flex items-center justify-center text-fg-muted font-medium text-xs">
+                      <div className="w-8 h-8 rounded-full bg-subtle-hover flex items-center justify-center text-fg-muted font-medium text-xs">
                         {log.user?.name?.charAt(0) || '?'}
                       </div>
                       <div>
@@ -220,7 +220,7 @@ export default async function AuditoriaPage({
                   <td className="px-8 py-5">
                     <span className={`px-3 py-1 rounded-lg text-xs font-medium ${
                       log.action === 'INSERT' ? 'bg-success-subtle text-success-fg' :
-                      log.action === 'UPDATE' ? 'bg-zinc-100 text-fg-muted' :
+                      log.action === 'UPDATE' ? 'bg-subtle text-fg-muted' :
                       'bg-danger-subtle text-danger-fg'
                     }`}>
                       {log.action}
@@ -243,7 +243,7 @@ export default async function AuditoriaPage({
                   </td>
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-2">
-                       <Database size={14} className="text-zinc-300" />
+                       <Database size={14} className="text-fg-disabled" />
                        <span className="text-xs font-medium text-fg-muted">{log.entityType}</span>
                     </div>
                   </td>
@@ -270,7 +270,7 @@ export default async function AuditoriaPage({
                                       <span className="px-1.5 py-0.5 bg-danger-subtle text-danger-fg rounded border border-danger-line line-through">
                                         {oldVal !== null ? String(oldVal) : 'Ø'}
                                       </span>
-                                      <span className="text-zinc-300">→</span>
+                                      <span className="text-fg-disabled">→</span>
                                       <span className="px-1.5 py-0.5 bg-success-subtle text-success-fg rounded border border-success-line font-medium">
                                         {newVal !== null ? String(newVal) : 'Ø'}
                                       </span>
@@ -288,7 +288,7 @@ export default async function AuditoriaPage({
                           return (
                             <div className="flex flex-wrap gap-1">
                               {entries.map(([k, v]) => (
-                                <span key={k} className="px-1.5 py-0.5 bg-zinc-200 rounded text-xs font-medium text-fg-muted border border-zinc-300">
+                                <span key={k} className="px-1.5 py-0.5 bg-subtle-hover rounded text-xs font-medium text-fg-muted border border-line-strong">
                                   {k}: <span className="font-medium text-fg">{String(v)}</span>
                                 </span>
                               ))}
@@ -305,7 +305,7 @@ export default async function AuditoriaPage({
                 <tr>
                   <td colSpan={6} className="px-8 py-20 text-center">
                     <div className="max-w-xs mx-auto space-y-4">
-                      <div className="w-16 h-16 rounded-xl bg-zinc-50 flex items-center justify-center text-zinc-300 mx-auto">
+                      <div className="w-16 h-16 rounded-xl bg-canvas flex items-center justify-center text-fg-disabled mx-auto">
                         <ShieldAlert size={32} />
                       </div>
                       <p className="text-sm font-medium text-fg-subtle leading-relaxed">
@@ -319,11 +319,11 @@ export default async function AuditoriaPage({
           </table>
           
           {/* Paginação */}
-          <div className="bg-zinc-50 border-t border-zinc-200 px-8 py-4 flex items-center justify-between">
+          <div className="bg-canvas border-t border-line px-8 py-4 flex items-center justify-between">
             <Link 
               href={page > 1 ? `/dashboard/auditoria?page=${page - 1}${entityFilter ? `&entity=${entityFilter}` : ''}${query ? `&q=${query}` : ''}${userFilter ? `&user=${userFilter}` : ''}` : '#'} 
               className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${
-                page > 1 ? 'bg-white border border-zinc-300 text-fg-muted hover:bg-zinc-100' : 'opacity-50 cursor-not-allowed bg-zinc-100 text-fg-subtle border border-zinc-200'
+                page > 1 ? 'bg-surface border border-line-strong text-fg-muted hover:bg-subtle' : 'opacity-50 cursor-not-allowed bg-subtle text-fg-subtle border border-line'
               }`}
             >
               Anterior
@@ -334,7 +334,7 @@ export default async function AuditoriaPage({
             <Link 
               href={logs.length === limit ? `/dashboard/auditoria?page=${page + 1}${entityFilter ? `&entity=${entityFilter}` : ''}${query ? `&q=${query}` : ''}${userFilter ? `&user=${userFilter}` : ''}` : '#'} 
               className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${
-                logs.length === limit ? 'bg-white border border-zinc-300 text-fg-muted hover:bg-zinc-100' : 'opacity-50 cursor-not-allowed bg-zinc-100 text-fg-subtle border border-zinc-200'
+                logs.length === limit ? 'bg-surface border border-line-strong text-fg-muted hover:bg-subtle' : 'opacity-50 cursor-not-allowed bg-subtle text-fg-subtle border border-line'
               }`}
             >
               Próxima

@@ -13,23 +13,23 @@ export default function QuestaoPreviewModal({ questao, onClose, nomeEscola = 'Á
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-lg shadow-overlay w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
+      <div className="bg-surface rounded-lg shadow-overlay w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-zinc-100 flex items-center justify-between bg-zinc-50">
+        <div className="px-6 py-4 border-b border-line-subtle flex items-center justify-between bg-canvas">
           <div>
             <h2 className="text-lg font-bold text-fg">Visualização da Questão</h2>
             <p className="text-xs text-fg-subtle font-medium">Assim que a questão aparecerá na prova impressa</p>
           </div>
           <button 
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-zinc-200 text-fg-muted hover:bg-danger-subtle hover:text-danger-fg transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-subtle-hover text-fg-muted hover:bg-danger-subtle hover:text-danger-fg transition-colors"
           >
             <X size={18} />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-8 overflow-y-auto bg-white" style={{ fontFamily: 'Times New Roman, Times, serif' }}>
+        <div className="p-8 overflow-y-auto bg-surface" style={{ fontFamily: 'Times New Roman, Times, serif' }}>
           {/* Estilos para garantir quebras de linha e espaçamento de parágrafos */}
           <style dangerouslySetInnerHTML={{ __html: `
             .preview-content p { margin-bottom: 0.75em; }
@@ -45,13 +45,13 @@ export default function QuestaoPreviewModal({ questao, onClose, nomeEscola = 'Á
             <p className="text-sm">Professor: {questao.professor?.name || '____________________'}</p>
           </div>
 
-          <div className="space-y-6 text-base text-black leading-relaxed">
+          <div className="space-y-6 text-base text-fg leading-relaxed">
             {/* Numeração e Enunciado */}
             <div className="flex gap-2">
               <span className="font-bold">1.</span>
               <div className="w-full min-w-0">
                 <div 
-                  className="preview-content text-black break-words overflow-hidden w-full"
+                  className="preview-content text-fg break-words overflow-hidden w-full"
                   style={{ fontFamily: 'inherit', fontSize: '11pt', wordWrap: 'break-word', overflowWrap: 'break-word' }}
                   dangerouslySetInnerHTML={{ __html: questao.enunciado }}
                 />
@@ -61,7 +61,7 @@ export default function QuestaoPreviewModal({ questao, onClose, nomeEscola = 'Á
                     <img 
                       src={questao.imagemUrl} 
                       alt="Imagem da questão" 
-                      className="max-h-80 object-contain mx-auto border border-zinc-200 p-1 bg-white"
+                      className="max-h-80 object-contain mx-auto border border-line p-1 bg-surface"
                     />
                   </div>
                 )}
@@ -89,12 +89,12 @@ export default function QuestaoPreviewModal({ questao, onClose, nomeEscola = 'Á
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-zinc-100 bg-zinc-50 flex justify-between items-center">
+        <div className="px-6 py-4 border-t border-line-subtle bg-canvas flex justify-between items-center">
           <div className="flex gap-2">
-            <span className="px-2 py-1 bg-zinc-200 text-fg-muted text-xs font-bold rounded">
+            <span className="px-2 py-1 bg-subtle-hover text-fg-muted text-xs font-bold rounded">
               {questao.tipo === 'RECUPERACAO' ? 'Segunda Chamada' : 'Normal'}
             </span>
-            <span className="px-2 py-1 bg-zinc-200 text-fg-muted text-xs font-bold rounded">
+            <span className="px-2 py-1 bg-subtle-hover text-fg-muted text-xs font-bold rounded">
               {questao.unidade}ª Unidade
             </span>
           </div>

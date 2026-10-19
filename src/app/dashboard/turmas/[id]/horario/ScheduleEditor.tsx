@@ -116,8 +116,8 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
           </div>
         )}
 
-        <div className="bg-zinc-100 border border-zinc-200 rounded-xl p-6 flex items-start gap-4">
-          <div className="w-10 h-10 bg-zinc-200 rounded-lg flex items-center justify-center shrink-0">
+        <div className="bg-subtle border border-line rounded-xl p-6 flex items-start gap-4">
+          <div className="w-10 h-10 bg-subtle-hover rounded-lg flex items-center justify-center shrink-0">
             <Info className="w-5 h-5 text-fg-muted" />
           </div>
           <div>
@@ -149,29 +149,29 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
           </div>
         )}
 
-        <div className="bg-white rounded-xl shadow-card border border-zinc-300 overflow-hidden">
+        <div className="bg-surface rounded-xl shadow-card border border-line-strong overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1000px]">
               <thead>
-                <tr className="bg-zinc-50 border-b border-zinc-300">
+                <tr className="bg-canvas border-b border-line-strong">
                   <th className="p-4 text-center w-24">
                     <span className="text-xs font-medium text-fg-subtle">Horário</span>
                   </th>
                   {DAYS.map((day) => (
                     <th key={day.id} className="p-4 w-[18%]">
-                      <span className="text-sm font-medium text-fg block text-center bg-zinc-100/50 py-2 rounded-xl border border-zinc-200/50">
+                      <span className="text-sm font-medium text-fg block text-center bg-subtle/50 py-2 rounded-xl border border-line/50">
                         {day.label}
                       </span>
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-200">
+              <tbody className="divide-y divide-line">
                 {periodos.map((period) => {
                   const tempo = tempoDe(period)
                   return (
-                    <tr key={period} className="hover:bg-zinc-50/30 transition-colors">
-                      <td className="p-4 text-center border-r border-zinc-200 bg-zinc-50/30">
+                    <tr key={period} className="hover:bg-canvas/30 transition-colors">
+                      <td className="p-4 text-center border-r border-line bg-canvas/30">
                         <span className="font-medium text-fg-subtle">{period}º</span>
                         {tempo && <span className="block text-xs text-fg-subtle">{tempo.inicio}–{tempo.fim}</span>}
                       </td>
@@ -180,7 +180,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
                         const disciplinaId = schedule[key] ?? ""
                         const professor = disciplinaPorId.get(disciplinaId)?.professor
                         return (
-                          <td key={day.id} className="p-2 border-r border-zinc-200 last:border-0 h-20">
+                          <td key={day.id} className="p-2 border-r border-line last:border-0 h-20">
                             <div className="h-full flex flex-col items-center justify-center text-center">
                               <select
                                 aria-label={`${day.label}, ${period}º horário`}
@@ -211,8 +211,8 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
         </div>
 
         {/* Carga horária */}
-        <div className="bg-white rounded-lg shadow-sm border border-zinc-200 overflow-hidden">
-          <div className="p-4 border-b border-zinc-200">
+        <div className="bg-surface rounded-lg shadow-sm border border-line overflow-hidden">
+          <div className="p-4 border-b border-line">
             <h2 className="font-medium text-fg">Aulas por disciplina</h2>
             <p className="text-xs text-fg-subtle">
               {previstas
@@ -222,7 +222,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-zinc-50 text-fg-subtle text-xs">
+              <thead className="bg-canvas text-fg-subtle text-xs">
                 <tr>
                   <th className="px-4 py-2 text-left">Disciplina</th>
                   <th className="px-4 py-2 text-center">Tempos/semana</th>
@@ -230,7 +230,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
                   <th className="px-4 py-2 text-center">Carga horária</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100">
+              <tbody className="divide-y divide-line-subtle">
                 {turma.disciplinas.map((d) => {
                   const prev = previstas?.[d.id] ?? 0
                   const abaixo = d.cargaHoraria !== null && previstas !== null && prev < d.cargaHoraria

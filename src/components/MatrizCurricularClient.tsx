@@ -273,7 +273,7 @@ export default function MatrizCurricularClient({
             <div className="flex min-w-0 items-center gap-3">
               <Link
                 href="/dashboard"
-                className="p-2 hover:bg-zinc-100 rounded-lg transition-colors text-fg-subtle hover:text-fg-muted"
+                className="p-2 hover:bg-subtle rounded-lg transition-colors text-fg-subtle hover:text-fg-muted"
               >
                 <ArrowLeft size={16} strokeWidth={1.75} />
               </Link>
@@ -290,7 +290,7 @@ export default function MatrizCurricularClient({
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-32 space-y-8">
         
         {/* Filtros Premium */}
-        <div className="bg-white p-5 rounded-xl shadow-card border border-zinc-100 flex flex-wrap gap-4 items-end relative overflow-visible">
+        <div className="bg-surface p-5 rounded-xl shadow-card border border-line-subtle flex flex-wrap gap-4 items-end relative overflow-visible">
             <div className="absolute top-0 right-0 w-32 h-32 bg-accent-subtle rounded-full -mr-16 -mt-16 opacity-40 blur-3xl pointer-events-none" />
 
             {/* Modalidade */}
@@ -303,7 +303,7 @@ export default function MatrizCurricularClient({
                   <select
                       value={selectedModalidade}
                       onChange={(e) => { setSelectedModalidade(e.target.value); setSelectedCurso("") }}
-                      className="w-full bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 rounded-xl pl-9 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-all appearance-none cursor-pointer font-semibold text-fg-muted"
+                      className="w-full bg-canvas hover:bg-subtle border border-line rounded-xl pl-9 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-all appearance-none cursor-pointer font-semibold text-fg-muted"
                   >
                       <option value="">Todas</option>
                       <option value="EPTM">EPTM</option>
@@ -323,7 +323,7 @@ export default function MatrizCurricularClient({
                   <select
                       value={selectedTurno}
                       onChange={(e) => { setSelectedTurno(e.target.value); setSelectedCurso("") }}
-                      className="w-full bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 rounded-xl pl-9 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-all appearance-none cursor-pointer font-semibold text-fg-muted"
+                      className="w-full bg-canvas hover:bg-subtle border border-line rounded-xl pl-9 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-all appearance-none cursor-pointer font-semibold text-fg-muted"
                   >
                       <option value="">Todos</option>
                       <option value="Matutino">Matutino</option>
@@ -349,7 +349,7 @@ export default function MatrizCurricularClient({
                   <button
                     type="button"
                     onClick={() => setShowCursoDropdown(prev => !prev)}
-                    className="w-full bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 rounded-xl pl-9 pr-8 py-3 text-sm text-left focus:outline-none focus:ring-2 focus:ring-ring transition-all cursor-pointer font-semibold text-fg-muted flex items-center gap-2"
+                    className="w-full bg-canvas hover:bg-subtle border border-line rounded-xl pl-9 pr-8 py-3 text-sm text-left focus:outline-none focus:ring-2 focus:ring-ring transition-all cursor-pointer font-semibold text-fg-muted flex items-center gap-2"
                   >
                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-subtle">
                       <GraduationCap size={15} />
@@ -366,12 +366,12 @@ export default function MatrizCurricularClient({
                   </button>
 
                   {showCursoDropdown && (
-                    <div className="absolute z-40 top-full mt-1.5 w-full min-w-[260px] bg-white border border-zinc-100 rounded-lg shadow-overlay overflow-hidden">
+                    <div className="absolute z-40 top-full mt-1.5 w-full min-w-[260px] bg-surface border border-line-subtle rounded-lg shadow-overlay overflow-hidden">
                       <div className="max-h-60 overflow-y-auto">
                         <button
                           type="button"
                           onClick={() => { setSelectedCurso(''); setShowCursoDropdown(false) }}
-                          className="w-full text-left px-4 py-2.5 text-sm text-fg-subtle font-medium hover:bg-zinc-50 transition-colors border-b border-zinc-50"
+                          className="w-full text-left px-4 py-2.5 text-sm text-fg-subtle font-medium hover:bg-canvas transition-colors border-b border-line-subtle"
                         >
                           Todos os cursos
                         </button>
@@ -379,7 +379,7 @@ export default function MatrizCurricularClient({
                           <p className="px-4 py-4 text-xs text-fg-subtle text-center">Nenhum curso encontrado</p>
                         )}
                         {cursosFiltrados.map((c) => (
-                          <div key={c.id} className={`flex items-center group transition-colors ${selectedCurso === c.id ? 'bg-accent-subtle' : 'hover:bg-zinc-50'}`}>
+                          <div key={c.id} className={`flex items-center group transition-colors ${selectedCurso === c.id ? 'bg-accent-subtle' : 'hover:bg-canvas'}`}>
                             <button
                               type="button"
                               onClick={() => { setSelectedCurso(c.id); setShowCursoDropdown(false) }}
@@ -399,7 +399,7 @@ export default function MatrizCurricularClient({
                                   setCursoParaEditar({ id: c.id, nome: c.nome, sigla: c.sigla ?? '', modalidade: c.modalidade, nivelEnsino: c.nivelEnsino, esquemaAvaliacaoId: c.esquemaAvaliacaoId, turnos: c.turnos ?? [] })
                                   setIsModalCursoOpen(true)
                                 }}
-                                className="p-1.5 text-zinc-300 hover:text-warning-fg hover:bg-warning-subtle rounded-lg transition-all"
+                                className="p-1.5 text-fg-disabled hover:text-warning-fg hover:bg-warning-subtle rounded-lg transition-all"
                               >
                                 <Pencil size={13} />
                               </button>
@@ -411,7 +411,7 @@ export default function MatrizCurricularClient({
                                   e.stopPropagation()
                                   handleDeleteCurso(c.id, c.nome)
                                 }}
-                                className="p-1.5 text-zinc-300 hover:text-danger-fg hover:bg-danger-subtle rounded-lg transition-all disabled:opacity-50"
+                                className="p-1.5 text-fg-disabled hover:text-danger-fg hover:bg-danger-subtle rounded-lg transition-all disabled:opacity-50"
                               >
                                 {deletingCursoId === c.id
                                   ? <Loader2 size={13} className="animate-spin" />
@@ -436,7 +436,7 @@ export default function MatrizCurricularClient({
                   <select
                       value={selectedSerie}
                       onChange={(e) => setSelectedSerie(e.target.value)}
-                      className="w-full bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 rounded-xl pl-9 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-all appearance-none cursor-pointer font-semibold text-fg-muted"
+                      className="w-full bg-canvas hover:bg-subtle border border-line rounded-xl pl-9 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-all appearance-none cursor-pointer font-semibold text-fg-muted"
                   >
                       <option value="1">1ª Série</option>
                       <option value="2">2ª Série</option>
@@ -457,7 +457,7 @@ export default function MatrizCurricularClient({
                     <select
                         value={selectedAno}
                         onChange={(e) => setSelectedAno(e.target.value)}
-                        className="w-full bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 rounded-xl pl-8 pr-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-all appearance-none cursor-pointer font-bold text-fg-muted"
+                        className="w-full bg-canvas hover:bg-subtle border border-line rounded-xl pl-8 pr-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-all appearance-none cursor-pointer font-bold text-fg-muted"
                     >
                         {[2024, 2025, 2026, 2027].map(ano => (
                           <option key={ano} value={ano}>{ano}</option>
@@ -469,7 +469,7 @@ export default function MatrizCurricularClient({
             {/* Badge de disciplinas */}
             <div className="shrink-0 pb-0.5">
                 <div className="flex items-center gap-1.5 bg-accent text-on-accent px-3 py-2.5 rounded-xl shadow-card">
-                    <span className="w-1.5 h-1.5 rounded-full bg-white/70 animate-pulse" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-surface/70 animate-pulse" />
                     <span className="text-xs font-semibold whitespace-nowrap">{itemsFiltradosNaLista.length} disciplinas</span>
                 </div>
             </div>
@@ -477,7 +477,7 @@ export default function MatrizCurricularClient({
 
         {/* Formulário de Lançamento em Lote */}
         {selectedCurso && (
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-zinc-200">
+          <div className="bg-surface p-6 rounded-lg shadow-sm border border-line">
             <h2 className="text-base font-semibold text-fg mb-4 flex items-center gap-2">
                <Plus size={20} className="text-accent-fg" />
                Adicionar Disciplinas à Matriz
@@ -490,7 +490,7 @@ export default function MatrizCurricularClient({
                   value={novoNome}
                   onChange={(e) => setNovoNome(e.target.value)}
                   rows={1}
-                  className="w-full bg-zinc-50 border-none rounded-xl px-4 py-4 text-base font-semibold text-fg focus:ring-2 focus:ring-ring transition-all outline-none resize-none min-h-[60px] custom-scrollbar"
+                  className="w-full bg-canvas border-none rounded-xl px-4 py-4 text-base font-semibold text-fg focus:ring-2 focus:ring-ring transition-all outline-none resize-none min-h-[60px] custom-scrollbar"
                 />
               </div>
               <div className="md:col-span-4 space-y-1.5">
@@ -498,7 +498,7 @@ export default function MatrizCurricularClient({
                 <select
                   value={novaArea}
                   onChange={(e) => setNovaArea(e.target.value)}
-                  className="w-full bg-zinc-50 border-none rounded-xl px-4 py-4 text-base font-semibold text-fg-muted focus:ring-2 focus:ring-ring transition-all outline-none h-[60px] appearance-none cursor-pointer"
+                  className="w-full bg-canvas border-none rounded-xl px-4 py-4 text-base font-semibold text-fg-muted focus:ring-2 focus:ring-ring transition-all outline-none h-[60px] appearance-none cursor-pointer"
                 >
                   <option value="">Sem Área Vinculada</option>
                   {areas.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
@@ -519,8 +519,8 @@ export default function MatrizCurricularClient({
         )}
 
         {/* Listagem da Matriz */}
-        <div className="bg-white rounded-lg shadow-sm border border-zinc-200 overflow-hidden">
-          <div className="p-4 border-b border-zinc-100 bg-zinc-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="bg-surface rounded-lg shadow-sm border border-line overflow-hidden">
+          <div className="p-4 border-b border-line-subtle bg-canvas/50 flex flex-col sm:flex-row items-center justify-between gap-4">
             <h2 className="text-lg font-semibold text-fg-muted flex items-center gap-2">
                <BookOpen size={20} className="text-fg-subtle" />
                Componentes Curriculares Definidos
@@ -535,7 +535,7 @@ export default function MatrizCurricularClient({
                   placeholder="Buscar disciplina..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full bg-white border border-zinc-200 rounded-xl pl-9 pr-4 py-2.5 text-xs font-semibold text-fg-muted focus:ring-2 focus:ring-ring transition-all outline-none"
+                  className="w-full bg-surface border border-line rounded-xl pl-9 pr-4 py-2.5 text-xs font-semibold text-fg-muted focus:ring-2 focus:ring-ring transition-all outline-none"
                 />
               </div>
               {selectedCurso && items.length > 0 && (
@@ -546,7 +546,7 @@ export default function MatrizCurricularClient({
                   <select 
                     value={selectedAreaFiltro}
                     onChange={(e) => setSelectedAreaFiltro(e.target.value)}
-                    className="w-full bg-white border border-zinc-200 rounded-xl pl-9 pr-8 py-2.5 text-xs font-semibold text-fg-muted focus:ring-2 focus:ring-ring transition-all appearance-none cursor-pointer outline-none"
+                    className="w-full bg-surface border border-line rounded-xl pl-9 pr-8 py-2.5 text-xs font-semibold text-fg-muted focus:ring-2 focus:ring-ring transition-all appearance-none cursor-pointer outline-none"
                   >
                     <option value="">Todas as Áreas...</option>
                     {areas.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
@@ -559,7 +559,7 @@ export default function MatrizCurricularClient({
           <div className="overflow-x-auto">
             {!selectedCurso && !searchTerm ? (
               <div className="p-20 text-center space-y-4">
-                <Search className="w-12 h-12 text-zinc-200 mx-auto" />
+                <Search className="w-12 h-12 text-fg-disabled mx-auto" />
                 <p className="text-sm font-semibold text-fg-subtle">Selecione um curso para ver a matriz</p>
               </div>
             ) : loading ? (
@@ -569,12 +569,12 @@ export default function MatrizCurricularClient({
               </div>
             ) : items.length === 0 ? (
               <div className="p-20 text-center space-y-3">
-                 <AlertCircle className="w-10 h-10 text-zinc-200 mx-auto" />
+                 <AlertCircle className="w-10 h-10 text-fg-disabled mx-auto" />
                  <p className="text-sm font-semibold text-fg-subtle">Matriz vazia para esta configuração</p>
               </div>
             ) : (
               <table className="w-full text-left">
-                <thead className="bg-zinc-50/30 border-b border-zinc-100">
+                <thead className="bg-canvas/30 border-b border-line-subtle">
                   <tr>
                     {/* Checkbox selecionar todos */}
                     <th className="pl-6 pr-2 py-4 w-10">
@@ -600,14 +600,14 @@ export default function MatrizCurricularClient({
                     <th className="px-6 py-4 text-xs font-semibold text-fg-subtle text-right">Ação</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-100/80">
+                <tbody className="divide-y divide-line-subtle/80">
                   {itemsFiltradosNaLista.map((item) => (
                     <tr
                       key={item.id}
                       className={`transition-colors group cursor-pointer ${
                         selectedIds.has(item.id)
                           ? 'bg-accent-subtle'
-                          : 'hover:bg-zinc-50/50'
+                          : 'hover:bg-canvas/50'
                       }`}
                       onClick={() => {
                         setSelectedIds(prev => {
@@ -637,7 +637,7 @@ export default function MatrizCurricularClient({
                           <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
                             selectedIds.has(item.id)
                               ? 'bg-accent-subtle text-accent-fg'
-                              : 'bg-zinc-100 text-fg-subtle group-hover:bg-accent-subtle group-hover:text-accent-fg'
+                              : 'bg-subtle text-fg-subtle group-hover:bg-accent-subtle group-hover:text-accent-fg'
                           }`}>
                             <BookOpen size={16} />
                           </div>
@@ -646,7 +646,7 @@ export default function MatrizCurricularClient({
                               type="text"
                               value={editNome}
                               onChange={(e) => setEditNome(e.target.value)}
-                              className="bg-white border border-accent rounded-lg px-2 py-1 text-sm font-semibold text-fg-muted outline-none w-full"
+                              className="bg-surface border border-accent rounded-lg px-2 py-1 text-sm font-semibold text-fg-muted outline-none w-full"
                               autoFocus
                               onClick={(e) => e.stopPropagation()}
                             />
@@ -677,7 +677,7 @@ export default function MatrizCurricularClient({
                           <select
                             value={editArea}
                             onChange={(e) => setEditArea(e.target.value)}
-                            className="bg-white border border-accent/25 rounded-lg px-2 py-1 text-xs font-semibold text-fg-muted outline-none w-full"
+                            className="bg-surface border border-accent/25 rounded-lg px-2 py-1 text-xs font-semibold text-fg-muted outline-none w-full"
                           >
                             <option value="">Sem Área...</option>
                             {areas.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
@@ -687,7 +687,7 @@ export default function MatrizCurricularClient({
                             {item.area.nome}
                           </span>
                         ) : (
-                          <span className="text-zinc-300 text-xs font-medium italic">Não vinculada</span>
+                          <span className="text-fg-disabled text-xs font-medium italic">Não vinculada</span>
                         )}
                       </td>
                       <td className="px-6 py-4 text-right" onClick={e => e.stopPropagation()}>
@@ -703,7 +703,7 @@ export default function MatrizCurricularClient({
                               </button>
                               <button
                                 onClick={() => setEditingId(null)}
-                                className="p-2 text-fg-subtle hover:bg-zinc-50 rounded-xl transition-all"
+                                className="p-2 text-fg-subtle hover:bg-canvas rounded-xl transition-all"
                               >
                                 <X size={16} />
                               </button>
@@ -716,13 +716,13 @@ export default function MatrizCurricularClient({
                                   setEditNome(item.nome)
                                   setEditArea(item.areaId || "")
                                 }}
-                                className="p-2 text-zinc-300 hover:text-accent-fg hover:bg-accent-subtle rounded-xl transition-all opacity-0 group-hover:opacity-100"
+                                className="p-2 text-fg-disabled hover:text-accent-fg hover:bg-accent-subtle rounded-xl transition-all opacity-0 group-hover:opacity-100"
                               >
                                 <Pencil size={16} />
                               </button>
                               <button
                                 onClick={() => handleDelete(item.id)}
-                                className="p-2 text-zinc-300 hover:text-danger-fg hover:bg-danger-subtle rounded-xl transition-all"
+                                className="p-2 text-fg-disabled hover:text-danger-fg hover:bg-danger-subtle rounded-xl transition-all"
                               >
                                 <Trash2 size={16} />
                               </button>

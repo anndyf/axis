@@ -83,8 +83,8 @@ export default function RelatorioClient({
       )}
 
       {/* Lista de Estudantes (Accordion) */}
-      <div className="bg-white rounded-xl shadow-sm border border-zinc-300 overflow-hidden">
-        <div className="px-6 py-4 bg-zinc-50 border-b border-zinc-300">
+      <div className="bg-surface rounded-xl shadow-sm border border-line-strong overflow-hidden">
+        <div className="px-6 py-4 bg-canvas border-b border-line-strong">
           <h3 className="text-lg font-medium text-fg">
             {isProfessorOnly ? 'Estudantes Matriculados' : 'Desempenho Detalhado dos Estudantes'}
           </h3>
@@ -122,11 +122,11 @@ export default function RelatorioClient({
               const isExpanded = expandedStudent === estudante.matricula
 
               return (
-                <div key={estudante.matricula} className="border-b border-zinc-200 last:border-b-0">
+                <div key={estudante.matricula} className="border-b border-line last:border-b-0">
                   {/* Accordion Header */}
                   <div 
                     onClick={() => toggleStudent(estudante.matricula)}
-                    className={`flex items-center justify-between p-4 cursor-pointer hover:bg-zinc-50 transition-colors ${isExpanded ? 'bg-zinc-50' : ''}`}
+                    className={`flex items-center justify-between p-4 cursor-pointer hover:bg-canvas transition-colors ${isExpanded ? 'bg-canvas' : ''}`}
                   >
                     <div className="flex items-center gap-4 flex-1">
                       <span className="text-xs font-bold text-fg-subtle w-6">{index + 1}</span>
@@ -173,15 +173,15 @@ export default function RelatorioClient({
 
                   {/* Accordion Body (Detalhamento por Disciplina) */}
                   {isExpanded && !isProfessorOnly && (
-                    <div className="p-4 bg-zinc-50/80 border-t border-zinc-100">
+                    <div className="p-4 bg-canvas/80 border-t border-line-subtle">
                       {estudante.notas.length === 0 ? (
                         <div className="text-center py-4 text-sm text-fg-subtle flex items-center justify-center gap-2">
                           <AlertCircle className="w-4 h-4" /> Nenhuma nota lançada para este estudante ainda.
                         </div>
                       ) : (
-                        <div className="overflow-x-auto rounded-lg border border-zinc-200">
+                        <div className="overflow-x-auto rounded-lg border border-line">
                           <table className="w-full text-sm">
-                            <thead className="bg-zinc-100 text-fg-muted">
+                            <thead className="bg-subtle text-fg-muted">
                               <tr>
                                 <th className="px-4 py-2 text-left font-semibold">Disciplina</th>
                                 {nomesEtapas.map((nome: string) => (
@@ -193,7 +193,7 @@ export default function RelatorioClient({
                                 <th className="px-4 py-2 text-center font-semibold">Status</th>
                               </tr>
                             </thead>
-                            <tbody className="divide-y divide-zinc-200 bg-white">
+                            <tbody className="divide-y divide-line bg-surface">
                               {turma.disciplinas.map((disc: any) => {
                                 const nota = estudante.notas.find((n: any) => n.disciplinaId === disc.id)
                                 
@@ -211,7 +211,7 @@ export default function RelatorioClient({
                                 )
 
                                 return (
-                                  <tr key={disc.id} className="text-fg-muted hover:bg-zinc-50">
+                                  <tr key={disc.id} className="text-fg-muted hover:bg-canvas">
                                     <td className="px-4 py-2 font-semibold text-fg">{disc.nome}</td>
                                     {nota.etapas.map((etapa: EtapaDaNota, i: number) => (
                                       <td key={i} className="px-4 py-2 text-center">{etapa.nota?.toFixed(1) ?? '-'}</td>
@@ -238,7 +238,7 @@ export default function RelatorioClient({
                   )}
                   
                   {isExpanded && isProfessorOnly && (
-                    <div className="p-4 bg-zinc-50/80 border-t border-zinc-100 text-center text-sm text-fg-subtle">
+                    <div className="p-4 bg-canvas/80 border-t border-line-subtle text-center text-sm text-fg-subtle">
                       O detalhamento de notas não está disponível para o seu perfil nesta visualização.
                     </div>
                   )}
@@ -252,8 +252,8 @@ export default function RelatorioClient({
       {/* Modal Professores */}
       {showProfessorsModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-lg shadow-overlay w-full max-w-2xl max-h-[85vh] flex flex-col animate-pop-in">
-            <div className="flex items-center justify-between p-6 border-b border-zinc-100">
+          <div className="bg-surface rounded-lg shadow-overlay w-full max-w-2xl max-h-[85vh] flex flex-col animate-pop-in">
+            <div className="flex items-center justify-between p-6 border-b border-line-subtle">
               <div>
                 <h3 className="text-xl font-bold text-fg flex items-center gap-2">
                   <BookOpen className="w-6 h-6 text-accent-fg" />
@@ -263,7 +263,7 @@ export default function RelatorioClient({
               </div>
               <button 
                 onClick={() => setShowProfessorsModal(false)}
-                className="p-2 text-fg-subtle hover:text-fg-muted hover:bg-zinc-100 rounded-full transition-colors"
+                className="p-2 text-fg-subtle hover:text-fg-muted hover:bg-subtle rounded-full transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -272,13 +272,13 @@ export default function RelatorioClient({
             <div className="p-6 overflow-y-auto">
               {professoresList.length === 0 ? (
                 <div className="text-center py-8 text-fg-subtle">
-                  <Users className="w-12 h-12 mx-auto text-zinc-300 mb-3" />
+                  <Users className="w-12 h-12 mx-auto text-fg-disabled mb-3" />
                   <p>Nenhum professor vinculado às disciplinas desta turma.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {professoresList.map(prof => (
-                    <div key={prof.id} className="p-4 rounded-xl border border-zinc-200 bg-zinc-50 hover:bg-white hover:border-accent/25 transition-colors shadow-sm">
+                    <div key={prof.id} className="p-4 rounded-xl border border-line bg-canvas hover:bg-surface hover:border-accent/25 transition-colors shadow-sm">
                       <div className="flex items-start gap-3">
                         <div className="w-10 h-10 rounded-full bg-accent-subtle flex items-center justify-center text-accent-fg font-bold shrink-0">
                           {prof.name.charAt(0).toUpperCase()}
@@ -301,7 +301,7 @@ export default function RelatorioClient({
               )}
             </div>
             
-            <div className="p-4 border-t border-zinc-100 bg-zinc-50 rounded-b-2xl flex justify-end">
+            <div className="p-4 border-t border-line-subtle bg-canvas rounded-b-2xl flex justify-end">
               <button
                 onClick={() => setShowProfessorsModal(false)}
                 className="px-6 py-2 bg-zinc-800 text-white font-medium rounded-lg hover:bg-zinc-700 transition-colors"

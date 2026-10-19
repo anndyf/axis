@@ -52,7 +52,7 @@ export default function TeacherTipsModal({ storageKey, tips, title }: TeacherTip
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-zinc-900/80 backdrop-blur-md animate-fade-in">
-      <div className="bg-white rounded-xl w-full max-w-lg shadow-overlay overflow-hidden border border-zinc-100 flex flex-col animate-slide-up">
+      <div className="bg-surface rounded-xl w-full max-w-lg shadow-overlay overflow-hidden border border-line-subtle flex flex-col animate-slide-up">
         
         {/* Header com gradiente sutil */}
         <div className="p-8 pb-4 flex items-center justify-between">
@@ -67,7 +67,7 @@ export default function TeacherTipsModal({ storageKey, tips, title }: TeacherTip
           </div>
           <button 
             onClick={handleClose}
-            className="p-2 hover:bg-zinc-100 rounded-full transition-colors text-fg-subtle"
+            className="p-2 hover:bg-subtle rounded-full transition-colors text-fg-subtle"
           >
             <X size={24} />
           </button>
@@ -75,7 +75,7 @@ export default function TeacherTipsModal({ storageKey, tips, title }: TeacherTip
 
         {/* Content Area */}
         <div className="px-8 py-10 flex flex-col items-center text-center">
-          <div className={`w-24 h-24 mb-8 rounded-xl flex items-center justify-center bg-zinc-50 border-2 border-dashed border-zinc-200`}>
+          <div className={`w-24 h-24 mb-8 rounded-xl flex items-center justify-center bg-canvas border-2 border-dashed border-line`}>
              {currentTip.icon}
           </div>
           
@@ -94,7 +94,7 @@ export default function TeacherTipsModal({ storageKey, tips, title }: TeacherTip
               {tips.map((_, i) => (
                 <div 
                   key={i} 
-                  className={`h-2 rounded-full transition-all duration-300 ${i === currentStep ? "w-8 bg-accent" : "w-2 bg-zinc-200"}`} 
+                  className={`h-2 rounded-full transition-all duration-300 ${i === currentStep ? "w-8 bg-accent" : "w-2 bg-subtle-hover"}`} 
                 />
               ))}
             </div>
@@ -107,7 +107,7 @@ export default function TeacherTipsModal({ storageKey, tips, title }: TeacherTip
             {currentStep > 0 && (
               <button
                 onClick={prevStep}
-                className="flex-1 py-4 px-6 rounded-lg text-sm font-semibold text-fg-muted bg-zinc-50 hover:bg-zinc-100 transition-all flex items-center justify-center gap-2 border border-zinc-200"
+                className="flex-1 py-4 px-6 rounded-lg text-sm font-semibold text-fg-muted bg-canvas hover:bg-subtle transition-all flex items-center justify-center gap-2 border border-line"
               >
                 <ChevronLeft size={20} />
                 Anterior

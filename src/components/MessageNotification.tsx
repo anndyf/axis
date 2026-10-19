@@ -46,21 +46,21 @@ export default function MessageNotification() {
 
   return (
     <div className="fixed bottom-6 right-6 z-[9999] animate-slide-up print:hidden">
-      <div className="bg-white border border-zinc-200 rounded-xl shadow-card p-1 flex items-center gap-4 max-w-sm overflow-hidden ring-1 ring-zinc-900/5">
+      <div className="bg-surface border border-line rounded-xl shadow-card p-1 flex items-center gap-4 max-w-sm overflow-hidden ring-1 ring-zinc-900/5">
         
         <div className="relative shrink-0 ml-1">
           <div className="w-14 h-14 bg-accent rounded-xl flex items-center justify-center text-on-accent shadow-card">
             <MessageSquare size={24} />
           </div>
           <div className="absolute -top-1 -right-1 w-5 h-5 bg-danger border-2 border-white rounded-full flex items-center justify-center">
-            <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-surface animate-pulse" />
           </div>
         </div>
 
         <div className="flex-1 min-w-0 py-2 pr-4">
           <div className="flex items-center justify-between mb-0.5">
             <p className="text-xs font-semibold text-accent-fg leading-none">Nova Mensagem</p>
-            <button onClick={() => setShow(false)} className="p-1 hover:bg-zinc-100 rounded-lg transition-all -mr-2">
+            <button onClick={() => setShow(false)} className="p-1 hover:bg-subtle rounded-lg transition-all -mr-2">
               <X size={14} className="text-fg-subtle" />
             </button>
           </div>

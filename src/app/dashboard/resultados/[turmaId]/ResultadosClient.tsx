@@ -111,7 +111,7 @@ export default function ResultadosTurmaClient({
   }
 
   const renderCellContent = (n: NotaResultado | undefined) => {
-    if (!n) return <span className="text-zinc-300">/</span>
+    if (!n) return <span className="text-fg-disabled">/</span>
 
     if (selectedUnit === 'FINAL') {
         let label = '-'
@@ -172,7 +172,7 @@ export default function ResultadosTurmaClient({
         )
     }
     
-    if (value === null || value === undefined) return <span className="text-zinc-300">-</span>
+    if (value === null || value === undefined) return <span className="text-fg-disabled">-</span>
     
     const config = getStatusConfig('NUMERIC', value)
     
@@ -238,7 +238,7 @@ export default function ResultadosTurmaClient({
             <div className="flex min-w-0 items-center gap-3">
               <Link
                 href="/dashboard/resultados"
-                className="w-10 h-10 bg-white border border-zinc-300 rounded-xl flex items-center justify-center text-fg-muted hover:bg-zinc-50 transition-all shadow-sm hover:translate-x-[-2px]"
+                className="w-10 h-10 bg-surface border border-line-strong rounded-xl flex items-center justify-center text-fg-muted hover:bg-canvas transition-all shadow-sm hover:translate-x-[-2px]"
               >
                 <ArrowLeft className="w-5 h-5" />
               </Link>
@@ -296,17 +296,17 @@ export default function ResultadosTurmaClient({
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Compact Summary & Legend Row */}
-        <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 mb-6 bg-white p-4 rounded-lg border border-zinc-300 shadow-sm">
+        <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 mb-6 bg-surface p-4 rounded-lg border border-line-strong shadow-sm">
           {/* Metrics */}
           <div className="flex items-center space-x-6 px-2">
             <div>
                <p className="text-xs font-medium text-fg-subtle">Estudantes</p>
-               <p className="text-2xl font-medium text-black leading-none">{matrixData.length}</p>
+               <p className="text-2xl font-medium text-fg leading-none">{matrixData.length}</p>
             </div>
-            <div className="w-px h-8 bg-zinc-200" />
+            <div className="w-px h-8 bg-subtle-hover" />
             <div>
                <p className="text-xs font-medium text-fg-subtle">Disciplinas</p>
-               <p className="text-2xl font-medium text-black leading-none">{disciplinas.length}</p>
+               <p className="text-2xl font-medium text-fg leading-none">{disciplinas.length}</p>
             </div>
           </div>
 
@@ -331,19 +331,19 @@ export default function ResultadosTurmaClient({
         </div>
 
         {/* Ultra Compact Matriz */}
-        <div className="bg-white rounded-lg shadow-card border border-zinc-200 overflow-hidden relative">
+        <div className="bg-surface rounded-lg shadow-card border border-line overflow-hidden relative">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
-                <tr className="bg-zinc-50/80 border-b border-zinc-300">
-                  <th className="px-2 py-2 text-center text-xs font-medium text-fg-subtle sticky left-0 bg-zinc-50/95 backdrop-blur z-20 w-10 border-r border-zinc-300">
+                <tr className="bg-canvas/80 border-b border-line-strong">
+                  <th className="px-2 py-2 text-center text-xs font-medium text-fg-subtle sticky left-0 bg-canvas/95 backdrop-blur z-20 w-10 border-r border-line-strong">
                     #
                   </th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-black sticky left-8 bg-white z-30 min-w-[250px] border-r border-zinc-300 shadow-[2px_0_5px_rgba(0,0,0,0.05)] whitespace-nowrap">
+                  <th className="px-3 py-2 text-left text-xs font-medium text-fg sticky left-8 bg-surface z-30 min-w-[250px] border-r border-line-strong shadow-[2px_0_5px_rgba(0,0,0,0.05)] whitespace-nowrap">
                     Estudante
                   </th>
                   {disciplinas.map((disc) => (
-                    <th key={disc.id} className="w-11 min-w-[2.75rem] max-w-[2.75rem] px-0 py-2 align-bottom h-24 border-r border-zinc-200 last:border-0">
+                    <th key={disc.id} className="w-11 min-w-[2.75rem] max-w-[2.75rem] px-0 py-2 align-bottom h-24 border-r border-line last:border-0">
                       <div className="flex items-center justify-center h-full w-full">
                         <span className="text-xs font-medium text-fg-muted [writing-mode:vertical-rl] rotate-180 whitespace-nowrap overflow-hidden text-ellipsis max-h-[85px]">
                           {abreviarNome(disc.nome)}
@@ -351,12 +351,12 @@ export default function ResultadosTurmaClient({
                       </div>
                     </th>
                   ))}
-                  <th className="w-24 px-2 py-2 text-center text-xs font-medium text-fg-muted sticky right-0 bg-zinc-50/95 backdrop-blur z-20 border-l border-zinc-300">
+                  <th className="w-24 px-2 py-2 text-center text-xs font-medium text-fg-muted sticky right-0 bg-canvas/95 backdrop-blur z-20 border-l border-line-strong">
                     Risco
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-200">
+              <tbody className="divide-y divide-line">
                 {matrixData.length === 0 ? (
                   <tr>
                     <td colSpan={disciplinas.length + 3} className="py-12 text-center text-fg-subtle font-medium text-xs">
@@ -391,28 +391,28 @@ export default function ResultadosTurmaClient({
                       <tr 
                         key={estudante.id} 
                         onClick={() => setSelectedStudentId(isSelected ? null : estudante.id)}
-                        className={`group hover:bg-zinc-50 transition-colors cursor-pointer ${rowBg}`}
+                        className={`group hover:bg-canvas transition-colors cursor-pointer ${rowBg}`}
                       >
-                        <td className={`h-9 px-1 text-center text-xs font-medium text-fg-subtle sticky left-0 group-hover:bg-zinc-50 transition-colors z-10 border-r border-zinc-200 ${rowBg}`}>
+                        <td className={`h-9 px-1 text-center text-xs font-medium text-fg-subtle sticky left-0 group-hover:bg-canvas transition-colors z-10 border-r border-line ${rowBg}`}>
                           {(idx + 1).toString().padStart(2, '0')}
                         </td>
-                        <td className={`h-9 px-3 text-sm font-medium text-black sticky left-8 z-20 border-r border-zinc-300 shadow-[2px_0_5px_rgba(0,0,0,0.05)] whitespace-nowrap min-w-[250px] bg-white`}>
+                        <td className={`h-9 px-3 text-sm font-medium text-fg sticky left-8 z-20 border-r border-line-strong shadow-[2px_0_5px_rgba(0,0,0,0.05)] whitespace-nowrap min-w-[250px] bg-surface`}>
                            {estudante.nome.toUpperCase()}
                         </td>
                         {disciplinas.map((disc) => (
-                          <td key={disc.id} className="w-11 min-w-[2.75rem] max-w-[2.75rem] h-9 px-0 text-center border-r border-zinc-50 last:border-0">
+                          <td key={disc.id} className="w-11 min-w-[2.75rem] max-w-[2.75rem] h-9 px-0 text-center border-r border-line-subtle last:border-0">
                             <div className="flex items-center justify-center w-full h-full">
                               {renderCellContent(estudante.notas[disc.id])}
                             </div>
                           </td>
                         ))}
-                        <td className={`h-9 px-2 text-center sticky right-0 bg-white border-l border-zinc-200 group-hover:bg-zinc-50 transition-colors z-10 ${rowBg}`}>
+                        <td className={`h-9 px-2 text-center sticky right-0 bg-surface border-l border-line group-hover:bg-canvas transition-colors z-10 ${rowBg}`}>
                            <div className={`
                              inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border transition-all
                              ${worstRisk.level === 'CRITICAL' ? 'bg-danger-subtle border-danger-line' : 
                                worstRisk.level === 'HIGH' ? 'bg-warning-subtle border-warning-line' :
                                worstRisk.level === 'MEDIUM' ? 'bg-warning-subtle border-warning-line' :
-                               'bg-zinc-50 border-zinc-200'}
+                               'bg-canvas border-line'}
                            `} title={worstRisk.message}>
                              {worstRisk.level === 'CRITICAL' && <AlertTriangle size={10} className="text-danger-fg animate-pulse" />}
                              {worstRisk.level === 'HIGH' && <TrendingDown size={10} className="text-warning-fg" />}

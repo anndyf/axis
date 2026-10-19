@@ -67,7 +67,7 @@ export default function ProfilePage() {
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
         <h1 className="text-3xl font-medium text-fg tracking-tight flex items-center gap-3">
-          <div className="w-10 h-10 bg-zinc-200 rounded-xl flex items-center justify-center">
+          <div className="w-10 h-10 bg-subtle-hover rounded-xl flex items-center justify-center">
             <Lock className="w-6 h-6 text-fg-muted" />
           </div>
           Meu Perfil
@@ -78,12 +78,12 @@ export default function ProfilePage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* User Info Card */}
         <div className="md:col-span-1 space-y-6">
-          <div className="bg-white rounded-xl p-6 shadow-card border border-zinc-200 relative overflow-hidden group">
+          <div className="bg-surface rounded-xl p-6 shadow-card border border-line relative overflow-hidden group">
              <div className="absolute top-0 left-0 w-full h-24 bg-zinc-500" />
              
              <div className="relative flex flex-col items-center mt-8">
-                <div className="w-20 h-20 bg-white p-1 rounded-full shadow-card">
-                  <div className="w-full h-full rounded-full bg-zinc-200 flex items-center justify-center text-2xl font-medium text-fg-muted">
+                <div className="w-20 h-20 bg-surface p-1 rounded-full shadow-card">
+                  <div className="w-full h-full rounded-full bg-subtle-hover flex items-center justify-center text-2xl font-medium text-fg-muted">
                     {session?.user?.name?.charAt(0).toUpperCase() || "U"}
                   </div>
                 </div>
@@ -95,7 +95,7 @@ export default function ProfilePage() {
                   {session?.user?.email}
                 </p>
                 
-                <div className="mt-4 inline-flex items-center px-3 py-1 rounded-full bg-zinc-50 text-fg-muted text-xs font-medium">
+                <div className="mt-4 inline-flex items-center px-3 py-1 rounded-full bg-canvas text-fg-muted text-xs font-medium">
                   {session?.user?.isSuperuser ? "Administrador" : "Professor"}
                 </div>
              </div>
@@ -104,7 +104,7 @@ export default function ProfilePage() {
 
         {/* Change Password Form */}
         <div id="senha" className="md:col-span-2 scroll-mt-20">
-          <div className="bg-white rounded-xl p-8 shadow-card border border-zinc-200">
+          <div className="bg-surface rounded-xl p-8 shadow-card border border-line">
             <h2 className="text-xl font-medium text-fg mb-6 flex items-center gap-2">
               <Key className="w-5 h-5 text-fg-muted" />
               Alterar Senha
@@ -120,7 +120,7 @@ export default function ProfilePage() {
                   required
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="w-full h-12 px-4 rounded-xl bg-zinc-50 border border-zinc-300 text-fg font-medium focus:ring-4 focus:ring-zinc-500/10 focus:border-zinc-500 transition-all outline-none"
+                  className="w-full h-12 px-4 rounded-xl bg-canvas border border-line-strong text-fg font-medium focus:ring-4 focus:ring-zinc-500/10 focus:border-zinc-500 transition-all outline-none"
                 />
               </div>
 
@@ -134,7 +134,7 @@ export default function ProfilePage() {
                     required
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full h-12 px-4 rounded-xl bg-zinc-50 border border-zinc-300 text-fg font-medium focus:ring-4 focus:ring-zinc-500/10 focus:border-zinc-500 transition-all outline-none"
+                    className="w-full h-12 px-4 rounded-xl bg-canvas border border-line-strong text-fg font-medium focus:ring-4 focus:ring-zinc-500/10 focus:border-zinc-500 transition-all outline-none"
                   />
                 </div>
 
@@ -147,7 +147,7 @@ export default function ProfilePage() {
                     required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full h-12 px-4 rounded-xl bg-zinc-50 border border-zinc-300 text-fg font-medium focus:ring-4 focus:ring-zinc-500/10 focus:border-zinc-500 transition-all outline-none"
+                    className="w-full h-12 px-4 rounded-xl bg-canvas border border-line-strong text-fg font-medium focus:ring-4 focus:ring-zinc-500/10 focus:border-zinc-500 transition-all outline-none"
                   />
                 </div>
               </div>
@@ -191,8 +191,8 @@ export default function ProfilePage() {
       {/* Modal de Confirmação para Senha */}
       {showConfirm && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white w-full max-w-sm rounded-xl p-8 shadow-overlay animate-pop-in">
-            <div className="w-16 h-16 bg-zinc-100 text-fg-muted rounded-lg flex items-center justify-center mb-6">
+          <div className="bg-surface w-full max-w-sm rounded-xl p-8 shadow-overlay animate-pop-in">
+            <div className="w-16 h-16 bg-subtle text-fg-muted rounded-lg flex items-center justify-center mb-6">
               <Key className="w-8 h-8" />
             </div>
             <h3 className="text-2xl font-medium text-fg mb-2">Alterar Senha?</h3>
@@ -202,7 +202,7 @@ export default function ProfilePage() {
             <div className="grid grid-cols-2 gap-4">
               <button 
                 onClick={() => setShowConfirm(false)}
-                className="py-4 rounded-lg font-medium text-fg-muted hover:bg-zinc-50 transition-all"
+                className="py-4 rounded-lg font-medium text-fg-muted hover:bg-canvas transition-all"
               >
                 Cancelar
               </button>

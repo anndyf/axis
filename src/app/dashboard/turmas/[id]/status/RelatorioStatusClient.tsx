@@ -95,7 +95,7 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
   }
 
   const renderCellContent = (nota: NotaData | undefined) => {
-    if (!nota) return <span className="text-zinc-300">/</span>
+    if (!nota) return <span className="text-fg-disabled">/</span>
 
     if (viewMode === 'STATUS') {
       const config = getStatusConfig(nota.status)
@@ -119,7 +119,7 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
     }
 
     if (isDesistente) return <span className="text-fg font-medium text-xs">DS</span>
-    if (value === null || value === undefined) return <span className="text-zinc-300">-</span>
+    if (value === null || value === undefined) return <span className="text-fg-disabled">-</span>
     
     const numValue = typeof value === 'string' ? parseFloat(value) : value
     return (
@@ -138,7 +138,7 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
             <div className="flex min-w-0 items-center gap-3">
               <Link
                 href="/dashboard/turmas"
-                className="w-10 h-10 bg-white border border-zinc-300 rounded-xl flex items-center justify-center text-fg-muted hover:bg-zinc-50 transition-all shadow-sm hover:translate-x-[-2px]"
+                className="w-10 h-10 bg-surface border border-line-strong rounded-xl flex items-center justify-center text-fg-muted hover:bg-canvas transition-all shadow-sm hover:translate-x-[-2px]"
               >
                 <ArrowLeft className="w-5 h-5" />
               </Link>
@@ -157,7 +157,7 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
             </div>
             
             <div className="flex flex-wrap items-center gap-3">
-              <div className="bg-zinc-200/50 p-1 rounded-lg flex items-center border border-zinc-300/50 shadow-card">
+              <div className="bg-subtle-hover/50 p-1 rounded-lg flex items-center border border-line-strong/50 shadow-card">
                 {([
                   { id: 'STATUS', label: 'Status', icon: CheckCircle2 },
                   ...nomesEtapas.map((_, i) => ({ id: i, label: `Und ${i + 1}`, icon: FileText })),
@@ -173,7 +173,7 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
                       className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
                         active 
                         ? 'bg-subtle border border-line text-fg shadow-card active:scale-95' 
-                        : 'text-fg-muted hover:text-black hover:bg-white/50'
+                        : 'text-fg-muted hover:text-fg hover:bg-surface/50'
                       }`}
                     >
                       <Icon className={`w-3.5 h-3.5 ${active ? 'text-white' : 'text-fg-subtle'}`} />
@@ -200,17 +200,17 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
       {/* Main Content */}
       <main className="max-w-[1600px] mx-auto px-4 py-6">
         {/* Compact Summary & Legend Row */}
-        <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 mb-6 bg-white p-4 rounded-lg border border-zinc-300 shadow-sm">
+        <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 mb-6 bg-surface p-4 rounded-lg border border-line-strong shadow-sm">
           {/* Metrics */}
           <div className="flex items-center space-x-6 px-2">
             <div>
                <p className="text-xs font-medium text-fg-subtle">Estudantes</p>
-               <p className="text-2xl font-medium text-black leading-none">{turma.estudantes.length}</p>
+               <p className="text-2xl font-medium text-fg leading-none">{turma.estudantes.length}</p>
             </div>
-            <div className="w-px h-8 bg-zinc-200" />
+            <div className="w-px h-8 bg-subtle-hover" />
             <div>
                <p className="text-xs font-medium text-fg-subtle">Disciplinas</p>
-               <p className="text-2xl font-medium text-black leading-none">{turma.disciplinas.length}</p>
+               <p className="text-2xl font-medium text-fg leading-none">{turma.disciplinas.length}</p>
             </div>
           </div>
 
@@ -236,19 +236,19 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
         </div>
 
         {/* Ultra Compact Matriz */}
-        <div className="bg-white rounded-lg shadow-card border border-zinc-200 overflow-hidden relative">
+        <div className="bg-surface rounded-lg shadow-card border border-line overflow-hidden relative">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
-                <tr className="bg-zinc-50/80 border-b border-zinc-300">
-                  <th className="px-2 py-2 text-center text-xs font-medium text-fg-subtle sticky left-0 bg-zinc-50/95 backdrop-blur z-20 w-10 border-r border-zinc-300">
+                <tr className="bg-canvas/80 border-b border-line-strong">
+                  <th className="px-2 py-2 text-center text-xs font-medium text-fg-subtle sticky left-0 bg-canvas/95 backdrop-blur z-20 w-10 border-r border-line-strong">
                     #
                   </th>
-                  <th className="px-1.5 py-2 text-left text-xs font-medium text-black sticky left-10 bg-zinc-50/95 backdrop-blur z-20 w-[1%] border-r border-zinc-300 shadow-[2px_0_5px_rgba(0,0,0,0.02)] whitespace-nowrap">
+                  <th className="px-1.5 py-2 text-left text-xs font-medium text-fg sticky left-10 bg-canvas/95 backdrop-blur z-20 w-[1%] border-r border-line-strong shadow-[2px_0_5px_rgba(0,0,0,0.02)] whitespace-nowrap">
                     Estudante
                   </th>
                   {turma.disciplinas.map((disc) => (
-                    <th key={disc.id} className="w-9 min-w-[2.25rem] max-w-[2.25rem] px-0 py-2 align-bottom h-24 border-r border-zinc-200 last:border-0">
+                    <th key={disc.id} className="w-9 min-w-[2.25rem] max-w-[2.25rem] px-0 py-2 align-bottom h-24 border-r border-line last:border-0">
                       <div className="flex items-center justify-center h-full w-full">
                         <span className="text-xs font-medium text-fg-muted [writing-mode:vertical-rl] rotate-180 whitespace-nowrap overflow-hidden text-ellipsis max-h-[85px]">
                           {abreviarNome(disc.nome)}
@@ -258,7 +258,7 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-200">
+              <tbody className="divide-y divide-line">
                 {turma.estudantes.length === 0 ? (
                   <tr>
                     <td colSpan={turma.disciplinas.length + 2} className="py-12 text-center text-fg-subtle font-medium text-xs">
@@ -278,12 +278,12 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
                       <tr 
                         key={estudante.matricula} 
                         onClick={() => setSelectedStudentId(isSelected ? null : estudante.matricula)}
-                        className={`group hover:bg-zinc-50 transition-colors cursor-pointer ${rowBg}`}
+                        className={`group hover:bg-canvas transition-colors cursor-pointer ${rowBg}`}
                       >
-                        <td className={`h-9 px-1 text-center text-xs font-medium text-fg-subtle sticky left-0 group-hover:bg-zinc-50 transition-colors z-10 border-r border-zinc-200 ${rowBg}`}>
+                        <td className={`h-9 px-1 text-center text-xs font-medium text-fg-subtle sticky left-0 group-hover:bg-canvas transition-colors z-10 border-r border-line ${rowBg}`}>
                           {(idx + 1).toString().padStart(2, '0')}
                         </td>
-                        <td className={`h-9 px-1.5 text-sm tracking-tight font-medium text-black sticky left-10 group-hover:bg-zinc-50 transition-colors z-10 border-r border-zinc-300 shadow-[2px_0_5px_rgba(0,0,0,0.02)] whitespace-nowrap ${rowBg}`}>
+                        <td className={`h-9 px-1.5 text-sm tracking-tight font-medium text-fg sticky left-10 group-hover:bg-canvas transition-colors z-10 border-r border-line-strong shadow-[2px_0_5px_rgba(0,0,0,0.02)] whitespace-nowrap ${rowBg}`}>
                            <div className="flex items-center gap-1.5">
                               {estudante.nome}
                               {estudante.aeeProfile && (
@@ -298,7 +298,7 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
                            </div>
                         </td>
                         {turma.disciplinas.map((disc) => (
-                          <td key={disc.id} className="w-9 min-w-[2.25rem] max-w-[2.25rem] h-9 px-0 text-center border-r border-zinc-50 last:border-0">
+                          <td key={disc.id} className="w-9 min-w-[2.25rem] max-w-[2.25rem] h-9 px-0 text-center border-r border-line-subtle last:border-0">
                             <div className="flex items-center justify-center w-full h-full">
                               {renderCellContent(notasMap.get(disc.id))}
                             </div>

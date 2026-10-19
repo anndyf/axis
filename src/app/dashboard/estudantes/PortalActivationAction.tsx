@@ -64,11 +64,11 @@ export default function PortalActivationAction({
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-zinc-900/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
-          <div className="relative bg-white w-full max-w-md rounded-xl shadow-card overflow-hidden animate-pop-in border border-zinc-200">
+          <div className="relative bg-surface w-full max-w-md rounded-xl shadow-card overflow-hidden animate-pop-in border border-line">
             <div className="p-8">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                   <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${hasUser ? 'bg-success-subtle text-success-fg' : 'bg-zinc-100 text-fg-muted'}`}>
+                   <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${hasUser ? 'bg-success-subtle text-success-fg' : 'bg-subtle text-fg-muted'}`}>
                       {hasUser ? <ShieldCheck size={24} /> : <ShieldAlert size={24} />}
                    </div>
                    <div>
@@ -76,7 +76,7 @@ export default function PortalActivationAction({
                       <p className="text-xs font-semibold text-fg-subtle">Ativação do Portal do Aluno</p>
                    </div>
                 </div>
-                <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-zinc-100 rounded-full transition-colors">
+                <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-subtle rounded-full transition-colors">
                   <X size={20} className="text-fg-subtle" />
                 </button>
               </div>
@@ -107,7 +107,7 @@ export default function PortalActivationAction({
                         value={matricula}
                         onChange={(e) => setMatricula(e.target.value)}
                         placeholder="Número da Matrícula"
-                        className="w-full bg-zinc-50 border border-zinc-200 rounded-lg px-6 py-4 text-base font-bold text-fg outline-none focus:ring-4 focus:ring-zinc-900/5 focus:bg-white transition-all shadow-card"
+                        className="w-full bg-canvas border border-line rounded-lg px-6 py-4 text-base font-bold text-fg outline-none focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface transition-all shadow-card"
                       />
                    </div>
 

@@ -14,7 +14,7 @@ export default function ErrorModal({ isOpen, onClose, title = "Atenção", messa
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-xl w-full max-w-md shadow-overlay border border-danger-line overflow-hidden animate-pop-in">
+      <div className="bg-surface rounded-xl w-full max-w-md shadow-overlay border border-danger-line overflow-hidden animate-pop-in">
         <div className="px-8 py-6 bg-danger-subtle border-b border-danger-line flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-danger rounded-xl shadow-card">

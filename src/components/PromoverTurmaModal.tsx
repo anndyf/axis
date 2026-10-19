@@ -59,8 +59,8 @@ export default function PromoverTurmaModal({
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-xl w-full max-w-md shadow-overlay overflow-hidden border border-zinc-100 flex flex-col animate-pop-in">
-        <div className="flex items-center justify-between p-6 border-b border-zinc-50 bg-zinc-50/50">
+      <div className="bg-surface rounded-xl w-full max-w-md shadow-overlay overflow-hidden border border-line-subtle flex flex-col animate-pop-in">
+        <div className="flex items-center justify-between p-6 border-b border-line-subtle bg-canvas/50">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-accent-subtle rounded-xl flex items-center justify-center">
               <ArrowUpCircle className="w-5 h-5 text-accent-fg" />
@@ -72,7 +72,7 @@ export default function PromoverTurmaModal({
           </div>
           <button 
             onClick={onClose}
-            className="p-2 hover:bg-white rounded-xl transition-colors text-fg-subtle hover:text-fg-muted shadow-sm"
+            className="p-2 hover:bg-surface rounded-xl transition-colors text-fg-subtle hover:text-fg-muted shadow-sm"
           >
             <X size={20} />
           </button>
@@ -102,7 +102,7 @@ export default function PromoverTurmaModal({
                   max="9"
                   value={serie}
                   onChange={(e) => setSerie(e.target.value)}
-                  className="w-full bg-zinc-50 border-none rounded-xl px-4 py-2.5 text-sm font-semibold text-fg-muted focus:ring-2 focus:ring-ring transition-all font-mono"
+                  className="w-full bg-canvas border-none rounded-xl px-4 py-2.5 text-sm font-semibold text-fg-muted focus:ring-2 focus:ring-ring transition-all font-mono"
                 />
               </div>
               <div className="space-y-1.5">
@@ -111,7 +111,7 @@ export default function PromoverTurmaModal({
                   type="number"
                   value={anoLetivo}
                   onChange={(e) => setAnoLetivo(parseInt(e.target.value))}
-                  className="w-full bg-zinc-50 border-none rounded-xl px-4 py-2.5 text-sm font-semibold text-fg-muted focus:ring-2 focus:ring-ring transition-all font-mono"
+                  className="w-full bg-canvas border-none rounded-xl px-4 py-2.5 text-sm font-semibold text-fg-muted focus:ring-2 focus:ring-ring transition-all font-mono"
                 />
               </div>
             </div>
@@ -122,7 +122,7 @@ export default function PromoverTurmaModal({
                 type="text"
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
-                className="w-full bg-zinc-50 border-none rounded-xl px-4 py-2.5 text-sm font-semibold text-fg focus:ring-2 focus:ring-ring transition-all font-mono shadow-card"
+                className="w-full bg-canvas border-none rounded-xl px-4 py-2.5 text-sm font-semibold text-fg focus:ring-2 focus:ring-ring transition-all font-mono shadow-card"
               />
             </div>
           </div>
@@ -131,7 +131,7 @@ export default function PromoverTurmaModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-3 px-4 rounded-xl text-sm font-semibold text-fg-subtle hover:bg-zinc-50 transition-colors border border-zinc-100"
+              className="flex-1 py-3 px-4 rounded-xl text-sm font-semibold text-fg-subtle hover:bg-canvas transition-colors border border-line-subtle"
             >
               Cancelar
             </button>
