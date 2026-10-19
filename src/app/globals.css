@@ -47,14 +47,15 @@
   --line: #e6ebf1;
   --line-strong: #d3dbe5;
 
-  /* Menu lateral azul-marinho (derivado do #205EE6) */
-  --sidebar: #153477;
+  /* Menu lateral no azul do logo Áxis (#205EE6). Branco sobre ele dá 5,5:1;
+     os tons translúcidos ficam altos para manter AA (4,5:1). */
+  --sidebar: #205ee6;
   --sidebar-fg: #ffffff;
-  --sidebar-fg-muted: rgb(255 255 255 / 0.78);   /* 7,8:1 */
-  --sidebar-fg-subtle: rgb(255 255 255 / 0.62);  /* 5,5:1 */
-  --sidebar-hover: rgb(255 255 255 / 0.08);
-  --sidebar-active: rgb(255 255 255 / 0.15);
-  --sidebar-line: rgb(255 255 255 / 0.1);
+  --sidebar-fg-muted: rgb(255 255 255 / 0.92);   /* 4,8:1 */
+  --sidebar-fg-subtle: rgb(255 255 255 / 0.88);  /* 4,6:1 */
+  --sidebar-hover: rgb(255 255 255 / 0.12);
+  --sidebar-active: rgb(255 255 255 / 0.2);
+  --sidebar-line: rgb(255 255 255 / 0.18);
 
   --success: #16a34a;
   --success-subtle: #ecfdf5;
@@ -273,6 +274,10 @@
   :focus-visible {
     outline: 2px solid var(--ring);
     outline-offset: 2px;
+  }
+  /* Sobre o menu azul o anel de destaque sumiria: branco */
+  .bg-sidebar {
+    --ring: rgb(255 255 255 / 0.9);
   }
   ::selection {
     background: color-mix(in oklab, var(--accent) 20%, transparent);
