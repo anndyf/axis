@@ -63,7 +63,7 @@ export default function PortalActivationAction({
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-zinc-900/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
-          <div className="relative bg-white w-full max-w-md rounded-xl shadow-card overflow-hidden animate-in zoom-in-95 duration-200 border border-zinc-200">
+          <div className="relative bg-white w-full max-w-md rounded-xl shadow-card overflow-hidden animate-pop-in border border-zinc-200">
             <div className="p-8">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">

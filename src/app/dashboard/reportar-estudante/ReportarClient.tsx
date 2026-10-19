@@ -61,7 +61,7 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
             </button>
             <Link 
               href="/dashboard"
-              className="px-6 py-3 bg-accent text-white font-medium rounded-xl hover:bg-accent shadow-card transition-all"
+              className="px-6 py-3 bg-accent text-on-accent font-medium rounded-xl hover:bg-accent-hover shadow-card transition-all"
             >
               Voltar ao Painel
             </Link>
@@ -178,7 +178,7 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
               <button
                 type="submit"
                 disabled={submitting || !form.turmaId || !form.nome}
-                className="w-full sm:w-auto px-8 py-4 bg-accent hover:bg-accent text-white font-medium rounded-xl transition-all shadow-card disabled:opacity-50 disabled:shadow-none active:scale-95 flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-8 py-4 bg-accent hover:bg-accent-hover text-on-accent font-medium rounded-xl transition-all shadow-card disabled:opacity-50 disabled:shadow-none active:scale-95 flex items-center justify-center gap-2"
               >
                 {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                 Enviar Solicitação

@@ -126,7 +126,7 @@ export default function EstudantesFilter({ cursos, turmas, totalResults }: Filte
       {/* Top Row: Stats + Search */}
       <div className="flex flex-col md:flex-row gap-4 mb-4">
         {/* Total Card */}
-        <div className="flex-shrink-0 bg-zinc-700 to-zinc-600 text-white rounded-lg px-6 py-3 flex items-center space-x-4 shadow-sm min-w-[200px]">
+        <div className="flex-shrink-0 bg-zinc-700 text-white rounded-lg px-6 py-3 flex items-center space-x-4 shadow-sm min-w-[200px]">
            <div className="p-2 bg-white/20 rounded-lg">
              {isPending ? (
                <Loader2 className="w-5 h-5 text-white animate-spin" />

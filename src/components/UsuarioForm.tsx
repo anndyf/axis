@@ -207,7 +207,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
           {/* Seção 2: Níveis de Acesso */}
           <div className="bg-white rounded-xl p-8 shadow-sm border border-zinc-200">
             <div className="flex items-center space-x-4 mb-8">
-               <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center text-white shadow-card">
+               <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center text-on-accent shadow-card">
                   <Settings2 className="w-5 h-5" />
                </div>
                <h2 className="text-xl font-semibold text-fg tracking-tight">Nível de Permissão</h2>
@@ -291,8 +291,8 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
 
       {/* Modal de Confirmação */}
       {showConfirm && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-md rounded-xl p-8 shadow-card animate-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white w-full max-w-md rounded-xl p-8 shadow-overlay animate-pop-in">
             <div className="w-16 h-16 bg-accent-subtle text-accent-fg rounded-lg flex items-center justify-center mb-6">
               <Shield className="w-8 h-8" />
             </div>

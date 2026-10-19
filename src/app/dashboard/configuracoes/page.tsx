@@ -199,8 +199,8 @@ export default function ConfiguracoesPage() {
 
       {/* Modal de Confirmação para Configurações */}
       {showConfirm && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-sm rounded-xl p-8 shadow-card animate-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white w-full max-w-sm rounded-xl p-8 shadow-overlay animate-pop-in">
             <div className="w-16 h-16 bg-zinc-100 text-fg-muted rounded-lg flex items-center justify-center mb-6">
               <Shield className="w-8 h-8" />
             </div>

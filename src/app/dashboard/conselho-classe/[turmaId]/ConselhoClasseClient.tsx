@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { buttonClasses } from "@/components/ui"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Save, AlertCircle, Gavel, Loader2, ChevronDown, ChevronUp, CheckCircle2, Printer, X } from "lucide-react"
@@ -389,7 +390,7 @@ export default function ConselhoClasseClient({
                 <span className="font-medium">Aprov. Conselho</span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="px-2 py-1 bg-zinc-200 border border-accent font-medium rounded text-accent-fg text-[7px]">DP</span>
+                <span className="px-2 py-1 bg-zinc-200 border border-zinc-400 font-medium rounded text-accent-fg text-[7px]">DP</span>
                 <span className="font-medium">Dependência</span>
               </div>
               <div className="flex items-center gap-1">
@@ -407,13 +408,13 @@ export default function ConselhoClasseClient({
         <table className="print-table w-full border-collapse text-[9px]">
           <thead>
             <tr>
-              <th className="border border-accent px-2 bg-white font-medium text-center text-[8px]" style={{minWidth: '120px', maxWidth: '120px', width: '120px', height: '100px', verticalAlign: 'middle'}}>
+              <th className="border border-zinc-400 px-2 bg-white font-medium text-center text-[8px]" style={{minWidth: '120px', maxWidth: '120px', width: '120px', height: '100px', verticalAlign: 'middle'}}>
                 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%'}}>
                   ESTUDANTE
                 </div>
               </th>
               {disciplinas.map((disc) => (
-                <th key={disc} className="border border-accent bg-white font-medium text-center" style={{minWidth: '20px', maxWidth: '20px', width: '20px', height: '100px', padding: '8px 0'}}>
+                <th key={disc} className="border border-zinc-400 bg-white font-medium text-center" style={{minWidth: '20px', maxWidth: '20px', width: '20px', height: '100px', padding: '8px 0'}}>
                   <div style={{
                     writingMode: 'vertical-rl',
                     transform: 'rotate(180deg)',
@@ -443,14 +444,14 @@ export default function ConselhoClasseClient({
 
                 return (
                   <tr key={estudanteId}>
-                    <td className="border border-accent px-2 py-0.5 font-medium text-left bg-white text-[10px] leading-tight" style={{maxWidth: '120px', width: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
+                    <td className="border border-zinc-400 px-2 py-0.5 font-medium text-left bg-white text-[10px] leading-tight" style={{maxWidth: '120px', width: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
                       <span className="text-fg-muted mr-1 text-[8px]">{String(idx + 1).padStart(2, '0')}</span>
                       <span>{data.nome}</span>
                     </td>
                     {disciplinas.map((disc) => {
                       const nota = notasPorDisciplina[disc]
                       if (!nota) {
-                        return <td key={disc} className="border border-accent px-1 py-1 text-center bg-white">-</td>
+                        return <td key={disc} className="border border-zinc-400 px-1 py-1 text-center bg-white">-</td>
                       }
                       
                       const statusAtual = decisoes[nota.id] || nota.status
@@ -491,7 +492,7 @@ export default function ConselhoClasseClient({
                       }
                       
                       return (
-                        <td key={disc} className={`border border-accent px-1 py-1 text-center font-medium ${bgColor} ${textColor}`}>
+                        <td key={disc} className={`border border-zinc-400 px-1 py-1 text-center font-medium ${bgColor} ${textColor}`}>
                           <div className="flex flex-col items-center leading-tight">
                             <span className="text-[8px] font-medium">{statusAbrev}</span>
                             {notaFinal !== null && notaFinal !== undefined && (
@@ -508,7 +509,7 @@ export default function ConselhoClasseClient({
         </table>
       </div>
 
-    <div className="bg-white no-print">
+    <div className="no-print">
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
       <header className="mb-6 border-b border-line pb-4 no-print">
         <div className="max-w-7xl mx-auto py-4">
@@ -541,7 +542,7 @@ export default function ConselhoClasseClient({
         <form onSubmit={handleSubmit}>
           {/* Mensagem */}
           {message && (
-            <div className={`mb-8 p-5 rounded-xl animate-in fade-in slide-in-from-top-4 duration-300 ${
+            <div className={`mb-8 p-5 rounded-xl animate-slide-up ${
               message.type === 'success' 
                 ? 'bg-success-subtle border border-success-line text-success-fg shadow-sm' 
                 : 'bg-danger-subtle border border-danger-line text-danger-fg shadow-sm'
@@ -619,7 +620,7 @@ export default function ConselhoClasseClient({
 
               {/* Instruções Expansíveis */}
               {showInstructions && (
-                <div className="mt-8 p-8 bg-white rounded-xl border border-zinc-200 animate-in fade-in slide-in-from-top-4 duration-300">
+                <div className="mt-8 p-8 bg-white rounded-xl border border-zinc-200 animate-slide-up">
                   <div className="flex items-start space-x-5">
                     <div className="p-3 bg-accent rounded-lg shadow-card">
                       <Gavel className="w-6 h-6 text-white" />
@@ -719,12 +720,12 @@ export default function ConselhoClasseClient({
                   <button
                     type="button"
                     onClick={() => toggleStudent(estudanteId)}
-                    className={`w-full px-6 py-5 flex items-center justify-between text-left transition-colors rounded-lg ${
+                    className={`w-full px-4 py-3 flex items-center justify-between text-left transition-colors rounded-lg ${
                       isExpanded ? 'bg-white' : 'hover:bg-white/30'
                     }`}
                   >
                     <div className="flex items-center space-x-4">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-medium text-base transition-all ${
+                      <div className={`size-8 rounded-full flex items-center justify-center font-medium text-xs transition-all ${
                         todasResolvidas ? 'bg-success text-white' : 'bg-zinc-200 text-fg-muted border border-zinc-300'
                       }`}>
                         {todasResolvidas ? <CheckCircle2 className="w-5 h-5" /> : data.nome.charAt(0)}
@@ -773,7 +774,7 @@ export default function ConselhoClasseClient({
 
                   {/* Listagem de Disciplinas (Sanfonado) */}
                   {isExpanded && (
-                    <div className="px-6 pb-6 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="px-6 pb-6 pt-2 animate-slide-up">
                       <div className="overflow-x-auto">
                         <table className="w-full">
                           <thead>
@@ -905,28 +906,23 @@ export default function ConselhoClasseClient({
           </div>
 
           {/* Footer Fixo */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-zinc-200 px-4 py-6 z-50 shadow-[0_-10px_40px_rgba(15,23,42,0.1)]">
-            <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="sticky bottom-4 z-20 mt-6 rounded-lg border border-line bg-elevated/95 px-4 py-3 shadow-overlay backdrop-blur">
+            <div className="flex flex-col items-center justify-between gap-3 md:flex-row">
               <div className="flex items-center space-x-4">
-                <div className="bg-zinc-100 p-3 rounded-lg border border-zinc-200 shadow-card">
-                  <Gavel className="w-5 h-5 text-fg-muted" />
-                </div>
+                <Gavel size={16} strokeWidth={1.75} className="text-fg-subtle" aria-hidden />
                 <div>
-                   <p className="text-[10px] font-medium text-fg uppercase tracking-widest leading-none">Fechamento de Conselhos</p>
-                   <p className="text-[9px] font-medium text-fg-subtle uppercase tracking-widest mt-1.5 flex items-center">
-                     <span className="w-2 h-2 bg-accent rounded-full mr-2 animate-pulse" />
-                     {notasConselho.length} Registros totais nesta turma
-                   </p>
+                   <p className="text-13 font-medium text-fg">Fechamento do conselho</p>
+                   <p className="text-xs text-fg-subtle">{notasConselho.length} registros nesta turma</p>
                 </div>
               </div>
               <div className="flex items-center space-x-4 w-full md:w-auto">
                 <button
                   type="submit"
                   disabled={loading || Object.keys(decisoes).length === 0}
-                  className="flex-1 md:flex-none flex items-center justify-center space-x-4 bg-accent text-white px-10 py-4 rounded-xl font-medium uppercase tracking-widest hover:bg-accent transition-all shadow-card active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed group border-b-4 border-accent"
+                  className={buttonClasses({ className: "flex-1 md:flex-none" })}
                 >
-                  {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5 group-hover:rotate-12 transition-transform" />}
-                  <span className="text-xs">{loading ? 'Sincronizando...' : 'Gravar Decisões Agora'}</span>
+                  {loading ? <Loader2 size={16} strokeWidth={1.75} className="animate-spin" /> : <Save size={16} strokeWidth={1.75} />}
+                  {loading ? 'Salvando…' : 'Gravar decisões'}
                 </button>
               </div>
             </div>
@@ -934,8 +930,8 @@ export default function ConselhoClasseClient({
         </form>
         {/* Modal de Confirmação */}
         {showConfirmModal && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-900/40 backdrop-blur-sm p-4 animate-in fade-in duration-300">
-            <div className="bg-white rounded-xl shadow-card max-w-2xl w-full flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-900/40 backdrop-blur-sm p-4 animate-fade-in">
+            <div className="bg-white rounded-xl shadow-overlay max-w-2xl w-full flex flex-col max-h-[90vh] animate-pop-in">
               <div className="p-8 border-b border-zinc-50 flex items-center justify-between">
                 <div>
                   <h3 className="text-xl font-medium text-fg uppercase tracking-tight">Revisar Decisões</h3>
@@ -999,7 +995,7 @@ export default function ConselhoClasseClient({
                 <button
                   type="button"
                   onClick={handleConfirmSave}
-                  className="px-10 py-3 rounded-lg bg-accent text-white font-medium uppercase tracking-widest hover:bg-accent shadow-card transition-all flex items-center space-x-3 active:scale-95 text-xs"
+                  className="px-10 py-3 rounded-lg bg-accent text-on-accent font-medium uppercase tracking-widest hover:bg-accent-hover shadow-card transition-all flex items-center space-x-3 active:scale-95 text-xs"
                 >
                   <Save className="w-4 h-4" />
                   <span>Gravar Permanentemente</span>

@@ -651,8 +651,8 @@ export default function LancarNotasTurmaClient({
       </main>
 
       {showModal && esquema && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-xl shadow-card w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 border border-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-xl shadow-overlay w-full max-w-lg overflow-hidden animate-pop-in border border-white">
             <div className="px-6 py-5 border-b border-zinc-200 flex justify-between items-center bg-zinc-50">
               <div className="flex items-center gap-3">
                  <div className="w-10 h-10 bg-zinc-600 text-white rounded-xl flex items-center justify-center shadow-card"><Save size={20}/></div>
@@ -692,8 +692,8 @@ export default function LancarNotasTurmaClient({
       )}
 
       {feedbackModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-[32px] shadow-card w-full max-w-sm overflow-hidden p-8 flex flex-col items-center text-center animate-in zoom-in-95 duration-200 border border-zinc-100">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-[32px] shadow-overlay w-full max-w-sm overflow-hidden p-8 flex flex-col items-center text-center animate-pop-in border border-zinc-100">
             {feedbackModal.type === 'success' ? (
               <div className="w-16 h-16 bg-success-subtle text-success-fg rounded-full flex items-center justify-center mb-5 ring-8 ring-success/30">
                 <CheckCircle2 size={36} className="animate-bounce" />

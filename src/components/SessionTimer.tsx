@@ -15,8 +15,8 @@ export default function SessionTimer() {
   if (!showWarning) return null
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-white rounded-lg shadow-card p-8 max-w-sm w-full mx-4 border border-zinc-200 text-center relative overflow-hidden">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white rounded-lg shadow-overlay p-8 max-w-sm w-full mx-4 border border-zinc-200 text-center relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-warning animate-[pulse_1s_infinite]" />
         
         <h3 className="text-xl font-semibold text-fg mb-2">Sessão Expirando</h3>

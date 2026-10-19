@@ -59,7 +59,7 @@ export default async function MessagesPage() {
       </div>
 
       {/* Alerta de Suporte Fixo */}
-      <div className="bg-zinc-100 border border-zinc-200 rounded-xl p-6 flex flex-col md:flex-row items-center gap-6 animate-in fade-in slide-in-from-top-4 duration-700">
+      <div className="bg-zinc-100 border border-zinc-200 rounded-xl p-6 flex flex-col md:flex-row items-center gap-6 animate-slide-up">
         <div className="w-14 h-14 bg-white rounded-lg shadow-card flex items-center justify-center shrink-0">
           <LifeBuoy className="text-fg-muted w-7 h-7" />
         </div>

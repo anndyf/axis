@@ -468,7 +468,7 @@ export default function MatrizCurricularClient({
 
             {/* Badge de disciplinas */}
             <div className="shrink-0 pb-0.5">
-                <div className="flex items-center gap-1.5 bg-accent text-white px-3 py-2.5 rounded-xl shadow-card">
+                <div className="flex items-center gap-1.5 bg-accent text-on-accent px-3 py-2.5 rounded-xl shadow-card">
                     <span className="w-1.5 h-1.5 rounded-full bg-white/70 animate-pulse" />
                     <span className="text-[11px] font-semibold uppercase tracking-wider whitespace-nowrap">{itemsFiltradosNaLista.length} disciplinas</span>
                 </div>
@@ -742,7 +742,7 @@ export default function MatrizCurricularClient({
 
       {/* Barra flutuante de ação em lote */}
       {selectedIds.size > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-4 duration-200">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-slide-up">
           <div className="flex items-center gap-4 bg-zinc-900 text-white px-5 py-3.5 rounded-lg shadow-card border border-white/10">
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded-full bg-danger flex items-center justify-center text-xs font-semibold">
@@ -775,7 +775,7 @@ export default function MatrizCurricularClient({
 
       {/* Toast de propagação para turmas */}
       {propagacaoMsg && (
-        <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-4 duration-300">
+        <div className="fixed bottom-6 right-6 z-50 animate-slide-up">
           <div className="flex items-center gap-3 bg-success text-white px-5 py-3.5 rounded-lg shadow-card border border-success max-w-sm">
             <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
               <BookOpen size={16} />

@@ -104,7 +104,7 @@ export default function RelatorioClient({
 
       {/* Lista de Estudantes (Accordion) */}
       <div className="bg-white rounded-xl shadow-sm border border-zinc-300 overflow-hidden">
-        <div className="px-6 py-4 bg-zinc-50 to-zinc-50 border-b border-zinc-300">
+        <div className="px-6 py-4 bg-zinc-50 border-b border-zinc-300">
           <h3 className="text-lg font-medium text-accent-fg">
             {isProfessorOnly ? 'Estudantes Matriculados' : 'Desempenho Detalhado dos Estudantes'}
           </h3>
@@ -273,8 +273,8 @@ export default function RelatorioClient({
 
       {/* Modal Professores */}
       {showProfessorsModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-lg shadow-card w-full max-w-2xl max-h-[85vh] flex flex-col animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-lg shadow-overlay w-full max-w-2xl max-h-[85vh] flex flex-col animate-pop-in">
             <div className="flex items-center justify-between p-6 border-b border-zinc-100">
               <div>
                 <h3 className="text-xl font-bold text-fg flex items-center gap-2">

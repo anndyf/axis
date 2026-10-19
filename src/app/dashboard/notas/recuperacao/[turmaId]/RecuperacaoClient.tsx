@@ -329,8 +329,8 @@ export default function RecuperacaoTurmaClient({
       </main>
 
       {showConfirmModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-xl shadow-card w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 border border-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-xl shadow-overlay w-full max-w-md overflow-hidden animate-pop-in border border-white">
             <div className="px-6 py-5 border-b border-zinc-200 flex justify-between items-center bg-zinc-50">
               <div className="flex items-center gap-3">
                  <div className="w-10 h-10 bg-danger text-white rounded-xl flex items-center justify-center shadow-card"><TrendingUp size={20}/></div>

@@ -359,8 +359,8 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
   }
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-white w-full max-w-4xl max-h-[90vh] rounded-xl shadow-card flex flex-col overflow-hidden animate-in zoom-in-95 duration-300">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white w-full max-w-4xl max-h-[90vh] rounded-xl shadow-overlay flex flex-col overflow-hidden animate-pop-in">
         <div className="p-6 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/50">
           <div>
             <h2 className="text-xl font-bold text-fg">
@@ -379,7 +379,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
         <div className="flex items-center justify-center sm:justify-start gap-2 px-6 sm:px-8 py-4 bg-zinc-50/80 border-b border-zinc-100 overflow-x-auto no-scrollbar">
           {[1, 2, 3].map(step => (
             <div key={step} className={`flex items-center gap-2 ${currentStep === step ? 'text-accent-fg' : 'text-fg-subtle'}`}>
-               <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${currentStep === step ? 'bg-accent text-white shadow-card' : (currentStep > step ? 'bg-success text-white' : 'bg-zinc-200 text-fg-subtle')}`}>
+               <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${currentStep === step ? 'bg-accent text-on-accent shadow-card' : (currentStep > step ? 'bg-success text-on-accent' : 'bg-zinc-200 text-fg-subtle')}`}>
                  {currentStep > step ? <CheckCircle2 size={14} /> : step}
                </div>
                <span className={`text-xs font-bold whitespace-nowrap transition-all ${currentStep === step ? 'text-accent-fg' : 'hidden sm:block'}`}>
@@ -399,7 +399,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
           )}
 
           {duplicateWarning && (
-            <div className="bg-warning-subtle border border-warning-line text-warning-fg px-4 py-4 rounded-xl flex flex-col gap-3 animate-in fade-in zoom-in duration-300">
+            <div className="bg-warning-subtle border border-warning-line text-warning-fg px-4 py-4 rounded-xl flex flex-col gap-3 animate-fade-in zoom-in duration-300">
               <div className="flex items-center gap-3">
                 <AlertTriangle className="w-5 h-5 flex-shrink-0 text-warning-fg" />
                 <p className="text-sm font-medium">{duplicateWarning}</p>
@@ -431,7 +431,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
 
           {/* Enunciado Rich Text */}
           {currentStep === 2 && (
-          <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+          <div className="space-y-8 animate-slide-up">
           <div className="space-y-3">
             <div className="flex items-center justify-between ml-1">
               <label className="text-sm font-bold text-fg-muted">Enunciado da Questão</label>
@@ -568,7 +568,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
 
           {/* Unidade */}
           {currentStep === 1 && (
-          <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+          <div className="space-y-8 animate-slide-up">
             <div className="space-y-6">
               <div className="space-y-2">
                 <label className="text-sm font-bold text-fg flex items-center gap-2">
@@ -610,7 +610,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
 
           {/* Alternativas */}
           {currentStep === 3 && (
-          <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+          <div className="space-y-8 animate-slide-up">
           <div className="space-y-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 ml-1">
               <h3 className="text-sm font-bold text-fg-muted uppercase tracking-wider">Alternativas de Resposta</h3>
@@ -623,7 +623,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
                   <Plus size={12} />
                   Colar Bloco
                 </button>
-                <div className="flex items-center gap-1.5 px-3 py-1 bg-success-subtle text-success-fg rounded-full border border-success-line animate-in fade-in slide-in-from-right-4 duration-500 shadow-sm">
+                <div className="flex items-center gap-1.5 px-3 py-1 bg-success-subtle text-success-fg rounded-full border border-success-line animate-slide-up shadow-sm">
                   <CheckCircle2 size={14} className="text-success-fg" />
                   <span className="text-[10px] font-semibold uppercase tracking-tight">Clique na letra da questão correta</span>
                 </div>
@@ -704,7 +704,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
 
           {/* Vínculo Inteligente Unificado */}
           {currentStep === 1 && (
-          <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 border-t pt-8 border-zinc-100">
+          <div className="space-y-8 animate-slide-up border-t pt-8 border-zinc-100">
           <div className="space-y-4 pt-4">
             <div className="flex items-center justify-between ml-1">
               <label className="text-sm font-bold text-fg-muted">Onde aplicar esta questão?</label>
@@ -746,7 +746,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
 
               {/* Passo 2: Seleção de Disciplinas (visível apenas se houver turmas selecionadas) */}
               {formData.turmasIds.length > 0 && (
-                <div className="space-y-3 animate-in fade-in slide-in-from-top-2">
+                <div className="space-y-3 animate-slide-up">
                   <div className="flex items-center gap-2 px-2">
                     <span className="text-[10px] font-semibold text-fg-subtle uppercase tracking-[0.2em]">Passo 2: Disciplinas nas Turmas Selecionadas</span>
                     <div className="h-px flex-1 bg-zinc-100" />
@@ -761,7 +761,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
                             onClick={() => toggleSelection(d.id, 'disciplinasIds')}
                             className={`px-4 py-2.5 rounded-xl text-xs font-bold border transition-all flex items-center gap-2 shadow-sm ${
                               formData.disciplinasIds.includes(d.id)
-                              ? 'bg-accent border-accent text-white translate-y-[-2px] '
+                              ? 'bg-accent border-accent text-on-accent translate-y-[-2px] '
                               : 'bg-white border-zinc-200 text-fg-muted hover:border-accent hover:bg-zinc-50'
                             }`}
                           >
@@ -776,7 +776,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
                             <button
                               type="button"
                               onClick={() => selectAllSameName(d.nome)}
-                              className="hidden group-hover:flex absolute -top-2 -right-2 bg-zinc-900 text-white rounded-full p-1.5 shadow-overlay animate-in zoom-in-50 items-center justify-center z-10"
+                              className="hidden group-hover:flex absolute -top-2 -right-2 bg-zinc-900 text-white rounded-full p-1.5 shadow-overlay animate-pop-in items-center justify-center z-10"
                               title={`Selecionar ${d.nome} em todas as turmas marcadas`}
                             >
                               <Plus size={10} strokeWidth={4} />
@@ -816,7 +816,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
               type="button"
               onClick={() => handleSubmit()}
               disabled={loading}
-              className="bg-accent hover:bg-accent disabled:opacity-50 text-white px-8 py-3 rounded-lg font-bold flex items-center gap-2 transition-all shadow-card active:scale-95 text-sm"
+              className="bg-accent hover:bg-accent-hover disabled:opacity-50 text-on-accent px-8 py-3 rounded-lg font-bold flex items-center gap-2 transition-all shadow-card active:scale-95 text-sm"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -831,8 +831,8 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
 
       {/* Modal de Assistente de Colagem */}
       {showPasteModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-           <div className="bg-white w-full max-w-lg rounded-xl p-8 shadow-card animate-in zoom-in-95 duration-300 overflow-hidden">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
+           <div className="bg-white w-full max-w-lg rounded-xl p-8 shadow-overlay animate-pop-in overflow-hidden">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-accent-subtle text-accent-fg rounded-lg flex items-center justify-center">
@@ -870,7 +870,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
                  <button 
                   onClick={() => distribuirAlternativas(pasteText)} 
                   disabled={!pasteText.trim()}
-                  className="py-4 rounded-lg font-semibold bg-accent text-white hover:bg-accent disabled:opacity-50 transition-all shadow-card text-sm flex items-center justify-center gap-2"
+                  className="py-4 rounded-lg font-semibold bg-accent text-on-accent hover:bg-accent-hover disabled:opacity-50 transition-all shadow-card text-sm flex items-center justify-center gap-2"
                  >
                   <Save size={18} />
                   Distribuir nos Campos
@@ -882,8 +882,8 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
 
       {/* Modal de Confirmação para Edição */}
       {showConfirm && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-           <div className="bg-white w-full max-w-sm rounded-xl p-8 shadow-card animate-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
+           <div className="bg-white w-full max-w-sm rounded-xl p-8 shadow-overlay animate-pop-in">
               <div className="w-14 h-14 bg-warning-subtle text-warning-fg rounded-lg flex items-center justify-center mb-6">
                  <AlertCircle className="w-8 h-8" />
               </div>
@@ -899,7 +899,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
               </p>
               <div className="grid grid-cols-2 gap-3">
                  <button onClick={() => setShowConfirm(false)} className="py-3 rounded-xl font-bold text-fg-subtle hover:bg-zinc-50 transition-all text-sm">Cancelar</button>
-                 <button onClick={() => handleSubmit()} className="py-3 rounded-xl font-semibold bg-accent text-white hover:bg-zinc-800 transition-all shadow-card text-sm">Confirmar</button>
+                 <button onClick={() => handleSubmit()} className="py-3 rounded-xl font-semibold bg-accent text-on-accent hover:bg-zinc-800 transition-all shadow-card text-sm">Confirmar</button>
               </div>
            </div>
         </div>

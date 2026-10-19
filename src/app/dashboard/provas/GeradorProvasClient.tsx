@@ -247,7 +247,7 @@ const ManualSelectorModal = ({ isOpen, onClose, onSelect, questions, selectedIds
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-zinc-900/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="bg-white w-full max-w-4xl max-h-[90vh] rounded-xl shadow-card relative z-10 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="bg-white w-full max-w-4xl max-h-[90vh] rounded-xl shadow-card relative z-10 flex flex-col overflow-hidden animate-pop-in">
         <div className="p-6 border-b border-zinc-100 flex items-center justify-between bg-white">
           <div>
             <h2 className="text-xl font-bold text-fg">Selecionar Questões</h2>
@@ -912,7 +912,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
       </div>
 
       {activeTab === 'gerador' && (
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 xl:gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500 items-start">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 xl:gap-8 animate-slide-up items-start">
         {/* Lado Esquerdo: Configurações + Disciplinas */}
         <div className="xl:col-span-5 space-y-6">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-zinc-100 space-y-6">
@@ -1012,7 +1012,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                         {selectedTurma._count?.questoes || 0} questões específicas
                     </p>
                     {tipoProva !== 'DEPENDÊNCIA' && tipoProva !== 'OUTRO' && (
-                      <div className="flex items-center gap-2 animate-in fade-in zoom-in duration-300">
+                      <div className="flex items-center gap-2 animate-fade-in zoom-in duration-300">
                         <span className="text-[10px] font-bold text-fg-subtle uppercase">Unidade:</span>
                         <select 
                           value={unidade}
@@ -1214,7 +1214,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                 <button
                   onClick={handleGenerateDraft}
                   disabled={loading || config.reduce((acc, c) => acc + c.qtd, 0) === 0}
-                  className="w-full bg-accent hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-card active:scale-95"
+                  className="w-full bg-accent hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed text-on-accent py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-card active:scale-95"
                 >
                   {loading ? <RefreshCw className="animate-spin" size={20} /> : <FileText size={20} />}
                   {config.reduce((acc, c) => acc + c.qtd, 0) === 0 ? "Adicione questões acima" : "Gerar Rascunho"}
@@ -1230,7 +1230,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
             <>
               <div className="flex items-center justify-between bg-accent-subtle p-4 rounded-lg border border-accent/25">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-accent text-white rounded-full flex items-center justify-center font-bold shadow-card">
+                  <div className="w-10 h-10 bg-accent text-on-accent rounded-full flex items-center justify-center font-bold shadow-card">
                     {draftQuestions.length}
                   </div>
                   <div>
@@ -1365,7 +1365,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
       )}
 
       {activeTab === 'historico' && (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-8 animate-slide-up">
           <div className="flex flex-col gap-6 mb-8">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-warning-subtle text-warning-fg rounded-lg flex items-center justify-center shadow-sm">
@@ -1648,7 +1648,7 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-zinc-900/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="bg-white w-full max-w-5xl max-h-[90vh] rounded-xl shadow-card relative z-10 flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="bg-white w-full max-w-5xl max-h-[90vh] rounded-xl shadow-card relative z-10 flex flex-col overflow-hidden animate-pop-in">
         <div className="p-6 border-b border-zinc-100 flex items-center justify-between bg-white text-fg">
           <div>
             <h2 className="text-xl font-bold">{prova.titulo}</h2>
@@ -1781,7 +1781,7 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
               
               <button 
                 onClick={() => onDownload({ layout: localLayout, ampliada: localAmpliada, apenasGabarito: true })}
-                className="bg-accent hover:bg-accent text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-card active:scale-95 transition-all flex items-center justify-center gap-2"
+                className="bg-accent hover:bg-accent-hover text-on-accent px-4 py-2.5 rounded-xl text-xs font-bold shadow-card active:scale-95 transition-all flex items-center justify-center gap-2"
                 title="Gerar apenas o Gabarito do Professor"
               >
                 <ClipboardCheck size={16} />

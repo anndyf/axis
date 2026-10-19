@@ -230,7 +230,7 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
 
           <button
             onClick={() => { setEditingQuestao(null); setShowForm(true); }}
-            className="flex items-center justify-center gap-2 bg-accent hover:bg-accent text-white px-5 py-2.5 rounded-lg font-semibold transition-all active:scale-95"
+            className="flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-5 py-2.5 rounded-lg font-semibold transition-all active:scale-95"
           >
             <Plus size={18} />
             Nova Questão
@@ -415,9 +415,9 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
 
         {/* Bulk Actions Bar */}
         {selectedIds.length > 0 && isAdmin && (
-          <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-zinc-900 text-white px-6 py-4 rounded-xl shadow-overlay flex items-center gap-6 animate-in slide-in-from-bottom-10">
+          <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-zinc-900 text-white px-6 py-4 rounded-xl shadow-overlay flex items-center gap-6 animate-slide-up">
             <div className="flex items-center gap-3 pr-6 border-r border-zinc-700">
-              <div className="bg-accent text-white w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold">
+              <div className="bg-accent text-on-accent w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold">
                 {selectedIds.length}
               </div>
               <span className="text-sm font-medium">Selecionadas</span>
@@ -426,7 +426,7 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
             <div className="flex gap-2">
               <button 
                 onClick={() => handleBulkStatusUpdate('APROVADA')}
-                className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent rounded-lg text-sm font-bold transition-all"
+                className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent-hover rounded-lg text-sm font-bold transition-all"
               >
                 <CheckCircle2 size={16} /> Aprovar
               </button>

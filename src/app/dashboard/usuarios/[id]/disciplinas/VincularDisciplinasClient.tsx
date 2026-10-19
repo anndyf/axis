@@ -285,7 +285,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
 
                   {/* Conteúdo das Disciplinas */}
                   {isExpanded && (
-                    <div className="px-8 pb-8 animate-in slide-in-from-top-2 duration-300">
+                    <div className="px-8 pb-8 animate-slide-up">
                       <div className="h-px bg-zinc-200 mb-6" />
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         {disciplinas.map((disc: any) => {

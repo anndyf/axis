@@ -12,8 +12,8 @@ export default function QuestaoPreviewModal({ questao, onClose, nomeEscola = 'Á
   if (!questao) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-lg shadow-card w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white rounded-lg shadow-overlay w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="px-6 py-4 border-b border-zinc-100 flex items-center justify-between bg-zinc-50">
           <div>

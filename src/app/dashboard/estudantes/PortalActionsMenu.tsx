@@ -67,7 +67,7 @@ export default function PortalActionsMenu() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 left-0 md:left-auto mt-2 w-full md:w-64 bg-white rounded-xl shadow-overlay border border-zinc-300 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="absolute right-0 left-0 md:left-auto mt-2 w-full md:w-64 bg-white rounded-xl shadow-overlay border border-zinc-300 py-2 z-50 animate-slide-up">
           <div className="px-4 py-2 mb-1 border-b border-zinc-200">
             <span className="text-xs font-medium text-fg-subtle uppercase tracking-wider">Ações em Lote</span>
           </div>

@@ -269,7 +269,7 @@ export default function MessagesClient({
   ]
 
   return (
-    <div className="flex flex-col bg-white rounded-xl shadow-card border border-zinc-200 min-h-[calc(100vh-180px)] overflow-hidden animate-in fade-in duration-500">
+    <div className="flex flex-col bg-white rounded-xl shadow-card border border-zinc-200 min-h-[calc(100vh-180px)] overflow-hidden animate-fade-in">
       
       {/* View 1: Listagem de Chamados (Full Width) */}
       {!selectedMessage && activeTab !== 'new' && (
@@ -309,7 +309,7 @@ export default function MessagesClient({
               </div>
               <button
                 onClick={() => { setActiveTab("new"); setSelectedMessage(null); }}
-                className="w-full sm:w-auto px-6 py-3 bg-accent text-white rounded-lg hover:bg-accent transition-all shadow-card active:scale-95 flex items-center justify-center gap-2 font-bold text-sm"
+                className="w-full sm:w-auto px-6 py-3 bg-accent text-on-accent rounded-lg hover:bg-accent-hover transition-all shadow-card active:scale-95 flex items-center justify-center gap-2 font-bold text-sm"
               >
                 <Plus size={18} /> Novo Chamado
               </button>
@@ -537,7 +537,7 @@ export default function MessagesClient({
                 </div>
 
                 {(newMsgCategory === 'SUPORTE' || newMsgCategory === 'DIRECAO') && predefinedSubject && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-slide-up">
                     {/* Campos Dinâmicos baseados no Assunto */}
                     {(predefinedSubject === 'Lançamento de Notas/Faltas' || predefinedSubject === 'Ajuste de Notas' || predefinedSubject === 'Gerador de Provas' || predefinedSubject === 'Ocorrência Grave') && (
                       <div className="space-y-3">
@@ -614,7 +614,7 @@ export default function MessagesClient({
                 <button 
                   onClick={() => handleSendMessage()}
                   disabled={sending}
-                  className="w-full md:w-auto px-12 bg-accent text-white py-5 rounded-lg font-semibold text-sm uppercase tracking-widest hover:bg-accent transition-all shadow-card disabled:opacity-50 active:scale-95 flex items-center justify-center gap-3"
+                  className="w-full md:w-auto px-12 bg-accent text-on-accent py-5 rounded-lg font-semibold text-sm uppercase tracking-widest hover:bg-accent-hover transition-all shadow-card disabled:opacity-50 active:scale-95 flex items-center justify-center gap-3"
                 >
                   {sending ? <Loader2 className="animate-spin w-5 h-5" /> : <Send size={20} />}
                   {sending ? "Enviando..." : "Registrar Chamado"}
@@ -710,14 +710,14 @@ export default function MessagesClient({
               {threadMessages.map((m, idx) => {
                 const isMe = m.senderId === currentUserId
                 return (
-                  <div key={m.id} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div key={m.id} className="animate-slide-up">
                     <div className={`w-full p-8 rounded-xl shadow-sm border ${
                       isMe ? 'bg-white border-accent/25' : 'bg-white border-zinc-200'
                     }`}>
                       <div className="flex items-center justify-between mb-6 pb-5 border-b border-zinc-100">
                         <div className="flex items-center gap-4">
                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-semibold text-lg ${
-                             isMe ? 'bg-accent text-white shadow-card ' : 'bg-zinc-100 text-fg-muted'
+                             isMe ? 'bg-accent text-on-accent shadow-card ' : 'bg-zinc-100 text-fg-muted'
                            }`}>
                              {m.sender?.name?.charAt(0) || m.sender?.username?.charAt(0) || '?'}
                            </div>
@@ -737,7 +737,7 @@ export default function MessagesClient({
               })}
               
               {loadingThread && (
-                <div className="flex flex-col items-center justify-center py-12 gap-3 opacity-60 animate-in fade-in">
+                <div className="flex flex-col items-center justify-center py-12 gap-3 opacity-60 animate-fade-in">
                   <Loader2 className="w-8 h-8 text-accent-fg animate-spin" />
                   <span className="text-xs font-bold text-fg-subtle uppercase tracking-widest">Carregando histórico...</span>
                 </div>
@@ -758,7 +758,7 @@ export default function MessagesClient({
                 <button 
                   type="submit"
                   disabled={!replyContent.trim() || replying}
-                  className="px-10 py-5 bg-accent text-white rounded-xl font-semibold uppercase text-xs tracking-widest hover:bg-accent transition-all shadow-card active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3"
+                  className="px-10 py-5 bg-accent text-on-accent rounded-xl font-semibold uppercase text-xs tracking-widest hover:bg-accent-hover transition-all shadow-card active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3"
                 >
                   {replying ? <Loader2 size={20} className="animate-spin" /> : <Send size={20} />}
                   {replying ? 'Enviando...' : 'Responder'}

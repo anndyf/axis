@@ -131,7 +131,7 @@ export default async function RelatorioTurmaPage({
                 href={`/api/relatorio/turma/${turma.id}/pdf`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center space-x-2 bg-zinc-700 to-zinc-600 text-white px-4 py-2 rounded-lg hover:bg-zinc-800 hover:to-zinc-700 transition-all shadow-card"
+                className="flex items-center space-x-2 bg-zinc-700 text-white px-4 py-2 rounded-lg hover:bg-zinc-800 transition-all shadow-card"
               >
                 <Download className="w-5 h-5" />
                 <span>Baixar PDF Global</span>

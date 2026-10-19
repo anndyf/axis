@@ -183,8 +183,8 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-white rounded-xl w-full max-w-lg shadow-card border border-zinc-100 overflow-hidden animate-in zoom-in-95 duration-300">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white rounded-xl w-full max-w-lg shadow-overlay border border-zinc-100 overflow-hidden animate-pop-in">
 
         {/* Header */}
         <div className={`px-8 py-6 border-b border-zinc-100 flex items-center justify-between ${isEdit ? 'bg-warning-subtle' : 'bg-zinc-50'}`}>
@@ -210,7 +210,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
 
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
           {error && (
-            <div className="p-4 bg-danger-subtle border border-danger-line rounded-xl text-danger-fg text-xs font-semibold animate-in slide-in-from-top-2">
+            <div className="p-4 bg-danger-subtle border border-danger-line rounded-xl text-danger-fg text-xs font-semibold animate-slide-up">
               {error}
             </div>
           )}
@@ -278,7 +278,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
                     disabled={isEdit}
                     className={`px-4 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wide transition-all border ${
                       formData.modalidades.includes(m)
-                        ? 'bg-accent text-white border-accent shadow-card '
+                        ? 'bg-accent text-on-accent border-accent shadow-card '
                         : 'bg-zinc-50 text-fg-subtle border-zinc-200 hover:border-zinc-300 hover:text-fg-muted'
                     } ${isEdit ? 'opacity-60 cursor-not-allowed' : ''}`}
                   >
@@ -357,7 +357,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
                     onClick={() => handleToggleTurno(t)}
                     className={`px-4 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wide transition-all border ${
                       formData.turnos.includes(t)
-                        ? 'bg-accent text-white border-accent shadow-card '
+                        ? 'bg-accent text-on-accent border-accent shadow-card '
                         : 'bg-zinc-50 text-fg-subtle border-zinc-200 hover:border-zinc-300 hover:text-fg-muted'
                     }`}
                   >

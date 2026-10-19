@@ -183,7 +183,7 @@ export default function DisciplinasList({ disciplinas }: DisciplinasListProps) {
                   </button>
                   
                   {isOpen && (
-                    <div className="p-6 border-t border-zinc-200 animate-in slide-in-from-top-2 duration-200">
+                    <div className="p-6 border-t border-zinc-200 animate-slide-up">
                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {discs.map((disciplina) => (
                           <Link

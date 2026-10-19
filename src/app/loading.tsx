@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 
 export default function Loading() {
   return (
-    <div className="fixed inset-0 min-h-screen w-full flex flex-col items-center justify-center bg-white/90 backdrop-blur-md z-[9999] animate-in fade-in duration-500 overflow-hidden">
+    <div className="fixed inset-0 min-h-screen w-full flex flex-col items-center justify-center bg-white/90 backdrop-blur-md z-[9999] animate-fade-in overflow-hidden">
       <div className="relative">
         <div className="absolute inset-0 rounded-full bg-accent-subtle animate-ping opacity-25" />
         <div className="relative bg-white p-6 rounded-xl shadow-card border border-zinc-100 flex items-center justify-center">

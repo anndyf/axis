@@ -57,8 +57,8 @@ export default function PlanoView({ planoId, onClose }: PlanoViewProps) {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-        <div className="bg-white p-8 rounded-lg shadow-card flex flex-col items-center gap-3">
+      <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm animate-fade-in">
+        <div className="bg-white p-8 rounded-lg shadow-overlay flex flex-col items-center gap-3">
             <div className="w-8 h-8 border-3 border-accent/25 border-t-accent rounded-full animate-spin" />
             <p className="text-fg-subtle text-xs font-bold uppercase tracking-widest animate-pulse">Buscando Detalhes...</p>
         </div>
@@ -71,8 +71,8 @@ export default function PlanoView({ planoId, onClose }: PlanoViewProps) {
   const formatDate = (date: string) => new Date(date).toLocaleDateString('pt-BR', { timeZone: 'UTC' })
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-white w-full max-w-4xl max-h-[90vh] rounded-xl shadow-card flex flex-col overflow-hidden animate-in zoom-in-95 duration-300 border border-zinc-100">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white w-full max-w-4xl max-h-[90vh] rounded-xl shadow-overlay flex flex-col overflow-hidden animate-pop-in border border-zinc-100">
         
         {/* Header Compact */}
         <div className="px-6 py-5 border-b border-zinc-50 flex items-center justify-between bg-white relative shrink-0">

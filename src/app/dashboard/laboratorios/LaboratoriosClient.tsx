@@ -219,7 +219,7 @@ export default function LaboratoriosClient({
   const selectedTurma = myTurmas.find(t => t.id === selectedTurmaId)
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 pb-20">
+    <div className="max-w-7xl mx-auto space-y-8 animate-fade-in pb-20">
       {/* Header Centralizado */}
       <section className="bg-white border border-zinc-200 rounded-xl p-8 shadow-sm relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-zinc-500/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
@@ -346,7 +346,7 @@ export default function LaboratoriosClient({
             </div>
 
             {initialLaboratorios.find(l => l.id === selectedLab)?.descricao && (
-               <div className="p-4 bg-zinc-50 rounded-lg border border-zinc-200 animate-in slide-in-from-top-2">
+               <div className="p-4 bg-zinc-50 rounded-lg border border-zinc-200 animate-slide-up">
                   <div className="flex items-center gap-2 mb-2">
                     <Info size={14} className="text-accent-fg" />
                     <span className="text-[10px] font-bold text-fg-subtle uppercase tracking-widest">Sobre este espaço</span>
@@ -362,7 +362,7 @@ export default function LaboratoriosClient({
          {/* Grade de Horários */}
          <div className="lg:col-span-3 space-y-6">
             {message && (
-              <div className={`p-4 rounded-lg flex items-center gap-3 animate-in slide-in-from-top-4 duration-300 ${
+              <div className={`p-4 rounded-lg flex items-center gap-3 animate-slide-up ${
                 message.type === 'success' ? 'bg-success-subtle border border-success-line text-success-fg' : 'bg-danger-subtle border border-danger-line text-danger-fg'
               }`}>
                 {message.type === 'success' ? <CheckCircle2 size={18}/> : <AlertCircle size={18}/>}
@@ -476,8 +476,8 @@ export default function LaboratoriosClient({
 
       {/* Modal de Reserva de Horário */}
       {showModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-           <div className="bg-white rounded-xl shadow-card w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
+           <div className="bg-white rounded-xl shadow-overlay w-full max-w-md overflow-hidden animate-pop-in">
               <div className="p-6 border-b border-zinc-100 flex items-center justify-between">
                  <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-zinc-100 text-fg rounded-xl flex items-center justify-center"><Clock size={20}/></div>
@@ -496,7 +496,7 @@ export default function LaboratoriosClient({
 
               <div className="p-8 space-y-6">
                  {message && (
-                   <div className={`p-4 rounded-lg flex items-center gap-3 animate-in fade-in duration-300 ${
+                   <div className={`p-4 rounded-lg flex items-center gap-3 animate-fade-in ${
                      message.type === 'success' ? 'bg-success-subtle border border-success-line text-success-fg' : 'bg-danger-subtle border border-danger-line text-danger-fg'
                    }`}>
                      {message.type === 'success' ? <CheckCircle2 size={18}/> : <AlertCircle size={18}/>}
@@ -593,8 +593,8 @@ export default function LaboratoriosClient({
 
       {/* Modal de Cadastro de Laboratório (Admin) */}
       {showLabModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-           <div className="bg-white rounded-xl shadow-card w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
+           <div className="bg-white rounded-xl shadow-overlay w-full max-w-md overflow-hidden animate-pop-in">
               <div className="p-6 border-b border-zinc-100 flex items-center justify-between bg-zinc-50">
                  <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-zinc-900 text-white rounded-xl flex items-center justify-center shadow-card"><Monitor size={20}/></div>

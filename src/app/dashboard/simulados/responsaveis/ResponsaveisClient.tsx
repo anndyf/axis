@@ -140,7 +140,7 @@ export default function ResponsaveisClient({
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-500">
+    <div className="max-w-6xl mx-auto space-y-8 animate-fade-in">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
@@ -233,7 +233,7 @@ export default function ResponsaveisClient({
               </div>
 
               {message && (
-                <div className={`p-3 rounded-xl flex items-center gap-2 text-xs font-medium animate-in slide-in-from-top-1 ${
+                <div className={`p-3 rounded-xl flex items-center gap-2 text-xs font-medium animate-slide-up ${
                   message.type === 'success' ? 'bg-success-subtle text-success-fg' : 'bg-danger-subtle text-danger-fg'
                 }`}>
                   {message.type === 'success' ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}

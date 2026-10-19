@@ -583,7 +583,7 @@ export default function SimuladosClient({
                   setMissingStudentForm(p => ({ ...p, turmaId: selectedTurma }))
                   setShowMissingStudentModal(true)
                 }}
-                className="flex items-center gap-2 bg-accent hover:bg-accent text-white px-4 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-widest transition-all shadow-card active:scale-95 shrink-0"
+                className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-4 py-2 rounded-xl text-[10px] font-semibold uppercase tracking-widest transition-all shadow-card active:scale-95 shrink-0"
               >
                 <UserPlus size={14} />
                 Reportar Ausência
@@ -735,8 +735,8 @@ export default function SimuladosClient({
       </main>
 
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-xl shadow-card w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 border border-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-xl shadow-overlay w-full max-w-lg overflow-hidden animate-pop-in border border-white">
             <div className="px-6 py-5 border-b border-zinc-200 flex justify-between items-center bg-zinc-50">
               <div className="flex items-center gap-3">
                  <div className="w-10 h-10 bg-zinc-600 text-white rounded-xl flex items-center justify-center shadow-card"><Save size={20}/></div>
@@ -787,8 +787,8 @@ export default function SimuladosClient({
       
       {/* Modal de Boas Vindas */}
       {showWelcomeModal && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-xl shadow-card w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 text-center">
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-xl shadow-overlay w-full max-w-md overflow-hidden animate-pop-in text-center">
             <div className="p-8 pt-10">
               <div className="w-20 h-20 bg-accent-subtle text-accent-fg rounded-full flex items-center justify-center mx-auto mb-6 shadow-card border border-accent/25">
                  <CheckCircle2 size={40} />
@@ -801,7 +801,7 @@ export default function SimuladosClient({
             <div className="p-6 bg-zinc-50 border-t border-zinc-100">
               <button
                 onClick={() => setShowWelcomeModal(false)}
-                className="w-full py-3.5 bg-accent hover:bg-accent text-white rounded-xl font-bold uppercase tracking-widest text-xs transition-all shadow-card active:scale-95"
+                className="w-full py-3.5 bg-accent hover:bg-accent-hover text-on-accent rounded-xl font-bold uppercase tracking-widest text-xs transition-all shadow-card active:scale-95"
               >
                 Ciente, iniciar lançamentos
               </button>
@@ -812,8 +812,8 @@ export default function SimuladosClient({
 
             {/* Modal do Gabarito Professor */}
       {showGabaritoModal && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-zinc-900/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-lg shadow-card w-full max-w-5xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 relative p-4 custom-scrollbar">
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-zinc-900/80 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-lg shadow-overlay w-full max-w-5xl max-h-[90vh] overflow-y-auto animate-pop-in relative p-4 custom-scrollbar">
             <button 
               onClick={() => setShowGabaritoModal(false)}
               className="absolute top-6 right-6 p-2 bg-zinc-100 hover:bg-zinc-200 rounded-full transition-colors z-10 print:hidden"
@@ -833,8 +833,8 @@ export default function SimuladosClient({
         </div>
       )}
       {showGabaritoModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-xl shadow-card w-full max-w-xl overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-xl shadow-overlay w-full max-w-xl overflow-hidden animate-pop-in">
             <div className="px-6 py-5 border-b border-zinc-200 flex justify-between items-center bg-zinc-50">
               <h3 className="text-lg font-medium text-fg flex items-center gap-2">
                 <Target size={20} className="text-accent-fg"/>
@@ -868,8 +868,8 @@ export default function SimuladosClient({
 
       {/* Modal para Estudante Faltando */}
       {showMissingStudentModal && (
-        <div className="fixed inset-0 bg-zinc-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-xl shadow-card max-w-md w-full overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 bg-zinc-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-fade-in">
+          <div className="bg-white rounded-xl shadow-overlay max-w-md w-full overflow-hidden animate-pop-in">
             <div className="p-6 border-b border-zinc-100 flex justify-between items-center bg-zinc-50">
               <h3 className="text-xl font-bold text-fg flex items-center gap-2">
                 <UserPlus className="w-5 h-5 text-accent-fg" />
@@ -967,7 +967,7 @@ export default function SimuladosClient({
                 <button
                   type="submit"
                   disabled={submittingMissingStudent}
-                  className="flex-1 py-3 text-sm font-medium text-white bg-accent hover:bg-accent rounded-xl transition-all flex items-center justify-center gap-2 shadow-card disabled:opacity-50"
+                  className="flex-1 py-3 text-sm font-medium text-on-accent bg-accent hover:bg-accent-hover rounded-xl transition-all flex items-center justify-center gap-2 shadow-card disabled:opacity-50"
                 >
                   {submittingMissingStudent ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                   Enviar Solicitação

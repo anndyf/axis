@@ -435,7 +435,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                         onClick={() => setFormData(p => ({ ...p, numero: n }))}
                         className={`flex-1 py-2.5 rounded-lg font-semibold text-sm transition-all border ${
                           formData.numero === n
-                          ? 'bg-accent border-accent text-white shadow-card' 
+                          ? 'bg-accent border-accent text-on-accent shadow-card' 
                           : 'bg-zinc-50 border-transparent text-black hover:bg-zinc-100'
                         }`}
                       >
@@ -497,7 +497,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
 
                   <button
                     type="submit" disabled={loading}
-                    className="flex-[1.5] flex items-center justify-center space-x-2 bg-accent text-white py-4 px-6 rounded-lg font-semibold hover:bg-accent transition-all shadow-card active:scale-[0.98] disabled:opacity-50"
+                    className="flex-[1.5] flex items-center justify-center space-x-2 bg-accent text-on-accent py-4 px-6 rounded-lg font-semibold hover:bg-accent-hover transition-all shadow-card active:scale-[0.98] disabled:opacity-50"
                   >
                     {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
                     <span className="text-sm uppercase tracking-wide">

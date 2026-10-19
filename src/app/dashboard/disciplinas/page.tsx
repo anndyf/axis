@@ -64,7 +64,7 @@ export default async function DisciplinasPage() {
             </p>
             <Link
               href="/dashboard/disciplinas/nova"
-              className="inline-flex items-center space-x-2 bg-accent text-white px-6 py-3 rounded-lg hover:bg-accent transition-colors"
+              className="inline-flex items-center space-x-2 bg-accent text-on-accent px-6 py-3 rounded-lg hover:bg-accent-hover transition-colors"
             >
               <Plus className="w-5 h-5" />
               <span>Criar Primeira Disciplina</span>

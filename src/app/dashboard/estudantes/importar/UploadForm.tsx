@@ -288,7 +288,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
 
         <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-zinc-300 p-6">
           {isFinished ? (
-            <div className="py-10 text-center animate-in fade-in zoom-in-95 duration-300">
+            <div className="py-10 text-center animate-pop-in">
                {message?.type === 'success' ? (
                  <div className="w-20 h-20 bg-success-subtle text-success-fg rounded-full flex items-center justify-center mx-auto mb-6">
                    <CheckCircle className="w-10 h-10" />
@@ -409,7 +409,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
                     </div>
 
                     {showTurmaDropdown && (
-                        <div className="absolute z-50 mt-2 w-full bg-white border border-zinc-200 rounded-xl shadow-overlay max-h-72 overflow-y-auto animate-in fade-in slide-in-from-top-1 duration-200 py-2">
+                        <div className="absolute z-50 mt-2 w-full bg-white border border-zinc-200 rounded-xl shadow-overlay max-h-72 overflow-y-auto animate-slide-up py-2">
                              {filteredTurmas.length === 0 ? (
                                 <div className="px-4 py-6 text-center text-sm text-fg-subtle font-medium">
                                     Nenhuma turma encontrada para "{turmaSearch}"
@@ -498,7 +498,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
               <Link href="/dashboard/estudantes" className="px-6 py-3 text-fg hover:bg-zinc-200 rounded-lg transition-colors">Cancelar</Link>
               <button 
                 type="submit" disabled={loading || preview.length === 0 || !manualTurma.trim()}
-                className={`flex items-center space-x-2 text-white px-6 py-3 rounded-lg transition-all shadow-card disabled:opacity-50 disabled:cursor-not-allowed ${syncMode ? ' bg-danger hover:bg-danger ' : ' bg-zinc-700 to-zinc-700 hover:bg-zinc-800 hover:to-zinc-800'}`}
+                className={`flex items-center space-x-2 text-white px-6 py-3 rounded-lg transition-all shadow-card disabled:opacity-50 disabled:cursor-not-allowed ${syncMode ? ' bg-danger hover:bg-danger ' : ' bg-zinc-700 hover:bg-zinc-800'}`}
               >
                 <Upload className="w-5 h-5" />
                 <span>{loading ? 'Importando...' : (syncMode ? 'Sincronizar Turma' : 'Importar Turma')}</span>

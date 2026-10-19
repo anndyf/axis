@@ -182,7 +182,7 @@ export default function PendenciasClient({
           <div className="flex items-center gap-3 w-full md:w-auto">
             <Link 
               href="/dashboard/estudantes/novo"
-              className="flex-1 md:flex-none text-center bg-accent text-white px-6 py-3 rounded-xl font-bold hover:bg-accent transition-all shadow-card active:scale-95"
+              className="flex-1 md:flex-none text-center bg-accent text-on-accent px-6 py-3 rounded-xl font-bold hover:bg-accent-hover transition-all shadow-card active:scale-95"
             >
               + Cadastrar Aluno
             </Link>
@@ -227,13 +227,13 @@ export default function PendenciasClient({
           <div className="flex bg-white p-1 rounded-lg border border-zinc-200 shadow-sm">
             <button 
               onClick={() => updateFilters({ status: 'pendente' })}
-              className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${!serverFilters.showResolved ? 'bg-accent text-white shadow-card' : 'text-fg-subtle hover:bg-zinc-50'}`}
+              className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${!serverFilters.showResolved ? 'bg-accent text-on-accent shadow-card' : 'text-fg-subtle hover:bg-zinc-50'}`}
             >
               Pendências
             </button>
             <button 
               onClick={() => updateFilters({ status: 'resolvido' })}
-              className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${serverFilters.showResolved ? 'bg-accent text-white shadow-card' : 'text-fg-subtle hover:bg-zinc-50'}`}
+              className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${serverFilters.showResolved ? 'bg-accent text-on-accent shadow-card' : 'text-fg-subtle hover:bg-zinc-50'}`}
             >
               Histórico / Resolvidos
             </button>
@@ -369,7 +369,7 @@ export default function PendenciasClient({
                               
                               {/* Advanced Controls Dropdown */}
                               {isExpanded && (
-                                <div className="grid grid-cols-1 gap-2 animate-in fade-in duration-300">
+                                <div className="grid grid-cols-1 gap-2 animate-fade-in">
                                   <div className="flex gap-2">
                                     <div className="flex-1 flex flex-col gap-1">
                                       <label className="text-[9px] font-semibold text-fg-subtle uppercase tracking-widest ml-1">Status Interno:</label>
@@ -393,7 +393,7 @@ export default function PendenciasClient({
 
                         {/* Details and Conversation History */}
                         {isExpanded && (
-                          <div className="bg-zinc-50 border-t border-zinc-100 p-6 space-y-6 animate-in slide-in-from-top-2 duration-300">
+                          <div className="bg-zinc-50 border-t border-zinc-100 p-6 space-y-6 animate-slide-up">
                             {/* Original Observation */}
                             {item.observacao && (
                               <div className="space-y-2">
@@ -442,8 +442,8 @@ export default function PendenciasClient({
 
       {/* Reply Modal */}
       {replyingTo && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white rounded-[32px] w-full max-w-2xl shadow-card border border-zinc-100 overflow-hidden animate-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-[32px] w-full max-w-2xl shadow-overlay border border-zinc-100 overflow-hidden animate-pop-in">
             <div className="px-8 py-6 flex items-center justify-between border-b bg-zinc-50/50 border-zinc-100">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 bg-accent-subtle text-accent-fg rounded-xl">
@@ -471,7 +471,7 @@ export default function PendenciasClient({
                     <button
                       key={template.label}
                       onClick={() => setReplyContent(template.text)}
-                      className="px-4 py-2 bg-accent-subtle text-accent-fg text-xs font-bold rounded-xl border border-accent/25 hover:bg-accent hover:text-white transition-all active:scale-95"
+                      className="px-4 py-2 bg-accent-subtle text-accent-fg text-xs font-bold rounded-xl border border-accent/25 hover:bg-accent-hover hover:text-white transition-all active:scale-95"
                     >
                       {template.label}
                     </button>
@@ -500,7 +500,7 @@ export default function PendenciasClient({
                 <button
                   onClick={handleSendReply}
                   disabled={isSendingReply || !replyContent.trim()}
-                  className="flex-1 px-6 py-4 bg-accent text-white rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:bg-accent transition-all shadow-card active:scale-95 disabled:opacity-50"
+                  className="flex-1 px-6 py-4 bg-accent text-on-accent rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:bg-accent-hover transition-all shadow-card active:scale-95 disabled:opacity-50"
                 >
                   {isSendingReply ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                   Enviar Mensagem

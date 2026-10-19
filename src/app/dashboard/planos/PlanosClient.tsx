@@ -319,7 +319,7 @@ export default function PlanosClient() {
                                 </button>
 
                                 {isExpanded && (
-                                    <div className="bg-zinc-50/20 border-t border-zinc-200/50 animate-in slide-in-from-top-2 duration-300 pb-2">
+                                    <div className="bg-zinc-50/20 border-t border-zinc-200/50 animate-slide-up pb-2">
                                         {Object.keys(groupedData[turmaNome]).map(month => (
                                             <div key={month} className="space-y-0">
                                                 <div className="px-8 py-3 bg-zinc-50 border-b border-zinc-200 flex items-center gap-3">

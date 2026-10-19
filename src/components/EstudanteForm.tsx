@@ -250,7 +250,7 @@ export default function EstudanteForm({ estudante, isEdit = false }: EstudanteFo
 
       {/* Toast Notification */}
       {resultMsg && (
-        <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-4 duration-300">
+        <div className="fixed bottom-6 right-6 z-50 animate-slide-up">
           <div className={`flex items-center gap-3 text-white px-5 py-3.5 rounded-lg shadow-card max-w-sm border ${
             resultMsg.ok
               ? 'bg-success border-success '

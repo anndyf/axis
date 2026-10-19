@@ -73,7 +73,7 @@ function Opcoes<T extends string>({ valor, opcoes, onChange }: { valor: T; opcoe
       {opcoes.map(o => (
         <button
           key={o.valor} type="button" title={o.ajuda} onClick={() => onChange(o.valor)}
-          className={`px-3 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wide transition-all border ${valor === o.valor ? 'bg-accent text-white border-accent shadow-card ' : 'bg-white text-fg-subtle border-zinc-200 hover:border-zinc-300'}`}
+          className={`px-3 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wide transition-all border ${valor === o.valor ? 'bg-accent text-on-accent border-accent shadow-card ' : 'bg-white text-fg-subtle border-zinc-200 hover:border-zinc-300'}`}
         >
           {o.rotulo}
         </button>
@@ -230,8 +230,8 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-white rounded-xl w-full max-w-2xl shadow-card border border-zinc-100 overflow-hidden animate-in zoom-in-95 duration-300 my-8 flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white rounded-xl w-full max-w-2xl shadow-overlay border border-zinc-100 overflow-hidden animate-pop-in my-8 flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className={`px-8 py-6 border-b border-zinc-100 flex items-center justify-between shrink-0 ${isEdit ? 'bg-warning-subtle' : 'bg-zinc-50'}`}>
           <div className="flex items-center space-x-3">
@@ -254,7 +254,7 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
 
         <div className="p-8 space-y-8 overflow-y-auto">
           {error && (
-            <div className="p-4 bg-danger-subtle border border-danger-line rounded-xl text-danger-fg text-xs font-semibold animate-in slide-in-from-top-2">
+            <div className="p-4 bg-danger-subtle border border-danger-line rounded-xl text-danger-fg text-xs font-semibold animate-slide-up">
               {error}
             </div>
           )}

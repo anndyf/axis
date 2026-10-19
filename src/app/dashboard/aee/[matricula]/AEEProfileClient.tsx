@@ -192,7 +192,7 @@ export default function AEEProfileClient({
             
             {/* Card de Identificação Estilo Perfil */}
             <div className="bg-white rounded-xl shadow-card border border-zinc-200 relative overflow-hidden group">
-               <div className="absolute top-0 left-0 w-full h-24 bg-zinc-900 to-zinc-600" />
+               <div className="absolute top-0 left-0 w-full h-24 bg-zinc-900" />
                
                <div className="relative flex flex-col items-center mt-8 px-6 pb-8">
                   <div className="w-24 h-24 bg-white p-1.5 rounded-xl shadow-card relative">

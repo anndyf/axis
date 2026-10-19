@@ -153,14 +153,14 @@ export default function ProfilePage() {
               </div>
 
               {error && (
-                <div className="p-4 bg-danger-subtle border border-danger-line rounded-xl text-danger-fg text-xs font-medium flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
+                <div className="p-4 bg-danger-subtle border border-danger-line rounded-xl text-danger-fg text-xs font-medium flex items-center gap-2 animate-slide-up">
                   <AlertCircle className="w-4 h-4" />
                   {error}
                 </div>
               )}
 
               {success && (
-                <div className="p-4 bg-success-subtle border border-success-line rounded-xl text-success-fg text-xs font-medium flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
+                <div className="p-4 bg-success-subtle border border-success-line rounded-xl text-success-fg text-xs font-medium flex items-center gap-2 animate-slide-up">
                   <CheckCircle2 className="w-4 h-4" />
                   Senha alterada com sucesso!
                 </div>
@@ -190,8 +190,8 @@ export default function ProfilePage() {
 
       {/* Modal de Confirmação para Senha */}
       {showConfirm && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-sm rounded-xl p-8 shadow-card animate-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white w-full max-w-sm rounded-xl p-8 shadow-overlay animate-pop-in">
             <div className="w-16 h-16 bg-zinc-100 text-fg-muted rounded-lg flex items-center justify-center mb-6">
               <Key className="w-8 h-8" />
             </div>

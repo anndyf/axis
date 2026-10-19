@@ -67,7 +67,7 @@ export default async function TurmasPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-32">
         {turmas.length > 0 && (
-          <div className="relative overflow-hidden bg-zinc-700 to-zinc-700 rounded-lg p-6 mb-6 shadow-card">
+          <div className="relative overflow-hidden bg-zinc-700 rounded-lg p-6 mb-6 shadow-card">
             <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-medium text-white mb-1">Gestão de Turmas</h2>

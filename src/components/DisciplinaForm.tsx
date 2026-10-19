@@ -421,7 +421,7 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
               <button
                 type="submit"
                 disabled={loading || (!isEdit && selectedTurmas.length === 0)}
-                className="flex items-center space-x-2 bg-accent text-white px-8 py-3 rounded-lg hover:bg-accent transition-all shadow-card disabled:opacity-50 font-medium"
+                className="flex items-center space-x-2 bg-accent text-on-accent px-8 py-3 rounded-lg hover:bg-accent-hover transition-all shadow-card disabled:opacity-50 font-medium"
               >
                 {loading ? (
                   <>

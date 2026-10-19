@@ -45,11 +45,11 @@ export default function MessageNotification() {
   if (!show || !latestMessage || isMessagesPage) return null
 
   return (
-    <div className="fixed bottom-6 right-6 z-[9999] animate-in slide-in-from-right-10 duration-500 print:hidden">
+    <div className="fixed bottom-6 right-6 z-[9999] animate-slide-up print:hidden">
       <div className="bg-white border border-zinc-200 rounded-xl shadow-card p-1 flex items-center gap-4 max-w-sm overflow-hidden ring-1 ring-zinc-900/5">
         
         <div className="relative shrink-0 ml-1">
-          <div className="w-14 h-14 bg-accent rounded-xl flex items-center justify-center text-white shadow-card">
+          <div className="w-14 h-14 bg-accent rounded-xl flex items-center justify-center text-on-accent shadow-card">
             <MessageSquare size={24} />
           </div>
           <div className="absolute -top-1 -right-1 w-5 h-5 bg-danger border-2 border-white rounded-full flex items-center justify-center">

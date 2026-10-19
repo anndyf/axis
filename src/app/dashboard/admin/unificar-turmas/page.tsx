@@ -111,7 +111,7 @@ export default function MigracaoPage() {
       <button
         onClick={handleMerge}
         disabled={merging || !selection.from || !selection.to}
-        className="w-full bg-accent hover:bg-accent disabled:bg-zinc-400 text-white font-bold py-4 rounded-xl shadow-card transition-all flex items-center justify-center gap-3"
+        className="w-full bg-accent hover:bg-accent-hover disabled:bg-zinc-400 text-on-accent font-bold py-4 rounded-xl shadow-card transition-all flex items-center justify-center gap-3"
       >
         {merging ? <Loader2 className="animate-spin" /> : <ArrowRight />}
         {merging ? 'Processando Migração...' : 'Unificar Turmas Agora'}

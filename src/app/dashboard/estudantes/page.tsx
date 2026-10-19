@@ -334,7 +334,7 @@ export default async function EstudantesPage({
                                     {estudante.aeeProfile && (
                                       <Link 
                                         href={`/dashboard/aee/${estudante.matricula}`}
-                                        className="p-1 bg-accent-subtle text-accent-fg rounded-lg border border-accent/25 hover:bg-accent hover:text-white transition-all shadow-sm"
+                                        className="p-1 bg-accent-subtle text-accent-fg rounded-lg border border-accent/25 hover:bg-accent-hover hover:text-white transition-all shadow-sm"
                                         title="Aluno com Atendimento Especializado (AEE)"
                                       >
                                         <Accessibility className="w-3.5 h-3.5" />

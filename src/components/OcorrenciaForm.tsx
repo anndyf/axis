@@ -107,8 +107,8 @@ export default function OcorrenciaForm({
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/80 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-white rounded-xl shadow-card w-full max-w-4xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/80 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white rounded-xl shadow-overlay w-full max-w-4xl overflow-hidden animate-pop-in flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="px-8 py-6 border-b border-zinc-100 flex justify-between items-center bg-zinc-50/50">
           <div className="flex items-center gap-4">
@@ -190,7 +190,7 @@ export default function OcorrenciaForm({
                 
                 {/* Search Results Dropdown */}
                 {searchResults.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-zinc-200 rounded-lg shadow-overlay z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-zinc-200 rounded-lg shadow-overlay z-50 overflow-hidden animate-slide-up">
                     {searchResults.map(est => (
                       <button
                         key={est.matricula}

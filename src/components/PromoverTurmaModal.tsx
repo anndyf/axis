@@ -58,8 +58,8 @@ export default function PromoverTurmaModal({
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-xl w-full max-w-md shadow-card overflow-hidden border border-zinc-100 flex flex-col animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white rounded-xl w-full max-w-md shadow-overlay overflow-hidden border border-zinc-100 flex flex-col animate-pop-in">
         <div className="flex items-center justify-between p-6 border-b border-zinc-50 bg-zinc-50/50">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-accent-subtle rounded-xl flex items-center justify-center">
@@ -138,7 +138,7 @@ export default function PromoverTurmaModal({
             <button
               type="submit"
               disabled={loading || !nome}
-              className="flex-1 py-3 px-4 bg-accent hover:bg-accent text-white rounded-xl text-sm font-semibold shadow-card transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="flex-1 py-3 px-4 bg-accent hover:bg-accent-hover text-on-accent rounded-xl text-sm font-semibold shadow-card transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {loading ? <Loader2 size={18} className="animate-spin" /> : <ArrowUpCircle size={18} />}
               Confirmar Promoção

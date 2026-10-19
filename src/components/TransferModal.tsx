@@ -81,8 +81,8 @@ export default function TransferModal({ isOpen, onClose, fromUserId, fromUserNam
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-xl w-full max-w-md shadow-card border border-zinc-200 overflow-hidden transform animate-in slide-in-from-bottom-4 duration-300">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white rounded-xl w-full max-w-md shadow-overlay border border-zinc-200 overflow-hidden transform animate-slide-up">
         <div className="p-6 border-b border-zinc-100 flex items-center justify-between bg-zinc-50">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-warning-subtle rounded-lg flex items-center justify-center">

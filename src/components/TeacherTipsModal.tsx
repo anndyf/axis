@@ -51,8 +51,8 @@ export default function TeacherTipsModal({ storageKey, tips, title }: TeacherTip
   const currentTip = tips[currentStep]
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-zinc-900/80 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="bg-white rounded-xl w-full max-w-lg shadow-card overflow-hidden border border-zinc-100 flex flex-col animate-in slide-in-from-bottom-8 duration-500">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-zinc-900/80 backdrop-blur-md animate-fade-in">
+      <div className="bg-white rounded-xl w-full max-w-lg shadow-overlay overflow-hidden border border-zinc-100 flex flex-col animate-slide-up">
         
         {/* Header com gradiente sutil */}
         <div className="p-8 pb-4 flex items-center justify-between">

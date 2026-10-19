@@ -95,8 +95,8 @@ export default function PlanoForm({ plano, onSuccess, onClose }: PlanoFormProps)
   }
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-white w-full max-w-4xl max-h-[90vh] rounded-xl shadow-card flex flex-col overflow-hidden animate-in zoom-in-95 duration-300 border border-zinc-100">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white w-full max-w-4xl max-h-[90vh] rounded-xl shadow-overlay flex flex-col overflow-hidden animate-pop-in border border-zinc-100">
         
         {/* Header Compact */}
         <div className="px-6 py-5 border-b border-zinc-100 bg-white flex items-center justify-between shrink-0">
@@ -116,7 +116,7 @@ export default function PlanoForm({ plano, onSuccess, onClose }: PlanoFormProps)
 
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-zinc-50/30">
           {error && (
-            <div className="p-3 bg-danger-subtle border border-danger-line rounded-xl flex items-center gap-3 text-danger-fg text-xs font-bold animate-in slide-in-from-top-2">
+            <div className="p-3 bg-danger-subtle border border-danger-line rounded-xl flex items-center gap-3 text-danger-fg text-xs font-bold animate-slide-up">
               <AlertCircle size={16} /> {error}
             </div>
           )}
@@ -186,7 +186,7 @@ export default function PlanoForm({ plano, onSuccess, onClose }: PlanoFormProps)
                               <button
                                 key={turma.id} type="button" onClick={() => toggleTurma(turma.id)}
                                 className={`px-4 py-2 rounded-xl text-[11px] font-bold transition-all ${
-                                  formData.turmasIds.includes(turma.id) ? 'bg-accent text-white shadow-card ' : 'bg-zinc-50 text-fg-subtle border border-zinc-100 hover:bg-zinc-100'
+                                  formData.turmasIds.includes(turma.id) ? 'bg-accent text-on-accent shadow-card ' : 'bg-zinc-50 text-fg-subtle border border-zinc-100 hover:bg-zinc-100'
                                 }`}
                               >
                                   {turma.nome}

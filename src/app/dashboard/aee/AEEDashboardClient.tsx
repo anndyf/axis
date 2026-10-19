@@ -394,7 +394,7 @@ export default function AEEDashboardClient({
             </div>
           </>
         ) : (
-          <div className="animate-in slide-in-from-bottom-4 duration-500 space-y-12">
+          <div className="animate-slide-up space-y-12">
              {activePanel === 'create' && !selectedStudent ? (
                 <div className="max-w-2xl mx-auto space-y-8 py-10">
                    <div className="text-center space-y-2">
@@ -428,7 +428,7 @@ export default function AEEDashboardClient({
                    </div>
                 </div>
              ) : (
-                <div className="space-y-12 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <div className="space-y-12 animate-slide-up">
                    {/* DESKTOP BANNER: Identificação Horizontal */}
                    <div className="bg-white border border-zinc-200 p-4 rounded-xl flex flex-col md:flex-row items-center gap-6 shadow-card">
                       <div className="relative group shrink-0">
@@ -709,7 +709,7 @@ export default function AEEDashboardClient({
 
                    {/* Relatório de Ciência Nominal */}
                    {activePanel === 'edit' && isDirecao && (
-                      <div id="relatorio-leituras" className="pt-10 border-t border-zinc-200 space-y-8 animate-in fade-in duration-700">
+                      <div id="relatorio-leituras" className="pt-10 border-t border-zinc-200 space-y-8 animate-fade-in">
                          <div className="flex items-center justify-between">
                             <h3 className="text-base font-bold text-fg uppercase tracking-widest flex items-center gap-3">
                                <div className="w-1.5 h-6 bg-accent rounded-full" />

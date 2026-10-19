@@ -119,14 +119,14 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
         </div>
       </header>
 
-      <main className="flex-1 pb-24 md:pb-8 pt-4 md:pt-8 px-4 md:px-8 max-w-7xl mx-auto w-full animate-in fade-in duration-500">
+      <main className="flex-1 pb-24 md:pb-8 pt-4 md:pt-8 px-4 md:px-8 max-w-7xl mx-auto w-full animate-fade-in">
         
         {/* Tab: Home */}
         {activeTab === 'home' && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                {/* Status Acadêmico */}
-               <div className="bg-accent rounded-xl p-8 text-white shadow-card relative overflow-hidden group flex flex-col justify-between min-h-[200px]">
+               <div className="bg-accent rounded-xl p-8 text-on-accent shadow-card relative overflow-hidden group flex flex-col justify-between min-h-[200px]">
                  <div className="relative z-10">
                    <h2 className="text-2xl font-semibold mb-1 tracking-tight">Status Atual</h2>
                    <p className="text-on-accent/80 font-medium text-xs mb-6 opacity-80">Seu resumo acadêmico.</p>
@@ -208,7 +208,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
 
         {/* Tab: Messages */}
         {activeTab === 'messages' && (
-          <div className="space-y-4 animate-in slide-in-from-bottom-4 duration-300">
+          <div className="space-y-4 animate-slide-up">
             <div className="hidden md:flex mb-6">
                <button 
                  onClick={() => setActiveTab('home')}
@@ -237,7 +237,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
                        {new Date(msg.createdAt).toLocaleDateString()}
                     </span>
                     {isMessageNew(msg) && (
-                        <span className="px-2 py-0.5 bg-accent text-white text-[8px] font-semibold uppercase tracking-widest rounded-full">Nova</span>
+                        <span className="px-2 py-0.5 bg-accent text-on-accent text-[8px] font-semibold uppercase tracking-widest rounded-full">Nova</span>
                     )}
                   </div>
                   <h4 className="text-sm font-semibold text-fg mb-1 leading-tight">{msg.subject}</h4>
@@ -255,7 +255,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
 
         {/* Tab: Grades */}
         {activeTab === 'grades' && (
-          <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-300">
+          <div className="space-y-6 animate-slide-up">
             <div className="hidden md:flex mb-2">
                <button 
                  onClick={() => setActiveTab('home')}
@@ -351,7 +351,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
 
         {/* Tab: Profile */}
         {activeTab === 'profile' && (
-           <div className="max-w-md mx-auto space-y-8 animate-in slide-in-from-bottom-4 duration-300">
+           <div className="max-w-md mx-auto space-y-8 animate-slide-up">
             <div className="hidden md:flex mb-2">
                <button 
                  onClick={() => setActiveTab('home')}
@@ -415,7 +415,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
       </main>
 
       {/* FIXED MOBILE BAR */}
-      <nav className="md:hidden fixed bottom-6 left-6 right-6 bg-zinc-900/95 backdrop-blur-xl border border-white/10 rounded-xl py-3 px-6 shadow-overlay z-[60] flex justify-between items-center animate-in slide-in-from-bottom-10 duration-500">
+      <nav className="md:hidden fixed bottom-6 left-6 right-6 bg-zinc-900/95 backdrop-blur-xl border border-white/10 rounded-xl py-3 px-6 shadow-overlay z-[60] flex justify-between items-center animate-slide-up">
         <button 
             onClick={() => setActiveTab('home')}
             className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'home' ? 'text-white scale-110' : 'text-fg-subtle'}`}
@@ -457,7 +457,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
             className="absolute inset-0 bg-zinc-900/40 backdrop-blur-sm transition-opacity" 
             onClick={() => setSelectedMessage(null)}
           />
-          <div className="bg-white rounded-xl shadow-card relative w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="bg-white rounded-xl shadow-card relative w-full max-w-2xl overflow-hidden animate-pop-in">
             <div className="bg-zinc-50 border-b border-zinc-100 p-6 md:p-8 flex justify-between items-start">
               <div className="pr-10">
                 <span className="inline-block px-3 py-1 bg-accent-subtle text-accent-fg rounded-lg text-[10px] font-semibold uppercase tracking-widest mb-3">
@@ -509,7 +509,7 @@ export default function PortalClient({ initialData, user, nomeEscola }: { initia
             className="absolute inset-0 bg-zinc-900/60 backdrop-blur-sm transition-opacity" 
             onClick={() => setIsScheduleOpen(false)}
           />
-          <div className="bg-white rounded-xl shadow-card relative w-full max-w-5xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+          <div className="bg-white rounded-xl shadow-card relative w-full max-w-5xl overflow-hidden animate-pop-in flex flex-col max-h-[90vh]">
             <div className="bg-zinc-50 border-b border-zinc-200 p-6 flex justify-between items-center shrink-0">
                <div>
                  <h3 className="text-xl font-semibold text-fg flex items-center gap-2">

@@ -120,7 +120,34 @@ def dinamica(m):
     return f'{prefixo}border-line'
 
 
+ANIMACAO = re.compile(r'(?<![\w-])animate-in(?:\s+(?:fade-in|zoom-in-\d+|zoom-in-\[[^\]]+\]|slide-in-from-[a-z]+(?:-\d+)?|duration-\d+))*(?![\w-])')
+
+
+def animacao(m):
+    # tailwindcss-animate não está no projeto: animate-in nunca funcionou -> animações de 150ms do design system
+    s = m.group(0)
+    return 'animate-pop-in' if 'zoom-in' in s else 'animate-slide-up' if 'slide-in' in s else 'animate-fade-in'
+
+
+def acabamento(texto):
+    """Ajustes por className: texto sobre o destaque legível com qualquer cor
+    de escola; degradês órfãos (to-/via- sem bg-gradient)."""
+    def ajustar(m):
+        cls = m.group(0)
+        if re.search(r'(?<![\w:/-])bg-accent(?![\w-])', cls):
+            cls = re.sub(r'(?<![\w/-])text-white(?![\w/-])', 'text-on-accent', cls)
+        # hover de botão sólido no destaque: tom mais escuro (bg-blue-600 + hover:bg-blue-700)
+        cls = re.sub(r'(?<![\w-])((?:[a-z0-9-]+:)*hover:)bg-accent(?![\w/-])', r'\1bg-accent-hover', cls)
+        cls = re.sub(r'\s*(?<![\w-])(?:[a-z0-9-]+:)*(?:to|via)-zinc-\d{2,3}(?:/\d+)?(?![\w-])', '', cls)
+        cls = re.sub(r'(?<![\w-])((?:[a-z0-9-]+:)*)from-zinc-(\d{2,3})(?![\w-])', r'\1bg-zinc-\2', cls)
+        return cls
+    texto = re.sub(r'className=(?:"[^"]*"|\{`[^`]*`\})', ajustar, texto)
+    # painel de modal: logo depois do fundo "fixed inset-0", sombra de camada flutuante
+    return re.sub(r'(fixed inset-0[^"]*">\s*<div className="[^"]*?)shadow-card', r'\1shadow-overlay', texto)
+
+
 def migrar(texto):
+    texto = ANIMACAO.sub(animacao, texto)
     texto = DINAMICA.sub(dinamica, texto)
     texto = GRADIENTE.sub('', texto)
     texto = TEXTO_DEGRADE.sub('', texto)
@@ -191,7 +218,7 @@ if __name__ == '__main__':
         if contar:
             total += len(ALVO.findall(texto))
             continue
-        novo = limpar_espacos(sombras(casca(migrar(texto), str(p))))
+        novo = limpar_espacos(acabamento(sombras(casca(migrar(texto), str(p)))))
         if novo != texto:
             p.write_text(novo)
             mudados += 1

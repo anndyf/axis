@@ -278,7 +278,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
                             ? 'bg-zinc-300'
                             : usuario.isSuperuser
                               ? ' bg-zinc-500 '
-                              : ' bg-zinc-500 to-zinc-600'
+                              : ' bg-zinc-500'
                       }`}>
                         {usuario.name?.charAt(0).toUpperCase() || 'U'}
                       </div>
@@ -380,7 +380,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
 
       {/* Barra flutuante de aprovação em massa */}
       {selectedIds.size > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-4 duration-200">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-slide-up">
           <div className="flex items-center gap-4 bg-zinc-900 text-white px-5 py-3.5 rounded-lg shadow-card border border-white/10">
             {/* Contagem */}
             <div className="flex items-center gap-2">
@@ -423,7 +423,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
 
       {/* Toast de resultado */}
       {resultMsg && (
-        <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-4 duration-300">
+        <div className="fixed bottom-6 right-6 z-50 animate-slide-up">
           <div className={`flex items-center gap-3 text-white px-5 py-3.5 rounded-lg shadow-card max-w-sm border ${
             resultMsg.ok
               ? 'bg-success border-success '
