@@ -2,7 +2,7 @@ import Link from "next/link"
 import { redirect } from "next/navigation"
 import { unstable_cache } from "next/cache"
 import {
-  Accessibility, AlertTriangle, CalendarDays, ClipboardCheck, ClipboardList, FileText, FileWarning,
+  Accessibility, AlertTriangle, CalendarDays, ClipboardCheck, Clock, ClipboardList, FileText, FileWarning,
   GraduationCap, Megaphone, MessageSquare, NotebookPen, UserRound, Users, type LucideIcon,
 } from "lucide-react"
 import { auth } from "@/lib/auth"
@@ -13,8 +13,11 @@ import { MODULOS, modulosVisiveis } from "@/lib/modules"
 import { formatarFrequencia } from "@/lib/services/frequencia"
 import {
   atividadesDoProfessor, comunicadosRecentes, estudantesAEE, estudantesEmRisco, numerosDaEscola, ocorrenciasRecentes,
-  pendenciasPorDisciplina, professoresAtrasados, proximasDatas, resumoGestao, resumoProfessor,
+  pendenciasPorDisciplina, professoresAtrasados, proximasDatas, resumoGestao, resumoProfessor, type AulaDeHoje,
 } from "@/lib/services/painel-leitura"
+import { cartoesDoProfessor, destaqueDoDia, horaNaEscola, rotuloTempos, turmasDosCartoes } from "@/lib/services/inicio-professor"
+import CartoesTurmas from "@/components/painel/CartoesTurmas"
+import { Avatar } from "@/components/ui/Avatar"
 import { ROTULO_VISAO, visaoEfetiva, visoesDoUsuario, type VisaoPainel } from "@/lib/services/painel-visoes"
 import { cn } from "@/components/ui/cn"
 import TeacherTipsModal from "@/components/TeacherTipsModal"
@@ -79,7 +82,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   else if (visao === "pedagogia") conteudo = await PainelPedagogia({ escolaId, anoLetivo, atalho, visiveis })
   else if (visao === "administracao") conteudo = await PainelAdministracao({ escolaId, anoLetivo, atalho })
   else conteudo = (
-    <Secao titulo="Atalhos">
+    <Secao titulo="Atalhos" className="hidden md:block">
       <Atalhos itens={[...atalho("mensagens"), ...atalho("laboratorios")]} />
     </Secao>
   )
@@ -102,10 +105,12 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
       {/* Boas-vindas: a cor da escola aparece só nesta faixa (--escola) */}
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="min-w-0 border-l-4 border-escola pl-4">
-          <p className="text-sm text-fg-subtle">Boas-vindas de volta,</p>
-          <h1 className="break-words text-2xl font-semibold text-fg">{nome}</h1>
-          <p className="mt-1 text-sm text-fg-subtle first-letter:uppercase">{hoje} · {escola?.nome ?? "Áxis"} · ano letivo {anoLetivo}</p>
+        <div className="flex min-w-0 items-center gap-3 md:gap-4">
+          <Avatar nome={nome} size="lg" tom="destaque" className="md:size-12 md:text-base" />
+          <div className="min-w-0">
+            <h1 className="break-words text-xl font-semibold text-fg md:text-2xl">Olá, {nome.split(" ")[0]}</h1>
+            <p className="text-13 text-fg-subtle first-letter:uppercase md:text-sm">{hoje} · {escola?.nome ?? "Áxis"}<span className="hidden sm:inline"> · ano letivo {anoLetivo}</span></p>
+          </div>
         </div>
         {visoes.length > 1 && visao && (
           <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Visão do painel">
@@ -131,68 +136,74 @@ type Atalho = (id: string, rotulo?: string, href?: string) => { rotulo: string; 
 /* ------------------------------- Professor ------------------------------- */
 
 async function PainelProfessor({ escolaId, userId, anoLetivo, atalho }: { escolaId: string; userId: string; anoLetivo: number; atalho: Atalho }) {
-  const [prof, pendencias, atividades, comunicados] = await Promise.all([
+  const [prof, pendencias, atividades, comunicados, temposAula] = await Promise.all([
     resumoProfessor(escolaId, userId, anoLetivo),
     pendenciasPorDisciplina(escolaId, anoLetivo, userId),
     atividadesDoProfessor(escolaId, userId, anoLetivo),
     comunicadosRecentes(escolaId, "professor"),
+    prisma.tempoAula.findMany({ where: { escolaId }, select: { turno: true, ordem: true, inicio: true, fim: true } }),
   ])
   const chamadas = pendencias.filter((p) => p.chamadasPendentes > 0)
   const totalChamadas = chamadas.reduce((s, p) => s + p.chamadasPendentes, 0)
   const semNota = prof.disciplinas.reduce((s, d) => s + d.semNota, 0)
-  const pendPorDisc = new Map(pendencias.map((p) => [p.disciplinaId ?? `dia-${p.turmaId}`, p]))
   const linkChamada = (turmaId: string, disciplinaId: string | null) => `/dashboard/chamada/fazer?turma=${turmaId}${disciplinaId ? `&disciplina=${disciplinaId}` : ""}&data=${prof.hoje}`
   const primeira = prof.disciplinas[0]
 
+  // Cartões turma × disciplina (Minhas turmas) e destaque Agora/Próxima aula
+  const cartoes = cartoesDoProfessor({
+    disciplinas: prof.disciplinas,
+    pendencias,
+    turmasChamadaDiaria: new Set(pendencias.filter((p) => p.disciplinaId === null).map((p) => p.turmaId)),
+    aulasHoje: new Set(prof.aulasDeHoje.map((a) => `${a.turmaId}|${a.disciplinaId ?? ""}`)),
+    feitasHoje: new Set(prof.aulasDeHoje.filter((a) => a.feita).map((a) => `${a.turmaId}|${a.disciplinaId ?? ""}`)),
+    hoje: prof.hoje,
+  })
+  const destaque = destaqueDoDia(prof.aulasDeHoje, (a) => temposAula.filter((t) => t.turno === a.turno), horaNaEscola())
+
   return (
     <>
-      <GradeIndicadores>
-        <Indicador icone={ClipboardCheck} tom="accent" valor={prof.aulasDeHoje.length} rotulo="Aulas hoje" detalhe={`${prof.aulasDeHoje.filter((a) => a.feita).length} com chamada feita`} href="#aulas" />
-        <Indicador icone={AlertTriangle} tom="danger" valor={totalChamadas} rotulo="Chamadas pendentes" detalhe="Dias com aula sem chamada" href="#chamadas" />
-        <Indicador icone={FileText} tom="violet" valor={semNota} rotulo="Notas a lançar" detalhe="Alunos sem nota lançada" href="#disciplinas" />
-        <Indicador icone={NotebookPen} tom="success" valor={atividades.length} rotulo="Atividades" detalhe="Próximas avaliações" href="#atividades" />
-      </GradeIndicadores>
+      {destaque && <CartaoDestaque destaque={destaque} href={linkChamada(destaque.aula.turmaId, destaque.aula.disciplinaId)} />}
+
+      {/* No celular os números ficam nos cartões das turmas */}
+      <div className="hidden md:block">
+        <GradeIndicadores>
+          <Indicador icone={ClipboardCheck} tom="accent" valor={prof.aulasDeHoje.length} rotulo="Aulas hoje" detalhe={`${prof.aulasDeHoje.filter((a) => a.feita).length} com chamada feita`} href="#aulas" />
+          <Indicador icone={AlertTriangle} tom="danger" valor={totalChamadas} rotulo="Chamadas pendentes" detalhe="Dias com aula sem chamada" href="#chamadas" />
+          <Indicador icone={FileText} tom="violet" valor={semNota} rotulo="Notas a lançar" detalhe="Alunos sem nota lançada" href="#turmas" />
+          <Indicador icone={NotebookPen} tom="success" valor={atividades.length} rotulo="Atividades" detalhe="Próximas avaliações" href="#atividades" />
+        </GradeIndicadores>
+      </div>
 
       <Secao id="aulas" titulo="Aulas de hoje" acao={{ rotulo: "Todas as chamadas", href: "/dashboard/chamada" }}>
         <Lista vazio="Nenhuma aula sua hoje. Dias não letivos e disciplinas fora do horário não aparecem.">
           {prof.aulasDeHoje.map((a) => (
-            <Item
-              key={`${a.turmaId}-${a.disciplinaId}`}
-              icone={a.feita ? ClipboardCheck : ClipboardList}
-              tom={a.feita ? "success" : "accent"}
-              titulo={a.nome}
-              subtitulo={`${a.turmaNome} · ${a.tempos.length ? a.tempos.map((t) => `${t}º`).join(", ") + " tempo" : "dia inteiro"}`}
-              href={linkChamada(a.turmaId, a.disciplinaId)}
-              direita={<span className={cn("rounded-full px-2.5 py-1 font-medium", a.feita ? TOM.success : "bg-accent text-on-accent")}>{a.feita ? "Feita" : "Fazer chamada"}</span>}
-            />
+            <li key={`${a.turmaId}-${a.disciplinaId}`} className="border-b border-line-subtle last:border-0">
+              <Link href={linkChamada(a.turmaId, a.disciplinaId)} className="flex min-h-14 min-w-0 items-center gap-3 px-4 py-3 transition-colors duration-150 hover:bg-subtle sm:px-5">
+                <span className={cn("flex size-9 shrink-0 items-center justify-center rounded-full", a.feita ? TOM.success : TOM.accent)}>
+                  {a.feita ? <ClipboardCheck size={16} strokeWidth={1.75} aria-hidden /> : <ClipboardList size={16} strokeWidth={1.75} aria-hidden />}
+                </span>
+                {/* Nome inteiro (quebra linha); a situação desce para baixo do nome no celular */}
+                <span className="min-w-0 flex-1">
+                  <span className="block break-words text-sm font-medium text-fg">{a.nome}</span>
+                  <span className="block text-13 text-fg-subtle">{a.turmaNome} · {rotuloTempos(a.tempos)}</span>
+                </span>
+                <span className={cn("shrink-0 rounded-full px-2.5 py-1 text-xs font-medium", a.feita ? TOM.success : "bg-accent text-on-accent")}>{a.feita ? "Feita" : "Fazer"}</span>
+              </Link>
+            </li>
           ))}
         </Lista>
       </Secao>
 
-      <Secao id="disciplinas" titulo="Minhas disciplinas" descricao={`Notas lançadas em ${anoLetivo}`} acao={{ rotulo: "Lançar notas", href: "/dashboard/notas" }}>
-        {prof.disciplinas.length === 0 ? (
+      <Secao id="turmas" titulo="Minhas turmas" descricao={`Disciplinas de ${anoLetivo}`}>
+        {cartoes.length === 0 ? (
           <Aviso>Nenhuma disciplina vinculada a você. Peça à gestão para vincular suas disciplinas.</Aviso>
         ) : (
-          <GradeCartoes>
-            {prof.disciplinas.map((d) => (
-              <CartaoProgresso
-                key={d.id}
-                codigo={d.turmaNome}
-                detalheCodigo={String(anoLetivo)}
-                titulo={d.nome}
-                rotulo="Notas lançadas"
-                percentual={d.alunos ? ((d.alunos - d.semNota) / d.alunos) * 100 : null}
-                rodape={`${d.alunos} alunos · ${d.semNota} sem nota`}
-                href={`/dashboard/notas/lancar/${d.turmaId}`}
-                alerta={{ valor: pendPorDisc.get(d.id)?.chamadasPendentes ?? 0, rotulo: "chamadas pendentes" }}
-              />
-            ))}
-          </GradeCartoes>
+          <CartoesTurmas cartoes={cartoes} turmas={turmasDosCartoes(cartoes)} />
         )}
       </Secao>
 
       <div className="grid gap-8 lg:grid-cols-2">
-        <Secao id="chamadas" titulo="Chamadas pendentes">
+        <Secao id="chamadas" titulo="Chamadas pendentes" className="hidden md:block">
           <Lista vazio="Nenhuma chamada pendente.">
             {chamadas.map((p) => (
               <Item key={`${p.turmaId}-${p.disciplinaId}`} icone={AlertTriangle} tom="danger" titulo={p.disciplinaNome} subtitulo={p.turmaNome} href={`/dashboard/chamada/diario?turma=${p.turmaId}${p.disciplinaId ? `&disciplina=${p.disciplinaId}` : ""}`} direita={`${p.chamadasPendentes} ${p.chamadasPendentes === 1 ? "dia" : "dias"}`} />
@@ -212,7 +223,8 @@ async function PainelProfessor({ escolaId, userId, anoLetivo, atalho }: { escola
         <Secao id="comunicados" titulo="Comunicados" acao={{ rotulo: "Ver todos", href: "/dashboard/mensagens" }}>
           <ListaComunicados comunicados={comunicados} />
         </Secao>
-        <Secao titulo="Atalhos">
+        {/* Atalhos duplicam a barra inferior no celular */}
+        <Secao titulo="Atalhos" className="hidden md:block">
           <Atalhos itens={[
             ...atalho("chamada", "Fazer chamada"),
             ...atalho("notas", "Lançar notas"),
@@ -221,6 +233,24 @@ async function PainelProfessor({ escolaId, userId, anoLetivo, atalho }: { escola
         </Secao>
       </div>
     </>
+  )
+}
+
+/** "Agora" / "Próxima aula" / chamada de hoje pendente, com o botão grande da chamada. */
+function CartaoDestaque({ destaque, href }: { destaque: NonNullable<ReturnType<typeof destaqueDoDia<AulaDeHoje>>>; href: string }) {
+  const { aula } = destaque
+  const rotulo = destaque.tipo === "agora" ? `Agora · ${destaque.inicio}–${destaque.fim}` : destaque.tipo === "proxima" ? `Próxima aula · ${destaque.inicio}` : "Chamada de hoje pendente"
+  return (
+    <section aria-label="Aula em destaque" className="rounded-2xl bg-accent p-5 text-on-accent shadow-card md:p-6">
+      <p className="flex items-center gap-2 text-13 font-medium opacity-90">
+        <Clock size={14} strokeWidth={1.75} aria-hidden /> {rotulo}
+      </p>
+      <p className="mt-2 break-words text-xl font-semibold leading-snug md:text-2xl">{aula.nome}</p>
+      <p className="mt-0.5 text-sm opacity-90">{aula.turmaNome} · {rotuloTempos(aula.tempos)}{aula.feita && " · chamada feita"}</p>
+      <Link href={href} className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-on-accent px-4 text-base font-semibold text-accent transition-opacity duration-150 hover:opacity-90 md:w-auto md:inline-flex">
+        <ClipboardCheck size={18} strokeWidth={1.75} aria-hidden /> {aula.feita ? "Ver chamada" : "Fazer chamada"}
+      </Link>
+    </section>
   )
 }
 
@@ -329,7 +359,7 @@ async function PainelPedagogia({ escolaId, anoLetivo, atalho, visiveis }: { esco
         )}
       </div>
 
-      <Secao titulo="Atalhos">
+      <Secao titulo="Atalhos" className="hidden md:block">
         <Atalhos itens={[...atalho("conselho-classe"), ...atalho("ocorrencias"), ...atalho("aee")]} />
       </Secao>
     </>
@@ -441,7 +471,7 @@ async function PainelAdministracao({ escolaId, anoLetivo, atalho }: { escolaId: 
         </div>
       </div>
 
-      <Secao titulo="Atalhos">
+      <Secao titulo="Atalhos" className="hidden md:block">
         <Atalhos itens={[...atalho("usuarios"), ...atalho("resultados", "Relatórios e resultados"), ...atalho("configuracoes"), ...(atalho("usuarios").length ? [] : atalho("turmas"))]} />
       </Secao>
     </>

@@ -58,9 +58,11 @@ async function getTurmaData(turmaId: string, session: Session) {
 }
 
 export default async function LancarNotasTurmaPage({
-  params
+  params,
+  searchParams,
 }: {
   params: Promise<{ turmaId: string }>
+  searchParams: Promise<{ disciplina?: string }>
 }) {
   const session = await auth()
   
@@ -69,6 +71,7 @@ export default async function LancarNotasTurmaPage({
   }
 
   const { turmaId } = await params
+  const { disciplina } = await searchParams
   const turma = await getTurmaData(turmaId, session)
   
   if (!turma) {
@@ -81,6 +84,8 @@ export default async function LancarNotasTurmaPage({
       turmaNome={turma.nome}
       disciplinas={turma.disciplinas}
       estudantes={turma.estudantes}
+      // ?disciplina= (atalho do início do professor) só vale se for uma das disciplinas liberadas acima
+      disciplinaInicial={turma.disciplinas.find((d) => d.id === disciplina)?.id ?? ""}
     />
   )
 }

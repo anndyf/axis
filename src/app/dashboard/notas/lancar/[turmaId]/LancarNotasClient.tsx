@@ -94,15 +94,17 @@ export default function LancarNotasTurmaClient({
   turmaId,
   turmaNome,
   disciplinas,
-  estudantes
+  estudantes,
+  disciplinaInicial = "",
 }: {
   turmaId: string
   turmaNome: string
   disciplinas: Disciplina[]
   estudantes: Estudante[]
+  disciplinaInicial?: string
 }) {
   const router = useRouter()
-  const [disciplinaSelecionada, setDisciplinaSelecionada] = useState("")
+  const [disciplinaSelecionada, setDisciplinaSelecionada] = useState(disciplinaInicial)
   const [esquema, setEsquema] = useState<EsquemaInfo | null>(null)
   const [statusMap, setStatusMap] = useState<Record<string, string>>({})
   const [notas, setNotas] = useState<Record<string, NotaState>>({})

@@ -27,3 +27,13 @@ Capturas: `npx tsx scripts/capturas.ts <fase>` com `npm run dev` rodando (`CHROM
 - [x] Portal: abas Início · Boletim · Frequência · Horário na barra inferior (aba na URL, `?aba=`), "Mais" com Avisos, Meu perfil, tema e Sair. Frequência por disciplina e horário por dia viraram abas em cartões (o horário era um modal com tabela larga).
 - Sem contador de mensagens não lidas na barra (fica no sino do cabeçalho e no menu lateral).
 - Capturas: `docs/capturas/mobile-1-navegacao/` (375, 390, 1440 e `-escuro` em 375).
+
+### 2. Início do professor por turma e disciplina — feito
+- [x] Regras puras `src/lib/services/inicio-professor.ts` (teste `inicio-professor.test.ts`): `destaqueDoDia` (aula de agora pelos `TempoAula` do turno da turma; senão a próxima de hoje; senão a primeira de hoje sem chamada), `cartoesDoProfessor` (um cartão por turma × disciplina, com pendências e links), `rotuloTempos` ("1º e 6º tempos"), `horaNaEscola`, `turmasDosCartoes`.
+  - A ação "Chamada" do cartão abre hoje se houver aula hoje ainda sem chamada; senão o último dia pendente; senão hoje (revisar) ou o diário. Na chamada diária (POR_DIA), chamada/diário/pendências são da turma.
+  - "Notas" abre o lançamento já na disciplina (`/dashboard/notas/lancar/<turma>?disciplina=<id>`; o id só vale se estiver entre as disciplinas liberadas ao usuário naquela turma).
+- [x] `pendenciasPorDisciplina` passou a devolver `ultimaPendente`; `resumoProfessor` devolve o turno normalizado de cada aula de hoje.
+- [x] Tela: saudação com avatar ("Olá, Nome", data e escola, para todos os perfis), cartão de destaque em azul com botão grande "Fazer chamada", "Aulas de hoje" sem cortar o nome (quebra linha; era o bug "B.", "F."), "Minhas turmas" com fichas de filtro por turma (`ui/Fichas`, rolam de lado no celular) e cartões com selos de chamadas pendentes e alunos sem nota + Chamada · Notas · Diário (44px).
+- [x] No celular saem os indicadores (os números já estão nos cartões), "Chamadas pendentes" (idem) e os "Atalhos" (duplicavam a barra inferior) — também nos painéis da gestão e da pedagogia.
+- **[decisão]** Para as capturas mostrarem o destaque, apaguei no `axis_dev` local as aulas de hoje de História e Português da 1TIM1 (o seed de frequência marca todas as aulas até hoje como feitas). Só dado local.
+- Capturas: `docs/capturas/mobile-2-inicio-professor/`.
