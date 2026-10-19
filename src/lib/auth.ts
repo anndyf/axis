@@ -6,6 +6,7 @@ import { excedeuLimite, registrarTentativa, limparTentativas } from "@/lib/limit
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { headers } from "next/headers"
+import type { Papel } from "./rbac"
 
 // Force Node.js runtime (not Edge)
 export const runtime = 'nodejs'
@@ -69,6 +70,7 @@ export const authConfig: NextAuthConfig = {
             isAEE: true,
             isPortalUser: true,
             isPlatformAdmin: true,
+            papeis: true,
             estudanteId: true,
             escolaId: true
           }
@@ -124,6 +126,7 @@ export const authConfig: NextAuthConfig = {
           isPortalUser: user.isPortalUser,
           isAEE: (user as any).isAEE || false,
           isPlatformAdmin: user.isPlatformAdmin,
+          papeis: user.papeis,
           estudanteId: user.estudanteId,
           escolaId: user.escolaId
         }
@@ -141,6 +144,7 @@ export const authConfig: NextAuthConfig = {
         token.isPortalUser = (user as any).isPortalUser
         token.isAEE = (user as any).isAEE
         token.isPlatformAdmin = (user as any).isPlatformAdmin
+        token.papeis = user.papeis
         token.estudanteId = (user as any).estudanteId
         token.escolaId = (user as any).escolaId
       }
@@ -156,6 +160,8 @@ export const authConfig: NextAuthConfig = {
         session.user.isPortalUser = token.isPortalUser as boolean
         ;(session.user as any).isAEE = token.isAEE as boolean
         session.user.isPlatformAdmin = token.isPlatformAdmin as boolean
+        // Ausente em sessões anteriores aos papéis: can() deriva dos campos is*
+        session.user.papeis = token.papeis as Papel[] | undefined
         session.user.estudanteId = token.estudanteId as string
         session.user.escolaId = token.escolaId as string
       }

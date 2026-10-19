@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import * as dotenv from 'dotenv'
 import bcrypt from 'bcryptjs'
+import { dadosDePapeis, type Papel } from '../src/lib/rbac'
 
 dotenv.config()
 
@@ -26,20 +27,18 @@ type UsuarioTeste = {
   username: string
   senha: string
   name: string
-  isSuperuser?: boolean
-  isDirecao?: boolean
-  isStaff?: boolean
-  isAEE?: boolean
+  papeis: Papel[]
   isActive?: boolean
   isApproved?: boolean
 }
 
 const usuarios: UsuarioTeste[] = [
-  { username: 'direcao', senha: 'direcao123', name: 'Diretora Teste', isDirecao: true, isStaff: true },
-  { username: 'aee', senha: 'aee123', name: 'Coordenação AEE Teste', isAEE: true, isStaff: true },
-  { username: 'professor', senha: 'professor123', name: 'Professor Teste', isStaff: true },
-  { username: 'professor.pendente', senha: 'pendente123', name: 'Professor Pendente', isStaff: true, isApproved: false },
-  { username: 'professor.inativo', senha: 'inativo123', name: 'Professor Inativo', isStaff: true, isActive: false },
+  { username: 'direcao', senha: 'direcao123', name: 'Diretora Teste', papeis: ['DIRECAO', 'PROFESSOR'] },
+  { username: 'coordenacao', senha: 'coordenacao123', name: 'Coordenação Pedagógica Teste', papeis: ['COORDENACAO'] },
+  { username: 'aee', senha: 'aee123', name: 'Coordenação AEE Teste', papeis: ['AEE', 'PROFESSOR'] },
+  { username: 'professor', senha: 'professor123', name: 'Professor Teste', papeis: ['PROFESSOR'] },
+  { username: 'professor.pendente', senha: 'pendente123', name: 'Professor Pendente', papeis: ['PROFESSOR'], isApproved: false },
+  { username: 'professor.inativo', senha: 'inativo123', name: 'Professor Inativo', papeis: ['PROFESSOR'], isActive: false },
 ]
 
 async function main() {
@@ -54,10 +53,11 @@ async function main() {
 
   console.log('👥 Criando usuários de teste...')
   for (const u of usuarios) {
-    const { senha, ...flags } = u
+    const { senha, papeis, ...resto } = u
     const password = await bcrypt.hash(senha, 10)
     const data = {
-      ...flags,
+      ...resto,
+      ...dadosDePapeis(papeis),
       email: `${u.username}@axis.com`,
       password,
       isActive: u.isActive ?? true,

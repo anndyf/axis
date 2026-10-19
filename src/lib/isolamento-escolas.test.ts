@@ -10,6 +10,7 @@
  */
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest'
 import { NextRequest } from 'next/server'
+import { dadosDePapeis } from '@/lib/rbac'
 import { prisma } from '@/lib/prisma'
 import { vincularCursosSemEsquema } from '@/lib/services/esquemas-padrao'
 
@@ -30,9 +31,9 @@ const B: Record<string, string> = {}
 async function criarEscola(dest: Record<string, string>, letra: string) {
   const escola = await prisma.escola.create({ data: { nome: `Escola ${letra} ${SUFIXO}`, slug: `${SUFIXO}-${letra.toLowerCase()}`, plano: 'ENTERPRISE', status: 'ATIVA' } })
   dest.escola = escola.id
-  const admin = await prisma.user.create({ data: { escolaId: escola.id, username: `admin-${letra}`, email: `admin-${letra}@${SUFIXO}.t`, password: 'x', name: `Admin ${letra}`, isSuperuser: true, isDirecao: true, isStaff: true, isApproved: true } })
+  const admin = await prisma.user.create({ data: { escolaId: escola.id, username: `admin-${letra}`, email: `admin-${letra}@${SUFIXO}.t`, password: 'x', name: `Admin ${letra}`, ...dadosDePapeis(['ADMIN', 'DIRECAO', 'PROFESSOR']), isApproved: true } })
   dest.admin = admin.id
-  const prof = await prisma.user.create({ data: { escolaId: escola.id, username: `prof-${letra}`, email: `prof-${letra}@${SUFIXO}.t`, password: 'x', name: `Prof ${letra}`, isStaff: true, isApproved: true } })
+  const prof = await prisma.user.create({ data: { escolaId: escola.id, username: `prof-${letra}`, email: `prof-${letra}@${SUFIXO}.t`, password: 'x', name: `Prof ${letra}`, ...dadosDePapeis(['PROFESSOR']), isApproved: true } })
   dest.prof = prof.id
   const curso = await prisma.curso.create({ data: { escolaId: escola.id, nome: `Curso ${letra}`, sigla: `C${letra}`, modalidade: 'EPI', turnos: ['MATUTINO'] } })
   dest.curso = curso.id

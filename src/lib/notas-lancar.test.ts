@@ -5,6 +5,7 @@
  */
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest'
 import { NextRequest } from 'next/server'
+import { dadosDePapeis } from '@/lib/rbac'
 import { prisma } from '@/lib/prisma'
 import { vincularCursosSemEsquema } from '@/lib/services/esquemas-padrao'
 
@@ -18,9 +19,9 @@ const D: Record<string, any> = {}
 beforeAll(async () => {
   const escola = await prisma.escola.create({ data: { nome: `Escola ${SUFIXO}`, slug: SUFIXO, status: 'ATIVA' } })
   D.escola = escola.id
-  D.admin = (await prisma.user.create({ data: { escolaId: escola.id, username: 'adm', email: `adm@${SUFIXO}.t`, password: 'x', isSuperuser: true, isDirecao: true, isStaff: true, isApproved: true } })).id
-  D.prof = (await prisma.user.create({ data: { escolaId: escola.id, username: 'prof', email: `prof@${SUFIXO}.t`, password: 'x', isStaff: true, isApproved: true } })).id
-  D.outroProf = (await prisma.user.create({ data: { escolaId: escola.id, username: 'prof2', email: `prof2@${SUFIXO}.t`, password: 'x', isStaff: true, isApproved: true } })).id
+  D.admin = (await prisma.user.create({ data: { escolaId: escola.id, username: 'adm', email: `adm@${SUFIXO}.t`, password: 'x', ...dadosDePapeis(['ADMIN', 'DIRECAO', 'PROFESSOR']), isApproved: true } })).id
+  D.prof = (await prisma.user.create({ data: { escolaId: escola.id, username: 'prof', email: `prof@${SUFIXO}.t`, password: 'x', ...dadosDePapeis(['PROFESSOR']), isApproved: true } })).id
+  D.outroProf = (await prisma.user.create({ data: { escolaId: escola.id, username: 'prof2', email: `prof2@${SUFIXO}.t`, password: 'x', ...dadosDePapeis(['PROFESSOR']), isApproved: true } })).id
   const curso = await prisma.curso.create({ data: { escolaId: escola.id, nome: 'Curso', sigla: 'C', modalidade: 'EPI', turnos: ['MATUTINO'] } })
   await vincularCursosSemEsquema(prisma, escola.id)
   const esquema = await prisma.esquemaAvaliacao.findFirstOrThrow({

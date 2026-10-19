@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import * as dotenv from 'dotenv'
 import bcrypt from 'bcryptjs'
+import { dadosDePapeis } from '../src/lib/rbac'
 import { vincularCursosSemEsquema } from '../src/lib/services/esquemas-padrao'
 import { calcularMediaFinal, calcularStatus, paraEsquemaConfig } from '../src/lib/services/notas'
 
@@ -53,11 +54,9 @@ async function main() {
       email: 'admin@axis.com',
       password: hashedPassword,
       name: 'Administrador Global',
-      isSuperuser: true,
-      isStaff: true,
+      ...dadosDePapeis(['ADMIN', 'DIRECAO', 'PROFESSOR']),
       isActive: true,
       isApproved: true,
-      isDirecao: true,
       escolaId
     }
   })
@@ -80,7 +79,7 @@ async function main() {
       create: {
         ...p,
         password: hashedPassword,
-        isStaff: true,
+        ...dadosDePapeis(['PROFESSOR']),
         isActive: true,
         isApproved: true,
         escolaId

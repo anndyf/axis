@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
+import { dadosDePapeis } from '@/lib/rbac'
 
 export const runtime = 'nodejs'
 
@@ -78,9 +79,7 @@ export async function POST(request: NextRequest) {
           username: adminUsername,
           email: adminEmail,
           password: hashedPassword,
-          isSuperuser: true,
-          isStaff: true,
-          isDirecao: true,
+          ...dadosDePapeis(['ADMIN', 'DIRECAO', 'PROFESSOR']),
           isActive: true,
           isApproved: true,
         }

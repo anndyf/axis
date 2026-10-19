@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { hash } from 'bcryptjs'
 import { logAudit } from '@/lib/audit'
+import { aplicarFlags, dadosDePapeis } from '@/lib/rbac'
 
 export const runtime = 'nodejs'
 
@@ -35,6 +36,16 @@ export async function PUT(
       isSuperuser, isDirecao, isStaff, isAEE, isActive, disciplinasIds
     } = data
 
+    // papeis é o formato atual; os campos is* ainda são aceitos de clientes
+    // antigos. Papéis e campos são sempre gravados juntos (CHECK no banco).
+    const mudaPapeis = Array.isArray(data.papeis) ||
+      [isSuperuser, isDirecao, isStaff, isAEE].some((v) => v !== undefined)
+    const papeis = mudaPapeis
+      ? dadosDePapeis(Array.isArray(data.papeis)
+          ? data.papeis
+          : aplicarFlags(existingUser.papeis, { isSuperuser, isDirecao, isStaff, isAEE }))
+      : null
+
     // Regra de Exclusividade: Se houver novas disciplinas, remover de outros professores
     if (disciplinasIds && Array.isArray(disciplinasIds) && disciplinasIds.length > 0) {
       const placeholders = disciplinasIds.map((_, i) => `$${i + 1}`).join(',')
@@ -50,10 +61,7 @@ export async function PUT(
       updateData.email = email
       updateData.username = email
     }
-    if (isSuperuser !== undefined) updateData.isSuperuser = isSuperuser
-    if (isDirecao !== undefined) updateData.isDirecao = isDirecao
-    if (isStaff !== undefined) updateData.isStaff = isStaff
-    if (isAEE !== undefined) updateData.isAEE = isAEE
+    if (papeis) Object.assign(updateData, papeis)
     if (isActive !== undefined) updateData.isActive = isActive
     
     if (disciplinasIds !== undefined) {
@@ -95,10 +103,13 @@ export async function PUT(
         sqlFields.push(`email = $${valIdx++}`); values.push(email)
         sqlFields.push(`username = $${valIdx++}`); values.push(email) 
       }
-      if (isSuperuser !== undefined) { sqlFields.push(`is_superuser = $${valIdx++}`); values.push(!!isSuperuser) }
-      if (isDirecao !== undefined) { sqlFields.push(`is_direcao = $${valIdx++}`); values.push(!!isDirecao) }
-      if (isStaff !== undefined) { sqlFields.push(`is_staff = $${valIdx++}`); values.push(!!isStaff) }
-      if (isAEE !== undefined) { sqlFields.push(`is_aee = $${valIdx++}`); values.push(!!isAEE) }
+      if (papeis) {
+        sqlFields.push(`papeis = $${valIdx++}::"Papel"[]`); values.push(papeis.papeis)
+        sqlFields.push(`is_superuser = $${valIdx++}`); values.push(papeis.isSuperuser)
+        sqlFields.push(`is_direcao = $${valIdx++}`); values.push(papeis.isDirecao)
+        sqlFields.push(`is_staff = $${valIdx++}`); values.push(papeis.isStaff)
+        sqlFields.push(`is_aee = $${valIdx++}`); values.push(papeis.isAEE)
+      }
       if (isActive !== undefined) { sqlFields.push(`is_active = $${valIdx++}`); values.push(!!isActive) }
       if (updateData.password) { sqlFields.push(`password = $${valIdx++}`); values.push(updateData.password) }
 

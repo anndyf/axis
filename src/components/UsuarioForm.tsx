@@ -6,8 +6,9 @@ import Link from "next/link"
 import { 
   ArrowLeft, Save, Loader2, Shield, User, Mail, 
   AlertCircle, Key, Calendar, CheckCircle2, ChevronRight,
-  ShieldCheck, UserCircle, Settings2, Fingerprint, Accessibility
+  ShieldCheck, UserCircle, Settings2, Fingerprint, Accessibility, BookOpenCheck
 } from "lucide-react"
+import { papeisDe, ROTULO_PAPEL, type Papel } from "@/lib/rbac"
 
 interface UsuarioFormProps {
   usuario?: {
@@ -19,6 +20,7 @@ interface UsuarioFormProps {
     isDirecao: boolean
     isStaff: boolean
     isAEE?: boolean
+    papeis?: string[] | null
     lastLogin?: string | null
   }
   isEdit?: boolean
@@ -33,10 +35,8 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
     name: usuario?.name || "",
     email: usuario?.email || "",
     password: "",
-    isSuperuser: usuario?.isSuperuser || false,
-    isDirecao: usuario?.isDirecao || false,
-    isStaff: usuario?.isStaff || !isEdit,
-    isAEE: (usuario as any)?.isAEE || false,
+    // Novo usuário começa como professor
+    papeis: usuario ? papeisDe(usuario) : (['PROFESSOR'] as Papel[]),
   })
 
   const formatLastLogin = (date: string | null | undefined) => {
@@ -82,36 +82,40 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
     }
   }
 
-  const roles = [
-    { 
-      id: 'isStaff', 
-      label: 'Professor', 
+  const roles: { id: Papel; desc: string; icon: React.ReactNode }[] = [
+    {
+      id: 'PROFESSOR',
       desc: 'Lançamento de notas das disciplinas permitidas',
       icon: <UserCircle className="w-5 h-5" />,
-      color: 'blue' 
     },
-    { 
-      id: 'isDirecao', 
-      label: 'Gestão Escolar', 
+    {
+      id: 'COORDENACAO',
+      desc: 'Acompanhamento pedagógico de todas as turmas, ocorrências e conselho',
+      icon: <BookOpenCheck className="w-5 h-5" />,
+    },
+    {
+      id: 'DIRECAO',
       desc: 'Acesso total a relatórios e visualização de turmas',
       icon: <ShieldCheck className="w-5 h-5" />,
-      color: 'purple' 
     },
-    { 
-      id: 'isSuperuser', 
-      label: 'Administrador (T.I)', 
+    {
+      id: 'ADMIN',
       desc: 'Controle completo, logs e gestão de usuários',
       icon: <Fingerprint className="w-5 h-5" />,
-      color: 'slate' 
     },
-    { 
-      id: 'isAEE', 
-      label: 'Especialista AEE', 
+    {
+      id: 'AEE',
       desc: 'Acesso exclusivo para gestão de alunos com necessidades especiais',
       icon: <Accessibility className="w-5 h-5" />,
-      color: 'teal' 
     }
   ]
+
+  const alternarPapel = (papel: Papel, marcado: boolean) => {
+    setFormData({
+      ...formData,
+      papeis: marcado ? [...formData.papeis, papel] : formData.papeis.filter((p) => p !== papel),
+    })
+  }
 
   return (
     <div className="pb-20">
@@ -215,7 +219,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
 
             <div className="grid grid-cols-1 gap-4">
               {roles.map((role) => {
-                const isActive = (formData as any)[role.id]
+                const isActive = formData.papeis.includes(role.id)
                 return (
                   <label 
                     key={role.id} 
@@ -232,7 +236,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
                     </div>
                     <div className="flex-grow">
                        <p className={`font-semibold text-sm ${isActive ? 'text-white' : 'text-fg'}`}>
-                          {role.label}
+                          {ROTULO_PAPEL[role.id]}
                        </p>
                        <p className={`text-xs ${isActive ? 'text-fg-subtle' : 'text-fg-subtle'}`}>
                           {role.desc}
@@ -246,7 +250,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: UsuarioFormProp
                     <input 
                       type="checkbox" className="hidden" 
                       checked={isActive}
-                      onChange={(e) => setFormData({...formData, [role.id]: e.target.checked})}
+                      onChange={(e) => alternarPapel(role.id, e.target.checked)}
                     />
                   </label>
                 )

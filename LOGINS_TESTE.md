@@ -27,6 +27,7 @@ O login aceita **usuário ou e-mail**. Após **5 tentativas erradas** em 15 minu
 |---|---|---|---|
 | **Administrador (superuser)** | `admin` | `admin123` | Acesso total: criar/editar/excluir tudo, usuários, configurações |
 | **Direção** | `direcao` | `direcao123` | Gestão sem ser superuser: relatórios, usuários, conselho |
+| **Coordenação pedagógica** | `coordenacao` | `coordenacao123` | Papel novo (Fase 1): por enquanto vê o painel e as mensagens; as telas pedagógicas chegam na Fase 3 |
 | **Coordenação AEE** | `aee` | `aee123` | Painel AEE (há 1 estudante com perfil AEE: *1TIM1-003*) |
 | **Professor** | `professor` | `professor123` | Vinculado às 5 disciplinas da turma **1TIM1** — lançar notas |
 | Professor (seed) | `ricardo.prof` | `admin123` | Professor com disciplinas espalhadas por várias turmas |

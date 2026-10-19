@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import * as dotenv from 'dotenv'
 import bcrypt from 'bcryptjs'
+import { dadosDePapeis } from '../src/lib/rbac'
 import { vincularCursosSemEsquema } from '../src/lib/services/esquemas-padrao'
 
 dotenv.config()
@@ -51,11 +52,9 @@ async function main() {
       email: 'admin@axis.com',
       password: hashedPassword,
       name: 'Administrador - Horizonte',
-      isSuperuser: true,
-      isStaff: true,
+      ...dadosDePapeis(['ADMIN', 'DIRECAO', 'PROFESSOR']),
       isActive: true,
       isApproved: true,
-      isDirecao: true,
       escolaId: escola.id,
     },
   })

@@ -50,8 +50,8 @@ export const MODULOS: Modulo[] = [
 
   { id: 'simulados', nome: 'Simulados', grupo: 'Diário e Avaliações', icone: Target, rota: '/dashboard/simulados', permissao: (u) => !u.isAEE && can(u, 'staff'), planoMinimo: 'PRO' },
   { id: 'chamada', nome: 'Chamada e Diário', grupo: 'Diário e Avaliações', icone: ClipboardCheck, rota: '/dashboard/chamada', permissao: (u) => !u.isAEE && can(u, 'staff') },
-  { id: 'notas', nome: 'Lançar Notas', grupo: 'Diário e Avaliações', icone: FileText, rota: '/dashboard/notas', permissao: (u) => !u.isAEE && (u.isStaff || u.isSuperuser) },
-  { id: 'notas-recuperacao', nome: 'Recuperação Final', grupo: 'Diário e Avaliações', icone: TrendingUp, rota: '/dashboard/notas/recuperacao', permissao: (u) => !u.isAEE && (u.isStaff || u.isSuperuser) },
+  { id: 'notas', nome: 'Lançar Notas', grupo: 'Diário e Avaliações', icone: FileText, rota: '/dashboard/notas', permissao: (u) => !u.isAEE && !!(u.isStaff || u.isSuperuser) },
+  { id: 'notas-recuperacao', nome: 'Recuperação Final', grupo: 'Diário e Avaliações', icone: TrendingUp, rota: '/dashboard/notas/recuperacao', permissao: (u) => !u.isAEE && !!(u.isStaff || u.isSuperuser) },
   { id: 'planos-ensino', nome: 'Planos de Ensino', grupo: 'Diário e Avaliações', icone: ClipboardList, rota: '/dashboard/planos', permissao: (u) => !u.isAEE && can(u, 'staff') },
   { id: 'resultados', nome: 'Resultados', grupo: 'Diário e Avaliações', icone: Award, rota: '/dashboard/resultados', permissao: (u) => !u.isAEE && can(u, 'gestao') },
   { id: 'frequencia', nome: 'Frequência', grupo: 'Diário e Avaliações', icone: UserX, rota: '/dashboard/frequencia', permissao: (u) => !u.isAEE && can(u, 'gestao') },

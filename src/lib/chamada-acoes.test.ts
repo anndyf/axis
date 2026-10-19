@@ -4,6 +4,7 @@
  * esquema de isolamento-escolas.test.ts: escola A x escola B.
  */
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest'
+import { dadosDePapeis } from '@/lib/rbac'
 import { prisma } from '@/lib/prisma'
 import { vincularCursosSemEsquema } from '@/lib/services/esquemas-padrao'
 
@@ -20,9 +21,9 @@ const SEGUNDA = '2026-03-02'
 async function criarEscola(dest: Record<string, string>, letra: string) {
   const escola = await prisma.escola.create({ data: { nome: `Escola ${letra} ${SUFIXO}`, slug: `${SUFIXO}-${letra.toLowerCase()}`, status: 'ATIVA' } })
   dest.escola = escola.id
-  dest.admin = (await prisma.user.create({ data: { escolaId: escola.id, username: `adm-${letra}`, email: `adm-${letra}@${SUFIXO}.t`, password: 'x', isSuperuser: true, isDirecao: true, isStaff: true, isApproved: true } })).id
-  dest.prof = (await prisma.user.create({ data: { escolaId: escola.id, username: `prof-${letra}`, email: `prof-${letra}@${SUFIXO}.t`, password: 'x', isStaff: true, isApproved: true } })).id
-  dest.outroProf = (await prisma.user.create({ data: { escolaId: escola.id, username: `prof2-${letra}`, email: `prof2-${letra}@${SUFIXO}.t`, password: 'x', isStaff: true, isApproved: true } })).id
+  dest.admin = (await prisma.user.create({ data: { escolaId: escola.id, username: `adm-${letra}`, email: `adm-${letra}@${SUFIXO}.t`, password: 'x', ...dadosDePapeis(['ADMIN', 'DIRECAO', 'PROFESSOR']), isApproved: true } })).id
+  dest.prof = (await prisma.user.create({ data: { escolaId: escola.id, username: `prof-${letra}`, email: `prof-${letra}@${SUFIXO}.t`, password: 'x', ...dadosDePapeis(['PROFESSOR']), isApproved: true } })).id
+  dest.outroProf = (await prisma.user.create({ data: { escolaId: escola.id, username: `prof2-${letra}`, email: `prof2-${letra}@${SUFIXO}.t`, password: 'x', ...dadosDePapeis(['PROFESSOR']), isApproved: true } })).id
   const curso = await prisma.curso.create({ data: { escolaId: escola.id, nome: `Curso ${letra}`, sigla: `C${letra}`, modalidade: 'EPI', turnos: ['MATUTINO'] } })
   await vincularCursosSemEsquema(prisma, escola.id)
   await prisma.periodoLetivo.create({ data: { escolaId: escola.id, anoLetivo: 2026, inicio: new Date('2026-02-02'), fim: new Date('2026-12-18') } })

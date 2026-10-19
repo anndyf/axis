@@ -7,6 +7,7 @@ import { enviarSenhaPorEmail } from '@/lib/mail'
 import { gerarSenhaProvisoria } from '@/lib/senha'
 import { podeAdicionarUsuarioStaff } from '@/lib/modules-server'
 import { LIMITE_USUARIOS } from '@/lib/modules'
+import { dadosDePapeis, papeisDeFlags } from '@/lib/rbac'
 
 export const runtime = 'nodejs'
 
@@ -38,6 +39,7 @@ export async function GET(request: NextRequest) {
         isSuperuser: true,
         isDirecao: true,
         isStaff: true,
+        papeis: true,
       }
     })
 
@@ -55,7 +57,10 @@ export async function POST(request: NextRequest) {
     }
     const escolaId = session.user.escolaId
 
-    const { name, email, isSuperuser, isDirecao, isStaff, isAEE } = await request.json()
+    const body = await request.json()
+    const { name, email } = body
+    // papeis é o formato atual; os campos is* ainda são aceitos de clientes antigos
+    const papeis = dadosDePapeis(Array.isArray(body.papeis) ? body.papeis : papeisDeFlags(body))
 
     if (!email) {
       return NextResponse.json({ message: 'Email é obrigatório' }, { status: 400 })
@@ -88,10 +93,7 @@ export async function POST(request: NextRequest) {
         username: email,
         password: hashedPassword,
         deveTrocarSenha: true,
-        isSuperuser: !!isSuperuser,
-        isDirecao: !!isDirecao,
-        isStaff: !!isStaff,
-        isAEE: !!isAEE,
+        ...papeis,
         escolaId,
       }
     })

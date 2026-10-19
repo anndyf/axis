@@ -62,6 +62,14 @@ enum PlanoTipo {
   ENTERPRISE
 }
 
+enum Papel {
+  ADMIN
+  DIRECAO
+  COORDENACAO
+  PROFESSOR
+  AEE
+}
+
 enum StatusEscola {
   TRIAL
   ATIVA
@@ -89,6 +97,10 @@ model User {
   estudanteId           String?                 @map("estudante_id")
   isAEE                 Boolean                 @default(false) @map("is_aee")
   isPlatformAdmin       Boolean                 @default(false) @map("is_platform_admin")
+  // Fonte da verdade dos papéis (src/lib/rbac.ts). Durante a transição os
+  // campos is* acima são gravados junto (flagsDePapeis) e uma CHECK no banco
+  // garante que batem; saem quando todas as telas usarem can().
+  papeis                Papel[]                 @default([])
   // Senha provisória (e-mail de acesso) ou igual à matrícula (portal):
   // obriga a troca no próximo acesso.
   deveTrocarSenha       Boolean                 @default(false) @map("deve_trocar_senha")

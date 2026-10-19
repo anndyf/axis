@@ -19,6 +19,7 @@ async function getUsuario(id: string, escolaId: string) {
         is_staff as "isStaff",
         is_direcao as "isDirecao",
         is_aee as "isAEE",
+        papeis::text[] as "papeis",
         last_login as "lastLogin"
       FROM users
       WHERE id = ${id} AND escola_id = ${escolaId}

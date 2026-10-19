@@ -5,10 +5,11 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
   Shield, GraduationCap, PauseCircle, Clock, CheckCircle2,
-  CheckCheck, Loader2, X, Users, Search, Filter, Accessibility
+  CheckCheck, Loader2, X, Users, Search, Filter, Accessibility, ShieldCheck, BookOpenCheck
 } from "lucide-react"
 import { Avatar } from "@/components/ui"
 import UserActions from "./UserActions"
+import { papeisDe } from "@/lib/rbac"
 
 interface Usuario {
   id: string
@@ -20,6 +21,8 @@ interface Usuario {
   isActive: boolean
   isApproved: boolean
   isAEE?: boolean
+  isDirecao?: boolean
+  papeis?: string[] | null
   _count: { disciplinasPermitidas: number }
 }
 
@@ -300,17 +303,27 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
                           </span>
                         ) : (
                           <>
-                            {usuario.isSuperuser && (
+                            {papeisDe(usuario).includes('ADMIN') && (
                               <span className="px-2.5 py-0.5 inline-flex items-center text-xs font-medium rounded-full bg-accent-subtle text-accent-fg border border-accent/25">
                                 <Shield className="w-3 h-3 mr-1" />Admin
                               </span>
                             )}
-                             {usuario.isStaff && (
+                             {papeisDe(usuario).includes('DIRECAO') && (
+                               <span className="px-2.5 py-0.5 inline-flex items-center text-xs font-medium rounded-full bg-accent-subtle text-accent-fg border border-accent/25">
+                                 <ShieldCheck className="w-3 h-3 mr-1" />Direção
+                               </span>
+                             )}
+                             {papeisDe(usuario).includes('COORDENACAO') && (
+                               <span className="px-2.5 py-0.5 inline-flex items-center text-xs font-medium rounded-full bg-info-subtle text-info-fg border border-info-line">
+                                 <BookOpenCheck className="w-3 h-3 mr-1" />Coordenação
+                               </span>
+                             )}
+                             {papeisDe(usuario).includes('PROFESSOR') && (
                                <span className="px-2.5 py-0.5 inline-flex items-center text-xs font-medium rounded-full bg-subtle-hover text-fg border border-line-strong">
                                  <GraduationCap className="w-3 h-3 mr-1" />Professor
                                </span>
                              )}
-                             {(usuario as any).isAEE && (
+                             {papeisDe(usuario).includes('AEE') && (
                                <span className="px-2.5 py-0.5 inline-flex items-center text-xs font-medium rounded-full bg-success-subtle text-success-fg border border-success-line">
                                  <Accessibility className="w-3 h-3 mr-1" />AEE
                                </span>
