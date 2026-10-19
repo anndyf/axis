@@ -22,19 +22,19 @@ Notas configuráveis por esquema, recuperação, conselho de classe, boletim, po
 | **Cabeçalhos de segurança HTTP** | HSTS, `X-Frame-Options`, `nosniff`, `Referrer-Policy` | ✅ Feito (CSP pendente) |
 | **CI (GitHub Actions)** | `tsc` + testes a cada push; hoje nada impede um commit quebrado | ✅ `.github/workflows/ci.yml` (roda ao subir para o GitHub) |
 | **Teste automático de isolamento entre escolas** | Os ~40 vazamentos corrigidos foram achados lendo código. Um teste que chama cada rota com usuário da escola B pedindo dado da escola A pega regressões | ✅ `src/lib/isolamento-escolas.test.ts`: 67 tentativas da escola B contra dados da A + 11 de aluno do portal; já achou 1 vazamento novo e 3 rotas sem checagem de papel |
-| **Monitoramento de erros** (Sentry ou similar) | Erros em produção hoje só aparecem no log do servidor | Próximo |
+| **Monitoramento de erros** (Sentry ou similar) | Erros em produção hoje só aparecem no log do servidor | ✅ Opcional: com `SENTRY_DSN`, erros não tratados do servidor vão para o Sentry (`src/instrumentation.ts`, sem SDK); sem a variável, nada muda. Erros do navegador ainda não |
 | **Backup e exportação por escola** | Restauração testada + exportação completa dos dados de uma escola (portabilidade, encerramento de contrato) | Próximo |
-| **Lançamento de notas em transação** | Lote com erro no meio deixa metade salva | Pendência registrada |
+| **Lançamento de notas em transação** | Lote com erro no meio deixa metade salva | ✅ Lote validado inteiro antes e gravado numa transação (também no conselho de classe) |
 
 ## P1 — Núcleo acadêmico que falta
 
 | Ferramenta | Por quê |
 |---|---|
-| **Calendário letivo + horário real + chamada/frequência** | Ver `plano-avaliacao-frequencia.md` (passos 6–9). Reprovação por falta é exigência legal (LDB art. 24) |
-| **Diário de classe** | Registro de aula com conteúdo ministrado, ligado ao plano de ensino e à chamada — é o documento oficial do professor |
+| **Calendário letivo + horário real + chamada/frequência** | ✅ Ver `plano-avaliacao-frequencia.md` (passos 6–9). Reprovação por falta é exigência legal (LDB art. 24) |
+| **Diário de classe** | ✅ Registro de aula com conteúdo ministrado e chamada (Chamada e Diário). Falta: ligar ao plano de ensino e PDF oficial do diário |
 | **Matrícula por ano letivo + histórico escolar** | Hoje o estudante tem uma única turma; a vida escolar de anos anteriores se perde ao promover. Modelo `Matricula (estudante, turma, ano, situação)` |
 | **Documentos oficiais com validação** | Declaração de matrícula, boletim oficial, histórico escolar, ata de resultados finais — PDF com QR code verificável |
-| **Atividades criadas pelo professor** | Decidido como configurável (passo 5 do plano de avaliação) |
+| **Atividades criadas pelo professor** | ✅ Passo 5 do plano de avaliação |
 | **Conceito / parecer descritivo** | Necessário para anos iniciais e educação infantil |
 
 ## P2 — Comunidade escolar

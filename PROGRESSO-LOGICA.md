@@ -61,5 +61,48 @@ Ambiente: PostgreSQL 16 local subiu; `axis_dev` e `axis_test` criados, migration
   - **[correção de segurança]** `api/notas/turma/[turmaId]/disciplina/[disciplinaId]` (GET) não conferia papel nem se a disciplina era da turma: aluno do portal lia as notas da turma inteira, e qualquer professor lia as de qualquer disciplina. Agora: equipe, disciplina da turma, professor só as dele.
   - **[correção]** O modal de esquema não enviava `definicaoAtividades`, então salvar voltava sempre para ESCOLA.
 
+## Para validar localmente
+
+### Testes
+Todos os testes foram **executados** nesta sessão contra um PostgreSQL 16 local (`axis_test`), inclusive `src/lib/isolamento-escolas.test.ts`: **18 arquivos, 254 testes passando**; `npx tsc --noEmit` com 0 erros e `next build` passando (rodado depois do item de monitoramento). Não há teste escrito sem execução.
+
+Arquivos de teste novos:
+- Puros: `src/lib/services/lancamento-notas.test.ts`, `frequencia.test.ts`, `chamada.test.ts`, `avaliacoes-professor.test.ts`, `src/lib/risk-analysis.test.ts`, `src/lib/monitoramento.test.ts` (+ casos novos em `notas.test.ts`).
+- Integração (banco): `src/lib/notas-lancar.test.ts`, `conselho-classe.test.ts`, `chamada-acoes.test.ts` (chamada + justificativas, escola A × B), `frequencia-leitura.test.ts`, `avaliacoes-professor-acoes.test.ts`.
+
+### Migrations criadas (só tabelas novas, nenhum dado alterado)
+1. `20261019020000_chamada_frequencia` — `aulas`, `faltas`, `justificativas` + enums.
+2. `20261019030000_atividades_professor` — `avaliacoes_disciplina`, `notas_avaliacoes`.
+
+Aplicar com `npx prisma migrate deploy`. Seed de exemplo: `npx tsx prisma/seed-frequencia.ts` (depois de `seed.ts` e `seed-calendario.ts`).
+
+### Telas novas para conferir
+- **Chamada e Diário** (`/dashboard/chamada`): aulas do dia pelo horário, chamada (`/dashboard/chamada/fazer`), diário por disciplina (`/dashboard/chamada/diario`). Testar com `professor` / `professor123` e com a direção. A data padrão é "hoje" no fuso de Brasília.
+- **Frequência** (`/dashboard/frequencia`, gestão): relatório de infrequência + atestados/justificativas.
+- **Minhas avaliações** (`/dashboard/notas/avaliacoes`): só tem efeito em turma cujo esquema esteja em "Atividades definidas pelo professor" (nova opção no modal de esquema, Configurações → Avaliação).
+- Telas existentes com acréscimo mínimo: boletim (campo "Frequência" + coluna "Freq."), PDF do boletim, portal (frequência no cabeçalho do boletim + coluna "Freq"), relatório da turma (bloco "Frequência" no aluno + coluna "Freq."), PDF global da turma (coluna "Freq."), conselho de classe (etiqueta "FREQ" + alunos abaixo do mínimo), lançamento de notas (aviso no modo PROFESSOR). As colunas só aparecem quando a turma já tem chamada salva.
+- Itens de menu: "Chamada e Diário" e "Frequência" foram adicionados em `src/lib/modules.ts` (catálogo). O componente do menu não foi tocado.
+
+### Decisões tomadas sem confirmação
+Estão marcadas com **[decisão]** nos itens acima. As principais:
+1. REPROVADO_FALTA é calculado na leitura e não gravado em `NotaFinal.status`; só vale depois do fim do ano letivo do calendário. Decisão do conselho e desistência prevalecem.
+2. Uma `Aula` por disciplina/dia (com nº de tempos), não uma por tempo; falta com quantidade.
+3. Justificativa aplicada por intervalo de datas no cálculo (sem vínculo direto com a falta).
+4. Chamada só em dia letivo com aula no horário, nunca em data futura; sem calendário, recusada.
+5. Conselho de classe passa a listar quem está abaixo da frequência mínima mesmo com nota para aprovar, e não aprova esses casos automaticamente.
+6. Monitoramento sem o SDK do Sentry (envio direto por `fetch`, só servidor).
+7. No modo PROFESSOR, o template da escola vira o teto da etapa; avaliação com notas não muda de valor nem é removida; editar esquema com avaliações criadas é recusado.
+8. `api/notas/lancar` passou a exigir equipe e professor da disciplina; alunos de outra turma ou disciplinas misturadas recusam o lote.
+
+### Correções de segurança encontradas no caminho
+- `api/notas/lancar`: qualquer usuário logado da escola (inclusive aluno do portal) podia lançar notas.
+- `api/notas/turma/[turmaId]/disciplina/[disciplinaId]` (GET): aluno do portal lia as notas da turma; professor lia as de qualquer disciplina; disciplina não era conferida contra a turma.
+- `api/boletim/[id]/pdf`: aluno do portal baixava o boletim de colegas.
+
+### Achados não corrigidos (fora do escopo, para decidir)
+- Editar um esquema de avaliação sem notas apaga e recria as unidades, e com isso **apaga as datas das unidades no calendário letivo** (`EtapaCalendario` tem `onDelete: Cascade`). Quem editar um esquema precisa salvar as datas de novo.
+- `api/relatorio/turma/[id]/pdf` e outras telas antigas ainda calculam "média geral" pela média simples de `NotaFinal.nota` e fixam 5 como mínimo (`AP`/`RC`).
+- O antigo "DS/INF" (`isDesistente` por etapa) continua manual; poderia ser derivado da frequência.
+
 ## Próximo passo
-Encerramento: planos, seção "Para validar localmente" e pull request.
+Concluído. Sugestões para a próxima sessão: PDF oficial do diário de classe, frequência por etapa no boletim, derivar "DS/INF" da frequência, preservar as datas do calendário ao editar esquema.

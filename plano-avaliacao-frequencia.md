@@ -2,7 +2,7 @@
 
 **Objetivo:** fazer o motor de notas cobrir os sistemas de avaliação mais usados pelas escolas brasileiras (não só "média simples das unidades") e criar o módulo de **frequência**, usando o **horário de aulas** e o **calendário letivo** como base para saber quais aulas existiram e, portanto, quais faltas são possíveis.
 
-## Status (atualizado em 18/10/2026)
+## Status (atualizado em 19/10/2026)
 
 | Passo (seção 4) | Situação |
 |---|---|
@@ -10,13 +10,17 @@
 | 2. Regra de avaliação (schema + motor) | ✅ Migration `avaliacao_regra_configuravel`; motor com 5 formas de cálculo, peso por etapa, `MEDIA_COM_UNIDADE`, `MEDIA_COM_FINAL`; esquemas legados com resultado idêntico (testes) |
 | 3. Tela de esquemas | ✅ Escala, forma de cálculo por etapa e final, recuperação, frequência (campos gravados; chamada ainda não existe) |
 | 4. Migrar leitores de `nota1/2/3` | ✅ Todas as telas, PDFs e o portal leem `NotaUnidade` com colunas U1..UN do esquema da turma (`src/lib/services/notas-leitura.ts`). Lançamento parou o dual-write; seed grava no modelo novo. Colunas `nota_1/2/3` e `is_desistente_unid1/2/3` removidas (migration `remove_colunas_notas_legadas`, que antes copia para `notas_unidades` qualquer nota ainda sem etapas) |
-| 5. Atividades do professor | ⏳ Não iniciado |
+| 5. Atividades do professor | ✅ `definicaoAtividades = PROFESSOR`: professor cria as avaliações de cada unidade em Notas → Minhas avaliações (`AvaliacaoDisciplina`/`NotaAvaliacao`, migration `atividades_professor`); as atividades do template viram o teto da etapa; o lançamento usa as avaliações do professor (`src/lib/services/avaliacoes-professor.ts`) |
 | 6. Calendário + tempos de aula + horário com chaves reais | ✅ Configurações → Calendário letivo (ano, datas das unidades, feriados, sábados letivos, tempos por turno); horário da turma com disciplina/professor por chave e quadro de aulas previstas × carga horária (`src/lib/services/calendario.ts`) |
-| 7–9. Chamada, frequência, justificativas | ⏳ Próximo |
+| 7. Chamada | ✅ `Aula`/`Falta` (migration `chamada_frequencia`): aula criada sob demanda pelo horário × calendário, POR_AULA (uma aula por disciplina/dia, `quantidade` = tempos) ou POR_DIA; tela do professor e diário de classe em Chamada e Diário (`src/lib/services/chamada.ts`) |
+| 8. Frequência | ✅ Motor puro `src/lib/services/frequencia.ts` (por disciplina e geral, GERAL/POR_COMPONENTE, mínimo do esquema); frequência no boletim (tela e PDF), portal, relatório da turma (tela e PDF) e conselho; situação final `REPROVADO_FALTA` calculada na leitura quando o ano letivo terminou (não gravada em `NotaFinal.status`) |
+| 9. Justificativas e infrequência | ✅ `Justificativa` (ABONA / SO_JUSTIFICA por intervalo de datas, aplicada no cálculo); tela Frequência da gestão com relatório de infrequência e projeção até o fim do ano; risco por faltas em `src/lib/risk-analysis.ts` |
 
-Pendências pequenas registradas no caminho:
-- `api/conselho-classe` ainda valida a nota de recuperação contra 0–10 fixo (deveria usar `notaMaxima` do esquema).
-- `api/notas/lancar` grava aluno por aluno sem transação: se o 3º aluno de um lote tem nota inválida, os 2 primeiros já ficaram salvos.
+Pendências registradas no caminho (resolvidas em 19/10/2026):
+- ✅ `api/conselho-classe` valida a recuperação contra `notaMaxima` do esquema, e o lote é atômico.
+- ✅ `api/notas/lancar` valida o lote inteiro e grava numa transação.
+
+Ainda em aberto: derivar automaticamente o antigo "DS/INF" (`isDesistente`) da frequência; registro do Conselho Tutelar (ECA art. 56) como documento; frequência por etapa no boletim.
 
 ---
 
