@@ -23,7 +23,16 @@ Capturas: `npx tsx scripts/capturas.ts <fase>` com `npm run dev` rodando (Chromi
 - [x] Vitrine `/dashboard/ui` (só superuser).
 
 ### 2. Casca do sistema
-- [ ] pendente
+- [x] Menu lateral (`src/components/DashboardSidebar.tsx`) estilo Linear: fundo neutro, itens de 32px com ícone 16px, item ativo com fundo sutil + marca na cor de destaque, rótulos de grupo pequenos, marca da escola (logo ou inicial na cor de destaque) + nome + ano letivo no topo, usuário no rodapé com menu (Meu perfil, Trocar senha → `/dashboard/perfil#senha`, Componentes para superuser, Sair). Recolhível no desktop (preferência no navegador), gaveta no celular que fecha ao navegar. Itens e permissões continuam vindo de `src/lib/modules.ts`; contadores de mensagens/usuários pendentes mantidos.
+  - **[decisão]** Menu passa a abrir **expandido** por padrão (antes recolhido); quem recolher, fica recolhido.
+- [x] Barra superior (`src/components/DashboardTopbar.tsx`) fixa, com migalhas derivadas da rota (módulo do catálogo + subpáginas conhecidas; ids não aparecem) e área de ações. Layout com largura máxima de 1400px e espaçamentos padronizados; rodapé discreto.
+- [x] Dashboard inicial por perfil (`src/app/dashboard/page.tsx`, dados em `src/lib/services/painel-leitura.ts`, só leitura e escopado pela escola):
+  - Gestão: alunos, frequência média, alunos em risco (em recuperação ∪ abaixo da frequência mínima, sem contar duas vezes), chamadas pendentes; tabela por turma (frequência média, abaixo do mínimo, chamadas pendentes); atalhos; comunicados. Resumo por turma em cache de 5 min por escola (mesmo padrão `unstable_cache` com `escolaId` como argumento).
+  - Professor: aulas de hoje com botão para a chamada, notas pendentes (alunos sem nota lançada por disciplina), minhas turmas, atalhos, comunicados.
+- [x] `devIndicators: false` em `next.config.ts` (o indicador do modo dev cobria o menu do usuário).
+- **[correção]** Lista de turmas vazia: o banco grava o turno como `MATUTINO` e a tela agrupava por `Matutino`, então nenhuma turma aparecia (já estava assim antes, ver `0-antes/turmas-1440.png`). Agrupamento agora normaliza o turno; dados intocados.
+- Capturas: `docs/capturas/2-casca/`.
+- Nota: com `npm run dev` rodando, o Next às vezes corrompe `.next/dev/types/routes.d.ts` (gerado); a verificação considera 0 erros de `tsc` fora de `.next/`.
 
 ### 3. Identidade visual da escola e acesso
 - [ ] pendente
@@ -35,4 +44,4 @@ Capturas: `npx tsx scripts/capturas.ts <fase>` com `npm run dev` rodando (Chromi
 - [ ] pendente
 
 ## Próximo passo
-Fase 2: menu lateral, barra superior e dashboard inicial.
+Fase 3: identidade visual da escola, login, páginas de acesso, página de entrada no domínio raiz.

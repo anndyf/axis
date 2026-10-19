@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import { normalizarTurno } from "@/lib/services/calendario"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
@@ -154,11 +155,18 @@ export default function TurmasListClient({
     setSelectedSerie(null)
   }
 
+  // Turno gravado como "MATUTINO" ou "Matutino": agrupa sempre pelo rótulo
+  const rotuloTurno = (t?: string | null) => {
+    const n = normalizarTurno(t)
+    const rotulo = { MATUTINO: "Matutino", VESPERTINO: "Vespertino", NOTURNO: "Noturno", INTEGRAL: "Integral" }[n]
+    return rotulo ?? "Outros"
+  }
+
   const filteredTurmas = useMemo(() => {
     return turmas.filter(t => {
       const decoded = decodeTurma(t.nome)
       const nomeCurso = t.curso || decoded.curso || "Outros"
-      const turno = t.turno || decoded.turno || "Outros"
+      const turno = rotuloTurno(t.turno || decoded.turno)
       const serieMatch = t.nome.match(/^(\d+)/)
       const serie = serieMatch ? serieMatch[1] : null
 
@@ -175,7 +183,7 @@ export default function TurmasListClient({
   const turmasAgrupadas = useMemo(() => {
     return filteredTurmas.reduce((acc, turma) => {
       const decoded = decodeTurma(turma.nome)
-      const turno = turma.turno || decoded.turno || "Outros"
+      const turno = rotuloTurno(turma.turno || decoded.turno)
       if (!acc[turno]) acc[turno] = []
       acc[turno].push(turma)
       return acc

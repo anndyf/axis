@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Sem o indicador flutuante do modo dev (cobria o menu do usuário nas capturas)
+  devIndicators: false,
   async headers() {
     return [
       {

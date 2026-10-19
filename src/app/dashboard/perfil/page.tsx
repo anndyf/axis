@@ -103,7 +103,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Change Password Form */}
-        <div className="md:col-span-2">
+        <div id="senha" className="md:col-span-2 scroll-mt-20">
           <div className="bg-white rounded-[2rem] p-8 shadow-xl shadow-slate-200 border border-slate-200">
             <h2 className="text-xl font-medium text-slate-800 mb-6 flex items-center gap-2">
               <Key className="w-5 h-5 text-slate-600" />
