@@ -50,14 +50,15 @@ export default function PortalActivationAction({
     <>
       <button 
         onClick={() => setIsModalOpen(true)}
-        className={`p-2 rounded-xl transition-all ${
-          hasUser 
-          ? 'bg-success-subtle text-success-fg border border-success-line' 
-          : 'bg-zinc-50 text-fg-subtle border border-zinc-200 hover:text-fg hover:bg-white'
+        className={`p-1.5 rounded-md transition-colors duration-150 hover:bg-subtle ${
+          hasUser
+          ? 'text-success-fg'
+          : 'text-fg-subtle hover:text-fg'
         }`}
         title={hasUser ? "Portal Ativo" : "Ativar Acesso Estudante"}
+        aria-label={hasUser ? "Portal ativo: gerenciar acesso" : "Ativar acesso ao portal"}
       >
-        <ShieldCheck size={18} />
+        <ShieldCheck size={16} strokeWidth={1.75} />
       </button>
 
       {isModalOpen && (

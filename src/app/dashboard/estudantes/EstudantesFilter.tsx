@@ -122,53 +122,35 @@ export default function EstudantesFilter({ cursos, turmas, totalResults }: Filte
   }
 
   return (
-    <div className="p-6 border-b border-zinc-300">
-      {/* Top Row: Stats + Search */}
-      <div className="flex flex-col md:flex-row gap-4 mb-4">
-        {/* Total Card */}
-        <div className="flex-shrink-0 bg-zinc-700 text-white rounded-lg px-6 py-3 flex items-center space-x-4 shadow-sm min-w-[200px]">
-           <div className="p-2 bg-white/20 rounded-lg">
-             {isPending ? (
-               <Loader2 className="w-5 h-5 text-white animate-spin" />
-             ) : (
-               <Users className="w-5 h-5 text-white" />
-             )}
-           </div>
-           <div>
-             <p className="text-xs font-medium text-zinc-200">
-               {isPending ? 'Buscando...' : 'Total Encontrado'}
-             </p>
-             <p className="text-2xl font-medium leading-none">
-               {isPending ? '--' : totalResults}
-             </p>
-           </div>
-        </div>
-
-        {/* Search Input */}
+    <div className="p-4 sm:p-5 border-b border-line">
+      {/* Busca + total */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
         <div className="flex-1 relative">
-           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-             {isPending ? (
-               <Loader2 className="h-6 w-6 text-fg-subtle animate-spin" />
-             ) : (
-               <Search className="h-6 w-6 text-fg-subtle" />
-             )}
+           <label htmlFor="estudantes-busca" className="sr-only">Buscar por nome ou matrícula</label>
+           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-fg-subtle">
+             {isPending ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} strokeWidth={1.75} />}
            </div>
            <input
-             type="text"
+             id="estudantes-busca"
+             type="search"
              placeholder="Buscar por nome ou matrícula..."
-             className="block w-full pl-12 pr-4 py-4 h-full border border-zinc-300 rounded-lg leading-5 bg-zinc-50 placeholder-zinc-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-zinc-500/20 focus:border-zinc-500 sm:text-lg transition-all"
+             className="block w-full h-9 pl-9 pr-3 border border-line rounded-lg bg-surface text-sm text-fg placeholder:text-fg-subtle transition-colors duration-150 hover:border-line-strong focus:border-accent"
              value={search}
              onChange={(e) => setSearch(e.target.value)}
            />
         </div>
+        <p className="flex shrink-0 items-center gap-1.5 text-13 text-fg-muted" role="status">
+           <Users size={16} strokeWidth={1.75} className="text-fg-subtle" aria-hidden />
+           {isPending ? 'Buscando...' : <><span className="font-semibold tabular-nums text-fg">{totalResults}</span> {totalResults === 1 ? 'estudante' : 'estudantes'}</>}
+        </p>
       </div>
-      
+
       {/* Bottom Row: Filters + Clear */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
         {/* Curso Filter */}
         <div>
           <select
-            className="block w-full pl-3 pr-10 py-2.5 text-sm border-zinc-300 focus:outline-none focus:ring-zinc-500 focus:border-zinc-500 rounded-lg"
+            className="block w-full h-9 pl-3 pr-8 text-sm text-fg bg-surface border border-line rounded-lg transition-colors duration-150 hover:border-line-strong focus:border-accent"
             value={cursoId}
             onChange={(e) => handleCursoChange(e.target.value)}
           >
@@ -184,7 +166,7 @@ export default function EstudantesFilter({ cursos, turmas, totalResults }: Filte
         {/* Turno Filter */}
         <div>
           <select
-            className="block w-full pl-3 pr-10 py-2.5 text-sm border-zinc-300 focus:outline-none focus:ring-zinc-500 focus:border-zinc-500 rounded-lg"
+            className="block w-full h-9 pl-3 pr-8 text-sm text-fg bg-surface border border-line rounded-lg transition-colors duration-150 hover:border-line-strong focus:border-accent"
             value={turno}
             onChange={(e) => handleTurnoChange(e.target.value)}
           >
@@ -198,7 +180,7 @@ export default function EstudantesFilter({ cursos, turmas, totalResults }: Filte
         {/* Serie Filter */}
         <div>
           <select
-            className="block w-full pl-3 pr-10 py-2.5 text-sm border-zinc-300 focus:outline-none focus:ring-zinc-500 focus:border-zinc-500 rounded-lg"
+            className="block w-full h-9 pl-3 pr-8 text-sm text-fg bg-surface border border-line rounded-lg transition-colors duration-150 hover:border-line-strong focus:border-accent"
             value={serie}
             onChange={(e) => handleSerieChange(e.target.value)}
           >
@@ -213,7 +195,7 @@ export default function EstudantesFilter({ cursos, turmas, totalResults }: Filte
         {/* Turma Filter */}
         <div>
           <select
-            className="block w-full pl-3 pr-10 py-2.5 text-sm border-zinc-300 focus:outline-none focus:ring-zinc-500 focus:border-zinc-500 rounded-lg disabled:bg-zinc-50 disabled:text-fg-subtle"
+            className="block w-full h-9 pl-3 pr-8 text-sm text-fg bg-surface border border-line rounded-lg transition-colors duration-150 hover:border-line-strong focus:border-accent disabled:bg-subtle disabled:text-fg-disabled"
             value={turmaId}
             onChange={(e) => handleTurmaChange(e.target.value)}
             disabled={!cursoId && !turno && !serie && turmas.length > 50} 
@@ -230,10 +212,10 @@ export default function EstudantesFilter({ cursos, turmas, totalResults }: Filte
         {/* Clear Button */}
         <button 
            onClick={handleClearFilters}
-           className="flex items-center justify-center space-x-2 px-4 py-2 bg-zinc-200 hover:bg-zinc-300 text-fg-muted rounded-lg transition-colors font-medium border border-zinc-300"
+           className="col-span-2 md:col-span-1 flex h-9 items-center justify-center gap-1.5 px-3 text-13 font-medium text-fg-muted rounded-lg transition-colors duration-150 hover:bg-subtle hover:text-fg"
            title="Limpar todos os filtros"
         >
-           <FilterX className="w-4 h-4" />
+           <FilterX size={16} strokeWidth={1.75} aria-hidden />
            <span>Limpar</span>
         </button>
       </div>

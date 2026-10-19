@@ -120,18 +120,18 @@ export default function RecuperacaoTurmaClient({
   return (
     <div className="">
       {/* Header Estilo Simulados */}
-      <header className="mb-6 border-b border-line pb-4">
+      <header className="mb-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link href="/dashboard/notas/recuperacao" className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-fg-subtle hover:text-fg-muted">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <Link href="/dashboard/notas/recuperacao" aria-label="Voltar" className="hidden sm:inline-flex p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg">
                 <ArrowLeft size={20}/>
               </Link>
               <div>
-                <h1 className="text-3xl font-medium text-fg tracking-tight">
+                <h1 className="text-2xl font-semibold tracking-tight text-fg">
                   {disciplinaSelecionada ? disciplineObj?.nome : "Lançar Recuperação Final"}
                 </h1>
-                <p className="text-base text-fg-muted font-medium">{disciplinaSelecionada ? `Turma: ${turmaNome}` : `Turma Selecionada: ${turmaNome}`}</p>
+                <p className="text-sm text-fg-muted">{disciplinaSelecionada ? `Turma: ${turmaNome}` : `Turma Selecionada: ${turmaNome}`}</p>
               </div>
             </div>
 
@@ -139,7 +139,7 @@ export default function RecuperacaoTurmaClient({
               <button
                 onClick={handleSubmit}
                 disabled={saving}
-                className="flex items-center gap-2 bg-accent border border-accent text-on-accent px-5 py-2.5 rounded-xl font-medium hover:bg-accent-hover transition-all text-sm active:scale-95 shadow-card"
+                className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
               >
                 {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save size={16} />}
                 {saving ? 'SALVANDO...' : 'SALVAR RECUPERAÇÃO FINAL'}

@@ -2,7 +2,15 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Shield, Database, Check, AlertCircle, Save, ClipboardList, ChevronRight, CalendarDays, Palette } from "lucide-react"
+import { Check, AlertCircle, Save, ClipboardList, ChevronRight, CalendarDays, Palette, type LucideIcon } from "lucide-react"
+import { Button, Card, CardBody, CardFooter, CardHeader, PageHeader, Select, Skeleton, Switch } from "@/components/ui"
+import ConfirmModal from "@/components/ConfirmModal"
+
+const ATALHOS: { href: string; icon: LucideIcon; titulo: string; descricao: string }[] = [
+  { href: "/dashboard/configuracoes/avaliacao", icon: ClipboardList, titulo: "Esquemas de avaliação", descricao: "Unidades, atividades e regras de recuperação da escola." },
+  { href: "/dashboard/configuracoes/calendario", icon: CalendarDays, titulo: "Calendário letivo", descricao: "Início e fim do ano, datas das unidades, feriados, sábados letivos e tempos de aula." },
+  { href: "/dashboard/configuracoes/identidade", icon: Palette, titulo: "Identidade visual", descricao: "Logo e cor de destaque da escola no sistema, no login e nos PDFs." },
+]
 
 export default function ConfiguracoesPage() {
   const [loading, setLoading] = useState(true)
@@ -58,173 +66,82 @@ export default function ConfiguracoesPage() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-700"></div>
-      </div>
-    )
-  }
-
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-3xl font-medium text-fg flex items-center gap-3">
-          <Shield className="text-fg-muted" />
-          Configurações do Sistema
-        </h1>
-        <p className="text-fg-muted mt-2">Gerencie as funcionalidades globais e acessos dos professores.</p>
-      </div>
+    <div className="mx-auto max-w-3xl space-y-6">
+      <PageHeader title="Configurações" description="Funcionalidades globais da escola e acesso dos professores." />
 
-      <Link
-        href="/dashboard/configuracoes/avaliacao"
-        className="flex items-center justify-between bg-white rounded-lg shadow-sm border border-zinc-200 p-6 hover:border-zinc-300 hover:shadow-card transition-all group"
-      >
-        <div className="flex items-center gap-4">
-          <div className="p-3 rounded-xl bg-zinc-100 text-fg-muted group-hover:bg-zinc-700 group-hover:text-white transition-colors">
-            <ClipboardList className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="font-medium text-accent-fg">Esquemas de Avaliação</p>
-            <p className="text-sm text-fg-muted">Configure unidades, atividades e regras de recuperação por escola.</p>
-          </div>
-        </div>
-        <ChevronRight className="w-5 h-5 text-zinc-300 group-hover:text-fg-muted transition-colors" />
-      </Link>
+      <Card>
+        <ul className="divide-y divide-line-subtle">
+          {ATALHOS.map(({ href, icon: Icon, titulo, descricao }) => (
+            <li key={href}>
+              <Link href={href} className="group flex items-center gap-3 px-4 py-3.5 transition-colors duration-150 hover:bg-subtle/60 sm:px-5">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-md border border-line bg-subtle text-fg-muted" aria-hidden>
+                  <Icon size={16} strokeWidth={1.75} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-medium text-fg">{titulo}</span>
+                  <span className="block text-13 text-fg-muted">{descricao}</span>
+                </span>
+                <ChevronRight size={16} strokeWidth={1.75} className="shrink-0 text-fg-disabled transition-colors duration-150 group-hover:text-fg-muted" aria-hidden />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </Card>
 
-      <Link
-        href="/dashboard/configuracoes/calendario"
-        className="flex items-center justify-between bg-white rounded-lg shadow-sm border border-zinc-200 p-6 hover:border-zinc-300 hover:shadow-card transition-all group"
-      >
-        <div className="flex items-center gap-4">
-          <div className="p-3 rounded-xl bg-zinc-100 text-fg-muted group-hover:bg-zinc-700 group-hover:text-white transition-colors">
-            <CalendarDays className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="font-medium text-accent-fg">Calendário Letivo</p>
-            <p className="text-sm text-fg-muted">Início e fim do ano, datas das unidades, feriados, sábados letivos e tempos de aula.</p>
-          </div>
-        </div>
-        <ChevronRight className="w-5 h-5 text-zinc-300 group-hover:text-fg-muted transition-colors" />
-      </Link>
-
-      <Link
-        href="/dashboard/configuracoes/identidade"
-        className="flex items-center justify-between bg-white rounded-lg shadow-sm border border-zinc-200 p-6 hover:border-zinc-300 hover:shadow-card transition-all group"
-      >
-        <div className="flex items-center gap-4">
-          <div className="p-3 rounded-xl bg-zinc-100 text-fg-muted group-hover:bg-zinc-700 group-hover:text-white transition-colors">
-            <Palette className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="font-medium text-accent-fg">Identidade visual</p>
-            <p className="text-sm text-fg-muted">Logo e cor de destaque da escola no sistema, no login e nos PDFs.</p>
-          </div>
-        </div>
-        <ChevronRight className="w-5 h-5 text-zinc-300 group-hover:text-fg-muted transition-colors" />
-      </Link>
-
-      <div className="bg-white rounded-lg shadow-sm border border-zinc-200 overflow-hidden">
-        <div className="p-6 border-b border-zinc-200 bg-zinc-100/50">
-          <h2 className="text-lg font-medium flex items-center gap-2">
-            <Database className="w-5 h-5 text-fg-muted" />
-            Módulos Pedagógicos
-          </h2>
-        </div>
-        
-        <div className="p-6 space-y-6">
-          <div className="flex items-center justify-between p-4 rounded-xl border border-zinc-200 hover:bg-zinc-100 transition-colors">
-            <div className="space-y-1">
-              <p className="font-medium text-accent-fg">Banco de Questões</p>
-              <p className="text-sm text-fg-muted">Permitir que professores enviem e visualizem o banco de questões.</p>
-            </div>
-            <button
-              onClick={() => setIsBancoAtivo(!isBancoAtivo)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ring-2 ring-offset-2 ${
-                isBancoAtivo ? 'bg-zinc-700 ring-zinc-500' : 'bg-zinc-300 ring-transparent'
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  isBancoAtivo ? 'translate-x-6' : 'translate-x-1'
-                }`}
-              />
-            </button>
-          </div>
-
-          <div className="flex items-center justify-between p-4 rounded-xl border border-zinc-200 hover:bg-zinc-100 transition-colors">
-            <div className="space-y-1">
-              <p className="font-medium text-accent-fg">Ano Letivo Ativo</p>
-              <p className="text-sm text-fg-muted">Define qual ano letivo será exibido e gerenciado no sistema.</p>
-            </div>
-            <select
-              value={anoLetivo}
-              onChange={(e) => setAnoLetivo(Number(e.target.value))}
-              className="bg-white border border-accent/25 text-accent-fg text-sm rounded-lg focus:ring-zinc-500 focus:border-zinc-500 block w-32 p-2.5"
-            >
-              {availableYears.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="p-6 bg-zinc-100 border-t border-zinc-200 flex items-center justify-between">
-          <div>
-            {message && (
-              <div className={`flex items-center gap-2 text-sm font-medium ${
-                message.type === 'success' ? 'text-success-fg' : 'text-danger-fg'
-              }`}>
-                {message.type === 'success' ? <Check size={16} /> : <AlertCircle size={16} />}
-                {message.text}
+      <Card>
+        <CardHeader title="Módulos pedagógicos" description="Valem para todos os usuários da escola." />
+        {loading ? (
+          <CardBody className="space-y-4">
+            <Skeleton className="h-10" />
+            <Skeleton className="h-10" />
+          </CardBody>
+        ) : (
+          <ul className="divide-y divide-line-subtle">
+            <li className="flex items-center justify-between gap-4 px-4 py-3.5 sm:px-5">
+              <div className="min-w-0">
+                <label htmlFor="cfg-banco" className="block text-sm font-medium text-fg">Banco de questões</label>
+                <p className="text-13 text-fg-muted">Permitir que professores enviem e consultem o banco de questões.</p>
               </div>
+              <Switch id="cfg-banco" checked={isBancoAtivo} onChange={setIsBancoAtivo} />
+            </li>
+            <li className="flex items-center justify-between gap-4 px-4 py-3.5 sm:px-5">
+              <div className="min-w-0">
+                <label htmlFor="cfg-ano" className="block text-sm font-medium text-fg">Ano letivo ativo</label>
+                <p className="text-13 text-fg-muted">Ano exibido e gerenciado no sistema.</p>
+              </div>
+              <Select id="cfg-ano" value={anoLetivo} onChange={(e) => setAnoLetivo(Number(e.target.value))} className="w-28 tabular-nums">
+                {availableYears.map((year) => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </Select>
+            </li>
+          </ul>
+        )}
+        <CardFooter className="justify-between">
+          <div role="status">
+            {message && (
+              <p className={`flex items-center gap-1.5 text-13 font-medium ${message.type === 'success' ? 'text-success-fg' : 'text-danger-fg'}`}>
+                {message.type === 'success' ? <Check size={16} strokeWidth={1.75} /> : <AlertCircle size={16} strokeWidth={1.75} />}
+                {message.text}
+              </p>
             )}
           </div>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="bg-surface border border-line hover:bg-subtle disabled:opacity-50 text-fg px-6 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-all shadow-card active:scale-95"
-          >
-            {saving ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              <Save size={20} />
-            )}
-            Salvar Alterações
-          </button>
-        </div>
-      </div>
+          <Button onClick={handleSave} loading={saving} disabled={loading}>
+            {!saving && <Save size={16} strokeWidth={1.75} />} Salvar alterações
+          </Button>
+        </CardFooter>
+      </Card>
 
-      {/* Modal de Confirmação para Configurações */}
-      {showConfirm && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white w-full max-w-sm rounded-xl p-8 shadow-overlay animate-pop-in">
-            <div className="w-16 h-16 bg-zinc-100 text-fg-muted rounded-lg flex items-center justify-center mb-6">
-              <Shield className="w-8 h-8" />
-            </div>
-            <h3 className="text-2xl font-medium text-fg mb-2">Salvar Configurações?</h3>
-            <p className="text-fg-muted font-medium mb-8">
-              Estas alterações afetarão o comportamento global do sistema para todos os usuários. Deseja confirmar?
-            </p>
-            <div className="grid grid-cols-2 gap-4">
-              <button 
-                onClick={() => setShowConfirm(false)}
-                className="py-4 rounded-lg font-medium text-fg-muted hover:bg-zinc-50 transition-all"
-              >
-                Cancelar
-              </button>
-              <button 
-                onClick={() => handleSave()}
-                className="py-4 rounded-lg font-medium bg-zinc-900 text-white hover:bg-zinc-800 transition-all shadow-card"
-              >
-                Confirmar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmModal
+        isOpen={showConfirm}
+        onClose={() => setShowConfirm(false)}
+        onConfirm={handleSave}
+        title="Salvar configurações?"
+        message="Estas alterações afetam o comportamento do sistema para todos os usuários da escola."
+        confirmText="Salvar"
+        variant="info"
+      />
     </div>
   )
 }

@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from "react"
 import Link from "next/link"
-import { ArrowLeft, CalendarDays, Clock, Plus, Trash2, Save, Loader2, CheckCircle2, AlertCircle } from "lucide-react"
+import { PageHeader, buttonClasses, cn } from "@/components/ui"
+import { ArrowLeft, Clock, Plus, Trash2, Save, Loader2, CheckCircle2, AlertCircle } from "lucide-react"
 import {
   salvarPeriodoLetivo, salvarEtapas, adicionarDiaNaoLetivo, removerDiaNaoLetivo,
   adicionarDiaLetivoExtra, removerDiaLetivoExtra, salvarTemposAula,
@@ -32,9 +33,10 @@ const TIPOS = [
   { id: "OUTRO", nome: "Outro" },
 ]
 
-const card = "bg-white rounded-lg shadow-sm border border-zinc-200 p-6 space-y-4"
-const input = "px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-lg outline-none text-sm text-fg-muted focus:bg-white focus:border-accent"
-const botao = "flex items-center gap-2 bg-zinc-900 text-white px-4 py-2 rounded-lg text-xs font-medium uppercase tracking-wide hover:bg-zinc-800 disabled:opacity-50"
+const card = "bg-surface rounded-lg border border-line p-4 sm:p-5 space-y-4"
+const input = "h-9 px-3 bg-surface border border-line rounded-lg text-sm text-fg tabular-nums transition-colors duration-150 hover:border-line-strong focus:border-accent"
+const botao = buttonClasses({ size: "sm" })
+const botaoSecundario = buttonClasses({ size: "sm", variant: "secondary" })
 
 const dataBR = (iso: string) => iso.split("-").reverse().join("/")
 
@@ -74,21 +76,15 @@ export default function CalendarioClient(props: Props) {
     setTempos((prev) => ({ ...prev, [turno]: prev[turno].map((t, idx) => (idx === i ? { ...t, [campo]: valor } : t)) }))
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-16">
-      <div className="flex items-center gap-4">
-        <Link href="/dashboard/configuracoes" className="p-2 hover:bg-zinc-200 rounded-lg transition-colors">
-          <ArrowLeft className="w-5 h-5 text-fg-muted" />
-        </Link>
-        <div>
-          <h1 className="text-2xl font-medium text-fg flex items-center gap-2">
-            <CalendarDays className="w-6 h-6 text-fg-muted" /> Calendário letivo {props.anoLetivo}
-          </h1>
-          <p className="text-sm text-fg-muted">Base das aulas previstas e da frequência: dias letivos × horário das turmas.</p>
-        </div>
-      </div>
+    <div className="max-w-4xl mx-auto space-y-4 pb-16">
+      <PageHeader
+        title={`Calendário letivo ${props.anoLetivo}`}
+        description="Base das aulas previstas e da frequência: dias letivos × horário das turmas."
+        actions={<Link href="/dashboard/configuracoes" className={buttonClasses({ variant: "ghost" })}><ArrowLeft size={16} strokeWidth={1.75} /> Configurações</Link>}
+      />
 
       {aviso && (
-        <div className={`p-4 rounded-xl border text-sm flex items-center gap-2 ${aviso.tipo === "ok" ? "bg-success-subtle border-success-line text-success-fg" : "bg-danger-subtle border-danger-line text-danger-fg"}`}>
+        <div className={`px-4 py-3 rounded-lg border text-13 flex items-center gap-2 ${aviso.tipo === "ok" ? "bg-success-subtle border-success-line text-success-fg" : "bg-danger-subtle border-danger-line text-danger-fg"}`}>
           {aviso.tipo === "ok" ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
           {aviso.texto}
         </div>
@@ -96,7 +92,7 @@ export default function CalendarioClient(props: Props) {
 
       {/* Período letivo */}
       <section className={card}>
-        <h2 className="font-medium text-fg">Ano letivo</h2>
+        <h2 className="text-sm font-semibold text-fg">Ano letivo</h2>
         <div className="flex flex-wrap items-end gap-3">
           <label className="text-xs text-fg-subtle space-y-1"><span className="block">Início</span>
             <input type="date" value={inicio} onChange={(e) => setInicio(e.target.value)} className={input} />
@@ -118,7 +114,7 @@ export default function CalendarioClient(props: Props) {
 
       {/* Etapas por esquema */}
       <section className={card}>
-        <h2 className="font-medium text-fg">Datas das unidades</h2>
+        <h2 className="text-sm font-semibold text-fg">Datas das unidades</h2>
         {!props.periodo && <p className="text-sm text-warning-fg">Salve o início e o fim do ano letivo antes.</p>}
         {props.esquemas.map((esq) => (
           <div key={esq.id} className="space-y-2">
@@ -145,26 +141,26 @@ export default function CalendarioClient(props: Props) {
 
       {/* Dias não letivos */}
       <section className={card}>
-        <h2 className="font-medium text-fg">Feriados, recessos e dias sem aula</h2>
+        <h2 className="text-sm font-semibold text-fg">Feriados, recessos e dias sem aula</h2>
         <div className="flex flex-wrap items-center gap-2">
           <input type="date" value={novoNaoLetivo.data} onChange={(e) => setNovoNaoLetivo({ ...novoNaoLetivo, data: e.target.value })} className={input} />
           <select value={novoNaoLetivo.tipo} onChange={(e) => setNovoNaoLetivo({ ...novoNaoLetivo, tipo: e.target.value })} className={input}>
             {TIPOS.map((t) => <option key={t.id} value={t.id}>{t.nome}</option>)}
           </select>
           <input placeholder="Descrição (ex.: Tiradentes)" value={novoNaoLetivo.descricao} onChange={(e) => setNovoNaoLetivo({ ...novoNaoLetivo, descricao: e.target.value })} className={`${input} flex-1 min-w-48`} />
-          <button disabled={pendente} className={botao} onClick={() => executar(async () => {
+          <button disabled={pendente} className={botaoSecundario} onClick={() => executar(async () => {
             const r = await adicionarDiaNaoLetivo(novoNaoLetivo.data, novoNaoLetivo.tipo, novoNaoLetivo.descricao)
             if ("ok" in r) setNovoNaoLetivo({ data: "", tipo: "FERIADO", descricao: "" })
             return r
           }, "Dia adicionado.")}>
-            <Plus className="w-4 h-4" /> Adicionar
+            <Plus size={16} strokeWidth={1.75} /> Adicionar
           </button>
         </div>
-        <ul className="divide-y divide-zinc-100">
+        <ul className="divide-y divide-line-subtle">
           {props.naoLetivos.map((d) => (
             <li key={d.id} className="flex items-center justify-between py-2 text-sm">
               <span><strong className="text-fg">{dataBR(d.data)}</strong> · <span className="text-fg-subtle">{TIPOS.find((t) => t.id === d.tipo)?.nome}</span> · {d.descricao}</span>
-              <button aria-label="Remover" disabled={pendente} onClick={() => executar(() => removerDiaNaoLetivo(d.id), "Dia removido.")} className="p-1.5 text-danger-fg hover:bg-danger-subtle rounded-lg">
+              <button aria-label="Remover" disabled={pendente} onClick={() => executar(() => removerDiaNaoLetivo(d.id), "Dia removido.")} className="p-1.5 text-fg-subtle hover:bg-danger-subtle hover:text-danger-fg rounded-md transition-colors duration-150">
                 <Trash2 className="w-4 h-4" />
               </button>
             </li>
@@ -175,26 +171,26 @@ export default function CalendarioClient(props: Props) {
 
       {/* Dias letivos extras */}
       <section className={card}>
-        <h2 className="font-medium text-fg">Sábados letivos e reposições</h2>
+        <h2 className="text-sm font-semibold text-fg">Sábados letivos e reposições</h2>
         <div className="flex flex-wrap items-center gap-2">
           <input type="date" value={novoExtra.data} onChange={(e) => setNovoExtra({ ...novoExtra, data: e.target.value })} className={input} />
           <select value={novoExtra.seguirHorarioDe} onChange={(e) => setNovoExtra({ ...novoExtra, seguirHorarioDe: Number(e.target.value) })} className={input}>
             {[1, 2, 3, 4, 5].map((d) => <option key={d} value={d}>Horário de {DIAS[d]}</option>)}
           </select>
           <input placeholder="Descrição" value={novoExtra.descricao} onChange={(e) => setNovoExtra({ ...novoExtra, descricao: e.target.value })} className={`${input} flex-1 min-w-48`} />
-          <button disabled={pendente} className={botao} onClick={() => executar(async () => {
+          <button disabled={pendente} className={botaoSecundario} onClick={() => executar(async () => {
             const r = await adicionarDiaLetivoExtra(novoExtra.data, novoExtra.seguirHorarioDe, novoExtra.descricao)
             if ("ok" in r) setNovoExtra({ data: "", seguirHorarioDe: 1, descricao: "" })
             return r
           }, "Dia letivo adicionado.")}>
-            <Plus className="w-4 h-4" /> Adicionar
+            <Plus size={16} strokeWidth={1.75} /> Adicionar
           </button>
         </div>
-        <ul className="divide-y divide-zinc-100">
+        <ul className="divide-y divide-line-subtle">
           {props.extras.map((d) => (
             <li key={d.id} className="flex items-center justify-between py-2 text-sm">
               <span><strong className="text-fg">{dataBR(d.data)}</strong> · horário de {DIAS[d.seguirHorarioDe]} · {d.descricao}</span>
-              <button aria-label="Remover" disabled={pendente} onClick={() => executar(() => removerDiaLetivoExtra(d.id), "Dia removido.")} className="p-1.5 text-danger-fg hover:bg-danger-subtle rounded-lg">
+              <button aria-label="Remover" disabled={pendente} onClick={() => executar(() => removerDiaLetivoExtra(d.id), "Dia removido.")} className="p-1.5 text-fg-subtle hover:bg-danger-subtle hover:text-danger-fg rounded-md transition-colors duration-150">
                 <Trash2 className="w-4 h-4" />
               </button>
             </li>
@@ -205,11 +201,11 @@ export default function CalendarioClient(props: Props) {
 
       {/* Tempos de aula */}
       <section className={card}>
-        <h2 className="font-medium text-fg flex items-center gap-2"><Clock className="w-4 h-4" /> Tempos de aula</h2>
+        <h2 className="text-sm font-semibold text-fg flex items-center gap-2"><Clock size={16} strokeWidth={1.75} className="text-fg-subtle" aria-hidden /> Tempos de aula</h2>
         <p className="text-xs text-fg-subtle">O 1º, 2º, 3º... horário da grade de cada turma usa os tempos do turno dela.</p>
         <div className="flex flex-wrap gap-2">
           {TURNOS.map((t) => (
-            <button key={t.id} onClick={() => setTurno(t.id)} className={`px-3 py-1.5 rounded-lg text-xs font-medium border ${turno === t.id ? "bg-zinc-900 text-white border-zinc-900" : "bg-white text-fg-muted border-zinc-200"}`}>
+            <button key={t.id} onClick={() => setTurno(t.id)} className={cn("h-8 px-3 rounded-md text-13 font-medium border transition-colors duration-150", turno === t.id ? "bg-subtle text-fg border-line-strong" : "bg-surface text-fg-muted border-line hover:text-fg")}>
               {t.nome} ({(tempos[t.id] ?? []).length})
             </button>
           ))}
@@ -221,15 +217,15 @@ export default function CalendarioClient(props: Props) {
               <input type="time" aria-label={`${i + 1}º tempo início`} value={t.inicio} onChange={(e) => setTempo(i, "inicio", e.target.value)} className={input} />
               <span className="text-xs text-fg-subtle">às</span>
               <input type="time" aria-label={`${i + 1}º tempo fim`} value={t.fim} onChange={(e) => setTempo(i, "fim", e.target.value)} className={input} />
-              <button aria-label="Remover tempo" onClick={() => setTempos((prev) => ({ ...prev, [turno]: prev[turno].filter((_, idx) => idx !== i) }))} className="p-1.5 text-danger-fg hover:bg-danger-subtle rounded-lg">
+              <button aria-label="Remover tempo" onClick={() => setTempos((prev) => ({ ...prev, [turno]: prev[turno].filter((_, idx) => idx !== i) }))} className="p-1.5 text-fg-subtle hover:bg-danger-subtle hover:text-danger-fg rounded-md transition-colors duration-150">
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
           ))}
         </div>
         <div className="flex gap-2">
-          <button onClick={() => setTempos((prev) => ({ ...prev, [turno]: [...(prev[turno] ?? []), { inicio: "", fim: "" }] }))} className="flex items-center gap-1 text-xs font-bold text-accent-fg">
-            <Plus className="w-3.5 h-3.5" /> Tempo
+          <button onClick={() => setTempos((prev) => ({ ...prev, [turno]: [...(prev[turno] ?? []), { inicio: "", fim: "" }] }))} className={botaoSecundario}>
+            <Plus size={16} strokeWidth={1.75} /> Tempo
           </button>
           <button disabled={pendente} className={botao} onClick={() => executar(() => salvarTemposAula(turno, temposDoTurno), "Tempos de aula salvos.")}>
             <Save className="w-4 h-4" /> Salvar tempos do turno

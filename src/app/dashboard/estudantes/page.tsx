@@ -3,7 +3,8 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
-import { ArrowLeft, Plus, GraduationCap, Upload, Users, Accessibility, Pencil, FileText, Info, ShieldCheck } from "lucide-react"
+import { Plus, GraduationCap, Upload, Accessibility, Pencil, FileText, ShieldCheck } from "lucide-react"
+import { Avatar, Badge, EmptyState, PageHeader, buttonClasses } from "@/components/ui"
 import EstudantesFilter from "./EstudantesFilter"
 import PortalActivationAction from "./PortalActivationAction"
 import PortalActionsMenu from "./PortalActionsMenu"
@@ -178,226 +179,127 @@ export default async function EstudantesPage({
     }))
     .sort((a, b) => a.nome.localeCompare(b.nome))
 
+  const podeGerir = session.user.isSuperuser || session.user.isDirecao
+  const acaoIcone = "p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg"
+
   return (
-    <div className="">
-      {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
-      <header className="mb-6 border-b border-line pb-4">
-        <div className="max-w-7xl mx-auto py-4">
-          <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
-            <div className="flex items-center space-x-5">
-              <Link
-                href="/dashboard"
-                className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-fg-subtle hover:text-fg-muted"
-              >
-                <ArrowLeft size={20} />
-              </Link>
-              <div>
-                <h1 className="text-2xl font-bold text-fg tracking-tight">Estudantes</h1>
-                <p className="text-base text-fg-muted font-medium">Gerenciar cadastro de alunos</p>
-              </div>
-            </div>
-            
-            <div className={`grid grid-cols-2 md:flex md:items-center gap-2 ${(!session.user.isSuperuser && !session.user.isDirecao) ? 'hidden' : ''}`}>
-              <Link
-                href="/dashboard/aee"
-                className="flex items-center justify-center space-x-2 bg-accent-subtle text-accent-fg px-3 md:px-4 py-2.5 rounded-lg hover:bg-accent-subtle transition-all border border-accent/25 shadow-sm text-sm font-bold"
-              >
-                <Accessibility className="w-4 h-4" />
-                <span className="whitespace-nowrap">Painel AEE</span>
-              </Link>
-              <div className="hidden md:block w-px h-6 bg-zinc-200 mx-1" />
-              <div className="col-span-2 md:col-auto">
-                <PortalActionsMenu />
-              </div>
-              <div className="hidden md:block w-px h-6 bg-zinc-300 mx-1" />
-              <Link
-                href="/dashboard/estudantes/importar"
-                className="flex items-center justify-center space-x-2 bg-surface border border-line text-fg px-3 md:px-4 py-2.5 rounded-lg hover:bg-subtle transition-all shadow-sm text-sm font-medium"
-              >
-                <Upload className="w-4 h-4" />
-                <span className="whitespace-nowrap">Importar</span>
-              </Link>
-              <Link
-                href="/dashboard/estudantes/novo"
-                className="flex items-center justify-center space-x-2 bg-accent text-on-accent px-3 md:px-4 py-2.5 rounded-lg hover:bg-accent-hover transition-all shadow-sm text-sm font-medium"
-              >
-                <Plus className="w-4 h-4" />
-                <span className="whitespace-nowrap">Novo Aluno</span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="mx-auto max-w-7xl space-y-4 pb-16">
+      <PageHeader
+        title="Estudantes"
+        description="Cadastro de alunos, acesso ao portal e boletins."
+        actions={podeGerir ? (
+          <>
+            <Link href="/dashboard/aee" className={buttonClasses({ variant: "ghost" })}>
+              <Accessibility size={16} strokeWidth={1.75} /> Painel AEE
+            </Link>
+            <PortalActionsMenu />
+            <Link href="/dashboard/estudantes/importar" className={buttonClasses({ variant: "secondary" })}>
+              <Upload size={16} strokeWidth={1.75} /> Importar
+            </Link>
+            <Link href="/dashboard/estudantes/novo" className={buttonClasses()}>
+              <Plus size={16} strokeWidth={1.75} /> Novo aluno
+            </Link>
+          </>
+        ) : undefined}
+      />
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-32">
-        {/* Legenda de Ícones - NOVO */}
-        <div className="bg-white/50 backdrop-blur p-4 rounded-xl border border-white/50 shadow-sm flex flex-wrap items-center justify-center gap-8 mb-6">
-           <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-zinc-100 text-fg-subtle rounded-lg border border-zinc-200">
-                 <ShieldCheck size={14} />
-              </div>
-              <span className="text-xs font-semibold text-fg-subtle leading-none">Gestão de Acesso</span>
-           </div>
-           <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-zinc-100 text-fg-subtle rounded-lg border border-zinc-200">
-                 <Pencil size={14} />
-              </div>
-              <span className="text-xs font-semibold text-fg-subtle leading-none">Editar Dados</span>
-           </div>
-           <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-accent-subtle text-accent-fg rounded-lg border border-accent/25">
-                 <Accessibility size={14} />
-              </div>
-              <span className="text-xs font-semibold text-fg-subtle leading-none">Ficha AEE</span>
-           </div>
-           <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-zinc-100 text-fg-subtle rounded-lg border border-zinc-200">
-                 <FileText size={14} />
-              </div>
-              <span className="text-xs font-semibold text-fg-subtle leading-none">Gerar Boletim</span>
-           </div>
-        </div>
+      <div className="bg-surface rounded-lg border border-line overflow-hidden">
+         <EstudantesFilter cursos={cursos} turmas={turmas} totalResults={estudantes.length} />
+         {estudantes.length > 0 && (
+           <p className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2 text-xs text-fg-subtle sm:px-5">
+             <span className="inline-flex items-center gap-1.5"><ShieldCheck size={14} strokeWidth={1.75} aria-hidden /> Acesso ao portal</span>
+             <span className="inline-flex items-center gap-1.5"><Pencil size={14} strokeWidth={1.75} aria-hidden /> Editar dados</span>
+             <span className="inline-flex items-center gap-1.5"><Accessibility size={14} strokeWidth={1.75} aria-hidden /> Ficha AEE</span>
+             <span className="inline-flex items-center gap-1.5"><FileText size={14} strokeWidth={1.75} aria-hidden /> Boletim</span>
+           </p>
+         )}
+      </div>
 
-        <div className="bg-white rounded-xl shadow-card border border-zinc-200 overflow-hidden mb-6">
-           <EstudantesFilter cursos={cursos} turmas={turmas} totalResults={estudantes.length} />
-        </div>
-
-        <div className="bg-white rounded-xl shadow-card border border-zinc-200 overflow-hidden">
-          {estudantes.length === 0 ? (
-            <div className="p-12 text-center">
-              <GraduationCap className="w-16 h-16 text-fg-subtle mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-fg mb-2">
-                {hasFilters ? 'Nenhum estudante encontrado' : 'Pesquise por estudantes'}
-              </h3>
-              <p className="text-fg-muted mb-6">
-                {hasFilters 
-                  ? 'Tente ajustar os filtros de busca' 
-                  : 'Utilize a busca ou os filtros acima para carregar a lista de estudantes sem sobrecarregar o sistema.'}
-              </p>
-              {!hasFilters && (
-                <div className="flex justify-center gap-4">
-                  <Link
-                    href="/dashboard/estudantes/novo"
-                    className="inline-flex items-center space-x-2 bg-accent text-on-accent px-6 py-3 rounded-lg hover:bg-accent-hover transition-colors"
-                  >
-                    <Plus className="w-5 h-5" />
-                    <span>Adicionar Estudante</span>
-                  </Link>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col">
-              {Object.entries(
-                estudantes.reduce((acc: any, estudante: any) => {
-                  const turma = estudante.turma.nome || "Sem Turma"
-                  if (!acc[turma]) acc[turma] = []
-                  acc[turma].push(estudante)
-                  return acc
-                }, {})
-              ).sort(([a], [b]) => a.localeCompare(b)).map(([turmaNome, estudantesDaTurma]: [string, any]) => (
-                <div key={turmaNome} className="mb-0 border-b-8 border-zinc-100 last:border-0">
-                  <div className="bg-zinc-50 px-6 py-4 border-b border-zinc-200 flex items-center justify-between">
-                    <h2 className="text-base font-bold text-fg flex items-center gap-2">
-                      <Users className="w-5 h-5 text-fg-subtle" />
-                      {turmaNome}
-                    </h2>
-                    <span className="text-xs font-bold text-fg-subtle bg-zinc-200 px-3 py-1 rounded-full">{estudantesDaTurma.length} estudantes</span>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead className="bg-white border-b border-zinc-200">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-bold text-fg-subtle">
-                            Nome
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-bold text-fg-subtle">
-                            Notas Lançadas
-                          </th>
-                          <th className="px-6 py-3 text-right text-xs font-bold text-fg-subtle">
-                            Ações / Gestão
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-zinc-100">
-                        {estudantesDaTurma.map((estudante: any) => (
-                          <tr key={estudante.matricula} className="hover:bg-zinc-50 transition-colors">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="flex items-center">
-                                <div className="w-10 h-10 bg-zinc-800 rounded-lg flex items-center justify-center text-white font-bold shadow-card">
-                                  {estudante.nome.charAt(0).toUpperCase()}
-                                </div>
-                                <div className="ml-4">
-                                  <div className="text-sm font-bold text-fg flex items-center gap-2">
-                                    {estudante.nome}
-                                    {estudante.aeeProfile && (
-                                      <Link 
-                                        href={`/dashboard/aee/${estudante.matricula}`}
-                                        className="p-1 bg-accent-subtle text-accent-fg rounded-lg border border-accent/25 hover:bg-accent-hover hover:text-white transition-all shadow-sm"
-                                        title="Aluno com Atendimento Especializado (AEE)"
-                                      >
-                                        <Accessibility className="w-3.5 h-3.5" />
-                                      </Link>
-                                    )}
-                                  </div>
-                                  <div className="text-xs font-bold text-fg-subtle mt-0.5">
-                                    Matrícula: {estudante.matricula}
-                                  </div>
-                                </div>
+      {estudantes.length === 0 ? (
+        <EmptyState
+          icon={GraduationCap}
+          title={hasFilters ? 'Nenhum estudante encontrado' : 'Pesquise por estudantes'}
+          description={hasFilters
+            ? 'Tente ajustar os filtros de busca.'
+            : 'Use a busca ou os filtros acima para carregar a lista sem sobrecarregar o sistema.'}
+          action={!hasFilters ? (
+            <Link href="/dashboard/estudantes/novo" className={buttonClasses({ variant: "secondary" })}>
+              <Plus size={16} strokeWidth={1.75} /> Adicionar estudante
+            </Link>
+          ) : undefined}
+          className="rounded-lg border border-line bg-surface"
+        />
+      ) : (
+        <div className="space-y-4">
+          {Object.entries(
+            estudantes.reduce((acc: any, estudante: any) => {
+              const turma = estudante.turma.nome || "Sem Turma"
+              if (!acc[turma]) acc[turma] = []
+              acc[turma].push(estudante)
+              return acc
+            }, {})
+          ).sort(([a], [b]) => a.localeCompare(b)).map(([turmaNome, estudantesDaTurma]: [string, any]) => (
+            <section key={turmaNome} className="bg-surface rounded-lg border border-line overflow-hidden" aria-label={turmaNome}>
+              <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3 sm:px-5">
+                <h2 className="text-sm font-semibold text-fg">{turmaNome}</h2>
+                <span className="text-xs tabular-nums text-fg-subtle">{estudantesDaTurma.length} {estudantesDaTurma.length === 1 ? 'estudante' : 'estudantes'}</span>
+              </div>
+              <div className="relative overflow-x-auto">
+                <table className="w-full min-w-[32rem] text-13">
+                  <thead>
+                    <tr className="border-b border-line-subtle text-xs text-fg-subtle">
+                      <th scope="col" className="h-9 px-4 text-left font-medium sm:px-5">Nome</th>
+                      <th scope="col" className="h-9 px-3 text-right font-medium">Notas lançadas</th>
+                      <th scope="col" className="h-9 px-4 text-right font-medium sm:px-5"><span className="sr-only">Ações</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {estudantesDaTurma.map((estudante: any) => (
+                      <tr key={estudante.matricula} className="border-b border-line-subtle last:border-0 transition-colors duration-150 hover:bg-subtle/60">
+                        <td className="px-4 py-2 sm:px-5">
+                          <div className="flex items-center gap-3">
+                            <Avatar nome={estudante.nome} size="sm" />
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5 font-medium text-fg">
+                                <span className="truncate">{estudante.nome}</span>
+                                {estudante.aeeProfile && <Badge tone="accent">AEE</Badge>}
                               </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-fg-muted">
-                              {estudante._count.notas}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-right">
-                               <div className="flex items-center justify-end gap-2">
-                                  {/* Icone Gestão de Acesso */}
-                                  <PortalActivationAction 
-                                      estudanteId={estudante.matricula} 
-                                      initialMatricula={estudante.matricula}
-                                      hasUser={portalUserIds.has(estudante.matricula)}
-                                  />
-
-                                  <Link
-                                    href={`/dashboard/estudantes/${estudante.matricula}/editar`}
-                                    className="p-2 bg-zinc-50 text-fg-subtle border border-zinc-200 rounded-xl hover:text-fg hover:bg-white transition-all shadow-sm"
-                                    title="Editar Dados"
-                                  >
-                                    <Pencil size={18} />
-                                  </Link>
-
-                                  {/* Link Direto AEE - Apenas se já existir perfil */}
-                                  {estudante.aeeProfile && (
-                                    <Link
-                                      href={`/dashboard/aee/${estudante.matricula}`}
-                                      className="p-2 bg-accent-subtle text-accent-fg border border-accent/25 rounded-xl hover:text-accent-fg hover:bg-white transition-all shadow-sm"
-                                      title="Ficha AEE"
-                                    >
-                                      <Accessibility size={18} />
-                                    </Link>
-                                  )}
-
-                                  <Link
-                                    href={`/dashboard/estudantes/${estudante.matricula}/boletim`}
-                                    className="p-2 bg-zinc-50 text-fg-subtle border border-zinc-200 rounded-xl hover:text-fg hover:bg-white transition-all shadow-sm"
-                                    title="Gerar Boletim"
-                                  >
-                                    <FileText size={18} />
-                                  </Link>
-                               </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+                              <div className="font-mono text-xs text-fg-subtle">{estudante.matricula}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-3 py-2 text-right tabular-nums text-fg-muted">
+                          {estudante._count.notas}
+                        </td>
+                        <td className="px-4 py-2 sm:px-5">
+                           <div className="flex items-center justify-end gap-0.5">
+                              <PortalActivationAction
+                                  estudanteId={estudante.matricula}
+                                  initialMatricula={estudante.matricula}
+                                  hasUser={portalUserIds.has(estudante.matricula)}
+                              />
+                              <Link href={`/dashboard/estudantes/${estudante.matricula}/editar`} className={acaoIcone} title="Editar dados" aria-label={`Editar dados de ${estudante.nome}`}>
+                                <Pencil size={16} strokeWidth={1.75} />
+                              </Link>
+                              {estudante.aeeProfile && (
+                                <Link href={`/dashboard/aee/${estudante.matricula}`} className={acaoIcone} title="Ficha AEE" aria-label={`Ficha AEE de ${estudante.nome}`}>
+                                  <Accessibility size={16} strokeWidth={1.75} />
+                                </Link>
+                              )}
+                              <Link href={`/dashboard/estudantes/${estudante.matricula}/boletim`} className={acaoIcone} title="Boletim" aria-label={`Boletim de ${estudante.nome}`}>
+                                <FileText size={16} strokeWidth={1.75} />
+                              </Link>
+                           </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          ))}
         </div>
-      </main>
+      )}
     </div>
   )
 }

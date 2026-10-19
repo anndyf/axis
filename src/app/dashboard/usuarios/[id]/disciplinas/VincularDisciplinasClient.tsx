@@ -121,10 +121,10 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
   return (
     <div className="bg-[#f8fafc]">
       {/* Header Fixo Premium */}
-      <header className="mb-6 border-b border-line pb-4">
+      <header className="mb-6">
         <div className="max-w-5xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-3">
               <Link 
                 href="/dashboard/usuarios" 
                 className="p-2 hover:bg-zinc-200 rounded-xl transition-colors border border-transparent hover:border-zinc-300"
@@ -132,8 +132,8 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
                 <ArrowLeft className="w-5 h-5 text-fg-muted" />
               </Link>
               <div>
-                <h1 className="text-xl font-medium text-fg leading-tight">Vincular Disciplinas</h1>
-                <p className="text-xs font-medium text-fg-muted">
+                <h1 className="text-2xl font-semibold tracking-tight text-fg">Vincular Disciplinas</h1>
+                <p className="text-sm text-fg-muted">
                    Professor: {usuario.name}
                 </p>
               </div>
@@ -149,7 +149,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
               </Link>
               <button
                 onClick={handleSave} disabled={loading}
-                className="flex items-center space-x-2 bg-accent text-on-accent px-6 py-3 rounded-xl font-medium text-sm hover:bg-accent-hover shadow-card active:scale-95 transition-all disabled:opacity-50"
+                className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
               >
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 <span>Salvar Alterações</span>

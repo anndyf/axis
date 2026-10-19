@@ -118,7 +118,7 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
   return (
     <div className="max-w-7xl mx-auto space-y-8 pb-32 animate-fade-in">
       {/* Header Premium */}
-      <header className="mb-6 border-b border-line pb-4">
+      <header className="mb-6">
         <div className="max-w-7xl mx-auto py-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-center space-x-6">
@@ -126,11 +126,11 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
                 href="/dashboard"
                 className="p-3 hover:bg-zinc-100 rounded-lg transition-all text-fg-subtle hover:text-fg border border-transparent hover:border-zinc-200 shadow-sm"
               >
-                <ArrowLeft size={20} />
+                <ArrowLeft size={16} strokeWidth={1.75} />
               </Link>
               <div>
-                <h1 className="text-3xl font-bold text-fg tracking-tight">Livro de Ocorrências</h1>
-                <p className="text-fg-subtle font-medium">Registro histórico e acompanhamento escolar</p>
+                <h1 className="text-2xl font-semibold tracking-tight text-fg">Livro de Ocorrências</h1>
+                <p className="text-sm text-fg-muted">Registro histórico e acompanhamento escolar</p>
               </div>
             </div>
 

@@ -232,10 +232,10 @@ export default function ResultadosTurmaClient({
       <TeacherTipsModal storageKey="seen_tips_resultados_v2" title="Novo Visual de Resultados" tips={resultTips} />
       
       {/* Header Premium */}
-      <header className="mb-6 border-b border-line pb-4">
+      <header className="mb-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="flex items-center space-x-5">
+            <div className="flex min-w-0 items-center gap-3">
               <Link
                 href="/dashboard/resultados"
                 className="w-10 h-10 bg-white border border-zinc-300 rounded-xl flex items-center justify-center text-fg-muted hover:bg-zinc-50 transition-all shadow-sm hover:translate-x-[-2px]"

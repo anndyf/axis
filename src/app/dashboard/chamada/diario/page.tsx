@@ -87,7 +87,7 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
         {aulas.length === 0 ? (
           <EmptyState icon={BookOpen} title="Nenhuma aula registrada ainda" description="As aulas aparecem aqui quando a chamada é salva." />
         ) : (
-          <div className="overflow-x-auto">
+          <div className="relative overflow-x-auto">
             <table className="w-full min-w-[40rem] text-13">
               <thead>
                 <tr className="border-b border-line text-xs text-fg-subtle">

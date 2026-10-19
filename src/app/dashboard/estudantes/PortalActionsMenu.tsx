@@ -53,54 +53,58 @@ export default function PortalActionsMenu() {
   }
 
   return (
-    <div className="relative w-full md:w-auto" ref={menuRef}>
+    <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         disabled={loading !== null}
-        className="flex items-center justify-between md:justify-start w-full md:w-auto space-x-2 bg-white text-fg-muted border border-zinc-300 px-4 py-2.5 rounded-lg hover:bg-zinc-50 transition-all shadow-sm font-medium text-sm"
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+        className="flex h-9 items-center justify-between md:justify-start w-full md:w-auto gap-2 bg-surface text-fg border border-line px-3 rounded-md hover:bg-subtle transition-colors duration-150 font-medium text-sm disabled:opacity-50"
       >
         <div className="flex items-center space-x-2">
-          <Shield size={16} className="text-fg-muted" />
+          <Shield size={16} strokeWidth={1.75} className="text-fg-subtle" />
           <span>Gestão de Acessos</span>
         </div>
         <ChevronDown size={14} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 left-0 md:left-auto mt-2 w-full md:w-64 bg-white rounded-xl shadow-overlay border border-zinc-300 py-2 z-50 animate-slide-up">
-          <div className="px-4 py-2 mb-1 border-b border-zinc-200">
-            <span className="text-xs font-medium text-fg-subtle">Ações em Lote</span>
+        <div className="absolute right-0 left-0 md:left-auto mt-2 w-full md:w-64 bg-elevated rounded-lg shadow-overlay border border-line py-1 z-50 animate-pop-in">
+          <div className="px-3 py-1.5 mb-1 border-b border-line-subtle">
+            <span className="text-xs font-medium text-fg-subtle">Ações em lote</span>
           </div>
           
           <button
             onClick={handleActivate}
             disabled={loading !== null}
-            className="w-full flex items-center space-x-3 px-4 py-3 text-sm text-success-fg hover:bg-success-subtle transition-colors text-left"
+            role="menuitem"
+            className="w-full flex items-center gap-3 px-3 py-2 text-sm text-fg hover:bg-subtle transition-colors duration-150 text-left"
           >
             {loading === "activate" ? (
               <Loader2 size={16} className="animate-spin" />
             ) : (
-              <ShieldCheck size={16} />
+              <ShieldCheck size={16} strokeWidth={1.75} className="text-fg-subtle" />
             )}
             <div>
-              <p className="font-medium">Ativar Todos</p>
-              <p className="text-xs text-success-fg">Cria acesso para alunos sem portal</p>
+              <p className="font-medium">Ativar todos</p>
+              <p className="text-xs text-fg-subtle">Cria acesso para alunos sem portal</p>
             </div>
           </button>
 
           <button
             onClick={handleDeactivate}
             disabled={loading !== null}
-            className="w-full flex items-center space-x-3 px-4 py-3 text-sm text-danger-fg hover:bg-danger-subtle transition-colors text-left"
+            role="menuitem"
+            className="w-full flex items-center gap-3 px-3 py-2 text-sm text-danger-fg hover:bg-danger-subtle transition-colors duration-150 text-left"
           >
             {loading === "deactivate" ? (
               <Loader2 size={16} className="animate-spin" />
             ) : (
-              <ShieldX size={16} />
+              <ShieldX size={16} strokeWidth={1.75} />
             )}
             <div>
-              <p className="font-medium">Desativar Todos</p>
-              <p className="text-xs text-danger-fg">Remove acesso de todos os alunos</p>
+              <p className="font-medium">Desativar todos</p>
+              <p className="text-xs text-fg-subtle">Remove acesso de todos os alunos</p>
             </div>
           </button>
         </div>

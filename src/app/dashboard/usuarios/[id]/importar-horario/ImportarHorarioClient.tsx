@@ -111,8 +111,8 @@ export default function ImportarHorarioClient({
   return (
     <div className="">
       {/* Header */}
-      <header className="mb-6 border-b border-line pb-4">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+      <header className="mb-6">
+        <div className="max-w-4xl mx-auto px-6 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-4">
             <Link
               href={`/dashboard/usuarios/${usuario.id}/disciplinas`}
@@ -121,8 +121,8 @@ export default function ImportarHorarioClient({
               <ArrowLeft className="w-5 h-5 text-fg-muted" />
             </Link>
             <div>
-              <h1 className="text-lg font-semibold text-fg">Importar Horário</h1>
-              <p className="text-xs font-medium text-fg-subtle">
+              <h1 className="text-2xl font-semibold tracking-tight text-fg">Importar Horário</h1>
+              <p className="text-sm text-fg-muted">
                 Professor: {usuario.name}
               </p>
             </div>
@@ -132,7 +132,7 @@ export default function ImportarHorarioClient({
             <button
               onClick={handleImportar}
               disabled={importando}
-              className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-5 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-card disabled:opacity-50 active:scale-95"
+              className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
             >
               {importando
                 ? <Loader2 size={16} className="animate-spin" />

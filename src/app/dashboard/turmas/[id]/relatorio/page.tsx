@@ -107,19 +107,19 @@ export default async function RelatorioTurmaPage({
   return (
     <div className="">
       {/* Header */}
-      <header className="mb-6 border-b border-line pb-4">
+      <header className="mb-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-3">
               <Link
                 href="/dashboard/turmas"
-                className="p-2 hover:bg-zinc-200 rounded-lg transition-colors"
+                aria-label="Voltar" className="hidden sm:inline-flex p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg"
                 title="Voltar para Turmas"
               >
                 <ArrowLeft className="w-5 h-5 text-fg-muted" />
               </Link>
               <div>
-                <h1 className="text-2xl font-medium text-fg">
+                <h1 className="text-2xl font-semibold tracking-tight text-fg">
                   {isProfessorOnly ? 'Relação de Estudantes' : 'Relatório da Turma'}
                 </h1>
                 <p className="text-sm text-fg-muted">{turma.nome}</p>

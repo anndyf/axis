@@ -165,21 +165,21 @@ export default function AEEDashboardClient({
   return (
     <div className="pb-10 text-fg antialiased">
       {/* Header Dinâmico */}
-      <header className="mb-6 border-b border-line pb-4">
-        <div className="max-w-7xl mx-auto py-4">
-          <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
-             <div className="flex items-center space-x-5">
+      <header className="mb-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+             <div className="flex min-w-0 items-center gap-3">
                <button
                  onClick={() => activePanel ? setActivePanel(null) : router.push('/dashboard')}
-                 className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-fg-subtle hover:text-fg-muted"
+                 aria-label="Voltar" className="hidden sm:inline-flex p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg"
                >
-                 <ArrowLeft size={20} />
+                 <ArrowLeft size={16} strokeWidth={1.75} />
                </button>
                <div>
-                 <h1 className="text-lg font-semibold text-fg tracking-tight">
+                 <h1 className="text-2xl font-semibold tracking-tight text-fg">
                    {activePanel === 'create' ? 'Nova Ficha de Atendimento' : activePanel === 'edit' ? 'Ficha Individual de AEE' : 'Atendimento Especializado (AEE)'}
                  </h1>
-                 <p className="text-base text-fg-muted font-medium">
+                 <p className="text-sm text-fg-muted">
                    {activePanel ? 'Registro Oficial de Inclusão' : 'Controle de Inclusão e Acessibilidade'}
                  </p>
                </div>
@@ -208,7 +208,7 @@ export default function AEEDashboardClient({
                {(activePanel === 'create' || (isDirecao && isEditing)) && (
                  <button 
                     onClick={handleSave} disabled={saving}
-                    className="flex items-center gap-2 bg-accent text-on-accent px-6 py-2 rounded-lg text-xs font-semibold hover:bg-accent-hover transition-all disabled:opacity-50 shadow-sm"
+                    className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
                  >
                     {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                     {saving ? 'Gravando...' : 'Salvar Alterações'}

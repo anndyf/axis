@@ -42,28 +42,28 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
   return (
     <div className="">
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
-      <header className="mb-6 border-b border-line pb-4">
-        <div className="max-w-7xl mx-auto py-4">
+      <header className="mb-6">
+        <div className="max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="flex items-center space-x-5">
+            <div className="flex min-w-0 items-center gap-3">
               <Link
                 href="/dashboard"
-                className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-fg-subtle hover:text-fg-muted"
+                aria-label="Voltar" className="hidden sm:inline-flex p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg"
               >
-                <ArrowLeft size={20} />
+                <ArrowLeft size={16} strokeWidth={1.75} />
               </Link>
               <div>
-                <h1 className="text-2xl font-medium text-fg tracking-tight">Lançar Notas</h1>
-                <p className="text-base text-fg-muted font-medium">Gestão de avaliações e fechamento de unidades</p>
+                <h1 className="text-2xl font-semibold tracking-tight text-fg">Lançar Notas</h1>
+                <p className="text-sm text-fg-muted">Gestão de avaliações e fechamento de unidades</p>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
               <Link 
                   href="/dashboard/notas/recuperacao"
-                  className="flex items-center gap-2 bg-accent text-on-accent px-6 py-3 rounded-lg font-medium hover:bg-accent-hover transition-all text-xs active:scale-95 shadow-card"
+                  className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
               >
-                  <TrendingUp size={16} /> Lançar Recuperação Final
+                  <TrendingUp size={16} strokeWidth={1.75} /> Lançar Recuperação Final
               </Link>
             </div>
           </div>

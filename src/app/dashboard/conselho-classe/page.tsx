@@ -118,19 +118,19 @@ export default async function ConselhoClassePage() {
   return (
     <div className="">
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
-      <header className="mb-6 border-b border-line pb-4">
-        <div className="max-w-7xl mx-auto py-4">
+      <header className="mb-6">
+        <div className="max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="flex items-center space-x-5">
+            <div className="flex min-w-0 items-center gap-3">
               <Link
                 href="/dashboard"
-                className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-fg-subtle hover:text-fg-muted"
+                aria-label="Voltar" className="hidden sm:inline-flex p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg"
               >
-                <ArrowLeft size={20} />
+                <ArrowLeft size={16} strokeWidth={1.75} />
               </Link>
               <div>
-                <h1 className="text-2xl font-medium text-fg tracking-tight">Conselho de Classe</h1>
-                <p className="text-base text-fg-muted font-medium">Gestão de deliberações e fechamento das turmas</p>
+                <h1 className="text-2xl font-semibold tracking-tight text-fg">Conselho de Classe</h1>
+                <p className="text-sm text-fg-muted">Gestão de deliberações e fechamento das turmas</p>
               </div>
             </div>
           </div>
