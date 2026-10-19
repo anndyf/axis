@@ -54,7 +54,7 @@ export default function DashboardTopbar({ escola, nome, onOpenMobile, acoes }: {
         <Bell size={20} strokeWidth={1.75} />
       </Link>
       <Link href="/dashboard/perfil" aria-label="Meu perfil" className="shrink-0 rounded-full">
-        <Avatar nome={nome} size="lg" className="bg-accent text-on-accent ring-0" />
+        <Avatar nome={nome} size="lg" tom="destaque" />
       </Link>
     </header>
   )

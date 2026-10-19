@@ -252,7 +252,7 @@ export default function DashboardSidebar({
                 title={recolhido ? user.name ?? undefined : undefined}
                 className={cn("flex w-full items-center gap-2.5 rounded-xl p-2 text-left transition-colors duration-150 hover:bg-sidebar-hover", recolhido && "justify-center p-1.5")}
               >
-                <Avatar nome={user.name} className="bg-sidebar-active text-sidebar-fg ring-sidebar-line" />
+                <Avatar nome={user.name} tom="menu" />
                 {!recolhido && (
                   <>
                     <span className="min-w-0 flex-1">

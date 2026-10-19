@@ -168,3 +168,14 @@ export function aulasRestantes(
   }
   return { total, porDisciplina }
 }
+
+/**
+ * Início da contagem de chamadas pendentes: a unidade (etapa) em andamento
+ * hoje; entre duas etapas, a última que já começou; sem etapas datadas, o
+ * início do período letivo. Datas em "AAAA-MM-DD".
+ */
+export function inicioDaContagemDePendencias(etapas: { inicio: string; fim: string }[], hoje: string, inicioPeriodo: string): string {
+  const iniciadas = etapas.filter((e) => e.inicio <= hoje).sort((a, b) => b.inicio.localeCompare(a.inicio))
+  const inicio = iniciadas[0]?.inicio
+  return inicio && inicio > inicioPeriodo ? inicio : inicioPeriodo
+}

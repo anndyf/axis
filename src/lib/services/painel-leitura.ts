@@ -1,8 +1,8 @@
 import { prisma } from '@/lib/prisma'
 import { chaveData } from '@/lib/services/calendario'
-import { carregarEsquemaDaTurma } from '@/lib/services/notas-leitura'
+import { carregarEsquemaDaTurma, type EsquemaDaTurma } from '@/lib/services/notas-leitura'
 import { carregarCalendario, carregarFrequenciaDaTurma } from '@/lib/services/frequencia-leitura'
-import { aulasDoDia, diasComAulaAte, hojeNaEscola } from '@/lib/services/chamada'
+import { aulasDoDia, diasComAulaAte, hojeNaEscola, inicioDaContagemDePendencias } from '@/lib/services/chamada'
 import { frequenciaConsiderada } from '@/lib/services/frequencia'
 
 /**
@@ -11,6 +11,7 @@ import { frequenciaConsiderada } from '@/lib/services/frequencia'
  * existem (frequência, chamada); aqui só se agrega por turma.
  */
 
+/** Chamadas pendentes contam só a unidade (etapa) atual até hoje. */
 export interface ResumoTurmaPainel {
   turmaId: string
   nome: string
@@ -26,6 +27,27 @@ export interface ResumoGestao {
   idsAbaixoDoMinimo: string[]
   chamadasPendentes: number
   turmas: ResumoTurmaPainel[]
+}
+
+type Calendario = NonNullable<Awaited<ReturnType<typeof carregarCalendario>>>
+
+/** Datas das etapas (unidades) do ano, por id da unidade do esquema. */
+async function etapasDatadas(escolaId: string, anoLetivo: number): Promise<Map<string, { inicio: string; fim: string }>> {
+  const etapas = await prisma.etapaCalendario.findMany({
+    where: { periodoLetivo: { escolaId, anoLetivo } },
+    select: { esquemaUnidadeId: true, inicio: true, fim: true },
+  })
+  return new Map(etapas.map((e) => [e.esquemaUnidadeId, { inicio: chaveData(e.inicio), fim: chaveData(e.fim) }]))
+}
+
+/**
+ * Calendário recortado para contar chamadas pendentes só da unidade (etapa)
+ * atual do esquema da turma até hoje; sem etapas datadas, o período letivo.
+ */
+function calendarioDaUnidadeAtual(calendario: Calendario, esquema: EsquemaDaTurma | null, datas: Map<string, { inicio: string; fim: string }>, hoje: string): Calendario {
+  const etapas = (esquema?.etapas ?? []).map((e) => datas.get(e.id)).filter((e): e is { inicio: string; fim: string } => !!e)
+  const inicio = inicioDaContagemDePendencias(etapas, hoje, chaveData(calendario.inicio))
+  return { ...calendario, inicio: new Date(`${inicio}T00:00:00Z`) }
 }
 
 /** Chamadas que deveriam ter sido feitas (dia letivo com aula até hoje) e não foram salvas. */
@@ -49,9 +71,10 @@ function contarPendentes(
 
 export async function resumoGestao(escolaId: string, anoLetivo: number): Promise<ResumoGestao> {
   const hoje = hojeNaEscola()
-  const [turmas, calendario] = await Promise.all([
+  const [turmas, calendario, datas] = await Promise.all([
     prisma.turma.findMany({ where: { escolaId, anoLetivo }, orderBy: { nome: 'asc' }, select: { id: true, nome: true, cursoId: true, esquemaAvaliacaoId: true } }),
     carregarCalendario(escolaId, anoLetivo),
+    etapasDatadas(escolaId, anoLetivo),
   ])
 
   const resumos: ResumoTurmaPainel[] = []
@@ -80,7 +103,7 @@ export async function resumoGestao(escolaId: string, anoLetivo: number): Promise
     alunosComFreq += n
 
     const registradas = new Set(aulas.map((a) => `${chaveData(a.data)}|${a.disciplinaId ?? ''}`))
-    const pendentes = calendario ? contarPendentes(hoje, turma.id, calendario, horario, registradas, esquema?.registroFrequencia === 'POR_DIA') : 0
+    const pendentes = calendario ? contarPendentes(hoje, turma.id, calendarioDaUnidadeAtual(calendario, esquema, datas, hoje), horario, registradas, esquema?.registroFrequencia === 'POR_DIA') : 0
 
     resumos.push({ turmaId: turma.id, nome: turma.nome, frequenciaMedia: n ? Math.round((soma / n) * 10) / 10 : null, abaixoDoMinimo: abaixo, chamadasPendentes: pendentes })
   }
@@ -183,8 +206,8 @@ export interface PendenciaDisciplina {
 }
 
 /**
- * Chamadas pendentes e alunos sem nota por disciplina, com os professores
- * vinculados. `professorId` restringe às disciplinas daquele professor.
+ * Chamadas pendentes (unidade atual, até hoje) e alunos sem nota por
+ * disciplina, com os professores vinculados. `professorId` restringe às disciplinas daquele professor.
  */
 export async function pendenciasPorDisciplina(escolaId: string, anoLetivo: number, professorId?: string): Promise<PendenciaDisciplina[]> {
   const hoje = hojeNaEscola()
@@ -205,6 +228,7 @@ export async function pendenciasPorDisciplina(escolaId: string, anoLetivo: numbe
     }),
     carregarCalendario(escolaId, anoLetivo),
   ])
+  const datas = await etapasDatadas(escolaId, anoLetivo)
 
   const linhas: PendenciaDisciplina[] = []
   for (const turma of turmas) {
@@ -215,6 +239,7 @@ export async function pendenciasPorDisciplina(escolaId: string, anoLetivo: numbe
     ])
     const registradas = new Set(aulas.map((a) => `${chaveData(a.data)}|${a.disciplinaId ?? ''}`))
     const porDia = esquema?.registroFrequencia === 'POR_DIA'
+    const cal = calendario ? calendarioDaUnidadeAtual(calendario, esquema, datas, hoje) : null
     const pessoas = (us: { id: string; name: string | null }[]) => us.map((p) => ({ id: p.id, nome: p.name ?? 'Sem nome' }))
 
     if (porDia) {
@@ -222,14 +247,14 @@ export async function pendenciasPorDisciplina(escolaId: string, anoLetivo: numbe
       for (const d of turma.disciplinas) for (const p of pessoas(d.usuariosPermitidos)) professores.set(p.id, p)
       linhas.push({
         disciplinaId: null, disciplinaNome: 'Chamada diária', turmaId: turma.id, turmaNome: turma.nome, alunos: turma._count.estudantes,
-        chamadasPendentes: calendario ? diasComAulaAte(hoje, turma.id, calendario, horario, null).filter((d) => !registradas.has(`${d}|`)).length : 0,
+        chamadasPendentes: cal ? diasComAulaAte(hoje, turma.id, cal, horario, null).filter((d) => !registradas.has(`${d}|`)).length : 0,
         semNota: 0, professores: [...professores.values()],
       })
     }
     for (const d of turma.disciplinas) {
       linhas.push({
         disciplinaId: d.id, disciplinaNome: d.nome, turmaId: turma.id, turmaNome: turma.nome, alunos: turma._count.estudantes,
-        chamadasPendentes: !porDia && calendario ? diasComAulaAte(hoje, turma.id, calendario, horario, d.id).filter((x) => !registradas.has(`${x}|${d.id}`)).length : 0,
+        chamadasPendentes: !porDia && cal ? diasComAulaAte(hoje, turma.id, cal, horario, d.id).filter((x) => !registradas.has(`${x}|${d.id}`)).length : 0,
         semNota: Math.max(0, turma._count.estudantes - d._count.notas),
         professores: pessoas(d.usuariosPermitidos),
       })

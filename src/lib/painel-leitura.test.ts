@@ -1,5 +1,5 @@
 /**
- * Serviços dos painéis por perfil (/dashboard/modelos): cada consulta fica
+ * Serviços do painel por perfil (/dashboard): cada consulta fica
  * na escola recebida, mesmo com dados parecidos em outra escola.
  */
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest'
@@ -11,7 +11,7 @@ import {
 
 vi.setConfig({ testTimeout: 60_000 })
 
-const SUFIXO = `modelos-${Date.now()}`
+const SUFIXO = `painel-${Date.now()}`
 const ANO = 2026
 const E: Record<string, { escola: string; professor: string; estudante: string }> = {}
 

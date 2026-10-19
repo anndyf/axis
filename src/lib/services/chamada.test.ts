@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { aulasDoDia, planejarChamada, validarFaltas, chaveAula, hojeNaEscola, dataValida, diasComAulaAte, aulasRestantes } from './chamada'
+import { aulasDoDia, planejarChamada, validarFaltas, chaveAula, hojeNaEscola, dataValida, diasComAulaAte, aulasRestantes, inicioDaContagemDePendencias } from './chamada'
 
 const CAL = {
   inicio: '2026-02-02',
@@ -114,5 +114,24 @@ describe('aulasRestantes', () => {
   it('antes do início conta o período todo; depois do fim, zero', () => {
     expect(aulasRestantes('2026-01-01', 't', cal, HOR, 'POR_DIA').total).toBe(aulasRestantes('2026-03-01', 't', cal, HOR, 'POR_DIA').total)
     expect(aulasRestantes('2026-03-10', 't', cal, HOR, 'POR_AULA').total).toBe(0)
+  })
+})
+
+describe('inicioDaContagemDePendencias', () => {
+  const etapas = [
+    { inicio: '2026-02-02', fim: '2026-04-30' },
+    { inicio: '2026-05-04', fim: '2026-07-10' },
+    { inicio: '2026-08-03', fim: '2026-12-18' },
+  ]
+  it('conta da etapa em andamento', () => {
+    expect(inicioDaContagemDePendencias(etapas, '2026-10-19', '2026-02-02')).toBe('2026-08-03')
+    expect(inicioDaContagemDePendencias(etapas, '2026-05-04', '2026-02-02')).toBe('2026-05-04')
+  })
+  it('entre etapas (recesso), a última que começou', () => {
+    expect(inicioDaContagemDePendencias(etapas, '2026-07-20', '2026-02-02')).toBe('2026-05-04')
+  })
+  it('sem etapas datadas ou antes da primeira, o período letivo', () => {
+    expect(inicioDaContagemDePendencias([], '2026-10-19', '2026-02-02')).toBe('2026-02-02')
+    expect(inicioDaContagemDePendencias(etapas.slice(1), '2026-03-01', '2026-02-02')).toBe('2026-02-02')
   })
 })
