@@ -15,9 +15,12 @@ Capturas: `npx tsx scripts/capturas.ts <fase>` com `npm run dev` rodando (Chromi
 ## Fases
 
 ### 1. Fundação: design system
-- [ ] Tokens em `globals.css`
-- [ ] Componentes em `src/components/ui`
-- [ ] `/dashboard/ui`
+- [x] Tokens em `src/app/globals.css` (`@theme inline`): superfícies `canvas/surface/elevated/subtle`, texto `fg/fg-muted/fg-subtle/fg-disabled`, bordas `line-subtle/line/line-strong`, destaque `accent/accent-hover/accent-subtle/accent-fg/on-accent/ring` (hover e versões suaves derivadas de `--accent` com `color-mix`, para a escola sobrescrever só `--accent` e `--on-accent`), semânticas `success/warning/danger/info` (+ `-subtle`, `-fg`, `-line`), sombras `shadow-card`/`shadow-overlay`, tamanho `text-13`, animações de 150ms (`animate-fade-in`, `animate-pop-in`, `animate-slide-up`, `animate-skeleton`), foco visível global, `prefers-reduced-motion`.
+  - **[decisão]** Tema escuro definido, mas só liga com `data-theme="dark"` (ou `data-theme="system"` + preferência do sistema). Ligar pelo `prefers-color-scheme` sozinho deixaria as telas ainda não migradas metade claras/metade escuras.
+  - **[decisão]** Raios pela escala padrão do Tailwind, que já bate com a direção: `rounded-md` 6px (controles), `rounded-lg` 8px (cards/inputs), `rounded-xl` 12px (modais). Sem `rounded-2xl/3xl`.
+  - **[decisão]** Destaque padrão índigo `#4f46e5`, texto sobre ele branco.
+- [x] Componentes em `src/components/ui` (sem dependência nova): `Button` (+ `buttonClasses` para links), `Field`/`Label`/`FieldError`/`FieldHint`, `Input`, `Textarea`, `Select`, `Checkbox`, `Switch`, `Badge`, `Alert`, `Card` (+ Header/Body/Footer), `PageHeader` + `Breadcrumb`, `Table` (`TableContainer` com rolagem interna e cabeçalho fixo, `TH/TD numeric`, `TableEmpty`), `EmptyState`, `Skeleton`/`SkeletonRows`, `Dialog` (foco preso, Esc, clique fora, foco volta), `Tabs` (setas/Home/End), `Menu` (setas, Esc, clique fora), `Tooltip`, `Toast` (`ToastProvider` em `Providers.tsx` + `useToast`), `Avatar`, `Stat`. Ícones: `ICONE = { size: 16, strokeWidth: 1.75 }`.
+- [x] Vitrine `/dashboard/ui` (só superuser).
 
 ### 2. Casca do sistema
 - [ ] pendente
@@ -32,4 +35,4 @@ Capturas: `npx tsx scripts/capturas.ts <fase>` com `npm run dev` rodando (Chromi
 - [ ] pendente
 
 ## Próximo passo
-Fase 1: componentes.
+Fase 2: menu lateral, barra superior e dashboard inicial.

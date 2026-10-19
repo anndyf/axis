@@ -1,28 +1,253 @@
 @import "tailwindcss";
 
+/*
+ * Design system do Áxis - tokens (PROGRESSO-VISUAL.md, fase 1).
+ *
+ * Base neutra (zinc), superfícies brancas sobre página #fafafa, bordas finas.
+ * UMA cor de destaque (a da escola): ação principal, item ativo, links, foco.
+ * Semânticas (sucesso, alerta, erro, info) só para status, em versão suave.
+ *
+ * Uso: bg-canvas / bg-surface / bg-elevated / bg-subtle, text-fg /
+ * text-fg-muted / text-fg-subtle, border-line / border-line-subtle /
+ * border-line-strong, bg-accent text-on-accent, bg-accent-subtle
+ * text-accent-fg, bg-success-subtle text-success-fg (idem warning, danger, info).
+ *
+ * --accent e --on-accent podem ser sobrescritos por escola (layout define a
+ * partir de Escola.corPrimaria); hover e versões suaves derivam deles.
+ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Destaque padrão: índigo sóbrio */
+  --accent: #4f46e5;
+  --on-accent: #ffffff;
+
+  --canvas: #fafafa;
+  --surface: #ffffff;
+  --elevated: #ffffff;
+  --subtle: #f4f4f5;
+  --subtle-hover: #ececee;
+
+  --fg: #18181b;
+  --fg-muted: #52525b;
+  --fg-subtle: #71717a;
+  --fg-disabled: #a1a1aa;
+
+  --line-subtle: #f0f0f2;
+  --line: #e4e4e7;
+  --line-strong: #d4d4d8;
+
+  --accent-hover: color-mix(in oklab, var(--accent) 86%, black);
+  --accent-subtle: color-mix(in oklab, var(--accent) 9%, var(--surface));
+  --accent-fg: color-mix(in oklab, var(--accent) 82%, black);
+  --ring: color-mix(in oklab, var(--accent) 55%, transparent);
+
+  --success: #16a34a;
+  --success-subtle: #f0fdf4;
+  --success-fg: #166534;
+  --success-line: #bbf7d0;
+  --warning: #d97706;
+  --warning-subtle: #fffbeb;
+  --warning-fg: #92400e;
+  --warning-line: #fde68a;
+  --danger: #dc2626;
+  --danger-subtle: #fef2f2;
+  --danger-fg: #991b1b;
+  --danger-line: #fecaca;
+  --info: #0284c7;
+  --info-subtle: #f0f9ff;
+  --info-fg: #075985;
+  --info-line: #bae6fd;
+
+  --shadow-overlay: 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px -4px rgb(0 0 0 / 0.10);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04);
+
+  color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/*
+ * Tema escuro. Por enquanto só com data-theme="dark" (ou data-theme="system"
+ * + preferência do sistema): várias telas ainda não usam os tokens e
+ * ficariam metade claras/metade escuras se o escuro ligasse sozinho.
+ */
+:root[data-theme="dark"] {
+  --canvas: #09090b;
+  --surface: #111113;
+  --elevated: #18181b;
+  --subtle: #1c1c1f;
+  --subtle-hover: #27272a;
+  --fg: #fafafa;
+  --fg-muted: #a1a1aa;
+  --fg-subtle: #8b8b94;
+  --fg-disabled: #52525b;
+  --line-subtle: #1f1f22;
+  --line: #27272a;
+  --line-strong: #3f3f46;
+  --accent-hover: color-mix(in oklab, var(--accent) 86%, white);
+  --accent-subtle: color-mix(in oklab, var(--accent) 18%, var(--surface));
+  --accent-fg: color-mix(in oklab, var(--accent) 55%, white);
+  --success-subtle: #0f2417;
+  --success-fg: #86efac;
+  --success-line: #14532d;
+  --warning-subtle: #2a1d08;
+  --warning-fg: #fcd34d;
+  --warning-line: #78350f;
+  --danger-subtle: #2b1111;
+  --danger-fg: #fca5a5;
+  --danger-line: #7f1d1d;
+  --info-subtle: #0b2030;
+  --info-fg: #7dd3fc;
+  --info-line: #0c4a6e;
+  --shadow-overlay: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -4px rgb(0 0 0 / 0.6);
+  --shadow-card: none;
+  color-scheme: dark;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root[data-theme="system"] {
+    --canvas: #09090b;
+    --surface: #111113;
+    --elevated: #18181b;
+    --subtle: #1c1c1f;
+    --subtle-hover: #27272a;
+    --fg: #fafafa;
+    --fg-muted: #a1a1aa;
+    --fg-subtle: #8b8b94;
+    --fg-disabled: #52525b;
+    --line-subtle: #1f1f22;
+    --line: #27272a;
+    --line-strong: #3f3f46;
+    --accent-hover: color-mix(in oklab, var(--accent) 86%, white);
+    --accent-subtle: color-mix(in oklab, var(--accent) 18%, var(--surface));
+    --accent-fg: color-mix(in oklab, var(--accent) 55%, white);
+    --success-subtle: #0f2417;
+    --success-fg: #86efac;
+    --success-line: #14532d;
+    --warning-subtle: #2a1d08;
+    --warning-fg: #fcd34d;
+    --warning-line: #78350f;
+    --danger-subtle: #2b1111;
+    --danger-fg: #fca5a5;
+    --danger-line: #7f1d1d;
+    --info-subtle: #0b2030;
+    --info-fg: #7dd3fc;
+    --info-line: #0c4a6e;
+    --shadow-overlay: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -4px rgb(0 0 0 / 0.6);
+    --shadow-card: none;
+    color-scheme: dark;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+@theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* superfícies */
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-elevated: var(--elevated);
+  --color-subtle: var(--subtle);
+  --color-subtle-hover: var(--subtle-hover);
+
+  /* texto */
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-fg-disabled: var(--fg-disabled);
+
+  /* bordas */
+  --color-line-subtle: var(--line-subtle);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+
+  /* destaque (cor da escola) */
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-accent-fg: var(--accent-fg);
+  --color-on-accent: var(--on-accent);
+  --color-ring: var(--ring);
+
+  /* semânticas - só para status */
+  --color-success: var(--success);
+  --color-success-subtle: var(--success-subtle);
+  --color-success-fg: var(--success-fg);
+  --color-success-line: var(--success-line);
+  --color-warning: var(--warning);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-warning-fg: var(--warning-fg);
+  --color-warning-line: var(--warning-line);
+  --color-danger: var(--danger);
+  --color-danger-subtle: var(--danger-subtle);
+  --color-danger-fg: var(--danger-fg);
+  --color-danger-line: var(--danger-line);
+  --color-info: var(--info);
+  --color-info-subtle: var(--info-subtle);
+  --color-info-fg: var(--info-fg);
+  --color-info-line: var(--info-line);
+
+  /* sombras: só camadas flutuantes */
+  --shadow-overlay: var(--shadow-overlay);
+  --shadow-card: var(--shadow-card);
+
+  /* escala tipográfica curta: 12/13/14/16/20/24/30 */
+  --text-13: 0.8125rem;
+  --text-13--line-height: 1.125rem;
+
+  /* raios: 6px controles (rounded-md), 8px cards/inputs (rounded-lg), 12px modais (rounded-xl) */
+  --radius-control: 6px;
+  --radius-card: 8px;
+  --radius-modal: 12px;
+
+  /* movimento mínimo: 150ms */
+  --animate-skeleton: skeleton 1.4s ease-in-out infinite;
+  --animate-fade-in: fade-in 150ms ease-out;
+  --animate-pop-in: pop-in 150ms ease-out;
+  --animate-slide-up: slide-up 150ms ease-out;
+}
+
+@keyframes skeleton {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+}
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.98) translateY(4px); }
+}
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(6px); }
+}
+
+@layer base {
+  html {
+    background: var(--canvas);
+  }
+  body {
+    background: var(--canvas);
+    color: var(--fg);
+    font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 {
+    letter-spacing: -0.015em;
+  }
+  /* Foco sempre visível, na cor de destaque */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--accent) 20%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 @keyframes progress-loading {
