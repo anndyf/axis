@@ -86,7 +86,10 @@ export async function GET(
       return NextResponse.json({ message: 'Turma não encontrada' }, { status: 404 })
     }
 
-    const etapas = (await carregarEsquemaDaTurma(turma))?.etapas ?? []
+    const esquema = await carregarEsquemaDaTurma(turma)
+    const etapas = esquema?.etapas ?? []
+    // Mínimo de aprovação do esquema da turma (antes: 5 fixo)
+    const notaMinima = esquema?.config.notaMinimaAprovacao ?? 5
     const matchEtapa = /^UNIDADE_(\d+)$/.exec(unit)
     const indiceEtapa = matchEtapa ? Number(matchEtapa[1]) - 1 : null
 
@@ -173,16 +176,16 @@ export async function GET(
 
           const valStr = String(status).replace(',', '.')
           const isNumeric = !isNaN(parseFloat(valStr))
-          const isRC = status === 'RC' || (isNumeric && parseFloat(valStr) < 5)
-          const isAP = status === 'AP' || (isNumeric && parseFloat(valStr) >= 5)
+          const isRC = status === 'RC' || (isNumeric && parseFloat(valStr) < notaMinima)
+          const isAP = status === 'AP' || (isNumeric && parseFloat(valStr) >= notaMinima)
 
           if (isRC) {
-             // Destaque para Recuperação ou Nota < 5 (Fundo Laranja)
+             // Destaque para Recuperação ou Nota abaixo do mínimo (Fundo Laranja)
              data.cell.styles.fillColor = [249, 115, 22] // Orange 500
              data.cell.styles.textColor = [255, 255, 255]
              data.cell.styles.fontStyle = 'bold'
           } else if (isAP) {
-             // Aprovados ou Nota >= 5
+             // Aprovados ou Nota no mínimo ou acima
              data.cell.styles.fillColor = [255, 255, 255]
              data.cell.styles.textColor = [0, 0, 0]
              data.cell.styles.fontStyle = 'bold'

@@ -103,7 +103,8 @@ export async function GET(
 
     // Etapas do esquema da turma (2, 3, 4...) - antes "isSemestral" por
     // Turma.modalidade, que nunca foi preenchida nos dados reais.
-    const etapas = (await carregarEsquemaDaTurma(turma))?.etapas ?? []
+    const esquema = await carregarEsquemaDaTurma(turma)
+    const etapas = esquema?.etapas ?? []
 
     turma.estudantes.forEach(estudante => {
       const aprovadas = estudante.notas.filter(n => n.status === 'APROVADO').length
@@ -163,7 +164,8 @@ export async function GET(
       const linha = [
         estudante.nome,
         estudante.notas.length.toString(),
-        media >= 5 ? 'AP' : 'RC',
+        // Média simples das notas finais, na escala do esquema da turma
+        estudante.notas.length > 0 ? media.toFixed(1).replace('.', ',') : '-',
         status
       ]
       if (comFrequencia) linha.splice(3, 0, fmtFreq(freqAluno?.geral.percentual ?? null))
