@@ -16,5 +16,7 @@ export default async function FazerChamadaPage({ searchParams }: { searchParams:
   const { turma, disciplina, data } = await searchParams
   if (!turma) redirect("/dashboard/chamada")
   const hoje = hojeNaEscola()
-  return <ChamadaClient turmaId={turma} disciplinaId={disciplina ?? null} data={dataValida(data) ? data : hoje} hoje={hoje} />
+  const dia = dataValida(data) ? data : hoje
+  // key: trocar a data/disciplina remonta a tela (sem mostrar a chamada anterior enquanto carrega)
+  return <ChamadaClient key={`${turma}|${disciplina ?? ''}|${dia}`} turmaId={turma} disciplinaId={disciplina ?? null} data={dia} hoje={hoje} />
 }

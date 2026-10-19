@@ -17,7 +17,10 @@ export interface ChamadaAberta {
   turma: { id: string; nome: string }
   disciplina: { id: string; nome: string } | null
   alunos: { id: string; nome: string; matricula: string; status: string | null }[]
-  faltas: Record<string, number>
+  /** aluno -> tempos perdidos (na chamada diária, [] com quantidade) */
+  faltas: Record<string, { quantidade: number; tempos: number[] }>
+  /** aluno -> observação do professor nesta aula (não vai ao portal) */
+  observacoes: Record<string, string>
   /** aluno -> efeito da justificativa que cobre a data (atestado etc.) */
   justificados: Record<string, "ABONA" | "SO_JUSTIFICA">
 }
@@ -78,9 +81,10 @@ export async function abrirChamada(turmaId: string, disciplinaId: string | null,
   }
 
   const dataAula = new Date(`${data}T00:00:00Z`)
-  const [alunos, faltas, justificativas] = await Promise.all([
+  const [alunos, faltas, observacoes, justificativas] = await Promise.all([
     prisma.estudante.findMany({ where: { turmaId: turmaBase.id, escolaId: user.escolaId }, orderBy: { nome: "asc" }, select: { id: true, nome: true, matricula: true, status: true } }),
-    prisma.falta.findMany({ where: { aulaId: aula.id }, select: { estudanteId: true, quantidade: true } }),
+    prisma.falta.findMany({ where: { aulaId: aula.id }, select: { estudanteId: true, quantidade: true, tempos: true } }),
+    prisma.observacaoChamada.findMany({ where: { aulaId: aula.id }, select: { estudanteId: true, texto: true } }),
     prisma.justificativa.findMany({
       where: { escolaId: user.escolaId, estudante: { turmaId: turmaBase.id }, inicio: { lte: dataAula }, fim: { gte: dataAula } },
       select: { estudanteId: true, efeito: true },
@@ -97,7 +101,8 @@ export async function abrirChamada(turmaId: string, disciplinaId: string | null,
     turma: { id: acesso.turma.id, nome: acesso.turma.nome },
     disciplina: acesso.disciplina,
     alunos,
-    faltas: Object.fromEntries(faltas.map((f) => [f.estudanteId, f.quantidade])),
+    faltas: Object.fromEntries(faltas.map((f) => [f.estudanteId, { quantidade: f.quantidade, tempos: f.tempos }])),
+    observacoes: Object.fromEntries(observacoes.map((o) => [o.estudanteId, o.texto])),
     justificados,
   }
 }
@@ -114,22 +119,24 @@ async function aulaComAcesso(aulaId: string) {
 /**
  * Salva a chamada: grava só as faltas (quem não está na lista estava
  * presente), o conteúdo ministrado e marca a aula como REALIZADA. Serve
- * também para corrigir a chamada de dias anteriores.
+ * também para corrigir a chamada de dias anteriores. Cada falta traz os
+ * tempos perdidos (falta por tempo) ou, no formato antigo, a quantidade.
+ * Sem senha: o login identifica o professor e a aula guarda quem salvou.
  */
-export async function salvarChamada(aulaId: string, faltas: { estudanteId: string; quantidade: number }[], conteudo: string): Promise<{ ok: true } | Erro> {
+export async function salvarChamada(aulaId: string, faltas: { estudanteId: string; tempos?: number[]; quantidade?: number }[], conteudo: string): Promise<{ ok: true } | Erro> {
   const ctx = await aulaComAcesso(aulaId)
   if (!ctx) return { erro: "Aula não encontrada" }
   const { user, aula } = ctx
   if (chaveData(aula.data) > hojeNaEscola()) return { erro: "Não é possível fazer chamada de um dia que ainda não chegou." }
 
   const alunos = await prisma.estudante.findMany({ where: { turmaId: aula.turmaId, escolaId: user.escolaId }, select: { id: true } })
-  const validas = validarFaltas(faltas, new Set(alunos.map((a) => a.id)), aula.quantidade)
+  const validas = validarFaltas(faltas, new Set(alunos.map((a) => a.id)), aula)
   if (!validas.ok) return { erro: validas.erro }
   const texto = typeof conteudo === "string" ? conteudo.trim().slice(0, 5000) : ""
 
   await prisma.$transaction([
     prisma.falta.deleteMany({ where: { aulaId: aula.id } }),
-    prisma.falta.createMany({ data: validas.faltas.map((f) => ({ aulaId: aula.id, estudanteId: f.estudanteId, quantidade: f.quantidade })) }),
+    prisma.falta.createMany({ data: validas.faltas.map((f) => ({ aulaId: aula.id, estudanteId: f.estudanteId, quantidade: f.quantidade, tempos: f.tempos })) }),
     prisma.aula.update({ where: { id: aula.id }, data: { situacao: "REALIZADA", conteudo: texto || null, professorId: user.id } }),
   ])
   revalidatePath("/dashboard/chamada")
@@ -142,6 +149,33 @@ export async function cancelarAula(aulaId: string, motivo: string): Promise<{ ok
   if (!ctx) return { erro: "Aula não encontrada" }
   const texto = typeof motivo === "string" ? motivo.trim().slice(0, 5000) : ""
   await prisma.aula.update({ where: { id: ctx.aula.id }, data: { situacao: "CANCELADA", conteudo: texto || ctx.aula.conteudo, professorId: ctx.user.id } })
+  revalidatePath("/dashboard/chamada")
+  return { ok: true }
+}
+
+/**
+ * Observação de um aluno numa aula (presente ou faltoso). Texto vazio apaga.
+ * Mesmo acesso da chamada: professor da disciplina ou gestão, na escola da
+ * sessão; o aluno precisa ser da turma da aula.
+ */
+export async function salvarObservacao(aulaId: string, estudanteId: string, texto: string): Promise<{ ok: true } | Erro> {
+  const ctx = await aulaComAcesso(aulaId)
+  if (!ctx) return { erro: "Aula não encontrada" }
+  const { user, aula } = ctx
+  if (typeof estudanteId !== "string") return { erro: "Aluno não pertence a esta turma." }
+  const aluno = await prisma.estudante.findFirst({ where: { id: estudanteId, turmaId: aula.turmaId, escolaId: user.escolaId }, select: { id: true } })
+  if (!aluno) return { erro: "Aluno não pertence a esta turma." }
+  const limpo = typeof texto === "string" ? texto.trim().slice(0, 2000) : ""
+
+  if (!limpo) {
+    await prisma.observacaoChamada.deleteMany({ where: { aulaId: aula.id, estudanteId: aluno.id } })
+  } else {
+    await prisma.observacaoChamada.upsert({
+      where: { aulaId_estudanteId: { aulaId: aula.id, estudanteId: aluno.id } },
+      update: { texto: limpo, autorId: user.id },
+      create: { aulaId: aula.id, estudanteId: aluno.id, texto: limpo, autorId: user.id },
+    })
+  }
   revalidatePath("/dashboard/chamada")
   return { ok: true }
 }

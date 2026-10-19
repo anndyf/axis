@@ -95,28 +95,58 @@ export function planejarChamada(p: {
   return { ok: true, disciplinaId: p.disciplinaId, tempos, quantidade: tempos.length, chave: chaveAula(p.turmaId, p.data, p.disciplinaId) }
 }
 
+export interface FaltaValida {
+  estudanteId: string
+  /** nº de tempos perdidos - o que o motor de frequência usa */
+  quantidade: number
+  /** quais tempos da aula (subconjunto de aula.tempos, em ordem); vazio na chamada diária */
+  tempos: number[]
+}
+
 /**
- * Faltas recebidas do navegador: só alunos da turma, sem repetição, e
- * quantidade entre 1 e o nº de tempos da aula (0 = presente, descartado).
+ * Faltas recebidas do navegador: só alunos da turma, sem repetição.
+ *
+ * Falta por tempo: numa aula com tempos (ex.: 1º e 6º), cada falta traz os
+ * `tempos` que o aluno perdeu - todos precisam ser tempos DESTA aula, sem
+ * repetir - e a quantidade passa a ser o nº de tempos. Sem `tempos`, vale a
+ * `quantidade` (1..nº de tempos) e entram os primeiros tempos da aula.
+ * Chamada diária (aula sem tempos): só quantidade, e tempos fica vazio.
+ * Falta sem nenhum tempo/quantidade 0 = presente (descartada).
  */
 export function validarFaltas(
   faltas: unknown,
   alunosDaTurma: Set<string>,
-  quantidadeAula: number
-): { ok: true; faltas: { estudanteId: string; quantidade: number }[] } | { ok: false; erro: string } {
+  aula: { tempos: number[]; quantidade: number }
+): { ok: true; faltas: FaltaValida[] } | { ok: false; erro: string } {
   if (!Array.isArray(faltas)) return { ok: false, erro: 'Dados inválidos.' }
+  const temposDaAula = [...aula.tempos].sort((a, b) => a - b)
+  const limite = temposDaAula.length || aula.quantidade
   const vistos = new Set<string>()
-  const validas: { estudanteId: string; quantidade: number }[] = []
+  const validas: FaltaValida[] = []
   for (const f of faltas) {
     const estudanteId = f?.estudanteId
-    const quantidade = f?.quantidade ?? 1
     if (typeof estudanteId !== 'string' || !alunosDaTurma.has(estudanteId)) return { ok: false, erro: 'Aluno não pertence a esta turma.' }
     if (vistos.has(estudanteId)) return { ok: false, erro: 'Aluno repetido na chamada.' }
-    if (!Number.isInteger(quantidade) || quantidade < 0 || quantidade > quantidadeAula) {
-      return { ok: false, erro: `Quantidade de faltas deve estar entre 0 e ${quantidadeAula}.` }
-    }
     vistos.add(estudanteId)
-    if (quantidade > 0) validas.push({ estudanteId, quantidade })
+
+    if (f?.tempos !== undefined) {
+      const tempos = f.tempos
+      if (!Array.isArray(tempos) || tempos.some((t: unknown) => !Number.isInteger(t))) return { ok: false, erro: 'Tempos inválidos.' }
+      if (temposDaAula.length === 0 && tempos.length > 0) return { ok: false, erro: 'A chamada diária não tem falta por tempo.' }
+      if (new Set(tempos).size !== tempos.length) return { ok: false, erro: 'Tempo repetido na falta.' }
+      if (tempos.some((t: number) => !temposDaAula.includes(t))) return { ok: false, erro: 'Tempo não pertence a esta aula.' }
+      if (temposDaAula.length > 0) {
+        if (tempos.length > 0) validas.push({ estudanteId, quantidade: tempos.length, tempos: [...tempos].sort((a: number, b: number) => a - b) })
+        continue
+      }
+      // chamada diária com tempos: [] segue pela quantidade
+    }
+
+    const quantidade = f?.quantidade ?? 1
+    if (!Number.isInteger(quantidade) || quantidade < 0 || quantidade > limite) {
+      return { ok: false, erro: `Quantidade de faltas deve estar entre 0 e ${limite}.` }
+    }
+    if (quantidade > 0) validas.push({ estudanteId, quantidade, tempos: temposDaAula.slice(0, quantidade) })
   }
   return { ok: true, faltas: validas }
 }

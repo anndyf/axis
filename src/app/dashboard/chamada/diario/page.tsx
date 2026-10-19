@@ -36,7 +36,7 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
     prisma.aula.findMany({
       where: { escolaId, turmaId: turma.id, disciplinaId },
       orderBy: { data: 'desc' },
-      select: { id: true, data: true, tempos: true, quantidade: true, conteudo: true, situacao: true, professor: { select: { name: true, username: true } }, faltas: { select: { quantidade: true } } },
+      select: { id: true, data: true, tempos: true, quantidade: true, conteudo: true, situacao: true, professor: { select: { name: true, username: true } }, faltas: { select: { quantidade: true } }, observacoes: { orderBy: { estudante: { nome: 'asc' } }, select: { id: true, texto: true, estudante: { select: { nome: true } } } } },
     }),
     prisma.horarioAula.findMany({ where: { turmaId: turma.id }, select: { diaSemana: true, horario: true, disciplinaId: true } }),
     anoLetivoDaTurma(escolaId, turma),
@@ -114,6 +114,11 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
                           {a.situacao === "REALIZADA" ? null : <Badge tone={a.situacao === "CANCELADA" ? "neutral" : "warning"}>{SITUACAO[a.situacao]}</Badge>}
                           {a.professor && <span>{a.professor.name || a.professor.username}</span>}
                         </p>
+                        {a.observacoes.length > 0 && (
+                          <ul className="mt-1.5 space-y-0.5 text-xs text-fg-muted" aria-label="Observações">
+                            {a.observacoes.map((o) => <li key={o.id}><span className="font-medium text-fg">{o.estudante.nome}:</span> {o.texto}</li>)}
+                          </ul>
+                        )}
                       </td>
                       <td className="px-3 py-2.5 text-right tabular-nums text-fg-muted">{a.situacao === "REALIZADA" ? faltas : "—"}</td>
                       <td className="px-4 py-2.5 text-right sm:px-5">
