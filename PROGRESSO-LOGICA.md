@@ -46,7 +46,8 @@ Ambiente: PostgreSQL 16 local subiu; `axis_dev` e `axis_test` criados, migration
   - **[decisão]** Item "Frequência" (gestão) adicionado ao catálogo `src/lib/modules.ts`, como o da chamada.
   - **[decisão]** O risco por faltas não foi enfiado na coluna "Risco" do portal (que é de notas) para não mudar o layout; o portal mostra a frequência em vermelho abaixo do mínimo.
   - **[decisão]** "Pode faltar" usa as aulas previstas pelo horário × calendário até o fim do ano letivo; sem calendário, conta só as aulas já dadas.
-- [ ] Seed de aulas/faltas
+- [x] Seed `prisma/seed-frequencia.ts` (rodar depois de `seed.ts` e `seed-calendario.ts`: `npx tsx prisma/seed-frequencia.ts`): chamadas dos últimos 30 dias letivos de cada turma pelo horário × calendário; 1º aluno de cada turma infrequente (~35%), 2º perto do limite (~20%) com um atestado de 2 dias, demais ~4%. Idempotente (rodado 2x: 2ª vez cria 0), guarda de host local.
+  - **[decisão]** Seed novo em vez de mexer no `seed-calendario.ts`, para poder rodar/repetir separado.
 
 ## Próximo passo
-Seed de aulas e faltas de exemplo.
+Item 3 (atividades criadas pelo professor).
