@@ -77,9 +77,9 @@
 }
 
 /*
- * Tema escuro. Por enquanto só com data-theme="dark" (ou data-theme="system"
- * + preferência do sistema): várias telas ainda não usam os tokens e
- * ficariam metade claras/metade escuras se o escuro ligasse sozinho.
+ * Tema escuro: data-theme="dark", ou data-theme="system" + preferência do
+ * sistema. Escolhido no menu do usuário (cookie axis_tema, src/lib/tema.ts);
+ * o padrão é o claro.
  */
 :root[data-theme="dark"] {
   --canvas: #09090b;

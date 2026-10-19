@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useId, useRef, useState, type ComponentType, type ReactNode } from 'react'
+import { Check } from 'lucide-react'
 import { cn } from './cn'
 
 export interface ItemMenu {
@@ -11,6 +12,8 @@ export interface ItemMenu {
   href?: string
   perigo?: boolean
   separadorAntes?: boolean
+  /** Opção de escolha única (ex.: tema): vira menuitemradio com marca de seleção */
+  marcado?: boolean
 }
 
 /**
@@ -70,14 +73,14 @@ export function Menu({ trigger, items, align = 'end', side = 'bottom', className
         >
           {items.map((item, i) => {
             const Icone = item.icon
-            const conteudo = <>{Icone && <Icone size={16} strokeWidth={1.75} className="shrink-0 text-fg-subtle" />}{item.label}</>
+            const conteudo = <>{Icone && <Icone size={16} strokeWidth={1.75} className="shrink-0 text-fg-subtle" />}{item.label}{item.marcado && <Check size={14} strokeWidth={1.75} className="ml-auto shrink-0 text-accent-fg" aria-hidden />}</>
             return (
               <div key={i}>
                 {item.separadorAntes && <div role="separator" className="my-1 h-px bg-line-subtle" />}
                 {item.href ? (
                   <Link role="menuitem" href={item.href} ref={(el) => { itens.current[i] = el }} onClick={() => setAberto(false)} className={classeItem(item.perigo)}>{conteudo}</Link>
                 ) : (
-                  <button role="menuitem" type="button" ref={(el) => { itens.current[i] = el }} onClick={() => { setAberto(false); item.onSelect?.() }} className={classeItem(item.perigo)}>{conteudo}</button>
+                  <button role={item.marcado === undefined ? "menuitem" : "menuitemradio"} aria-checked={item.marcado} type="button" ref={(el) => { itens.current[i] = el }} onClick={() => { setAberto(false); item.onSelect?.() }} className={classeItem(item.perigo)}>{conteudo}</button>
                 )}
               </div>
             )

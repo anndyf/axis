@@ -5,6 +5,8 @@ import Providers from "@/components/Providers";
 import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
 import NextTopLoader from 'nextjs-toploader';
 import { escolaDaRequisicao } from "@/lib/escola-atual";
+import { cookies } from "next/headers";
+import { COOKIE_TEMA, temaValido } from "@/lib/tema";
 import { variaveisDeDestaque } from "@/lib/services/identidade";
 
 const geistSans = Geist({
@@ -57,8 +59,10 @@ export default async function RootLayout({
 }>) {
   // Destaque da escola nos tokens do design system (globals.css)
   const escola = await escolaDaRequisicao();
+  // Tema escolhido no menu do usuário (cookie), aplicado já no HTML do servidor: sem piscar
+  const tema = temaValido((await cookies()).get(COOKIE_TEMA)?.value);
   return (
-    <html lang="pt-BR" style={variaveisDeDestaque(escola?.corPrimaria) as React.CSSProperties}>
+    <html lang="pt-BR" data-theme={tema} style={variaveisDeDestaque(escola?.corPrimaria) as React.CSSProperties}>
       <head>
         {/* PWA meta tags para melhor suporte em iOS */}
         <meta name="mobile-web-app-capable" content="yes" />

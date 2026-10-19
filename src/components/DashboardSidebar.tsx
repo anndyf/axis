@@ -4,7 +4,8 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { signOut } from "next-auth/react"
-import { KeyRound, LogOut, PanelLeftClose, PanelLeftOpen, UserRound, X, ChevronsUpDown, Clock, Blocks } from "lucide-react"
+import { KeyRound, LogOut, PanelLeftClose, PanelLeftOpen, UserRound, X, ChevronsUpDown, Clock, Blocks, Sun, Moon, Monitor } from "lucide-react"
+import { definirTema, temaValido, type Tema } from "@/lib/tema"
 import { useSessionTimer } from "@/contexts/SessionTimerContext"
 import { getUnreadCount } from "@/app/dashboard/mensagens/actions"
 import { getPendingUsersCount } from "@/app/dashboard/usuarios/actions"
@@ -77,6 +78,9 @@ export default function DashboardSidebar({
   const [unreadCount, setUnreadCount] = useState(0)
   const [pendingUsersCount, setPendingUsersCount] = useState(0)
   const { timeLeft } = useSessionTimer()
+  const [tema, setTema] = useState<Tema>("light")
+  useEffect(() => { setTema(temaValido(document.documentElement.dataset.theme)) }, [])
+  const escolherTema = (t: Tema) => { definirTema(t); setTema(t) }
 
   useEffect(() => {
     getUnreadCount().then(setUnreadCount)
@@ -225,6 +229,9 @@ export default function DashboardSidebar({
               { label: "Meu perfil", icon: UserRound, href: "/dashboard/perfil" },
               { label: "Trocar senha", icon: KeyRound, href: "/dashboard/perfil#senha" },
               ...(user.isSuperuser ? [{ label: "Componentes", icon: Blocks, href: "/dashboard/ui" }] : []),
+              { label: "Tema claro", icon: Sun, marcado: tema === "light", separadorAntes: true, onSelect: () => escolherTema("light") },
+              { label: "Tema escuro", icon: Moon, marcado: tema === "dark", onSelect: () => escolherTema("dark") },
+              { label: "Tema do sistema", icon: Monitor, marcado: tema === "system", onSelect: () => escolherTema("system") },
               { label: "Sair", icon: LogOut, perigo: true, separadorAntes: true, onSelect: () => signOut({ redirectTo: "/login" }) },
             ]}
           />
