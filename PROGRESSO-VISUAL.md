@@ -71,7 +71,48 @@ Capturas: `npx tsx scripts/capturas.ts <fase>` com `npm run dev` rodando (Chromi
 - Capturas: `docs/capturas/4-migracao/`.
 
 ### 5. Extras
-- [ ] pendente
+- [x] Neutros fixos → tokens (regra `neutros()` do codemod): `bg-white` → `surface`, `zinc-50` → `canvas`, `zinc-100` → `subtle`, `border-zinc-200/300` → `line/line-strong`, `text-black` → `fg` etc. Mesmos valores no claro (conferido por captura); no escuro tudo se adapta. Ficam de fora a impressão da prova e a bolinha dos interruptores. Classes neutras fixas: ~1.600 → 139 (restantes: impressão, sobreposições `bg-zinc-900/60`, casos pontuais).
+- [x] Seletor de tema no menu do usuário (Tema claro / escuro / do sistema, `menuitemradio` com marca). Preferência no cookie `axis_tema` (`src/lib/tema.ts`, teste `tema.test.ts`), lida no layout raiz: o HTML já vem com `data-theme` certo, sem piscar e sem script inline.
+  - **[decisão]** Padrão é o **claro**; o escuro é opcional.
+- [x] Busca rápida Ctrl+K / ⌘K (`src/components/CommandPalette.tsx`), também por botão "Buscar" no menu lateral. Páginas = as mesmas do menu (`modulosVisiveis()` em `src/lib/modules.ts`, agora usada pelos dois). Turmas e estudantes só para a gestão, sempre na escola da sessão e com seleção mínima de campos (`src/app/dashboard/paleta/actions.ts`; teste `src/lib/paleta-acoes.test.ts` cobre outra escola, professor, AEE, portal e sem sessão). Busca sem acento/caixa (`src/lib/services/busca.ts`, teste `busca.test.ts`). Combobox acessível (setas, Enter, Esc, `aria-activedescendant`).
+- [x] Content-Security-Policy em todas as respostas (`src/lib/csp.ts`, teste `csp.test.ts`, usada no `next.config.ts`). Varredura das telas principais e do portal com o servidor rodando: sem violações no console.
+  - **[decisão]** `script-src` com `'unsafe-inline'`: o Next injeta scripts inline de hidratação; usar nonce exigiria renderização dinâmica em todas as páginas e mexer no proxy. Mesmo assim a política fecha plugins, `<base>`, destino de formulários e embutir em outro site.
+- Capturas finais: `docs/capturas/5-final/`.
 
-## Próximo passo
-Fase 5: neutros fixos → tokens (para o tema escuro), seletor de tema, paleta Ctrl+K, CSP.
+## Contagens (antes → depois)
+| Medida | Antes | Depois |
+|---|---|---|
+| Classes de cor soltas (padrão do PROGRESSO) | 2031 em 85 arquivos | **0** |
+| `uppercase` | 701 | 3 (campos de digitação e uma constante de rótulo) |
+| `rounded-2xl` / `rounded-3xl` | 1024 raios no total, muitos 2xl/3xl | 0 de 2xl/3xl |
+| Neutros fixos (branco/zinc) | ~1.600 | 139 |
+| Testes | 255 | 295 |
+
+## Para validar localmente
+
+Preparar: `npm ci`, `npx prisma migrate deploy` (nenhuma migração nova nesta sessão), seeds de sempre, `npm run dev`. Logins em `LOGINS_TESTE.md`.
+
+**Telas (comparar `docs/capturas/0-antes/` com `docs/capturas/5-final/`, em 1440px e 375px):**
+- Login (`/login`), recuperação de senha (link "Esqueci minha senha"), `/trocar-senha` e `/redefinir-senha` (indicador de força).
+- Dashboard da direção e do professor.
+- Turmas, relatório da turma, lançamento de notas, chamada (lista, fazer chamada, diário), frequência, boletim do estudante, conselho de classe (lista e turma), resultados, configurações, portal do estudante.
+- Configurações → Identidade visual: trocar a cor (ver contraste e pré-visualização), enviar um logo, salvar; conferir menu, login, portal, cor do navegador e um PDF (boletim) com o logo.
+- Domínio raiz: sem `DEV_ESCOLA_SLUG`, `http://localhost:3000` mostra a página de entrada; `http://inexistente.localhost:3000` cai em `/escola-invalida`.
+- Ctrl+K como direção (páginas, turmas, estudantes) e como professor (só páginas).
+- Menu do usuário → Tema escuro / do sistema; recarregar a página (não deve piscar claro).
+- Celular (375px): nenhuma tela deve rolar de lado; tabelas rolam dentro do cartão.
+
+**Migrações:** nenhuma.
+
+**Testes novos:** `identidade.test.ts`, `identidade-acoes.test.ts`, `pdf-logo.test.ts`, `forca-senha.test.ts`, `dominio.test.ts`, `proxy.test.ts`, `paleta-acoes.test.ts`, `busca.test.ts`, `tema.test.ts`, `csp.test.ts` (295 no total, `npx vitest run`).
+
+**Decisões não confirmadas** (marcadas com [decisão] acima):
+- Destaque padrão índigo; tema escuro opcional, padrão claro.
+- Menu lateral abre expandido por padrão.
+- Logo enviado (data URL até 150 KB) ou endereço https; PDFs só usam o enviado.
+- `corSecundaria` sem uso.
+- `/cadastro-professor` continua só redirecionando para o login.
+- `playwright` como devDependency (capturas).
+- Barras flutuantes escuras de ação em lote mantidas em duas telas.
+- CSP com `'unsafe-inline'` em script.
+- Não confirmado no navegador: importação de alunos por **PDF** (worker do pdf.js vindo do unpkg) com a CSP; a política libera esse endereço, mas vale enviar um PDF de teste em Estudantes → Importar.

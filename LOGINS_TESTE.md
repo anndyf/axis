@@ -11,6 +11,10 @@
 
 Iniciar o sistema: `npm run dev` (na pasta `C:\AXIS`).
 
+**Página de entrada (domínio raiz):** sem subdomínio de escola e sem `DEV_ESCOLA_SLUG`, o endereço raiz mostra a página "Endereço da sua escola" (`/entrada`), que leva para `<escola>.<domínio>/login`. Com `DEV_ESCOLA_SLUG` no `.env`, `http://localhost:3000` continua abrindo direto a escola, como antes; a página de entrada pode ser vista em `http://localhost:3000/entrada`. Subdomínio inexistente cai em `/escola-invalida`.
+
+**No painel:** `Ctrl+K` (ou ⌘K) abre a busca rápida (páginas; para a direção/admin também turmas e estudantes). O tema (claro, escuro ou do sistema) fica no menu do usuário, no rodapé do menu lateral. A cor e o logo da escola se ajustam em Configurações → Identidade visual (direção/admin).
+
 O login aceita **usuário ou e-mail**. Após **5 tentativas erradas** em 15 minutos o usuário fica bloqueado por 15 minutos (ou até redefinir a senha pelo link "Esqueci minha senha").
 
 ---
