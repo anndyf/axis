@@ -23,6 +23,7 @@ interface User {
   isDirecao: boolean
   isStaff: boolean
   isAEE?: boolean
+  isPlatformAdmin?: boolean
 }
 
 export interface EscolaDoMenu {
@@ -30,7 +31,7 @@ export interface EscolaDoMenu {
   logoUrl?: string | null
 }
 
-const GRUPOS_ORDENADOS = ["Início", "Gestão Acadêmica", "Diário e Avaliações", "Ferramentas", "Configurações"]
+const GRUPOS_ORDENADOS = ["Início", "Gestão Acadêmica", "Diário e Avaliações", "Ferramentas", "Configurações", "Plataforma"]
 
 export function papelDoUsuario(user: User) {
   return user.isSuperuser ? "Administrador" : user.isAEE ? "Especialista AEE" : user.isDirecao ? "Direção" : user.isStaff ? "Professor" : "Gestão escolar"

@@ -20,6 +20,7 @@ import {
   DollarSign,
   ClipboardCheck,
   UserX,
+  Building2,
   type LucideIcon,
 } from 'lucide-react'
 import { PlanoTipo } from '@prisma/client'
@@ -66,6 +67,10 @@ export const MODULOS: Modulo[] = [
   { id: 'matriz', nome: 'Matriz Curricular', grupo: 'Configurações', icone: LayoutGrid, rota: '/dashboard/matriz', permissao: (u) => !u.isAEE && can(u, 'gestao') },
   { id: 'usuarios', nome: 'Usuários', grupo: 'Configurações', icone: Shield, rota: '/dashboard/usuarios', permissao: (u) => !u.isAEE && can(u, 'superuser') },
   { id: 'configuracoes', nome: 'Configurações', grupo: 'Configurações', icone: Settings, rota: '/dashboard/configuracoes', permissao: (u) => !u.isAEE && can(u, 'superuser') },
+
+  // Ferramenta da dona da plataforma (gestão cross-tenant de escolas), não é
+  // um módulo pago da escola - não passa por planoMinimo/EscolaModulo.
+  { id: 'plataforma', nome: 'Plataforma', grupo: 'Plataforma', icone: Building2, rota: '/dashboard/plataforma', permissao: (u) => !!u.isPlatformAdmin },
 ]
 
 export const ORDEM_PLANO: Record<PlanoTipo, number> = { BASICO: 0, PRO: 1, ENTERPRISE: 2 }
