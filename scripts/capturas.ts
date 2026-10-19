@@ -62,7 +62,7 @@ async function sessao(browser: Browser, largura: number, usuario?: string, senha
   await ctx.addInitScript(() => {
     const original = Storage.prototype.getItem
     Storage.prototype.getItem = function (chave: string) {
-      return chave.startsWith('seen_tips') ? 'true' : original.call(this, chave)
+      return chave.startsWith('seen_') ? 'true' : original.call(this, chave)
     }
   })
   const page = await ctx.newPage()

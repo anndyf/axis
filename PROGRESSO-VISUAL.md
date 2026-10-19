@@ -59,11 +59,19 @@ Capturas: `npx tsx scripts/capturas.ts <fase>` com `npm run dev` rodando (Chromi
 - [x] Prioridade 2 (manual): turmas (sem faixa escura, cartões neutros, ações em ícones cinza com `aria-label`, relatório da turma com `Stat`), usuários (avatar do sistema, filtros suaves, barra de seleção e aviso em superfície clara), estudantes (busca/total discretos, tabela densa com matrícula em mono, ações neutras), disciplinas (turnos sem cor, lista expansível com `aria-expanded`), configurações (atalhos em lista, `Switch`/`Select`, confirmação no `Dialog`), calendário letivo (botões padrão, sem caixa alta, lixeira neutra que fica vermelha só no hover), esquemas de avaliação e horário pelo codemod de cabeçalhos.
   - **[correção]** Em 375px a página de estudantes rolava de lado: o `sr-only` do cabeçalho "Ações" é `absolute` e escapava do contêiner com rolagem. Contêineres de tabela com rolagem agora são `relative` (o `TableContainer` já era).
   - Verificado em 375px: estudantes, disciplinas, configurações, calendário, esquemas, usuários, turmas, horário, notas, AEE, questões, provas, ocorrências — sem rolagem lateral da página.
-- [ ] Prioridade 3: portal (celular primeiro, logo da escola).
-- [ ] Prioridade 4: demais telas (provas, questões, simulados, planos, AEE, ocorrências, mensagens, laboratórios, auditoria).
+- [x] Prioridade 3: portal do estudante (`src/app/portal`), celular primeiro: topo com a marca da escola (logo ou inicial na cor de destaque), abas no desktop e barra inferior simples no celular (`aria-current`), início com turma/frequência/horário, avisos em lista com marca de não lido, boletim em tabela densa com a disciplina fixa na rolagem lateral e situação em `Badge`, perfil enxuto; comunicado e horário de aulas no `Dialog` (ganhou o tamanho `xl`). Lógica intocada (abas, mensagens lidas no navegador, análise de risco, frequência, professor do horário).
+  - **[correção de segurança]** `portal/page.tsx` mandava a sessão inteira (`session.user`) para o componente cliente; agora vai só `{ id }`, que é o único campo usado.
+- [x] Prioridade 4: demais telas, pelo codemod + ajustes pontuais:
+  - `maiusculas()`: sem rótulos em caixa alta (exceto campos de digitação e a visão de impressão da prova).
+  - `estados()`: selecionado preto → destaque suave; selecionado verde → sucesso suave; botão verde ou escuro **clicável** (tem `hover:`) → primário na cor da escola; chips/ícones escuros → neutros; fundos hex quase brancos → canvas.
+  - Conselho de classe (lista): sem linhas avermelhadas, situação em `Badge`, link "abrir" com `aria-label`. Matriz curricular, estudante (formulário): barra de seleção e aviso em superfície clara. AEE: observações da direção em bloco claro, chips de CID e perfis selecionados em destaque suave. Ocorrências: botão primário padrão.
+  - Cabeçalhos de formulário (turma, usuário, matriz, ficha AEE) deixam de ser `sticky top-0 z-50` (cobriam a barra superior ao rolar).
+  - **[decisão]** As barras flutuantes escuras de ação em lote (banco de questões, vincular disciplinas) ficaram escuras: é uma camada flutuante, padrão do Linear. Usuários e matriz curricular já tinham sido trocadas para clara antes desta decisão; ficou assim.
+- [x] Carregamento: `dashboard/loading.tsx` e `portal/loading.tsx` com esqueletos (menu e barra superior ficam); o carregamento da raiz deixou de cobrir a tela com um painel.
+- Capturas: `docs/capturas/4-migracao/`.
 
 ### 5. Extras
 - [ ] pendente
 
 ## Próximo passo
-Fase 4, prioridade 3: portal do estudante (celular primeiro, logo da escola no topo).
+Fase 5: neutros fixos → tokens (para o tema escuro), seletor de tema, paleta Ctrl+K, CSP.
