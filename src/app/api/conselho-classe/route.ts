@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { StatusNota } from '@prisma/client'
 import { logAudit } from '@/lib/audit'
+import { reportarErro } from '@/lib/monitoramento'
 import { can } from '@/lib/rbac'
 import { calcularMediaFinal, resolverEsquemaAvaliacaoId, paraEsquemaConfig, unidadesDeNotasSalvas, notaRecuperacaoValida, type EsquemaConfig } from '@/lib/services/notas'
 
@@ -178,6 +179,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: error.message }, { status: 404 })
     }
     
+    await reportarErro(error, { metodo: 'POST', caminho: '/api/conselho-classe' })
     return NextResponse.json(
       { message: 'Erro ao salvar decisões do conselho' },
       { status: 500 }

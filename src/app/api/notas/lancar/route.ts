@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { logAudit } from '@/lib/audit'
+import { reportarErro } from '@/lib/monitoramento'
 import { can } from '@/lib/rbac'
 import { resolverEsquemaAvaliacaoId, paraEsquemaConfig, type StatusNota } from '@/lib/services/notas'
 import {
@@ -168,6 +169,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: error.message }, { status: 400 })
     }
     console.error('Erro crítico ao lançar notas:', error?.message || error)
+    await reportarErro(error, { metodo: 'POST', caminho: '/api/notas/lancar' })
     return NextResponse.json({ message: 'Erro ao processar notas' }, { status: 500 })
   }
 }

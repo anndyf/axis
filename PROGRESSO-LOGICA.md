@@ -15,10 +15,12 @@ Ambiente: PostgreSQL 16 local subiu; `axis_dev` e `axis_test` criados, migration
 - [x] `api/conselho-classe` valida a recuperação contra `notaMaxima` do esquema da turma (`notaRecuperacaoValida` em `services/notas.ts`, com teste) — teste de integração `src/lib/conselho-classe.test.ts` (escala 100 aceita 85, recusa 101; escala 10 recusa 11).
   - **[decisão]** O lote do conselho também ficou atômico (antes era `Promise.all`: uma decisão inválida no meio deixava as anteriores gravadas). Valor não numérico na recuperação passa a ser recusado com 400.
   - Turma sem esquema resolvido continua validando contra 10 (comportamento anterior).
-- [ ] Sentry opcional
+- [x] Monitoramento opcional: `src/instrumentation.ts` (`onRequestError` do Next) + `src/lib/monitoramento.ts`. Só age com `SENTRY_DSN`; sem ela não há rede nem efeito.
+  - **[decisão]** Sem instalar `@sentry/nextjs`: envio direto para a API de envelope do Sentry via `fetch` (sem nova dependência, sem mexer em `next.config.ts`). Não envia cabeçalhos, cookies, corpo nem query string. Só erro do servidor (erros de navegador ficam para depois — exigiria mexer em layout/componentes visuais).
+  - `api/notas/lancar` e `api/conselho-classe` também reportam os 500 que eles próprios capturam.
 
 ### 2. Chamada e frequência
 - [ ] pendente
 
 ## Próximo passo
-Sentry opcional.
+Item 2: modelos Aula/Falta/Justificativa.
