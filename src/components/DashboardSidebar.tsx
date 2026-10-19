@@ -4,12 +4,14 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { signOut } from "next-auth/react"
-import { KeyRound, LogOut, PanelLeftClose, PanelLeftOpen, UserRound, X, ChevronsUpDown, Clock, Blocks, Sun, Moon, Monitor } from "lucide-react"
+import { KeyRound, LogOut, PanelLeftClose, PanelLeftOpen, UserRound, X, ChevronsUpDown, Clock, Blocks, Sun, Moon, Monitor, Search } from "lucide-react"
 import { definirTema, temaValido, type Tema } from "@/lib/tema"
 import { useSessionTimer } from "@/contexts/SessionTimerContext"
 import { getUnreadCount } from "@/app/dashboard/mensagens/actions"
 import { getPendingUsersCount } from "@/app/dashboard/usuarios/actions"
-import { MODULOS } from "@/lib/modules"
+import { modulosVisiveis } from "@/lib/modules"
+import { can } from "@/lib/rbac"
+import CommandPalette from "@/components/CommandPalette"
 import { Avatar } from "@/components/ui/Avatar"
 import { Menu } from "@/components/ui/Menu"
 import { cn } from "@/components/ui/cn"
@@ -81,6 +83,19 @@ export default function DashboardSidebar({
   const [tema, setTema] = useState<Tema>("light")
   useEffect(() => { setTema(temaValido(document.documentElement.dataset.theme)) }, [])
   const escolherTema = (t: Tema) => { definirTema(t); setTema(t) }
+  const [paletaAberta, setPaletaAberta] = useState(false)
+
+  // Ctrl+K / ⌘K abre a busca rápida de qualquer tela do painel
+  useEffect(() => {
+    const atalho = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault()
+        setPaletaAberta((a) => !a)
+      }
+    }
+    window.addEventListener("keydown", atalho)
+    return () => window.removeEventListener("keydown", atalho)
+  }, [])
 
   useEffect(() => {
     getUnreadCount().then(setUnreadCount)
@@ -105,10 +120,8 @@ export default function DashboardSidebar({
   const badgesPorModulo: Record<string, number> = { mensagens: unreadCount, usuarios: pendingUsersCount }
   const menuGroups = GRUPOS_ORDENADOS.map((title) => ({
     title,
-    links: MODULOS
+    links: modulosVisiveis(user, modulosAtivos)
       .filter((m) => m.grupo === title)
-      .filter((m) => m.permissao(user as any))
-      .filter((m) => !m.planoMinimo || modulosAtivos.includes(m.id))
       .map((m) => ({ name: m.nome, href: m.rota, icon: m.icone, badge: badgesPorModulo[m.id] })),
   })).filter((group) => group.links.length > 0)
 
@@ -145,6 +158,23 @@ export default function DashboardSidebar({
           {!recolhido && anoLetivo && <span className="shrink-0 rounded-md border border-line px-1.5 text-xs font-medium leading-5 text-fg-subtle tabular-nums">{anoLetivo}</span>}
           <button type="button" onClick={closeMobile} aria-label="Fechar menu" className="rounded-md p-1 text-fg-subtle hover:bg-subtle hover:text-fg md:hidden">
             <X size={16} strokeWidth={1.75} />
+          </button>
+        </div>
+
+        {/* Busca rápida */}
+        <div className={cn("shrink-0 px-2 pt-3", recolhido && "flex justify-center")}>
+          <button
+            type="button"
+            onClick={() => setPaletaAberta(true)}
+            aria-label="Busca rápida (Ctrl+K)"
+            title={recolhido ? "Busca rápida (Ctrl+K)" : undefined}
+            className={cn(
+              "flex h-8 items-center gap-2 rounded-md border border-line bg-surface text-13 text-fg-subtle transition-colors duration-150 hover:border-line-strong hover:text-fg",
+              recolhido ? "w-8 justify-center" : "w-full px-2"
+            )}
+          >
+            <Search size={14} strokeWidth={1.75} aria-hidden />
+            {!recolhido && <><span>Buscar...</span><kbd className="ml-auto font-mono text-xs text-fg-disabled">Ctrl K</kbd></>}
           </button>
         </div>
 
@@ -247,6 +277,13 @@ export default function DashboardSidebar({
           </button>
         </div>
       </aside>
+
+      <CommandPalette
+        aberto={paletaAberta}
+        onFechar={() => setPaletaAberta(false)}
+        paginas={modulosVisiveis(user, modulosAtivos).map((m) => ({ nome: m.nome, rota: m.rota, grupo: m.grupo, icone: m.icone }))}
+        buscarRegistros={!user.isAEE && can(user, "gestao")}
+      />
     </>
   )
 }

@@ -80,3 +80,10 @@ export const LIMITE_USUARIOS: Record<PlanoTipo, number> = {
   PRO: 50,
   ENTERPRISE: Infinity,
 }
+
+/** Módulos que o usuário vê (menu lateral e paleta Ctrl+K): permissão do papel E, se exigir plano, módulo ativo na escola. */
+export function modulosVisiveis(user: RbacUser, modulosAtivos: string[]): Modulo[] {
+  return MODULOS
+    .filter((m) => m.permissao(user))
+    .filter((m) => !m.planoMinimo || modulosAtivos.includes(m.id))
+}
