@@ -51,10 +51,13 @@ Capturas: `npx tsx scripts/capturas.ts <fase>` com `npm run dev` rodando (Chromi
 - [x] `/escola-invalida` no novo padrão, com botão para a página de entrada (endereço raiz calculado do host).
 
 ### 4. Migração das telas
-- [ ] pendente
+- [x] Codemod `scripts/codemod-cores.py` (mecânico, reproduzível, documentado no próprio arquivo) aplicado em 88 arquivos de `src`: cinzas → zinc (texto cinza → `fg/fg-muted/fg-subtle`, para passar AA), azuis/roxos → destaque, verdes/amarelos/vermelhos → semânticas suaves, degradês e sombras coloridas removidos, sombras grandes → `shadow-card` (ou `shadow-overlay` em camadas flutuantes), `rounded-2xl` → `rounded-lg`, `rounded-3xl`/`rounded-[Nrem]` → `rounded-xl`, `font-black/extrabold` → `font-semibold`, ícones decorativos com classe dinâmica (`bg-${cor}-50`) → neutros. Dentro de `/dashboard`: cabeçalhos de página `sticky` com margem negativa (do layout antigo, colidiam com a barra superior) viram bloco normal; `min-h-screen` das páginas sai (empurrava o rodapé).
+  - Contagem de classes de cor soltas: **2031 → 0** (padrão do PROGRESSO; `python3 scripts/codemod-cores.py src --contar`).
+  - **[decisão]** `scripts/` e `docs/` fora da varredura do Tailwind (`@source not`): o Tailwind lia texto do script como classe e gerava CSS inválido (derrubou o app até a correção).
+- [ ] Polimento manual por tela (prioridade 1 → 4)
 
 ### 5. Extras
 - [ ] pendente
 
 ## Próximo passo
-Capturas da fase 3 e início da fase 4 (lançamento de notas, chamada, frequência, boletim, conselho, resultados).
+Fase 4: polimento manual, prioridade 1 (lançamento de notas, chamada, frequência, boletim, conselho, resultados).

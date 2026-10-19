@@ -99,41 +99,41 @@ export default async function ChamadaPage({ searchParams }: { searchParams: Prom
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-16">
       <div className="flex items-center gap-4">
-        <Link href="/dashboard" className="p-2 hover:bg-slate-200 rounded-lg transition-colors">
-          <ArrowLeft className="w-5 h-5 text-slate-700" />
+        <Link href="/dashboard" className="p-2 hover:bg-zinc-200 rounded-lg transition-colors">
+          <ArrowLeft className="w-5 h-5 text-fg-muted" />
         </Link>
         <div className="flex-1">
-          <h1 className="text-2xl font-medium text-blue-900 flex items-center gap-2">
-            <ClipboardCheck className="w-6 h-6 text-slate-700" /> Chamada e diário de classe
+          <h1 className="text-2xl font-medium text-accent-fg flex items-center gap-2">
+            <ClipboardCheck className="w-6 h-6 text-fg-muted" /> Chamada e diário de classe
           </h1>
-          <p className="text-sm text-slate-600">Todos começam presentes: marque só quem faltou.</p>
+          <p className="text-sm text-fg-muted">Todos começam presentes: marque só quem faltou.</p>
         </div>
         <SeletorData data={data} hoje={hoje} />
       </div>
 
       {!calendario && (
-        <div className="p-4 rounded-xl border text-sm flex items-center gap-2 bg-amber-50 border-amber-200 text-amber-800">
+        <div className="p-4 rounded-xl border text-sm flex items-center gap-2 bg-warning-subtle border-warning-line text-warning-fg">
           <AlertCircle className="w-4 h-4" /> O calendário letivo de {ano} ainda não foi configurado. A gestão precisa cadastrá-lo em Configurações → Calendário letivo.
         </div>
       )}
 
-      <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-3">
-        <h2 className="font-medium text-slate-800">
+      <section className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6 space-y-3">
+        <h2 className="font-medium text-fg">
           Aulas de {dataBR}{diaSemana !== null ? ` (${DIAS[diaSemana]})` : ""}
         </h2>
-        {calendario && !letivo && <p className="text-sm text-slate-500">Dia não letivo.</p>}
-        {letivo && doDia.length === 0 && <p className="text-sm text-slate-500">Nenhuma aula sua no horário deste dia.</p>}
-        <div className="divide-y divide-slate-100">
+        {calendario && !letivo && <p className="text-sm text-fg-subtle">Dia não letivo.</p>}
+        {letivo && doDia.length === 0 && <p className="text-sm text-fg-subtle">Nenhuma aula sua no horário deste dia.</p>}
+        <div className="divide-y divide-zinc-100">
           {doDia.map((i) => (
             <div key={`${i.turmaId}-${i.disciplinaId}`} className="flex flex-wrap items-center gap-3 py-3">
               <div className="flex-1 min-w-[12rem]">
-                <p className="text-sm font-medium text-slate-800">{i.nome}</p>
-                <p className="text-xs text-slate-500">
+                <p className="text-sm font-medium text-fg">{i.nome}</p>
+                <p className="text-xs text-fg-subtle">
                   {i.turmaNome}{i.tempos.length > 0 && ` · ${i.tempos.map((t) => `${t}º`).join(", ")} ${i.tempos.length > 1 ? "tempos" : "tempo"}`}
                 </p>
               </div>
               <Situacao situacao={i.situacao} />
-              <Link href={link(i)} className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-lg text-xs font-medium uppercase tracking-wide hover:bg-slate-800">
+              <Link href={link(i)} className="flex items-center gap-2 bg-zinc-900 text-white px-4 py-2 rounded-lg text-xs font-medium uppercase tracking-wide hover:bg-zinc-800">
                 {i.situacao === "REALIZADA" ? "Editar chamada" : "Fazer chamada"}
               </Link>
             </div>
@@ -142,18 +142,18 @@ export default async function ChamadaPage({ searchParams }: { searchParams: Prom
       </section>
 
       {itens.length > 0 && (
-        <section className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-3">
-          <h2 className="font-medium text-slate-800 flex items-center gap-2"><BookOpen className="w-4 h-4" /> Diários</h2>
-          <div className="divide-y divide-slate-100">
+        <section className="bg-white rounded-lg shadow-sm border border-zinc-200 p-6 space-y-3">
+          <h2 className="font-medium text-fg flex items-center gap-2"><BookOpen className="w-4 h-4" /> Diários</h2>
+          <div className="divide-y divide-zinc-100">
             {[...doDia, ...outros].map((i) => (
               <div key={`d-${i.turmaId}-${i.disciplinaId}`} className="flex flex-wrap items-center gap-3 py-2">
-                <p className="flex-1 text-sm text-slate-700">{i.nome} <span className="text-slate-400">· {i.turmaNome}</span></p>
+                <p className="flex-1 text-sm text-fg-muted">{i.nome} <span className="text-fg-subtle">· {i.turmaNome}</span></p>
                 {i.pendentes > 0 && (
-                  <span className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5 flex items-center gap-1">
+                  <span className="text-xs text-warning-fg bg-warning-subtle border border-warning-line rounded-full px-2 py-0.5 flex items-center gap-1">
                     <Clock className="w-3 h-3" /> {i.pendentes} {i.pendentes === 1 ? "chamada pendente" : "chamadas pendentes"}
                   </span>
                 )}
-                <Link href={linkDiario(i)} className="text-xs font-medium text-blue-700 hover:underline">Abrir diário</Link>
+                <Link href={linkDiario(i)} className="text-xs font-medium text-accent-fg hover:underline">Abrir diário</Link>
               </div>
             ))}
           </div>
@@ -164,7 +164,7 @@ export default async function ChamadaPage({ searchParams }: { searchParams: Prom
 }
 
 function Situacao({ situacao }: { situacao: Item["situacao"] }) {
-  if (situacao === "REALIZADA") return <span className="text-xs text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5 flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Chamada feita</span>
-  if (situacao === "CANCELADA") return <span className="text-xs text-slate-600 bg-slate-100 border border-slate-200 rounded-full px-2 py-0.5">Aula não dada</span>
-  return <span className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">Pendente</span>
+  if (situacao === "REALIZADA") return <span className="text-xs text-success-fg bg-success-subtle border border-success-line rounded-full px-2 py-0.5 flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Chamada feita</span>
+  if (situacao === "CANCELADA") return <span className="text-xs text-fg-muted bg-zinc-100 border border-zinc-200 rounded-full px-2 py-0.5">Aula não dada</span>
+  return <span className="text-xs text-warning-fg bg-warning-subtle border border-warning-line rounded-full px-2 py-0.5">Pendente</span>
 }

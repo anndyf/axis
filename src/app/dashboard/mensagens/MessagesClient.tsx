@@ -247,36 +247,36 @@ export default function MessagesClient({
 
   const getCatStyles = (cat: string) => {
     switch(cat) {
-      case "COMUNICADO": return { bg: "bg-amber-50", text: "text-amber-600", dot: "bg-amber-500", border: "border-amber-100", label: "📢 Comunicado" }
-      case "SUPORTE": return { bg: "bg-indigo-50", text: "text-indigo-600", dot: "bg-indigo-500", border: "border-indigo-100", label: "🛠️ Chamado Técnico" }
-      case "DIRECAO": return { bg: "bg-purple-50", text: "text-purple-600", dot: "bg-purple-500", border: "border-purple-100", label: "🏛️ Chamado Direção" }
-      default: return { bg: "bg-emerald-50", text: "text-emerald-600", dot: "bg-emerald-500", border: "border-emerald-100", label: "💬 Mensagem Geral" }
+      case "COMUNICADO": return { bg: "bg-warning-subtle", text: "text-warning-fg", dot: "bg-warning", border: "border-warning-line", label: "📢 Comunicado" }
+      case "SUPORTE": return { bg: "bg-accent-subtle", text: "text-accent-fg", dot: "bg-accent", border: "border-accent/25", label: "🛠️ Chamado Técnico" }
+      case "DIRECAO": return { bg: "bg-accent-subtle", text: "text-accent-fg", dot: "bg-accent", border: "border-accent/25", label: "🏛️ Chamado Direção" }
+      default: return { bg: "bg-success-subtle", text: "text-success-fg", dot: "bg-success", border: "border-success-line", label: "💬 Mensagem Geral" }
     }
   }
 
   const ticketStatuses = [
-    { value: "ABERTO", label: "Aberto", color: "bg-slate-100 text-slate-600" },
-    { value: "EM_ATENDIMENTO", label: "Em Atendimento", color: "bg-blue-100 text-blue-600" },
-    { value: "AGUARDANDO_RESPOSTA", label: "Aguardando Resposta", color: "bg-amber-100 text-amber-600" },
-    { value: "RESOLVIDO", label: "Resolvido", color: "bg-emerald-100 text-emerald-600" }
+    { value: "ABERTO", label: "Aberto", color: "bg-zinc-100 text-fg-muted" },
+    { value: "EM_ATENDIMENTO", label: "Em Atendimento", color: "bg-accent-subtle text-accent-fg" },
+    { value: "AGUARDANDO_RESPOSTA", label: "Aguardando Resposta", color: "bg-warning-subtle text-warning-fg" },
+    { value: "RESOLVIDO", label: "Resolvido", color: "bg-success-subtle text-success-fg" }
   ]
 
   const priorities = [
-    { value: "BAIXA", label: "Baixa", color: "text-slate-400" },
-    { value: "MEDIA", label: "Média", color: "text-blue-500" },
-    { value: "ALTA", label: "Alta", color: "text-orange-500 font-bold" },
-    { value: "CRITICA", label: "Crítica", color: "text-rose-600 font-black" }
+    { value: "BAIXA", label: "Baixa", color: "text-fg-subtle" },
+    { value: "MEDIA", label: "Média", color: "text-accent-fg" },
+    { value: "ALTA", label: "Alta", color: "text-warning-fg font-bold" },
+    { value: "CRITICA", label: "Crítica", color: "text-danger-fg font-semibold" }
   ]
 
   return (
-    <div className="flex flex-col bg-white rounded-[2.5rem] shadow-2xl shadow-slate-300/40 border border-slate-200 min-h-[calc(100vh-180px)] overflow-hidden animate-in fade-in duration-500">
+    <div className="flex flex-col bg-white rounded-xl shadow-card border border-zinc-200 min-h-[calc(100vh-180px)] overflow-hidden animate-in fade-in duration-500">
       
       {/* View 1: Listagem de Chamados (Full Width) */}
       {!selectedMessage && activeTab !== 'new' && (
-        <div className="flex flex-col h-full bg-slate-50/20">
-          <div className="p-8 md:px-12 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="flex flex-col h-full bg-zinc-50/20">
+          <div className="p-8 md:px-12 border-b border-zinc-100 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
-              <h2 className="text-3xl font-black text-slate-800 tracking-tight">Painel de Chamados</h2>
+              <h2 className="text-3xl font-semibold text-fg tracking-tight">Painel de Chamados</h2>
               <button 
                 onClick={async () => {
                   startTransition(async () => {
@@ -286,30 +286,30 @@ export default function MessagesClient({
                   })
                 }}
                 disabled={isPending}
-                className="text-xs font-bold text-indigo-500 uppercase tracking-widest hover:text-indigo-600 transition-colors mt-3 flex items-center gap-2"
+                className="text-xs font-bold text-accent-fg uppercase tracking-widest hover:text-accent-fg transition-colors mt-3 flex items-center gap-2"
               >
                 <CheckCheck size={14} /> Marcar todos como lidos
               </button>
             </div>
             
             <div className="flex flex-col sm:flex-row items-center gap-4">
-              <div className="flex bg-slate-100 p-1.5 rounded-2xl w-full sm:w-auto">
+              <div className="flex bg-zinc-100 p-1.5 rounded-lg w-full sm:w-auto">
                 <button
                   onClick={() => setActiveTab("inbox")}
-                  className={`px-8 py-3 text-xs font-bold uppercase tracking-widest rounded-xl transition-all ${activeTab === 'inbox' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                  className={`px-8 py-3 text-xs font-bold uppercase tracking-widest rounded-xl transition-all ${activeTab === 'inbox' ? 'bg-white text-accent-fg shadow-sm' : 'text-fg-subtle hover:text-fg-muted'}`}
                 >
                   Fila de Chamados
                 </button>
                 <button
                   onClick={() => setActiveTab("sent")}
-                  className={`px-8 py-3 text-xs font-bold uppercase tracking-widest rounded-xl transition-all ${activeTab === 'sent' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+                  className={`px-8 py-3 text-xs font-bold uppercase tracking-widest rounded-xl transition-all ${activeTab === 'sent' ? 'bg-white text-accent-fg shadow-sm' : 'text-fg-subtle hover:text-fg-muted'}`}
                 >
                   Meus Chamados
                 </button>
               </div>
               <button
                 onClick={() => { setActiveTab("new"); setSelectedMessage(null); }}
-                className="w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white rounded-2xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 active:scale-95 flex items-center justify-center gap-2 font-bold text-sm"
+                className="w-full sm:w-auto px-6 py-3 bg-accent text-white rounded-lg hover:bg-accent transition-all shadow-card active:scale-95 flex items-center justify-center gap-2 font-bold text-sm"
               >
                 <Plus size={18} /> Novo Chamado
               </button>
@@ -318,13 +318,13 @@ export default function MessagesClient({
 
           <div className="p-8 md:px-12">
             <div className="relative max-w-md mb-8">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-subtle w-5 h-5" />
               <input 
                 type="text" 
                 placeholder="Buscar ticket por assunto ou remetente..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all shadow-sm"
+                className="w-full pl-12 pr-4 py-4 bg-white border border-zinc-200 rounded-lg text-sm font-medium focus:ring-2 focus:ring-ring outline-none transition-all shadow-sm"
               />
             </div>
 
@@ -339,52 +339,52 @@ export default function MessagesClient({
                   <div 
                     key={msg.id}
                     onClick={() => handleSelectMessage(msg)}
-                    className={`group p-6 rounded-[2rem] cursor-pointer transition-all border flex flex-col justify-between min-h-[160px] ${
+                    className={`group p-6 rounded-xl cursor-pointer transition-all border flex flex-col justify-between min-h-[160px] ${
                       isUnread 
-                        ? 'bg-indigo-50/40 border-indigo-200 shadow-md shadow-indigo-100/50' 
-                        : 'bg-white border-slate-200 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100/40'
+                        ? 'bg-accent-subtle border-accent/25 shadow-card ' 
+                        : 'bg-white border-zinc-200 hover:border-accent/25 hover:shadow-card '
                     }`}
                   >
                     <div>
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${style.bg} ${style.text} ${style.border}`}>
+                          <span className={`px-2 py-1 rounded-lg text-[9px] font-semibold uppercase tracking-widest border ${style.bg} ${style.text} ${style.border}`}>
                             {style.label}
                           </span>
                           {!msg.isResolved && msg.category !== 'GERAL' && (
-                            <span className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${statusData.color} border border-current opacity-80`}>
+                            <span className={`px-2 py-1 rounded-lg text-[9px] font-semibold uppercase tracking-widest ${statusData.color} border border-current opacity-80`}>
                               {statusData.label}
                             </span>
                           )}
                         </div>
                         {isUnread && (
                           <div className="flex items-center gap-1.5 shrink-0">
-                            <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></div>
-                            <span className="text-[9px] font-black text-indigo-500 uppercase tracking-widest">Novo</span>
+                            <div className="w-2 h-2 bg-accent rounded-full animate-pulse"></div>
+                            <span className="text-[9px] font-semibold text-accent-fg uppercase tracking-widest">Novo</span>
                           </div>
                         )}
                       </div>
                       
-                      <h4 className={`text-base leading-tight mb-2 ${isUnread ? 'font-black text-slate-900' : 'font-bold text-slate-800'}`}>
-                        {msg.ticketNumber ? <span className="text-indigo-500 mr-2">#{msg.ticketNumber}</span> : ''}
+                      <h4 className={`text-base leading-tight mb-2 ${isUnread ? 'font-semibold text-fg' : 'font-bold text-fg'}`}>
+                        {msg.ticketNumber ? <span className="text-accent-fg mr-2">#{msg.ticketNumber}</span> : ''}
                         {msg.subject.replace(/\[Ticket\]|\[Cadastro Pendente\]/gi, '').trim() || 'Sem Assunto'}
                       </h4>
                       
                       <div className="flex items-center gap-2 mb-4">
-                        <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-600">
+                        <div className="w-6 h-6 rounded-full bg-zinc-100 flex items-center justify-center text-[10px] font-bold text-fg-muted">
                            {activeTab === 'inbox' ? (msg.sender?.name?.charAt(0) || msg.sender?.username?.charAt(0)) : (msg.receiver?.name?.charAt(0) || 'G')}
                         </div>
-                        <span className="text-xs font-medium text-slate-500 truncate">
+                        <span className="text-xs font-medium text-fg-subtle truncate">
                           {activeTab === 'inbox' ? (msg.sender?.name || msg.sender?.username) : (msg.receiver?.name || 'Geral')}
                         </span>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100/80">
-                      <span className={`text-[9px] font-black uppercase tracking-widest ${priorityData.color}`}>
+                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-zinc-100/80">
+                      <span className={`text-[9px] font-semibold uppercase tracking-widest ${priorityData.color}`}>
                         Prio: {priorityData.label}
                       </span>
-                      <span className="text-[10px] font-bold text-slate-400">
+                      <span className="text-[10px] font-bold text-fg-subtle">
                         {formatarData(msg.updatedAt || msg.createdAt)}
                       </span>
                     </div>
@@ -393,12 +393,12 @@ export default function MessagesClient({
               })}
               
               {filteredBySearchAndCategory.length === 0 && (
-                <div className="col-span-full py-20 flex flex-col items-center justify-center text-center bg-white rounded-[2rem] border border-dashed border-slate-200">
-                  <div className="w-24 h-24 bg-slate-50 rounded-[2rem] flex items-center justify-center mb-6">
-                    <Inbox className="w-10 h-10 text-slate-300" />
+                <div className="col-span-full py-20 flex flex-col items-center justify-center text-center bg-white rounded-xl border border-dashed border-zinc-200">
+                  <div className="w-24 h-24 bg-zinc-50 rounded-xl flex items-center justify-center mb-6">
+                    <Inbox className="w-10 h-10 text-zinc-300" />
                   </div>
-                  <h3 className="text-xl font-black text-slate-700">Nenhum chamado encontrado</h3>
-                  <p className="text-sm font-medium text-slate-400 mt-2">Você não tem chamados pendentes nesta categoria.</p>
+                  <h3 className="text-xl font-semibold text-fg-muted">Nenhum chamado encontrado</h3>
+                  <p className="text-sm font-medium text-fg-subtle mt-2">Você não tem chamados pendentes nesta categoria.</p>
                 </div>
               )}
             </div>
@@ -408,7 +408,7 @@ export default function MessagesClient({
                 <button
                   onClick={loadMore}
                   disabled={loadingMore}
-                  className="px-8 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl text-sm font-bold shadow-sm hover:bg-slate-50 hover:text-indigo-600 transition-colors flex items-center gap-2 disabled:opacity-50"
+                  className="px-8 py-3 bg-white border border-zinc-200 text-fg-muted rounded-xl text-sm font-bold shadow-sm hover:bg-zinc-50 hover:text-accent-fg transition-colors flex items-center gap-2 disabled:opacity-50"
                 >
                   {loadingMore ? (
                     <><Loader2 size={16} className="animate-spin" /> Carregando...</>
@@ -424,26 +424,26 @@ export default function MessagesClient({
 
       {/* View 2: Criação de Novo Chamado (Full Width) */}
       {activeTab === "new" && (
-        <div className="flex-1 flex flex-col bg-slate-50/30 overflow-y-auto">
-          <div className="px-8 py-6 bg-white border-b border-slate-100 flex items-center gap-4 sticky top-0 z-10">
-            <button onClick={() => setActiveTab("inbox")} className="p-3 bg-slate-50 hover:bg-slate-100 rounded-2xl transition-all">
-              <ArrowLeft size={20} className="text-slate-600" />
+        <div className="flex-1 flex flex-col bg-zinc-50/30 overflow-y-auto">
+          <div className="px-8 py-6 bg-white border-b border-zinc-100 flex items-center gap-4 sticky top-0 z-10">
+            <button onClick={() => setActiveTab("inbox")} className="p-3 bg-zinc-50 hover:bg-zinc-100 rounded-lg transition-all">
+              <ArrowLeft size={20} className="text-fg-muted" />
             </button>
             <div>
-              <h2 className="text-2xl font-black text-slate-800 tracking-tight leading-none">Abrir Novo Chamado</h2>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1.5">Preencha os detalhes do seu ticket</p>
+              <h2 className="text-2xl font-semibold text-fg tracking-tight leading-none">Abrir Novo Chamado</h2>
+              <p className="text-xs font-bold text-fg-subtle uppercase tracking-widest mt-1.5">Preencha os detalhes do seu ticket</p>
             </div>
           </div>
 
           <div className="flex-1 p-8 md:p-12">
-            <div className="max-w-3xl mx-auto space-y-8 bg-white p-8 md:p-10 rounded-[2rem] shadow-sm border border-slate-100">
+            <div className="max-w-3xl mx-auto space-y-8 bg-white p-8 md:p-10 rounded-xl shadow-sm border border-zinc-100">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-3">
-                  <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Categoria / Departamento</label>
+                  <label className="text-[11px] font-semibold text-fg-subtle uppercase tracking-widest ml-1">Categoria / Departamento</label>
                   <select 
                     value={newMsgCategory} 
                     onChange={e => setNewMsgCategory(e.target.value)}
-                    className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl font-bold text-slate-700 focus:bg-white focus:border-indigo-500 transition-all outline-none"
+                    className="w-full p-4 bg-zinc-50 border-2 border-transparent rounded-lg font-bold text-fg-muted focus:bg-white focus:border-accent transition-all outline-none"
                   >
                     <option value="SUPORTE">Suporte Técnico (Sistema)</option>
                     <option value="DIRECAO">Direção (Pedagógico)</option>
@@ -458,11 +458,11 @@ export default function MessagesClient({
                 </div>
 
                 <div className="space-y-3">
-                  <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Nível de Urgência</label>
+                  <label className="text-[11px] font-semibold text-fg-subtle uppercase tracking-widest ml-1">Nível de Urgência</label>
                   <select 
                     value={newMsgPriority} 
                     onChange={e => setNewMsgPriority(e.target.value)}
-                    className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl font-bold text-slate-700 focus:bg-white focus:border-indigo-500 transition-all outline-none"
+                    className="w-full p-4 bg-zinc-50 border-2 border-transparent rounded-lg font-bold text-fg-muted focus:bg-white focus:border-accent transition-all outline-none"
                   >
                     <option value="BAIXA">Baixa (Pode esperar)</option>
                     <option value="MEDIA">Normal</option>
@@ -473,11 +473,11 @@ export default function MessagesClient({
 
                 {newMsgCategory === "GERAL" && (
                   <div className="md:col-span-2 space-y-3">
-                    <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Atribuir A / Destinatário</label>
+                    <label className="text-[11px] font-semibold text-fg-subtle uppercase tracking-widest ml-1">Atribuir A / Destinatário</label>
                     <select 
                       value={newMsgReceiver} 
                       onChange={e => setNewMsgReceiver(e.target.value)}
-                      className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl font-bold text-slate-700 focus:bg-white focus:border-indigo-500 transition-all outline-none"
+                      className="w-full p-4 bg-zinc-50 border-2 border-transparent rounded-lg font-bold text-fg-muted focus:bg-white focus:border-accent transition-all outline-none"
                     >
                       <option value="">Selecione o usuário responsável...</option>
                       {users.filter(u => u.id !== currentUserId).map(u => (
@@ -490,7 +490,7 @@ export default function MessagesClient({
 
               <div className="space-y-6">
                 <div className="space-y-3">
-                  <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Assunto / Tópico</label>
+                  <label className="text-[11px] font-semibold text-fg-subtle uppercase tracking-widest ml-1">Assunto / Tópico</label>
                   {newMsgCategory === 'SUPORTE' ? (
                     <select
                       value={predefinedSubject}
@@ -503,7 +503,7 @@ export default function MessagesClient({
                              setNewMsgSubject('');
                          }
                       }}
-                      className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl font-bold text-slate-800 focus:bg-white focus:border-indigo-500 transition-all outline-none"
+                      className="w-full p-4 bg-zinc-50 border-2 border-transparent rounded-lg font-bold text-fg focus:bg-white focus:border-accent transition-all outline-none"
                     >
                       <option value="">Selecione o tópico principal...</option>
                       <option value="Lançamento de Notas/Faltas">Problema no Lançamento de Notas/Faltas</option>
@@ -517,7 +517,7 @@ export default function MessagesClient({
                     <select
                       value={predefinedSubject}
                       onChange={e => { setPredefinedSubject(e.target.value); setNewMsgSubject(''); }}
-                      className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl font-bold text-slate-800 focus:bg-white focus:border-indigo-500 transition-all outline-none"
+                      className="w-full p-4 bg-zinc-50 border-2 border-transparent rounded-lg font-bold text-fg focus:bg-white focus:border-accent transition-all outline-none"
                     >
                       <option value="">Selecione o tópico principal...</option>
                       <option value="Ajuste de Notas">Solicitação de Ajuste de Notas (Fora do Prazo)</option>
@@ -531,7 +531,7 @@ export default function MessagesClient({
                       value={newMsgSubject} 
                       onChange={e => setNewMsgSubject(e.target.value)}
                       placeholder="Assunto da mensagem"
-                      className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl font-bold text-slate-800 focus:bg-white focus:border-indigo-500 transition-all outline-none"
+                      className="w-full p-4 bg-zinc-50 border-2 border-transparent rounded-lg font-bold text-fg focus:bg-white focus:border-accent transition-all outline-none"
                     />
                   )}
                 </div>
@@ -541,11 +541,11 @@ export default function MessagesClient({
                     {/* Campos Dinâmicos baseados no Assunto */}
                     {(predefinedSubject === 'Lançamento de Notas/Faltas' || predefinedSubject === 'Ajuste de Notas' || predefinedSubject === 'Gerador de Provas' || predefinedSubject === 'Ocorrência Grave') && (
                       <div className="space-y-3">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Turma (Opcional para provas)</label>
+                        <label className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest ml-1">Turma (Opcional para provas)</label>
                         <select 
                           value={selectedTurmaId} 
                           onChange={e => setSelectedTurmaId(e.target.value)}
-                          className="w-full p-3.5 bg-slate-50 border-2 border-transparent rounded-xl font-bold text-sm text-slate-700 focus:bg-white focus:border-indigo-500 transition-all outline-none"
+                          className="w-full p-3.5 bg-zinc-50 border-2 border-transparent rounded-xl font-bold text-sm text-fg-muted focus:bg-white focus:border-accent transition-all outline-none"
                         >
                           <option value="">Selecione a Turma...</option>
                           {turmas?.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
@@ -555,12 +555,12 @@ export default function MessagesClient({
                     
                     {(predefinedSubject === 'Lançamento de Notas/Faltas' || predefinedSubject === 'Ajuste de Notas' || predefinedSubject === 'Gerador de Provas') && (
                       <div className="space-y-3">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Disciplina</label>
+                        <label className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest ml-1">Disciplina</label>
                         <select 
                           value={selectedDisciplinaId} 
                           onChange={e => setSelectedDisciplinaId(e.target.value)}
                           disabled={!selectedTurmaId || turmaDetails.disciplinas.length === 0}
-                          className="w-full p-3.5 bg-slate-50 border-2 border-transparent rounded-xl font-bold text-sm text-slate-700 focus:bg-white focus:border-indigo-500 transition-all outline-none disabled:opacity-50"
+                          className="w-full p-3.5 bg-zinc-50 border-2 border-transparent rounded-xl font-bold text-sm text-fg-muted focus:bg-white focus:border-accent transition-all outline-none disabled:opacity-50"
                         >
                           <option value="">Selecione a Disciplina...</option>
                           {turmaDetails.disciplinas.map(d => <option key={d.id} value={d.id}>{d.nome}</option>)}
@@ -570,12 +570,12 @@ export default function MessagesClient({
 
                     {predefinedSubject === 'Ocorrência Grave' && (
                       <div className="space-y-3">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Estudante</label>
+                        <label className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest ml-1">Estudante</label>
                         <select 
                           value={selectedEstudanteId} 
                           onChange={e => setSelectedEstudanteId(e.target.value)}
                           disabled={!selectedTurmaId || turmaDetails.estudantes.length === 0}
-                          className="w-full p-3.5 bg-slate-50 border-2 border-transparent rounded-xl font-bold text-sm text-slate-700 focus:bg-white focus:border-indigo-500 transition-all outline-none disabled:opacity-50"
+                          className="w-full p-3.5 bg-zinc-50 border-2 border-transparent rounded-xl font-bold text-sm text-fg-muted focus:bg-white focus:border-accent transition-all outline-none disabled:opacity-50"
                         >
                           <option value="">Selecione o Estudante...</option>
                           {turmaDetails.estudantes.map((e: any) => <option key={e.matricula} value={e.matricula}>{e.nome}</option>)}
@@ -585,13 +585,13 @@ export default function MessagesClient({
 
                     {(predefinedSubject === 'Outro Problema' || predefinedSubject === 'Solicitação de Material' || predefinedSubject === 'Dúvida Pedagógica' || predefinedSubject === 'Gerador de Provas') && (
                       <div className="space-y-3 md:col-span-2">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Detalhes Rápidos / Título</label>
+                        <label className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest ml-1">Detalhes Rápidos / Título</label>
                         <input 
                           type="text" 
                           value={newMsgSubject} 
                           onChange={e => setNewMsgSubject(e.target.value)}
                           placeholder="Ex: Laboratório de Informática / Não consigo cadastrar questão"
-                          className="w-full p-3.5 bg-slate-50 border-2 border-transparent rounded-xl font-bold text-sm text-slate-700 focus:bg-white focus:border-indigo-500 transition-all outline-none"
+                          className="w-full p-3.5 bg-zinc-50 border-2 border-transparent rounded-xl font-bold text-sm text-fg-muted focus:bg-white focus:border-accent transition-all outline-none"
                         />
                       </div>
                     )}
@@ -600,8 +600,8 @@ export default function MessagesClient({
               </div>
 
               <div className="space-y-3">
-                <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1">Descrição Completa da Ocorrência</label>
-                <div className="rounded-2xl overflow-hidden border border-slate-200">
+                <label className="text-[11px] font-semibold text-fg-subtle uppercase tracking-widest ml-1">Descrição Completa da Ocorrência</label>
+                <div className="rounded-lg overflow-hidden border border-zinc-200">
                   <RichTextEditor
                     value={newMsgContent}
                     onChange={setNewMsgContent}
@@ -614,7 +614,7 @@ export default function MessagesClient({
                 <button 
                   onClick={() => handleSendMessage()}
                   disabled={sending}
-                  className="w-full md:w-auto px-12 bg-indigo-600 text-white py-5 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 disabled:opacity-50 active:scale-95 flex items-center justify-center gap-3"
+                  className="w-full md:w-auto px-12 bg-accent text-white py-5 rounded-lg font-semibold text-sm uppercase tracking-widest hover:bg-accent transition-all shadow-card disabled:opacity-50 active:scale-95 flex items-center justify-center gap-3"
                 >
                   {sending ? <Loader2 className="animate-spin w-5 h-5" /> : <Send size={20} />}
                   {sending ? "Enviando..." : "Registrar Chamado"}
@@ -627,42 +627,42 @@ export default function MessagesClient({
 
       {/* View 3: Detalhes do Chamado (Full Width) */}
       {selectedMessage && (
-        <div className="flex-1 flex flex-col h-full bg-slate-50/30 overflow-hidden">
-          <div className="px-8 py-6 bg-white border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm z-10 shrink-0">
+        <div className="flex-1 flex flex-col h-full bg-zinc-50/30 overflow-hidden">
+          <div className="px-8 py-6 bg-white border-b border-zinc-100 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm z-10 shrink-0">
             <div className="flex items-center gap-5">
                <button 
                  onClick={() => { setSelectedMessage(null); setThreadMessages([]); }} 
-                 className="p-3 bg-slate-50 hover:bg-slate-100 rounded-2xl transition-all"
+                 className="p-3 bg-zinc-50 hover:bg-zinc-100 rounded-lg transition-all"
                >
-                 <ArrowLeft size={20} className="text-slate-600" />
+                 <ArrowLeft size={20} className="text-fg-muted" />
                </button>
                <div>
                   <div className="flex items-center gap-3 mb-1.5">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    <span className="text-[10px] font-semibold uppercase tracking-widest text-fg-subtle">
                       CHAMADO #{selectedMessage.ticketNumber || selectedMessage.id.substring(selectedMessage.id.length - 6).toUpperCase()}
                     </span>
-                    <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest border ${getCatStyles(selectedMessage.category).bg} ${getCatStyles(selectedMessage.category).text} ${getCatStyles(selectedMessage.category).border}`}>
+                    <span className={`px-2 py-0.5 rounded-md text-[8px] font-semibold uppercase tracking-widest border ${getCatStyles(selectedMessage.category).bg} ${getCatStyles(selectedMessage.category).text} ${getCatStyles(selectedMessage.category).border}`}>
                       {getCatStyles(selectedMessage.category).label}
                     </span>
                   </div>
-                  <h3 className="text-2xl font-black text-slate-800 tracking-tight leading-none">
+                  <h3 className="text-2xl font-semibold text-fg tracking-tight leading-none">
                     {selectedMessage.subject.replace(/\[Ticket\]|\[Cadastro Pendente\]/gi, '').trim()}
                   </h3>
                </div>
             </div>
             
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <div className="flex items-center gap-2 bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-100">
-                <Clock size={16} className="text-slate-400" />
+              <div className="flex items-center gap-2 bg-zinc-50 px-4 py-2.5 rounded-xl border border-zinc-100">
+                <Clock size={16} className="text-fg-subtle" />
                 <div className="flex flex-col">
-                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Aberto em</span>
-                  <span className="text-xs font-bold text-slate-600">{formatarData(selectedMessage.createdAt)}</span>
+                  <span className="text-[9px] font-semibold uppercase tracking-widest text-fg-subtle">Aberto em</span>
+                  <span className="text-xs font-bold text-fg-muted">{formatarData(selectedMessage.createdAt)}</span>
                 </div>
               </div>
               
               <div className="flex flex-wrap items-center gap-2">
                 {selectedMessage.assignedTo && (
-                  <div className="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-blue-50 text-blue-600 border border-blue-100 flex items-center gap-1.5">
+                  <div className="px-4 py-2.5 rounded-xl text-[10px] font-semibold uppercase tracking-widest bg-accent-subtle text-accent-fg border border-accent/25 flex items-center gap-1.5">
                     <User size={12} />
                     {selectedMessage.assignedTo.name}
                   </div>
@@ -677,14 +677,14 @@ export default function MessagesClient({
                       setThreadMessages(newThread)
                       setSelectedMessage({...selectedMessage, assignedToId: currentUserId, assignedTo: { name: 'Você' }})
                     }}
-                    className="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 transition-colors cursor-pointer flex items-center gap-1"
+                    className="px-4 py-2.5 rounded-xl text-[10px] font-semibold uppercase tracking-widest bg-accent-subtle hover:bg-accent-subtle text-accent-fg border border-accent/25 transition-colors cursor-pointer flex items-center gap-1"
                   >
                     <User size={12} /> Assumir Chamado
                   </button>
                 )}
 
                 {!selectedMessage.isResolved && selectedMessage.category !== 'GERAL' && (
-                  <span className={`px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-amber-50 text-amber-600 border border-amber-100`}>
+                  <span className={`px-4 py-2.5 rounded-xl text-[10px] font-semibold uppercase tracking-widest bg-warning-subtle text-warning-fg border border-warning-line`}>
                     Em Aberto
                   </span>
                 )}
@@ -696,7 +696,7 @@ export default function MessagesClient({
                       await updateTicketStatus(selectedMessage.id, 'RESOLVIDO')
                       setSelectedMessage({...selectedMessage, isResolved: true, status: 'RESOLVIDO'})
                     }}
-                    className="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-500 hover:bg-emerald-600 text-white border border-emerald-600 transition-colors shadow-sm cursor-pointer flex items-center gap-1"
+                    className="px-4 py-2.5 rounded-xl text-[10px] font-semibold uppercase tracking-widest bg-success hover:bg-success text-white border border-success transition-colors shadow-sm cursor-pointer flex items-center gap-1"
                   >
                     <Check size={12} /> Marcar Resolvido
                   </button>
@@ -705,30 +705,30 @@ export default function MessagesClient({
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-8 md:p-12 space-y-6 custom-scrollbar bg-slate-50/50">
+          <div className="flex-1 overflow-y-auto p-8 md:p-12 space-y-6 custom-scrollbar bg-zinc-50/50">
             <div className="max-w-4xl mx-auto space-y-6">
               {threadMessages.map((m, idx) => {
                 const isMe = m.senderId === currentUserId
                 return (
                   <div key={m.id} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className={`w-full p-8 rounded-[2rem] shadow-sm border ${
-                      isMe ? 'bg-white border-indigo-100' : 'bg-white border-slate-200'
+                    <div className={`w-full p-8 rounded-xl shadow-sm border ${
+                      isMe ? 'bg-white border-accent/25' : 'bg-white border-zinc-200'
                     }`}>
-                      <div className="flex items-center justify-between mb-6 pb-5 border-b border-slate-100">
+                      <div className="flex items-center justify-between mb-6 pb-5 border-b border-zinc-100">
                         <div className="flex items-center gap-4">
-                           <div className={`w-12 h-12 rounded-[1.2rem] flex items-center justify-center font-black text-lg ${
-                             isMe ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100' : 'bg-slate-100 text-slate-600'
+                           <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-semibold text-lg ${
+                             isMe ? 'bg-accent text-white shadow-card ' : 'bg-zinc-100 text-fg-muted'
                            }`}>
                              {m.sender?.name?.charAt(0) || m.sender?.username?.charAt(0) || '?'}
                            </div>
                            <div>
-                              <p className="text-base font-black text-slate-800">{m.sender?.name || m.sender?.username}</p>
-                              <p className="text-xs font-bold text-slate-400">{formatarData(m.createdAt)} às {formatarHora(m.createdAt)}</p>
+                              <p className="text-base font-semibold text-fg">{m.sender?.name || m.sender?.username}</p>
+                              <p className="text-xs font-bold text-fg-subtle">{formatarData(m.createdAt)} às {formatarHora(m.createdAt)}</p>
                            </div>
                         </div>
-                        {isMe && <CheckCheck size={20} className="text-indigo-400" />}
+                        {isMe && <CheckCheck size={20} className="text-accent" />}
                       </div>
-                      <div className="text-sm font-medium text-slate-700 leading-relaxed max-w-none prose prose-slate">
+                      <div className="text-sm font-medium text-fg-muted leading-relaxed max-w-none prose prose-slate">
                         <MarkdownContent content={m.content} />
                       </div>
                     </div>
@@ -738,14 +738,14 @@ export default function MessagesClient({
               
               {loadingThread && (
                 <div className="flex flex-col items-center justify-center py-12 gap-3 opacity-60 animate-in fade-in">
-                  <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Carregando histórico...</span>
+                  <Loader2 className="w-8 h-8 text-accent-fg animate-spin" />
+                  <span className="text-xs font-bold text-fg-subtle uppercase tracking-widest">Carregando histórico...</span>
                 </div>
               )}
             </div>
           </div>
 
-          <div className="p-8 md:px-12 bg-white border-t border-slate-100 shrink-0">
+          <div className="p-8 md:px-12 bg-white border-t border-zinc-100 shrink-0">
             <div className="max-w-4xl mx-auto">
               <form onSubmit={handleQuickReply} className="flex flex-col md:flex-row gap-4">
                 <input 
@@ -753,12 +753,12 @@ export default function MessagesClient({
                   value={replyContent}
                   onChange={e => setReplyContent(e.target.value)}
                   placeholder="Escreva sua interação ou resposta para este chamado..."
-                  className="flex-1 px-8 py-5 bg-slate-50 border-2 border-transparent rounded-[1.5rem] font-bold text-slate-700 focus:bg-white focus:border-indigo-500 transition-all outline-none"
+                  className="flex-1 px-8 py-5 bg-zinc-50 border-2 border-transparent rounded-xl font-bold text-fg-muted focus:bg-white focus:border-accent transition-all outline-none"
                 />
                 <button 
                   type="submit"
                   disabled={!replyContent.trim() || replying}
-                  className="px-10 py-5 bg-indigo-600 text-white rounded-[1.5rem] font-black uppercase text-xs tracking-widest hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3"
+                  className="px-10 py-5 bg-accent text-white rounded-xl font-semibold uppercase text-xs tracking-widest hover:bg-accent transition-all shadow-card active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3"
                 >
                   {replying ? <Loader2 size={20} className="animate-spin" /> : <Send size={20} />}
                   {replying ? 'Enviando...' : 'Responder'}

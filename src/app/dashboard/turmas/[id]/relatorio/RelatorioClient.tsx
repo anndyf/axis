@@ -46,11 +46,11 @@ export default function RelatorioClient({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'APROVADO': return 'text-green-700 bg-green-100'
-      case 'RECUPERACAO': return 'text-orange-700 bg-orange-100'
-      case 'DESISTENTE': return 'text-slate-800 bg-slate-200'
-      case 'REPROVADO': return 'text-red-700 bg-red-100'
-      default: return 'text-slate-600 bg-slate-100'
+      case 'APROVADO': return 'text-success-fg bg-success-subtle'
+      case 'RECUPERACAO': return 'text-warning-fg bg-warning-subtle'
+      case 'DESISTENTE': return 'text-fg bg-zinc-200'
+      case 'REPROVADO': return 'text-danger-fg bg-danger-subtle'
+      default: return 'text-fg-muted bg-zinc-100'
     }
   }
 
@@ -61,7 +61,7 @@ export default function RelatorioClient({
       <div className="flex justify-end mb-6">
         <button
           onClick={() => setShowProfessorsModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-lg font-semibold transition-colors border border-indigo-200 shadow-sm"
+          className="flex items-center gap-2 px-4 py-2 bg-accent-subtle text-accent-fg hover:bg-accent-subtle rounded-lg font-semibold transition-colors border border-accent/25 shadow-sm"
         >
           <Users className="w-5 h-5" />
           Ver Professores da Turma
@@ -71,49 +71,49 @@ export default function RelatorioClient({
       {/* Estatísticas - Apenas para Direção/Superuser */}
       {!isProfessorOnly && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-slate-100 border border-slate-300 rounded-xl p-6">
-            <p className="text-sm text-slate-800 mb-1">Total de Estudantes</p>
-            <p className="text-3xl font-medium text-blue-900">{totalEstudantes}</p>
+          <div className="bg-zinc-100 border border-zinc-300 rounded-xl p-6">
+            <p className="text-sm text-fg mb-1">Total de Estudantes</p>
+            <p className="text-3xl font-medium text-accent-fg">{totalEstudantes}</p>
           </div>
-          <div className="bg-green-50 border border-green-200 rounded-xl p-6">
-            <p className="text-sm text-green-700 mb-1">Aprovados</p>
-            <p className="text-3xl font-medium text-green-900">{totalAprovados}</p>
+          <div className="bg-success-subtle border border-success-line rounded-xl p-6">
+            <p className="text-sm text-success-fg mb-1">Aprovados</p>
+            <p className="text-3xl font-medium text-success-fg">{totalAprovados}</p>
           </div>
-          <div className="bg-orange-50 border border-orange-200 rounded-xl p-6">
-            <p className="text-sm text-orange-700 mb-1">Em Recuperação</p>
-            <p className="text-3xl font-medium text-orange-900">{totalRecuperacao}</p>
+          <div className="bg-warning-subtle border border-warning-line rounded-xl p-6">
+            <p className="text-sm text-warning-fg mb-1">Em Recuperação</p>
+            <p className="text-3xl font-medium text-warning-fg">{totalRecuperacao}</p>
           </div>
-          <div className="bg-slate-100 border border-slate-300 rounded-xl p-6">
-            <p className="text-sm text-slate-800 mb-1">Desistentes</p>
-            <p className="text-3xl font-medium text-blue-900">{totalDesistentes}</p>
+          <div className="bg-zinc-100 border border-zinc-300 rounded-xl p-6">
+            <p className="text-sm text-fg mb-1">Desistentes</p>
+            <p className="text-3xl font-medium text-accent-fg">{totalDesistentes}</p>
           </div>
         </div>
       )}
 
       {isProfessorOnly && (
-        <div className="mb-8 p-6 bg-blue-50 border border-blue-200 rounded-2xl flex items-center justify-between">
+        <div className="mb-8 p-6 bg-accent-subtle border border-accent/25 rounded-lg flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-blue-900">Contagem de Alunos</h2>
-            <p className="text-sm text-blue-700">Total de estudantes matriculados nesta turma</p>
+            <h2 className="text-lg font-bold text-accent-fg">Contagem de Alunos</h2>
+            <p className="text-sm text-accent-fg">Total de estudantes matriculados nesta turma</p>
           </div>
-          <div className="text-4xl font-black text-blue-900 pr-4">
+          <div className="text-4xl font-semibold text-accent-fg pr-4">
             {totalEstudantes}
           </div>
         </div>
       )}
 
       {/* Lista de Estudantes (Accordion) */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-300 overflow-hidden">
-        <div className="px-6 py-4 bg-gradient-to-r from-slate-50 to-slate-50 border-b border-slate-300">
-          <h3 className="text-lg font-medium text-blue-900">
+      <div className="bg-white rounded-xl shadow-sm border border-zinc-300 overflow-hidden">
+        <div className="px-6 py-4 bg-zinc-50 to-zinc-50 border-b border-zinc-300">
+          <h3 className="text-lg font-medium text-accent-fg">
             {isProfessorOnly ? 'Estudantes Matriculados' : 'Desempenho Detalhado dos Estudantes'}
           </h3>
         </div>
 
         {turma.estudantes.length === 0 ? (
           <div className="p-12 text-center">
-            <FileText className="w-16 h-16 text-blue-400 mx-auto mb-4" />
-            <p className="text-slate-700">Nenhum estudante cadastrado nesta turma</p>
+            <FileText className="w-16 h-16 text-accent mx-auto mb-4" />
+            <p className="text-fg-muted">Nenhum estudante cadastrado nesta turma</p>
           </div>
         ) : (
           <div className="flex flex-col">
@@ -126,38 +126,38 @@ export default function RelatorioClient({
                 : '0.00'
 
               let statusText = 'Pendente'
-              let statusColor = 'text-slate-800 bg-slate-200'
+              let statusColor = 'text-fg bg-zinc-200'
 
               if (desistente) {
                 statusText = 'Desistente'
-                statusColor = 'text-slate-800 bg-slate-200'
+                statusColor = 'text-fg bg-zinc-200'
               } else if (recuperacao > 0) {
                 statusText = 'Recuperação'
-                statusColor = 'text-orange-700 bg-orange-100'
+                statusColor = 'text-warning-fg bg-warning-subtle'
               } else if (aprovadas === totalDisciplinas && totalDisciplinas > 0) {
                 statusText = 'Aprovado'
-                statusColor = 'text-green-700 bg-green-100'
+                statusColor = 'text-success-fg bg-success-subtle'
               }
 
               const isExpanded = expandedStudent === estudante.matricula
 
               return (
-                <div key={estudante.matricula} className="border-b border-slate-200 last:border-b-0">
+                <div key={estudante.matricula} className="border-b border-zinc-200 last:border-b-0">
                   {/* Accordion Header */}
                   <div 
                     onClick={() => toggleStudent(estudante.matricula)}
-                    className={`flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors ${isExpanded ? 'bg-slate-50' : ''}`}
+                    className={`flex items-center justify-between p-4 cursor-pointer hover:bg-zinc-50 transition-colors ${isExpanded ? 'bg-zinc-50' : ''}`}
                   >
                     <div className="flex items-center gap-4 flex-1">
-                      <span className="text-xs font-bold text-slate-400 w-6">{index + 1}</span>
-                      <div className="w-10 h-10 bg-slate-800 rounded-2xl flex items-center justify-center text-white font-bold shadow-md shrink-0">
+                      <span className="text-xs font-bold text-fg-subtle w-6">{index + 1}</span>
+                      <div className="w-10 h-10 bg-zinc-800 rounded-lg flex items-center justify-center text-white font-bold shadow-card shrink-0">
                         {estudante.nome.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1">
-                        <div className="text-sm font-bold text-slate-800 uppercase tracking-tight">
+                        <div className="text-sm font-bold text-fg uppercase tracking-tight">
                           {estudante.nome}
                         </div>
-                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
+                        <div className="text-[10px] font-bold text-fg-subtle uppercase tracking-widest mt-0.5">
                           {estudante.matricula}
                         </div>
                       </div>
@@ -166,15 +166,15 @@ export default function RelatorioClient({
                     {!isProfessorOnly && (
                       <div className="flex items-center gap-6 pr-4 hidden md:flex">
                         <div className="text-center">
-                          <p className="text-[10px] font-bold text-slate-400 uppercase">Média Geral</p>
-                          <span className="text-sm font-bold text-slate-700">{media}</span>
+                          <p className="text-[10px] font-bold text-fg-subtle uppercase">Média Geral</p>
+                          <span className="text-sm font-bold text-fg-muted">{media}</span>
                         </div>
                         {frequencia && (() => {
                           const f = frequencia.porAluno[estudante.id]?.geral
                           return (
                             <div className="text-center" title={f ? `${f.faltas} faltas em ${f.aulas} aulas` : undefined}>
-                              <p className="text-[10px] font-bold text-slate-400 uppercase">Frequência</p>
-                              <span className={`text-sm font-bold ${f?.percentual != null && f.percentual < frequencia.minimo ? 'text-rose-600' : 'text-slate-700'}`}>
+                              <p className="text-[10px] font-bold text-fg-subtle uppercase">Frequência</p>
+                              <span className={`text-sm font-bold ${f?.percentual != null && f.percentual < frequencia.minimo ? 'text-danger-fg' : 'text-fg-muted'}`}>
                                 {formatarFrequencia(f?.percentual ?? null)}
                               </span>
                             </div>
@@ -188,39 +188,39 @@ export default function RelatorioClient({
                       </div>
                     )}
                     
-                    <div className="text-slate-400 p-2">
+                    <div className="text-fg-subtle p-2">
                       {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                     </div>
                   </div>
 
                   {/* Accordion Body (Detalhamento por Disciplina) */}
                   {isExpanded && !isProfessorOnly && (
-                    <div className="p-4 bg-slate-50/80 border-t border-slate-100">
+                    <div className="p-4 bg-zinc-50/80 border-t border-zinc-100">
                       {estudante.notas.length === 0 ? (
-                        <div className="text-center py-4 text-sm text-slate-500 flex items-center justify-center gap-2">
+                        <div className="text-center py-4 text-sm text-fg-subtle flex items-center justify-center gap-2">
                           <AlertCircle className="w-4 h-4" /> Nenhuma nota lançada para este estudante ainda.
                         </div>
                       ) : (
-                        <div className="overflow-x-auto rounded-lg border border-slate-200">
+                        <div className="overflow-x-auto rounded-lg border border-zinc-200">
                           <table className="w-full text-sm">
-                            <thead className="bg-slate-100 text-slate-600">
+                            <thead className="bg-zinc-100 text-fg-muted">
                               <tr>
                                 <th className="px-4 py-2 text-left font-semibold">Disciplina</th>
                                 {nomesEtapas.map((nome: string) => (
                                   <th key={nome} className="px-4 py-2 text-center font-semibold">{nome}</th>
                                 ))}
-                                <th className="px-4 py-2 text-center font-semibold text-blue-800">Média</th>
+                                <th className="px-4 py-2 text-center font-semibold text-accent-fg">Média</th>
                                 <th className="px-4 py-2 text-center font-semibold">Recup.</th>
                                 {frequencia && <th className="px-4 py-2 text-center font-semibold">Freq.</th>}
                                 <th className="px-4 py-2 text-center font-semibold">Status</th>
                               </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-200 bg-white">
+                            <tbody className="divide-y divide-zinc-200 bg-white">
                               {turma.disciplinas.map((disc: any) => {
                                 const nota = estudante.notas.find((n: any) => n.disciplinaId === disc.id)
                                 
                                 if (!nota) return (
-                                  <tr key={disc.id} className="text-slate-400">
+                                  <tr key={disc.id} className="text-fg-subtle">
                                     <td className="px-4 py-2 font-medium">{disc.nome}</td>
                                     {nomesEtapas.map((nome: string) => (
                                       <td key={nome} className="px-4 py-2 text-center">-</td>
@@ -233,16 +233,16 @@ export default function RelatorioClient({
                                 )
 
                                 return (
-                                  <tr key={disc.id} className="text-slate-700 hover:bg-slate-50">
-                                    <td className="px-4 py-2 font-semibold text-slate-800">{disc.nome}</td>
+                                  <tr key={disc.id} className="text-fg-muted hover:bg-zinc-50">
+                                    <td className="px-4 py-2 font-semibold text-fg">{disc.nome}</td>
                                     {nota.etapas.map((etapa: EtapaDaNota, i: number) => (
                                       <td key={i} className="px-4 py-2 text-center">{etapa.nota?.toFixed(1) ?? '-'}</td>
                                     ))}
-                                    <td className="px-4 py-2 text-center font-bold text-blue-900">{nota.nota?.toFixed(1) ?? '-'}</td>
+                                    <td className="px-4 py-2 text-center font-bold text-accent-fg">{nota.nota?.toFixed(1) ?? '-'}</td>
                                     <td className="px-4 py-2 text-center">{nota.notaRecuperacao?.toFixed(1) ?? '-'}</td>
                                     {frequencia && (() => {
                                       const p = frequencia.porAluno[estudante.id]?.porDisciplina[disc.id]?.percentual ?? null
-                                      return <td className={`px-4 py-2 text-center ${p !== null && p < frequencia.minimo ? 'text-rose-600 font-semibold' : ''}`}>{formatarFrequencia(p)}</td>
+                                      return <td className={`px-4 py-2 text-center ${p !== null && p < frequencia.minimo ? 'text-danger-fg font-semibold' : ''}`}>{formatarFrequencia(p)}</td>
                                     })()}
                                     <td className="px-4 py-2 text-center">
                                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${getStatusColor(nota.status)}`}>
@@ -260,7 +260,7 @@ export default function RelatorioClient({
                   )}
                   
                   {isExpanded && isProfessorOnly && (
-                    <div className="p-4 bg-slate-50/80 border-t border-slate-100 text-center text-sm text-slate-500">
+                    <div className="p-4 bg-zinc-50/80 border-t border-zinc-100 text-center text-sm text-fg-subtle">
                       O detalhamento de notas não está disponível para o seu perfil nesta visualização.
                     </div>
                   )}
@@ -274,18 +274,18 @@ export default function RelatorioClient({
       {/* Modal Professores */}
       {showProfessorsModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between p-6 border-b border-slate-100">
+          <div className="bg-white rounded-lg shadow-card w-full max-w-2xl max-h-[85vh] flex flex-col animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between p-6 border-b border-zinc-100">
               <div>
-                <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                  <BookOpen className="w-6 h-6 text-indigo-600" />
+                <h3 className="text-xl font-bold text-fg flex items-center gap-2">
+                  <BookOpen className="w-6 h-6 text-accent-fg" />
                   Corpo Docente da Turma
                 </h3>
-                <p className="text-sm text-slate-500 mt-1">{turma.nome}</p>
+                <p className="text-sm text-fg-subtle mt-1">{turma.nome}</p>
               </div>
               <button 
                 onClick={() => setShowProfessorsModal(false)}
-                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+                className="p-2 text-fg-subtle hover:text-fg-muted hover:bg-zinc-100 rounded-full transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -293,24 +293,24 @@ export default function RelatorioClient({
             
             <div className="p-6 overflow-y-auto">
               {professoresList.length === 0 ? (
-                <div className="text-center py-8 text-slate-500">
-                  <Users className="w-12 h-12 mx-auto text-slate-300 mb-3" />
+                <div className="text-center py-8 text-fg-subtle">
+                  <Users className="w-12 h-12 mx-auto text-zinc-300 mb-3" />
                   <p>Nenhum professor vinculado às disciplinas desta turma.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {professoresList.map(prof => (
-                    <div key={prof.id} className="p-4 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-indigo-200 transition-colors shadow-sm">
+                    <div key={prof.id} className="p-4 rounded-xl border border-zinc-200 bg-zinc-50 hover:bg-white hover:border-accent/25 transition-colors shadow-sm">
                       <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-accent-subtle flex items-center justify-center text-accent-fg font-bold shrink-0">
                           {prof.name.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <h4 className="font-semibold text-slate-800 text-sm leading-tight">{prof.name}</h4>
-                          <p className="text-xs text-slate-500 mt-0.5">{prof.email}</p>
+                          <h4 className="font-semibold text-fg text-sm leading-tight">{prof.name}</h4>
+                          <p className="text-xs text-fg-subtle mt-0.5">{prof.email}</p>
                           <div className="mt-2 flex flex-wrap gap-1">
                             {prof.disciplinas.map((d: string) => (
-                              <span key={d} className="px-2 py-0.5 bg-indigo-50 text-indigo-700 text-[10px] font-bold uppercase rounded border border-indigo-100">
+                              <span key={d} className="px-2 py-0.5 bg-accent-subtle text-accent-fg text-[10px] font-bold uppercase rounded border border-accent/25">
                                 {d}
                               </span>
                             ))}
@@ -323,10 +323,10 @@ export default function RelatorioClient({
               )}
             </div>
             
-            <div className="p-4 border-t border-slate-100 bg-slate-50 rounded-b-2xl flex justify-end">
+            <div className="p-4 border-t border-zinc-100 bg-zinc-50 rounded-b-2xl flex justify-end">
               <button
                 onClick={() => setShowProfessorsModal(false)}
-                className="px-6 py-2 bg-slate-800 text-white font-medium rounded-lg hover:bg-slate-700 transition-colors"
+                className="px-6 py-2 bg-zinc-800 text-white font-medium rounded-lg hover:bg-zinc-700 transition-colors"
               >
                 Fechar
               </button>

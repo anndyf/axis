@@ -109,13 +109,13 @@ export default function UserActions({
   return (
     <div className="flex items-center justify-end space-x-2">
       {loading ? (
-        <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
+        <Loader2 className="w-5 h-5 text-fg-subtle animate-spin" />
       ) : (
         <>
           {!isApproved && (
             <button
               onClick={handleApprove}
-              className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors animate-pulse"
+              className="p-2 text-success-fg hover:bg-success-subtle rounded-lg transition-colors animate-pulse"
               title="Aprovar Cadastro"
             >
               <CheckCircle className="w-5 h-5" />
@@ -125,7 +125,7 @@ export default function UserActions({
           {isStaff && !isSuperuser && isApproved && (
             <Link
               href={`/dashboard/usuarios/${userId}/disciplinas`}
-              className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors title='Disciplinas'"
+              className="p-2 text-success-fg hover:bg-success-subtle rounded-lg transition-colors title='Disciplinas'"
               title="Gerenciar Disciplinas"
             >
               <Plus className="w-5 h-5" />
@@ -134,7 +134,7 @@ export default function UserActions({
 
           <button
             onClick={() => setIsTransferModalOpen(true)}
-            className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+            className="p-2 text-accent-fg hover:bg-accent-subtle rounded-lg transition-colors"
             title="Transferir Posse de Dados"
           >
             <Share2 className="w-5 h-5" />
@@ -144,8 +144,8 @@ export default function UserActions({
             onClick={handleToggleActive}
             className={`p-2 rounded-lg transition-colors ${
               isActive 
-                ? 'text-amber-600 hover:bg-amber-50' 
-                : 'text-emerald-600 hover:bg-emerald-50'
+                ? 'text-warning-fg hover:bg-warning-subtle' 
+                : 'text-success-fg hover:bg-success-subtle'
             }`}
             title={isActive ? 'Pausar Acesso' : 'Reativar Acesso'}
           >
@@ -154,7 +154,7 @@ export default function UserActions({
 
           <Link
             href={`/dashboard/usuarios/${userId}/editar`}
-            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            className="p-2 text-accent-fg hover:bg-accent-subtle rounded-lg transition-colors"
             title="Editar Usuário"
           >
             <Edit className="w-5 h-5" />
@@ -162,7 +162,7 @@ export default function UserActions({
 
           <button
             onClick={handleDelete}
-            className="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+            className="p-2 text-danger-fg hover:bg-danger-subtle rounded-lg transition-colors"
             title="Excluir Usuário"
           >
             <Trash2 className="w-5 h-5" />

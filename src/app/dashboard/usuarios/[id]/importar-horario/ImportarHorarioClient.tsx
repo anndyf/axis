@@ -109,20 +109,20 @@ export default function ImportarHorarioClient({
   const jaVinculadas = resultado?.encontrados.filter(e => e.jaVinculada) ?? []
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="bg-zinc-50">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-sm">
+      <header className="mb-6 border-b border-line pb-4">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
               href={`/dashboard/usuarios/${usuario.id}/disciplinas`}
-              className="p-2 hover:bg-slate-100 rounded-xl transition-colors"
+              className="p-2 hover:bg-zinc-100 rounded-xl transition-colors"
             >
-              <ArrowLeft className="w-5 h-5 text-slate-600" />
+              <ArrowLeft className="w-5 h-5 text-fg-muted" />
             </Link>
             <div>
-              <h1 className="text-lg font-semibold text-slate-800">Importar Horário</h1>
-              <p className="text-xs font-medium text-slate-500 uppercase tracking-widest">
+              <h1 className="text-lg font-semibold text-fg">Importar Horário</h1>
+              <p className="text-xs font-medium text-fg-subtle uppercase tracking-widest">
                 Professor: {usuario.name}
               </p>
             </div>
@@ -132,7 +132,7 @@ export default function ImportarHorarioClient({
             <button
               onClick={handleImportar}
               disabled={importando}
-              className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-lg shadow-emerald-200 disabled:opacity-50 active:scale-95"
+              className="flex items-center gap-2 bg-success hover:bg-success text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-card disabled:opacity-50 active:scale-95"
             >
               {importando
                 ? <Loader2 size={16} className="animate-spin" />
@@ -147,36 +147,36 @@ export default function ImportarHorarioClient({
 
         {/* Sucesso */}
         {sucesso && (
-          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 flex items-center gap-4">
-            <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-              <CheckCheck className="w-6 h-6 text-emerald-600" />
+          <div className="bg-success-subtle border border-success-line rounded-lg p-6 flex items-center gap-4">
+            <div className="w-12 h-12 bg-success-subtle rounded-xl flex items-center justify-center">
+              <CheckCheck className="w-6 h-6 text-success-fg" />
             </div>
             <div>
-              <p className="font-bold text-emerald-800">Disciplinas vinculadas com sucesso!</p>
-              <p className="text-sm text-emerald-600">Redirecionando para a lista de disciplinas...</p>
+              <p className="font-bold text-success-fg">Disciplinas vinculadas com sucesso!</p>
+              <p className="text-sm text-success-fg">Redirecionando para a lista de disciplinas...</p>
             </div>
           </div>
         )}
 
         {/* Área de cola */}
         {!sucesso && (
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+          <div className="bg-white rounded-lg border border-zinc-200 shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-zinc-100 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-                  <ClipboardPaste className="w-4 h-4 text-blue-600" />
+                <div className="w-8 h-8 bg-accent-subtle rounded-lg flex items-center justify-center">
+                  <ClipboardPaste className="w-4 h-4 text-accent-fg" />
                 </div>
                 <div>
-                  <h2 className="text-sm font-bold text-slate-800">Cole o horário do professor</h2>
-                  <p className="text-xs text-slate-400">Formato: <code className="bg-slate-100 px-1 rounded">TURMA(Disciplina)</code> — ex: <code className="bg-slate-100 px-1 rounded">2TIM2(Inst Manu Computadores)</code></p>
+                  <h2 className="text-sm font-bold text-fg">Cole o horário do professor</h2>
+                  <p className="text-xs text-fg-subtle">Formato: <code className="bg-zinc-100 px-1 rounded">TURMA(Disciplina)</code> — ex: <code className="bg-zinc-100 px-1 rounded">2TIM2(Inst Manu Computadores)</code></p>
                 </div>
               </div>
               {texto && (
                 <button
                   onClick={() => { setTexto(""); setResultado(null); setErro(null) }}
-                  className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"
+                  className="p-1.5 hover:bg-zinc-100 rounded-lg transition-colors"
                 >
-                  <RotateCcw size={14} className="text-slate-400" />
+                  <RotateCcw size={14} className="text-fg-subtle" />
                 </button>
               )}
             </div>
@@ -186,17 +186,17 @@ export default function ImportarHorarioClient({
               onChange={e => { setTexto(e.target.value); setResultado(null) }}
               placeholder={"2TIM2(Inst Manu Computadores)\n2TIM3(Inst Manu Computadores)\n2TNDV1(MATEMATICA)\n2TIN1E(INST MANUT COMPUTADORES)\n..."}
               rows={8}
-              className="w-full px-6 py-4 font-mono text-sm text-slate-700 bg-slate-50/50 focus:outline-none focus:bg-white resize-none transition-colors"
+              className="w-full px-6 py-4 font-mono text-sm text-fg-muted bg-zinc-50/50 focus:outline-none focus:bg-white resize-none transition-colors"
             />
 
-            <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
-              <p className="text-xs text-slate-400">
+            <div className="px-6 py-4 border-t border-zinc-100 flex items-center justify-between">
+              <p className="text-xs text-fg-subtle">
                 {texto.match(/\w+\([^)]+\)/g)?.length ?? 0} par(es) identificado(s) no texto
               </p>
               <button
                 onClick={handleVerificar}
                 disabled={!texto.trim() || verificando}
-                className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all disabled:opacity-40 active:scale-95"
+                className="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all disabled:opacity-40 active:scale-95"
               >
                 {verificando
                   ? <Loader2 size={16} className="animate-spin" />
@@ -209,9 +209,9 @@ export default function ImportarHorarioClient({
 
         {/* Erro */}
         {erro && (
-          <div className="bg-rose-50 border border-rose-200 rounded-2xl p-4 flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-rose-500 shrink-0" />
-            <p className="text-sm font-medium text-rose-700">{erro}</p>
+          <div className="bg-danger-subtle border border-danger-line rounded-lg p-4 flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-danger-fg shrink-0" />
+            <p className="text-sm font-medium text-danger-fg">{erro}</p>
           </div>
         )}
 
@@ -220,29 +220,29 @@ export default function ImportarHorarioClient({
           <div className="space-y-4">
             {/* Resumo */}
             <div className="grid grid-cols-3 gap-3">
-              <div className="bg-white rounded-2xl border border-slate-200 p-4 text-center">
-                <p className="text-2xl font-black text-slate-800">{resultado.totalPares}</p>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Pares lidos</p>
+              <div className="bg-white rounded-lg border border-zinc-200 p-4 text-center">
+                <p className="text-2xl font-semibold text-fg">{resultado.totalPares}</p>
+                <p className="text-[10px] font-bold text-fg-subtle uppercase tracking-widest mt-1">Pares lidos</p>
               </div>
-              <div className="bg-emerald-50 rounded-2xl border border-emerald-200 p-4 text-center">
-                <p className="text-2xl font-black text-emerald-700">{resultado.encontrados.length}</p>
-                <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mt-1">Encontrados</p>
+              <div className="bg-success-subtle rounded-lg border border-success-line p-4 text-center">
+                <p className="text-2xl font-semibold text-success-fg">{resultado.encontrados.length}</p>
+                <p className="text-[10px] font-bold text-success-fg uppercase tracking-widest mt-1">Encontrados</p>
               </div>
-              <div className={`rounded-2xl border p-4 text-center ${resultado.naoEncontrados.length > 0 ? 'bg-rose-50 border-rose-200' : 'bg-slate-50 border-slate-200'}`}>
-                <p className={`text-2xl font-black ${resultado.naoEncontrados.length > 0 ? 'text-rose-700' : 'text-slate-400'}`}>
+              <div className={`rounded-lg border p-4 text-center ${resultado.naoEncontrados.length > 0 ? 'bg-danger-subtle border-danger-line' : 'bg-zinc-50 border-zinc-200'}`}>
+                <p className={`text-2xl font-semibold ${resultado.naoEncontrados.length > 0 ? 'text-danger-fg' : 'text-fg-subtle'}`}>
                   {resultado.naoEncontrados.length}
                 </p>
-                <p className={`text-[10px] font-bold uppercase tracking-widest mt-1 ${resultado.naoEncontrados.length > 0 ? 'text-rose-400' : 'text-slate-400'}`}>Não encontrados</p>
+                <p className={`text-[10px] font-bold uppercase tracking-widest mt-1 ${resultado.naoEncontrados.length > 0 ? 'text-danger' : 'text-fg-subtle'}`}>Não encontrados</p>
               </div>
             </div>
 
             {/* Novas para vincular */}
             {novasParaVincular.length > 0 && (
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <div className="bg-white rounded-lg border border-zinc-200 shadow-sm overflow-hidden">
+                <div className="px-6 py-4 border-b border-zinc-100 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                    <h3 className="text-sm font-bold text-slate-800">
+                    <CheckCircle2 className="w-4 h-4 text-success-fg" />
+                    <h3 className="text-sm font-bold text-fg">
                       Prontas para vincular ({novasParaVincular.length})
                     </h3>
                   </div>
@@ -254,39 +254,39 @@ export default function ImportarHorarioClient({
                         setConfirmados(new Set(novasParaVincular.map(e => e.discId)))
                       }
                     }}
-                    className="text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+                    className="text-xs font-semibold text-accent-fg hover:text-accent-fg transition-colors"
                   >
                     {confirmados.size === novasParaVincular.length ? 'Desmarcar todos' : 'Marcar todos'}
                   </button>
                 </div>
-                <div className="divide-y divide-slate-100">
+                <div className="divide-y divide-zinc-100">
                   {novasParaVincular.map((e, i) => (
                     <label
                       key={i}
                       className={`flex items-center gap-4 px-6 py-3.5 cursor-pointer transition-colors ${
-                        confirmados.has(e.discId) ? 'bg-emerald-50/50' : 'hover:bg-slate-50'
+                        confirmados.has(e.discId) ? 'bg-success-subtle' : 'hover:bg-zinc-50'
                       }`}
                     >
                       <input
                         type="checkbox"
                         checked={confirmados.has(e.discId)}
                         onChange={() => toggleConfirmado(e.discId)}
-                        className="w-4 h-4 rounded accent-emerald-600 cursor-pointer"
+                        className="w-4 h-4 rounded accent-[var(--success)] cursor-pointer"
                       />
                       <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-xs font-black text-slate-500 bg-slate-100 px-2 py-1 rounded-lg font-mono uppercase">
+                        <span className="text-xs font-semibold text-fg-subtle bg-zinc-100 px-2 py-1 rounded-lg font-mono uppercase">
                           {e.turmaCode}
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-slate-800 truncate">{e.discNomeBanco}</p>
+                        <p className="text-sm font-semibold text-fg truncate">{e.discNomeBanco}</p>
                         {normalizar(e.discNome) !== normalizar(e.discNomeBanco) && (
-                          <p className="text-[10px] text-slate-400 truncate">
+                          <p className="text-[10px] text-fg-subtle truncate">
                             no horário: "{e.discNome}"
                           </p>
                         )}
                       </div>
-                      <CheckCircle2 className={`w-4 h-4 shrink-0 ${confirmados.has(e.discId) ? 'text-emerald-500' : 'text-slate-200'}`} />
+                      <CheckCircle2 className={`w-4 h-4 shrink-0 ${confirmados.has(e.discId) ? 'text-success-fg' : 'text-zinc-200'}`} />
                     </label>
                   ))}
                 </div>
@@ -295,21 +295,21 @@ export default function ImportarHorarioClient({
 
             {/* Já vinculadas */}
             {jaVinculadas.length > 0 && (
-              <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-                <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-blue-400" />
-                  <h3 className="text-sm font-bold text-slate-800">
+              <div className="bg-white rounded-lg border border-zinc-200 overflow-hidden">
+                <div className="px-6 py-4 border-b border-zinc-100 flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-accent" />
+                  <h3 className="text-sm font-bold text-fg">
                     Já vinculadas ({jaVinculadas.length})
                   </h3>
                 </div>
-                <div className="divide-y divide-slate-100">
+                <div className="divide-y divide-zinc-100">
                   {jaVinculadas.map((e, i) => (
                     <div key={i} className="flex items-center gap-4 px-6 py-3 opacity-60">
-                      <span className="text-xs font-black text-slate-400 bg-slate-100 px-2 py-1 rounded-lg font-mono uppercase">
+                      <span className="text-xs font-semibold text-fg-subtle bg-zinc-100 px-2 py-1 rounded-lg font-mono uppercase">
                         {e.turmaCode}
                       </span>
-                      <p className="text-sm text-slate-600 flex-1">{e.discNomeBanco}</p>
-                      <span className="text-[10px] font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded-full uppercase tracking-widest">
+                      <p className="text-sm text-fg-muted flex-1">{e.discNomeBanco}</p>
+                      <span className="text-[10px] font-bold text-accent-fg bg-accent-subtle px-2 py-0.5 rounded-full uppercase tracking-widest">
                         já vinculada
                       </span>
                     </div>
@@ -320,31 +320,31 @@ export default function ImportarHorarioClient({
 
             {/* Não encontrados */}
             {resultado.naoEncontrados.length > 0 && (
-              <div className="bg-white rounded-2xl border border-rose-200 overflow-hidden">
-                <div className="px-6 py-4 border-b border-rose-100 flex items-center gap-2">
-                  <XCircle className="w-4 h-4 text-rose-400" />
-                  <h3 className="text-sm font-bold text-slate-800">
+              <div className="bg-white rounded-lg border border-danger-line overflow-hidden">
+                <div className="px-6 py-4 border-b border-danger-line flex items-center gap-2">
+                  <XCircle className="w-4 h-4 text-danger" />
+                  <h3 className="text-sm font-bold text-fg">
                     Não encontrados ({resultado.naoEncontrados.length})
                   </h3>
                 </div>
-                <div className="divide-y divide-rose-50">
+                <div className="divide-y divide-danger-line">
                   {resultado.naoEncontrados.map((n, i) => (
                     <div key={i} className="px-6 py-4">
                       <div className="flex items-start gap-3">
-                        <span className="text-xs font-black text-rose-400 bg-rose-50 px-2 py-1 rounded-lg font-mono uppercase shrink-0">
+                        <span className="text-xs font-semibold text-danger bg-danger-subtle px-2 py-1 rounded-lg font-mono uppercase shrink-0">
                           {n.turmaCode}
                         </span>
                         <div className="flex-1">
-                          <p className="text-sm font-semibold text-rose-700">"{n.discNome}"</p>
-                          <p className="text-xs text-slate-400 mt-0.5">{n.motivo}</p>
+                          <p className="text-sm font-semibold text-danger-fg">"{n.discNome}"</p>
+                          <p className="text-xs text-fg-subtle mt-0.5">{n.motivo}</p>
                           {n.sugestoes.length > 0 && (
                             <div className="mt-2">
-                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                              <p className="text-[10px] font-bold text-fg-subtle uppercase tracking-widest mb-1">
                                 Disciplinas desta turma:
                               </p>
                               <div className="flex flex-wrap gap-1">
                                 {n.sugestoes.map((s, j) => (
-                                  <span key={j} className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-lg">
+                                  <span key={j} className="text-[10px] bg-zinc-100 text-fg-muted px-2 py-0.5 rounded-lg">
                                     {s}
                                   </span>
                                 ))}

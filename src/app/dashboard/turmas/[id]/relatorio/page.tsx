@@ -105,24 +105,24 @@ export default async function RelatorioTurmaPage({
   const isProfessorOnly = session.user.isStaff && !session.user.isDirecao && !session.user.isSuperuser
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="bg-zinc-100">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-slate-300">
+      <header className="bg-white shadow-sm border-b border-zinc-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Link
                 href="/dashboard/turmas"
-                className="p-2 hover:bg-slate-200 rounded-lg transition-colors"
+                className="p-2 hover:bg-zinc-200 rounded-lg transition-colors"
                 title="Voltar para Turmas"
               >
-                <ArrowLeft className="w-5 h-5 text-slate-700" />
+                <ArrowLeft className="w-5 h-5 text-fg-muted" />
               </Link>
               <div>
-                <h1 className="text-2xl font-medium text-blue-900">
+                <h1 className="text-2xl font-medium text-accent-fg">
                   {isProfessorOnly ? 'Relação de Estudantes' : 'Relatório da Turma'}
                 </h1>
-                <p className="text-sm text-slate-700">{turma.nome}</p>
+                <p className="text-sm text-fg-muted">{turma.nome}</p>
               </div>
             </div>
             
@@ -131,7 +131,7 @@ export default async function RelatorioTurmaPage({
                 href={`/api/relatorio/turma/${turma.id}/pdf`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center space-x-2 bg-gradient-to-r from-slate-700 to-slate-600 text-white px-4 py-2 rounded-lg hover:from-slate-800 hover:to-slate-700 transition-all shadow-lg"
+                className="flex items-center space-x-2 bg-zinc-700 to-zinc-600 text-white px-4 py-2 rounded-lg hover:bg-zinc-800 hover:to-zinc-700 transition-all shadow-card"
               >
                 <Download className="w-5 h-5" />
                 <span>Baixar PDF Global</span>

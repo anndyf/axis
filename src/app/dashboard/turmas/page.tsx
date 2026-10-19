@@ -36,26 +36,26 @@ export default async function TurmasPage() {
   const turnosOrdenados = ["Matutino", "Vespertino", "Noturno", "Integral"].filter(t => turmasAgrupadas[t])
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="bg-zinc-50">
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
-      <header className="bg-white/80 backdrop-blur-xl border-b border-slate-300 sticky top-0 z-50 -mx-4 -mt-4 md:-mx-8 md:-mt-8 mb-4 px-4 sm:px-6 lg:px-8">
+      <header className="mb-6 border-b border-line pb-4">
         <div className="max-w-7xl mx-auto py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-5">
               <Link
                 href="/dashboard"
-                className="p-2 hover:bg-slate-200 rounded-lg transition-colors text-slate-400 hover:text-slate-700"
+                className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-fg-subtle hover:text-fg-muted"
               >
                 <ArrowLeft size={20} />
               </Link>
               <div>
-                <h1 className="text-2xl font-medium text-slate-800 tracking-tight">Turmas</h1>
-                <p className="text-base text-slate-700 font-medium">Gestão de turmas e acessos rápidos</p>
+                <h1 className="text-2xl font-medium text-fg tracking-tight">Turmas</h1>
+                <p className="text-base text-fg-muted font-medium">Gestão de turmas e acessos rápidos</p>
               </div>
             </div>
             <Link
               href="/dashboard/turmas/nova"
-              className={`flex items-center space-x-2 bg-slate-900 text-white px-6 py-3 rounded-2xl font-medium hover:bg-slate-800 transition-all text-xs uppercase tracking-widest active:scale-95 shadow-xl shadow-slate-300 ${(!session.user.isSuperuser && !session.user.isDirecao) ? 'hidden' : ''}`}
+              className={`flex items-center space-x-2 bg-zinc-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-zinc-800 transition-all text-xs uppercase tracking-widest active:scale-95 shadow-card ${(!session.user.isSuperuser && !session.user.isDirecao) ? 'hidden' : ''}`}
             >
               <Plus size={16} />
               <span>Nova Turma</span>
@@ -67,23 +67,23 @@ export default async function TurmasPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-32">
         {turmas.length > 0 && (
-          <div className="relative overflow-hidden bg-gradient-to-r from-slate-700 to-slate-700 rounded-2xl p-6 mb-6 shadow-lg">
+          <div className="relative overflow-hidden bg-zinc-700 to-zinc-700 rounded-lg p-6 mb-6 shadow-card">
             <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-medium text-white mb-1">Gestão de Turmas</h2>
-                <p className="text-slate-200 max-w-xl text-sm">
+                <p className="text-zinc-200 max-w-xl text-sm">
                   Acesse rapidamente o lançamento de notas, relatórios e matrizes de desempenho para todas as suas turmas.
                 </p>
               </div>
               
               <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-hide">
                 <div className="bg-white/10 backdrop-blur-md rounded-xl p-2 border border-white/20 min-w-[75px] text-center shrink-0">
-                  <p className="text-slate-200 text-[9px] font-medium uppercase tracking-wider mb-0.5 opacity-80">Total</p>
+                  <p className="text-zinc-200 text-[9px] font-medium uppercase tracking-wider mb-0.5 opacity-80">Total</p>
                   <p className="text-xl font-medium text-white leading-none">{turmas.length}</p>
                 </div>
                 {turnosOrdenados.map(turno => (
                   <div key={turno} className="bg-white/10 backdrop-blur-md rounded-xl p-2 border border-white/20 min-w-[75px] text-center shrink-0">
-                    <p className="text-slate-200 text-[9px] font-medium uppercase tracking-wider mb-0.5 opacity-80">{turno}</p>
+                    <p className="text-zinc-200 text-[9px] font-medium uppercase tracking-wider mb-0.5 opacity-80">{turno}</p>
                     <p className="text-xl font-medium text-white leading-none">{turmasAgrupadas[turno].length}</p>
                   </div>
                 ))}
@@ -97,19 +97,19 @@ export default async function TurmasPage() {
         )}
 
         {turmas.length === 0 ? (
-          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-300/50 border border-slate-200 p-20 text-center">
-            <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
-              <Users className="w-10 h-10 text-slate-300" />
+          <div className="bg-white rounded-xl shadow-card border border-zinc-200 p-20 text-center">
+            <div className="w-20 h-20 bg-zinc-50 rounded-xl flex items-center justify-center mx-auto mb-6">
+              <Users className="w-10 h-10 text-zinc-300" />
             </div>
-            <h3 className="text-2xl font-medium text-slate-800 mb-2">
+            <h3 className="text-2xl font-medium text-fg mb-2">
               Nenhuma turma encontrada
             </h3>
-            <p className="text-slate-700 font-medium mb-8 max-w-xs mx-auto text-sm">
+            <p className="text-fg-muted font-medium mb-8 max-w-xs mx-auto text-sm">
               Você ainda não possui turmas vinculadas ao seu perfil.
             </p>
             <Link
               href="/dashboard/turmas/nova"
-              className="inline-flex items-center space-x-2 bg-slate-900 text-white px-8 py-4 rounded-2xl hover:bg-slate-800 transition-all font-medium text-xs uppercase tracking-widest shadow-xl shadow-slate-300 active:scale-95"
+              className="inline-flex items-center space-x-2 bg-zinc-900 text-white px-8 py-4 rounded-lg hover:bg-zinc-800 transition-all font-medium text-xs uppercase tracking-widest shadow-card active:scale-95"
             >
               <Plus size={16} />
               <span>Criar Primeira Turma</span>

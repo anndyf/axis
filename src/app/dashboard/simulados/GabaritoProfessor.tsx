@@ -36,12 +36,12 @@ export default function GabaritoProfessor({ titulo, questoes, maxNota = 4.0, nom
   }
 
   return (
-    <div className="bg-white p-8 max-w-4xl mx-auto shadow-sm border border-slate-200 mt-6 mb-8 text-black" style={{ fontFamily: 'Arial, sans-serif' }}>
+    <div className="bg-white p-8 max-w-4xl mx-auto shadow-sm border border-zinc-200 mt-6 mb-8 text-black" style={{ fontFamily: 'Arial, sans-serif' }}>
       
       {/* Header */}
       <div className="text-center border-b-[3px] border-black pb-4 mb-6">
         <h1 className="text-xl font-bold uppercase tracking-wide m-0">Centro Territorial de Educação Profissional</h1>
-        <h2 className="text-sm uppercase text-gray-700 mt-1 m-0">{nomeEscola}</h2>
+        <h2 className="text-sm uppercase text-fg-muted mt-1 m-0">{nomeEscola}</h2>
       </div>
 
       {/* Titulo */}
@@ -55,21 +55,21 @@ export default function GabaritoProfessor({ titulo, questoes, maxNota = 4.0, nom
         
         {/* Coluna 1 */}
         <div className="border-2 border-black rounded-lg overflow-hidden w-64">
-          <div className="bg-gray-200 text-center py-2 font-bold text-xs uppercase border-b-2 border-black">
+          <div className="bg-zinc-200 text-center py-2 font-bold text-xs uppercase border-b-2 border-black">
             Questão / Resposta
           </div>
           <div className="p-2 space-y-1">
             {col1.map((q, idx) => (
-              <div key={q.numero} className={`flex items-center justify-between p-2 rounded ${idx % 2 !== 0 ? 'bg-pink-50' : 'bg-white'}`}>
+              <div key={q.numero} className={`flex items-center justify-between p-2 rounded ${idx % 2 !== 0 ? 'bg-accent-subtle' : 'bg-white'}`}>
                 <span className="font-bold text-sm w-6">{q.numero.toString().padStart(2, '0')}</span>
                 <div className="flex gap-2">
                   {options.map((opt) => (
                     <div 
                       key={opt}
-                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border border-gray-400 ${
+                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border border-zinc-400 ${
                         q.correta === opt 
                           ? 'bg-black text-white border-black' 
-                          : 'bg-white text-gray-400'
+                          : 'bg-white text-fg-subtle'
                       }`}
                     >
                       {opt}
@@ -84,21 +84,21 @@ export default function GabaritoProfessor({ titulo, questoes, maxNota = 4.0, nom
         {/* Coluna 2 */}
         {col2.length > 0 && (
           <div className="border-2 border-black rounded-lg overflow-hidden w-64">
-            <div className="bg-gray-200 text-center py-2 font-bold text-xs uppercase border-b-2 border-black">
+            <div className="bg-zinc-200 text-center py-2 font-bold text-xs uppercase border-b-2 border-black">
               Questão / Resposta
             </div>
             <div className="p-2 space-y-1">
               {col2.map((q, idx) => (
-                <div key={q.numero} className={`flex items-center justify-between p-2 rounded ${idx % 2 !== 0 ? 'bg-pink-50' : 'bg-white'}`}>
+                <div key={q.numero} className={`flex items-center justify-between p-2 rounded ${idx % 2 !== 0 ? 'bg-accent-subtle' : 'bg-white'}`}>
                   <span className="font-bold text-sm w-6">{q.numero.toString().padStart(2, '0')}</span>
                   <div className="flex gap-2">
                     {options.map((opt) => (
                       <div 
                         key={opt}
-                        className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border border-gray-400 ${
+                        className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border border-zinc-400 ${
                           q.correta === opt 
                             ? 'bg-black text-white border-black' 
-                            : 'bg-white text-gray-400'
+                            : 'bg-white text-fg-subtle'
                         }`}
                       >
                         {opt}
@@ -121,15 +121,15 @@ export default function GabaritoProfessor({ titulo, questoes, maxNota = 4.0, nom
           
           {/* Pontuacao Col 1 */}
           <div className="border-2 border-black rounded-lg overflow-hidden w-64">
-            <div className="flex bg-gray-200 font-bold text-xs uppercase border-b-2 border-black">
+            <div className="flex bg-zinc-200 font-bold text-xs uppercase border-b-2 border-black">
               <div className="flex-1 py-2 text-center border-r-2 border-black">Acertos</div>
               <div className="flex-1 py-2 text-center">Nota</div>
             </div>
             <div>
               {tabelaPontuacaoCol1.map((item, idx) => (
-                <div key={item.acertos} className={`flex font-bold text-sm ${idx % 2 !== 0 ? 'bg-pink-50' : 'bg-white'}`}>
+                <div key={item.acertos} className={`flex font-bold text-sm ${idx % 2 !== 0 ? 'bg-accent-subtle' : 'bg-white'}`}>
                   <div className="flex-1 py-2 text-center border-r-2 border-black">{item.acertos}</div>
-                  <div className="flex-1 py-2 text-center text-indigo-900">{item.nota}</div>
+                  <div className="flex-1 py-2 text-center text-accent-fg">{item.nota}</div>
                 </div>
               ))}
             </div>
@@ -138,15 +138,15 @@ export default function GabaritoProfessor({ titulo, questoes, maxNota = 4.0, nom
           {/* Pontuacao Col 2 */}
           {tabelaPontuacaoCol2.length > 0 && (
             <div className="border-2 border-black rounded-lg overflow-hidden w-64">
-              <div className="flex bg-gray-200 font-bold text-xs uppercase border-b-2 border-black">
+              <div className="flex bg-zinc-200 font-bold text-xs uppercase border-b-2 border-black">
                 <div className="flex-1 py-2 text-center border-r-2 border-black">Acertos</div>
                 <div className="flex-1 py-2 text-center">Nota</div>
               </div>
               <div>
                 {tabelaPontuacaoCol2.map((item, idx) => (
-                  <div key={item.acertos} className={`flex font-bold text-sm ${idx % 2 !== 0 ? 'bg-pink-50' : 'bg-white'}`}>
+                  <div key={item.acertos} className={`flex font-bold text-sm ${idx % 2 !== 0 ? 'bg-accent-subtle' : 'bg-white'}`}>
                     <div className="flex-1 py-2 text-center border-r-2 border-black">{item.acertos}</div>
-                    <div className="flex-1 py-2 text-center text-indigo-900">{item.nota}</div>
+                    <div className="flex-1 py-2 text-center text-accent-fg">{item.nota}</div>
                   </div>
                 ))}
               </div>

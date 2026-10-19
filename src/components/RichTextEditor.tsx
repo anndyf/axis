@@ -81,12 +81,12 @@ export default function RichTextEditor({ value, onChange, placeholder, required,
   }
 
   return (
-    <div className={`flex flex-col border border-slate-200 rounded-2xl overflow-hidden bg-slate-50 focus-within:ring-2 focus-within:ring-blue-500 transition-all ${className}`}>
-      <div className="flex items-center gap-1 p-2 border-b border-slate-200 bg-slate-100/50">
+    <div className={`flex flex-col border border-zinc-200 rounded-lg overflow-hidden bg-zinc-50 focus-within:ring-2 focus-within:ring-ring transition-all ${className}`}>
+      <div className="flex items-center gap-1 p-2 border-b border-zinc-200 bg-zinc-100/50">
         <button
           type="button"
           onClick={() => insertFormat('**', '**')}
-          className="p-2 hover:bg-white rounded-lg text-slate-600 hover:text-blue-600 transition-colors"
+          className="p-2 hover:bg-white rounded-lg text-fg-muted hover:text-accent-fg transition-colors"
           title="Negrito"
         >
           <Bold size={16} strokeWidth={3} />
@@ -94,16 +94,16 @@ export default function RichTextEditor({ value, onChange, placeholder, required,
         <button
           type="button"
           onClick={() => insertFormat('*', '*')}
-          className="p-2 hover:bg-white rounded-lg text-slate-600 hover:text-blue-600 transition-colors"
+          className="p-2 hover:bg-white rounded-lg text-fg-muted hover:text-accent-fg transition-colors"
           title="Itálico"
         >
           <Italic size={16} />
         </button>
-        <div className="w-px h-4 bg-slate-300 mx-1" />
+        <div className="w-px h-4 bg-zinc-300 mx-1" />
         <button
           type="button"
           onClick={insertList}
-          className="p-2 hover:bg-white rounded-lg text-slate-600 hover:text-blue-600 transition-colors"
+          className="p-2 hover:bg-white rounded-lg text-fg-muted hover:text-accent-fg transition-colors"
           title="Lista"
         >
           <List size={16} />
@@ -111,7 +111,7 @@ export default function RichTextEditor({ value, onChange, placeholder, required,
         <button
           type="button"
           onClick={insertLink}
-          className="p-2 hover:bg-white rounded-lg text-slate-600 hover:text-blue-600 transition-colors"
+          className="p-2 hover:bg-white rounded-lg text-fg-muted hover:text-accent-fg transition-colors"
           title="Link"
         >
           <LinkIcon size={16} />
@@ -123,7 +123,7 @@ export default function RichTextEditor({ value, onChange, placeholder, required,
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         required={required}
-        className="w-full p-4 bg-transparent border-none outline-none min-h-[150px] resize-y text-slate-700 font-medium placeholder:text-slate-400"
+        className="w-full p-4 bg-transparent border-none outline-none min-h-[150px] resize-y text-fg-muted font-medium placeholder:text-fg-subtle"
       />
     </div>
   )

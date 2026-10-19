@@ -51,23 +51,23 @@ export default function TeacherTipsModal({ storageKey, tips, title }: TeacherTip
   const currentTip = tips[currentStep]
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden border border-slate-100 flex flex-col animate-in slide-in-from-bottom-8 duration-500">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-zinc-900/80 backdrop-blur-md animate-in fade-in duration-300">
+      <div className="bg-white rounded-xl w-full max-w-lg shadow-card overflow-hidden border border-zinc-100 flex flex-col animate-in slide-in-from-bottom-8 duration-500">
         
         {/* Header com gradiente sutil */}
         <div className="p-8 pb-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg ${currentTip.color}`}>
+            <div className={`w-12 h-12 rounded-lg flex items-center justify-center shadow-card ${currentTip.color}`}>
               <Lightbulb className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">Dica do sistema</p>
-              <h3 className="text-xl font-semibold text-slate-800 leading-tight">{title}</h3>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-fg-subtle">Dica do sistema</p>
+              <h3 className="text-xl font-semibold text-fg leading-tight">{title}</h3>
             </div>
           </div>
           <button 
             onClick={handleClose}
-            className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400"
+            className="p-2 hover:bg-zinc-100 rounded-full transition-colors text-fg-subtle"
           >
             <X size={24} />
           </button>
@@ -75,14 +75,14 @@ export default function TeacherTipsModal({ storageKey, tips, title }: TeacherTip
 
         {/* Content Area */}
         <div className="px-8 py-10 flex flex-col items-center text-center">
-          <div className={`w-24 h-24 mb-8 rounded-[2rem] flex items-center justify-center bg-slate-50 border-2 border-dashed border-slate-200`}>
+          <div className={`w-24 h-24 mb-8 rounded-xl flex items-center justify-center bg-zinc-50 border-2 border-dashed border-zinc-200`}>
              {currentTip.icon}
           </div>
           
-          <h4 className="text-2xl font-semibold text-slate-800 mb-4 tracking-tight">
+          <h4 className="text-2xl font-semibold text-fg mb-4 tracking-tight">
             {currentTip.title}
           </h4>
-          <p className="text-slate-600 leading-relaxed text-base font-medium max-w-sm">
+          <p className="text-fg-muted leading-relaxed text-base font-medium max-w-sm">
             {currentTip.description}
           </p>
         </div>
@@ -94,11 +94,11 @@ export default function TeacherTipsModal({ storageKey, tips, title }: TeacherTip
               {tips.map((_, i) => (
                 <div 
                   key={i} 
-                  className={`h-2 rounded-full transition-all duration-300 ${i === currentStep ? "w-8 bg-slate-900" : "w-2 bg-slate-200"}`} 
+                  className={`h-2 rounded-full transition-all duration-300 ${i === currentStep ? "w-8 bg-zinc-900" : "w-2 bg-zinc-200"}`} 
                 />
               ))}
             </div>
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
+            <span className="text-xs font-semibold text-fg-subtle uppercase tracking-widest">
               Passo {currentStep + 1} de {tips.length}
             </span>
           </div>
@@ -107,7 +107,7 @@ export default function TeacherTipsModal({ storageKey, tips, title }: TeacherTip
             {currentStep > 0 && (
               <button
                 onClick={prevStep}
-                className="flex-1 py-4 px-6 rounded-2xl text-sm font-semibold text-slate-600 bg-slate-50 hover:bg-slate-100 transition-all flex items-center justify-center gap-2 border border-slate-200"
+                className="flex-1 py-4 px-6 rounded-lg text-sm font-semibold text-fg-muted bg-zinc-50 hover:bg-zinc-100 transition-all flex items-center justify-center gap-2 border border-zinc-200"
               >
                 <ChevronLeft size={20} />
                 Anterior
@@ -115,7 +115,7 @@ export default function TeacherTipsModal({ storageKey, tips, title }: TeacherTip
             )}
             <button
               onClick={nextStep}
-              className={`flex-[2] py-4 px-6 rounded-2xl text-sm font-semibold text-white transition-all flex items-center justify-center gap-2 shadow-xl ${currentStep === tips.length - 1 ? "bg-emerald-600 shadow-emerald-600/20" : "bg-slate-900 shadow-slate-900/20"}`}
+              className={`flex-[2] py-4 px-6 rounded-lg text-sm font-semibold text-white transition-all flex items-center justify-center gap-2 shadow-card ${currentStep === tips.length - 1 ? "bg-success " : "bg-zinc-900 "}`}
             >
               {currentStep === tips.length - 1 ? (
                 <>

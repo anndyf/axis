@@ -61,7 +61,7 @@ export default function ConfiguracoesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-700"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-700"></div>
       </div>
     )
   }
@@ -69,79 +69,79 @@ export default function ConfiguracoesPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
-        <h1 className="text-3xl font-medium text-blue-900 flex items-center gap-3">
-          <Shield className="text-slate-700" />
+        <h1 className="text-3xl font-medium text-accent-fg flex items-center gap-3">
+          <Shield className="text-fg-muted" />
           Configurações do Sistema
         </h1>
-        <p className="text-slate-600 mt-2">Gerencie as funcionalidades globais e acessos dos professores.</p>
+        <p className="text-fg-muted mt-2">Gerencie as funcionalidades globais e acessos dos professores.</p>
       </div>
 
       <Link
         href="/dashboard/configuracoes/avaliacao"
-        className="flex items-center justify-between bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:border-slate-300 hover:shadow-md transition-all group"
+        className="flex items-center justify-between bg-white rounded-lg shadow-sm border border-zinc-200 p-6 hover:border-zinc-300 hover:shadow-card transition-all group"
       >
         <div className="flex items-center gap-4">
-          <div className="p-3 rounded-xl bg-slate-100 text-slate-700 group-hover:bg-slate-700 group-hover:text-white transition-colors">
+          <div className="p-3 rounded-xl bg-zinc-100 text-fg-muted group-hover:bg-zinc-700 group-hover:text-white transition-colors">
             <ClipboardList className="w-5 h-5" />
           </div>
           <div>
-            <p className="font-medium text-blue-900">Esquemas de Avaliação</p>
-            <p className="text-sm text-slate-600">Configure unidades, atividades e regras de recuperação por escola.</p>
+            <p className="font-medium text-accent-fg">Esquemas de Avaliação</p>
+            <p className="text-sm text-fg-muted">Configure unidades, atividades e regras de recuperação por escola.</p>
           </div>
         </div>
-        <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-slate-600 transition-colors" />
+        <ChevronRight className="w-5 h-5 text-zinc-300 group-hover:text-fg-muted transition-colors" />
       </Link>
 
       <Link
         href="/dashboard/configuracoes/calendario"
-        className="flex items-center justify-between bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:border-slate-300 hover:shadow-md transition-all group"
+        className="flex items-center justify-between bg-white rounded-lg shadow-sm border border-zinc-200 p-6 hover:border-zinc-300 hover:shadow-card transition-all group"
       >
         <div className="flex items-center gap-4">
-          <div className="p-3 rounded-xl bg-slate-100 text-slate-700 group-hover:bg-slate-700 group-hover:text-white transition-colors">
+          <div className="p-3 rounded-xl bg-zinc-100 text-fg-muted group-hover:bg-zinc-700 group-hover:text-white transition-colors">
             <CalendarDays className="w-5 h-5" />
           </div>
           <div>
-            <p className="font-medium text-blue-900">Calendário Letivo</p>
-            <p className="text-sm text-slate-600">Início e fim do ano, datas das unidades, feriados, sábados letivos e tempos de aula.</p>
+            <p className="font-medium text-accent-fg">Calendário Letivo</p>
+            <p className="text-sm text-fg-muted">Início e fim do ano, datas das unidades, feriados, sábados letivos e tempos de aula.</p>
           </div>
         </div>
-        <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-slate-600 transition-colors" />
+        <ChevronRight className="w-5 h-5 text-zinc-300 group-hover:text-fg-muted transition-colors" />
       </Link>
 
       <Link
         href="/dashboard/configuracoes/identidade"
-        className="flex items-center justify-between bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:border-slate-300 hover:shadow-md transition-all group"
+        className="flex items-center justify-between bg-white rounded-lg shadow-sm border border-zinc-200 p-6 hover:border-zinc-300 hover:shadow-card transition-all group"
       >
         <div className="flex items-center gap-4">
-          <div className="p-3 rounded-xl bg-slate-100 text-slate-700 group-hover:bg-slate-700 group-hover:text-white transition-colors">
+          <div className="p-3 rounded-xl bg-zinc-100 text-fg-muted group-hover:bg-zinc-700 group-hover:text-white transition-colors">
             <Palette className="w-5 h-5" />
           </div>
           <div>
-            <p className="font-medium text-blue-900">Identidade visual</p>
-            <p className="text-sm text-slate-600">Logo e cor de destaque da escola no sistema, no login e nos PDFs.</p>
+            <p className="font-medium text-accent-fg">Identidade visual</p>
+            <p className="text-sm text-fg-muted">Logo e cor de destaque da escola no sistema, no login e nos PDFs.</p>
           </div>
         </div>
-        <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-slate-600 transition-colors" />
+        <ChevronRight className="w-5 h-5 text-zinc-300 group-hover:text-fg-muted transition-colors" />
       </Link>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="p-6 border-b border-slate-200 bg-slate-100/50">
+      <div className="bg-white rounded-lg shadow-sm border border-zinc-200 overflow-hidden">
+        <div className="p-6 border-b border-zinc-200 bg-zinc-100/50">
           <h2 className="text-lg font-medium flex items-center gap-2">
-            <Database className="w-5 h-5 text-slate-700" />
+            <Database className="w-5 h-5 text-fg-muted" />
             Módulos Pedagógicos
           </h2>
         </div>
         
         <div className="p-6 space-y-6">
-          <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors">
+          <div className="flex items-center justify-between p-4 rounded-xl border border-zinc-200 hover:bg-zinc-100 transition-colors">
             <div className="space-y-1">
-              <p className="font-medium text-blue-900">Banco de Questões</p>
-              <p className="text-sm text-slate-600">Permitir que professores enviem e visualizem o banco de questões.</p>
+              <p className="font-medium text-accent-fg">Banco de Questões</p>
+              <p className="text-sm text-fg-muted">Permitir que professores enviem e visualizem o banco de questões.</p>
             </div>
             <button
               onClick={() => setIsBancoAtivo(!isBancoAtivo)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ring-2 ring-offset-2 ${
-                isBancoAtivo ? 'bg-slate-700 ring-slate-500' : 'bg-slate-300 ring-transparent'
+                isBancoAtivo ? 'bg-zinc-700 ring-zinc-500' : 'bg-zinc-300 ring-transparent'
               }`}
             >
               <span
@@ -152,15 +152,15 @@ export default function ConfiguracoesPage() {
             </button>
           </div>
 
-          <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:bg-slate-100 transition-colors">
+          <div className="flex items-center justify-between p-4 rounded-xl border border-zinc-200 hover:bg-zinc-100 transition-colors">
             <div className="space-y-1">
-              <p className="font-medium text-blue-900">Ano Letivo Ativo</p>
-              <p className="text-sm text-slate-600">Define qual ano letivo será exibido e gerenciado no sistema.</p>
+              <p className="font-medium text-accent-fg">Ano Letivo Ativo</p>
+              <p className="text-sm text-fg-muted">Define qual ano letivo será exibido e gerenciado no sistema.</p>
             </div>
             <select
               value={anoLetivo}
               onChange={(e) => setAnoLetivo(Number(e.target.value))}
-              className="bg-white border border-blue-300 text-blue-900 text-sm rounded-lg focus:ring-slate-500 focus:border-slate-500 block w-32 p-2.5"
+              className="bg-white border border-accent/25 text-accent-fg text-sm rounded-lg focus:ring-zinc-500 focus:border-zinc-500 block w-32 p-2.5"
             >
               {availableYears.map((year) => (
                 <option key={year} value={year}>
@@ -171,11 +171,11 @@ export default function ConfiguracoesPage() {
           </div>
         </div>
 
-        <div className="p-6 bg-slate-100 border-t border-slate-200 flex items-center justify-between">
+        <div className="p-6 bg-zinc-100 border-t border-zinc-200 flex items-center justify-between">
           <div>
             {message && (
               <div className={`flex items-center gap-2 text-sm font-medium ${
-                message.type === 'success' ? 'text-green-600' : 'text-red-600'
+                message.type === 'success' ? 'text-success-fg' : 'text-danger-fg'
               }`}>
                 {message.type === 'success' ? <Check size={16} /> : <AlertCircle size={16} />}
                 {message.text}
@@ -185,7 +185,7 @@ export default function ConfiguracoesPage() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="bg-slate-700 hover:bg-slate-800 disabled:opacity-50 text-white px-6 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-all shadow-md active:scale-95"
+            className="bg-zinc-700 hover:bg-zinc-800 disabled:opacity-50 text-white px-6 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-all shadow-card active:scale-95"
           >
             {saving ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -199,25 +199,25 @@ export default function ConfiguracoesPage() {
 
       {/* Modal de Confirmação para Configurações */}
       {showConfirm && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-sm rounded-3xl p-8 shadow-2xl animate-in zoom-in-95 duration-300">
-            <div className="w-16 h-16 bg-slate-100 text-slate-700 rounded-2xl flex items-center justify-center mb-6">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white w-full max-w-sm rounded-xl p-8 shadow-card animate-in zoom-in-95 duration-300">
+            <div className="w-16 h-16 bg-zinc-100 text-fg-muted rounded-lg flex items-center justify-center mb-6">
               <Shield className="w-8 h-8" />
             </div>
-            <h3 className="text-2xl font-medium text-slate-800 mb-2">Salvar Configurações?</h3>
-            <p className="text-slate-600 font-medium mb-8">
+            <h3 className="text-2xl font-medium text-fg mb-2">Salvar Configurações?</h3>
+            <p className="text-fg-muted font-medium mb-8">
               Estas alterações afetarão o comportamento global do sistema para todos os usuários. Deseja confirmar?
             </p>
             <div className="grid grid-cols-2 gap-4">
               <button 
                 onClick={() => setShowConfirm(false)}
-                className="py-4 rounded-2xl font-medium text-slate-600 hover:bg-slate-50 transition-all"
+                className="py-4 rounded-lg font-medium text-fg-muted hover:bg-zinc-50 transition-all"
               >
                 Cancelar
               </button>
               <button 
                 onClick={() => handleSave()}
-                className="py-4 rounded-2xl font-medium bg-slate-900 text-white hover:bg-slate-800 transition-all shadow-lg"
+                className="py-4 rounded-lg font-medium bg-zinc-900 text-white hover:bg-zinc-800 transition-all shadow-card"
               >
                 Confirmar
               </button>

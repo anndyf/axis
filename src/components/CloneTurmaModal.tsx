@@ -81,30 +81,30 @@ export default function CloneTurmaModal({
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden border border-slate-100 flex flex-col animate-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between p-6 border-b border-slate-50 bg-slate-50/50">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white rounded-xl w-full max-w-md shadow-card overflow-hidden border border-zinc-100 flex flex-col animate-in zoom-in-95 duration-200">
+        <div className="flex items-center justify-between p-6 border-b border-zinc-50 bg-zinc-50/50">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
-              <Copy className="w-5 h-5 text-emerald-600" />
+            <div className="w-10 h-10 bg-success-subtle rounded-xl flex items-center justify-center">
+              <Copy className="w-5 h-5 text-success-fg" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-slate-800">Clonar Turma</h3>
-              <p className="text-xs text-slate-500 font-medium">{turmaOriginal?.nome}</p>
+              <h3 className="text-lg font-semibold text-fg">Clonar Turma</h3>
+              <p className="text-xs text-fg-subtle font-medium">{turmaOriginal?.nome}</p>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="p-2 hover:bg-white rounded-xl transition-colors text-slate-400 hover:text-slate-600 shadow-sm"
+            className="p-2 hover:bg-white rounded-xl transition-colors text-fg-subtle hover:text-fg-muted shadow-sm"
           >
             <X size={20} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          <div className="bg-amber-50 border border-amber-100 rounded-2xl p-4 flex gap-3">
-            <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-            <p className="text-[11px] text-amber-800 font-medium leading-relaxed">
+          <div className="bg-warning-subtle border border-warning-line rounded-lg p-4 flex gap-3">
+            <AlertTriangle className="w-5 h-5 text-warning-fg shrink-0 mt-0.5" />
+            <p className="text-[11px] text-warning-fg font-medium leading-relaxed">
               As disciplinas serão copiadas, mas <span className="font-semibold underline">vínculos com professores e alunos não serão mantidos</span>. 
               A nova turma nascerá limpa.
             </p>
@@ -113,35 +113,35 @@ export default function CloneTurmaModal({
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 ml-1">Novo Turno</label>
+                <label className="text-[10px] font-semibold uppercase tracking-widest text-fg-subtle ml-1">Novo Turno</label>
                 <select
                   value={turno}
                   onChange={(e) => setTurno(e.target.value)}
-                  className="w-full bg-slate-50 border-none rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-emerald-500 transition-all"
+                  className="w-full bg-zinc-50 border-none rounded-xl px-4 py-2.5 text-sm font-semibold text-fg-muted focus:ring-2 focus:ring-success/30 transition-all"
                 >
                   {turnos.map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 ml-1">Nomenclatura (Número)</label>
+                <label className="text-[10px] font-semibold uppercase tracking-widest text-fg-subtle ml-1">Nomenclatura (Número)</label>
                 <input
                   type="number"
                   min="1"
                   max="9"
                   value={numero}
                   onChange={(e) => setNumero(parseInt(e.target.value))}
-                  className="w-full bg-slate-50 border-none rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-emerald-500 transition-all font-mono"
+                  className="w-full bg-zinc-50 border-none rounded-xl px-4 py-2.5 text-sm font-semibold text-fg-muted focus:ring-2 focus:ring-success/30 transition-all font-mono"
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 ml-1">Nome Final da Turma</label>
+              <label className="text-[10px] font-semibold uppercase tracking-widest text-fg-subtle ml-1">Nome Final da Turma</label>
               <input
                 type="text"
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
-                className="w-full bg-slate-50 border-none rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-emerald-500 transition-all uppercase tracking-wider font-mono shadow-inner"
+                className="w-full bg-zinc-50 border-none rounded-xl px-4 py-2.5 text-sm font-semibold text-fg focus:ring-2 focus:ring-success/30 transition-all uppercase tracking-wider font-mono shadow-card"
               />
             </div>
           </div>
@@ -150,14 +150,14 @@ export default function CloneTurmaModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-3 px-4 rounded-xl text-sm font-semibold text-slate-500 hover:bg-slate-50 transition-colors border border-slate-100"
+              className="flex-1 py-3 px-4 rounded-xl text-sm font-semibold text-fg-subtle hover:bg-zinc-50 transition-colors border border-zinc-100"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading || !nome}
-              className="flex-1 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="flex-1 py-3 px-4 bg-success hover:bg-success text-white rounded-xl text-sm font-semibold shadow-card transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {loading ? <Loader2 size={18} className="animate-spin" /> : <Copy size={18} />}
               Confirmar Clone

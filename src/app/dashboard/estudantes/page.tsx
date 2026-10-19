@@ -179,47 +179,47 @@ export default async function EstudantesPage({
     .sort((a, b) => a.nome.localeCompare(b.nome))
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="bg-zinc-50">
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
-      <header className="bg-white/80 backdrop-blur-xl border-b border-slate-300 sticky top-0 z-50 -mx-4 -mt-4 md:-mx-8 md:-mt-8 mb-4 px-4 sm:px-6 lg:px-8">
+      <header className="mb-6 border-b border-line pb-4">
         <div className="max-w-7xl mx-auto py-4">
           <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
             <div className="flex items-center space-x-5">
               <Link
                 href="/dashboard"
-                className="p-2 hover:bg-slate-200 rounded-lg transition-colors text-slate-400 hover:text-slate-700"
+                className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-fg-subtle hover:text-fg-muted"
               >
                 <ArrowLeft size={20} />
               </Link>
               <div>
-                <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Estudantes</h1>
-                <p className="text-base text-slate-700 font-medium">Gerenciar cadastro de alunos</p>
+                <h1 className="text-2xl font-bold text-fg tracking-tight">Estudantes</h1>
+                <p className="text-base text-fg-muted font-medium">Gerenciar cadastro de alunos</p>
               </div>
             </div>
             
             <div className={`grid grid-cols-2 md:flex md:items-center gap-2 ${(!session.user.isSuperuser && !session.user.isDirecao) ? 'hidden' : ''}`}>
               <Link
                 href="/dashboard/aee"
-                className="flex items-center justify-center space-x-2 bg-indigo-50 text-indigo-700 px-3 md:px-4 py-2.5 rounded-lg hover:bg-indigo-100 transition-all border border-indigo-200 shadow-sm text-sm font-bold"
+                className="flex items-center justify-center space-x-2 bg-accent-subtle text-accent-fg px-3 md:px-4 py-2.5 rounded-lg hover:bg-accent-subtle transition-all border border-accent/25 shadow-sm text-sm font-bold"
               >
                 <Accessibility className="w-4 h-4" />
                 <span className="whitespace-nowrap">Painel AEE</span>
               </Link>
-              <div className="hidden md:block w-px h-6 bg-slate-200 mx-1" />
+              <div className="hidden md:block w-px h-6 bg-zinc-200 mx-1" />
               <div className="col-span-2 md:col-auto">
                 <PortalActionsMenu />
               </div>
-              <div className="hidden md:block w-px h-6 bg-slate-300 mx-1" />
+              <div className="hidden md:block w-px h-6 bg-zinc-300 mx-1" />
               <Link
                 href="/dashboard/estudantes/importar"
-                className="flex items-center justify-center space-x-2 bg-slate-700 text-white px-3 md:px-4 py-2.5 rounded-lg hover:bg-slate-800 transition-all shadow-sm text-sm font-medium"
+                className="flex items-center justify-center space-x-2 bg-zinc-700 text-white px-3 md:px-4 py-2.5 rounded-lg hover:bg-zinc-800 transition-all shadow-sm text-sm font-medium"
               >
                 <Upload className="w-4 h-4" />
                 <span className="whitespace-nowrap">Importar</span>
               </Link>
               <Link
                 href="/dashboard/estudantes/novo"
-                className="flex items-center justify-center space-x-2 bg-gradient-to-r from-green-600 to-green-700 text-white px-3 md:px-4 py-2.5 rounded-lg hover:from-green-700 hover:to-green-800 transition-all shadow-sm text-sm font-medium"
+                className="flex items-center justify-center space-x-2 bg-success text-white px-3 md:px-4 py-2.5 rounded-lg hover:bg-success transition-all shadow-sm text-sm font-medium"
               >
                 <Plus className="w-4 h-4" />
                 <span className="whitespace-nowrap">Novo Aluno</span>
@@ -232,45 +232,45 @@ export default async function EstudantesPage({
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-32">
         {/* Legenda de Ícones - NOVO */}
-        <div className="bg-white/50 backdrop-blur p-4 rounded-3xl border border-white/50 shadow-sm flex flex-wrap items-center justify-center gap-8 mb-6">
+        <div className="bg-white/50 backdrop-blur p-4 rounded-xl border border-white/50 shadow-sm flex flex-wrap items-center justify-center gap-8 mb-6">
            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-slate-100 text-slate-500 rounded-lg border border-slate-200">
+              <div className="p-1.5 bg-zinc-100 text-fg-subtle rounded-lg border border-zinc-200">
                  <ShieldCheck size={14} />
               </div>
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Gestão de Acesso</span>
+              <span className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest leading-none">Gestão de Acesso</span>
            </div>
            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-slate-100 text-slate-500 rounded-lg border border-slate-200">
+              <div className="p-1.5 bg-zinc-100 text-fg-subtle rounded-lg border border-zinc-200">
                  <Pencil size={14} />
               </div>
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Editar Dados</span>
+              <span className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest leading-none">Editar Dados</span>
            </div>
            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-indigo-50 text-indigo-500 rounded-lg border border-indigo-200">
+              <div className="p-1.5 bg-accent-subtle text-accent-fg rounded-lg border border-accent/25">
                  <Accessibility size={14} />
               </div>
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Ficha AEE</span>
+              <span className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest leading-none">Ficha AEE</span>
            </div>
            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-slate-100 text-slate-500 rounded-lg border border-slate-200">
+              <div className="p-1.5 bg-zinc-100 text-fg-subtle rounded-lg border border-zinc-200">
                  <FileText size={14} />
               </div>
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Gerar Boletim</span>
+              <span className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest leading-none">Gerar Boletim</span>
            </div>
         </div>
 
-        <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-300/40 border border-slate-200 overflow-hidden mb-6">
+        <div className="bg-white rounded-xl shadow-card border border-zinc-200 overflow-hidden mb-6">
            <EstudantesFilter cursos={cursos} turmas={turmas} totalResults={estudantes.length} />
         </div>
 
-        <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-300/50 border border-slate-200 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-card border border-zinc-200 overflow-hidden">
           {estudantes.length === 0 ? (
             <div className="p-12 text-center">
-              <GraduationCap className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-slate-800 mb-2">
+              <GraduationCap className="w-16 h-16 text-fg-subtle mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-fg mb-2">
                 {hasFilters ? 'Nenhum estudante encontrado' : 'Pesquise por estudantes'}
               </h3>
-              <p className="text-slate-700 mb-6">
+              <p className="text-fg-muted mb-6">
                 {hasFilters 
                   ? 'Tente ajustar os filtros de busca' 
                   : 'Utilize a busca ou os filtros acima para carregar a lista de estudantes sem sobrecarregar o sistema.'}
@@ -279,7 +279,7 @@ export default async function EstudantesPage({
                 <div className="flex justify-center gap-4">
                   <Link
                     href="/dashboard/estudantes/novo"
-                    className="inline-flex items-center space-x-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
+                    className="inline-flex items-center space-x-2 bg-success text-white px-6 py-3 rounded-lg hover:bg-success transition-colors"
                   >
                     <Plus className="w-5 h-5" />
                     <span>Adicionar Estudante</span>
@@ -297,57 +297,57 @@ export default async function EstudantesPage({
                   return acc
                 }, {})
               ).sort(([a], [b]) => a.localeCompare(b)).map(([turmaNome, estudantesDaTurma]: [string, any]) => (
-                <div key={turmaNome} className="mb-0 border-b-8 border-slate-100 last:border-0">
-                  <div className="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-                    <h2 className="text-base font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2">
-                      <Users className="w-5 h-5 text-slate-400" />
+                <div key={turmaNome} className="mb-0 border-b-8 border-zinc-100 last:border-0">
+                  <div className="bg-zinc-50 px-6 py-4 border-b border-zinc-200 flex items-center justify-between">
+                    <h2 className="text-base font-bold text-fg uppercase tracking-widest flex items-center gap-2">
+                      <Users className="w-5 h-5 text-fg-subtle" />
                       {turmaNome}
                     </h2>
-                    <span className="text-xs font-bold text-slate-500 bg-slate-200 px-3 py-1 rounded-full">{estudantesDaTurma.length} estudantes</span>
+                    <span className="text-xs font-bold text-fg-subtle bg-zinc-200 px-3 py-1 rounded-full">{estudantesDaTurma.length} estudantes</span>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full">
-                      <thead className="bg-white border-b border-slate-200">
+                      <thead className="bg-white border-b border-zinc-200">
                         <tr>
-                          <th className="px-6 py-3 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">
+                          <th className="px-6 py-3 text-left text-xs font-bold text-fg-subtle uppercase tracking-widest">
                             Nome
                           </th>
-                          <th className="px-6 py-3 text-left text-xs font-bold text-slate-400 uppercase tracking-widest">
+                          <th className="px-6 py-3 text-left text-xs font-bold text-fg-subtle uppercase tracking-widest">
                             Notas Lançadas
                           </th>
-                          <th className="px-6 py-3 text-right text-xs font-bold text-slate-400 uppercase tracking-widest">
+                          <th className="px-6 py-3 text-right text-xs font-bold text-fg-subtle uppercase tracking-widest">
                             Ações / Gestão
                           </th>
                         </tr>
                       </thead>
-                      <tbody className="bg-white divide-y divide-slate-100">
+                      <tbody className="bg-white divide-y divide-zinc-100">
                         {estudantesDaTurma.map((estudante: any) => (
-                          <tr key={estudante.matricula} className="hover:bg-slate-50 transition-colors">
+                          <tr key={estudante.matricula} className="hover:bg-zinc-50 transition-colors">
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">
-                                <div className="w-10 h-10 bg-slate-800 rounded-2xl flex items-center justify-center text-white font-bold shadow-md">
+                                <div className="w-10 h-10 bg-zinc-800 rounded-lg flex items-center justify-center text-white font-bold shadow-card">
                                   {estudante.nome.charAt(0).toUpperCase()}
                                 </div>
                                 <div className="ml-4">
-                                  <div className="text-sm font-bold text-slate-800 uppercase tracking-tight flex items-center gap-2">
+                                  <div className="text-sm font-bold text-fg uppercase tracking-tight flex items-center gap-2">
                                     {estudante.nome}
                                     {estudante.aeeProfile && (
                                       <Link 
                                         href={`/dashboard/aee/${estudante.matricula}`}
-                                        className="p-1 bg-indigo-50 text-indigo-600 rounded-lg border border-indigo-200 hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
+                                        className="p-1 bg-accent-subtle text-accent-fg rounded-lg border border-accent/25 hover:bg-accent hover:text-white transition-all shadow-sm"
                                         title="Aluno com Atendimento Especializado (AEE)"
                                       >
                                         <Accessibility className="w-3.5 h-3.5" />
                                       </Link>
                                     )}
                                   </div>
-                                  <div className="text-[11px] font-bold tracking-widest text-slate-400 uppercase mt-0.5">
+                                  <div className="text-[11px] font-bold tracking-widest text-fg-subtle uppercase mt-0.5">
                                     Matrícula: {estudante.matricula}
                                   </div>
                                 </div>
                               </div>
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-600">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-fg-muted">
                               {estudante._count.notas}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-right">
@@ -361,7 +361,7 @@ export default async function EstudantesPage({
 
                                   <Link
                                     href={`/dashboard/estudantes/${estudante.matricula}/editar`}
-                                    className="p-2 bg-slate-50 text-slate-400 border border-slate-200 rounded-xl hover:text-slate-900 hover:bg-white transition-all shadow-sm"
+                                    className="p-2 bg-zinc-50 text-fg-subtle border border-zinc-200 rounded-xl hover:text-fg hover:bg-white transition-all shadow-sm"
                                     title="Editar Dados"
                                   >
                                     <Pencil size={18} />
@@ -371,7 +371,7 @@ export default async function EstudantesPage({
                                   {estudante.aeeProfile && (
                                     <Link
                                       href={`/dashboard/aee/${estudante.matricula}`}
-                                      className="p-2 bg-indigo-50 text-indigo-500 border border-indigo-100 rounded-xl hover:text-indigo-900 hover:bg-white transition-all shadow-sm"
+                                      className="p-2 bg-accent-subtle text-accent-fg border border-accent/25 rounded-xl hover:text-accent-fg hover:bg-white transition-all shadow-sm"
                                       title="Ficha AEE"
                                     >
                                       <Accessibility size={18} />
@@ -380,7 +380,7 @@ export default async function EstudantesPage({
 
                                   <Link
                                     href={`/dashboard/estudantes/${estudante.matricula}/boletim`}
-                                    className="p-2 bg-slate-50 text-slate-400 border border-slate-200 rounded-xl hover:text-slate-900 hover:bg-white transition-all shadow-sm"
+                                    className="p-2 bg-zinc-50 text-fg-subtle border border-zinc-200 rounded-xl hover:text-fg hover:bg-white transition-all shadow-sm"
                                     title="Gerar Boletim"
                                   >
                                     <FileText size={18} />

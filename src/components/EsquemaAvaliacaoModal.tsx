@@ -73,7 +73,7 @@ function Opcoes<T extends string>({ valor, opcoes, onChange }: { valor: T; opcoe
       {opcoes.map(o => (
         <button
           key={o.valor} type="button" title={o.ajuda} onClick={() => onChange(o.valor)}
-          className={`px-3 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wide transition-all border ${valor === o.valor ? 'bg-blue-500 text-white border-blue-500 shadow-lg shadow-blue-200' : 'bg-white text-slate-400 border-slate-200 hover:border-slate-300'}`}
+          className={`px-3 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wide transition-all border ${valor === o.valor ? 'bg-accent text-white border-accent shadow-card ' : 'bg-white text-fg-subtle border-zinc-200 hover:border-zinc-300'}`}
         >
           {o.rotulo}
         </button>
@@ -84,15 +84,15 @@ function Opcoes<T extends string>({ valor, opcoes, onChange }: { valor: T; opcoe
 
 function Toggle({ ativo, onClick }: { ativo: boolean; onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ${ativo ? 'bg-blue-600' : 'bg-slate-300'}`}>
+    <button type="button" onClick={onClick} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0 ${ativo ? 'bg-accent' : 'bg-zinc-300'}`}>
       <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${ativo ? 'translate-x-6' : 'translate-x-1'}`} />
     </button>
   )
 }
 
-const inputClass = "w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-slate-700 focus:bg-white focus:border-blue-500 transition-all"
-const labelClass = "block text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5 ml-1"
-const smallInput = "px-3 py-2 bg-white border border-slate-200 rounded-lg outline-none text-xs font-medium text-slate-700 focus:border-blue-500 text-center"
+const inputClass = "w-full px-5 py-4 bg-zinc-50 border border-zinc-200 rounded-lg outline-none font-semibold text-fg-muted focus:bg-white focus:border-accent transition-all"
+const labelClass = "block text-[10px] font-semibold text-fg-subtle uppercase tracking-widest mb-1.5 ml-1"
+const smallInput = "px-3 py-2 bg-white border border-zinc-200 rounded-lg outline-none text-xs font-medium text-fg-muted focus:border-accent text-center"
 
 export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esquemaParaEditar }: Props) {
   const isEdit = !!esquemaParaEditar
@@ -230,31 +230,31 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-300 my-8 flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/40 backdrop-blur-sm animate-in fade-in duration-300">
+      <div className="bg-white rounded-xl w-full max-w-2xl shadow-card border border-zinc-100 overflow-hidden animate-in zoom-in-95 duration-300 my-8 flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className={`px-8 py-6 border-b border-slate-100 flex items-center justify-between shrink-0 ${isEdit ? 'bg-amber-50' : 'bg-slate-50'}`}>
+        <div className={`px-8 py-6 border-b border-zinc-100 flex items-center justify-between shrink-0 ${isEdit ? 'bg-warning-subtle' : 'bg-zinc-50'}`}>
           <div className="flex items-center space-x-3">
-            <div className={`p-2 rounded-xl ${isEdit ? 'bg-amber-500' : 'bg-blue-500'}`}>
+            <div className={`p-2 rounded-xl ${isEdit ? 'bg-warning' : 'bg-accent'}`}>
               <ClipboardList className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-slate-800 tracking-tight">
+              <h2 className="text-xl font-semibold text-fg tracking-tight">
                 {isEdit ? 'Editar Esquema' : 'Novo Esquema de Avaliação'}
               </h2>
-              <p className="text-xs text-slate-400 font-medium">
+              <p className="text-xs text-fg-subtle font-medium">
                 Unidades, cálculo da média, recuperação e frequência
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full transition-colors">
-            <X className="w-5 h-5 text-slate-500" />
+          <button onClick={onClose} className="p-2 hover:bg-zinc-200 rounded-full transition-colors">
+            <X className="w-5 h-5 text-fg-subtle" />
           </button>
         </div>
 
         <div className="p-8 space-y-8 overflow-y-auto">
           {error && (
-            <div className="p-4 bg-rose-50 border border-rose-100 rounded-xl text-rose-600 text-xs font-semibold animate-in slide-in-from-top-2">
+            <div className="p-4 bg-danger-subtle border border-danger-line rounded-xl text-danger-fg text-xs font-semibold animate-in slide-in-from-top-2">
               {error}
             </div>
           )}
@@ -279,12 +279,12 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
           <div className="space-y-2">
             <label className={labelClass}>Como as unidades formam a média final</label>
             <Opcoes valor={formaFinal} opcoes={FORMAS_FINAIS} onChange={setFormaFinal} />
-            <p className="text-[10px] text-slate-400 ml-1">{FORMAS_FINAIS.find(f => f.valor === formaFinal)?.ajuda}</p>
+            <p className="text-[10px] text-fg-subtle ml-1">{FORMAS_FINAIS.find(f => f.valor === formaFinal)?.ajuda}</p>
             {formaFinal === "SOMA_COM_DIVISOR" && (
               <input type="text" inputMode="decimal" placeholder="Divisor" value={divisorFinal} onChange={e => setDivisorFinal(e.target.value)} className={`w-28 ${smallInput}`} />
             )}
             <div className="flex items-center gap-2 pt-1 ml-1">
-              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Casas decimais</span>
+              <span className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest">Casas decimais</span>
               <Opcoes valor={String(casasDecimais)} opcoes={[{ valor: "0", rotulo: "0" }, { valor: "1", rotulo: "1" }, { valor: "2", rotulo: "2" }]} onChange={v => setCasasDecimais(Number(v))} />
             </div>
           </div>
@@ -293,25 +293,25 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <label className={labelClass}>Unidades</label>
-              <button type="button" onClick={addUnidade} className="flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-wide">
+              <button type="button" onClick={addUnidade} className="flex items-center gap-1 text-[11px] font-bold text-accent-fg hover:text-accent-fg uppercase tracking-wide">
                 <Plus className="w-3.5 h-3.5" /> Unidade
               </button>
             </div>
 
             {unidades.map((u, uIdx) => (
-              <div key={uIdx} className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+              <div key={uIdx} className="p-4 bg-zinc-50 border border-zinc-200 rounded-lg space-y-3">
                 <div className="flex items-center gap-2">
                   <input
                     type="text" value={u.nome}
                     onChange={e => updateUnidade(uIdx, { nome: e.target.value })}
-                    className="flex-1 px-4 py-2.5 bg-white border border-slate-200 rounded-xl outline-none font-semibold text-sm text-slate-700 focus:border-blue-500"
+                    className="flex-1 px-4 py-2.5 bg-white border border-zinc-200 rounded-xl outline-none font-semibold text-sm text-fg-muted focus:border-accent"
                     placeholder={`${uIdx + 1}ª Unidade`}
                   />
                   {formaFinal === "MEDIA_PONDERADA" && (
                     <input type="text" inputMode="decimal" title="Peso da unidade na média final" placeholder="Peso" value={u.peso} onChange={e => updateUnidade(uIdx, { peso: e.target.value })} className={`w-20 ${smallInput}`} />
                   )}
                   {unidades.length > 1 && (
-                    <button type="button" onClick={() => removeUnidade(uIdx)} className="p-2 text-rose-500 hover:bg-rose-50 rounded-xl transition-colors">
+                    <button type="button" onClick={() => removeUnidade(uIdx)} className="p-2 text-danger-fg hover:bg-danger-subtle rounded-xl transition-colors">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   )}
@@ -331,25 +331,25 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
                         type="text" placeholder="Nome (ex: Prova)"
                         value={a.nome}
                         onChange={e => updateAtividade(uIdx, aIdx, 'nome', e.target.value)}
-                        className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-lg outline-none text-xs font-medium text-slate-700 focus:border-blue-500"
+                        className="flex-1 px-3 py-2 bg-white border border-zinc-200 rounded-lg outline-none text-xs font-medium text-fg-muted focus:border-accent"
                       />
                       <input type="text" inputMode="decimal" placeholder="Vale" title="Nota máxima da atividade" value={a.notaMaxima} onChange={e => updateAtividade(uIdx, aIdx, 'notaMaxima', e.target.value)} className={`w-20 ${smallInput}`} />
                       {u.formaCalculo === "MEDIA_PONDERADA" && (
                         <input type="text" inputMode="decimal" placeholder="Peso" title="Peso na média ponderada" value={a.peso} onChange={e => updateAtividade(uIdx, aIdx, 'peso', e.target.value)} className={`w-16 ${smallInput}`} />
                       )}
                       {u.atividades.length > 1 && (
-                        <button type="button" onClick={() => removeAtividade(uIdx, aIdx)} className="p-1.5 text-rose-400 hover:bg-rose-50 rounded-lg transition-colors">
+                        <button type="button" onClick={() => removeAtividade(uIdx, aIdx)} className="p-1.5 text-danger hover:bg-danger-subtle rounded-lg transition-colors">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       )}
                     </div>
                   ))}
-                  <button type="button" onClick={() => addAtividade(uIdx)} className="flex items-center gap-1 text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-wide pl-1">
+                  <button type="button" onClick={() => addAtividade(uIdx)} className="flex items-center gap-1 text-[10px] font-bold text-accent-fg hover:text-accent-fg uppercase tracking-wide pl-1">
                     <Plus className="w-3 h-3" /> Atividade
                   </button>
                 </div>
 
-                <p className="text-[10px] font-bold uppercase tracking-wide pl-1 text-slate-500">
+                <p className="text-[10px] font-bold uppercase tracking-wide pl-1 text-fg-subtle">
                   Nota máxima da unidade: {Number(tetoEtapa(u).toFixed(2))}
                 </p>
               </div>
@@ -360,11 +360,11 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
           <div className="space-y-3">
             <label className={labelClass}>Recuperação</label>
 
-            <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+            <div className="p-4 bg-zinc-50 border border-zinc-200 rounded-lg space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-semibold text-slate-700">Recuperação por unidade (paralela)</p>
-                  <p className="text-[10px] text-slate-400">Nunca baixa a nota da unidade</p>
+                  <p className="text-sm font-semibold text-fg-muted">Recuperação por unidade (paralela)</p>
+                  <p className="text-[10px] text-fg-subtle">Nunca baixa a nota da unidade</p>
                 </div>
                 <Toggle ativo={recUnidadeAtiva} onClick={() => setRecUnidadeAtiva(v => !v)} />
               </div>
@@ -376,11 +376,11 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
               )}
             </div>
 
-            <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+            <div className="p-4 bg-zinc-50 border border-zinc-200 rounded-lg space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-semibold text-slate-700">Recuperação final / exame</p>
-                  <p className="text-[10px] text-slate-400">Afeta o resultado geral da disciplina</p>
+                  <p className="text-sm font-semibold text-fg-muted">Recuperação final / exame</p>
+                  <p className="text-[10px] text-fg-subtle">Afeta o resultado geral da disciplina</p>
                 </div>
                 <Toggle ativo={recFinalAtiva} onClick={() => setRecFinalAtiva(v => !v)} />
               </div>
@@ -393,7 +393,7 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
                   ]} />
                   {modoRecFinal === "MEDIA_COM_FINAL" && (
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-slate-500">Mínimo de (média + exame) / 2:</span>
+                      <span className="text-[10px] text-fg-subtle">Mínimo de (média + exame) / 2:</span>
                       <input type="text" inputMode="decimal" placeholder={notaMinima} value={notaMinimaExame} onChange={e => setNotaMinimaExame(e.target.value)} className={`w-20 ${smallInput}`} />
                     </div>
                   )}
@@ -405,7 +405,7 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
           {/* Quem define as atividades de cada unidade */}
           <div className="space-y-3">
             <label className={labelClass}>Atividades das unidades</label>
-            <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+            <div className="p-4 bg-zinc-50 border border-zinc-200 rounded-lg space-y-2">
               <Opcoes valor={definicaoAtividades} onChange={setDefinicaoAtividades} opcoes={[
                 { valor: "ESCOLA", rotulo: "Definidas pela escola", ajuda: "As atividades abaixo valem para todas as disciplinas" },
                 { valor: "PROFESSOR", rotulo: "Definidas pelo professor", ajuda: "Cada professor cria as avaliações; as atividades abaixo viram o máximo da unidade" },
@@ -416,39 +416,39 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
           {/* Frequência */}
           <div className="space-y-3">
             <label className={labelClass}>Frequência</label>
-            <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+            <div className="p-4 bg-zinc-50 border border-zinc-200 rounded-lg space-y-3">
               <div className="space-y-1">
-                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Chamada</p>
+                <p className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest">Chamada</p>
                 <Opcoes valor={registroFrequencia} onChange={setRegistroFrequencia} opcoes={[
                   { valor: "POR_AULA", rotulo: "Por aula", ajuda: "Cada tempo do horário tem chamada" },
                   { valor: "POR_DIA", rotulo: "Por dia", ajuda: "Uma chamada por dia (anos iniciais)" },
                 ]} />
               </div>
               <div className="space-y-1">
-                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Frequência mínima para aprovar</p>
+                <p className="text-[10px] font-semibold text-fg-subtle uppercase tracking-widest">Frequência mínima para aprovar</p>
                 <div className="flex flex-wrap items-center gap-2">
                   <Opcoes valor={apuracaoFrequencia} onChange={setApuracaoFrequencia} opcoes={[
                     { valor: "GERAL", rotulo: "Geral", ajuda: "Sobre o total de horas letivas (LDB)" },
                     { valor: "POR_COMPONENTE", rotulo: "Por disciplina" },
                   ]} />
                   <input type="text" inputMode="decimal" value={frequenciaMinima} onChange={e => setFrequenciaMinima(e.target.value)} className={`w-20 ${smallInput}`} />
-                  <span className="text-xs text-slate-500">%</span>
+                  <span className="text-xs text-fg-subtle">%</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="p-8 pt-4 border-t border-slate-100 flex gap-3 shrink-0">
+        <div className="p-8 pt-4 border-t border-zinc-100 flex gap-3 shrink-0">
           <button
             type="button" onClick={onClose}
-            className="px-6 py-4 rounded-2xl font-semibold text-sm text-slate-500 hover:bg-slate-100 transition-all"
+            className="px-6 py-4 rounded-lg font-semibold text-sm text-fg-subtle hover:bg-zinc-100 transition-all"
           >
             Cancelar
           </button>
           <button
             type="button" onClick={handleSubmit} disabled={loading}
-            className={`flex-1 text-white py-4 rounded-2xl font-semibold text-sm flex items-center justify-center space-x-2 transition-all disabled:opacity-50 ${isEdit ? 'bg-amber-500 hover:bg-amber-600' : 'bg-slate-900 hover:bg-slate-800'}`}
+            className={`flex-1 text-white py-4 rounded-lg font-semibold text-sm flex items-center justify-center space-x-2 transition-all disabled:opacity-50 ${isEdit ? 'bg-warning hover:bg-warning' : 'bg-zinc-900 hover:bg-zinc-800'}`}
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
             <span>{isEdit ? 'Salvar Alterações' : 'Criar Esquema'}</span>

@@ -23,10 +23,10 @@ interface NotaConselho {
 }
 
 const STATUS_OPTIONS = [
-  { value: 'APROVADO_RECUPERACAO', label: 'Aprovado na Recuperação', color: 'text-emerald-700' },
-  { value: 'APROVADO_CONSELHO', label: 'Aprovado pelo Conselho', color: 'text-emerald-700' },
-  { value: 'DEPENDENCIA', label: 'Dependência', color: 'text-slate-800' },
-  { value: 'CONSERVADO', label: 'Conservado', color: 'text-rose-700' }
+  { value: 'APROVADO_RECUPERACAO', label: 'Aprovado na Recuperação', color: 'text-success-fg' },
+  { value: 'APROVADO_CONSELHO', label: 'Aprovado pelo Conselho', color: 'text-success-fg' },
+  { value: 'DEPENDENCIA', label: 'Dependência', color: 'text-fg' },
+  { value: 'CONSERVADO', label: 'Conservado', color: 'text-danger-fg' }
 ]
 
 export default function ConselhoClasseClient({
@@ -241,15 +241,15 @@ export default function ConselhoClasseClient({
       case 'APROVADO':
       case 'APROVADO_RECUPERACAO':
       case 'APROVADO_CONSELHO':
-        return 'text-emerald-700 bg-emerald-100'
+        return 'text-success-fg bg-success-subtle'
       case 'RECUPERACAO':
-        return 'text-orange-700 bg-orange-100'
+        return 'text-warning-fg bg-warning-subtle'
       case 'DEPENDENCIA':
-        return 'text-slate-800 bg-slate-200'
+        return 'text-fg bg-zinc-200'
       case 'CONSERVADO':
-        return 'text-rose-700 bg-rose-100'
+        return 'text-danger-fg bg-danger-subtle'
       default:
-        return 'text-slate-800 bg-slate-200'
+        return 'text-fg bg-zinc-200'
     }
   }
 
@@ -363,41 +363,41 @@ export default function ConselhoClasseClient({
         <div className="mb-3 flex items-start justify-between gap-6">
           {/* Identificação - Esquerda */}
           <div className="flex-1">
-            <p className="text-[9px] font-medium text-slate-700 mb-1 uppercase leading-tight">
+            <p className="text-[9px] font-medium text-fg-muted mb-1 uppercase leading-tight">
               Centro Territorial de Educação Profissional do Litoral Norte e Agreste Baiano
             </p>
             <div className="flex items-center gap-2 mb-1">
-              <div className="text-slate-800 font-medium text-lg">Áxis</div>
-              <div className="text-slate-300">|</div>
-              <h1 className="text-xl font-medium text-slate-900">Conselho de Classe Final</h1>
+              <div className="text-fg font-medium text-lg">Áxis</div>
+              <div className="text-zinc-300">|</div>
+              <h1 className="text-xl font-medium text-fg">Conselho de Classe Final</h1>
             </div>
-            <h2 className="text-lg font-medium text-slate-900 mb-0.5">{turmaNome}</h2>
-            {turmaCurso && <p className="text-sm font-medium text-slate-700">{turmaCurso} {turmaTurno && `- ${turmaTurno}`}</p>}
-            <p className="text-xs text-slate-400 mt-0.5">Impresso em: {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+            <h2 className="text-lg font-medium text-fg mb-0.5">{turmaNome}</h2>
+            {turmaCurso && <p className="text-sm font-medium text-fg-muted">{turmaCurso} {turmaTurno && `- ${turmaTurno}`}</p>}
+            <p className="text-xs text-fg-subtle mt-0.5">Impresso em: {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
           </div>
           
           {/* Legenda - Direita */}
-          <div className="bg-white rounded px-3 py-2 border border-slate-300" style={{minWidth: '450px'}}>
+          <div className="bg-white rounded px-3 py-2 border border-zinc-300" style={{minWidth: '450px'}}>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[8px]">
-              <span className="font-medium text-blue-800 text-[9px] mr-1">LEGENDA:</span>
+              <span className="font-medium text-accent-fg text-[9px] mr-1">LEGENDA:</span>
               <div className="flex items-center gap-1">
-                <span className="px-2 py-1 bg-emerald-100 border border-emerald-400 font-medium rounded text-emerald-900 text-[7px]">AR</span>
+                <span className="px-2 py-1 bg-success-subtle border border-success font-medium rounded text-success-fg text-[7px]">AR</span>
                 <span className="font-medium">Aprov. Recup.</span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="px-2 py-1 bg-emerald-200 border border-emerald-500 font-medium rounded text-emerald-900 text-[7px]">AC</span>
+                <span className="px-2 py-1 bg-success-subtle border border-success font-medium rounded text-success-fg text-[7px]">AC</span>
                 <span className="font-medium">Aprov. Conselho</span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="px-2 py-1 bg-slate-200 border border-blue-400 font-medium rounded text-blue-900 text-[7px]">DP</span>
+                <span className="px-2 py-1 bg-zinc-200 border border-accent font-medium rounded text-accent-fg text-[7px]">DP</span>
                 <span className="font-medium">Dependência</span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="px-2 py-1 bg-rose-100 border border-rose-400 font-medium rounded text-rose-900 text-[7px]">CO</span>
+                <span className="px-2 py-1 bg-danger-subtle border border-danger font-medium rounded text-danger-fg text-[7px]">CO</span>
                 <span className="font-medium">Conservado</span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="px-2 py-1 bg-amber-100 border border-amber-400 font-medium rounded text-amber-900 text-[7px]">RC</span>
+                <span className="px-2 py-1 bg-warning-subtle border border-warning font-medium rounded text-warning-fg text-[7px]">RC</span>
                 <span className="font-medium">Recuperação</span>
               </div>
             </div>
@@ -407,13 +407,13 @@ export default function ConselhoClasseClient({
         <table className="print-table w-full border-collapse text-[9px]">
           <thead>
             <tr>
-              <th className="border border-blue-400 px-2 bg-white font-medium text-center text-[8px]" style={{minWidth: '120px', maxWidth: '120px', width: '120px', height: '100px', verticalAlign: 'middle'}}>
+              <th className="border border-accent px-2 bg-white font-medium text-center text-[8px]" style={{minWidth: '120px', maxWidth: '120px', width: '120px', height: '100px', verticalAlign: 'middle'}}>
                 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%'}}>
                   ESTUDANTE
                 </div>
               </th>
               {disciplinas.map((disc) => (
-                <th key={disc} className="border border-blue-400 bg-white font-medium text-center" style={{minWidth: '20px', maxWidth: '20px', width: '20px', height: '100px', padding: '8px 0'}}>
+                <th key={disc} className="border border-accent bg-white font-medium text-center" style={{minWidth: '20px', maxWidth: '20px', width: '20px', height: '100px', padding: '8px 0'}}>
                   <div style={{
                     writingMode: 'vertical-rl',
                     transform: 'rotate(180deg)',
@@ -443,14 +443,14 @@ export default function ConselhoClasseClient({
 
                 return (
                   <tr key={estudanteId}>
-                    <td className="border border-blue-400 px-2 py-0.5 font-medium text-left bg-white text-[10px] leading-tight" style={{maxWidth: '120px', width: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
-                      <span className="text-slate-600 mr-1 text-[8px]">{String(idx + 1).padStart(2, '0')}</span>
+                    <td className="border border-accent px-2 py-0.5 font-medium text-left bg-white text-[10px] leading-tight" style={{maxWidth: '120px', width: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
+                      <span className="text-fg-muted mr-1 text-[8px]">{String(idx + 1).padStart(2, '0')}</span>
                       <span>{data.nome}</span>
                     </td>
                     {disciplinas.map((disc) => {
                       const nota = notasPorDisciplina[disc]
                       if (!nota) {
-                        return <td key={disc} className="border border-blue-400 px-1 py-1 text-center bg-white">-</td>
+                        return <td key={disc} className="border border-accent px-1 py-1 text-center bg-white">-</td>
                       }
                       
                       const statusAtual = decisoes[nota.id] || nota.status
@@ -459,39 +459,39 @@ export default function ConselhoClasseClient({
                         : nota.notaRecuperacao
                       
                       let bgColor = 'bg-white'
-                      let textColor = 'text-blue-900'
+                      let textColor = 'text-accent-fg'
                       let statusAbrev = ''
                       
                       switch(statusAtual) {
                         case 'APROVADO_RECUPERACAO':
-                          bgColor = 'bg-emerald-100'
-                          textColor = 'text-emerald-900'
+                          bgColor = 'bg-success-subtle'
+                          textColor = 'text-success-fg'
                           statusAbrev = 'AR'
                           break
                         case 'APROVADO_CONSELHO':
-                          bgColor = 'bg-emerald-200'
-                          textColor = 'text-emerald-900'
+                          bgColor = 'bg-success-subtle'
+                          textColor = 'text-success-fg'
                           statusAbrev = 'AC'
                           break
                         case 'DEPENDENCIA':
-                          bgColor = 'bg-slate-200'
-                          textColor = 'text-blue-900'
+                          bgColor = 'bg-zinc-200'
+                          textColor = 'text-accent-fg'
                           statusAbrev = 'DP'
                           break
                         case 'CONSERVADO':
-                          bgColor = 'bg-rose-100'
-                          textColor = 'text-rose-900'
+                          bgColor = 'bg-danger-subtle'
+                          textColor = 'text-danger-fg'
                           statusAbrev = 'CO'
                           break
                         case 'RECUPERACAO':
-                          bgColor = 'bg-amber-50'
-                          textColor = 'text-amber-900'
+                          bgColor = 'bg-warning-subtle'
+                          textColor = 'text-warning-fg'
                           statusAbrev = 'RC'
                           break
                       }
                       
                       return (
-                        <td key={disc} className={`border border-blue-400 px-1 py-1 text-center font-medium ${bgColor} ${textColor}`}>
+                        <td key={disc} className={`border border-accent px-1 py-1 text-center font-medium ${bgColor} ${textColor}`}>
                           <div className="flex flex-col items-center leading-tight">
                             <span className="text-[8px] font-medium">{statusAbrev}</span>
                             {notaFinal !== null && notaFinal !== undefined && (
@@ -508,28 +508,28 @@ export default function ConselhoClasseClient({
         </table>
       </div>
 
-    <div className="min-h-screen bg-white no-print">
+    <div className="bg-white no-print">
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
-      <header className="bg-white/80 backdrop-blur-xl border-b border-slate-300 sticky top-0 z-50 -mx-4 -mt-4 md:-mx-8 md:-mt-8 mb-4 px-4 sm:px-6 lg:px-8 no-print">
+      <header className="mb-6 border-b border-line pb-4 no-print">
         <div className="max-w-7xl mx-auto py-4">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="flex items-center space-x-5">
               <Link
                 href="/dashboard/conselho-classe"
-                className="p-2 hover:bg-slate-200 rounded-lg transition-colors text-slate-400 hover:text-slate-700"
+                className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-fg-subtle hover:text-fg-muted"
               >
                 <ArrowLeft size={20} />
               </Link>
               <div>
                 <div className="flex items-center space-x-2 mb-0.5">
-                  <h1 className="text-2xl font-bold text-slate-800 tracking-tight">{turmaNome}</h1>
+                  <h1 className="text-2xl font-bold text-fg tracking-tight">{turmaNome}</h1>
                   {turmaTurno && (
-                    <span className="px-2.5 py-1 bg-slate-900 text-white text-[10px] font-medium rounded-md uppercase tracking-widest leading-none">
+                    <span className="px-2.5 py-1 bg-zinc-900 text-white text-[10px] font-medium rounded-md uppercase tracking-widest leading-none">
                       {turmaTurno}
                     </span>
                   )}
                 </div>
-                <p className="text-base text-slate-600 font-medium">Conselho de Classe Final • {turmaCurso || 'Análise Pedagógica'}</p>
+                <p className="text-base text-fg-muted font-medium">Conselho de Classe Final • {turmaCurso || 'Análise Pedagógica'}</p>
               </div>
             </div>
           </div>
@@ -541,13 +541,13 @@ export default function ConselhoClasseClient({
         <form onSubmit={handleSubmit}>
           {/* Mensagem */}
           {message && (
-            <div className={`mb-8 p-5 rounded-3xl animate-in fade-in slide-in-from-top-4 duration-300 ${
+            <div className={`mb-8 p-5 rounded-xl animate-in fade-in slide-in-from-top-4 duration-300 ${
               message.type === 'success' 
-                ? 'bg-emerald-50 border border-emerald-100 text-emerald-900 shadow-sm' 
-                : 'bg-rose-50 border border-rose-100 text-rose-900 shadow-sm'
+                ? 'bg-success-subtle border border-success-line text-success-fg shadow-sm' 
+                : 'bg-danger-subtle border border-danger-line text-danger-fg shadow-sm'
             }`}>
               <div className="flex items-center space-x-3">
-                <div className={`p-1.5 rounded-xl ${message.type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'}`}>
+                <div className={`p-1.5 rounded-xl ${message.type === 'success' ? 'bg-success' : 'bg-danger'}`}>
                   <AlertCircle className="w-5 h-5 text-white" />
                 </div>
                 <span className="font-medium text-sm tracking-tight">{message.text}</span>
@@ -556,7 +556,7 @@ export default function ConselhoClasseClient({
           )}
 
           {/* Dashboard de Visão Geral */}
-          <div className="mb-6 bg-white p-1.5 rounded-3xl border border-slate-300 shadow-lg shadow-slate-300/30 overflow-hidden">
+          <div className="mb-6 bg-white p-1.5 rounded-xl border border-zinc-300 shadow-card overflow-hidden">
             <div className="p-4">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 {/* Métricas Rápidas */}
@@ -575,17 +575,17 @@ export default function ConselhoClasseClient({
 
                   return (
                     <div className="flex flex-wrap items-center gap-2">
-                      <div className="px-3 py-1.5 bg-white rounded-xl border border-slate-200 flex items-center space-x-2">
-                        <div className="w-1 h-1 bg-slate-400 rounded-full" />
-                        <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">{total} Alunos</span>
+                      <div className="px-3 py-1.5 bg-white rounded-xl border border-zinc-200 flex items-center space-x-2">
+                        <div className="w-1 h-1 bg-zinc-400 rounded-full" />
+                        <span className="text-[10px] font-medium text-fg-subtle uppercase tracking-wider">{total} Alunos</span>
                       </div>
-                      <div className="px-3 py-1.5 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center space-x-2">
-                        <div className="w-1 h-1 bg-emerald-500 rounded-full" />
-                        <span className="text-[10px] font-medium text-emerald-700 uppercase tracking-wider">{concluidos} Concluídos</span>
+                      <div className="px-3 py-1.5 bg-success-subtle rounded-xl border border-success-line flex items-center space-x-2">
+                        <div className="w-1 h-1 bg-success rounded-full" />
+                        <span className="text-[10px] font-medium text-success-fg uppercase tracking-wider">{concluidos} Concluídos</span>
                       </div>
-                      <div className="px-3 py-1.5 bg-amber-50 rounded-xl border border-amber-100 flex items-center space-x-2">
-                        <div className="w-1 h-1 bg-amber-500 rounded-full animate-pulse" />
-                        <span className="text-[10px] font-medium text-amber-700 uppercase tracking-wider">{pendentes} Pendentes</span>
+                      <div className="px-3 py-1.5 bg-warning-subtle rounded-xl border border-warning-line flex items-center space-x-2">
+                        <div className="w-1 h-1 bg-warning rounded-full animate-pulse" />
+                        <span className="text-[10px] font-medium text-warning-fg uppercase tracking-wider">{pendentes} Pendentes</span>
                       </div>
                     </div>
                   )
@@ -596,7 +596,7 @@ export default function ConselhoClasseClient({
                   <button 
                     type="button"
                     onClick={handlePrint}
-                    className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all bg-white text-slate-700 border border-slate-300 hover:border-slate-500 hover:text-slate-700 hover:bg-slate-100"
+                    className="flex items-center space-x-2 px-4 py-2 rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all bg-white text-fg-muted border border-zinc-300 hover:border-zinc-500 hover:text-fg-muted hover:bg-zinc-100"
                   >
                     <Printer className="w-3 h-3" />
                     <span>Imprimir</span>
@@ -607,8 +607,8 @@ export default function ConselhoClasseClient({
                     onClick={() => setShowInstructions(!showInstructions)}
                     className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all ${
                       showInstructions 
-                      ? 'bg-slate-800 text-white shadow-md' 
-                      : 'bg-white text-slate-400 border border-slate-300 hover:border-pink-300 hover:text-pink-500 font-medium'
+                      ? 'bg-zinc-800 text-white shadow-card' 
+                      : 'bg-white text-fg-subtle border border-zinc-300 hover:border-accent/25 hover:text-accent-fg font-medium'
                     }`}
                   >
                     <AlertCircle className="w-3 h-3" />
@@ -619,25 +619,25 @@ export default function ConselhoClasseClient({
 
               {/* Instruções Expansíveis */}
               {showInstructions && (
-                <div className="mt-8 p-8 bg-white rounded-[2rem] border border-slate-200 animate-in fade-in slide-in-from-top-4 duration-300">
+                <div className="mt-8 p-8 bg-white rounded-xl border border-zinc-200 animate-in fade-in slide-in-from-top-4 duration-300">
                   <div className="flex items-start space-x-5">
-                    <div className="p-3 bg-pink-500 rounded-2xl shadow-lg shadow-pink-200">
+                    <div className="p-3 bg-accent rounded-lg shadow-card">
                       <Gavel className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-base font-medium text-slate-800 tracking-tight">Guia Rápido do Conselho</h3>
+                      <h3 className="text-base font-medium text-fg tracking-tight">Guia Rápido do Conselho</h3>
                       <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div className="space-y-2">
-                          <span className="text-[10px] font-medium text-pink-500 uppercase tracking-widest">Passo 01</span>
-                          <p className="text-xs text-slate-500 leading-relaxed font-medium">Clique no nome do aluno para abrir a lista de matérias com pendência.</p>
+                          <span className="text-[10px] font-medium text-accent-fg uppercase tracking-widest">Passo 01</span>
+                          <p className="text-xs text-fg-subtle leading-relaxed font-medium">Clique no nome do aluno para abrir a lista de matérias com pendência.</p>
                         </div>
                         <div className="space-y-2">
-                          <span className="text-[10px] font-medium text-pink-500 uppercase tracking-widest">Passo 02</span>
-                          <p className="text-xs text-slate-500 leading-relaxed font-medium">Ajuste a <b>Nota Rec.</b> se necessário. Notas acima de 5.0 aprovam na hora.</p>
+                          <span className="text-[10px] font-medium text-accent-fg uppercase tracking-widest">Passo 02</span>
+                          <p className="text-xs text-fg-subtle leading-relaxed font-medium">Ajuste a <b>Nota Rec.</b> se necessário. Notas acima de 5.0 aprovam na hora.</p>
                         </div>
                         <div className="space-y-2">
-                          <span className="text-[10px] font-medium text-pink-500 uppercase tracking-widest">Passo 03</span>
-                          <p className="text-xs text-slate-500 leading-relaxed font-medium">Defina a <b>Decisão Final</b> e use o botão <b>Gravar</b> no rodapé fixo.</p>
+                          <span className="text-[10px] font-medium text-accent-fg uppercase tracking-widest">Passo 03</span>
+                          <p className="text-xs text-fg-subtle leading-relaxed font-medium">Defina a <b>Decisão Final</b> e use o botão <b>Gravar</b> no rodapé fixo.</p>
                         </div>
                       </div>
                     </div>
@@ -646,27 +646,27 @@ export default function ConselhoClasseClient({
               )}
 
               {/* Legenda Minimalista */}
-              <div className="mt-8 pt-6 border-t border-slate-50 flex flex-wrap items-center gap-8 px-2">
-                <span className="text-[10px] font-medium text-slate-300 uppercase tracking-widest">Legenda de Estados:</span>
+              <div className="mt-8 pt-6 border-t border-zinc-50 flex flex-wrap items-center gap-8 px-2">
+                <span className="text-[10px] font-medium text-zinc-300 uppercase tracking-widest">Legenda de Estados:</span>
                 <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <span className="text-[10px] font-medium text-slate-600 uppercase tracking-wider">Aprovado</span>
+                  <div className="w-2 h-2 rounded-full bg-success" />
+                  <span className="text-[10px] font-medium text-fg-muted uppercase tracking-wider">Aprovado</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 rounded-full bg-white0" />
-                  <span className="text-[10px] font-medium text-slate-600 uppercase tracking-wider">Dependência</span>
+                  <span className="text-[10px] font-medium text-fg-muted uppercase tracking-wider">Dependência</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 rounded-full bg-rose-500" />
-                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Conservado</span>
+                  <div className="w-2 h-2 rounded-full bg-danger" />
+                  <span className="text-[10px] font-medium text-fg-subtle uppercase tracking-wider">Conservado</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 rounded-full bg-orange-500" />
-                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Recuperação</span>
+                  <div className="w-2 h-2 rounded-full bg-warning" />
+                  <span className="text-[10px] font-medium text-fg-subtle uppercase tracking-wider">Recuperação</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 rounded-sm bg-orange-100 border border-orange-200" />
-                  <span className="text-[10px] font-medium text-orange-600 uppercase tracking-wider">Infrequente (INF)</span>
+                  <div className="w-2 h-2 rounded-sm bg-warning-subtle border border-warning-line" />
+                  <span className="text-[10px] font-medium text-warning-fg uppercase tracking-wider">Infrequente (INF)</span>
                 </div>
               </div>
             </div>
@@ -709,48 +709,48 @@ export default function ConselhoClasseClient({
               return (
                 <div 
                   key={estudanteId} 
-                  className={`bg-white rounded-2xl shadow-sm transition-all duration-300 border ${
-                    isExpanded ? 'shadow-md border-slate-300' : 'border-slate-200'
+                  className={`bg-white rounded-lg shadow-sm transition-all duration-300 border ${
+                    isExpanded ? 'shadow-card border-zinc-300' : 'border-zinc-200'
                   } ${
-                    todasResolvidas ? 'bg-emerald-50/10 border-emerald-100' : ''
+                    todasResolvidas ? 'bg-success-subtle border-success-line' : ''
                   }`}
                 >
                   {/* Cabeçalho do Card (Toggle) */}
                   <button
                     type="button"
                     onClick={() => toggleStudent(estudanteId)}
-                    className={`w-full px-6 py-5 flex items-center justify-between text-left transition-colors rounded-2xl ${
+                    className={`w-full px-6 py-5 flex items-center justify-between text-left transition-colors rounded-lg ${
                       isExpanded ? 'bg-white' : 'hover:bg-white/30'
                     }`}
                   >
                     <div className="flex items-center space-x-4">
                       <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-medium text-base transition-all ${
-                        todasResolvidas ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600 border border-slate-300'
+                        todasResolvidas ? 'bg-success text-white' : 'bg-zinc-200 text-fg-muted border border-zinc-300'
                       }`}>
                         {todasResolvidas ? <CheckCircle2 className="w-5 h-5" /> : data.nome.charAt(0)}
                       </div>
                       <div>
                         <h3 className={`text-base font-medium tracking-tight ${
-                          todasResolvidas ? 'text-emerald-900' : 'text-slate-800'
+                          todasResolvidas ? 'text-success-fg' : 'text-fg'
                         }`}>
                           {data.nome}
                         </h3>
                         {/* Status Detalhado */}
                         <div className="flex flex-wrap items-center gap-2 mt-1.5">
                           {recTotal > 0 && (
-                            <span className="text-[10px] font-medium uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
+                            <span className="text-[10px] font-medium uppercase tracking-wider px-2 py-0.5 rounded-md bg-zinc-100 text-fg-muted border border-zinc-200">
                               {recTotal} {recTotal === 1 ? 'Recuperação' : 'Recuperações'} ({recAprovado} Passou)
                             </span>
                           )}
                           
                           <span className={`text-[10px] font-medium uppercase tracking-wider px-2 py-0.5 rounded-md ${
-                             todasResolvidas ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-pink-100 text-pink-600 border border-pink-200'
+                             todasResolvidas ? 'bg-success-subtle text-success-fg border border-success-line' : 'bg-accent-subtle text-accent-fg border border-accent/25'
                           }`}>
                             {levadasAoConselho} {levadasAoConselho === 1 ? 'Matéria' : 'Matérias'} analit.
                           </span>
 
                           {!isExpanded && (
-                             <span className="text-[10px] font-medium text-slate-400 ml-1">
+                             <span className="text-[10px] font-medium text-fg-subtle ml-1">
                                {resolvidasCount}/{data.notas.length} Resolvidas
                              </span>
                           )}
@@ -760,12 +760,12 @@ export default function ConselhoClasseClient({
                     
                     <div className="flex items-center space-x-4">
                        {todasResolvidas && !isExpanded && (
-                          <div className="hidden md:flex items-center space-x-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-lg border border-emerald-100">
+                          <div className="hidden md:flex items-center space-x-1.5 px-3 py-1 bg-success-subtle text-success-fg rounded-lg border border-success-line">
                              <CheckCircle2 className="w-3.5 h-3.5" />
                              <span className="text-[10px] font-medium uppercase tracking-wider">Concluído</span>
                           </div>
                        )}
-                       <div className={`p-1.5 rounded-lg border transition-all ${isExpanded ? 'bg-white border-pink-200 text-pink-500 shadow-sm' : 'bg-white border-slate-200 text-slate-400'}`}>
+                       <div className={`p-1.5 rounded-lg border transition-all ${isExpanded ? 'bg-white border-accent/25 text-accent-fg shadow-sm' : 'bg-white border-zinc-200 text-fg-subtle'}`}>
                          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                        </div>
                     </div>
@@ -777,12 +777,12 @@ export default function ConselhoClasseClient({
                       <div className="overflow-x-auto">
                         <table className="w-full">
                           <thead>
-                            <tr className="border-b border-slate-200">
-                               <th className="px-4 py-3 text-left text-sm font-medium text-slate-400 uppercase tracking-widest w-10">#</th>
-                              <th className="px-4 py-3 text-left text-sm font-medium text-slate-400 uppercase tracking-widest text-nowrap">Disciplina</th>
-                              <th className="px-4 py-3 text-center text-sm font-medium text-slate-400 uppercase tracking-widest">Média Anual</th>
-                              <th className="px-4 py-3 text-center text-sm font-medium text-slate-400 uppercase tracking-widest text-nowrap">Nota Rec.</th>
-                              <th className="px-4 py-3 text-left text-sm font-medium text-pink-500 uppercase tracking-widest">Decisão</th>
+                            <tr className="border-b border-zinc-200">
+                               <th className="px-4 py-3 text-left text-sm font-medium text-fg-subtle uppercase tracking-widest w-10">#</th>
+                              <th className="px-4 py-3 text-left text-sm font-medium text-fg-subtle uppercase tracking-widest text-nowrap">Disciplina</th>
+                              <th className="px-4 py-3 text-center text-sm font-medium text-fg-subtle uppercase tracking-widest">Média Anual</th>
+                              <th className="px-4 py-3 text-center text-sm font-medium text-fg-subtle uppercase tracking-widest text-nowrap">Nota Rec.</th>
+                              <th className="px-4 py-3 text-left text-sm font-medium text-accent-fg uppercase tracking-widest">Decisão</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y-0">
@@ -803,43 +803,43 @@ export default function ConselhoClasseClient({
                                 const isResolvida = isApproved || ['APROVADO_CONSELHO', 'DEPENDENCIA', 'CONSERVADO'].includes(statusValue || nota.status)
                                 
                                 // Definir cores dinâmicas para o select
-                                let selectBg = 'bg-white border-slate-200 text-slate-700'
-                                let iconColor = 'text-slate-300'
+                                let selectBg = 'bg-white border-zinc-200 text-fg-muted'
+                                let iconColor = 'text-zinc-300'
                                 
                                 if (statusValue.includes('APROVADO')) {
-                                  selectBg = 'bg-emerald-50 border-emerald-100 text-emerald-700'
-                                  iconColor = 'text-emerald-500'
+                                  selectBg = 'bg-success-subtle border-success-line text-success-fg'
+                                  iconColor = 'text-success-fg'
                                 } else if (statusValue === 'DEPENDENCIA') {
-                                  selectBg = 'bg-slate-100 border-slate-200 text-slate-800'
-                                  iconColor = 'text-slate-600'
+                                  selectBg = 'bg-zinc-100 border-zinc-200 text-fg'
+                                  iconColor = 'text-fg-muted'
                                 } else if (statusValue === 'CONSERVADO') {
-                                  selectBg = 'bg-rose-50 border-rose-100 text-rose-700'
-                                  iconColor = 'text-rose-500'
+                                  selectBg = 'bg-danger-subtle border-danger-line text-danger-fg'
+                                  iconColor = 'text-danger-fg'
                                 }
 
                                 return (
-                                  <tr key={nota.id} className={`group transition-all hover:bg-slate-100/50 even:bg-white ${isResolvida ? 'opacity-70' : ''}`}>
-                                     <td className="px-4 py-4 rounded-l-xl text-sm font-medium text-slate-300">
+                                  <tr key={nota.id} className={`group transition-all hover:bg-zinc-100/50 even:bg-white ${isResolvida ? 'opacity-70' : ''}`}>
+                                     <td className="px-4 py-4 rounded-l-xl text-sm font-medium text-zinc-300">
                                       {nota.originalIndex + 1}
                                     </td>
                                     <td className="px-4 py-4">
                                       <div className="flex items-center gap-2">
-                                        <div className="text-lg font-medium text-slate-900">
+                                        <div className="text-lg font-medium text-fg">
                                           {nota.disciplinaNome}
                                         </div>
                                         <div className="flex gap-1">
                                           {nota.etapas.map((etapa: EtapaDaNota, i: number) => etapa.desistente && (
-                                            <span key={i} className="px-1.5 py-0.5 bg-rose-50 text-[8px] font-medium text-rose-600 border border-rose-100 rounded uppercase tracking-tighter" title={`Infrequente na Unidade ${i + 1}`}>
+                                            <span key={i} className="px-1.5 py-0.5 bg-danger-subtle text-[8px] font-medium text-danger-fg border border-danger-line rounded uppercase tracking-tighter" title={`Infrequente na Unidade ${i + 1}`}>
                                               INF U{i + 1}
                                             </span>
                                           ))}
                                           {nota.frequencia !== null && nota.frequencia !== undefined && (
-                                            <span className={`px-1.5 py-0.5 text-[8px] font-medium border rounded uppercase tracking-tighter ${nota.abaixoMinimoFrequencia ? 'bg-rose-50 text-rose-600 border-rose-100' : 'bg-slate-50 text-slate-500 border-slate-200'}`} title={`Frequência mínima: ${frequenciaMinima}%`}>
+                                            <span className={`px-1.5 py-0.5 text-[8px] font-medium border rounded uppercase tracking-tighter ${nota.abaixoMinimoFrequencia ? 'bg-danger-subtle text-danger-fg border-danger-line' : 'bg-zinc-50 text-fg-subtle border-zinc-200'}`} title={`Frequência mínima: ${frequenciaMinima}%`}>
                                               FREQ {formatarFrequencia(nota.frequencia)}{nota.abaixoMinimoFrequencia && ' · abaixo do mínimo'}
                                             </span>
                                           )}
                                           {nota.status === 'DESISTENTE' && !nota.etapas.some((e: EtapaDaNota) => e.desistente) && (
-                                            <span className="px-1.5 py-0.5 bg-slate-100 text-[8px] font-medium text-slate-700 border border-slate-200 rounded uppercase tracking-tighter">
+                                            <span className="px-1.5 py-0.5 bg-zinc-100 text-[8px] font-medium text-fg-muted border border-zinc-200 rounded uppercase tracking-tighter">
                                               INFREQUENTE
                                             </span>
                                           )}
@@ -847,7 +847,7 @@ export default function ConselhoClasseClient({
                                       </div>
                                     </td>
                                      <td className="px-4 py-4 text-center">
-                                        <span className={`text-lg font-medium font-mono ${mediaCalculada < notaMinima ? 'text-rose-600' : 'text-slate-700'}`}>
+                                        <span className={`text-lg font-medium font-mono ${mediaCalculada < notaMinima ? 'text-danger-fg' : 'text-fg-muted'}`}>
                                           {mediaCalculada.toFixed(1)}
                                         </span>
                                     </td>
@@ -860,8 +860,8 @@ export default function ConselhoClasseClient({
                                          disabled={isApproved}
                                          className={`w-16 h-9 text-center rounded-md text-base font-medium border outline-none transition-all ${
                                            isApproved 
-                                           ? 'bg-emerald-50 text-emerald-700 border-emerald-100 cursor-not-allowed font-medium' 
-                                           : 'bg-rose-50 text-rose-700 border-rose-100 focus:border-rose-300 focus:ring-2 focus:ring-rose-50'
+                                           ? 'bg-success-subtle text-success-fg border-success-line cursor-not-allowed font-medium' 
+                                           : 'bg-danger-subtle text-danger-fg border-danger-line focus:border-danger-line focus:ring-2 focus:ring-danger/30'
                                          }`}
                                          placeholder="---"
                                        />
@@ -874,19 +874,19 @@ export default function ConselhoClasseClient({
                                            disabled={isApproved}
                                            className={`w-[212px] h-10 px-4 pr-8 rounded-lg outline-none font-medium text-xs uppercase tracking-wider transition-all appearance-none border ${
                                              isApproved 
-                                             ? 'bg-emerald-50 border-emerald-200 text-emerald-700 cursor-not-allowed' 
-                                             : `${selectBg} cursor-pointer ${!statusValue ? 'focus:border-pink-300 focus:ring-2 focus:ring-pink-50' : ''}`
+                                             ? 'bg-success-subtle border-success-line text-success-fg cursor-not-allowed' 
+                                             : `${selectBg} cursor-pointer ${!statusValue ? 'focus:border-accent/25 focus:ring-2 focus:ring-ring' : ''}`
                                            }`}
                                          >
-                                           <option value="" className="text-slate-400">Definir decisão...</option>
+                                           <option value="" className="text-fg-subtle">Definir decisão...</option>
                                            <option value="APROVADO_RECUPERACAO">Aprovado na Recuperação</option>
                                            {STATUS_OPTIONS.filter(opt => opt.value !== 'APROVADO_RECUPERACAO').map((opt) => (
-                                              <option key={opt.value} value={opt.value} className="text-slate-800 font-medium">
+                                              <option key={opt.value} value={opt.value} className="text-fg font-medium">
                                                 {opt.label}
                                               </option>
                                             ))}
                                           </select>
-                                          <div className={`absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none ${isApproved ? 'text-emerald-500' : iconColor}`}>
+                                          <div className={`absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none ${isApproved ? 'text-success-fg' : iconColor}`}>
                                             <ChevronDown className="w-3.5 h-3.5" />
                                           </div>
                                         </div>
@@ -905,16 +905,16 @@ export default function ConselhoClasseClient({
           </div>
 
           {/* Footer Fixo */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-slate-200 px-4 py-6 z-50 shadow-[0_-10px_40px_rgba(15,23,42,0.1)]">
+          <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-zinc-200 px-4 py-6 z-50 shadow-[0_-10px_40px_rgba(15,23,42,0.1)]">
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex items-center space-x-4">
-                <div className="bg-slate-100 p-3 rounded-2xl border border-slate-200 shadow-inner">
-                  <Gavel className="w-5 h-5 text-slate-700" />
+                <div className="bg-zinc-100 p-3 rounded-lg border border-zinc-200 shadow-card">
+                  <Gavel className="w-5 h-5 text-fg-muted" />
                 </div>
                 <div>
-                   <p className="text-[10px] font-medium text-slate-900 uppercase tracking-widest leading-none">Fechamento de Conselhos</p>
-                   <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest mt-1.5 flex items-center">
-                     <span className="w-2 h-2 bg-pink-500 rounded-full mr-2 animate-pulse" />
+                   <p className="text-[10px] font-medium text-fg uppercase tracking-widest leading-none">Fechamento de Conselhos</p>
+                   <p className="text-[9px] font-medium text-fg-subtle uppercase tracking-widest mt-1.5 flex items-center">
+                     <span className="w-2 h-2 bg-accent rounded-full mr-2 animate-pulse" />
                      {notasConselho.length} Registros totais nesta turma
                    </p>
                 </div>
@@ -923,7 +923,7 @@ export default function ConselhoClasseClient({
                 <button
                   type="submit"
                   disabled={loading || Object.keys(decisoes).length === 0}
-                  className="flex-1 md:flex-none flex items-center justify-center space-x-4 bg-pink-600 text-white px-10 py-4 rounded-[1.5rem] font-medium uppercase tracking-widest hover:bg-pink-700 transition-all shadow-xl shadow-pink-200 active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed group border-b-4 border-pink-800"
+                  className="flex-1 md:flex-none flex items-center justify-center space-x-4 bg-accent text-white px-10 py-4 rounded-xl font-medium uppercase tracking-widest hover:bg-accent transition-all shadow-card active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed group border-b-4 border-accent"
                 >
                   {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5 group-hover:rotate-12 transition-transform" />}
                   <span className="text-xs">{loading ? 'Sincronizando...' : 'Gravar Decisões Agora'}</span>
@@ -934,33 +934,33 @@ export default function ConselhoClasseClient({
         </form>
         {/* Modal de Confirmação */}
         {showConfirmModal && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 animate-in fade-in duration-300">
-            <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300">
-              <div className="p-8 border-b border-slate-50 flex items-center justify-between">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-900/40 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+            <div className="bg-white rounded-xl shadow-card max-w-2xl w-full flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300">
+              <div className="p-8 border-b border-zinc-50 flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-medium text-slate-900 uppercase tracking-tight">Revisar Decisões</h3>
-                  <p className="text-xs font-medium text-slate-400 mt-1">Confira os dados antes de consolidar no sistema</p>
+                  <h3 className="text-xl font-medium text-fg uppercase tracking-tight">Revisar Decisões</h3>
+                  <p className="text-xs font-medium text-fg-subtle mt-1">Confira os dados antes de consolidar no sistema</p>
                 </div>
                 <button 
                   type="button"
                   onClick={() => setShowConfirmModal(false)}
-                  className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+                  className="p-2 hover:bg-zinc-100 rounded-full transition-colors"
                 >
-                  <X className="w-6 h-6 text-slate-300" />
+                  <X className="w-6 h-6 text-zinc-300" />
                 </button>
               </div>
               
               <div className="p-8 overflow-y-auto flex-1 custom-scrollbar">
-                <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-inner font-mono">
+                <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden shadow-card font-mono">
                   <table className="w-full text-left">
-                    <thead className="bg-slate-200/50 text-slate-400 font-medium uppercase text-[10px] tracking-widest">
+                    <thead className="bg-zinc-200/50 text-fg-subtle font-medium uppercase text-[10px] tracking-widest">
                       <tr>
                         <th className="px-6 py-4">Estudante / Disciplina</th>
                         <th className="px-6 py-4 text-center">Nota Rec.</th>
                         <th className="px-6 py-4 text-center">Decisão</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-50 bg-white">
+                    <tbody className="divide-y divide-zinc-50 bg-white">
                       {Object.entries(decisoes).map(([notaId, status]) => {
                         const nota = notasConselho.find(n => n.id === notaId)
                         if (!nota) return null
@@ -971,13 +971,13 @@ export default function ConselhoClasseClient({
                         return (
                           <tr key={notaId}>
                             <td className="px-6 py-4">
-                              <p className="font-medium text-slate-900 text-xs uppercase">{nota.estudanteNome}</p>
-                              <p className="text-[10px] text-slate-400 font-medium uppercase mt-0.5">{nota.disciplinaNome}</p>
+                              <p className="font-medium text-fg text-xs uppercase">{nota.estudanteNome}</p>
+                              <p className="text-[10px] text-fg-subtle font-medium uppercase mt-0.5">{nota.disciplinaNome}</p>
                             </td>
-                            <td className="px-6 py-4 text-center font-medium text-slate-700 text-xs">
+                            <td className="px-6 py-4 text-center font-medium text-fg-muted text-xs">
                               {notaRecVal !== null && notaRecVal !== undefined ? notaRecVal.toFixed(1) : '-'}
                             </td>
-                            <td className={`px-6 py-4 text-center text-[10px] font-medium uppercase tracking-widest ${statusOpt?.color || 'text-slate-900'}`}>
+                            <td className={`px-6 py-4 text-center text-[10px] font-medium uppercase tracking-widest ${statusOpt?.color || 'text-fg'}`}>
                               {statusOpt?.label || status}
                             </td>
                           </tr>
@@ -988,18 +988,18 @@ export default function ConselhoClasseClient({
                 </div>
               </div>
 
-              <div className="p-8 border-t border-slate-50 flex justify-end space-x-4 bg-slate-100/50 rounded-b-[2.5rem]">
+              <div className="p-8 border-t border-zinc-50 flex justify-end space-x-4 bg-zinc-100/50 rounded-b-[2.5rem]">
                 <button
                   type="button"
                   onClick={() => setShowConfirmModal(false)}
-                  className="px-8 py-3 rounded-2xl font-medium text-slate-400 hover:bg-white transition-all text-sm uppercase tracking-widest"
+                  className="px-8 py-3 rounded-lg font-medium text-fg-subtle hover:bg-white transition-all text-sm uppercase tracking-widest"
                 >
                   Voltar
                 </button>
                 <button
                   type="button"
                   onClick={handleConfirmSave}
-                  className="px-10 py-3 rounded-2xl bg-pink-600 text-white font-medium uppercase tracking-widest hover:bg-pink-700 shadow-xl shadow-pink-200 transition-all flex items-center space-x-3 active:scale-95 text-xs"
+                  className="px-10 py-3 rounded-lg bg-accent text-white font-medium uppercase tracking-widest hover:bg-accent shadow-card transition-all flex items-center space-x-3 active:scale-95 text-xs"
                 >
                   <Save className="w-4 h-4" />
                   <span>Gravar Permanentemente</span>

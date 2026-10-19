@@ -13,32 +13,32 @@ export default function ErrorModal({ isOpen, onClose, title = "Atenção", messa
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl border border-rose-100 overflow-hidden animate-in zoom-in-95 duration-300">
-        <div className="px-8 py-6 bg-rose-50 border-b border-rose-100 flex items-center justify-between">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+      <div className="bg-white rounded-xl w-full max-w-md shadow-card border border-danger-line overflow-hidden animate-in zoom-in-95 duration-300">
+        <div className="px-8 py-6 bg-danger-subtle border-b border-danger-line flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-rose-500 rounded-xl shadow-lg shadow-rose-200">
+            <div className="p-2 bg-danger rounded-xl shadow-card">
               <AlertCircle className="w-5 h-5 text-white" />
             </div>
-            <h2 className="text-xl font-semibold text-rose-900 tracking-tight">{title}</h2>
+            <h2 className="text-xl font-semibold text-danger-fg tracking-tight">{title}</h2>
           </div>
           <button 
             onClick={onClose} 
-            className="p-2 hover:bg-rose-100 rounded-full transition-colors group"
+            className="p-2 hover:bg-danger-subtle rounded-full transition-colors group"
           >
-            <X className="w-5 h-5 text-rose-400 group-hover:text-rose-600" />
+            <X className="w-5 h-5 text-danger group-hover:text-danger-fg" />
           </button>
         </div>
 
         <div className="p-8">
-          <p className="text-slate-600 font-medium leading-relaxed">
+          <p className="text-fg-muted font-medium leading-relaxed">
             {message}
           </p>
           
           <div className="mt-8">
             <button
               onClick={onClose}
-              className="w-full bg-slate-900 text-white py-4 rounded-2xl font-semibold text-sm flex items-center justify-center space-x-2 hover:bg-slate-800 transition-all shadow-xl shadow-slate-200"
+              className="w-full bg-zinc-900 text-white py-4 rounded-lg font-semibold text-sm flex items-center justify-center space-x-2 hover:bg-zinc-800 transition-all shadow-card"
             >
               <span>Entendido</span>
             </button>

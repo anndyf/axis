@@ -163,23 +163,23 @@ export default function AEEDashboardClient({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-10 text-slate-900 antialiased">
+    <div className="bg-zinc-50 pb-10 text-fg antialiased">
       {/* Header Dinâmico */}
-      <header className="bg-white/80 backdrop-blur-xl border-b border-slate-300 sticky top-0 z-50 -mx-4 -mt-4 md:-mx-8 md:-mt-8 mb-4 px-4 sm:px-6 lg:px-8">
+      <header className="mb-6 border-b border-line pb-4">
         <div className="max-w-7xl mx-auto py-4">
           <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
              <div className="flex items-center space-x-5">
                <button
                  onClick={() => activePanel ? setActivePanel(null) : router.push('/dashboard')}
-                 className="p-2 hover:bg-slate-200 rounded-lg transition-colors text-slate-400 hover:text-slate-700"
+                 className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-fg-subtle hover:text-fg-muted"
                >
                  <ArrowLeft size={20} />
                </button>
                <div>
-                 <h1 className="text-lg font-black text-slate-800 tracking-tight">
+                 <h1 className="text-lg font-semibold text-fg tracking-tight">
                    {activePanel === 'create' ? 'Nova Ficha de Atendimento' : activePanel === 'edit' ? 'Ficha Individual de AEE' : 'Atendimento Especializado (AEE)'}
                  </h1>
-                 <p className="text-base text-slate-700 font-medium">
+                 <p className="text-base text-fg-muted font-medium">
                    {activePanel ? 'Registro Oficial de Inclusão' : 'Controle de Inclusão e Acessibilidade'}
                  </p>
                </div>
@@ -189,7 +189,7 @@ export default function AEEDashboardClient({
                {!activePanel && isDirecao && (
                  <button
                    onClick={() => { setActivePanel('create'); setSelectedStudent(null); setStudentSearch(""); }}
-                   className="flex items-center justify-center space-y-0 space-x-2 bg-gradient-to-r from-green-600 to-green-700 text-white px-6 py-2.5 rounded-lg hover:from-green-700 hover:to-green-800 transition-all shadow-sm text-sm font-medium uppercase tracking-widest active:scale-95"
+                   className="flex items-center justify-center space-y-0 space-x-2 bg-success text-white px-6 py-2.5 rounded-lg hover:bg-success transition-all shadow-sm text-sm font-medium uppercase tracking-widest active:scale-95"
                  >
                    <PlusCircle className="w-4 h-4" />
                    <span className="whitespace-nowrap">Nova Ficha</span>
@@ -199,7 +199,7 @@ export default function AEEDashboardClient({
                {activePanel === 'edit' && isDirecao && !isEditing && (
                  <button 
                     onClick={() => setIsEditing(true)}
-                    className="flex items-center gap-2 bg-white border border-slate-300 px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm"
+                    className="flex items-center gap-2 bg-white border border-zinc-300 px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-widest hover:bg-zinc-50 transition-all shadow-sm"
                  >
                     <Edit3 size={14} /> Editar Ficha
                  </button>
@@ -208,7 +208,7 @@ export default function AEEDashboardClient({
                {(activePanel === 'create' || (isDirecao && isEditing)) && (
                  <button 
                     onClick={handleSave} disabled={saving}
-                    className="flex items-center gap-2 bg-black text-white px-6 py-2 rounded-lg text-xs font-semibold uppercase tracking-widest hover:bg-slate-800 transition-all disabled:opacity-50 shadow-sm"
+                    className="flex items-center gap-2 bg-black text-white px-6 py-2 rounded-lg text-xs font-semibold uppercase tracking-widest hover:bg-zinc-800 transition-all disabled:opacity-50 shadow-sm"
                  >
                     {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                     {saving ? 'Gravando...' : 'Salvar Alterações'}
@@ -218,7 +218,7 @@ export default function AEEDashboardClient({
                {!isDirecao && activePanel === 'edit' && !selectedProfile?.acknowledgements?.some((ack: any) => ack.user.id === usuario.id) && (
                  <button 
                     onClick={() => handleAtestar(selectedProfile)} disabled={saving}
-                    className="flex items-center gap-2 bg-emerald-600 text-white px-6 py-2 rounded-lg text-xs font-semibold uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-sm"
+                    className="flex items-center gap-2 bg-success text-white px-6 py-2 rounded-lg text-xs font-semibold uppercase tracking-widest hover:bg-success transition-all shadow-sm"
                  >
                     {saving ? <Loader2 size={14} className="animate-spin" /> : <ClipboardCheck size={14} />}
                     Confirmar Ciência
@@ -227,7 +227,7 @@ export default function AEEDashboardClient({
                 {activePanel === 'edit' && isDirecao && (
                   <button 
                      onClick={() => handleDelete(selectedProfile)} disabled={saving}
-                     className="p-2.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 transition-all border border-rose-200 shadow-sm"
+                     className="p-2.5 bg-danger-subtle text-danger-fg rounded-lg hover:bg-danger-subtle transition-all border border-danger-line shadow-sm"
                      title="Excluir Ficha"
                   >
                      <Trash2 size={16} />
@@ -243,50 +243,50 @@ export default function AEEDashboardClient({
           <>
             {/* Stats Row */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-               <div className="bg-white p-4 rounded-3xl border border-slate-200 flex items-center gap-4 shadow-xl shadow-slate-200/50">
-                  <div className="w-10 h-10 bg-slate-50 rounded-2xl flex items-center justify-center border border-slate-100 text-slate-900 shadow-sm">
+               <div className="bg-white p-4 rounded-xl border border-zinc-200 flex items-center gap-4 shadow-card">
+                  <div className="w-10 h-10 bg-zinc-50 rounded-lg flex items-center justify-center border border-zinc-100 text-fg shadow-sm">
                     <Users size={16} />
                   </div>
                   <div>
-                    <p className="text-lg font-bold text-slate-900 leading-none">{aeeAlunos.length}</p>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Mapeados</p>
+                    <p className="text-lg font-bold text-fg leading-none">{aeeAlunos.length}</p>
+                    <p className="text-[10px] text-fg-subtle font-bold uppercase tracking-widest mt-1">Mapeados</p>
                   </div>
                </div>
-               <div className="bg-white p-4 rounded-3xl border border-slate-200 flex items-center gap-4 shadow-xl shadow-slate-200/50">
-                  <div className="w-10 h-10 bg-emerald-50 rounded-2xl flex items-center justify-center border border-emerald-100 text-emerald-600 shadow-sm">
+               <div className="bg-white p-4 rounded-xl border border-zinc-200 flex items-center gap-4 shadow-card">
+                  <div className="w-10 h-10 bg-success-subtle rounded-lg flex items-center justify-center border border-success-line text-success-fg shadow-sm">
                     <CheckCircle2 size={16} />
                   </div>
                   <div>
-                    <p className="text-lg font-bold text-slate-900 leading-none">{aeeAlunos.filter(a => a.acknowledgements.length > 0).length}</p>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Lidos</p>
+                    <p className="text-lg font-bold text-fg leading-none">{aeeAlunos.filter(a => a.acknowledgements.length > 0).length}</p>
+                    <p className="text-[10px] text-fg-subtle font-bold uppercase tracking-widest mt-1">Lidos</p>
                   </div>
                </div>
-               <div className="bg-white p-4 rounded-3xl border border-slate-200 flex items-center gap-4 shadow-xl shadow-slate-200/50">
-                  <div className="w-10 h-10 bg-amber-50 rounded-2xl flex items-center justify-center border border-amber-100 text-amber-600 shadow-sm">
+               <div className="bg-white p-4 rounded-xl border border-zinc-200 flex items-center gap-4 shadow-card">
+                  <div className="w-10 h-10 bg-warning-subtle rounded-lg flex items-center justify-center border border-warning-line text-warning-fg shadow-sm">
                     <AlertCircle size={16} />
                   </div>
                   <div>
-                    <p className="text-lg font-bold text-slate-900 leading-none">{aeeAlunos.filter(a => a.acknowledgements.length === 0).length}</p>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Pendentes</p>
+                    <p className="text-lg font-bold text-fg leading-none">{aeeAlunos.filter(a => a.acknowledgements.length === 0).length}</p>
+                    <p className="text-[10px] text-fg-subtle font-bold uppercase tracking-widest mt-1">Pendentes</p>
                   </div>
                </div>
             </div>
 
             {/* Filters */}
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-5 rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-200/60">
+            <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-5 rounded-xl border border-zinc-200 shadow-card">
                <div className="relative w-full md:max-w-md">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-subtle" />
                   <input 
                     type="text" placeholder="Buscar aluno por nome ou matrícula..." 
                     value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:bg-white focus:ring-4 focus:ring-slate-100 outline-none transition-all placeholder:text-slate-400"
+                    className="w-full pl-11 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg text-sm font-bold focus:bg-white focus:ring-4 focus:ring-zinc-100 outline-none transition-all placeholder:text-fg-subtle"
                   />
                </div>
                <div className="flex items-center gap-2 w-full md:w-auto">
-                  <Filter className="w-4 h-4 text-slate-400 ml-2" />
+                  <Filter className="w-4 h-4 text-fg-subtle ml-2" />
                   <select 
                     value={filterTurma} onChange={e => setFilterTurma(e.target.value)}
-                    className="flex-1 md:w-64 bg-slate-50 border border-slate-200 rounded-2xl px-5 py-3 text-sm font-bold outline-none appearance-none focus:bg-white transition-all cursor-pointer shadow-sm hover:bg-slate-100"
+                    className="flex-1 md:w-64 bg-zinc-50 border border-zinc-200 rounded-lg px-5 py-3 text-sm font-bold outline-none appearance-none focus:bg-white transition-all cursor-pointer shadow-sm hover:bg-zinc-100"
                   >
                      <option value="">Todas as Turmas</option>
                      {todasTurmas.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
@@ -295,48 +295,48 @@ export default function AEEDashboardClient({
             </div>
 
             {/* LIST */}
-            <div className="bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden shadow-2xl shadow-slate-300/40">
+            <div className="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-card">
                {filteredAlunos.length === 0 ? (
                  <div className="p-24 text-center">
-                   <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-6 text-slate-200 border border-slate-100 shadow-inner">
+                   <div className="w-20 h-20 bg-zinc-50 rounded-xl flex items-center justify-center mx-auto mb-6 text-zinc-200 border border-zinc-100 shadow-card">
                       <Accessibility size={40} />
                    </div>
-                   <p className="text-slate-400 uppercase tracking-[0.2em] text-[10px] font-black">Nenhum registro encontrado</p>
-                   <p className="text-slate-900 font-medium mt-2">Tente outros critérios de busca ou filtros.</p>
+                   <p className="text-fg-subtle uppercase tracking-[0.2em] text-[10px] font-semibold">Nenhum registro encontrado</p>
+                   <p className="text-fg font-medium mt-2">Tente outros critérios de busca ou filtros.</p>
                  </div>
                ) : (
                  <div className="overflow-x-auto">
                    <table className="w-full text-left">
                      <thead>
-                        <tr className="bg-slate-50 border-b border-slate-200">
-                           <th className="px-6 py-3.5 text-[10px] text-slate-900 uppercase tracking-widest font-semibold">Estudante</th>
-                           <th className="px-6 py-3.5 text-[10px] text-slate-900 uppercase tracking-widest font-semibold">Turma</th>
-                           <th className="px-6 py-3.5 text-[10px] text-slate-900 uppercase tracking-widest font-semibold">Diagnóstico</th>
-                           <th className="px-6 py-3.5 text-[10px] text-slate-900 uppercase tracking-widest font-semibold">Acompanhamento</th>
+                        <tr className="bg-zinc-50 border-b border-zinc-200">
+                           <th className="px-6 py-3.5 text-[10px] text-fg uppercase tracking-widest font-semibold">Estudante</th>
+                           <th className="px-6 py-3.5 text-[10px] text-fg uppercase tracking-widest font-semibold">Turma</th>
+                           <th className="px-6 py-3.5 text-[10px] text-fg uppercase tracking-widest font-semibold">Diagnóstico</th>
+                           <th className="px-6 py-3.5 text-[10px] text-fg uppercase tracking-widest font-semibold">Acompanhamento</th>
                            <th className="px-6 py-3.5 text-right"></th>
                         </tr>
                      </thead>
-                     <tbody className="divide-y divide-slate-100">
+                     <tbody className="divide-y divide-zinc-100">
                         {filteredAlunos.map(a => (
-                          <tr key={a.id} onClick={() => openEdit(a)} className="hover:bg-slate-50 cursor-pointer transition-colors group">
+                          <tr key={a.id} onClick={() => openEdit(a)} className="hover:bg-zinc-50 cursor-pointer transition-colors group">
                              <td className="px-6 py-4">
                                 <div className="flex items-center gap-3">
-                                   <div className="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center text-slate-900 font-medium text-sm border border-slate-200 overflow-hidden">
+                                   <div className="w-9 h-9 bg-zinc-100 rounded-lg flex items-center justify-center text-fg font-medium text-sm border border-zinc-200 overflow-hidden">
                                       {a.fotoUrl ? <img src={a.fotoUrl} className="w-full h-full object-cover" /> : a.estudante.nome.charAt(0)}
                                    </div>
                                    <div>
-                                      <p className="text-sm font-medium text-slate-900 uppercase leading-none mb-1">{a.estudante.nome}</p>
-                                      <p className="text-[10px] text-slate-900 uppercase tracking-tighter">Mat: {a.estudante.matricula}</p>
+                                      <p className="text-sm font-medium text-fg uppercase leading-none mb-1">{a.estudante.nome}</p>
+                                      <p className="text-[10px] text-fg uppercase tracking-tighter">Mat: {a.estudante.matricula}</p>
                                    </div>
                                 </div>
                              </td>
-                             <td className="px-6 py-4 text-xs text-slate-900 font-medium uppercase">{a.estudante.turma.nome}</td>
+                             <td className="px-6 py-4 text-xs text-fg font-medium uppercase">{a.estudante.turma.nome}</td>
                              <td className="px-6 py-4">
                                 <div className="flex flex-wrap gap-1">
                                    {a.cids.slice(0, 2).map((c: string) => (
-                                     <span key={c} className="text-[9px] bg-slate-100 text-slate-900 px-1.5 py-0.5 rounded border border-slate-200 uppercase">{c}</span>
+                                     <span key={c} className="text-[9px] bg-zinc-100 text-fg px-1.5 py-0.5 rounded border border-zinc-200 uppercase">{c}</span>
                                    ))}
-                                   {a.cids.length > 2 && <span className="text-[9px] text-slate-900">+{a.cids.length - 2}</span>}
+                                   {a.cids.length > 2 && <span className="text-[9px] text-fg">+{a.cids.length - 2}</span>}
                                 </div>
                              </td>
                              <td className="px-6 py-4">
@@ -350,20 +350,20 @@ export default function AEEDashboardClient({
 
                                    if (totalLidos === 0) {
                                       return (
-                                         <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-amber-50 text-amber-700 rounded-full border border-amber-100">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
+                                         <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-warning-subtle text-warning-fg rounded-full border border-warning-line">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" />
                                             <span className="text-[9px] uppercase tracking-widest font-medium">Pendente</span>
                                          </div>
                                       )
                                    } else if (totalLidos < totalProfessores) {
                                       return (
-                                         <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-blue-50 text-blue-700 rounded-full border border-blue-100">
+                                         <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-accent-subtle text-accent-fg rounded-full border border-accent/25">
                                             <span className="text-[9px] uppercase tracking-widest font-bold font-mono">{totalLidos}/{totalProfessores} Lidos</span>
                                          </div>
                                       )
                                    } else {
                                       return (
-                                         <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100">
+                                         <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-success-subtle text-success-fg rounded-full border border-success-line">
                                             <CheckCircle2 size={10} />
                                             <span className="text-[9px] uppercase tracking-widest font-medium">Lido</span>
                                          </div>
@@ -376,13 +376,13 @@ export default function AEEDashboardClient({
                                   {isDirecao && (
                                     <button 
                                       onClick={(e) => { e.stopPropagation(); handleDelete(a); }}
-                                      className="p-1.5 text-slate-300 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100"
+                                      className="p-1.5 text-zinc-300 hover:text-danger-fg transition-colors opacity-0 group-hover:opacity-100"
                                       title="Excluir Ficha"
                                     >
                                       <Trash2 size={16} />
                                     </button>
                                   )}
-                                  <ChevronRight size={16} className="inline text-slate-300 group-hover:text-black transition-colors" />
+                                  <ChevronRight size={16} className="inline text-zinc-300 group-hover:text-black transition-colors" />
                                 </div>
                              </td>
                           </tr>
@@ -399,30 +399,30 @@ export default function AEEDashboardClient({
                 <div className="max-w-2xl mx-auto space-y-8 py-10">
                    <div className="text-center space-y-2">
                       <h3 className="text-xl font-semibold">Vincular Estudante</h3>
-                      <p className="text-sm text-slate-900">Pesquise abaixo para carregar os dados base do estudante.</p>
+                      <p className="text-sm text-fg">Pesquise abaixo para carregar os dados base do estudante.</p>
                    </div>
                    <div className="relative">
-                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-fg-subtle" />
                       <input 
                          type="text" value={studentSearch} onChange={e => setStudentSearch(e.target.value)}
                          placeholder="Nome ou Matrícula..."
-                         className="w-full pl-12 pr-6 py-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:bg-white focus:ring-2 focus:ring-black/5 outline-none transition-all"
+                         className="w-full pl-12 pr-6 py-4 bg-zinc-50 border border-zinc-200 rounded-xl text-sm font-medium focus:bg-white focus:ring-2 focus:ring-black/5 outline-none transition-all"
                       />
                    </div>
                    <div className="grid grid-cols-1 gap-2">
                       {estudantesSemAee.filter(s => s.nome.toLowerCase().includes(studentSearch.toLowerCase())).slice(0, 8).map(s => (
                          <button 
                             key={s.matricula} onClick={() => openCreate(s)}
-                            className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl hover:border-black transition-all group"
+                            className="flex items-center justify-between p-4 bg-white border border-zinc-200 rounded-xl hover:border-black transition-all group"
                          >
                             <div className="flex items-center gap-4 text-left">
-                               <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center font-medium text-slate-400">{s.nome.charAt(0)}</div>
+                               <div className="w-10 h-10 bg-zinc-100 rounded-lg flex items-center justify-center font-medium text-fg-subtle">{s.nome.charAt(0)}</div>
                                <div>
-                                  <p className="text-sm font-semibold uppercase text-slate-900">{s.nome}</p>
-                                  <p className="text-[10px] text-slate-900 uppercase tracking-widest">{s.turma.nome}</p>
+                                  <p className="text-sm font-semibold uppercase text-fg">{s.nome}</p>
+                                  <p className="text-[10px] text-fg uppercase tracking-widest">{s.turma.nome}</p>
                                 </div>
                             </div>
-                            <ChevronRight size={18} className="text-slate-300 group-hover:text-black" />
+                            <ChevronRight size={18} className="text-zinc-300 group-hover:text-black" />
                          </button>
                       ))}
                    </div>
@@ -430,17 +430,17 @@ export default function AEEDashboardClient({
              ) : (
                 <div className="space-y-12 animate-in fade-in slide-in-from-bottom-2 duration-500">
                    {/* DESKTOP BANNER: Identificação Horizontal */}
-                   <div className="bg-white border border-slate-200 p-4 rounded-[1.5rem] flex flex-col md:flex-row items-center gap-6 shadow-lg shadow-slate-200/40">
+                   <div className="bg-white border border-zinc-200 p-4 rounded-xl flex flex-col md:flex-row items-center gap-6 shadow-card">
                       <div className="relative group shrink-0">
-                          <div className="w-16 h-16 bg-slate-50 rounded-xl overflow-hidden border border-slate-200 shadow-inner flex items-center justify-center">
+                          <div className="w-16 h-16 bg-zinc-50 rounded-xl overflow-hidden border border-zinc-200 shadow-card flex items-center justify-center">
                             {formData.fotoUrl ? (
                                <img src={formData.fotoUrl} className="w-full h-full object-cover" />
                             ) : (
-                                <Users size={24} className="text-slate-300" />
+                                <Users size={24} className="text-zinc-300" />
                             )}
                          </div>
                          {isEditing && (
-                            <label className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl cursor-pointer">
+                            <label className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg cursor-pointer">
                                 <Upload size={14} className="text-white" />
                                <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
                             </label>
@@ -448,40 +448,40 @@ export default function AEEDashboardClient({
                       </div>
                       <div className="flex-1 text-center md:text-left space-y-2">
                          <div className="flex flex-col md:flex-row md:items-center gap-1.5">
-                            <h3 className="text-lg font-bold text-slate-800 tracking-tight">
+                            <h3 className="text-lg font-bold text-fg tracking-tight">
                                {activePanel === 'create' ? selectedStudent?.nome : selectedProfile?.estudante.nome}
                             </h3>
                             {activePanel === 'edit' && !isEditing && (
-                               <div className="flex items-center gap-1.5 px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-full border border-indigo-100 self-center md:self-auto">
+                               <div className="flex items-center gap-1.5 px-2 py-0.5 bg-accent-subtle text-accent-fg rounded-full border border-accent/25 self-center md:self-auto">
                                   <Accessibility size={10} />
-                                  <span className="text-[9px] font-black uppercase tracking-widest">Ficha Ativa</span>
+                                  <span className="text-[9px] font-semibold uppercase tracking-widest">Ficha Ativa</span>
                                </div>
                             )}
                          </div>
                          <div className="flex flex-wrap justify-center md:justify-start items-center gap-4">
                             <div className="flex items-center gap-2">
-                               <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest leading-none">Matrícula</span>
-                               <span className="text-sm font-bold text-slate-700">{activePanel === 'create' ? selectedStudent?.matricula : selectedProfile?.estudante.matricula}</span>
+                               <span className="text-[10px] text-fg-subtle font-semibold uppercase tracking-widest leading-none">Matrícula</span>
+                               <span className="text-sm font-bold text-fg-muted">{activePanel === 'create' ? selectedStudent?.matricula : selectedProfile?.estudante.matricula}</span>
                             </div>
-                            <div className="w-px h-4 bg-slate-200 hidden md:block" />
+                            <div className="w-px h-4 bg-zinc-200 hidden md:block" />
                             <div className="flex items-center gap-2">
-                               <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest leading-none">Turma</span>
-                               <span className="text-sm font-bold text-slate-700 uppercase">{activePanel === 'create' ? selectedStudent?.turma.nome : selectedProfile?.estudante.turma.nome}</span>
+                               <span className="text-[10px] text-fg-subtle font-semibold uppercase tracking-widest leading-none">Turma</span>
+                               <span className="text-sm font-bold text-fg-muted uppercase">{activePanel === 'create' ? selectedStudent?.turma.nome : selectedProfile?.estudante.turma.nome}</span>
                             </div>
                          </div>
                       </div>
                       
                       {activePanel === 'edit' && !isEditing && (
-                         <div className="shrink-0 flex items-center gap-4 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100 shadow-inner">
+                         <div className="shrink-0 flex items-center gap-4 bg-zinc-50 px-4 py-2 rounded-xl border border-zinc-100 shadow-card">
                             <div>
-                               <p className="text-[9px] text-slate-400 font-black uppercase tracking-[0.2em] mb-1">Status de Ciência</p>
+                               <p className="text-[9px] text-fg-subtle font-semibold uppercase tracking-[0.2em] mb-1">Status de Ciência</p>
                                {selectedProfile.acknowledgements.length === 0 ? (
-                                  <div className="flex items-center gap-1.5 text-amber-600">
+                                  <div className="flex items-center gap-1.5 text-warning-fg">
                                      <Clock size={12} className="animate-pulse" />
                                      <span className="text-xs font-bold uppercase tracking-tight">Pendente</span>
                                   </div>
                                ) : (
-                                  <div className="flex items-center gap-1.5 text-emerald-600">
+                                  <div className="flex items-center gap-1.5 text-success-fg">
                                      <CheckCircle2 size={14} />
                                      <span className="text-xs font-bold uppercase tracking-tight">{selectedProfile.acknowledgements.length} Leituras</span>
                                   </div>
@@ -494,9 +494,9 @@ export default function AEEDashboardClient({
                    {/* Grid Superior: Dados Compactos */}
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Diagnóstico (CIDs) */}
-                      <div className="bg-white border border-slate-200 rounded-[1.5rem] p-5 shadow-lg shadow-slate-200/40 space-y-4">
-                         <label className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] flex items-center gap-3">
-                            <div className="p-2 bg-rose-50 text-rose-500 rounded-xl border border-rose-100">
+                      <div className="bg-white border border-zinc-200 rounded-xl p-5 shadow-card space-y-4">
+                         <label className="text-[10px] text-fg-subtle font-semibold uppercase tracking-[0.2em] flex items-center gap-3">
+                            <div className="p-2 bg-danger-subtle text-danger-fg rounded-xl border border-danger-line">
                                <AlertCircle size={16} />
                             </div>
                             Diagnóstico Clínico (CIDs)
@@ -505,10 +505,10 @@ export default function AEEDashboardClient({
                          {isEditing ? (
                             <div className="space-y-4">
                                <div className="relative">
-                                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-subtle" />
                                   <input 
                                     type="text" placeholder="Pesquisar por nome ou código CID..." value={cidSearch} onChange={e => setCidSearch(e.target.value)}
-                                    className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold focus:bg-white outline-none"
+                                    className="w-full pl-11 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-lg text-xs font-bold focus:bg-white outline-none"
                                   />
                                </div>
                                <div className="flex flex-col gap-1.5 max-h-56 overflow-y-auto p-1 custom-scrollbar pr-2">
@@ -516,11 +516,11 @@ export default function AEEDashboardClient({
                                      <button 
                                         key={c.code} onClick={() => toggleCID(c.code)}
                                         className={`flex items-center justify-between px-4 py-3 rounded-xl border text-[10px] font-bold transition-all text-left group ${
-                                           formData.cids.includes(c.code) ? 'bg-black text-white border-black shadow-lg scale-[1.02]' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                                           formData.cids.includes(c.code) ? 'bg-black text-white border-black shadow-card scale-[1.02]' : 'bg-white text-fg-muted border-zinc-200 hover:bg-zinc-50'
                                         }`}
                                      >
                                         <div className="flex items-center gap-3">
-                                           <span className={`px-2 py-0.5 rounded font-black border ${formData.cids.includes(c.code) ? 'bg-white/20 border-white/30' : 'bg-slate-100 border-slate-200 text-slate-900'}`}>{c.code}</span>
+                                           <span className={`px-2 py-0.5 rounded font-semibold border ${formData.cids.includes(c.code) ? 'bg-white/20 border-white/30' : 'bg-zinc-100 border-zinc-200 text-fg'}`}>{c.code}</span>
                                            <span className="uppercase tracking-tight opacity-90 line-clamp-1">{c.label}</span>
                                         </div>
                                         {formData.cids.includes(c.code) && <CheckCircle2 size={14} className="text-white" />}
@@ -533,18 +533,18 @@ export default function AEEDashboardClient({
                                {formData.cids.length > 0 ? formData.cids.map(code => {
                                   const cid = CIDS_AEE.find(c => c.code === code)
                                   return (
-                                     <div key={code} className="bg-slate-50 border border-slate-100 p-4 rounded-2xl flex items-center gap-4 transition-all hover:bg-white hover:border-slate-200 hover:shadow-md group">
-                                        <div className="bg-slate-900 text-white px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shrink-0 shadow-sm">
+                                     <div key={code} className="bg-zinc-50 border border-zinc-100 p-4 rounded-lg flex items-center gap-4 transition-all hover:bg-white hover:border-zinc-200 hover:shadow-card group">
+                                        <div className="bg-zinc-900 text-white px-2.5 py-1 rounded-lg text-[10px] font-semibold uppercase tracking-wider shrink-0 shadow-sm">
                                            {code}
                                         </div>
-                                        <div className="text-xs font-bold text-slate-800 uppercase tracking-tight leading-tight">
+                                        <div className="text-xs font-bold text-fg uppercase tracking-tight leading-tight">
                                            {cid?.label || "CID Desconhecido"}
                                         </div>
                                      </div>
                                   )
                                }) : (
-                                  <div className="py-10 text-center border-2 border-dashed border-slate-100 rounded-2xl">
-                                     <p className="text-xs text-slate-400 italic font-medium">Nenhum diagnóstico registrado.</p>
+                                  <div className="py-10 text-center border-2 border-dashed border-zinc-100 rounded-lg">
+                                     <p className="text-xs text-fg-subtle italic font-medium">Nenhum diagnóstico registrado.</p>
                                   </div>
                                )}
                             </div>
@@ -552,9 +552,9 @@ export default function AEEDashboardClient({
                       </div>
 
                       {/* Configurações de Prova */}
-                      <div className="bg-white border border-slate-200 rounded-[1.5rem] p-5 shadow-lg shadow-slate-200/40 space-y-4">
-                         <label className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] flex items-center gap-3">
-                            <div className="p-2 bg-indigo-50 text-indigo-500 rounded-xl border border-indigo-100">
+                      <div className="bg-white border border-zinc-200 rounded-xl p-5 shadow-card space-y-4">
+                         <label className="text-[10px] text-fg-subtle font-semibold uppercase tracking-[0.2em] flex items-center gap-3">
+                            <div className="p-2 bg-accent-subtle text-accent-fg rounded-xl border border-accent/25">
                                <ClipboardCheck size={16} />
                             </div>
                             Necessidades Avaliativas
@@ -573,16 +573,16 @@ export default function AEEDashboardClient({
                                     onClick={() => setFormData(f => ({ ...f, [item.id]: !isSelected }))}
                                     className={`flex items-center gap-6 p-4 rounded-xl border-2 transition-all text-left group ${
                                        isSelected 
-                                          ? 'bg-slate-900 text-white border-slate-900 shadow-xl scale-[1.02]' 
-                                          : 'bg-white border-slate-100 text-slate-700 hover:border-slate-300'
+                                          ? 'bg-zinc-900 text-white border-zinc-900 shadow-card scale-[1.02]' 
+                                          : 'bg-white border-zinc-100 text-fg-muted hover:border-zinc-300'
                                     } ${!isEditing && 'cursor-default opacity-100'}`}
                                  >
-                                    <div className={`p-3 rounded-xl transition-colors ${isSelected ? 'bg-white/10 text-white' : 'bg-slate-50 text-slate-400 group-hover:text-slate-600'}`}>
+                                    <div className={`p-3 rounded-xl transition-colors ${isSelected ? 'bg-white/10 text-white' : 'bg-zinc-50 text-fg-subtle group-hover:text-fg-muted'}`}>
                                        <Icon size={20} />
                                     </div>
                                     <div>
-                                       <span className="text-sm font-black uppercase tracking-widest block mb-0.5">{item.label}</span>
-                                       <span className={`text-[10px] font-bold uppercase ${isSelected ? 'text-white/50' : 'text-slate-400'}`}>
+                                       <span className="text-sm font-semibold uppercase tracking-widest block mb-0.5">{item.label}</span>
+                                       <span className={`text-[10px] font-bold uppercase ${isSelected ? 'text-white/50' : 'text-fg-subtle'}`}>
                                           {isSelected ? 'Configuração Ativada' : 'Não Solicitado'}
                                        </span>
                                     </div>
@@ -601,9 +601,9 @@ export default function AEEDashboardClient({
                       ].map(field => {
                          const Icon = field.icon as any
                          return (
-                            <div key={field.id} className="bg-white border border-slate-200 rounded-[1.5rem] p-5 shadow-xl shadow-slate-200/40 space-y-4">
-                               <label className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] flex items-center gap-3">
-                                  <div className={`p-2 bg-${field.color}-50 text-${field.color}-500 rounded-xl border border-${field.color}-100`}>
+                            <div key={field.id} className="bg-white border border-zinc-200 rounded-xl p-5 shadow-card space-y-4">
+                               <label className="text-[10px] text-fg-subtle font-semibold uppercase tracking-[0.2em] flex items-center gap-3">
+                                  <div className={`p-2 bg-subtle text-fg-muted rounded-xl border border-line`}>
                                      <Icon size={18} />
                                   </div>
                                   {field.label}
@@ -612,15 +612,15 @@ export default function AEEDashboardClient({
                                   rows={field.rows} readOnly={!isEditing}
                                   value={(formData as any)[field.id]} onChange={e => setFormData(f => ({ ...f, [field.id]: e.target.value }))}
                                   placeholder={isEditing ? field.placeholder : 'Nenhuma informação cadastrada no prontuário.'}
-                                  className={`w-full bg-slate-50 border border-slate-100 rounded-2xl px-8 py-6 text-base font-medium text-slate-900 leading-relaxed outline-none transition-all placeholder:text-slate-300 ${isEditing ? 'focus:bg-white focus:ring-4 focus:ring-slate-100 focus:border-slate-300' : 'cursor-default border-transparent'}`}
+                                  className={`w-full bg-zinc-50 border border-zinc-100 rounded-lg px-8 py-6 text-base font-medium text-fg leading-relaxed outline-none transition-all placeholder:text-zinc-300 ${isEditing ? 'focus:bg-white focus:ring-4 focus:ring-zinc-100 focus:border-zinc-300' : 'cursor-default border-transparent'}`}
                                />
                             </div>
                          )
                       })}
 
                       {isDirecao && (
-                         <div className="bg-slate-900 border border-slate-800 rounded-[1.5rem] p-6 shadow-2xl space-y-4">
-                            <label className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] flex items-center gap-3">
+                         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 shadow-card space-y-4">
+                            <label className="text-[10px] text-fg-subtle font-semibold uppercase tracking-[0.2em] flex items-center gap-3">
                                <div className="p-2 bg-white/5 text-white/40 rounded-xl border border-white/10">
                                   <Lock size={18} />
                                 </div>
@@ -630,9 +630,9 @@ export default function AEEDashboardClient({
                                rows={4} readOnly={!isEditing} value={formData.notasDirecao}
                                onChange={e => setFormData(f => ({ ...f, notasDirecao: e.target.value }))}
                                placeholder="Notas administrativas, controle de laudos, renovações e acompanhamento interno da gestão..."
-                               className={`w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-6 text-base font-medium text-white leading-relaxed outline-none transition-all placeholder:text-white/20 ${isEditing ? 'focus:bg-white/10 focus:border-white/20' : 'cursor-default border-transparent'}`}
+                               className={`w-full bg-white/5 border border-white/10 rounded-lg px-8 py-6 text-base font-medium text-white leading-relaxed outline-none transition-all placeholder:text-white/20 ${isEditing ? 'focus:bg-white/10 focus:border-white/20' : 'cursor-default border-transparent'}`}
                             />
-                            <p className="text-[9px] text-white/30 uppercase tracking-widest font-black text-right pr-4">Visível apenas para a direção e superusuários</p>
+                            <p className="text-[9px] text-white/30 uppercase tracking-widest font-semibold text-right pr-4">Visível apenas para a direção e superusuários</p>
                          </div>
                       )}
                    </div>
@@ -640,28 +640,28 @@ export default function AEEDashboardClient({
                    {/* Rodapé: Contatos e Resumo de Leitura */}
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       {/* Contatos Emergência */}
-                      <div className="bg-white border border-slate-200 p-5 rounded-[1.5rem] shadow-xl shadow-slate-200/40 space-y-4">
-                         <div className="flex items-center gap-3 pb-4 border-b border-slate-50">
-                            <div className="p-2 bg-rose-50 text-rose-500 rounded-xl">
+                      <div className="bg-white border border-zinc-200 p-5 rounded-xl shadow-card space-y-4">
+                         <div className="flex items-center gap-3 pb-4 border-b border-zinc-50">
+                            <div className="p-2 bg-danger-subtle text-danger-fg rounded-xl">
                                <Phone size={16} />
                             </div>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Contatos de Emergência do Estudante</p>
+                            <p className="text-[10px] font-semibold uppercase tracking-widest text-fg-subtle">Contatos de Emergência do Estudante</p>
                          </div>
                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                               <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">Nome do Responsável</label>
+                               <label className="text-[9px] font-semibold uppercase tracking-widest text-fg-subtle px-1">Nome do Responsável</label>
                                <input 
                                   type="text" readOnly={!isEditing} value={formData.contatoNome}
                                   onChange={e => setFormData(f => ({ ...f, contatoNome: e.target.value }))}
-                                  className={`w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none transition-all ${isEditing ? 'focus:bg-white focus:border-slate-200' : 'border-transparent bg-transparent pl-1 cursor-default'}`}
+                                  className={`w-full bg-zinc-50 border border-zinc-100 rounded-xl px-4 py-3 text-sm font-bold text-fg-muted outline-none transition-all ${isEditing ? 'focus:bg-white focus:border-zinc-200' : 'border-transparent bg-transparent pl-1 cursor-default'}`}
                                />
                             </div>
                             <div className="space-y-2">
-                               <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-1">Telefone / WhatsApp</label>
+                               <label className="text-[9px] font-semibold uppercase tracking-widest text-fg-subtle px-1">Telefone / WhatsApp</label>
                                <input 
                                   type="text" readOnly={!isEditing} value={formData.contatoTelefone}
                                   onChange={e => setFormData(f => ({ ...f, contatoTelefone: formatPhone(e.target.value) }))}
-                                  className={`w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-bold text-slate-700 outline-none font-mono transition-all ${isEditing ? 'focus:bg-white focus:border-slate-200' : 'border-transparent bg-transparent pl-1 cursor-default'}`}
+                                  className={`w-full bg-zinc-50 border border-zinc-100 rounded-xl px-4 py-3 text-sm font-bold text-fg-muted outline-none font-mono transition-all ${isEditing ? 'focus:bg-white focus:border-zinc-200' : 'border-transparent bg-transparent pl-1 cursor-default'}`}
                                />
                             </div>
                          </div>
@@ -679,25 +679,25 @@ export default function AEEDashboardClient({
                          const totalCont = todosProfessores.length
 
                          return (
-                            <div className="bg-white border border-slate-200 p-5 rounded-[1.5rem] shadow-lg shadow-slate-200/40 space-y-4 flex flex-col justify-center">
+                            <div className="bg-white border border-zinc-200 p-5 rounded-xl shadow-card space-y-4 flex flex-col justify-center">
                                <div className="flex justify-between items-center">
                                   <div className="flex items-center gap-3">
-                                     <div className="p-2 bg-emerald-50 text-emerald-500 rounded-xl">
+                                     <div className="p-2 bg-success-subtle text-success-fg rounded-xl">
                                         <CheckCircle2 size={16} />
                                      </div>
-                                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Controle Docente</label>
+                                     <label className="text-[10px] font-semibold uppercase tracking-widest text-fg-subtle">Controle Docente</label>
                                   </div>
-                                  <div className="px-3 py-1 bg-slate-900 text-white rounded-lg text-xs font-black shadow-sm">
+                                  <div className="px-3 py-1 bg-zinc-900 text-white rounded-lg text-xs font-semibold shadow-sm">
                                      {lidosCont} / {totalCont}
                                   </div>
                                </div>
                                <div className="space-y-4">
-                                  <div className="w-full h-3 bg-slate-50 rounded-full overflow-hidden border border-slate-100 shadow-inner">
-                                     <div className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 transition-all duration-1000 shadow-[0_0_10px_rgba(16,185,129,0.3)]" style={{ width: `${(lidosCont/totalCont)*100}%` }} />
+                                  <div className="w-full h-3 bg-zinc-50 rounded-full overflow-hidden border border-zinc-100 shadow-card">
+                                     <div className="h-full bg-success transition-all duration-1000 shadow-[0_0_10px_rgba(16,185,129,0.3)]" style={{ width: `${(lidosCont/totalCont)*100}%` }} />
                                   </div>
                                   <button 
                                      onClick={() => document.getElementById('relatorio-leituras')?.scrollIntoView({ behavior: 'smooth' })}
-                                     className="w-full py-3.5 text-[10px] text-slate-900 font-black uppercase tracking-[0.2em] border-2 border-slate-100 rounded-2xl hover:bg-slate-50 hover:border-slate-200 transition-all active:scale-[0.98]"
+                                     className="w-full py-3.5 text-[10px] text-fg font-semibold uppercase tracking-[0.2em] border-2 border-zinc-100 rounded-lg hover:bg-zinc-50 hover:border-zinc-200 transition-all active:scale-[0.98]"
                                   >
                                      Auditoria Nominal de Leituras
                                   </button>
@@ -709,15 +709,15 @@ export default function AEEDashboardClient({
 
                    {/* Relatório de Ciência Nominal */}
                    {activePanel === 'edit' && isDirecao && (
-                      <div id="relatorio-leituras" className="pt-10 border-t border-slate-200 space-y-8 animate-in fade-in duration-700">
+                      <div id="relatorio-leituras" className="pt-10 border-t border-zinc-200 space-y-8 animate-in fade-in duration-700">
                          <div className="flex items-center justify-between">
-                            <h3 className="text-base font-bold text-slate-800 uppercase tracking-widest flex items-center gap-3">
-                               <div className="w-1.5 h-6 bg-indigo-500 rounded-full" />
+                            <h3 className="text-base font-bold text-fg uppercase tracking-widest flex items-center gap-3">
+                               <div className="w-1.5 h-6 bg-accent rounded-full" />
                                Relatório Nominal de Ciência
                             </h3>
                             <div className="flex gap-6">
-                               <div className="flex items-center gap-2 text-[10px] text-slate-400 font-black uppercase tracking-widest"><div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" /> Concluído</div>
-                               <div className="flex items-center gap-2 text-[10px] text-slate-400 font-black uppercase tracking-widest"><div className="w-2.5 h-2.5 rounded-full bg-slate-200" /> Pendente</div>
+                               <div className="flex items-center gap-2 text-[10px] text-fg-subtle font-semibold uppercase tracking-widest"><div className="w-2.5 h-2.5 rounded-full bg-success shadow-[0_0_8px_rgba(16,185,129,0.5)]" /> Concluído</div>
+                               <div className="flex items-center gap-2 text-[10px] text-fg-subtle font-semibold uppercase tracking-widest"><div className="w-2.5 h-2.5 rounded-full bg-zinc-200" /> Pendente</div>
                             </div>
                          </div>
                          
@@ -733,14 +733,14 @@ export default function AEEDashboardClient({
                                return Array.from(profsMap.entries()).map(([id, name]) => {
                                   const lidoAt = lidosMap.get(id)
                                   return (
-                                     <div key={id} className={`p-5 rounded-3xl border transition-all ${lidoAt ? 'bg-white border-emerald-100 shadow-lg shadow-emerald-50' : 'bg-slate-50/50 border-slate-100 opacity-60'}`}>
+                                     <div key={id} className={`p-5 rounded-xl border transition-all ${lidoAt ? 'bg-white border-success-line shadow-card ' : 'bg-zinc-50/50 border-zinc-100 opacity-60'}`}>
                                         <div className="flex items-center gap-4">
-                                           <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black text-xs shadow-md ${lidoAt ? 'bg-emerald-500 text-white' : 'bg-white text-slate-300 border border-slate-100'}`}>
+                                           <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-semibold text-xs shadow-card ${lidoAt ? 'bg-success text-white' : 'bg-white text-zinc-300 border border-zinc-100'}`}>
                                               {name.charAt(0)}
                                            </div>
                                            <div className="min-w-0">
-                                              <p className="text-xs font-bold text-slate-800 truncate uppercase mt-0.5">{name}</p>
-                                              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
+                                              <p className="text-xs font-bold text-fg truncate uppercase mt-0.5">{name}</p>
+                                              <p className="text-[9px] text-fg-subtle font-bold uppercase tracking-widest mt-0.5">
                                                  {lidoAt ? `Lido: ${lidoAt}` : 'Não Visualizado'}
                                               </p>
                                            </div>

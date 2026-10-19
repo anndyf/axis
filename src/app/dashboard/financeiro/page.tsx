@@ -29,11 +29,11 @@ export default async function FinanceiroPage() {
 
   return (
     <div className="max-w-3xl mx-auto py-24 text-center space-y-4">
-      <div className="w-16 h-16 bg-slate-100 text-slate-700 rounded-2xl flex items-center justify-center mx-auto">
+      <div className="w-16 h-16 bg-zinc-100 text-fg-muted rounded-lg flex items-center justify-center mx-auto">
         <DollarSign className="w-8 h-8" />
       </div>
-      <h1 className="text-2xl font-medium text-slate-800">Módulo Financeiro</h1>
-      <p className="text-slate-600">Em breve.</p>
+      <h1 className="text-2xl font-medium text-fg">Módulo Financeiro</h1>
+      <p className="text-fg-muted">Em breve.</p>
     </div>
   )
 }

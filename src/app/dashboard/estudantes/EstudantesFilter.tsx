@@ -122,11 +122,11 @@ export default function EstudantesFilter({ cursos, turmas, totalResults }: Filte
   }
 
   return (
-    <div className="p-6 border-b border-slate-300">
+    <div className="p-6 border-b border-zinc-300">
       {/* Top Row: Stats + Search */}
       <div className="flex flex-col md:flex-row gap-4 mb-4">
         {/* Total Card */}
-        <div className="flex-shrink-0 bg-gradient-to-r from-slate-700 to-slate-600 text-white rounded-lg px-6 py-3 flex items-center space-x-4 shadow-sm min-w-[200px]">
+        <div className="flex-shrink-0 bg-zinc-700 to-zinc-600 text-white rounded-lg px-6 py-3 flex items-center space-x-4 shadow-sm min-w-[200px]">
            <div className="p-2 bg-white/20 rounded-lg">
              {isPending ? (
                <Loader2 className="w-5 h-5 text-white animate-spin" />
@@ -135,7 +135,7 @@ export default function EstudantesFilter({ cursos, turmas, totalResults }: Filte
              )}
            </div>
            <div>
-             <p className="text-xs font-medium text-slate-200 uppercase tracking-widest">
+             <p className="text-xs font-medium text-zinc-200 uppercase tracking-widest">
                {isPending ? 'Buscando...' : 'Total Encontrado'}
              </p>
              <p className="text-2xl font-medium leading-none">
@@ -148,15 +148,15 @@ export default function EstudantesFilter({ cursos, turmas, totalResults }: Filte
         <div className="flex-1 relative">
            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
              {isPending ? (
-               <Loader2 className="h-6 w-6 text-slate-400 animate-spin" />
+               <Loader2 className="h-6 w-6 text-fg-subtle animate-spin" />
              ) : (
-               <Search className="h-6 w-6 text-slate-400" />
+               <Search className="h-6 w-6 text-fg-subtle" />
              )}
            </div>
            <input
              type="text"
              placeholder="Buscar por nome ou matrícula..."
-             className="block w-full pl-12 pr-4 py-4 h-full border border-slate-300 rounded-lg leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 sm:text-lg transition-all"
+             className="block w-full pl-12 pr-4 py-4 h-full border border-zinc-300 rounded-lg leading-5 bg-zinc-50 placeholder-zinc-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-zinc-500/20 focus:border-zinc-500 sm:text-lg transition-all"
              value={search}
              onChange={(e) => setSearch(e.target.value)}
            />
@@ -168,7 +168,7 @@ export default function EstudantesFilter({ cursos, turmas, totalResults }: Filte
         {/* Curso Filter */}
         <div>
           <select
-            className="block w-full pl-3 pr-10 py-2.5 text-sm border-slate-300 focus:outline-none focus:ring-slate-500 focus:border-slate-500 rounded-lg"
+            className="block w-full pl-3 pr-10 py-2.5 text-sm border-zinc-300 focus:outline-none focus:ring-zinc-500 focus:border-zinc-500 rounded-lg"
             value={cursoId}
             onChange={(e) => handleCursoChange(e.target.value)}
           >
@@ -184,7 +184,7 @@ export default function EstudantesFilter({ cursos, turmas, totalResults }: Filte
         {/* Turno Filter */}
         <div>
           <select
-            className="block w-full pl-3 pr-10 py-2.5 text-sm border-slate-300 focus:outline-none focus:ring-slate-500 focus:border-slate-500 rounded-lg"
+            className="block w-full pl-3 pr-10 py-2.5 text-sm border-zinc-300 focus:outline-none focus:ring-zinc-500 focus:border-zinc-500 rounded-lg"
             value={turno}
             onChange={(e) => handleTurnoChange(e.target.value)}
           >
@@ -198,7 +198,7 @@ export default function EstudantesFilter({ cursos, turmas, totalResults }: Filte
         {/* Serie Filter */}
         <div>
           <select
-            className="block w-full pl-3 pr-10 py-2.5 text-sm border-slate-300 focus:outline-none focus:ring-slate-500 focus:border-slate-500 rounded-lg"
+            className="block w-full pl-3 pr-10 py-2.5 text-sm border-zinc-300 focus:outline-none focus:ring-zinc-500 focus:border-zinc-500 rounded-lg"
             value={serie}
             onChange={(e) => handleSerieChange(e.target.value)}
           >
@@ -213,7 +213,7 @@ export default function EstudantesFilter({ cursos, turmas, totalResults }: Filte
         {/* Turma Filter */}
         <div>
           <select
-            className="block w-full pl-3 pr-10 py-2.5 text-sm border-slate-300 focus:outline-none focus:ring-slate-500 focus:border-slate-500 rounded-lg disabled:bg-slate-50 disabled:text-slate-400"
+            className="block w-full pl-3 pr-10 py-2.5 text-sm border-zinc-300 focus:outline-none focus:ring-zinc-500 focus:border-zinc-500 rounded-lg disabled:bg-zinc-50 disabled:text-fg-subtle"
             value={turmaId}
             onChange={(e) => handleTurmaChange(e.target.value)}
             disabled={!cursoId && !turno && !serie && turmas.length > 50} 
@@ -230,7 +230,7 @@ export default function EstudantesFilter({ cursos, turmas, totalResults }: Filte
         {/* Clear Button */}
         <button 
            onClick={handleClearFilters}
-           className="flex items-center justify-center space-x-2 px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg transition-colors font-medium border border-slate-300"
+           className="flex items-center justify-center space-x-2 px-4 py-2 bg-zinc-200 hover:bg-zinc-300 text-fg-muted rounded-lg transition-colors font-medium border border-zinc-300"
            title="Limpar todos os filtros"
         >
            <FilterX className="w-4 h-4" />

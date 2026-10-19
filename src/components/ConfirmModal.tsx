@@ -28,38 +28,38 @@ export default function ConfirmModal({
   if (!isOpen) return null
 
   const variantStyles = {
-    danger: "bg-rose-500 shadow-rose-200 border-rose-100",
-    warning: "bg-amber-500 shadow-amber-200 border-amber-100",
-    info: "bg-blue-500 shadow-blue-200 border-blue-100"
+    danger: "bg-danger  border-danger-line",
+    warning: "bg-warning  border-warning-line",
+    info: "bg-accent  border-accent/25"
   }
 
   const buttonStyles = {
-    danger: "bg-rose-600 hover:bg-rose-700",
-    warning: "bg-amber-600 hover:bg-amber-700",
-    info: "bg-blue-600 hover:bg-blue-700"
+    danger: "bg-danger hover:bg-danger",
+    warning: "bg-warning hover:bg-warning",
+    info: "bg-accent hover:bg-accent"
   }
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-300">
-        <div className={`px-8 py-6 flex items-center justify-between border-b ${variant === 'danger' ? 'bg-rose-50 border-rose-100' : 'bg-slate-50 border-slate-100'}`}>
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+      <div className="bg-white rounded-xl w-full max-w-md shadow-card border border-zinc-100 overflow-hidden animate-in zoom-in-95 duration-300">
+        <div className={`px-8 py-6 flex items-center justify-between border-b ${variant === 'danger' ? 'bg-danger-subtle border-danger-line' : 'bg-zinc-50 border-zinc-100'}`}>
           <div className="flex items-center space-x-3">
-            <div className={`p-2 rounded-xl shadow-lg ${variantStyles[variant]}`}>
+            <div className={`p-2 rounded-xl shadow-card ${variantStyles[variant]}`}>
               <AlertTriangle className="w-5 h-5 text-white" />
             </div>
-            <h2 className={`text-xl font-semibold tracking-tight ${variant === 'danger' ? 'text-rose-900' : 'text-slate-800'}`}>{title}</h2>
+            <h2 className={`text-xl font-semibold tracking-tight ${variant === 'danger' ? 'text-danger-fg' : 'text-fg'}`}>{title}</h2>
           </div>
           <button 
             disabled={loading}
             onClick={onClose} 
             className="p-2 hover:bg-white/50 rounded-full transition-colors group disabled:opacity-50"
           >
-            <X className="w-5 h-5 text-slate-400 group-hover:text-slate-600" />
+            <X className="w-5 h-5 text-fg-subtle group-hover:text-fg-muted" />
           </button>
         </div>
 
         <div className="p-8">
-          <p className="text-slate-600 font-medium leading-relaxed">
+          <p className="text-fg-muted font-medium leading-relaxed">
             {message}
           </p>
           
@@ -67,14 +67,14 @@ export default function ConfirmModal({
             <button
               disabled={loading}
               onClick={onClose}
-              className="flex-1 px-6 py-4 bg-slate-100 text-slate-600 rounded-2xl font-semibold text-sm hover:bg-slate-200 transition-all disabled:opacity-50"
+              className="flex-1 px-6 py-4 bg-zinc-100 text-fg-muted rounded-lg font-semibold text-sm hover:bg-zinc-200 transition-all disabled:opacity-50"
             >
               {cancelText}
             </button>
             <button
               disabled={loading}
               onClick={onConfirm}
-              className={`flex-1 px-6 py-4 text-white rounded-2xl font-semibold text-sm flex items-center justify-center space-x-2 transition-all shadow-xl disabled:opacity-50 ${buttonStyles[variant]}`}
+              className={`flex-1 px-6 py-4 text-white rounded-lg font-semibold text-sm flex items-center justify-center space-x-2 transition-all shadow-card disabled:opacity-50 ${buttonStyles[variant]}`}
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
               <span>{confirmText}</span>

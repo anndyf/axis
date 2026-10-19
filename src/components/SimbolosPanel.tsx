@@ -197,28 +197,28 @@ export default function SimbolosPanel({ inputRef, onInsertQuill, onInsert }: Sim
   const categoriaAtual = CATEGORIAS.find(c => c.id === aba) ?? CATEGORIAS[0]
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-slate-50 overflow-hidden">
+    <div className="rounded-lg border border-zinc-200 bg-zinc-50 overflow-hidden">
       {/* Header toggle */}
       <button
         type="button"
         onClick={() => setOpen(v => !v)}
-        className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-slate-100 transition-colors"
+        className="w-full flex items-center justify-between px-4 py-2.5 text-left hover:bg-zinc-100 transition-colors"
       >
         <div className="flex items-center gap-2">
           <span className="text-base">𝛴</span>
-          <span className="text-xs font-black text-slate-600 uppercase tracking-wider">Símbolos Especiais</span>
-          <span className="text-[10px] text-slate-400 font-medium">Mat. · Quím. · Lógica · Conjuntos</span>
+          <span className="text-xs font-semibold text-fg-muted uppercase tracking-wider">Símbolos Especiais</span>
+          <span className="text-[10px] text-fg-subtle font-medium">Mat. · Quím. · Lógica · Conjuntos</span>
         </div>
         {open 
-          ? <ChevronUp className="w-4 h-4 text-slate-400" /> 
-          : <ChevronDown className="w-4 h-4 text-slate-400" />
+          ? <ChevronUp className="w-4 h-4 text-fg-subtle" /> 
+          : <ChevronDown className="w-4 h-4 text-fg-subtle" />
         }
       </button>
 
       {open && (
-        <div className="border-t border-slate-200">
+        <div className="border-t border-zinc-200">
           {/* Abas de categorias */}
-          <div className="flex overflow-x-auto no-scrollbar border-b border-slate-200 bg-white">
+          <div className="flex overflow-x-auto no-scrollbar border-b border-zinc-200 bg-white">
             {CATEGORIAS.map(cat => (
               <button
                 key={cat.id}
@@ -226,8 +226,8 @@ export default function SimbolosPanel({ inputRef, onInsertQuill, onInsert }: Sim
                 onClick={() => setAba(cat.id)}
                 className={`px-4 py-2 text-[11px] font-bold whitespace-nowrap transition-colors border-b-2 -mb-px ${
                   aba === cat.id
-                    ? "border-blue-600 text-blue-700 bg-blue-50"
-                    : "border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+                    ? "border-accent text-accent-fg bg-accent-subtle"
+                    : "border-transparent text-fg-subtle hover:text-fg-muted hover:bg-zinc-50"
                 }`}
               >
                 {cat.label}
@@ -243,14 +243,14 @@ export default function SimbolosPanel({ inputRef, onInsertQuill, onInsert }: Sim
                 type="button"
                 title={t}
                 onClick={() => handleClick(s)}
-                className="w-9 h-9 flex items-center justify-center text-base font-medium bg-white border border-slate-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700 transition-all active:scale-95 shadow-sm"
+                className="w-9 h-9 flex items-center justify-center text-base font-medium bg-white border border-zinc-200 rounded-lg hover:border-accent hover:bg-accent-subtle hover:text-accent-fg transition-all active:scale-95 shadow-sm"
               >
                 {s}
               </button>
             ))}
           </div>
 
-          <p className="px-3 pb-2.5 text-[10px] text-slate-400 font-medium">
+          <p className="px-3 pb-2.5 text-[10px] text-fg-subtle font-medium">
             💡 Passe o mouse sobre o símbolo para ver o nome. Clique para inserir no campo ativo.
           </p>
         </div>

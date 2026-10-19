@@ -120,90 +120,90 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
         {/* Total */}
         <button
           onClick={() => setFiltroStatus('todos')}
-          className={`p-4 rounded-2xl border text-left transition-all ${
+          className={`p-4 rounded-lg border text-left transition-all ${
             filtroStatus === 'todos'
-              ? 'bg-slate-900 border-slate-900 text-white shadow-lg shadow-slate-300'
-              : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-sm'
+              ? 'bg-zinc-900 border-zinc-900 text-white shadow-card '
+              : 'bg-white border-zinc-200 hover:border-zinc-300 hover:shadow-sm'
           }`}
         >
-          <Users className={`w-4 h-4 mb-2 ${filtroStatus === 'todos' ? 'text-white/60' : 'text-slate-400'}`} />
-          <p className={`text-2xl font-black leading-none ${filtroStatus === 'todos' ? 'text-white' : 'text-slate-800'}`}>{stats.total}</p>
-          <p className={`text-[9px] font-bold uppercase tracking-widest mt-1 ${filtroStatus === 'todos' ? 'text-white/60' : 'text-slate-400'}`}>Total</p>
+          <Users className={`w-4 h-4 mb-2 ${filtroStatus === 'todos' ? 'text-white/60' : 'text-fg-subtle'}`} />
+          <p className={`text-2xl font-semibold leading-none ${filtroStatus === 'todos' ? 'text-white' : 'text-fg'}`}>{stats.total}</p>
+          <p className={`text-[9px] font-bold uppercase tracking-widest mt-1 ${filtroStatus === 'todos' ? 'text-white/60' : 'text-fg-subtle'}`}>Total</p>
         </button>
 
         {/* Ativos */}
         <button
           onClick={() => setFiltroStatus('ativos')}
-          className={`p-4 rounded-2xl border text-left transition-all ${
+          className={`p-4 rounded-lg border text-left transition-all ${
             filtroStatus === 'ativos'
-              ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-200'
-              : 'bg-white border-slate-200 hover:border-emerald-200 hover:shadow-sm'
+              ? 'bg-success border-success text-white shadow-card '
+              : 'bg-white border-zinc-200 hover:border-success-line hover:shadow-sm'
           }`}
         >
-          <CheckCircle2 className={`w-4 h-4 mb-2 ${filtroStatus === 'ativos' ? 'text-white/70' : 'text-emerald-500'}`} />
-          <p className={`text-2xl font-black leading-none ${filtroStatus === 'ativos' ? 'text-white' : 'text-slate-800'}`}>{stats.ativos}</p>
-          <p className={`text-[9px] font-bold uppercase tracking-widest mt-1 ${filtroStatus === 'ativos' ? 'text-white/60' : 'text-slate-400'}`}>Ativos</p>
+          <CheckCircle2 className={`w-4 h-4 mb-2 ${filtroStatus === 'ativos' ? 'text-white/70' : 'text-success-fg'}`} />
+          <p className={`text-2xl font-semibold leading-none ${filtroStatus === 'ativos' ? 'text-white' : 'text-fg'}`}>{stats.ativos}</p>
+          <p className={`text-[9px] font-bold uppercase tracking-widest mt-1 ${filtroStatus === 'ativos' ? 'text-white/60' : 'text-fg-subtle'}`}>Ativos</p>
         </button>
 
         {/* Pendentes */}
         <button
           onClick={() => setFiltroStatus('pendentes')}
-          className={`p-4 rounded-2xl border text-left transition-all relative ${
+          className={`p-4 rounded-lg border text-left transition-all relative ${
             filtroStatus === 'pendentes'
-              ? 'bg-amber-500 border-amber-500 text-white shadow-lg shadow-amber-200'
-              : 'bg-white border-slate-200 hover:border-amber-200 hover:shadow-sm'
+              ? 'bg-warning border-warning text-white shadow-card '
+              : 'bg-white border-zinc-200 hover:border-warning-line hover:shadow-sm'
           }`}
         >
           {stats.pendentes > 0 && filtroStatus !== 'pendentes' && (
-            <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+            <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-warning animate-ping" />
           )}
-          <Clock className={`w-4 h-4 mb-2 ${filtroStatus === 'pendentes' ? 'text-white/70' : 'text-amber-500'}`} />
-          <p className={`text-2xl font-black leading-none ${filtroStatus === 'pendentes' ? 'text-white' : 'text-slate-800'}`}>{stats.pendentes}</p>
-          <p className={`text-[9px] font-bold uppercase tracking-widest mt-1 ${filtroStatus === 'pendentes' ? 'text-white/60' : 'text-slate-400'}`}>Pendentes</p>
+          <Clock className={`w-4 h-4 mb-2 ${filtroStatus === 'pendentes' ? 'text-white/70' : 'text-warning-fg'}`} />
+          <p className={`text-2xl font-semibold leading-none ${filtroStatus === 'pendentes' ? 'text-white' : 'text-fg'}`}>{stats.pendentes}</p>
+          <p className={`text-[9px] font-bold uppercase tracking-widest mt-1 ${filtroStatus === 'pendentes' ? 'text-white/60' : 'text-fg-subtle'}`}>Pendentes</p>
         </button>
 
         {/* Pausados */}
-        <div className="p-4 rounded-2xl border border-slate-200 bg-white text-left">
-          <PauseCircle className="w-4 h-4 mb-2 text-rose-400" />
-          <p className="text-2xl font-black leading-none text-slate-800">{stats.pausados}</p>
-          <p className="text-[9px] font-bold uppercase tracking-widest mt-1 text-slate-400">Pausados</p>
+        <div className="p-4 rounded-lg border border-zinc-200 bg-white text-left">
+          <PauseCircle className="w-4 h-4 mb-2 text-danger" />
+          <p className="text-2xl font-semibold leading-none text-fg">{stats.pausados}</p>
+          <p className="text-[9px] font-bold uppercase tracking-widest mt-1 text-fg-subtle">Pausados</p>
         </div>
 
         {/* Professores */}
-        <div className="p-4 rounded-2xl border border-slate-200 bg-white text-left">
-          <GraduationCap className="w-4 h-4 mb-2 text-blue-500" />
-          <p className="text-2xl font-black leading-none text-slate-800">{stats.professores}</p>
-          <p className="text-[9px] font-bold uppercase tracking-widest mt-1 text-slate-400">Professores</p>
+        <div className="p-4 rounded-lg border border-zinc-200 bg-white text-left">
+          <GraduationCap className="w-4 h-4 mb-2 text-accent-fg" />
+          <p className="text-2xl font-semibold leading-none text-fg">{stats.professores}</p>
+          <p className="text-[9px] font-bold uppercase tracking-widest mt-1 text-fg-subtle">Professores</p>
         </div>
 
         {/* Admins */}
-        <div className="p-4 rounded-2xl border border-slate-200 bg-white text-left">
-          <Shield className="w-4 h-4 mb-2 text-purple-500" />
-          <p className="text-2xl font-black leading-none text-slate-800">{stats.admins}</p>
-          <p className="text-[9px] font-bold uppercase tracking-widest mt-1 text-slate-400">Admins</p>
+        <div className="p-4 rounded-lg border border-zinc-200 bg-white text-left">
+          <Shield className="w-4 h-4 mb-2 text-accent-fg" />
+          <p className="text-2xl font-semibold leading-none text-fg">{stats.admins}</p>
+          <p className="text-[9px] font-bold uppercase tracking-widest mt-1 text-fg-subtle">Admins</p>
         </div>
       </div>
       {/* Barra de ferramentas */}
       <div className="flex flex-col sm:flex-row items-center gap-3 mb-4">
         {/* Busca */}
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-subtle" />
           <input
             type="text"
             placeholder="Buscar por nome, e-mail ou @username..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+            className="w-full pl-9 pr-4 py-2.5 bg-white border border-zinc-200 rounded-xl text-sm focus:ring-2 focus:ring-ring outline-none transition-all"
           />
         </div>
 
         {/* Filtro de status */}
         <div className="relative shrink-0">
-          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-fg-subtle" />
           <select
             value={filtroStatus}
             onChange={e => setFiltroStatus(e.target.value as any)}
-            className="pl-8 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-blue-500 outline-none appearance-none cursor-pointer transition-all"
+            className="pl-8 pr-4 py-2.5 bg-white border border-zinc-200 rounded-xl text-sm font-semibold text-fg-muted focus:ring-2 focus:ring-ring outline-none appearance-none cursor-pointer transition-all"
           >
             <option value="todos">Todos</option>
             <option value="pendentes">Pendentes ({totalPendentes})</option>
@@ -215,7 +215,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
         {totalPendentes > 0 && (
           <button
             onClick={selecionarTodosPendentes}
-            className="shrink-0 flex items-center gap-2 px-4 py-2.5 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-xs font-bold uppercase tracking-widest rounded-xl transition-all"
+            className="shrink-0 flex items-center gap-2 px-4 py-2.5 bg-warning-subtle hover:bg-warning-subtle border border-warning-line text-warning-fg text-xs font-bold uppercase tracking-widest rounded-xl transition-all"
           >
             <Clock className="w-3.5 h-3.5" />
             Selecionar {totalPendentes} pendente{totalPendentes !== 1 ? 's' : ''}
@@ -224,10 +224,10 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
       </div>
 
       {/* Tabela */}
-      <div className="bg-white rounded-3xl shadow-xl shadow-slate-300 border border-slate-300 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-card border border-zinc-300 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-300">
+            <thead className="bg-zinc-50 border-b border-zinc-300">
               <tr>
                 {/* Checkbox selecionar todos */}
                 <th className="pl-6 pr-2 py-4 w-10">
@@ -239,24 +239,24 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
                         selectedIds.size > 0 && selectedIds.size < usuariosFiltrados.length
                     }}
                     onChange={toggleSelectAll}
-                    className="w-4 h-4 rounded cursor-pointer accent-blue-600"
+                    className="w-4 h-4 rounded cursor-pointer accent-[var(--accent)]"
                   />
                 </th>
-                <th className="px-4 py-4 text-left text-xs font-medium text-slate-600 uppercase tracking-widest">Usuário</th>
-                <th className="px-6 py-4 text-center text-xs font-medium text-slate-600 uppercase tracking-widest">Função & Status</th>
-                <th className="px-6 py-4 text-center text-xs font-medium text-slate-600 uppercase tracking-widest">Permissões</th>
-                <th className="px-6 py-4 text-right text-xs font-medium text-slate-600 uppercase tracking-widest">Gerenciamento</th>
+                <th className="px-4 py-4 text-left text-xs font-medium text-fg-muted uppercase tracking-widest">Usuário</th>
+                <th className="px-6 py-4 text-center text-xs font-medium text-fg-muted uppercase tracking-widest">Função & Status</th>
+                <th className="px-6 py-4 text-center text-xs font-medium text-fg-muted uppercase tracking-widest">Permissões</th>
+                <th className="px-6 py-4 text-right text-xs font-medium text-fg-muted uppercase tracking-widest">Gerenciamento</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200">
+            <tbody className="divide-y divide-zinc-200">
               {usuariosFiltrados.map((usuario) => (
                 <tr
                   key={usuario.id}
                   onClick={() => toggleSelect(usuario.id)}
                   className={`transition-colors cursor-pointer
-                    ${selectedIds.has(usuario.id) ? 'bg-blue-50' : ''}
-                    ${!selectedIds.has(usuario.id) && !usuario.isActive ? 'opacity-60 bg-slate-100' : ''}
-                    ${!selectedIds.has(usuario.id) ? 'hover:bg-slate-50' : ''}
+                    ${selectedIds.has(usuario.id) ? 'bg-accent-subtle' : ''}
+                    ${!selectedIds.has(usuario.id) && !usuario.isActive ? 'opacity-60 bg-zinc-100' : ''}
+                    ${!selectedIds.has(usuario.id) ? 'hover:bg-zinc-50' : ''}
                   `}
                 >
                   {/* Checkbox */}
@@ -265,34 +265,34 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
                       type="checkbox"
                       checked={selectedIds.has(usuario.id)}
                       onChange={() => toggleSelect(usuario.id)}
-                      className="w-4 h-4 rounded cursor-pointer accent-blue-600"
+                      className="w-4 h-4 rounded cursor-pointer accent-[var(--accent)]"
                     />
                   </td>
 
                   <td className="px-4 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white font-medium text-lg shadow-inner ${
+                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-white font-medium text-lg shadow-card ${
                         !usuario.isApproved
-                          ? 'bg-amber-400'
+                          ? 'bg-warning'
                           : !usuario.isActive
-                            ? 'bg-slate-300'
+                            ? 'bg-zinc-300'
                             : usuario.isSuperuser
-                              ? 'bg-gradient-to-br from-slate-500 to-purple-600'
-                              : 'bg-gradient-to-br from-slate-500 to-slate-600'
+                              ? ' bg-zinc-500 '
+                              : ' bg-zinc-500 to-zinc-600'
                       }`}>
                         {usuario.name?.charAt(0).toUpperCase() || 'U'}
                       </div>
                       <div className="ml-4">
                         <div className="flex items-center gap-2">
-                          <div className={`text-sm font-medium tracking-tight ${!usuario.isActive ? 'text-slate-600' : 'text-slate-800'}`}>
+                          <div className={`text-sm font-medium tracking-tight ${!usuario.isActive ? 'text-fg-muted' : 'text-fg'}`}>
                             {usuario.name || 'Sem nome'}
                           </div>
                           {!usuario.isApproved && (
-                            <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-ping" />
+                            <span className="flex h-2 w-2 rounded-full bg-warning animate-ping" />
                           )}
                         </div>
-                        <div className="text-xs text-slate-600 font-medium tracking-tight">{usuario.email}</div>
-                        <div className="text-[10px] text-slate-400 font-medium uppercase tracking-widest mt-0.5">
+                        <div className="text-xs text-fg-muted font-medium tracking-tight">{usuario.email}</div>
+                        <div className="text-[10px] text-fg-subtle font-medium uppercase tracking-widest mt-0.5">
                           @{usuario.username}
                         </div>
                       </div>
@@ -303,24 +303,24 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
                     <div className="flex flex-col items-center gap-1.5">
                       <div className="flex items-center gap-1.5">
                         {!usuario.isApproved ? (
-                          <span className="px-2.5 py-0.5 inline-flex items-center text-[10px] font-medium uppercase tracking-wider rounded-full bg-amber-100 text-amber-700 border border-amber-200">
+                          <span className="px-2.5 py-0.5 inline-flex items-center text-[10px] font-medium uppercase tracking-wider rounded-full bg-warning-subtle text-warning-fg border border-warning-line">
                             <Clock className="w-3 h-3 mr-1" />
                             Solicitação
                           </span>
                         ) : (
                           <>
                             {usuario.isSuperuser && (
-                              <span className="px-2.5 py-0.5 inline-flex items-center text-[10px] font-medium uppercase tracking-wider rounded-full bg-purple-100 text-purple-700 border border-purple-200">
+                              <span className="px-2.5 py-0.5 inline-flex items-center text-[10px] font-medium uppercase tracking-wider rounded-full bg-accent-subtle text-accent-fg border border-accent/25">
                                 <Shield className="w-3 h-3 mr-1" />Admin
                               </span>
                             )}
                              {usuario.isStaff && (
-                               <span className="px-2.5 py-0.5 inline-flex items-center text-[10px] font-medium uppercase tracking-wider rounded-full bg-slate-200 text-slate-800 border border-slate-300">
+                               <span className="px-2.5 py-0.5 inline-flex items-center text-[10px] font-medium uppercase tracking-wider rounded-full bg-zinc-200 text-fg border border-zinc-300">
                                  <GraduationCap className="w-3 h-3 mr-1" />Professor
                                </span>
                              )}
                              {(usuario as any).isAEE && (
-                               <span className="px-2.5 py-0.5 inline-flex items-center text-[10px] font-medium uppercase tracking-wider rounded-full bg-teal-100 text-teal-700 border border-teal-200">
+                               <span className="px-2.5 py-0.5 inline-flex items-center text-[10px] font-medium uppercase tracking-wider rounded-full bg-success-subtle text-success-fg border border-success-line">
                                  <Accessibility className="w-3 h-3 mr-1" />AEE
                                </span>
                              )}
@@ -328,12 +328,12 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
                         )}
                       </div>
                       {usuario.isApproved && !usuario.isActive && (
-                        <span className="px-2.5 py-0.5 inline-flex items-center text-[10px] font-medium uppercase tracking-wider rounded-full bg-rose-100 text-rose-700 border border-rose-200 animate-pulse">
+                        <span className="px-2.5 py-0.5 inline-flex items-center text-[10px] font-medium uppercase tracking-wider rounded-full bg-danger-subtle text-danger-fg border border-danger-line animate-pulse">
                           <PauseCircle className="w-3 h-3 mr-1" />Acesso Pausado
                         </span>
                       )}
                       {usuario.isApproved && usuario.isActive && (
-                        <span className="px-2.5 py-0.5 inline-flex items-center text-[10px] font-medium uppercase tracking-wider rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
+                        <span className="px-2.5 py-0.5 inline-flex items-center text-[10px] font-medium uppercase tracking-wider rounded-full bg-success-subtle text-success-fg border border-success-line">
                           <CheckCircle2 className="w-3 h-3 mr-1" />Ativo
                         </span>
                       )}
@@ -342,12 +342,12 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
 
                   <td className="px-6 py-4 whitespace-nowrap text-center text-sm">
                     {usuario.isSuperuser ? (
-                      <span className="text-slate-700 font-medium text-[10px] uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-lg border border-slate-200">Controle Total</span>
+                      <span className="text-fg-muted font-medium text-[10px] uppercase tracking-widest bg-zinc-50 px-3 py-1 rounded-lg border border-zinc-200">Controle Total</span>
                     ) : !usuario.isApproved ? (
-                      <span className="text-slate-400 italic text-[10px] font-medium uppercase tracking-widest">A aguardar</span>
+                      <span className="text-fg-subtle italic text-[10px] font-medium uppercase tracking-widest">A aguardar</span>
                     ) : (
-                      <span className="font-medium text-slate-700 text-xs">
-                        {usuario._count.disciplinasPermitidas} <span className="text-[10px] font-medium text-slate-400 uppercase tracking-tight">Disciplinas</span>
+                      <span className="font-medium text-fg-muted text-xs">
+                        {usuario._count.disciplinasPermitidas} <span className="text-[10px] font-medium text-fg-subtle uppercase tracking-tight">Disciplinas</span>
                       </span>
                     )}
                   </td>
@@ -368,8 +368,8 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
               {usuariosFiltrados.length === 0 && (
                 <tr>
                   <td colSpan={5} className="px-6 py-20 text-center">
-                    <Users className="w-10 h-10 text-slate-200 mx-auto mb-3" />
-                    <p className="text-sm font-semibold text-slate-400 uppercase tracking-widest">Nenhum usuário encontrado</p>
+                    <Users className="w-10 h-10 text-zinc-200 mx-auto mb-3" />
+                    <p className="text-sm font-semibold text-fg-subtle uppercase tracking-widest">Nenhum usuário encontrado</p>
                   </td>
                 </tr>
               )}
@@ -381,10 +381,10 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
       {/* Barra flutuante de aprovação em massa */}
       {selectedIds.size > 0 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-4 duration-200">
-          <div className="flex items-center gap-4 bg-slate-900 text-white px-5 py-3.5 rounded-2xl shadow-2xl shadow-slate-900/40 border border-white/10">
+          <div className="flex items-center gap-4 bg-zinc-900 text-white px-5 py-3.5 rounded-lg shadow-card border border-white/10">
             {/* Contagem */}
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-xs font-black shrink-0">
+              <div className="w-6 h-6 rounded-full bg-accent flex items-center justify-center text-xs font-semibold shrink-0">
                 {selectedIds.size}
               </div>
               <span className="text-sm font-semibold whitespace-nowrap">
@@ -407,7 +407,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
               <button
                 onClick={handleAprovarEmMassa}
                 disabled={aprovando}
-                className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-xl transition-all disabled:opacity-50 active:scale-95"
+                className="flex items-center gap-2 bg-success hover:bg-success text-white text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-xl transition-all disabled:opacity-50 active:scale-95"
               >
                 {aprovando
                   ? <Loader2 size={14} className="animate-spin" />
@@ -424,10 +424,10 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
       {/* Toast de resultado */}
       {resultMsg && (
         <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-4 duration-300">
-          <div className={`flex items-center gap-3 text-white px-5 py-3.5 rounded-2xl shadow-2xl max-w-sm border ${
+          <div className={`flex items-center gap-3 text-white px-5 py-3.5 rounded-lg shadow-card max-w-sm border ${
             resultMsg.ok
-              ? 'bg-emerald-600 border-emerald-500/50 shadow-emerald-900/30'
-              : 'bg-rose-600 border-rose-500/50 shadow-rose-900/30'
+              ? 'bg-success border-success '
+              : 'bg-danger border-danger '
           }`}>
             <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
               {resultMsg.ok ? <CheckCheck size={16} /> : <X size={16} />}

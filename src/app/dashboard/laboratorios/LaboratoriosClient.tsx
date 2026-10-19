@@ -221,31 +221,31 @@ export default function LaboratoriosClient({
   return (
     <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 pb-20">
       {/* Header Centralizado */}
-      <section className="bg-white border border-slate-200 rounded-[2rem] p-8 shadow-sm relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-slate-500/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
+      <section className="bg-white border border-zinc-200 rounded-xl p-8 shadow-sm relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-zinc-500/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-1">
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Reserva de Laboratórios</h1>
-            <p className="text-slate-500 font-medium">Gerencie o uso compartilhado dos espaços tecnológicos.</p>
+            <h1 className="text-3xl font-bold text-fg tracking-tight">Reserva de Laboratórios</h1>
+            <p className="text-fg-subtle font-medium">Gerencie o uso compartilhado dos espaços tecnológicos.</p>
           </div>
 
           <div className="flex flex-wrap gap-3">
-             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex items-center gap-4">
-                <div className="w-10 h-10 bg-white border border-slate-200 rounded-xl flex items-center justify-center text-slate-700 shadow-sm">
+             <div className="bg-zinc-50 border border-zinc-200 rounded-lg p-4 flex items-center gap-4">
+                <div className="w-10 h-10 bg-white border border-zinc-200 rounded-xl flex items-center justify-center text-fg-muted shadow-sm">
                    <Calendar className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Semana de</p>
-                  <p className="text-sm font-semibold text-slate-800">
+                  <p className="text-[10px] font-medium text-fg-subtle uppercase tracking-widest">Semana de</p>
+                  <p className="text-sm font-semibold text-fg">
                      {`${format(startOfWeek(selectedDate, { weekStartsOn: 1 }), "dd/MM")} a ${format(endOfWeek(selectedDate, { weekStartsOn: 1 }), "dd/MM")}`}
                   </p>
                 </div>
              </div>
 
-             <div className="flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200 shadow-inner">
+             <div className="flex items-center bg-zinc-100 p-1 rounded-lg border border-zinc-200 shadow-card">
                 <button 
                   onClick={() => setSelectedDate(subDays(selectedDate, 7))}
-                  className="p-2.5 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-white transition-all"
+                  className="p-2.5 rounded-xl text-fg-subtle hover:text-fg-muted hover:bg-white transition-all"
                   title="Semana Anterior"
                 >
                   <ChevronLeft size={18} />
@@ -253,14 +253,14 @@ export default function LaboratoriosClient({
                 
                 <button 
                   onClick={() => setSelectedDate(new Date())}
-                  className="px-4 py-2.5 rounded-xl text-[10px] font-bold text-slate-900 bg-white shadow-sm hover:bg-slate-50 transition-all"
+                  className="px-4 py-2.5 rounded-xl text-[10px] font-bold text-fg bg-white shadow-sm hover:bg-zinc-50 transition-all"
                 >
                   HOJE
                 </button>
 
                 <button 
                   onClick={() => setSelectedDate(addDays(selectedDate, 7))}
-                  className="p-2.5 rounded-xl text-slate-500 hover:text-slate-700 hover:bg-white transition-all"
+                  className="p-2.5 rounded-xl text-fg-subtle hover:text-fg-muted hover:bg-white transition-all"
                   title="Próxima Semana"
                 >
                   <ChevronRight size={18} />
@@ -276,10 +276,10 @@ export default function LaboratoriosClient({
                      setMessage({ type: 'error', text: "Selecione pelo menos um horário na grade abaixo." })
                    }
                  }}
-                 className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all shadow-md active:scale-95 ${
+                 className={`flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-all shadow-card active:scale-95 ${
                    selectedSlots.length > 0 
-                     ? 'bg-emerald-600 text-white shadow-emerald-200' 
-                     : 'bg-white border-2 border-slate-200 text-slate-400'
+                     ? 'bg-success text-white ' 
+                     : 'bg-white border-2 border-zinc-200 text-fg-subtle'
                  }`}
                >
                  <Plus size={18} />
@@ -295,7 +295,7 @@ export default function LaboratoriosClient({
          {/* Sidebar de Labs */}
          <div className="lg:col-span-1 space-y-4">
             <div className="flex items-center justify-between ml-1">
-              <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Laboratórios</h3>
+              <h3 className="text-xs font-semibold text-fg-subtle uppercase tracking-widest">Laboratórios</h3>
               <div className="flex gap-2">
                 {isAdmin && (
                   <>
@@ -308,7 +308,7 @@ export default function LaboratoriosClient({
                           setShowLabModal(true)
                         }
                       }}
-                      className="p-1.5 bg-white border border-slate-200 text-slate-500 rounded-lg hover:border-slate-900 hover:text-slate-900 transition-all shadow-sm"
+                      className="p-1.5 bg-white border border-zinc-200 text-fg-subtle rounded-lg hover:border-zinc-900 hover:text-fg transition-all shadow-sm"
                       title="Editar Laboratório Atual"
                     >
                       <Pencil size={14} />
@@ -319,7 +319,7 @@ export default function LaboratoriosClient({
                         setEditingLabId(null)
                         setShowLabModal(true)
                       }}
-                      className="p-1.5 bg-slate-900 text-white rounded-lg hover:bg-slate-700 transition-all shadow-sm"
+                      className="p-1.5 bg-zinc-900 text-white rounded-lg hover:bg-zinc-700 transition-all shadow-sm"
                       title="Novo Laboratório"
                     >
                       <Plus size={14} />
@@ -332,26 +332,26 @@ export default function LaboratoriosClient({
                <select
                  value={selectedLab}
                  onChange={(e) => setSelectedLab(e.target.value)}
-                 className="w-full appearance-none bg-white border-2 border-slate-200 rounded-2xl pl-5 pr-12 py-4 text-sm font-bold text-slate-800 focus:border-slate-900 focus:ring-0 transition-all shadow-sm cursor-pointer"
+                 className="w-full appearance-none bg-white border-2 border-zinc-200 rounded-lg pl-5 pr-12 py-4 text-sm font-bold text-fg focus:border-zinc-900 focus:ring-0 transition-all shadow-sm cursor-pointer"
                >
                  {initialLaboratorios.map(lab => (
-                   <option key={lab.id} value={lab.id} className="font-medium text-slate-700 py-2">
+                   <option key={lab.id} value={lab.id} className="font-medium text-fg-muted py-2">
                      {lab.nome}
                    </option>
                  ))}
                </select>
-               <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover:text-slate-600 transition-colors">
+               <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-fg-subtle group-hover:text-fg-muted transition-colors">
                   <ChevronDown className="w-4 h-4" />
                </div>
             </div>
 
             {initialLaboratorios.find(l => l.id === selectedLab)?.descricao && (
-               <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 animate-in slide-in-from-top-2">
+               <div className="p-4 bg-zinc-50 rounded-lg border border-zinc-200 animate-in slide-in-from-top-2">
                   <div className="flex items-center gap-2 mb-2">
-                    <Info size={14} className="text-blue-500" />
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Sobre este espaço</span>
+                    <Info size={14} className="text-accent-fg" />
+                    <span className="text-[10px] font-bold text-fg-subtle uppercase tracking-widest">Sobre este espaço</span>
                   </div>
-                  <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                  <p className="text-xs text-fg-muted leading-relaxed font-medium">
                     {initialLaboratorios.find(l => l.id === selectedLab)?.descricao}
                   </p>
                </div>
@@ -362,8 +362,8 @@ export default function LaboratoriosClient({
          {/* Grade de Horários */}
          <div className="lg:col-span-3 space-y-6">
             {message && (
-              <div className={`p-4 rounded-2xl flex items-center gap-3 animate-in slide-in-from-top-4 duration-300 ${
-                message.type === 'success' ? 'bg-emerald-50 border border-emerald-200 text-emerald-800' : 'bg-rose-50 border border-rose-200 text-rose-800'
+              <div className={`p-4 rounded-lg flex items-center gap-3 animate-in slide-in-from-top-4 duration-300 ${
+                message.type === 'success' ? 'bg-success-subtle border border-success-line text-success-fg' : 'bg-danger-subtle border border-danger-line text-danger-fg'
               }`}>
                 {message.type === 'success' ? <CheckCircle2 size={18}/> : <AlertCircle size={18}/>}
                 <span className="text-sm font-medium">{message.text}</span>
@@ -374,24 +374,24 @@ export default function LaboratoriosClient({
               {turnos.map(turno => (
                 <div key={turno.id} className="space-y-4">
                    <div className="flex items-center gap-3 ml-2">
-                      <div className="w-2 h-2 rounded-full bg-slate-900 shadow-[0_0_8px_rgba(15,23,42,0.3)]"></div>
-                      <h4 className="text-sm font-bold text-slate-800 uppercase tracking-[0.1em]">{turno.nome}</h4>
+                      <div className="w-2 h-2 rounded-full bg-zinc-900 shadow-[0_0_8px_rgba(15,23,42,0.3)]"></div>
+                      <h4 className="text-sm font-bold text-fg uppercase tracking-[0.1em]">{turno.nome}</h4>
                    </div>
 
-                   <div className="overflow-x-auto rounded-[2rem] border border-slate-200 shadow-sm bg-white">
+                   <div className="overflow-x-auto rounded-xl border border-zinc-200 shadow-sm bg-white">
                      <table className="w-full border-collapse table-fixed">
                        <thead>
-                         <tr className="bg-slate-50/50 text-slate-400">
-                           <th className="p-4 text-left text-[10px] font-bold uppercase tracking-[0.2em] border-b border-slate-100 w-24">Horário</th>
+                         <tr className="bg-zinc-50/50 text-fg-subtle">
+                           <th className="p-4 text-left text-[10px] font-bold uppercase tracking-[0.2em] border-b border-zinc-100 w-24">Horário</th>
                            {weekDays.map(day => {
                              const isToday = isSameDay(day, new Date())
                              return (
-                               <th key={day.toISOString()} className={`p-4 text-center border-b border-slate-100 min-w-[140px] ${isToday ? 'bg-blue-50/20' : ''}`}>
+                               <th key={day.toISOString()} className={`p-4 text-center border-b border-zinc-100 min-w-[140px] ${isToday ? 'bg-accent-subtle' : ''}`}>
                                  <div className="flex flex-col items-center gap-0.5">
-                                   <span className={`text-[10px] font-bold uppercase tracking-widest ${isToday ? 'text-blue-600' : 'text-slate-500'}`}>
+                                   <span className={`text-[10px] font-bold uppercase tracking-widest ${isToday ? 'text-accent-fg' : 'text-fg-subtle'}`}>
                                      {format(day, "EEEE", { locale: ptBR })}
                                    </span>
-                                   <span className={`text-[9px] font-medium ${isToday ? 'text-blue-500/70' : 'text-slate-400'}`}>
+                                   <span className={`text-[9px] font-medium ${isToday ? 'text-accent-fg' : 'text-fg-subtle'}`}>
                                      {format(day, "dd/MM")}
                                    </span>
                                  </div>
@@ -404,22 +404,22 @@ export default function LaboratoriosClient({
                          {Array.from({ length: turno.slots }).map((_, idx) => {
                            const horario = idx + 1
                            return (
-                             <tr key={horario} className="hover:bg-slate-50/50 transition-colors">
-                               <td className="p-4 border-b border-slate-100 font-bold text-slate-700 text-xs">{horario}º Horário</td>
+                             <tr key={horario} className="hover:bg-zinc-50/50 transition-colors">
+                               <td className="p-4 border-b border-zinc-100 font-bold text-fg-muted text-xs">{horario}º Horário</td>
                                {weekDays.map(day => {
                                  const reserva = getReservaForSlot(turno.id, horario, day)
                                  const isMyReserva = reserva?.userId === currentUser.id
                                  return (
-                                   <td key={day.toISOString()} className={`p-2 border-b border-slate-100 border-l border-slate-50 ${isSameDay(day, new Date()) ? 'bg-blue-50/10' : ''}`}>
+                                   <td key={day.toISOString()} className={`p-2 border-b border-zinc-100 border-l border-zinc-50 ${isSameDay(day, new Date()) ? 'bg-accent-subtle' : ''}`}>
                                      {reserva ? (
-                                       <div className={`p-3 rounded-xl border relative group ${isMyReserva ? 'bg-emerald-600 border-emerald-700 text-white shadow-lg shadow-emerald-100' : 'bg-white border-slate-200 text-slate-600 shadow-sm'}`}>
+                                       <div className={`p-3 rounded-xl border relative group ${isMyReserva ? 'bg-success border-success text-white shadow-card ' : 'bg-white border-zinc-200 text-fg-muted shadow-sm'}`}>
                                          <p className="text-[10px] font-bold line-clamp-1 uppercase tracking-tight">{reserva.user?.name || reserva.user?.username}</p>
-                                         <p className={`text-[9px] font-medium line-clamp-1 ${isMyReserva ? 'text-emerald-100' : 'text-slate-400'}`}>{reserva.disciplina || "Uso Técnico"}</p>
+                                         <p className={`text-[9px] font-medium line-clamp-1 ${isMyReserva ? 'text-white/85' : 'text-fg-subtle'}`}>{reserva.disciplina || "Uso Técnico"}</p>
                                          
                                          {(isMyReserva || isAdmin) && (
                                            <button 
                                              onClick={() => handleDeleteReserva(reserva.id)}
-                                             className="absolute -top-1 -right-1 p-1 bg-rose-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                                             className="absolute -top-1 -right-1 p-1 bg-danger text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-overlay"
                                            >
                                              <X size={10} />
                                            </button>
@@ -446,11 +446,11 @@ export default function LaboratoriosClient({
                                          }}
                                          className={`w-full h-10 rounded-xl border transition-all flex items-center justify-center group ${
                                            selectedSlots.find(s => s.data === format(day, 'yyyy-MM-dd') && s.turno === turno.id && s.horario === horario)
-                                             ? 'bg-slate-900 border-slate-900 text-white ring-4 ring-slate-900/10'
-                                             : 'border-dashed border-slate-200 hover:border-slate-900 hover:bg-white'
+                                             ? 'bg-zinc-900 border-zinc-900 text-white ring-4 ring-zinc-900/10'
+                                             : 'border-dashed border-zinc-200 hover:border-zinc-900 hover:bg-white'
                                          }`}
                                        >
-                                         <Plus size={14} className={selectedSlots.find(s => s.data === format(day, 'yyyy-MM-dd') && s.turno === turno.id && s.horario === horario) ? "text-white" : "text-slate-300 group-hover:text-slate-900"} />
+                                         <Plus size={14} className={selectedSlots.find(s => s.data === format(day, 'yyyy-MM-dd') && s.turno === turno.id && s.horario === horario) ? "text-white" : "text-zinc-300 group-hover:text-fg"} />
                                        </button>
                                      )}
                                    </td>
@@ -468,7 +468,7 @@ export default function LaboratoriosClient({
 
             {loading && (
               <div className="flex items-center justify-center py-20">
-                 <Loader2 className="w-8 h-8 text-slate-400 animate-spin" />
+                 <Loader2 className="w-8 h-8 text-fg-subtle animate-spin" />
               </div>
             )}
          </div>
@@ -476,14 +476,14 @@ export default function LaboratoriosClient({
 
       {/* Modal de Reserva de Horário */}
       {showModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-300">
-              <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+           <div className="bg-white rounded-xl shadow-card w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-300">
+              <div className="p-6 border-b border-zinc-100 flex items-center justify-between">
                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-slate-100 text-slate-900 rounded-xl flex items-center justify-center"><Clock size={20}/></div>
+                    <div className="w-10 h-10 bg-zinc-100 text-fg rounded-xl flex items-center justify-center"><Clock size={20}/></div>
                     <div>
-                        <h3 className="text-lg font-bold text-slate-800 tracking-tight">Nova Reserva</h3>
-                        <p className="text-xs font-medium text-slate-400 uppercase tracking-widest">
+                        <h3 className="text-lg font-bold text-fg tracking-tight">Nova Reserva</h3>
+                        <p className="text-xs font-medium text-fg-subtle uppercase tracking-widest">
                           {selectedSlots.length > 0 
                             ? `${selectedSlots.length} Horário(s) Selecionado(s)` 
                             : `${activeSlot?.horario}º Horário / ${turnos.find(t => t.id === activeSlot?.turno)?.nome}`
@@ -491,13 +491,13 @@ export default function LaboratoriosClient({
                         </p>
                     </div>
                  </div>
-                 <button onClick={() => setShowModal(false)} className="p-2 hover:bg-slate-100 rounded-xl transition-all text-slate-400"><X size={20}/></button>
+                 <button onClick={() => setShowModal(false)} className="p-2 hover:bg-zinc-100 rounded-xl transition-all text-fg-subtle"><X size={20}/></button>
               </div>
 
               <div className="p-8 space-y-6">
                  {message && (
-                   <div className={`p-4 rounded-2xl flex items-center gap-3 animate-in fade-in duration-300 ${
-                     message.type === 'success' ? 'bg-emerald-50 border border-emerald-200 text-emerald-800' : 'bg-rose-50 border border-rose-200 text-rose-800'
+                   <div className={`p-4 rounded-lg flex items-center gap-3 animate-in fade-in duration-300 ${
+                     message.type === 'success' ? 'bg-success-subtle border border-success-line text-success-fg' : 'bg-danger-subtle border border-danger-line text-danger-fg'
                    }`}>
                      {message.type === 'success' ? <CheckCircle2 size={18}/> : <AlertCircle size={18}/>}
                      <span className="text-xs font-medium leading-tight">{message.text}</span>
@@ -507,14 +507,14 @@ export default function LaboratoriosClient({
                  <div className="space-y-4">
                     {/* Seletor de Turma */}
                     <div className="space-y-2">
-                       <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-1">Turma</label>
+                       <label className="text-[10px] font-bold text-fg-subtle uppercase tracking-[0.2em] ml-1">Turma</label>
                        <select 
                          value={selectedTurmaId}
                          onChange={(e) => {
                            setSelectedTurmaId(e.target.value)
                            setSelectedDisciplinaId("")
                          }}
-                         className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-sm font-medium focus:ring-2 focus:ring-slate-900 transition-all outline-none shadow-sm"
+                         className="w-full bg-zinc-50 border-none rounded-lg px-6 py-4 text-sm font-medium focus:ring-2 focus:ring-zinc-900 transition-all outline-none shadow-sm"
                        >
                          <option value="">Selecione a Turma</option>
                          {myTurmas.map(t => (
@@ -526,11 +526,11 @@ export default function LaboratoriosClient({
                     {/* Seletor de Disciplina */}
                     {selectedTurmaId && (
                       <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-1">Disciplina</label>
+                        <label className="text-[10px] font-bold text-fg-subtle uppercase tracking-[0.2em] ml-1">Disciplina</label>
                         <select 
                           value={selectedDisciplinaId}
                           onChange={(e) => setSelectedDisciplinaId(e.target.value)}
-                          className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-sm font-medium focus:ring-2 focus:ring-slate-900 transition-all outline-none shadow-sm"
+                          className="w-full bg-zinc-50 border-none rounded-lg px-6 py-4 text-sm font-medium focus:ring-2 focus:ring-zinc-900 transition-all outline-none shadow-sm"
                         >
                           <option value="">Selecione a Disciplina</option>
                           {selectedTurma?.disciplinas.map((d: any) => (
@@ -543,22 +543,22 @@ export default function LaboratoriosClient({
                     {/* Campo de Texto (Motivo) - APENAS ADMIN */}
                     {isAdmin && (
                       <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-1">Motivo / Atividade (Manual)</label>
+                        <label className="text-[10px] font-bold text-fg-subtle uppercase tracking-[0.2em] ml-1">Motivo / Atividade (Manual)</label>
                         <input 
                           type="text" 
                           value={formDisciplina}
                           onChange={(e) => setFormDisciplina(e.target.value)}
                           placeholder="Opcional: Descreva a atividade"
-                          className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-sm font-medium focus:ring-2 focus:ring-slate-900 transition-all outline-none shadow-sm"
+                          className="w-full bg-zinc-50 border-none rounded-lg px-6 py-4 text-sm font-medium focus:ring-2 focus:ring-zinc-900 transition-all outline-none shadow-sm"
                         />
                       </div>
                     )}
                     
                     {!isAdmin && (
-                      <div className="bg-blue-50/50 rounded-2xl p-4 flex items-start gap-4 border border-blue-100">
-                        <Info size={18} className="text-blue-600 mt-1 shrink-0" />
-                        <p className="text-xs text-blue-800 leading-relaxed font-medium">
-                          Lembre-se: Você pode fazer até <strong className="text-blue-900">3 reservas em dias diferentes por semana</strong>.
+                      <div className="bg-accent-subtle rounded-lg p-4 flex items-start gap-4 border border-accent/25">
+                        <Info size={18} className="text-accent-fg mt-1 shrink-0" />
+                        <p className="text-xs text-accent-fg leading-relaxed font-medium">
+                          Lembre-se: Você pode fazer até <strong className="text-accent-fg">3 reservas em dias diferentes por semana</strong>.
                         </p>
                       </div>
                     )}
@@ -573,14 +573,14 @@ export default function LaboratoriosClient({
                         setSelectedDisciplinaId("")
                         setFormDisciplina("")
                       }} 
-                      className="flex-1 py-4 text-sm font-bold text-slate-400 hover:bg-slate-50 rounded-2xl transition-all"
+                      className="flex-1 py-4 text-sm font-bold text-fg-subtle hover:bg-zinc-50 rounded-lg transition-all"
                     >
                       CANCELAR
                     </button>
                     <button 
                       onClick={handleReserve}
                       disabled={submitting || (!isAdmin && (!selectedTurmaId || !selectedDisciplinaId))}
-                      className="flex-1 py-4 bg-slate-900 text-white text-sm font-bold rounded-2xl shadow-xl shadow-slate-300 hover:bg-slate-800 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                      className="flex-1 py-4 bg-zinc-900 text-white text-sm font-bold rounded-lg shadow-card hover:bg-zinc-800 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                        {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 size={18} />}
                        CONFIRMAR
@@ -593,38 +593,38 @@ export default function LaboratoriosClient({
 
       {/* Modal de Cadastro de Laboratório (Admin) */}
       {showLabModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-300">
-              <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+           <div className="bg-white rounded-xl shadow-card w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-300">
+              <div className="p-6 border-b border-zinc-100 flex items-center justify-between bg-zinc-50">
                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center shadow-lg"><Monitor size={20}/></div>
+                    <div className="w-10 h-10 bg-zinc-900 text-white rounded-xl flex items-center justify-center shadow-card"><Monitor size={20}/></div>
                     <div>
-                        <h3 className="text-lg font-bold text-slate-800 tracking-tight">{editingLabId ? 'Editar Laboratório' : 'Novo Laboratório'}</h3>
-                        <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Acesso Administrativo</p>
+                        <h3 className="text-lg font-bold text-fg tracking-tight">{editingLabId ? 'Editar Laboratório' : 'Novo Laboratório'}</h3>
+                        <p className="text-[10px] font-medium text-fg-subtle uppercase tracking-widest">Acesso Administrativo</p>
                     </div>
                  </div>
-                 <button onClick={() => { setShowLabModal(false); setEditingLabId(null); }} className="p-2 hover:bg-slate-200 rounded-xl transition-all text-slate-400"><X size={20}/></button>
+                 <button onClick={() => { setShowLabModal(false); setEditingLabId(null); }} className="p-2 hover:bg-zinc-200 rounded-xl transition-all text-fg-subtle"><X size={20}/></button>
               </div>
 
               <div className="p-8 space-y-6">
                  <div className="space-y-4">
                     <div className="space-y-2">
-                       <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-1">Nome do Espaço</label>
+                       <label className="text-[10px] font-bold text-fg-subtle uppercase tracking-[0.2em] ml-1">Nome do Espaço</label>
                        <input 
                          type="text" 
                          value={formLab.nome}
                          onChange={(e) => setFormLab(prev => ({ ...prev, nome: e.target.value }))}
                          placeholder="Ex: Laboratório de Redes"
-                         className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-sm font-medium focus:ring-2 focus:ring-slate-900 transition-all outline-none shadow-sm"
+                         className="w-full bg-zinc-50 border-none rounded-lg px-6 py-4 text-sm font-medium focus:ring-2 focus:ring-zinc-900 transition-all outline-none shadow-sm"
                        />
                     </div>
                     <div className="space-y-2">
-                       <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-1">Descrição (Opcional)</label>
+                       <label className="text-[10px] font-bold text-fg-subtle uppercase tracking-[0.2em] ml-1">Descrição (Opcional)</label>
                        <textarea 
                          value={formLab.descricao}
                          onChange={(e) => setFormLab(prev => ({ ...prev, descricao: e.target.value }))}
                          placeholder="Informações sobre equipamentos, capacidade, etc."
-                         className="w-full bg-slate-50 border-none rounded-2xl px-6 py-4 text-sm font-medium focus:ring-2 focus:ring-slate-900 transition-all outline-none shadow-sm min-h-[100px]"
+                         className="w-full bg-zinc-50 border-none rounded-lg px-6 py-4 text-sm font-medium focus:ring-2 focus:ring-zinc-900 transition-all outline-none shadow-sm min-h-[100px]"
                        />
                     </div>
                  </div>
@@ -632,14 +632,14 @@ export default function LaboratoriosClient({
                   <div className="flex gap-4 pt-4">
                     <button 
                       onClick={() => { setShowLabModal(false); setEditingLabId(null); }} 
-                      className="flex-1 py-4 text-sm font-bold text-slate-400 hover:bg-slate-50 rounded-2xl transition-all"
+                      className="flex-1 py-4 text-sm font-bold text-fg-subtle hover:bg-zinc-50 rounded-lg transition-all"
                     >
                       CANCELAR
                     </button>
                     <button 
                       onClick={handleSaveLab}
                       disabled={submitting || !formLab.nome}
-                      className="flex-1 py-4 bg-slate-900 text-white text-sm font-bold rounded-2xl shadow-xl shadow-slate-300 hover:bg-slate-800 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                      className="flex-1 py-4 bg-zinc-900 text-white text-sm font-bold rounded-lg shadow-card hover:bg-zinc-800 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                        {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 size={18} />}
                        {editingLabId ? 'ATUALIZAR' : 'CADASTRAR'}

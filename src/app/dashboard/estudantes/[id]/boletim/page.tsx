@@ -40,21 +40,21 @@ function getStatusColor(status: string) {
     case 'APROVADO':
     case 'APROVADO_RECUPERACAO':
     case 'APROVADO_CONSELHO':
-      return 'text-green-700 bg-green-100 shadow-sm border border-green-200'
+      return 'text-success-fg bg-success-subtle shadow-sm border border-success-line'
     case 'RECUPERACAO':
-      return 'text-orange-700 bg-orange-100 shadow-sm border border-orange-200'
+      return 'text-warning-fg bg-warning-subtle shadow-sm border border-warning-line'
     case 'EM_CONSELHO':
-      return 'text-amber-700 bg-amber-100 shadow-sm border border-amber-200 animate-pulse'
+      return 'text-warning-fg bg-warning-subtle shadow-sm border border-warning-line animate-pulse'
     case 'DEPENDENCIA':
-      return 'text-slate-800 bg-slate-200 shadow-sm border border-slate-300'
+      return 'text-fg bg-zinc-200 shadow-sm border border-zinc-300'
     case 'CONSERVADO':
-      return 'text-rose-700 bg-rose-100 shadow-sm border border-rose-200'
+      return 'text-danger-fg bg-danger-subtle shadow-sm border border-danger-line'
     case 'DESISTENTE':
-      return 'text-blue-800 bg-slate-200 shadow-sm border border-slate-300'
+      return 'text-accent-fg bg-zinc-200 shadow-sm border border-zinc-300'
     case 'REPROVADO_FALTA':
-      return 'text-rose-700 bg-rose-100 shadow-sm border border-rose-200'
+      return 'text-danger-fg bg-danger-subtle shadow-sm border border-danger-line'
     default:
-      return 'text-slate-800 bg-slate-100'
+      return 'text-fg bg-zinc-100'
   }
 }
 
@@ -136,28 +136,28 @@ export default async function BoletimPage({
     : '0.00'
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="bg-zinc-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-slate-200">
+      <header className="bg-white shadow-sm border-b border-zinc-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Link
                 href="/dashboard/estudantes"
-                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-zinc-100 rounded-lg transition-colors"
               >
-                <ArrowLeft className="w-5 h-5 text-slate-700" />
+                <ArrowLeft className="w-5 h-5 text-fg-muted" />
               </Link>
               <div>
-                <h1 className="text-2xl font-bold text-slate-900">Boletim</h1>
-                <p className="text-sm text-slate-500 font-medium">{estudante.nome}</p>
+                <h1 className="text-2xl font-bold text-fg">Boletim</h1>
+                <p className="text-sm text-fg-subtle font-medium">{estudante.nome}</p>
               </div>
             </div>
             <a
               href={`/api/boletim/${estudante.matricula}/pdf`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center space-x-2 bg-gradient-to-r from-slate-700 to-slate-600 text-white px-4 py-2 rounded-lg hover:from-slate-800 hover:to-slate-700 transition-all shadow-lg"
+              className="flex items-center space-x-2 bg-zinc-700 to-zinc-600 text-white px-4 py-2 rounded-lg hover:bg-zinc-800 hover:to-zinc-700 transition-all shadow-card"
             >
               <Download className="w-5 h-5" />
               <span>Baixar PDF</span>
@@ -169,32 +169,32 @@ export default async function BoletimPage({
       {/* Main Content */}
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Informações do Estudante */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-50 p-6 mb-6">
+        <div className="bg-white rounded-xl shadow-sm border border-zinc-50 p-6 mb-6">
           <div className="flex items-start space-x-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-slate-500 to-slate-700 rounded-full flex items-center justify-center text-white text-2xl font-medium">
+            <div className="w-16 h-16 bg-zinc-500 to-zinc-700 rounded-full flex items-center justify-center text-white text-2xl font-medium">
               {estudante.nome.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1">
-              <h2 className="text-2xl font-bold text-slate-900 mb-2">{estudante.nome}</h2>
+              <h2 className="text-2xl font-bold text-fg mb-2">{estudante.nome}</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <p className="text-sm text-slate-400 font-medium uppercase tracking-wider">Turma</p>
-                  <p className="font-medium text-slate-900">{estudante.turma.nome}</p>
+                  <p className="text-sm text-fg-subtle font-medium uppercase tracking-wider">Turma</p>
+                  <p className="font-medium text-fg">{estudante.turma.nome}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-slate-400 font-medium uppercase tracking-wider">Média Geral</p>
-                  <p className="font-medium text-slate-900">{mediaGeral}</p>
+                  <p className="text-sm text-fg-subtle font-medium uppercase tracking-wider">Média Geral</p>
+                  <p className="font-medium text-fg">{mediaGeral}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-slate-400 font-medium uppercase tracking-wider">Total de Disciplinas</p>
-                  <p className="font-medium text-slate-900">{estudante.notas.length}</p>
+                  <p className="text-sm text-fg-subtle font-medium uppercase tracking-wider">Total de Disciplinas</p>
+                  <p className="font-medium text-fg">{estudante.notas.length}</p>
                 </div>
                 {frequencia?.temChamada && (
                   <div>
-                    <p className="text-sm text-slate-400 font-medium uppercase tracking-wider">Frequência</p>
-                    <p className={`font-medium ${(freqAluno?.geral.percentual ?? 100) < freqMinima ? 'text-red-600' : 'text-slate-900'}`}>
+                    <p className="text-sm text-fg-subtle font-medium uppercase tracking-wider">Frequência</p>
+                    <p className={`font-medium ${(freqAluno?.geral.percentual ?? 100) < freqMinima ? 'text-danger-fg' : 'text-fg'}`}>
                       {formatarFrequencia(freqAluno?.geral.percentual ?? null)}
-                      <span className="text-xs text-slate-400 font-normal"> · {freqAluno?.geral.faltasConsideradas ?? 0} faltas · mínimo {freqMinima}%</span>
+                      <span className="text-xs text-fg-subtle font-normal"> · {freqAluno?.geral.faltasConsideradas ?? 0} faltas · mínimo {freqMinima}%</span>
                     </p>
                   </div>
                 )}
@@ -205,61 +205,61 @@ export default async function BoletimPage({
 
         {/* Resumo */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div className="bg-green-50 border border-green-200 rounded-xl p-6">
-            <p className="text-sm text-green-700 mb-1">Aprovado</p>
-            <p className="text-3xl font-medium text-green-900">{aprovadas}</p>
+          <div className="bg-success-subtle border border-success-line rounded-xl p-6">
+            <p className="text-sm text-success-fg mb-1">Aprovado</p>
+            <p className="text-3xl font-medium text-success-fg">{aprovadas}</p>
           </div>
-          <div className="bg-orange-50 border border-orange-200 rounded-xl p-6">
-            <p className="text-sm text-orange-700 mb-1">Recuperação</p>
-            <p className="text-3xl font-medium text-orange-900">{recuperacao}</p>
+          <div className="bg-warning-subtle border border-warning-line rounded-xl p-6">
+            <p className="text-sm text-warning-fg mb-1">Recuperação</p>
+            <p className="text-3xl font-medium text-warning-fg">{recuperacao}</p>
           </div>
-          <div className="bg-slate-100 border border-slate-300 rounded-xl p-6">
-            <p className="text-sm text-slate-800 mb-1">Média</p>
-            <p className="text-3xl font-medium text-blue-900">{mediaGeral}</p>
+          <div className="bg-zinc-100 border border-zinc-300 rounded-xl p-6">
+            <p className="text-sm text-fg mb-1">Média</p>
+            <p className="text-3xl font-medium text-accent-fg">{mediaGeral}</p>
           </div>
         </div>
 
         {/* Notas por Disciplina */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="px-6 py-4 bg-gradient-to-r from-slate-50 to-slate-50 border-b border-slate-200">
-            <h3 className="text-lg font-medium text-slate-900">Notas por Disciplina</h3>
+        <div className="bg-white rounded-xl shadow-sm border border-zinc-200 overflow-hidden">
+          <div className="px-6 py-4 bg-zinc-50 to-zinc-50 border-b border-zinc-200">
+            <h3 className="text-lg font-medium text-fg">Notas por Disciplina</h3>
           </div>
 
           {estudante.notas.length === 0 ? (
             <div className="p-12 text-center">
-              <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-              <p className="text-slate-400">Nenhuma nota lançada ainda</p>
+              <FileText className="w-16 h-16 text-zinc-300 mx-auto mb-4" />
+              <p className="text-fg-subtle">Nenhuma nota lançada ainda</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-slate-100/50 border-b border-slate-200">
+                <thead className="bg-zinc-100/50 border-b border-zinc-200">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-fg-subtle uppercase tracking-wider">
                       Disciplina
                     </th>
                     {etapas.map((etapa, i) => (
-                      <th key={etapa.id} title={etapa.nome} className="px-4 py-4 text-center text-xs font-medium text-slate-400 uppercase tracking-wider">
+                      <th key={etapa.id} title={etapa.nome} className="px-4 py-4 text-center text-xs font-medium text-fg-subtle uppercase tracking-wider">
                         U{i + 1}
                       </th>
                     ))}
-                    <th className="px-4 py-4 text-center text-xs font-medium text-slate-400 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-center text-xs font-medium text-fg-subtle uppercase tracking-wider">
                       Rec.
                     </th>
-                    <th className="px-6 py-4 text-center text-xs font-medium text-slate-400 uppercase tracking-wider bg-slate-100/50">
+                    <th className="px-6 py-4 text-center text-xs font-medium text-fg-subtle uppercase tracking-wider bg-zinc-100/50">
                       Média
                     </th>
                     {frequencia?.temChamada && (
-                      <th title="Frequência na disciplina" className="px-4 py-4 text-center text-xs font-medium text-slate-400 uppercase tracking-wider">
+                      <th title="Frequência na disciplina" className="px-4 py-4 text-center text-xs font-medium text-fg-subtle uppercase tracking-wider">
                         Freq.
                       </th>
                     )}
-                    <th className="px-6 py-4 text-center text-xs font-medium text-slate-400 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-center text-xs font-medium text-fg-subtle uppercase tracking-wider">
                       Status
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-slate-50">
+                <tbody className="bg-white divide-y divide-zinc-50">
                   {estudante.notas.map((nota) => {
                     const mediaCalculada = calcularMediaReal(nota);
                     const etapasDoAluno = etapasDaNota(etapas, nota.unidades);
@@ -267,15 +267,15 @@ export default async function BoletimPage({
                     const freqDisc = freqAluno?.porDisciplina[nota.disciplinaId];
                     
                     return (
-                      <tr key={nota.id} className="hover:bg-slate-100/50 transition-colors">
+                      <tr key={nota.id} className="hover:bg-zinc-100/50 transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex flex-col">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-sm font-medium text-slate-900">
+                              <span className="text-sm font-medium text-fg">
                                 {nota.disciplina.nome}
                               </span>
                               {isInfrequente && (
-                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200 uppercase tracking-tight">
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-100 text-fg-muted border border-zinc-200 uppercase tracking-tight">
                                   Infrequente
                                 </span>
                               )}
@@ -283,25 +283,25 @@ export default async function BoletimPage({
                           </div>
                         </td>
                         {etapasDoAluno.map((etapa, i) => (
-                          <td key={i} className="px-4 py-4 text-center text-sm text-slate-700 font-medium">
+                          <td key={i} className="px-4 py-4 text-center text-sm text-fg-muted font-medium">
                             {etapa.nota !== null ? etapa.nota.toFixed(1) : '-'}
                           </td>
                         ))}
                         <td className="px-4 py-4 text-center">
                           {nota.notaRecuperacao !== null ? (
-                            <span className="text-sm font-medium text-slate-700">
+                            <span className="text-sm font-medium text-fg-muted">
                               {nota.notaRecuperacao.toFixed(1)}
                             </span>
                           ) : '-'}
                         </td>
-                        <td className="px-6 py-4 text-center bg-slate-50">
-                          <span className={`text-base font-medium ${mediaCalculada < notaMinima ? 'text-red-600' : 'text-slate-800'}`}>
+                        <td className="px-6 py-4 text-center bg-zinc-50">
+                          <span className={`text-base font-medium ${mediaCalculada < notaMinima ? 'text-danger-fg' : 'text-fg'}`}>
                             {nota.nota === -1 ? '-' : mediaCalculada.toFixed(1)}
                           </span>
                         </td>
                         {frequencia?.temChamada && (
                           <td className="px-4 py-4 text-center text-sm" title={freqDisc ? `${freqDisc.faltasConsideradas} faltas em ${freqDisc.aulas} aulas` : undefined}>
-                            <span className={(freqDisc?.percentual ?? 100) < freqMinima ? 'text-red-600 font-medium' : 'text-slate-700'}>
+                            <span className={(freqDisc?.percentual ?? 100) < freqMinima ? 'text-danger-fg font-medium' : 'text-fg-muted'}>
                               {formatarFrequencia(freqDisc?.percentual ?? null)}
                             </span>
                           </td>

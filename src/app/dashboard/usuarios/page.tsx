@@ -43,30 +43,30 @@ export default async function UsuariosPage() {
   const pendentes = usuarios.filter(u => !u.isApproved).length
 
   return (
-    <div className="min-h-screen bg-slate-100 pb-20">
+    <div className="bg-zinc-100 pb-20">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-slate-300 sticky top-0 z-20">
+      <header className="mb-6 border-b border-line pb-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Link href="/dashboard" className="p-2 hover:bg-slate-200 rounded-lg transition-colors">
-                <ArrowLeft className="w-5 h-5 text-slate-700" />
+              <Link href="/dashboard" className="p-2 hover:bg-zinc-200 rounded-lg transition-colors">
+                <ArrowLeft className="w-5 h-5 text-fg-muted" />
               </Link>
               <div>
-                <h1 className="text-2xl font-medium text-blue-900 flex items-center gap-3">
+                <h1 className="text-2xl font-medium text-accent-fg flex items-center gap-3">
                   Gerenciar Usuários
                   {pendentes > 0 && (
-                    <span className="px-2.5 py-0.5 text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200 rounded-full uppercase tracking-wider animate-pulse">
+                    <span className="px-2.5 py-0.5 text-xs font-bold bg-warning-subtle text-warning-fg border border-warning-line rounded-full uppercase tracking-wider animate-pulse">
                       {pendentes} pendente{pendentes !== 1 ? 's' : ''}
                     </span>
                   )}
                 </h1>
-                <p className="text-sm text-slate-700">Administradores e Professores</p>
+                <p className="text-sm text-fg-muted">Administradores e Professores</p>
               </div>
             </div>
             <Link
               href="/dashboard/usuarios/novo"
-              className="flex items-center space-x-2 bg-slate-900 text-white px-4 py-2 rounded-xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-300 border border-slate-700 font-medium"
+              className="flex items-center space-x-2 bg-zinc-900 text-white px-4 py-2 rounded-xl hover:bg-zinc-800 transition-all shadow-card border border-zinc-700 font-medium"
             >
               <Plus className="w-5 h-5" />
               <span>Novo Usuário</span>

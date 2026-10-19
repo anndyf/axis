@@ -78,20 +78,20 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-300 sticky top-0 z-20">
+    <div className="bg-zinc-50">
+      <header className="mb-6 border-b border-line pb-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <Link href="/dashboard/turmas" className="p-2 hover:bg-slate-200 rounded-lg transition-colors">
-                <ArrowLeft className="w-5 h-5 text-slate-700" />
+              <Link href="/dashboard/turmas" className="p-2 hover:bg-zinc-200 rounded-lg transition-colors">
+                <ArrowLeft className="w-5 h-5 text-fg-muted" />
               </Link>
               <div>
-                <h1 className="text-2xl font-medium text-slate-800 tracking-tight flex items-center gap-2">
-                  <Calendar className="w-6 h-6 text-slate-700" />
+                <h1 className="text-2xl font-medium text-fg tracking-tight flex items-center gap-2">
+                  <Calendar className="w-6 h-6 text-fg-muted" />
                   Horário: {turma.nome}
                 </h1>
-                <p className="text-xs font-medium text-slate-400 uppercase tracking-widest">
+                <p className="text-xs font-medium text-fg-subtle uppercase tracking-widest">
                   {turma.curso} • {turma.anoLetivo}
                 </p>
               </div>
@@ -99,7 +99,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
             <button
               onClick={handleSave}
               disabled={saving}
-              className="flex items-center gap-2 bg-slate-900 text-white px-6 py-3 rounded-xl hover:bg-slate-800 transition-all shadow-lg active:scale-95 disabled:opacity-50"
+              className="flex items-center gap-2 bg-zinc-900 text-white px-6 py-3 rounded-xl hover:bg-zinc-800 transition-all shadow-card active:scale-95 disabled:opacity-50"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               <span className="text-xs font-medium uppercase tracking-wide">Salvar Alterações</span>
@@ -110,25 +110,25 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {aviso && (
-          <div className={`p-4 rounded-xl border text-sm flex items-center gap-2 ${aviso.tipo === "ok" ? "bg-green-50 border-green-200 text-green-700" : "bg-red-50 border-red-200 text-red-700"}`}>
+          <div className={`p-4 rounded-xl border text-sm flex items-center gap-2 ${aviso.tipo === "ok" ? "bg-success-subtle border-success-line text-success-fg" : "bg-danger-subtle border-danger-line text-danger-fg"}`}>
             {aviso.tipo === "ok" ? <CheckCircle2 className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}
             {aviso.texto}
           </div>
         )}
 
-        <div className="bg-slate-100 border border-slate-200 rounded-[2rem] p-6 flex items-start gap-4">
-          <div className="w-10 h-10 bg-slate-200 rounded-2xl flex items-center justify-center shrink-0">
-            <Info className="w-5 h-5 text-slate-700" />
+        <div className="bg-zinc-100 border border-zinc-200 rounded-xl p-6 flex items-start gap-4">
+          <div className="w-10 h-10 bg-zinc-200 rounded-lg flex items-center justify-center shrink-0">
+            <Info className="w-5 h-5 text-fg-muted" />
           </div>
           <div>
-            <h4 className="text-sm font-medium text-blue-900 uppercase tracking-tight mb-1">Como preencher</h4>
-            <p className="text-xs text-slate-700 font-medium leading-relaxed">
+            <h4 className="text-sm font-medium text-accent-fg uppercase tracking-tight mb-1">Como preencher</h4>
+            <p className="text-xs text-fg-muted font-medium leading-relaxed">
               Selecione a <span className="font-medium">disciplina</span> de cada horário. O professor vem do vínculo da disciplina com a turma.
               Este horário, junto com o <Link href="/dashboard/configuracoes/calendario" className="underline">calendário letivo</Link>,
               define as aulas previstas e a chamada de cada dia.
             </p>
             {tempos.length === 0 && (
-              <p className="text-[11px] text-amber-700 font-medium mt-2">
+              <p className="text-[11px] text-warning-fg font-medium mt-2">
                 Os tempos de aula (hora de início e fim) do turno desta turma ainda não foram cadastrados no calendário letivo.
               </p>
             )}
@@ -136,7 +136,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
         </div>
 
         {naoVinculadas.length > 0 && (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-800">
+          <div className="bg-warning-subtle border border-warning-line rounded-lg p-4 text-sm text-warning-fg">
             <p className="font-medium flex items-center gap-2"><AlertTriangle className="w-4 h-4" /> Horários antigos sem disciplina vinculada</p>
             <p className="text-xs mt-1">
               O texto destes horários não corresponde a nenhuma disciplina da turma. Escolha a disciplina certa nas células (vazias abaixo) e salve:
@@ -149,44 +149,44 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
           </div>
         )}
 
-        <div className="bg-white rounded-[2rem] shadow-xl border border-slate-300 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-card border border-zinc-300 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1000px]">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-300">
+                <tr className="bg-zinc-50 border-b border-zinc-300">
                   <th className="p-4 text-center w-24">
-                    <span className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Horário</span>
+                    <span className="text-[10px] font-medium text-fg-subtle uppercase tracking-widest">Horário</span>
                   </th>
                   {DAYS.map((day) => (
                     <th key={day.id} className="p-4 w-[18%]">
-                      <span className="text-sm font-medium text-slate-800 uppercase tracking-tight block text-center bg-slate-100/50 py-2 rounded-xl border border-slate-200/50">
+                      <span className="text-sm font-medium text-fg uppercase tracking-tight block text-center bg-zinc-100/50 py-2 rounded-xl border border-zinc-200/50">
                         {day.label}
                       </span>
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200">
+              <tbody className="divide-y divide-zinc-200">
                 {periodos.map((period) => {
                   const tempo = tempoDe(period)
                   return (
-                    <tr key={period} className="hover:bg-slate-50/30 transition-colors">
-                      <td className="p-4 text-center border-r border-slate-200 bg-slate-50/30">
-                        <span className="font-medium text-slate-500">{period}º</span>
-                        {tempo && <span className="block text-[10px] text-slate-400">{tempo.inicio}–{tempo.fim}</span>}
+                    <tr key={period} className="hover:bg-zinc-50/30 transition-colors">
+                      <td className="p-4 text-center border-r border-zinc-200 bg-zinc-50/30">
+                        <span className="font-medium text-fg-subtle">{period}º</span>
+                        {tempo && <span className="block text-[10px] text-fg-subtle">{tempo.inicio}–{tempo.fim}</span>}
                       </td>
                       {DAYS.map((day) => {
                         const key = `${day.id}-${period}`
                         const disciplinaId = schedule[key] ?? ""
                         const professor = disciplinaPorId.get(disciplinaId)?.professor
                         return (
-                          <td key={day.id} className="p-2 border-r border-slate-200 last:border-0 h-20">
+                          <td key={day.id} className="p-2 border-r border-zinc-200 last:border-0 h-20">
                             <div className="h-full flex flex-col items-center justify-center text-center">
                               <select
                                 aria-label={`${day.label}, ${period}º horário`}
                                 value={disciplinaId}
                                 onChange={(e) => setSchedule((prev) => ({ ...prev, [key]: e.target.value }))}
-                                className="w-full text-[10px] font-medium text-slate-800 bg-transparent outline-none text-center appearance-none cursor-pointer"
+                                className="w-full text-[10px] font-medium text-fg bg-transparent outline-none text-center appearance-none cursor-pointer"
                               >
                                 <option value="">--------</option>
                                 {turma.disciplinas.map((d) => (
@@ -194,7 +194,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
                                 ))}
                               </select>
                               {disciplinaId && (
-                                <span className={`text-[9px] font-medium uppercase tracking-tighter mt-0.5 truncate w-full px-1 ${professor ? "text-slate-400" : "text-amber-600"}`}>
+                                <span className={`text-[9px] font-medium uppercase tracking-tighter mt-0.5 truncate w-full px-1 ${professor ? "text-fg-subtle" : "text-warning-fg"}`}>
                                   {professor ?? "sem professor vinculado"}
                                 </span>
                               )}
@@ -211,10 +211,10 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
         </div>
 
         {/* Carga horária */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="p-4 border-b border-slate-200">
-            <h2 className="font-medium text-slate-800">Aulas por disciplina</h2>
-            <p className="text-xs text-slate-500">
+        <div className="bg-white rounded-lg shadow-sm border border-zinc-200 overflow-hidden">
+          <div className="p-4 border-b border-zinc-200">
+            <h2 className="font-medium text-fg">Aulas por disciplina</h2>
+            <p className="text-xs text-fg-subtle">
               {previstas
                 ? "Previstas no ano = horário salvo × dias letivos do calendário (já descontando feriados e recessos)."
                 : "Cadastre o início e o fim do ano no calendário letivo para ver as aulas previstas no ano."}
@@ -222,7 +222,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wide">
+              <thead className="bg-zinc-50 text-fg-subtle text-xs uppercase tracking-wide">
                 <tr>
                   <th className="px-4 py-2 text-left">Disciplina</th>
                   <th className="px-4 py-2 text-center">Tempos/semana</th>
@@ -230,16 +230,16 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
                   <th className="px-4 py-2 text-center">Carga horária</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-zinc-100">
                 {turma.disciplinas.map((d) => {
                   const prev = previstas?.[d.id] ?? 0
                   const abaixo = d.cargaHoraria !== null && previstas !== null && prev < d.cargaHoraria
                   return (
                     <tr key={d.id}>
-                      <td className="px-4 py-2 text-slate-800">{d.nome}</td>
+                      <td className="px-4 py-2 text-fg">{d.nome}</td>
                       <td className="px-4 py-2 text-center">{temposSemana.get(d.id) ?? 0}</td>
-                      <td className={`px-4 py-2 text-center ${abaixo ? "text-rose-600 font-medium" : ""}`}>{previstas ? prev : "—"}</td>
-                      <td className="px-4 py-2 text-center text-slate-500">{d.cargaHoraria ?? "—"}</td>
+                      <td className={`px-4 py-2 text-center ${abaixo ? "text-danger-fg font-medium" : ""}`}>{previstas ? prev : "—"}</td>
+                      <td className="px-4 py-2 text-center text-fg-subtle">{d.cargaHoraria ?? "—"}</td>
                     </tr>
                   )
                 })}

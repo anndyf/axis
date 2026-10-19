@@ -51,7 +51,7 @@ export default async function DashboardLayout({
   const modulosAtivos = await getModulosAtivos(session.user.escolaId, escola?.plano || 'BASICO')
 
   return (
-    <div className="flex min-h-screen bg-canvas font-sans text-fg print:block print:min-h-0">
+    <div className="flex bg-canvas font-sans text-fg print:block print:min-h-0">
       <SessionTimer />
       <MessageNotification />
       <DashboardLayoutWrapper

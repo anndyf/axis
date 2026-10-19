@@ -137,41 +137,41 @@ export default function PlanosClient() {
     {
       title: "Planejamento Quinzenal",
       description: "Organize seus conteúdos e indicadores para as próximas duas semanas de aula.",
-      icon: <Calendar className="w-5 h-5 text-emerald-600" />,
+      icon: <Calendar className="w-5 h-5 text-success-fg" />,
       color: "emerald"
     },
     {
       title: "Matriz Pedagógica",
       description: "Selecione as turmas de mesmo ano/série para replicar o planejamento rapidamente.",
-      icon: <Layers className="w-5 h-5 text-slate-700" />,
+      icon: <Layers className="w-5 h-5 text-fg-muted" />,
       color: "blue"
     },
     {
       title: "Resultados Finais",
       description: "Gere relatórios sintéticos de todos os planos para acompanhamento da coordenação.",
-      icon: <Sparkles className="w-5 h-5 text-slate-700" />,
+      icon: <Sparkles className="w-5 h-5 text-fg-muted" />,
       color: "indigo"
     }
   ]
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="bg-zinc-50">
       <TeacherTipsModal storageKey="seen_tips_planos_v1" title="Planos de Ensino" tips={planoTips} />
       
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
-      <header className="bg-white/80 backdrop-blur-xl border-b border-slate-300 sticky top-0 z-50 -mx-4 -mt-4 md:-mx-8 md:-mt-8 mb-4 px-4 sm:px-6 lg:px-8">
+      <header className="mb-6 border-b border-line pb-4">
         <div className="max-w-7xl mx-auto py-4">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="flex items-center space-x-5">
               <Link
                 href="/dashboard"
-                className="p-2 hover:bg-slate-200 rounded-lg transition-colors text-slate-400 hover:text-slate-700"
+                className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-fg-subtle hover:text-fg-muted"
               >
                 <ArrowLeft size={20} />
               </Link>
               <div>
-                <h1 className="text-2xl font-medium text-slate-800 tracking-tight">Planos de Ensino</h1>
-                <p className="text-base text-slate-700 font-medium">Gestão de cronogramas e conteúdos programáticos</p>
+                <h1 className="text-2xl font-medium text-fg tracking-tight">Planos de Ensino</h1>
+                <p className="text-base text-fg-muted font-medium">Gestão de cronogramas e conteúdos programáticos</p>
               </div>
             </div>
 
@@ -179,7 +179,7 @@ export default function PlanosClient() {
               {!isAdmin && (
                 <button 
                   onClick={() => { setShowForm(true); setSelectedPlano(null); }}
-                  className="flex items-center gap-2 bg-slate-900 text-white px-6 py-3 rounded-2xl font-medium hover:bg-slate-800 transition-all text-xs uppercase tracking-widest active:scale-95 shadow-xl shadow-slate-300"
+                  className="flex items-center gap-2 bg-zinc-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-zinc-800 transition-all text-xs uppercase tracking-widest active:scale-95 shadow-card"
                 >
                   <Plus size={16} /> Novo Plano
                 </button>
@@ -195,32 +195,32 @@ export default function PlanosClient() {
         {/* Dicas Fixas - Estilo Resultados */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {planoTips.map((tip, index) => (
-             <div key={index} className="bg-white/60 border border-slate-300/60 p-5 rounded-3xl flex items-start space-x-4 hover:bg-white hover:border-slate-300 hover:shadow-xl hover:shadow-slate-300/30 transition-all group">
-                <div className={`p-3 rounded-2xl bg-${tip.color}-50 text-${tip.color}-600 group-hover:bg-${tip.color}-600 group-hover:text-white transition-all shadow-inner`}>
+             <div key={index} className="bg-white/60 border border-zinc-300/60 p-5 rounded-xl flex items-start space-x-4 hover:bg-white hover:border-zinc-300 hover:shadow-card transition-all group">
+                <div className={`p-3 rounded-lg bg-subtle text-fg-muted transition-all shadow-card`}>
                    {tip.icon}
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-slate-800 uppercase tracking-widest mb-1">{tip.title}</h3>
-                  <p className="text-[11px] font-medium text-slate-400 uppercase leading-relaxed">{tip.description}</p>
+                  <h3 className="text-sm font-medium text-fg uppercase tracking-widest mb-1">{tip.title}</h3>
+                  <p className="text-[11px] font-medium text-fg-subtle uppercase leading-relaxed">{tip.description}</p>
                 </div>
              </div>
           ))}
         </div>
 
         {/* Filtros Premium */}
-        <div className="bg-white p-6 rounded-[2.5rem] shadow-xl shadow-slate-300/40 border border-slate-200 flex flex-wrap gap-6 items-end relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 rounded-full -mr-16 -mt-16 opacity-50 blur-3xl"></div>
+        <div className="bg-white p-6 rounded-xl shadow-card border border-zinc-200 flex flex-wrap gap-6 items-end relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-zinc-50 rounded-full -mr-16 -mt-16 opacity-50 blur-3xl"></div>
             
             <div className="flex-1 min-w-[200px] space-y-2">
-                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em] ml-2">Filtrar por Turma</label>
+                <label className="text-[10px] font-medium text-fg-subtle uppercase tracking-[0.2em] ml-2">Filtrar por Turma</label>
                 <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-slate-50 rounded-lg text-slate-400 group-focus-within:text-slate-700 group-focus-within:bg-slate-50 transition-all">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-zinc-50 rounded-lg text-fg-subtle group-focus-within:text-fg-muted group-focus-within:bg-zinc-50 transition-all">
                     <Users size={16} />
                   </div>
                   <select 
                       value={filters.turmaId} 
                       onChange={e => setFilters({...filters, turmaId: e.target.value})}
-                      className="w-full bg-slate-50 hover:bg-slate-200 border-none rounded-2xl pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-slate-500 transition-all appearance-none cursor-pointer font-medium text-slate-700 shadow-inner"
+                      className="w-full bg-zinc-50 hover:bg-zinc-200 border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-zinc-500 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
                   >
                       <option value="">Selecione a Turma...</option>
                       {turmas.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
@@ -229,9 +229,9 @@ export default function PlanosClient() {
             </div>
 
             <div className="flex-1 min-w-[200px] space-y-2">
-                <label className="text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em] ml-2">Disciplina</label>
+                <label className="text-[10px] font-medium text-fg-subtle uppercase tracking-[0.2em] ml-2">Disciplina</label>
                 <div className="relative group">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-slate-50 rounded-lg text-slate-400 group-focus-within:text-slate-700 group-focus-within:bg-slate-50 transition-all">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-zinc-50 rounded-lg text-fg-subtle group-focus-within:text-fg-muted group-focus-within:bg-zinc-50 transition-all">
                         <Search size={16} />
                     </div>
                     <input 
@@ -239,22 +239,22 @@ export default function PlanosClient() {
                         placeholder="Buscar matéria..." 
                         value={filters.disciplinaNome} 
                         onChange={e => setFilters({...filters, disciplinaNome: e.target.value})} 
-                        className="w-full bg-slate-50 hover:bg-slate-200 border-none rounded-2xl pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-slate-500 transition-all font-medium text-slate-700 shadow-inner placeholder:text-slate-300" 
+                        className="w-full bg-zinc-50 hover:bg-zinc-200 border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-zinc-500 transition-all font-medium text-fg-muted shadow-card placeholder:text-zinc-300" 
                     />
                 </div>
             </div>
 
             {isAdmin && (
                 <div className="flex-1 min-w-[200px] space-y-2">
-                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em] ml-2">Professor</label>
+                    <label className="text-[10px] font-medium text-fg-subtle uppercase tracking-[0.2em] ml-2">Professor</label>
                     <div className="relative group">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-slate-50 rounded-lg text-slate-400 group-focus-within:text-slate-700 group-focus-within:bg-slate-50 transition-all">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-zinc-50 rounded-lg text-fg-subtle group-focus-within:text-fg-muted group-focus-within:bg-zinc-50 transition-all">
                         <BookOpen size={16} />
                       </div>
                       <select 
                         value={filters.professorId} 
                         onChange={e => setFilters({...filters, professorId: e.target.value})}
-                        className="w-full bg-slate-50 hover:bg-slate-200 border-none rounded-2xl pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-slate-500 transition-all appearance-none cursor-pointer font-medium text-slate-700 shadow-inner"
+                        className="w-full bg-zinc-50 hover:bg-zinc-200 border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-zinc-500 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
                       >
                           <option value="">Todos os Professores</option>
                           {professores.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -265,32 +265,32 @@ export default function PlanosClient() {
         </div>
 
         {/* Matriz de Planos Estilo Resultados (Cards Table) */}
-        <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-300/50 border border-slate-200 overflow-hidden relative">
-          <div className="p-6 border-b border-slate-50 bg-slate-50/10 flex items-center justify-between">
-            <h2 className="text-sm font-medium text-slate-400 flex items-center gap-3 uppercase tracking-[0.2em] ml-2">
-              <div className="w-8 h-8 rounded-lg bg-slate-50 text-slate-700 flex items-center justify-center shadow-inner">
+        <div className="bg-white rounded-xl shadow-card border border-zinc-200 overflow-hidden relative">
+          <div className="p-6 border-b border-zinc-50 bg-zinc-50/10 flex items-center justify-between">
+            <h2 className="text-sm font-medium text-fg-subtle flex items-center gap-3 uppercase tracking-[0.2em] ml-2">
+              <div className="w-8 h-8 rounded-lg bg-zinc-50 text-fg-muted flex items-center justify-center shadow-card">
                 <Users size={16} />
               </div>
               Matriz de Planos Quinzenais
             </h2>
             <div className="hidden md:flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-lg shadow-emerald-200"></span>
-                <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest leading-none">Acesso em tempo real</p>
+                <span className="w-2 h-2 rounded-full bg-success animate-pulse shadow-card"></span>
+                <p className="text-[10px] font-medium text-fg-subtle uppercase tracking-widest leading-none">Acesso em tempo real</p>
             </div>
           </div>
 
           <div className="overflow-x-auto">
             {loading ? (
               <div className="p-20 text-center">
-                 <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-500 mx-auto"></div>
+                 <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-success mx-auto"></div>
               </div>
             ) : turmasNomes.length === 0 ? (
-              <div className="text-center py-20 text-slate-300">
+              <div className="text-center py-20 text-zinc-300">
                   <BarChart3 className="w-12 h-12 opacity-20 mx-auto mb-3" />
                   <p className="text-sm font-medium uppercase tracking-widest">Nenhum plano localizado</p>
               </div>
             ) : (
-                <div className="divide-y divide-slate-200">
+                <div className="divide-y divide-zinc-200">
                     {turmasNomes.map(turmaNome => {
                         const isExpanded = expandedTurmas.includes(turmaNome)
                         const matches = Object.values(groupedData[turmaNome]).flat()
@@ -299,72 +299,72 @@ export default function PlanosClient() {
                             <div key={turmaNome} className="bg-white">
                                 <button 
                                     onClick={() => toggleTurmaExpansion(turmaNome)}
-                                    className={`w-full px-8 py-5 flex items-center justify-between transition-all hover:bg-slate-50/80 group ${isExpanded ? 'bg-slate-50 border-b border-slate-200' : ''}`}
+                                    className={`w-full px-8 py-5 flex items-center justify-between transition-all hover:bg-zinc-50/80 group ${isExpanded ? 'bg-zinc-50 border-b border-zinc-200' : ''}`}
                                 >
                                     <div className="flex items-center gap-5">
-                                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 ${isExpanded ? 'bg-slate-600 text-white shadow-xl shadow-slate-300 rotate-6' : 'bg-slate-200 text-slate-400 group-hover:bg-white group-hover:shadow-md'}`}>
+                                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-500 ${isExpanded ? 'bg-zinc-600 text-white shadow-card rotate-6' : 'bg-zinc-200 text-fg-subtle group-hover:bg-white group-hover:shadow-card'}`}>
                                             <Users size={20} />
                                         </div>
                                         <div className="text-left">
-                                            <h3 className="text-lg font-medium text-slate-800 uppercase tracking-tight group-hover:text-slate-700 transition-colors">{turmaNome}</h3>
+                                            <h3 className="text-lg font-medium text-fg uppercase tracking-tight group-hover:text-fg-muted transition-colors">{turmaNome}</h3>
                                             <div className="flex items-center gap-2 mt-0.5">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div>
-                                                <span className="text-[10px] font-medium text-slate-400 uppercase tracking-[0.1em]">{matches.length} Documentos Arquivados</span>
+                                                <div className="w-1.5 h-1.5 rounded-full bg-zinc-300"></div>
+                                                <span className="text-[10px] font-medium text-fg-subtle uppercase tracking-[0.1em]">{matches.length} Documentos Arquivados</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all duration-300 ${isExpanded ? 'bg-slate-50 border-slate-300 text-slate-700 rotate-90' : 'bg-white border-slate-200 text-slate-300 group-hover:border-slate-300'}`}>
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all duration-300 ${isExpanded ? 'bg-zinc-50 border-zinc-300 text-fg-muted rotate-90' : 'bg-white border-zinc-200 text-zinc-300 group-hover:border-zinc-300'}`}>
                                         <ChevronRight size={16} />
                                     </div>
                                 </button>
 
                                 {isExpanded && (
-                                    <div className="bg-slate-50/20 border-t border-slate-200/50 animate-in slide-in-from-top-2 duration-300 pb-2">
+                                    <div className="bg-zinc-50/20 border-t border-zinc-200/50 animate-in slide-in-from-top-2 duration-300 pb-2">
                                         {Object.keys(groupedData[turmaNome]).map(month => (
                                             <div key={month} className="space-y-0">
-                                                <div className="px-8 py-3 bg-slate-50 border-b border-slate-200 flex items-center gap-3">
-                                                   <div className="w-1 h-3 bg-slate-500 rounded-full"></div>
-                                                   <span className="text-[10px] font-medium text-slate-600 uppercase tracking-[0.2em]">{month}</span>
+                                                <div className="px-8 py-3 bg-zinc-50 border-b border-zinc-200 flex items-center gap-3">
+                                                   <div className="w-1 h-3 bg-zinc-500 rounded-full"></div>
+                                                   <span className="text-[10px] font-medium text-fg-muted uppercase tracking-[0.2em]">{month}</span>
                                                 </div>
                                                 <table className="w-full text-left border-collapse">
                                                     <thead>
                                                         <tr className="bg-white">
-                                                            <th className="px-8 py-4 text-[10px] font-medium text-slate-400 uppercase tracking-[0.15em] border-b border-slate-50">Disciplina / Matéria</th>
-                                                            <th className="px-6 py-4 text-[10px] font-medium text-slate-400 uppercase tracking-[0.15em] text-center border-b border-slate-50">Período de Vigência</th>
-                                                            <th className="px-8 py-4 text-[10px] font-medium text-slate-400 uppercase tracking-[0.15em] text-center border-b border-slate-50">Ações</th>
+                                                            <th className="px-8 py-4 text-[10px] font-medium text-fg-subtle uppercase tracking-[0.15em] border-b border-zinc-50">Disciplina / Matéria</th>
+                                                            <th className="px-6 py-4 text-[10px] font-medium text-fg-subtle uppercase tracking-[0.15em] text-center border-b border-zinc-50">Período de Vigência</th>
+                                                            <th className="px-8 py-4 text-[10px] font-medium text-fg-subtle uppercase tracking-[0.15em] text-center border-b border-zinc-50">Ações</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody className="divide-y divide-slate-50">
+                                                    <tbody className="divide-y divide-zinc-50">
                                                         {groupedData[turmaNome][month].map((plano) => {
                                                             const current = isCurrentFortnight(plano.periodoInicio, plano.periodoFim)
                                                             return (
-                                                                <tr key={plano.id} className="group hover:bg-slate-50/30 transition-all">
+                                                                <tr key={plano.id} className="group hover:bg-zinc-50/30 transition-all">
                                                                     <td className="px-8 py-5">
                                                                         <div className="flex items-center gap-4">
-                                                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${current ? 'bg-emerald-50 text-emerald-600 shadow-sm border border-emerald-100' : 'bg-slate-50 text-slate-400 border border-slate-200 group-hover:bg-white'}`}>
+                                                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${current ? 'bg-success-subtle text-success-fg shadow-sm border border-success-line' : 'bg-zinc-50 text-fg-subtle border border-zinc-200 group-hover:bg-white'}`}>
                                                                                 <FileText size={18} />
                                                                             </div>
                                                                             <div className="flex flex-col">
-                                                                                 <span className="text-base font-medium text-slate-700 uppercase group-hover:text-slate-700 transition-colors leading-tight">{plano.disciplinaNome}</span>
-                                                                                 <span className="text-[10px] font-medium text-slate-400 uppercase tracking-widest mt-1">
+                                                                                 <span className="text-base font-medium text-fg-muted uppercase group-hover:text-fg-muted transition-colors leading-tight">{plano.disciplinaNome}</span>
+                                                                                 <span className="text-[10px] font-medium text-fg-subtle uppercase tracking-widest mt-1">
                                                                                     {isAdmin ? `PROF. ${plano.professor.name}` : 'Documento Quinzenal'}
                                                                                  </span>
                                                                              </div>
                                                                         </div>
                                                                     </td>
                                                                     <td className="px-6 py-5 text-center">
-                                                                        <div className="inline-flex items-center gap-2 bg-slate-50 px-4 py-2 rounded-xl border border-slate-200 shadow-sm group-hover:bg-white transition-all">
-                                                                            <Calendar size={14} className="text-slate-400" />
-                                                                            <span className="text-xs font-medium text-slate-700 uppercase tracking-tighter">
+                                                                        <div className="inline-flex items-center gap-2 bg-zinc-50 px-4 py-2 rounded-xl border border-zinc-200 shadow-sm group-hover:bg-white transition-all">
+                                                                            <Calendar size={14} className="text-fg-subtle" />
+                                                                            <span className="text-xs font-medium text-fg-muted uppercase tracking-tighter">
                                                                                 {new Date(plano.periodoInicio).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', timeZone: 'UTC'})} — {new Date(plano.periodoFim).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', timeZone: 'UTC'})}
                                                                             </span>
                                                                         </div>
                                                                     </td>
                                                                     <td className="px-8 py-5 text-center">
                                                                         <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all -translate-y-1 group-hover:translate-y-0">
-                                                                            <button onClick={() => { setViewPlanoId(plano.id); setShowView(true); }} className="w-9 h-9 flex items-center justify-center bg-white border border-slate-300 text-slate-400 rounded-xl hover:bg-slate-50 hover:text-slate-700 hover:border-slate-300 transition-all shadow-sm" title="Ver Detalhes"><Eye size={16} /></button>
-                                                                            <button onClick={() => { setSelectedPlano(plano); setShowForm(true); }} className="w-9 h-9 flex items-center justify-center bg-white border border-slate-300 text-slate-400 rounded-xl hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all shadow-sm" title="Editar"><Edit3 size={16} /></button>
-                                                                            <button onClick={() => handleDelete(plano.id)} className="w-9 h-9 flex items-center justify-center bg-white border border-slate-300 text-slate-400 rounded-xl hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all shadow-sm" title="Remover"><Trash2 size={16} /></button>
+                                                                            <button onClick={() => { setViewPlanoId(plano.id); setShowView(true); }} className="w-9 h-9 flex items-center justify-center bg-white border border-zinc-300 text-fg-subtle rounded-xl hover:bg-zinc-50 hover:text-fg-muted hover:border-zinc-300 transition-all shadow-sm" title="Ver Detalhes"><Eye size={16} /></button>
+                                                                            <button onClick={() => { setSelectedPlano(plano); setShowForm(true); }} className="w-9 h-9 flex items-center justify-center bg-white border border-zinc-300 text-fg-subtle rounded-xl hover:bg-zinc-900 hover:text-white hover:border-zinc-900 transition-all shadow-sm" title="Editar"><Edit3 size={16} /></button>
+                                                                            <button onClick={() => handleDelete(plano.id)} className="w-9 h-9 flex items-center justify-center bg-white border border-zinc-300 text-fg-subtle rounded-xl hover:bg-danger-subtle hover:text-danger-fg hover:border-danger-line transition-all shadow-sm" title="Remover"><Trash2 size={16} /></button>
                                                                         </div>
                                                                     </td>
                                                                 </tr>

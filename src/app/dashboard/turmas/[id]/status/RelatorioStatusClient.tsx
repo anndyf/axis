@@ -42,29 +42,29 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
   const getStatusConfig = (status: string) => {
     switch (status) {
       case 'APROVADO':
-        return { color: 'bg-emerald-500', text: 'text-white', label: 'AP' }
+        return { color: 'bg-success', text: 'text-white', label: 'AP' }
       case 'RECUPERACAO':
-        return { color: 'bg-amber-500', text: 'text-white', label: 'RC' }
+        return { color: 'bg-warning', text: 'text-white', label: 'RC' }
       case 'APROVADO_RECUPERACAO':
-        return { color: 'bg-emerald-600', text: 'text-white', label: 'AR' }
+        return { color: 'bg-success', text: 'text-white', label: 'AR' }
       case 'APROVADO_CONSELHO':
-        return { color: 'bg-slate-700', text: 'text-white', label: 'AC' }
+        return { color: 'bg-zinc-700', text: 'text-white', label: 'AC' }
       case 'DEPENDENCIA':
-        return { color: 'bg-rose-600', text: 'text-white', label: 'DP' }
+        return { color: 'bg-danger', text: 'text-white', label: 'DP' }
       case 'DESISTENTE':
-        return { color: 'bg-slate-800', text: 'text-white', label: 'DS' }
+        return { color: 'bg-zinc-800', text: 'text-white', label: 'DS' }
       case 'CONSERVADO':
-        return { color: 'bg-slate-400', text: 'text-white', label: 'CO' }
+        return { color: 'bg-zinc-400', text: 'text-white', label: 'CO' }
       default:
-        return { color: 'bg-slate-200', text: 'text-slate-400', label: '-' }
+        return { color: 'bg-zinc-200', text: 'text-fg-subtle', label: '-' }
     }
   }
 
   const getNotaStyle = (nota: number | null | undefined, isDesistente = false) => {
-    if (isDesistente) return 'text-slate-800 font-medium'
-    if (nota === null || nota === undefined) return 'text-slate-300 font-normal'
-    if (nota >= notaMinimaAprovacao) return 'text-emerald-600 font-medium'
-    return 'text-rose-600 font-medium'
+    if (isDesistente) return 'text-fg font-medium'
+    if (nota === null || nota === undefined) return 'text-zinc-300 font-normal'
+    if (nota >= notaMinimaAprovacao) return 'text-success-fg font-medium'
+    return 'text-danger-fg font-medium'
   }
 
   const abreviarNome = (nome: string) => {
@@ -95,7 +95,7 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
   }
 
   const renderCellContent = (nota: NotaData | undefined) => {
-    if (!nota) return <span className="text-slate-300">/</span>
+    if (!nota) return <span className="text-zinc-300">/</span>
 
     if (viewMode === 'STATUS') {
       const config = getStatusConfig(nota.status)
@@ -118,8 +118,8 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
       isDesistente = nota.status === 'DESISTENTE'
     }
 
-    if (isDesistente) return <span className="text-slate-800 font-medium text-xs">DS</span>
-    if (value === null || value === undefined) return <span className="text-slate-300">-</span>
+    if (isDesistente) return <span className="text-fg font-medium text-xs">DS</span>
+    if (value === null || value === undefined) return <span className="text-zinc-300">-</span>
     
     const numValue = typeof value === 'string' ? parseFloat(value) : value
     return (
@@ -130,34 +130,34 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="bg-zinc-50">
       {/* Header Premium */}
-      <header className="bg-white/80 backdrop-blur-xl border-b border-slate-300 sticky top-0 z-50">
+      <header className="mb-6 border-b border-line pb-4">
         <div className="max-w-[1600px] mx-auto px-6 py-4">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="flex items-center space-x-5">
               <Link
                 href="/dashboard/turmas"
-                className="w-10 h-10 bg-white border border-slate-300 rounded-xl flex items-center justify-center text-slate-700 hover:bg-slate-50 transition-all shadow-sm hover:translate-x-[-2px]"
+                className="w-10 h-10 bg-white border border-zinc-300 rounded-xl flex items-center justify-center text-fg-muted hover:bg-zinc-50 transition-all shadow-sm hover:translate-x-[-2px]"
               >
                 <ArrowLeft className="w-5 h-5" />
               </Link>
               <div>
                 <div className="flex items-center space-x-2 mb-0.5">
                   <h1 className="text-2xl font-medium text-black tracking-tight uppercase">RESULTADO - {turma.nome}</h1>
-                  <span className="px-2 py-0.5 bg-slate-700 text-white text-[9px] font-medium rounded-md uppercase tracking-widest leading-none">
+                  <span className="px-2 py-0.5 bg-zinc-700 text-white text-[9px] font-medium rounded-md uppercase tracking-widest leading-none">
                     Realtime
                   </span>
                 </div>
-                <p className="text-xs font-medium text-slate-400 uppercase tracking-widest flex items-center">
-                  <span className="text-slate-700 mr-2 font-medium">{turma.nome}</span>
+                <p className="text-xs font-medium text-fg-subtle uppercase tracking-widest flex items-center">
+                  <span className="text-fg-muted mr-2 font-medium">{turma.nome}</span>
                   • {turma.curso} • {turma.turno}
                 </p>
               </div>
             </div>
             
             <div className="flex flex-wrap items-center gap-3">
-              <div className="bg-slate-200/50 p-1 rounded-2xl flex items-center border border-slate-300/50 shadow-inner">
+              <div className="bg-zinc-200/50 p-1 rounded-lg flex items-center border border-zinc-300/50 shadow-card">
                 {([
                   { id: 'STATUS', label: 'Status', icon: CheckCircle2 },
                   ...nomesEtapas.map((_, i) => ({ id: i, label: `Und ${i + 1}`, icon: FileText })),
@@ -170,13 +170,13 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
                       key={item.id}
                       title={typeof item.id === 'number' ? nomesEtapas[item.id] : undefined}
                       onClick={() => setViewMode(item.id)}
-                      className={`flex items-center space-x-2 px-4 py-2 rounded-[0.8rem] text-xs font-medium transition-all ${
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
                         active 
-                        ? 'bg-black text-white shadow-lg active:scale-95' 
-                        : 'text-slate-600 hover:text-black hover:bg-white/50'
+                        ? 'bg-black text-white shadow-card active:scale-95' 
+                        : 'text-fg-muted hover:text-black hover:bg-white/50'
                       }`}
                     >
-                      <Icon className={`w-3.5 h-3.5 ${active ? 'text-white' : 'text-slate-400'}`} />
+                      <Icon className={`w-3.5 h-3.5 ${active ? 'text-white' : 'text-fg-subtle'}`} />
                       <span className="uppercase tracking-wide">{item.label}</span>
                     </button>
                   )
@@ -187,7 +187,7 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
                 href={`/api/relatorio/status/${turma.id}/pdf`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center space-x-2 bg-slate-700 text-white px-5 py-2.5 rounded-2xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-300 active:scale-95 font-medium text-xs uppercase tracking-widest"
+                className="flex items-center space-x-2 bg-zinc-700 text-white px-5 py-2.5 rounded-lg hover:bg-zinc-800 transition-all shadow-card active:scale-95 font-medium text-xs uppercase tracking-widest"
               >
                 <Download className="w-4 h-4" />
                 <span>PDF</span>
@@ -200,16 +200,16 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
       {/* Main Content */}
       <main className="max-w-[1600px] mx-auto px-4 py-6">
         {/* Compact Summary & Legend Row */}
-        <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 mb-6 bg-white p-4 rounded-2xl border border-slate-300 shadow-sm">
+        <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 mb-6 bg-white p-4 rounded-lg border border-zinc-300 shadow-sm">
           {/* Metrics */}
           <div className="flex items-center space-x-6 px-2">
             <div>
-               <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Estudantes</p>
+               <p className="text-[10px] font-medium text-fg-subtle uppercase tracking-widest">Estudantes</p>
                <p className="text-2xl font-medium text-black leading-none">{turma.estudantes.length}</p>
             </div>
-            <div className="w-px h-8 bg-slate-200" />
+            <div className="w-px h-8 bg-zinc-200" />
             <div>
-               <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Disciplinas</p>
+               <p className="text-[10px] font-medium text-fg-subtle uppercase tracking-widest">Disciplinas</p>
                <p className="text-2xl font-medium text-black leading-none">{turma.disciplinas.length}</p>
             </div>
           </div>
@@ -217,40 +217,40 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
           {/* Compact Legend */}
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
              {[
-               { id: 'AP', label: 'Aprovado', color: 'bg-emerald-500' },
-               { id: 'RC', label: 'Recup', color: 'bg-amber-500' },
-               { id: 'AR', label: 'Apr.Rec', color: 'bg-emerald-600' },
-               { id: 'AC', label: 'Conselho', color: 'bg-slate-700' },
-               { id: 'DP', label: 'Dep', color: 'bg-rose-600' },
-               { id: 'DS', label: 'Desist', color: 'bg-slate-800' },
-               { id: 'DS_U', badge: 'DS', label: 'Unid. Des', color: 'bg-white border border-slate-300', text: 'text-black' }
+               { id: 'AP', label: 'Aprovado', color: 'bg-success' },
+               { id: 'RC', label: 'Recup', color: 'bg-warning' },
+               { id: 'AR', label: 'Apr.Rec', color: 'bg-success' },
+               { id: 'AC', label: 'Conselho', color: 'bg-zinc-700' },
+               { id: 'DP', label: 'Dep', color: 'bg-danger' },
+               { id: 'DS', label: 'Desist', color: 'bg-zinc-800' },
+               { id: 'DS_U', badge: 'DS', label: 'Unid. Des', color: 'bg-white border border-zinc-300', text: 'text-black' }
              ].map((item) => (
                <div key={item.id} className="flex items-center space-x-1.5" title={item.label}>
                  <span className={`w-5 h-5 rounded flex items-center justify-center text-[9px] font-medium ${item.color} ${item.text || 'text-white'}`}>
                    {item.badge || item.id}
                  </span>
-                 <span className="text-[10px] font-medium text-slate-600 uppercase">{item.label}</span>
+                 <span className="text-[10px] font-medium text-fg-muted uppercase">{item.label}</span>
                </div>
              ))}
           </div>
         </div>
 
         {/* Ultra Compact Matriz */}
-        <div className="bg-white rounded-2xl shadow-xl shadow-slate-300/50 border border-slate-200 overflow-hidden relative">
+        <div className="bg-white rounded-lg shadow-card border border-zinc-200 overflow-hidden relative">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
-                <tr className="bg-slate-50/80 border-b border-slate-300">
-                  <th className="px-2 py-2 text-center text-[9px] font-medium text-slate-400 uppercase sticky left-0 bg-slate-50/95 backdrop-blur z-20 w-10 border-r border-slate-300">
+                <tr className="bg-zinc-50/80 border-b border-zinc-300">
+                  <th className="px-2 py-2 text-center text-[9px] font-medium text-fg-subtle uppercase sticky left-0 bg-zinc-50/95 backdrop-blur z-20 w-10 border-r border-zinc-300">
                     #
                   </th>
-                  <th className="px-1.5 py-2 text-left text-[9px] font-medium text-black uppercase sticky left-10 bg-slate-50/95 backdrop-blur z-20 w-[1%] border-r border-slate-300 shadow-[2px_0_5px_rgba(0,0,0,0.02)] whitespace-nowrap">
+                  <th className="px-1.5 py-2 text-left text-[9px] font-medium text-black uppercase sticky left-10 bg-zinc-50/95 backdrop-blur z-20 w-[1%] border-r border-zinc-300 shadow-[2px_0_5px_rgba(0,0,0,0.02)] whitespace-nowrap">
                     Estudante
                   </th>
                   {turma.disciplinas.map((disc) => (
-                    <th key={disc.id} className="w-9 min-w-[2.25rem] max-w-[2.25rem] px-0 py-2 align-bottom h-24 border-r border-slate-200 last:border-0">
+                    <th key={disc.id} className="w-9 min-w-[2.25rem] max-w-[2.25rem] px-0 py-2 align-bottom h-24 border-r border-zinc-200 last:border-0">
                       <div className="flex items-center justify-center h-full w-full">
-                        <span className="text-[9px] font-medium text-slate-600 uppercase tracking-widest [writing-mode:vertical-rl] rotate-180 whitespace-nowrap overflow-hidden text-ellipsis max-h-[85px]">
+                        <span className="text-[9px] font-medium text-fg-muted uppercase tracking-widest [writing-mode:vertical-rl] rotate-180 whitespace-nowrap overflow-hidden text-ellipsis max-h-[85px]">
                           {abreviarNome(disc.nome)}
                         </span>
                       </div>
@@ -258,10 +258,10 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200">
+              <tbody className="divide-y divide-zinc-200">
                 {turma.estudantes.length === 0 ? (
                   <tr>
-                    <td colSpan={turma.disciplinas.length + 2} className="py-12 text-center text-slate-400 font-medium uppercase tracking-widest text-xs">
+                    <td colSpan={turma.disciplinas.length + 2} className="py-12 text-center text-fg-subtle font-medium uppercase tracking-widest text-xs">
                        Nenhum estudante nesta turma.
                     </td>
                   </tr>
@@ -271,25 +271,25 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
                     const isEven = idx % 2 === 0
                     const isSelected = selectedStudentId === estudante.matricula
                     
-                    let rowBg = isEven ? 'bg-white' : 'bg-slate-50'
-                    if (isSelected) rowBg = '!bg-yellow-50'
+                    let rowBg = isEven ? 'bg-white' : 'bg-zinc-50'
+                    if (isSelected) rowBg = '!bg-warning-subtle'
                     
                     return (
                       <tr 
                         key={estudante.matricula} 
                         onClick={() => setSelectedStudentId(isSelected ? null : estudante.matricula)}
-                        className={`group hover:bg-slate-50 transition-colors cursor-pointer ${rowBg}`}
+                        className={`group hover:bg-zinc-50 transition-colors cursor-pointer ${rowBg}`}
                       >
-                        <td className={`h-9 px-1 text-center text-[10px] font-medium text-slate-400 sticky left-0 group-hover:bg-slate-50 transition-colors z-10 border-r border-slate-200 ${rowBg}`}>
+                        <td className={`h-9 px-1 text-center text-[10px] font-medium text-fg-subtle sticky left-0 group-hover:bg-zinc-50 transition-colors z-10 border-r border-zinc-200 ${rowBg}`}>
                           {(idx + 1).toString().padStart(2, '0')}
                         </td>
-                        <td className={`h-9 px-1.5 text-sm tracking-tight font-medium text-black sticky left-10 group-hover:bg-slate-50 transition-colors z-10 border-r border-slate-300 shadow-[2px_0_5px_rgba(0,0,0,0.02)] whitespace-nowrap ${rowBg}`}>
+                        <td className={`h-9 px-1.5 text-sm tracking-tight font-medium text-black sticky left-10 group-hover:bg-zinc-50 transition-colors z-10 border-r border-zinc-300 shadow-[2px_0_5px_rgba(0,0,0,0.02)] whitespace-nowrap ${rowBg}`}>
                            <div className="flex items-center gap-1.5">
                               {estudante.nome}
                               {estudante.aeeProfile && (
                                 <Link 
                                   href={`/dashboard/aee/${estudante.matricula}`}
-                                  className="text-indigo-600 hover:text-indigo-800 transition-colors"
+                                  className="text-accent-fg hover:text-accent-fg transition-colors"
                                   title="Ficha AEE"
                                 >
                                   <Accessibility className="w-3.5 h-3.5" />
@@ -298,7 +298,7 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
                            </div>
                         </td>
                         {turma.disciplinas.map((disc) => (
-                          <td key={disc.id} className="w-9 min-w-[2.25rem] max-w-[2.25rem] h-9 px-0 text-center border-r border-slate-50 last:border-0">
+                          <td key={disc.id} className="w-9 min-w-[2.25rem] max-w-[2.25rem] h-9 px-0 text-center border-r border-zinc-50 last:border-0">
                             <div className="flex items-center justify-center w-full h-full">
                               {renderCellContent(notasMap.get(disc.id))}
                             </div>
