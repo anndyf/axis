@@ -142,6 +142,35 @@ def tipografia(cls):
     return cls
 
 
+BOTAO_PRIMARIO = re.compile(r'(?<![\w:-])bg-(?:zinc-(?:900|950)|black|success)(?![\w/-])')
+BOTAO_ESCURO = re.compile(r'(?<![\w:-])bg-zinc-(?:700|800)(?![\w/-])')
+
+
+def botoes(texto):
+    """Botões: preto/verde sólido era a "ação principal" -> destaque da escola;
+    cinza-escuro sólido -> estilo secundário (superfície + borda)."""
+    def ajustar(m):
+        cls = m.group(2)
+        if not re.search(r'(?<![\w:/-])text-(?:white|on-accent)(?![\w/-])', cls):
+            return m.group(0)
+        if BOTAO_PRIMARIO.search(cls):
+            cls = BOTAO_PRIMARIO.sub('bg-accent', cls)
+            cls = re.sub(r'(?<![\w-])((?:[a-z0-9-]+:)*hover:)bg-(?:zinc-\d{3}|black|success|accent)(?![\w/-])', r'\1bg-accent-hover', cls)
+            cls = re.sub(r'(?<![\w:/-])text-white(?![\w/-])', 'text-on-accent', cls)
+            cls = re.sub(r'(?<![\w:-])border-(?:zinc-(?:900|950)|black|success)(?![\w/-])', 'border-accent', cls)
+        elif BOTAO_ESCURO.search(cls):
+            cls = BOTAO_ESCURO.sub('bg-surface border border-line', cls)
+            cls = re.sub(r'(?<![\w-])((?:[a-z0-9-]+:)*hover:)bg-(?:zinc-\d{3}|black)(?![\w/-])', r'\1bg-subtle', cls)
+            cls = re.sub(r'(?<![\w:/-])text-white(?![\w/-])', 'text-fg', cls)
+        return m.group(1) + cls
+    return re.sub(r'(<(?:button|a|Link)\b[^>]*?className=)("[^"]*"|\{`[^`]*`\})', ajustar, texto)
+
+
+def titulos(texto):
+    # títulos não ficam na cor de destaque (text-blue-900 era "azul-marinho de título")
+    return re.sub(r'(<h[1-4]\b[^>]*?className=(?:"[^"]*|\{`[^`]*))(?<![\w:/-])text-accent-fg(?![\w/-])', r'\1text-fg', texto)
+
+
 def acabamento(texto):
     """Ajustes por className: texto sobre o destaque legível com qualquer cor
     de escola; degradês órfãos (to-/via- sem bg-gradient)."""
@@ -209,6 +238,16 @@ def casca(texto, caminho):
         extra = ''.join(f' {c}' for c in ('no-print', 'print:hidden') if c in cls.split())
         return f'<header className="mb-6 border-b border-line pb-4{extra}"'
     texto = re.sub(r'<header className="([^"]*)"', cabecalho, texto)
+    # div raiz da página (logo após "return (") não pinta fundo: o layout já tem
+    # (só wrapper "puro": com borda, sombra ou cantos é um cartão e fica como está)
+    def raiz(m):
+        cls = m.group(2)
+        if re.search(r'(?<![\w-])(?:border|shadow|rounded)', cls):
+            return m.group(0)
+        return m.group(1) + ' '.join(c for c in cls.split() if not re.fullmatch(r'bg-(?:zinc-(?:50|100)(?:/\d+)?|white|canvas)', c)) + m.group(3)
+    texto = re.sub(r'(return \(\s*<div className=")([^"]*)(")', raiz, texto)
+    # cabeçalho de página com faixa branca/sombra também vira bloco simples
+    texto = re.sub(r'<header className="(?=[^"]*(?:bg-white|shadow))[^"]*"', lambda m: '<header className="mb-6 border-b border-line pb-4"' if 'print' not in m.group(0) else m.group(0), texto)
     return re.sub(r'(className=(?:"|\{`))((?:[^"`]*\s)?)min-h-screen(?=[\s"`])', lambda m: m.group(1) + m.group(2).rstrip() + ('' if m.group(2).strip() else ''), texto)
 
 
@@ -231,7 +270,7 @@ if __name__ == '__main__':
         if contar:
             total += len(ALVO.findall(texto))
             continue
-        novo = limpar_espacos(acabamento(sombras(casca(migrar(texto), str(p)))))
+        novo = limpar_espacos(titulos(botoes(acabamento(sombras(casca(migrar(texto), str(p)))))))
         if novo != texto:
             p.write_text(novo)
             mudados += 1
