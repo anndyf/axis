@@ -27,8 +27,9 @@ export default async function PortalPage() {
   const data = await getStudentPortalData()
   const escola = await prisma.escola.findUnique({
     where: { id: session.user.escolaId },
-    select: { nome: true }
+    select: { nome: true, logoUrl: true }
   })
 
-  return <PortalClient initialData={data} user={session.user} nomeEscola={escola?.nome || 'Áxis'} />
+  // Só o id vai ao navegador (chave local das mensagens lidas)
+  return <PortalClient initialData={data} user={{ id: session.user.id }} escola={{ nome: escola?.nome || 'Áxis', logoUrl: escola?.logoUrl ?? null }} />
 }

@@ -18,7 +18,7 @@ export function Dialog({ open, onClose, title, description, children, footer, si
   description?: ReactNode
   children?: ReactNode
   footer?: ReactNode
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'sm' | 'md' | 'lg' | 'xl'
 }) {
   const painel = useRef<HTMLDivElement>(null)
   const tituloId = useId()
@@ -77,7 +77,7 @@ export function Dialog({ open, onClose, title, description, children, footer, si
         className={cn(
           'relative flex max-h-[90vh] w-full flex-col rounded-t-xl border border-line bg-elevated shadow-overlay outline-none sm:rounded-xl',
           'animate-pop-in',
-          size === 'sm' ? 'sm:max-w-sm' : size === 'lg' ? 'sm:max-w-2xl' : 'sm:max-w-lg'
+          size === 'sm' ? 'sm:max-w-sm' : size === 'lg' ? 'sm:max-w-2xl' : size === 'xl' ? 'sm:max-w-5xl' : 'sm:max-w-lg'
         )}
       >
         <div className="flex items-start gap-3 px-5 pt-5 pb-3">

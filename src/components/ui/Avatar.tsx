@@ -7,8 +7,8 @@ function iniciais(nome?: string | null) {
 }
 
 /** Avatar com iniciais (ou imagem). Tamanhos: sm 24px, md 32px. */
-export function Avatar({ nome, src, size = 'md', className }: { nome?: string | null; src?: string | null; size?: 'sm' | 'md'; className?: string }) {
-  const tamanho = size === 'sm' ? 'size-6 text-[10px]' : 'size-8 text-xs'
+export function Avatar({ nome, src, size = 'md', className }: { nome?: string | null; src?: string | null; size?: 'sm' | 'md' | 'lg'; className?: string }) {
+  const tamanho = size === 'sm' ? 'size-6 text-[10px]' : size === 'lg' ? 'size-10 text-sm' : 'size-8 text-xs'
   if (src) {
     // eslint-disable-next-line @next/next/no-img-element
     return <img src={src} alt="" className={cn('shrink-0 rounded-full object-cover', tamanho, className)} />
