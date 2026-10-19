@@ -10,6 +10,8 @@ import { diasComAulaAte, hojeNaEscola } from "@/lib/services/chamada"
 import { diasLetivos, aulasPrevistasPorDisciplina, chaveData } from "@/lib/services/calendario"
 import { ArrowLeft, BookOpen, ChevronRight } from "lucide-react"
 import { getDisciplinasPermitidas } from "@/lib/data-fetching"
+import { calendarioDaDisciplina } from "@/lib/services/calendario-disciplina"
+import CalendarioDisciplina from "@/components/CalendarioDisciplina"
 import { Badge, Card, CardBody, CardHeader, EmptyState, PageHeader, Stat, buttonClasses } from "@/components/ui"
 
 export const metadata = { title: 'Áxis - Diário de classe' }
@@ -56,8 +58,16 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
     : null
 
   const linkChamada = (d: string) => `/dashboard/chamada/fazer?turma=${turma.id}${disciplinaId ? `&disciplina=${disciplinaId}` : ""}&data=${d}`
+  const linkBase = linkChamada("")
+  const diasCalendario = calendario ? calendarioDaDisciplina({ calendario, turmaId: turma.id, disciplinaId, horario, aulas, hoje }) : null
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className={diasCalendario ? "mx-auto max-w-6xl md:grid md:grid-cols-[15rem_minmax(0,1fr)] md:items-start md:gap-6" : "mx-auto max-w-4xl"}>
+      {diasCalendario && (
+        <aside aria-label="Calendário da disciplina" className="sticky top-20 hidden max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-2xl border border-line bg-surface p-3 shadow-card md:block">
+          <CalendarioDisciplina dias={diasCalendario} linkBase={linkBase} hoje={hoje} modo="coluna" />
+        </aside>
+      )}
+    <div className="min-w-0 space-y-6">
       <PageHeader
         title={`Diário de classe — ${acesso.disciplina?.nome ?? "Chamada diária"}`}
         description={`${turma.nome} · ${ano}`}
@@ -71,8 +81,15 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
         <Stat label="Chamadas pendentes" value={pendentes.length} hint={pendentes.length ? "Dias com aula sem chamada" : "Tudo em dia"} />
       </div>
 
+      {diasCalendario && (
+        <Card className="md:hidden">
+          <CardHeader title="Calendário" description="Toque num dia com aula para abrir a chamada." />
+          <CardBody><CalendarioDisciplina dias={diasCalendario} linkBase={linkBase} hoje={hoje} modo="mes" /></CardBody>
+        </Card>
+      )}
+
       {pendentes.length > 0 && (
-        <Card>
+        <Card className="hidden md:block">
           <CardHeader title="Dias com aula sem chamada" description="Toque no dia para fazer a chamada." />
           <CardBody className="flex flex-wrap gap-1.5">
             {pendentes.slice(0, 60).map((d) => (
@@ -132,6 +149,7 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
           </div>
         )}
       </Card>
+    </div>
     </div>
   )
 }

@@ -46,3 +46,13 @@ Capturas: `npx tsx scripts/capturas.ts <fase>` com `npm run dev` rodando (`CHROM
 - [x] `/dashboard/chamada`: aulas do dia em cartões (nome inteiro, turma, tempos, situação, botão largo) e diários em lista de 56px.
 - [x] Diário mostra as observações de cada aula (a reorganização por unidade vem na fase 5).
 - Capturas: `docs/capturas/mobile-3-chamada/`.
+
+### 4. Calendário da disciplina com legenda — feito
+- [x] Regra pura `src/lib/services/calendario-disciplina.ts` (teste `calendario-disciplina.test.ts`), reaproveitando `aulasDoDia` (chamada.ts) e `chaveData` (calendario.ts): para cada dia do período, `feita` (chamada lançada), `pendente` (aula no horário, já passado ou hoje, sem chamada; aula aberta e não salva conta como pendente, igual à tela de chamada), `futura`, `nao-letivo` (DiaNaoLetivo da escola ou da turma, com descrição), `cancelada` (não dada), `sem-aula`, e a marca `extra` (DiaLetivoExtra). Aula registrada vale mesmo se o horário mudou depois. `mesesDoCalendario` monta semanas de domingo a sábado.
+- [x] Leitura `src/lib/calendario-disciplina-leitura.ts` (server-only): mesmo acesso da chamada (`acessoChamada`); na chamada diária é o calendário da turma. `carregarCalendario` passou a trazer a descrição dos feriados/dias extras.
+- [x] Componente `CalendarioDisciplina` + `LegendaCalendario`: cor (tokens semânticos) **e** marca (✓ lançada, ponto pendente, borda tracejada futura, número riscado feriado, anel + "+" extra, × não dada), `aria-label`/`title` com dia da semana, estado e descrição. Dias com chamada (lançada, pendente, não dada) são links para a chamada daquela data; futuros e sem aula não.
+  - Desktop: meses empilhados numa coluna à esquerda (chamada e diário), que já abre rolada no mês da data.
+  - Celular: na chamada, botão "Calendário" abre um bottom sheet com um mês por vez e setas; no diário, o mês fica num cartão no topo.
+  - **[decisão]** No diário do desktop a lista de chips "Dias com aula sem chamada" continua (fica escondida no celular, onde o calendário cumpre o papel).
+- Observação: no `npm run dev`, quando o Playwright navega antes de a página terminar de carregar, o servidor registra "useSessionTimer deve ser usado dentro de SessionTimerProvider" junto de "aborted" e às vezes aparece o selo "1 Issue" do Next. Acontece só em renderização interrompida; não mexi nisso.
+- Capturas: `docs/capturas/mobile-4-calendario/` (inclui o bottom sheet aberto, claro e escuro).

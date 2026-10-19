@@ -2,10 +2,12 @@
 
 import { useEffect, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { Ban, CalendarDays, Check, MessageSquareText, MoreVertical, Save, Users } from "lucide-react"
+import { Ban, CalendarDays, CalendarRange, Check, MessageSquareText, MoreVertical, Save, Users } from "lucide-react"
 import { Alert, Avatar, BottomSheet, Button, Card, EmptyState, Label, SkeletonRows, Textarea, cn } from "@/components/ui"
 import { Menu } from "@/components/ui/Menu"
 import { rotuloTempos } from "@/lib/services/inicio-professor"
+import type { DiaDoCalendario } from "@/lib/services/calendario-disciplina"
+import CalendarioDisciplina from "@/components/CalendarioDisciplina"
 import { abrirChamada, salvarChamada, cancelarAula, salvarObservacao, type ChamadaAberta } from "../actions"
 
 interface Props {
@@ -13,6 +15,7 @@ interface Props {
   disciplinaId: string | null
   data: string
   hoje: string
+  calendario: { dias: DiaDoCalendario[]; linkBase: string } | null
 }
 
 type Falta = { tempos: number[]; quantidade: number }
@@ -28,7 +31,7 @@ const diaDaSemana = (iso: string) => DIAS[new Date(`${iso}T12:00:00Z`).getUTCDay
  * ficha pode ser desmarcada). Observação por aluno num painel que sobe de
  * baixo. Salvar fica fixo no rodapé, acima da barra de navegação.
  */
-export default function ChamadaClient({ turmaId, disciplinaId, data, hoje }: Props) {
+export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calendario }: Props) {
   const router = useRouter()
   const [pendente, startTransition] = useTransition()
   const [chamada, setChamada] = useState<ChamadaAberta | null>(null)
@@ -39,6 +42,7 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje }: Pro
   const [aviso, setAviso] = useState<{ tipo: "ok" | "erro"; texto: string } | null>(null)
   const [obsAberta, setObsAberta] = useState<{ id: string; nome: string; texto: string } | null>(null)
   const [salvandoObs, setSalvandoObs] = useState(false)
+  const [calendarioAberto, setCalendarioAberto] = useState(false)
 
   useEffect(() => {
     let ativo = true
@@ -115,7 +119,14 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje }: Pro
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-4 pb-32 md:space-y-5 md:pb-6">
+    <div className={cn("mx-auto", calendario ? "max-w-5xl md:grid md:grid-cols-[15rem_minmax(0,1fr)] md:items-start md:gap-6" : "max-w-3xl")}>
+      {/* Desktop: meses empilhados numa coluna à esquerda (como no SIGEduc) */}
+      {calendario && (
+        <aside aria-label="Calendário da disciplina" className="sticky top-20 hidden max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-2xl border border-line bg-surface p-3 shadow-card md:block">
+          <CalendarioDisciplina dias={calendario.dias} linkBase={calendario.linkBase} selecionada={data} hoje={hoje} modo="coluna" />
+        </aside>
+      )}
+    <div className="min-w-0 space-y-4 pb-32 md:space-y-5 md:pb-6">
       {/* Dados da turma */}
       <section aria-label="Dados da aula" className="rounded-2xl border border-line bg-surface p-4 shadow-card md:p-5">
         <div className="flex items-start gap-3">
@@ -146,7 +157,12 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje }: Pro
             <span className="sr-only">Data da chamada</span>
             <input type="date" value={data} max={hoje} onChange={(e) => trocarData(e.target.value)} className="h-10 rounded-lg border border-transparent bg-subtle px-2 text-sm text-fg outline-none focus:border-accent focus:ring-3 focus:ring-ring/40" />
           </label>
-          <p className="text-13 text-fg-subtle">Todos começam presentes; toque em quem faltou.</p>
+          {calendario && (
+            <button type="button" onClick={() => setCalendarioAberto(true)} className="flex min-h-10 items-center gap-1.5 rounded-lg bg-subtle px-3 text-13 font-medium text-fg md:hidden">
+              <CalendarRange size={16} strokeWidth={1.75} aria-hidden /> Calendário
+            </button>
+          )}
+          <p className="w-full text-13 text-fg-subtle">Todos começam presentes; toque em quem faltou.</p>
         </div>
       </section>
 
@@ -267,6 +283,14 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje }: Pro
           />
         )}
       </BottomSheet>
+
+      {/* Celular: um mês por vez, num painel que sobe de baixo */}
+      {calendario && (
+        <BottomSheet open={calendarioAberto} onClose={() => setCalendarioAberto(false)} title="Calendário da disciplina" description="Toque num dia com aula para abrir a chamada.">
+          <CalendarioDisciplina dias={calendario.dias} linkBase={calendario.linkBase} selecionada={data} hoje={hoje} modo="mes" />
+        </BottomSheet>
+      )}
+    </div>
     </div>
   )
 }
