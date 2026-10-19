@@ -415,7 +415,7 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
 
         {/* Bulk Actions Bar */}
         {selectedIds.length > 0 && isAdmin && (
-          <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-zinc-900 text-white px-6 py-4 rounded-xl shadow-overlay flex items-center gap-6 animate-slide-up">
+          <div className="fixed bottom-[calc(var(--barra-inferior)+2rem)] left-1/2 -translate-x-1/2 z-50 bg-zinc-900 text-white px-6 py-4 rounded-xl shadow-overlay flex items-center gap-6 animate-slide-up">
             <div className="flex items-center gap-3 pr-6 border-r border-zinc-700">
               <div className="bg-accent text-on-accent w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold">
                 {selectedIds.length}

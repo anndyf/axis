@@ -240,6 +240,7 @@
   --animate-fade-in: fade-in 150ms ease-out;
   --animate-pop-in: pop-in 150ms ease-out;
   --animate-slide-up: slide-up 150ms ease-out;
+  --animate-sheet-up: sheet-up 200ms ease-out;
 }
 
 @keyframes skeleton {
@@ -251,6 +252,9 @@
 }
 @keyframes pop-in {
   from { opacity: 0; transform: scale(0.98) translateY(4px); }
+}
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
 }
 @keyframes slide-up {
   from { opacity: 0; transform: translateY(6px); }
@@ -282,6 +286,16 @@
   ::selection {
     background: color-mix(in oklab, var(--accent) 20%, transparent);
   }
+}
+
+/*
+ * Barra de navegação inferior do celular (BarraInferior): --barra-inferior é
+ * o espaço que ela ocupa. Conteúdo, barras de ação fixas e avisos somam isto
+ * para não ficarem atrás dela. Zero no desktop e em telas sem a barra.
+ */
+:root { --barra-inferior: 0px; }
+@media (max-width: 767.98px) {
+  :root:has([data-barra-inferior]) { --barra-inferior: calc(4rem + env(safe-area-inset-bottom)); }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -346,7 +346,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
       </main>
 
       {/* Info Flutuante no Rodapé */}
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-zinc-900 text-white px-6 py-3 rounded-full shadow-overlay flex items-center space-x-4 border border-white/10 backdrop-blur-md">
+      <div className="fixed bottom-[calc(var(--barra-inferior)+2rem)] left-1/2 -translate-x-1/2 bg-zinc-900 text-white px-6 py-3 rounded-full shadow-overlay flex items-center space-x-4 border border-white/10 backdrop-blur-md">
          <Info className="w-4 h-4 text-accent" />
          <span className="text-xs font-medium leading-none">
             {selectedIds.length} selecionadas

@@ -1,11 +1,10 @@
 'use client'
 
-import { useEffect, useId, useRef, type ReactNode } from 'react'
+import { useId, useRef, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { cn } from './cn'
-
-const FOCAVEIS = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+import { useFocoPreso } from './foco'
 
 /**
  * Modal acessível: foco preso dentro, Esc e clique fora fecham, foco volta
@@ -24,43 +23,7 @@ export function Dialog({ open, onClose, title, description, children, footer, si
   const tituloId = useId()
   const descricaoId = useId()
 
-  useEffect(() => {
-    if (!open) return
-    const anterior = document.activeElement as HTMLElement | null
-    const el = painel.current
-    const primeiro = el?.querySelector<HTMLElement>('[data-autofocus]') ?? el?.querySelector<HTMLElement>(FOCAVEIS)
-    ;(primeiro ?? el)?.focus()
-    const overflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-
-    const tecla = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.stopPropagation()
-        onClose()
-        return
-      }
-      if (e.key !== 'Tab' || !el) return
-      const itens = Array.from(el.querySelectorAll<HTMLElement>(FOCAVEIS)).filter((x) => x.offsetParent !== null)
-      if (itens.length === 0) {
-        e.preventDefault()
-        return
-      }
-      const [ini, fim] = [itens[0], itens[itens.length - 1]]
-      if (e.shiftKey && document.activeElement === ini) {
-        e.preventDefault()
-        fim.focus()
-      } else if (!e.shiftKey && document.activeElement === fim) {
-        e.preventDefault()
-        ini.focus()
-      }
-    }
-    document.addEventListener('keydown', tecla)
-    return () => {
-      document.removeEventListener('keydown', tecla)
-      document.body.style.overflow = overflow
-      anterior?.focus?.()
-    }
-  }, [open, onClose])
+  useFocoPreso(painel, open, onClose)
 
   if (!open || typeof document === 'undefined') return null
 

@@ -8,7 +8,8 @@ import { carregarEsquemaDaTurma } from "@/lib/services/notas-leitura"
 import { carregarCalendario, anoLetivoDaTurma } from "@/lib/services/frequencia-leitura"
 import { diasComAulaAte, hojeNaEscola } from "@/lib/services/chamada"
 import { diasLetivos, aulasPrevistasPorDisciplina, chaveData } from "@/lib/services/calendario"
-import { ArrowLeft, BookOpen } from "lucide-react"
+import { ArrowLeft, BookOpen, ChevronRight } from "lucide-react"
+import { getDisciplinasPermitidas } from "@/lib/data-fetching"
 import { Badge, Card, CardBody, CardHeader, EmptyState, PageHeader, Stat, buttonClasses } from "@/components/ui"
 
 export const metadata = { title: 'Áxis - Diário de classe' }
@@ -23,7 +24,7 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
   if (!session?.user?.escolaId || session.user.isPortalUser || !can(session.user, 'staff')) redirect("/dashboard")
   const escolaId = session.user.escolaId
   const { turma: turmaId, disciplina } = await searchParams
-  if (!turmaId) redirect("/dashboard/chamada")
+  if (!turmaId) return <IndiceDiarios />
 
   const acesso = await acessoChamada(session.user, turmaId, disciplina ?? null)
   if (!acesso) redirect("/dashboard/chamada")
@@ -126,6 +127,51 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
           </div>
         )}
       </Card>
+    </div>
+  )
+}
+
+/** Sem turma escolhida (item "Diário" da barra do celular): os diários que o usuário pode abrir, por turma. */
+async function IndiceDiarios() {
+  const session = await auth()
+  if (!session?.user?.escolaId) redirect("/login")
+  const disciplinas = await getDisciplinasPermitidas(session)
+  const porTurma = new Map<string, { turma: (typeof disciplinas)[number]["turma"]; itens: { id: string; nome: string }[] }>()
+  for (const d of disciplinas) {
+    if (d.turma.escolaId !== session.user.escolaId) continue
+    const g = porTurma.get(d.turmaId) ?? { turma: d.turma, itens: [] }
+    g.itens.push({ id: d.id, nome: d.nome })
+    porTurma.set(d.turmaId, g)
+  }
+  const grupos = [...porTurma.values()].sort((a, b) => a.turma.nome.localeCompare(b.turma.nome))
+  for (const g of grupos) {
+    const esquema = await carregarEsquemaDaTurma(g.turma)
+    // Chamada diária: um diário só por turma, sem disciplina
+    if (esquema?.registroFrequencia === "POR_DIA") g.itens = [{ id: "", nome: "Chamada diária" }]
+    else g.itens.sort((a, b) => a.nome.localeCompare(b.nome))
+  }
+
+  return (
+    <div className="mx-auto max-w-4xl space-y-6">
+      <PageHeader title="Diário de classe" description="Aulas dadas, conteúdo ministrado e faltas por disciplina." />
+      {grupos.length === 0 ? (
+        <Card><EmptyState icon={BookOpen} title="Nenhuma disciplina vinculada" description="Peça à gestão para vincular suas disciplinas." /></Card>
+      ) : grupos.map((g) => (
+        <section key={g.turma.id} className="space-y-2">
+          <h2 className="px-1 font-mono text-13 font-medium text-fg-muted">{g.turma.nome}</h2>
+          <ul className="space-y-2">
+            {g.itens.map((i) => (
+              <li key={i.id || "dia"}>
+                <Link href={`/dashboard/chamada/diario?turma=${g.turma.id}${i.id ? `&disciplina=${i.id}` : ""}`} className="flex min-h-14 items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3 shadow-card transition-colors duration-150 hover:border-accent">
+                  <BookOpen size={18} strokeWidth={1.75} className="shrink-0 text-fg-subtle" aria-hidden />
+                  <span className="min-w-0 flex-1 break-words text-sm font-medium text-fg">{i.nome}</span>
+                  <ChevronRight size={16} strokeWidth={1.75} className="shrink-0 text-fg-disabled" aria-hidden />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
     </div>
   )
 }

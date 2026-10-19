@@ -53,7 +53,14 @@ async function ids() {
 async function salvar(page: Page, nome: string, largura: number) {
   await page.waitForLoadState('networkidle').catch(() => {})
   await page.waitForTimeout(800)
+  // Viewport do tamanho da página: barras fixas (navegação inferior, salvar)
+  // aparecem no fim, como depois de rolar, e não no meio da captura
+  const viewport = page.viewportSize()!
+  const altura = await page.evaluate(() => document.documentElement.scrollHeight)
+  await page.setViewportSize({ width: viewport.width, height: Math.max(viewport.height, Math.min(altura, 12000)) })
+  await page.waitForTimeout(300)
   const bruto = await page.screenshot({ fullPage: true })
+  await page.setViewportSize(viewport)
   const arquivo = path.join(saida, `${nome}-${largura}${TEMA === 'dark' ? '-escuro' : ''}.png`)
   // PNG com paleta: ~5x menor, suficiente para conferência
   await sharp(bruto).png({ palette: true, quality: 80, compressionLevel: 9 }).toFile(arquivo)

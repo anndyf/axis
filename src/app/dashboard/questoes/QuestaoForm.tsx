@@ -794,7 +794,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
           )}
         </form>
 
-        <div className="p-4 sm:p-6 border-t border-line-subtle bg-surface/80 backdrop-blur-md flex items-center justify-between sticky bottom-0 z-50">
+        <div className="p-4 sm:p-6 border-t border-line-subtle bg-surface/80 backdrop-blur-md flex items-center justify-between sticky bottom-[var(--barra-inferior)] z-30">
           <button
             type="button"
             onClick={() => currentStep > 1 ? setCurrentStep(currentStep - 1) : onClose()}

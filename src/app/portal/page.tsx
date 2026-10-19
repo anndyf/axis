@@ -9,7 +9,7 @@ import { precisaTrocarSenha } from "@/lib/data-fetching"
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
-export default async function PortalPage() {
+export default async function PortalPage({ searchParams }: { searchParams: Promise<{ aba?: string }> }) {
   const session = await auth()
 
   if (!session) {
@@ -30,6 +30,8 @@ export default async function PortalPage() {
     select: { nome: true, logoUrl: true }
   })
 
+  const { aba } = await searchParams
+
   // Só o id vai ao navegador (chave local das mensagens lidas)
-  return <PortalClient initialData={data} user={{ id: session.user.id }} escola={{ nome: escola?.nome || 'Áxis', logoUrl: escola?.logoUrl ?? null }} />
+  return <PortalClient initialData={data} user={{ id: session.user.id }} escola={{ nome: escola?.nome || 'Áxis', logoUrl: escola?.logoUrl ?? null }} abaInicial={aba} />
 }

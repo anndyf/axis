@@ -9,11 +9,12 @@ import {
   AlertTriangle,
   User as UserIcon,
   Calendar,
-  Home,
   MessageSquare,
   ChevronRight,
-  type LucideIcon
 } from "lucide-react"
+import BarraInferior from "@/components/BarraInferior"
+import MenuMais from "@/components/MenuMais"
+import { navegacaoMobile } from "@/lib/services/navegacao-mobile"
 import { signOut } from "next-auth/react"
 import { analyzeRisk } from "@/lib/risk-analysis"
 import { formatarFrequencia } from "@/lib/services/frequencia"
@@ -22,14 +23,21 @@ import MarkdownContent from "@/components/MarkdownContent"
 import { Avatar, Badge, Button, Card, CardHeader, EmptyState, cn, type BadgeTone } from "@/components/ui"
 import { Dialog } from "@/components/ui/Dialog"
 
-type Aba = 'home' | 'messages' | 'grades' | 'profile'
+type Aba = 'home' | 'grades' | 'frequencia' | 'horario' | 'messages' | 'profile'
 
-const ABAS: { id: Aba; rotulo: string; icone: LucideIcon }[] = [
-  { id: 'home', rotulo: 'Início', icone: Home },
-  { id: 'messages', rotulo: 'Avisos', icone: MessageSquare },
-  { id: 'grades', rotulo: 'Boletim', icone: BookOpen },
-  { id: 'profile', rotulo: 'Perfil', icone: UserIcon },
+// Abas do desktop; no celular, a barra inferior (navegacaoMobile) + "Mais"
+const ABAS: { id: Aba; rotulo: string }[] = [
+  { id: 'home', rotulo: 'Início' },
+  { id: 'grades', rotulo: 'Boletim' },
+  { id: 'frequencia', rotulo: 'Frequência' },
+  { id: 'horario', rotulo: 'Horário' },
+  { id: 'messages', rotulo: 'Avisos' },
+  { id: 'profile', rotulo: 'Perfil' },
 ]
+// id da barra do celular (?aba=) <-> aba da tela
+const ABA_DA_BARRA: Record<string, Aba> = { inicio: 'home', boletim: 'grades', frequencia: 'frequencia', horario: 'horario', avisos: 'messages', perfil: 'profile' }
+const BARRA_DA_ABA = Object.fromEntries(Object.entries(ABA_DA_BARRA).map(([k, v]) => [v, k])) as Record<Aba, string>
+const DIAS = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta']
 
 // Nível de risco (src/lib/risk-analysis) → tom e rótulo
 const RISCO: Record<string, { tom: BadgeTone; rotulo: string }> = {
@@ -44,12 +52,19 @@ const nota1 = (n: number | null | undefined) => (n === null || n === undefined ?
 const rotuloTurno = (t?: string | null) => (t ? t.charAt(0).toUpperCase() + t.slice(1).toLowerCase() : '—')
 const dataBR = (d: string) => new Date(d).toLocaleDateString('pt-BR')
 
-export default function PortalClient({ initialData, user, escola }: { initialData: any, user: { id: string }, escola: { nome: string; logoUrl: string | null } }) {
+export default function PortalClient({ initialData, user, escola, abaInicial }: { initialData: any, user: { id: string }, escola: { nome: string; logoUrl: string | null }, abaInicial?: string }) {
   const { estudante, mensagens = [], error, nomesEtapas = [], numUnidades = 3, notaMinimaAprovacao = 5, frequencia = null } = initialData
   const [selectedMessage, setSelectedMessage] = useState<any>(null)
   const [readMessageIds, setReadMessageIds] = useState<Set<string>>(new Set())
-  const [isScheduleOpen, setIsScheduleOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<Aba>('home')
+  const [activeTab, setAba] = useState<Aba>(ABA_DA_BARRA[abaInicial ?? ''] ?? 'home')
+  const [maisAberto, setMaisAberto] = useState(false)
+  // A aba fica na URL (?aba=), para voltar/recarregar na mesma seção
+  const setActiveTab = (aba: Aba) => {
+    setAba(aba)
+    const url = aba === 'home' ? '/portal' : `/portal?aba=${BARRA_DA_ABA[aba]}`
+    window.history.replaceState(null, '', url)
+    window.scrollTo({ top: 0 })
+  }
 
   useEffect(() => {
     if (user?.id) {
@@ -145,7 +160,7 @@ export default function PortalClient({ initialData, user, escola }: { initialDat
         </nav>
       </header>
 
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 pt-6 pb-28 md:px-6 md:pb-10 animate-fade-in">
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 pt-6 pb-[calc(var(--barra-inferior)+2rem)] md:px-6 md:pb-10 animate-fade-in">
 
         {/* Início */}
         {activeTab === 'home' && (
@@ -169,7 +184,7 @@ export default function PortalClient({ initialData, user, escola }: { initialDat
               </div>
               <button
                 type="button"
-                onClick={() => setIsScheduleOpen(true)}
+                onClick={() => setActiveTab('horario')}
                 className="col-span-2 flex items-center gap-3 rounded-2xl border border-line bg-surface p-4 text-left transition-colors duration-150 hover:border-line-strong md:col-span-1"
               >
                 <Calendar size={16} strokeWidth={1.75} className="shrink-0 text-fg-subtle" aria-hidden />
@@ -295,6 +310,84 @@ export default function PortalClient({ initialData, user, escola }: { initialDat
           </div>
         )}
 
+        {/* Frequência */}
+        {activeTab === 'frequencia' && (
+          <div className="space-y-4">
+            <h1 className="text-xl font-semibold tracking-tight text-fg">Frequência</h1>
+            {!frequencia ? (
+              <Card><EmptyState icon={Calendar} title="Sem chamadas registradas" description="A frequência aparece aqui quando os professores fizerem a chamada." /></Card>
+            ) : (
+              <>
+                <div className={cn('rounded-2xl border bg-surface p-5', abaixoDoMinimo ? 'border-danger-line' : 'border-line')}>
+                  <p className="text-13 text-fg-subtle">Frequência geral</p>
+                  <p className={cn('mt-1 text-3xl font-semibold tracking-tight tabular-nums', abaixoDoMinimo ? 'text-danger-fg' : 'text-fg')}>{formatarFrequencia(frequencia.geral.percentual)}</p>
+                  <p className="mt-1 text-13 text-fg-muted tabular-nums">{frequencia.geral.faltas} {frequencia.geral.faltas === 1 ? 'falta' : 'faltas'} em {frequencia.geral.aulas} aulas · mínimo {frequencia.minimo}%</p>
+                  {abaixoDoMinimo && <p className="mt-2 flex items-center gap-1.5 text-13 font-medium text-danger-fg"><AlertTriangle size={14} strokeWidth={1.75} aria-hidden /> Abaixo do mínimo</p>}
+                </div>
+                <ul className="grid gap-3 md:grid-cols-2">
+                  {(estudante.turma.disciplinas ?? [])
+                    .slice()
+                    .sort((a: any, b: any) => a.nome.localeCompare(b.nome))
+                    .map((d: any) => {
+                      const f = frequencia.porDisciplina[d.id]
+                      const baixa = f?.percentual != null && f.percentual < frequencia.minimo
+                      return (
+                        <li key={d.id} className="flex items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3">
+                          <span className="min-w-0 flex-1">
+                            <span className="block break-words text-sm font-medium text-fg">{d.nome}</span>
+                            <span className="block text-13 text-fg-subtle tabular-nums">{f ? `${f.faltas} ${f.faltas === 1 ? 'falta' : 'faltas'} em ${f.aulas} aulas` : 'Sem chamadas'}</span>
+                          </span>
+                          <span className={cn('shrink-0 text-base font-semibold tabular-nums', baixa ? 'text-danger-fg' : 'text-fg')}>
+                            {formatarFrequencia(f?.percentual ?? null)}
+                            {baixa && <span className="sr-only"> (abaixo do mínimo)</span>}
+                          </span>
+                        </li>
+                      )
+                    })}
+                </ul>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Horário */}
+        {activeTab === 'horario' && (
+          <div className="space-y-4">
+            <div>
+              <h1 className="text-xl font-semibold tracking-tight text-fg">Horário de aulas</h1>
+              <p className="text-13 text-fg-muted">{estudante.turma.nome}</p>
+            </div>
+            <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {DIAS.map((dia, i) => {
+                const aulas = (estudante.turma.horarios ?? []).filter((h: any) => h.diaSemana === i + 1).sort((a: any, b: any) => a.horario - b.horario)
+                return (
+                  <li key={dia} className="rounded-2xl border border-line bg-surface">
+                    <h2 className="border-b border-line-subtle px-4 py-3 text-sm font-semibold text-fg">{dia}</h2>
+                    {aulas.length === 0 ? (
+                      <p className="px-4 py-3 text-13 text-fg-subtle">Sem aulas</p>
+                    ) : (
+                      <ol className="divide-y divide-line-subtle">
+                        {aulas.map((h: any) => {
+                          const prof = professorDaAula(h, estudante.turma.disciplinas)
+                          return (
+                            <li key={h.id} className="flex gap-3 px-4 py-2.5">
+                              <span className="w-7 shrink-0 pt-0.5 text-xs tabular-nums text-fg-subtle">{h.horario}º</span>
+                              <span className="min-w-0 flex-1">
+                                <span className="block break-words text-sm font-medium text-fg">{h.disciplina}</span>
+                                {prof && <span className="block truncate text-xs text-fg-subtle">{prof}</span>}
+                              </span>
+                            </li>
+                          )
+                        })}
+                      </ol>
+                    )}
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        )}
+
         {/* Perfil */}
         {activeTab === 'profile' && (
           <div className="mx-auto max-w-md space-y-4">
@@ -329,28 +422,25 @@ export default function PortalClient({ initialData, user, escola }: { initialDat
         </footer>
       </main>
 
-      {/* Barra inferior (celular) */}
-      <nav aria-label="Seções do portal" className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
-        <ul className="mx-auto grid max-w-md grid-cols-4">
-          {ABAS.map(({ id, rotulo, icone: Icone }) => {
-            const ativa = activeTab === id
-            return (
-              <li key={id}>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab(id)}
-                  aria-current={ativa ? 'page' : undefined}
-                  className={cn('relative flex h-14 w-full flex-col items-center justify-center gap-0.5 text-xs font-medium transition-colors duration-150', ativa ? 'text-accent-fg' : 'text-fg-subtle')}
-                >
-                  <Icone size={18} strokeWidth={1.75} aria-hidden />
-                  {rotulo}
-                  {id === 'messages' && hasUnreadMessages && <span aria-hidden className="absolute right-[calc(50%-14px)] top-2.5 size-2 rounded-full bg-accent ring-2 ring-surface" />}
-                </button>
-              </li>
-            )
-          })}
-        </ul>
-      </nav>
+      {/* Barra inferior (celular) + "Mais" */}
+      <BarraInferior
+        itens={navegacaoMobile({ isSuperuser: false, isDirecao: false, isStaff: false, isPortalUser: true }, []).barra}
+        ativo={BARRA_DA_ABA[activeTab]}
+        maisAberto={maisAberto}
+        onMais={() => setMaisAberto(true)}
+        onItem={(id) => setActiveTab(ABA_DA_BARRA[id] ?? 'home')}
+      />
+      <MenuMais
+        open={maisAberto}
+        onClose={() => setMaisAberto(false)}
+        itens={[]}
+        ativo={null}
+        usuario={{ nome: estudante.nome, papel: `Estudante · ${estudante.turma.nome}` }}
+        conta={[
+          { rotulo: naoLidas > 0 ? `Avisos (${naoLidas} não lidos)` : 'Avisos', icone: MessageSquare, onClick: () => setActiveTab('messages') },
+          { rotulo: 'Meu perfil', icone: UserIcon, onClick: () => setActiveTab('profile') },
+        ]}
+      />
 
       {/* Comunicado */}
       <Dialog
@@ -373,75 +463,18 @@ export default function PortalClient({ initialData, user, escola }: { initialDat
         )}
       </Dialog>
 
-      {/* Horário de aulas */}
-      <Dialog
-        open={isScheduleOpen}
-        onClose={() => setIsScheduleOpen(false)}
-        size="xl"
-        title="Horário de aulas"
-        description={estudante.turma.nome}
-        footer={<Button variant="secondary" onClick={() => setIsScheduleOpen(false)}>Fechar</Button>}
-      >
-        <div className="relative -mx-5 overflow-x-auto px-5">
-          <table className="w-full min-w-[40rem] border-collapse text-13">
-            <thead>
-              <tr className="border-b border-line text-xs text-fg-subtle">
-                <th scope="col" className="h-9 w-12 px-2 text-left font-medium">Aula</th>
-                {["Seg", "Ter", "Qua", "Qui", "Sex"].map((day) => (
-                  <th key={day} scope="col" className="h-9 px-2 text-left font-medium">{day}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {[1, 2, 3, 4, 5, 6].map(period => (
-                <tr key={period} className="border-b border-line-subtle last:border-0">
-                  <td className="px-2 py-2 align-top text-xs tabular-nums text-fg-subtle">{period}º</td>
-                  {[1, 2, 3, 4, 5].map(day => {
-                    const aula = estudante.turma.horarios?.find(
-                        (h: any) => h.diaSemana === day && h.horario === period
-                    )
-
-                    // Tentar encontrar o professor se não estiver salvo na aula
-                    let profName = aula?.professor
-                    if (aula && (!profName || profName.trim() === "")) {
-                      const normalizedAulaDisc = aula.disciplina.trim().toLowerCase()
-                      const match = estudante.turma.disciplinas?.find((d: any) =>
-                        d.nome.trim().toLowerCase() === normalizedAulaDisc
-                      )
-                      if (match && match.usuariosPermitidos?.length > 0) {
-                        profName = match.usuariosPermitidos[0].name || match.usuariosPermitidos[0].username
-                      } else {
-                        // If no direct match, try to find a similar discipline name
-                        const similarMatch = estudante.turma.disciplinas?.find((d: any) =>
-                          normalizedAulaDisc.includes(d.nome.trim().toLowerCase()) || d.nome.trim().toLowerCase().includes(normalizedAulaDisc)
-                        );
-                        if (similarMatch && similarMatch.usuariosPermitidos?.length > 0) {
-                          profName = similarMatch.usuariosPermitidos[0].name || similarMatch.usuariosPermitidos[0].username;
-                        }
-                      }
-                    }
-
-                    return (
-                      <td key={day} className="px-2 py-2 align-top">
-                        {aula ? (
-                          <>
-                            <p className="font-medium leading-tight text-fg">{aula.disciplina}</p>
-                            {profName && profName.trim() !== "" && <p className="text-xs text-fg-subtle">{profName}</p>}
-                          </>
-                        ) : (
-                          <span className="text-fg-disabled">—</span>
-                        )}
-                      </td>
-                    )
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Dialog>
     </div>
   )
+}
+
+/** Professor da aula: o do horário ou, sem ele, o da disciplina de mesmo nome (ou nome parecido). */
+function professorDaAula(aula: any, disciplinas: any[] = []): string | null {
+  if (aula.professor?.trim()) return aula.professor
+  const nome = aula.disciplina.trim().toLowerCase()
+  const disc = disciplinas.find((d) => d.nome.trim().toLowerCase() === nome)
+    ?? disciplinas.find((d) => nome.includes(d.nome.trim().toLowerCase()) || d.nome.trim().toLowerCase().includes(nome))
+  const p = disc?.usuariosPermitidos?.[0]
+  return p ? (p.name || p.username) : null
 }
 
 function MensagemLinha({ msg, nova, onAbrir, completa }: { msg: any; nova: boolean; onAbrir: () => void; completa?: boolean }) {
