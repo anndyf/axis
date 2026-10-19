@@ -50,7 +50,6 @@ export default function ConselhoClasseList({
 
       {/* Filtros Premium */}
       <div className="bg-surface p-6 rounded-xl shadow-card border border-line flex flex-wrap gap-6 items-end relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-canvas rounded-full -mr-16 -mt-16 opacity-50 blur-3xl"></div>
           
           <div className="flex-1 min-w-[300px] space-y-2">
               <label className="text-xs font-medium text-fg-subtle ml-2">Turma ou Curso</label>

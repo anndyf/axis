@@ -120,21 +120,21 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
       {/* Header Premium */}
       <header className="mb-6">
         <div className="max-w-7xl mx-auto py-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="flex items-center space-x-6">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex min-w-0 items-center gap-4">
               <Link
                 href="/dashboard"
                 className="p-3 hover:bg-subtle rounded-lg transition-all text-fg-subtle hover:text-fg border border-transparent hover:border-line shadow-sm"
               >
                 <ArrowLeft size={16} strokeWidth={1.75} />
               </Link>
-              <div>
-                <h1 className="text-2xl font-semibold tracking-tight text-fg">Livro de Ocorrências</h1>
+              <div className="min-w-0">
+                <h1 className="break-words text-2xl font-semibold tracking-tight text-fg">Livro de Ocorrências</h1>
                 <p className="text-sm text-fg-muted">Registro histórico e acompanhamento escolar</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <button 
                 onClick={handlePrint}
                 className="flex items-center gap-2 bg-surface border border-line text-fg-muted px-6 py-3 rounded-lg font-semibold hover:bg-canvas transition-all shadow-sm active:scale-95"

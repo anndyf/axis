@@ -116,3 +116,18 @@ Preparar: `npm ci`, `npx prisma migrate deploy` (nenhuma migração nova nesta s
 - Barras flutuantes escuras de ação em lote mantidas em duas telas.
 - CSP com `'unsafe-inline'` em script.
 - Não confirmado no navegador: importação de alunos por **PDF** (worker do pdf.js vindo do unpkg) com a CSP; a política libera esse endereço, mas vale enviar um PDF de teste em Estudantes → Importar.
+
+## Modelo A "Institucional" (PR #5)
+
+Etapa 1: dois modelos de painel em `/dashboard/modelos` (A institucional, B leve). **Aprovado o A**; a rota e o modelo B saíram na Etapa 2.
+
+### Etapa 2
+- **Marca:** azul Áxis `#205EE6` fixo (`DESTAQUE_PADRAO` em `identidade.ts`) em menu, botões, links, foco e item ativo. A cor da escola **não substitui** mais o `--accent`: vira `--escola` (layout raiz) e só aparece como detalhe (faixa da boas-vindas no painel e anel da marca no menu). Logo da escola continua (menu, cabeçalho, portal, PDFs). Cor do tema do navegador e do manifest: azul. Campo `corPrimaria` mantido no banco.
+- **Tokens** (`globals.css`): neutros slate, página `#f8fafb`, menu azul-marinho (`--sidebar*`), violeta suave, escuro com azul claro para texto (`#8fb4ff`, 8,6:1). Contraste AA conferido nos dois temas.
+- **Componentes:** cartões, tabelas e modais com raio de 16px; botões 8px; `Avatar` com tom (neutro, destaque, menu). Cartões montados à mão: `rounded-lg` → `rounded-2xl` (troca mecânica em 53 classes com borda + `bg-surface` + padding, fora de campos/controles).
+- **Casca:** menu lateral azul-marinho (pílula translúcida no item ativo, rótulos de grupo pequenos), barra superior com migalhas, sino e avatar.
+- **Painel por perfil** (`/dashboard`): professor, pedagogia ou administração. A decisão fica só em `visoesDoUsuario()` (`src/lib/services/painel-visoes.ts`), via `can()`: administração = `gestao`, pedagogia = `aee`, professor = `staff` (no seletor, só para quem tem disciplinas). Cada bloco só aparece se o usuário puder abrir a tela de origem. Leituras em `painel-leitura.ts`, sempre por `escolaId` (teste `painel-leitura.test.ts`).
+- **Chamadas pendentes:** contam só a unidade (etapa) atual até hoje; sem etapas datadas, o período letivo (`inicioDaContagemDePendencias`, testada).
+- **Notificações:** a checagem de mensagens não gera mais "Failed to fetch" ao trocar de página.
+- **Rolagem horizontal:** `overflow-x-clip` do `<main>` removido; causas corrigidas na origem (calendário letivo, ocorrências, simulados, blobs decorativos com margem negativa). `npx tsx scripts/modelos.ts` percorre as rotas principais em 360/390/768/1024/1280/1440 px e falha se alguma rolar de lado: **276 verificações, nenhuma rolando**.
+- Não tocados: tela de gestão de usuários e `/dashboard/plataforma` (outra frente).

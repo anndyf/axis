@@ -2,10 +2,12 @@
 
 import { usePathname } from "next/navigation"
 import type { ReactNode } from "react"
-import { Menu as MenuIcon } from "lucide-react"
+import Link from "next/link"
+import { Bell, Menu as MenuIcon } from "lucide-react"
 import { MODULOS } from "@/lib/modules"
 import { Breadcrumb, type Migalha } from "@/components/ui/PageHeader"
 import { MarcaEscola, type EscolaDoMenu } from "@/components/DashboardSidebar"
+import { Avatar } from "@/components/ui/Avatar"
 
 // Rótulos de subpáginas conhecidas; segmentos que são ids não aparecem
 const SEGMENTOS: Record<string, string> = {
@@ -36,17 +38,24 @@ export function migalhasDaRota(pathname: string): Migalha[] {
   return migalhas
 }
 
-export default function DashboardTopbar({ escola, onOpenMobile, acoes }: { escola: EscolaDoMenu; onOpenMobile: () => void; acoes?: ReactNode }) {
+/** Barra superior (modelo A): migalhas à esquerda; mensagens e avatar do usuário à direita. */
+export default function DashboardTopbar({ escola, nome, onOpenMobile, acoes }: { escola: EscolaDoMenu; nome?: string | null; onOpenMobile: () => void; acoes?: ReactNode }) {
   const pathname = usePathname()
   return (
-    <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-3 border-b border-line bg-canvas/85 px-4 backdrop-blur supports-[backdrop-filter]:bg-canvas/75 md:px-6 print:hidden">
-      <button type="button" onClick={onOpenMobile} aria-label="Abrir menu" className="-ml-1 rounded-md p-1.5 text-fg-muted hover:bg-subtle hover:text-fg md:hidden">
-        <MenuIcon size={18} strokeWidth={1.75} />
+    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-3 border-b border-line bg-surface/90 px-4 backdrop-blur supports-[backdrop-filter]:bg-surface/80 md:px-8 print:hidden">
+      <button type="button" onClick={onOpenMobile} aria-label="Abrir menu" className="-ml-1 rounded-full p-2 text-fg-muted hover:bg-subtle hover:text-fg md:hidden">
+        <MenuIcon size={20} strokeWidth={1.75} />
       </button>
       <span className="md:hidden"><MarcaEscola escola={escola} compacta /></span>
       <Breadcrumb items={migalhasDaRota(pathname)} className="hidden min-w-0 flex-1 sm:block" />
       <span className="min-w-0 flex-1 truncate text-sm font-medium text-fg sm:hidden">{migalhasDaRota(pathname).at(-1)?.label}</span>
       {acoes && <div className="flex shrink-0 items-center gap-2">{acoes}</div>}
+      <Link href="/dashboard/mensagens" aria-label="Mensagens e comunicados" className="shrink-0 rounded-full p-2 text-fg-muted transition-colors duration-150 hover:bg-subtle hover:text-fg">
+        <Bell size={20} strokeWidth={1.75} />
+      </Link>
+      <Link href="/dashboard/perfil" aria-label="Meu perfil" className="shrink-0 rounded-full">
+        <Avatar nome={nome} size="lg" tom="destaque" />
+      </Link>
     </header>
   )
 }

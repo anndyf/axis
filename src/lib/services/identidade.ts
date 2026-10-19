@@ -1,11 +1,13 @@
 /**
  * Identidade visual da escola - funções puras (cor de destaque e logo).
  *
- * A cor da escola vira `--accent`; a cor do texto sobre ela (`--on-accent`)
- * é escolhida automaticamente pelo contraste (WCAG 2.x).
+ * O destaque do sistema é sempre o azul Áxis (#205EE6): menu, botões, links,
+ * foco e item ativo. A cor da escola não substitui o destaque; vira só um
+ * detalhe (`--escola`: faixa de boas-vindas e marca no menu). A identidade
+ * da escola aparece principalmente pelo logo.
  */
 
-export const DESTAQUE_PADRAO = '#4f46e5'
+export const DESTAQUE_PADRAO = '#205ee6'
 export const TEXTO_CLARO = '#ffffff'
 export const TEXTO_ESCURO = '#18181b'
 
@@ -63,10 +65,9 @@ export function avaliarCor(hex: string): AvaliacaoCor | null {
   return { cor, textoSobre: texto, contrasteTexto, contrasteFundo, avisos }
 }
 
-/** Variáveis CSS do destaque para o layout (padrão se a escola não definiu ou a cor é inválida). */
-export function variaveisDeDestaque(corPrimaria?: string | null): { '--accent': string; '--on-accent': string } {
-  const cor = normalizarHex(corPrimaria) ?? DESTAQUE_PADRAO
-  return { '--accent': cor, '--on-accent': textoSobre(cor) }
+/** Variável CSS do detalhe da escola para o layout (azul Áxis se a escola não definiu ou a cor é inválida). */
+export function variaveisDaEscola(corPrimaria?: string | null): { '--escola': string } {
+  return { '--escola': normalizarHex(corPrimaria) ?? DESTAQUE_PADRAO }
 }
 
 /** Imagem enviada pela tela (já reduzida no navegador): PNG/JPEG/WebP em data URL. */

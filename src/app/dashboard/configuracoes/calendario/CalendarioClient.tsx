@@ -158,9 +158,9 @@ export default function CalendarioClient(props: Props) {
         </div>
         <ul className="divide-y divide-line-subtle">
           {props.naoLetivos.map((d) => (
-            <li key={d.id} className="flex items-center justify-between py-2 text-sm">
-              <span><strong className="text-fg">{dataBR(d.data)}</strong> · <span className="text-fg-subtle">{TIPOS.find((t) => t.id === d.tipo)?.nome}</span> · {d.descricao}</span>
-              <button aria-label="Remover" disabled={pendente} onClick={() => executar(() => removerDiaNaoLetivo(d.id), "Dia removido.")} className="p-1.5 text-fg-subtle hover:bg-danger-subtle hover:text-danger-fg rounded-md transition-colors duration-150">
+            <li key={d.id} className="flex items-center justify-between gap-3 py-2 text-sm">
+              <span className="min-w-0 break-words"><strong className="text-fg">{dataBR(d.data)}</strong> · <span className="text-fg-subtle">{TIPOS.find((t) => t.id === d.tipo)?.nome}</span> · {d.descricao}</span>
+              <button aria-label="Remover" disabled={pendente} onClick={() => executar(() => removerDiaNaoLetivo(d.id), "Dia removido.")} className="shrink-0 p-1.5 text-fg-subtle hover:bg-danger-subtle hover:text-danger-fg rounded-md transition-colors duration-150">
                 <Trash2 className="w-4 h-4" />
               </button>
             </li>
@@ -188,9 +188,9 @@ export default function CalendarioClient(props: Props) {
         </div>
         <ul className="divide-y divide-line-subtle">
           {props.extras.map((d) => (
-            <li key={d.id} className="flex items-center justify-between py-2 text-sm">
-              <span><strong className="text-fg">{dataBR(d.data)}</strong> · horário de {DIAS[d.seguirHorarioDe]} · {d.descricao}</span>
-              <button aria-label="Remover" disabled={pendente} onClick={() => executar(() => removerDiaLetivoExtra(d.id), "Dia removido.")} className="p-1.5 text-fg-subtle hover:bg-danger-subtle hover:text-danger-fg rounded-md transition-colors duration-150">
+            <li key={d.id} className="flex items-center justify-between gap-3 py-2 text-sm">
+              <span className="min-w-0 break-words"><strong className="text-fg">{dataBR(d.data)}</strong> · horário de {DIAS[d.seguirHorarioDe]} · {d.descricao}</span>
+              <button aria-label="Remover" disabled={pendente} onClick={() => executar(() => removerDiaLetivoExtra(d.id), "Dia removido.")} className="shrink-0 p-1.5 text-fg-subtle hover:bg-danger-subtle hover:text-danger-fg rounded-md transition-colors duration-150">
                 <Trash2 className="w-4 h-4" />
               </button>
             </li>
@@ -213,11 +213,11 @@ export default function CalendarioClient(props: Props) {
         <div className="space-y-2">
           {temposDoTurno.map((t, i) => (
             <div key={i} className="flex items-center gap-2">
-              <span className="w-16 text-sm text-fg-muted">{i + 1}º</span>
-              <input type="time" aria-label={`${i + 1}º tempo início`} value={t.inicio} onChange={(e) => setTempo(i, "inicio", e.target.value)} className={input} />
-              <span className="text-xs text-fg-subtle">às</span>
-              <input type="time" aria-label={`${i + 1}º tempo fim`} value={t.fim} onChange={(e) => setTempo(i, "fim", e.target.value)} className={input} />
-              <button aria-label="Remover tempo" onClick={() => setTempos((prev) => ({ ...prev, [turno]: prev[turno].filter((_, idx) => idx !== i) }))} className="p-1.5 text-fg-subtle hover:bg-danger-subtle hover:text-danger-fg rounded-md transition-colors duration-150">
+              <span className="w-8 shrink-0 text-sm text-fg-muted sm:w-16">{i + 1}º</span>
+              <input type="time" aria-label={`${i + 1}º tempo início`} value={t.inicio} onChange={(e) => setTempo(i, "inicio", e.target.value)} className={cn(input, "min-w-0 flex-1 sm:flex-none")} />
+              <span className="shrink-0 text-xs text-fg-subtle">às</span>
+              <input type="time" aria-label={`${i + 1}º tempo fim`} value={t.fim} onChange={(e) => setTempo(i, "fim", e.target.value)} className={cn(input, "min-w-0 flex-1 sm:flex-none")} />
+              <button aria-label="Remover tempo" onClick={() => setTempos((prev) => ({ ...prev, [turno]: prev[turno].filter((_, idx) => idx !== i) }))} className="shrink-0 p-1.5 text-fg-subtle hover:bg-danger-subtle hover:text-danger-fg rounded-md transition-colors duration-150">
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>

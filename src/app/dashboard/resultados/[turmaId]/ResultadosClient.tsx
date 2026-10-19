@@ -296,7 +296,7 @@ export default function ResultadosTurmaClient({
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Compact Summary & Legend Row */}
-        <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 mb-6 bg-surface p-4 rounded-lg border border-line-strong shadow-sm">
+        <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 mb-6 bg-surface p-4 rounded-2xl border border-line-strong shadow-sm">
           {/* Metrics */}
           <div className="flex items-center space-x-6 px-2">
             <div>
@@ -331,7 +331,7 @@ export default function ResultadosTurmaClient({
         </div>
 
         {/* Ultra Compact Matriz */}
-        <div className="bg-surface rounded-lg shadow-card border border-line overflow-hidden relative">
+        <div className="bg-surface rounded-2xl shadow-card border border-line overflow-hidden relative">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>

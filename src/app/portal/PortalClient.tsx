@@ -156,7 +156,7 @@ export default function PortalClient({ initialData, user, escola }: { initialDat
             </div>
 
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-              <div className="rounded-lg border border-line bg-surface p-4">
+              <div className="rounded-2xl border border-line bg-surface p-4">
                 <p className="text-xs text-fg-subtle">Minha turma</p>
                 <p className="mt-1 text-xl font-semibold tracking-tight text-fg">{estudante.turma.nome}</p>
               </div>
@@ -170,7 +170,7 @@ export default function PortalClient({ initialData, user, escola }: { initialDat
               <button
                 type="button"
                 onClick={() => setIsScheduleOpen(true)}
-                className="col-span-2 flex items-center gap-3 rounded-lg border border-line bg-surface p-4 text-left transition-colors duration-150 hover:border-line-strong md:col-span-1"
+                className="col-span-2 flex items-center gap-3 rounded-2xl border border-line bg-surface p-4 text-left transition-colors duration-150 hover:border-line-strong md:col-span-1"
               >
                 <Calendar size={16} strokeWidth={1.75} className="shrink-0 text-fg-subtle" aria-hidden />
                 <span className="min-w-0 flex-1">
@@ -202,7 +202,7 @@ export default function PortalClient({ initialData, user, escola }: { initialDat
             <button
               type="button"
               onClick={() => setActiveTab('grades')}
-              className="flex w-full items-center gap-3 rounded-lg border border-line bg-surface p-4 text-left transition-colors duration-150 hover:border-line-strong"
+              className="flex w-full items-center gap-3 rounded-2xl border border-line bg-surface p-4 text-left transition-colors duration-150 hover:border-line-strong"
             >
               <BookOpen size={16} strokeWidth={1.75} className="shrink-0 text-fg-subtle" aria-hidden />
               <span className="min-w-0 flex-1">

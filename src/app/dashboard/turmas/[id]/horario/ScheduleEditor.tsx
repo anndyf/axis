@@ -211,7 +211,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
         </div>
 
         {/* Carga horária */}
-        <div className="bg-surface rounded-lg shadow-sm border border-line overflow-hidden">
+        <div className="bg-surface rounded-2xl shadow-sm border border-line overflow-hidden">
           <div className="p-4 border-b border-line">
             <h2 className="font-medium text-fg">Aulas por disciplina</h2>
             <p className="text-xs text-fg-subtle">

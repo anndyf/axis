@@ -238,7 +238,7 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
         </div>
 
         {/* Filters Area */}
-        <div className="bg-surface p-5 md:p-6 rounded-lg border border-line/60 shadow-sm mb-10">
+        <div className="bg-surface p-5 md:p-6 rounded-2xl border border-line/60 shadow-sm mb-10">
           <div className="flex items-center gap-2 mb-5">
             <Filter className="w-5 h-5 text-fg-subtle" />
             <h2 className="text-base font-bold text-fg">Filtros e Ações</h2>

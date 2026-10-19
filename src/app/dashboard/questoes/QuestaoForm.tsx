@@ -446,7 +446,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
                 modules={quillModules}
                 formats={quillFormats}
                 placeholder="Descreva o problema ou contexto da questão..."
-                className="bg-surface rounded-lg overflow-hidden border border-line focus-within:ring-2 focus-within:ring-ring transition-all font-sans"
+                className="bg-surface rounded-2xl overflow-hidden border border-line focus-within:ring-2 focus-within:ring-ring transition-all font-sans"
               />
             </div>
             <style jsx global>{`

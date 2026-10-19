@@ -8,7 +8,7 @@ import { cn } from './cn'
  */
 export function TableContainer({ className, maxHeight, children }: { className?: string; maxHeight?: string; children: ReactNode }) {
   return (
-    <div className={cn('relative w-full overflow-auto rounded-lg border border-line bg-surface', className)} style={maxHeight ? { maxHeight } : undefined}>
+    <div className={cn('relative w-full overflow-auto rounded-2xl border border-line bg-surface', className)} style={maxHeight ? { maxHeight } : undefined}>
       {children}
     </div>
   )

@@ -398,7 +398,7 @@ export default function PendenciasClient({
                             {item.observacao && (
                               <div className="space-y-2">
                                 <h4 className="text-xs font-semibold text-fg-subtle">Solicitação Original</h4>
-                                <div className="bg-surface p-4 rounded-lg border border-line text-sm text-fg-muted">
+                                <div className="bg-surface p-4 rounded-2xl border border-line text-sm text-fg-muted">
                                   {item.observacao}
                                 </div>
                               </div>
@@ -415,7 +415,7 @@ export default function PendenciasClient({
                                       <div className="w-8 h-8 rounded-xl bg-surface border border-line flex items-center justify-center text-xs font-bold text-fg-subtle shrink-0">
                                         {reply.sender.name?.charAt(0) || reply.sender.username.charAt(0)}
                                       </div>
-                                      <div className="bg-surface p-4 rounded-lg border border-line shadow-sm flex-1">
+                                      <div className="bg-surface p-4 rounded-2xl border border-line shadow-sm flex-1">
                                         <div className="flex justify-between items-center mb-2">
                                           <span className="text-xs font-bold text-fg-muted">{reply.sender.name || reply.sender.username}</span>
                                           <span className="text-xs text-fg-subtle font-medium">{new Date(reply.createdAt).toLocaleString('pt-BR')}</span>

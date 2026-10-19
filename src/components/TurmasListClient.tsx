@@ -195,7 +195,7 @@ export default function TurmasListClient({
   return (
     <div className="space-y-4">
       {/* Top Row */}
-      <div className="flex flex-col items-center gap-2 rounded-lg border border-line bg-surface p-1.5 shadow-card md:flex-row">
+      <div className="flex flex-col items-center gap-2 rounded-2xl border border-line bg-surface p-1.5 shadow-card md:flex-row">
         {/* Total Badge */}
         <div className="flex shrink-0 items-center gap-2 self-stretch px-3 md:self-auto">
           <Users size={16} strokeWidth={1.75} className="text-fg-subtle" aria-hidden />
@@ -276,7 +276,7 @@ export default function TurmasListClient({
                   return (
                     <div
                       key={turma.id}
-                      className="flex flex-col rounded-lg border border-line bg-surface p-4 shadow-card transition-colors duration-150 hover:border-line-strong"
+                      className="flex flex-col rounded-2xl border border-line bg-surface p-4 shadow-card transition-colors duration-150 hover:border-line-strong"
                     >
                       <div className="flex items-start justify-between mb-5">
                         <div className="flex items-center space-x-4 min-w-0 flex-1">

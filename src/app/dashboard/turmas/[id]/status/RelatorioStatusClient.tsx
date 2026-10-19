@@ -200,7 +200,7 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
       {/* Main Content */}
       <main className="max-w-[1600px] mx-auto px-4 py-6">
         {/* Compact Summary & Legend Row */}
-        <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 mb-6 bg-surface p-4 rounded-lg border border-line-strong shadow-sm">
+        <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 mb-6 bg-surface p-4 rounded-2xl border border-line-strong shadow-sm">
           {/* Metrics */}
           <div className="flex items-center space-x-6 px-2">
             <div>
@@ -236,7 +236,7 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
         </div>
 
         {/* Ultra Compact Matriz */}
-        <div className="bg-surface rounded-lg shadow-card border border-line overflow-hidden relative">
+        <div className="bg-surface rounded-2xl shadow-card border border-line overflow-hidden relative">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>

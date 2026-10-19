@@ -347,7 +347,7 @@ export default function LancarNotasTurmaClient({
       <main className="space-y-6">
 
         {/* Dicas de uso: recolhidas para não competir com a tabela */}
-        <details className="group rounded-lg border border-line bg-surface shadow-card">
+        <details className="group rounded-2xl border border-line bg-surface shadow-card">
           <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-13 font-medium text-fg-muted hover:text-fg">
             <Info size={16} strokeWidth={1.75} className="text-fg-subtle" aria-hidden /> Como funciona o lançamento
             <ChevronDown size={14} strokeWidth={1.75} className="ml-auto transition-transform duration-150 group-open:rotate-180" aria-hidden />
@@ -366,7 +366,7 @@ export default function LancarNotasTurmaClient({
         </details>
 
         {/* Filtros Estilo Simulados */}
-        <div className="bg-surface p-5 rounded-lg shadow-sm border border-line flex flex-wrap gap-5 items-end">
+        <div className="bg-surface p-5 rounded-2xl shadow-sm border border-line flex flex-wrap gap-5 items-end">
             <div className="flex-1 min-w-[300px] space-y-1.5">
                 <label className="text-sm font-medium text-fg-subtle ml-1">Disciplina</label>
                 <div className="relative">
@@ -391,7 +391,7 @@ export default function LancarNotasTurmaClient({
         </div>
 
         {/* Lançamento Estilo Simulados */}
-        <div className="bg-surface rounded-lg shadow-sm border border-line-strong overflow-hidden">
+        <div className="bg-surface rounded-2xl shadow-sm border border-line-strong overflow-hidden">
           <div className="p-4 border-b border-line bg-canvas/10 flex items-center justify-between">
             <h2 className="text-lg font-medium text-fg flex items-center gap-2">
               <Users size={20} className="text-fg-subtle" />
@@ -651,7 +651,7 @@ export default function LancarNotasTurmaClient({
             </div>
             <div className="p-6 max-h-[60vh] overflow-y-auto space-y-3 bg-canvas/20 custom-scrollbar">
               {estudantes.filter(e => JSON.stringify(notas[e.matricula]) !== JSON.stringify(originalNotas[e.matricula] || {})).map((est, i) => (
-                 <div key={i} className="flex items-center justify-between bg-surface p-3 rounded-lg border border-line shadow-sm">
+                 <div key={i} className="flex items-center justify-between bg-surface p-3 rounded-2xl border border-line shadow-sm">
                    <span className="text-sm font-medium text-fg-muted truncate pr-4">{est.nome}</span>
                    <div className="flex gap-2 flex-wrap justify-end">
                        {esquema.unidades.map(u => {

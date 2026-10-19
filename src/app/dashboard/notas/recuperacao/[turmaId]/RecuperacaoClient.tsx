@@ -154,7 +154,7 @@ export default function RecuperacaoTurmaClient({
         {/* Dicas Estilo Simulados */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {recuperacaoTips.map((tip, index) => (
-             <div key={index} className="bg-surface border border-line p-4 rounded-lg flex items-start gap-3">
+             <div key={index} className="bg-surface border border-line p-4 rounded-2xl flex items-start gap-3">
                 <div className={`p-2.5 rounded-xl bg-subtle text-fg-muted`}>
                    {tip.icon}
                 </div>
@@ -167,7 +167,7 @@ export default function RecuperacaoTurmaClient({
         </div>
 
         {/* Filtros Estilo Simulados */}
-        <div className="bg-surface p-5 rounded-lg shadow-sm border border-line flex flex-wrap gap-5 items-end">
+        <div className="bg-surface p-5 rounded-2xl shadow-sm border border-line flex flex-wrap gap-5 items-end">
             <div className="flex-1 min-w-[300px] space-y-1.5">
                 <label className="text-sm font-medium text-fg-subtle ml-1">Disciplina Alvo</label>
                 <div className="relative">
@@ -196,7 +196,7 @@ export default function RecuperacaoTurmaClient({
         </div>
 
         {/* Lançamento Estilo Simulados */}
-        <div className="bg-surface rounded-lg shadow-sm border border-line-strong overflow-hidden">
+        <div className="bg-surface rounded-2xl shadow-sm border border-line-strong overflow-hidden">
           <div className="p-4 border-b border-line bg-canvas/10 flex items-center justify-between">
             <h2 className="text-lg font-medium text-fg flex items-center gap-2">
                <Users size={20} className="text-fg-subtle" />
@@ -343,7 +343,7 @@ export default function RecuperacaoTurmaClient({
             </div>
             <div className="p-6 max-h-[50vh] overflow-y-auto space-y-2 bg-canvas/20 custom-scrollbar">
               {notasRecuperacao.filter(n => n.disciplinaId === disciplinaSelecionada && notas[n.id] !== originalNotas[n.id]).map(n => (
-                 <div key={n.id} className="flex items-center justify-between bg-surface p-3 rounded-lg border border-line shadow-sm">
+                 <div key={n.id} className="flex items-center justify-between bg-surface p-3 rounded-2xl border border-line shadow-sm">
                   <span className="text-sm font-medium text-fg-muted truncate pr-4">{n.estudanteNome}</span>
                   <span className="text-sm font-medium text-danger-fg min-w-max">{notas[n.id] === '-1' ? 'FALTOU' : `NOTA: ${notas[n.id]}`}</span>
                 </div>

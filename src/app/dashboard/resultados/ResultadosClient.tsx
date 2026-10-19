@@ -68,7 +68,6 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
 
         {/* Filtros Premium */}
         <div className="bg-surface p-6 rounded-xl shadow-card border border-line flex flex-wrap gap-6 items-end relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-subtle rounded-full -mr-16 -mt-16 opacity-50 blur-3xl"></div>
             
             <div className="flex-1 min-w-[200px] space-y-2">
                 <label className="text-xs font-medium text-fg-subtle ml-2">Curso</label>
@@ -143,7 +142,7 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
                 <Link
                   key={turma.id}
                   href={`/dashboard/resultados/${turma.id}`}
-                  className="border border-line-strong rounded-lg p-4 hover:border-zinc-500 hover:bg-subtle transition-all group bg-surface shadow-sm hover:shadow-card h-full flex flex-col justify-between"
+                  className="border border-line-strong rounded-2xl p-4 hover:border-zinc-500 hover:bg-subtle transition-all group bg-surface shadow-sm hover:shadow-card h-full flex flex-col justify-between"
                 >
                   <div>
                     <h3 className="font-medium text-fg mb-3 group-hover:text-fg whitespace-nowrap truncate text-base tracking-tight" title={turma.nome}>

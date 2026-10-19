@@ -68,7 +68,7 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
         {/* Dicas Fixas - Estilo Resultados */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {recuperacaoTips.map((tip, index) => (
-             <div key={index} className="bg-surface border border-line p-4 rounded-lg flex items-start gap-3">
+             <div key={index} className="bg-surface border border-line p-4 rounded-2xl flex items-start gap-3">
                 <div className={`p-3 rounded-lg bg-subtle text-fg-muted transition-all shadow-card`}>
                    {tip.icon}
                 </div>
@@ -81,7 +81,7 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
         </div>
 
         {/* Filtros Estilo Simulados */}
-        <div className="bg-surface p-5 rounded-lg shadow-sm border border-line flex flex-wrap gap-5 items-end">
+        <div className="bg-surface p-5 rounded-2xl shadow-sm border border-line flex flex-wrap gap-5 items-end">
             <div className="flex-1 min-w-[250px] space-y-1.5">
                 <label className="text-sm font-medium text-fg-subtle ml-1">Turma</label>
                 <div className="relative">
@@ -120,7 +120,7 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
         </div>
 
         {/* Listagem Estilo Simulados (Table) */}
-        <div className="bg-surface rounded-lg shadow-sm border border-line-strong overflow-hidden">
+        <div className="bg-surface rounded-2xl shadow-sm border border-line-strong overflow-hidden">
           <div className="p-4 border-b border-line bg-canvas/10 flex items-center justify-between">
             <h2 className="text-lg font-medium text-fg flex items-center gap-2">
                <TrendingUp size={20} className="text-fg-subtle" />

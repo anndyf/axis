@@ -190,7 +190,7 @@ export default function OcorrenciaForm({
                 
                 {/* Search Results Dropdown */}
                 {searchResults.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-line rounded-lg shadow-overlay z-50 overflow-hidden animate-slide-up">
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-line rounded-2xl shadow-overlay z-50 overflow-hidden animate-slide-up">
                     {searchResults.map(est => (
                       <button
                         key={est.matricula}
