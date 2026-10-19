@@ -50,8 +50,8 @@ export default function DashboardLayoutWrapper({
         isMobileOpen={isMobileOpen}
         closeMobile={closeMobile}
       />
-      <div className={cn("flex min-h-screen min-w-0 flex-1 flex-col transition-[margin] duration-150 ease-out print:ml-0", isCollapsed ? "md:ml-14" : "md:ml-60")}>
-        <DashboardTopbar escola={escola} onOpenMobile={() => setIsMobileOpen(true)} />
+      <div className={cn("flex min-h-screen min-w-0 flex-1 flex-col transition-[margin] duration-150 ease-out print:ml-0", isCollapsed ? "md:ml-16" : "md:ml-64")}>
+        <DashboardTopbar escola={escola} nome={user?.name} onOpenMobile={() => setIsMobileOpen(true)} />
         <main className="flex min-w-0 flex-1 flex-col overflow-x-clip print:block">{children}</main>
       </div>
     </>

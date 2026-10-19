@@ -37,25 +37,35 @@ export function papelDoUsuario(user: User) {
   return user.isSuperuser ? "Administrador" : user.isAEE ? "Especialista AEE" : user.isDirecao ? "Direção" : user.isStaff ? "Professor" : "Gestão escolar"
 }
 
-/** Marca da escola: logo (se houver) ou inicial na cor de destaque. */
-export function MarcaEscola({ escola, compacta }: { escola: EscolaDoMenu; compacta?: boolean }) {
+/**
+ * Marca da escola: logo (se houver) ou inicial. `escura`: sobre o menu
+ * azul-marinho (logo em círculo claro com anel na cor da escola, texto branco).
+ */
+export function MarcaEscola({ escola, compacta, escura, subtitulo }: { escola: EscolaDoMenu; compacta?: boolean; escura?: boolean; subtitulo?: string }) {
+  const tamanho = escura ? "size-9" : "size-7"
   return (
     <span className="flex min-w-0 items-center gap-2.5">
       {escola.logoUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={escola.logoUrl} alt="" className="size-7 shrink-0 rounded-md object-contain" />
+        <img src={escola.logoUrl} alt="" className={cn(tamanho, "shrink-0 object-contain", escura ? "rounded-full bg-surface p-1 ring-2 ring-escola" : "rounded-md")} />
       ) : (
-        <span aria-hidden className="flex size-7 shrink-0 items-center justify-center rounded-md bg-accent text-xs font-semibold text-on-accent">
+        <span aria-hidden className={cn(tamanho, "flex shrink-0 items-center justify-center font-semibold", escura ? "rounded-full bg-surface text-sm text-accent-fg ring-2 ring-escola" : "rounded-md bg-accent text-xs text-on-accent")}>
           {escola.nome.charAt(0).toUpperCase()}
         </span>
       )}
-      {!compacta && <span className="truncate text-sm font-semibold text-fg">{escola.nome}</span>}
+      {!compacta && (
+        <span className="min-w-0">
+          <span className={cn("block truncate text-sm font-semibold", escura ? "text-sidebar-fg" : "text-fg")}>{escola.nome}</span>
+          {subtitulo && <span className={cn("block truncate text-xs", escura ? "text-sidebar-fg-subtle" : "text-fg-subtle")}>{subtitulo}</span>}
+        </span>
+      )}
     </span>
   )
 }
 
 /**
- * Menu lateral (estilo Linear). Itens e permissões vêm de src/lib/modules.ts;
+ * Menu lateral (modelo A): azul-marinho, rótulos de grupo pequenos, item
+ * ativo em pílula translúcida com ponto. Itens e permissões vêm de src/lib/modules.ts;
  * recolhível no desktop, gaveta no celular (controlada pelo layout).
  */
 export default function DashboardSidebar({
@@ -140,55 +150,54 @@ export default function DashboardSidebar({
 
   return (
     <>
-      {isMobileOpen && <div className="fixed inset-0 z-40 bg-black/30 animate-fade-in md:hidden" onClick={closeMobile} aria-hidden />}
+      {isMobileOpen && <div className="fixed inset-0 z-40 bg-black/40 animate-fade-in md:hidden" onClick={closeMobile} aria-hidden />}
 
       <aside
         aria-label="Menu principal"
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex flex-col border-r border-line bg-canvas print:hidden",
+          "fixed inset-y-0 left-0 z-50 flex flex-col bg-sidebar text-sidebar-fg print:hidden",
           "transition-[width,transform] duration-150 ease-out",
-          recolhido ? "w-14" : "w-60",
+          recolhido ? "w-16" : "w-64",
           isMobileOpen ? "translate-x-0 shadow-overlay" : "-translate-x-full md:translate-x-0"
         )}
       >
         {/* Escola */}
-        <div className={cn("flex h-14 shrink-0 items-center gap-2 border-b border-line-subtle", recolhido ? "justify-center px-2" : "px-3")}>
+        <div className={cn("flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-line", recolhido ? "justify-center px-2" : "px-4")}>
           <Link href="/dashboard" className="min-w-0 flex-1 rounded-md" title={recolhido ? escola.nome : undefined}>
-            <MarcaEscola escola={escola} compacta={recolhido} />
+            <MarcaEscola escola={escola} compacta={recolhido} escura subtitulo={anoLetivo ? `Ano letivo ${anoLetivo}` : "Gestão escolar"} />
           </Link>
-          {!recolhido && anoLetivo && <span className="shrink-0 rounded-md border border-line px-1.5 text-xs font-medium leading-5 text-fg-subtle tabular-nums">{anoLetivo}</span>}
-          <button type="button" onClick={closeMobile} aria-label="Fechar menu" className="rounded-md p-1 text-fg-subtle hover:bg-subtle hover:text-fg md:hidden">
+          <button type="button" onClick={closeMobile} aria-label="Fechar menu" className="rounded-full p-1.5 text-sidebar-fg-muted hover:bg-sidebar-hover hover:text-sidebar-fg md:hidden">
             <X size={16} strokeWidth={1.75} />
           </button>
         </div>
 
         {/* Busca rápida */}
-        <div className={cn("shrink-0 px-2 pt-3", recolhido && "flex justify-center")}>
+        <div className={cn("shrink-0 px-3 pt-4", recolhido && "flex justify-center")}>
           <button
             type="button"
             onClick={() => setPaletaAberta(true)}
             aria-label="Busca rápida (Ctrl+K)"
             title={recolhido ? "Busca rápida (Ctrl+K)" : undefined}
             className={cn(
-              "flex h-8 items-center gap-2 rounded-md border border-line bg-surface text-13 text-fg-subtle transition-colors duration-150 hover:border-line-strong hover:text-fg",
-              recolhido ? "w-8 justify-center" : "w-full px-2"
+              "flex h-9 items-center gap-2 rounded-full bg-sidebar-hover text-13 text-sidebar-fg-muted transition-colors duration-150 hover:bg-sidebar-active hover:text-sidebar-fg",
+              recolhido ? "w-9 justify-center" : "w-full px-3"
             )}
           >
             <Search size={14} strokeWidth={1.75} aria-hidden />
-            {!recolhido && <><span>Buscar...</span><kbd className="ml-auto font-mono text-xs text-fg-disabled">Ctrl K</kbd></>}
+            {!recolhido && <><span>Buscar...</span><kbd className="ml-auto font-mono text-xs text-sidebar-fg-subtle">Ctrl K</kbd></>}
           </button>
         </div>
 
         {/* Navegação */}
-        <nav className="flex-1 space-y-5 overflow-y-auto px-2 py-3">
+        <nav className="flex-1 space-y-5 overflow-y-auto px-3 py-4">
           {menuGroups.map((group) => (
             <div key={group.title}>
               {!recolhido ? (
-                <p className="mb-1 px-2 text-xs font-medium text-fg-subtle">{group.title}</p>
+                <p className="mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-wider text-sidebar-fg-subtle">{group.title}</p>
               ) : (
-                <div className="mx-2 mb-2 h-px bg-line-subtle first:hidden" aria-hidden />
+                <div className="mx-2 mb-2 h-px bg-sidebar-line first:hidden" aria-hidden />
               )}
-              <ul className="space-y-px">
+              <ul className="space-y-0.5">
                 {group.links.map((link) => {
                   const Icon = link.icon
                   const active = isActive(link.href)
@@ -199,18 +208,18 @@ export default function DashboardSidebar({
                         title={recolhido ? link.name : undefined}
                         aria-current={active ? "page" : undefined}
                         className={cn(
-                          "group relative flex h-8 items-center gap-2.5 rounded-md text-13 transition-colors duration-150",
-                          recolhido ? "justify-center px-0" : "px-2",
-                          active ? "bg-subtle font-medium text-fg" : "text-fg-muted hover:bg-subtle hover:text-fg"
+                          "group relative flex h-10 items-center gap-3 rounded-full text-sm transition-colors duration-150",
+                          recolhido ? "justify-center px-0" : "px-3",
+                          active ? "bg-sidebar-active font-medium text-sidebar-fg" : "text-sidebar-fg-muted hover:bg-sidebar-hover hover:text-sidebar-fg"
                         )}
                       >
-                        {active && <span aria-hidden className="absolute -left-2 top-1.5 bottom-1.5 w-0.5 rounded-full bg-accent" />}
-                        <Icon size={16} strokeWidth={1.75} className={cn("shrink-0", active ? "text-accent" : "text-fg-subtle group-hover:text-fg-muted")} />
-                        {!recolhido && <span className="truncate">{link.name}</span>}
+                        <Icon size={16} strokeWidth={1.75} className={cn("shrink-0", active ? "text-sidebar-fg" : "text-sidebar-fg-subtle group-hover:text-sidebar-fg")} />
+                        {!recolhido && <span className="min-w-0 flex-1 truncate">{link.name}</span>}
+                        {active && !recolhido && !(link.badge && link.badge > 0) && <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-sidebar-fg" />}
                         {link.badge !== undefined && link.badge > 0 && (
                           <span className={cn(
-                            "rounded-full bg-accent px-1.5 text-[10px] font-semibold leading-4 text-on-accent tabular-nums",
-                            recolhido ? "absolute right-1 top-0.5" : "ml-auto"
+                            "rounded-full bg-surface px-1.5 text-[10px] font-semibold leading-4 text-accent-fg tabular-nums",
+                            recolhido ? "absolute right-0.5 top-0.5" : "shrink-0"
                           )}>
                             {link.badge}
                             <span className="sr-only"> novos</span>
@@ -226,9 +235,9 @@ export default function DashboardSidebar({
         </nav>
 
         {/* Usuário */}
-        <div className="shrink-0 space-y-1 border-t border-line-subtle p-2">
+        <div className="shrink-0 space-y-1 border-t border-sidebar-line p-3">
           {professor && !recolhido && (
-            <p className={cn("flex items-center gap-1.5 px-2 text-[11px] tabular-nums", timeLeft < 300 ? "text-warning-fg" : "text-fg-subtle")}>
+            <p className={cn("flex items-center gap-1.5 px-2 text-[11px] tabular-nums", timeLeft < 300 ? "font-medium text-sidebar-fg" : "text-sidebar-fg-subtle")}>
               <Clock size={12} strokeWidth={1.75} aria-hidden /> Sessão expira em {formatTime(timeLeft)}
             </p>
           )}
@@ -241,16 +250,16 @@ export default function DashboardSidebar({
                 {...p}
                 type="button"
                 title={recolhido ? user.name ?? undefined : undefined}
-                className={cn("flex w-full items-center gap-2.5 rounded-md p-1.5 text-left transition-colors duration-150 hover:bg-subtle", recolhido && "justify-center")}
+                className={cn("flex w-full items-center gap-2.5 rounded-xl p-2 text-left transition-colors duration-150 hover:bg-sidebar-hover", recolhido && "justify-center p-1.5")}
               >
-                <Avatar nome={user.name} size="sm" />
+                <Avatar nome={user.name} className="bg-sidebar-active text-sidebar-fg ring-sidebar-line" />
                 {!recolhido && (
                   <>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-13 font-medium text-fg">{user.name}</span>
-                      <span className="block truncate text-xs text-fg-subtle">{papelDoUsuario(user)}</span>
+                      <span className="block truncate text-13 font-medium text-sidebar-fg">{user.name}</span>
+                      <span className="block truncate text-xs text-sidebar-fg-subtle">{papelDoUsuario(user)}</span>
                     </span>
-                    <ChevronsUpDown size={14} strokeWidth={1.75} className="shrink-0 text-fg-subtle" aria-hidden />
+                    <ChevronsUpDown size={14} strokeWidth={1.75} className="shrink-0 text-sidebar-fg-subtle" aria-hidden />
                   </>
                 )}
                 {recolhido && <span className="sr-only">Menu do usuário</span>}
@@ -271,7 +280,7 @@ export default function DashboardSidebar({
             onClick={toggleCollapse}
             aria-label={isCollapsed ? "Expandir menu" : "Recolher menu"}
             title={isCollapsed ? "Expandir menu" : "Recolher menu"}
-            className={cn("hidden h-8 w-full items-center gap-2.5 rounded-md px-2 text-13 text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg md:flex", recolhido && "justify-center px-0")}
+            className={cn("hidden h-9 w-full items-center gap-3 rounded-full px-3 text-13 text-sidebar-fg-subtle transition-colors duration-150 hover:bg-sidebar-hover hover:text-sidebar-fg md:flex", recolhido && "justify-center px-0")}
           >
             {isCollapsed ? <PanelLeftOpen size={16} strokeWidth={1.75} /> : <PanelLeftClose size={16} strokeWidth={1.75} />}
             {!recolhido && "Recolher"}
