@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comparar layout</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --fg:#0f172a; --muted:#5b6678; --subtle:#8a94a6; --line:#e3e8ef; --line2:#d3dbe5; --canvas:#f4f6f9; --surface:#fff; --accent:#205ee6; --accent-soft:#eef3fe; --side:#0f1d3d;
+    --ok:#15803d; --ok-bg:#ecfdf3; --warn:#b45309; --warn-bg:#fff7ed; --bad:#b91c1c; --bad-bg:#fef2f2; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Inter',system-ui,sans-serif; color:var(--fg); background:#dfe3ea; font-feature-settings:'cv11','ss01'; }
+  .seletor { position:sticky; top:0; z-index:5; display:flex; gap:8px; justify-content:center; padding:10px; background:#fff; border-bottom:1px solid var(--line); }
+  .seletor button { font:500 14px Inter; padding:8px 14px; border-radius:8px; border:1px solid var(--line2); background:#fff; cursor:pointer; }
+  .seletor button.on { background:var(--fg); color:#fff; border-color:var(--fg); }
+  .tela { display:none; min-height:calc(100vh - 57px); }
+  .tela.on { display:flex; }
+  .side { width:232px; flex-shrink:0; background:var(--side); color:#fff; padding:12px 10px; font-size:13.5px; }
+  .side .esc { display:flex; gap:10px; align-items:center; padding:6px 6px 14px; border-bottom:1px solid rgb(255 255 255/.1); margin-bottom:10px; }
+  .side .esc b { display:block; font-weight:600; font-size:14px; } .side .esc span { color:rgb(255 255 255/.62); font-size:12px; }
+  .side .av { width:30px; height:30px; border-radius:50%; background:#fff; color:var(--side); display:grid; place-items:center; font-weight:600; font-size:13px; }
+  .side .g { color:rgb(255 255 255/.55); font-size:11px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; margin:14px 8px 6px; }
+  .side .i { padding:7px 10px; border-radius:6px; color:rgb(255 255 255/.82); } .side .i.on { background:rgb(255 255 255/.14); color:#fff; font-weight:500; }
+  .main { flex:1; min-width:0; display:flex; flex-direction:column; background:var(--canvas); }
+
+  /* ---------- HOJE ---------- */
+  .h-top { height:60px; background:#fff; border-bottom:1px solid var(--line); display:flex; align-items:center; padding:0 32px; color:var(--muted); font-size:14px; }
+  .h-wrap { max-width:960px; margin:0 auto; width:100%; padding:40px 32px; }
+  .h-wrap h1 { font-size:26px; font-weight:600; letter-spacing:-.02em; margin:0; }
+  .h-wrap .sub { color:var(--muted); margin-top:4px; }
+  .h-card { background:#fff; border-radius:20px; box-shadow:0 10px 30px rgb(15 23 42/.07); padding:32px; margin-top:24px; }
+  .h-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+  .h-stat b { display:block; font-size:30px; font-weight:600; } .h-stat span { color:var(--muted); font-size:14px; }
+  .h-aluno { display:flex; justify-content:space-between; align-items:center; padding:18px 4px; border-bottom:1px solid var(--line); }
+  .h-aluno:last-child { border:0; }
+  .h-btn { border:1px solid var(--line2); border-radius:12px; padding:10px 16px; font-size:14px; background:#fff; }
+
+  /* ---------- PROPOSTA ---------- */
+  .p-top { height:48px; background:#fff; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:12px; padding:0 20px; font-size:13px; }
+  .p-ctx { display:flex; align-items:center; gap:6px; padding:5px 10px; border:1px solid var(--line2); border-radius:6px; background:#fff; }
+  .p-ctx small { color:var(--subtle); }
+  .p-busca { flex:1; max-width:420px; padding:6px 10px; border:1px solid var(--line); border-radius:6px; color:var(--subtle); background:var(--canvas); }
+  .p-sp { flex:1; }
+  .p-user { display:flex; align-items:center; gap:8px; color:var(--muted); }
+  .p-user .av { width:26px; height:26px; border-radius:50%; background:var(--accent); color:#fff; display:grid; place-items:center; font-size:11px; font-weight:600; }
+  .p-head { background:#fff; border-bottom:1px solid var(--line); padding:14px 24px 0; }
+  .p-crumb { font-size:12.5px; color:var(--subtle); }
+  .p-tit { display:flex; align-items:flex-start; gap:16px; margin-top:6px; }
+  .p-tit h1 { font-size:21px; font-weight:600; letter-spacing:-.02em; margin:0; }
+  .p-meta { display:flex; flex-wrap:wrap; gap:14px; color:var(--muted); font-size:13px; margin-top:6px; }
+  .p-meta b { color:var(--fg); font-weight:500; }
+  .p-acoes { margin-left:auto; display:flex; gap:8px; }
+  .btn { font:500 13px Inter; padding:7px 12px; border-radius:6px; border:1px solid var(--line2); background:#fff; color:var(--fg); white-space:nowrap; }
+  .btn.pri { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .p-abas { display:flex; gap:22px; margin-top:14px; font-size:13.5px; }
+  .p-abas span { padding:9px 0; color:var(--muted); border-bottom:2px solid transparent; }
+  .p-abas span.on { color:var(--fg); font-weight:500; border-color:var(--accent); }
+  .p-corpo { padding:18px 24px; display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:16px; align-items:start; }
+  .pn { background:#fff; border:1px solid var(--line); border-radius:8px; }
+  .pn-h { display:flex; align-items:center; gap:10px; padding:10px 14px; border-bottom:1px solid var(--line); }
+  .pn-h h2 { font-size:14px; font-weight:600; margin:0; letter-spacing:-.01em; }
+  .pn-h small { color:var(--subtle); font-size:12.5px; }
+  .tool { display:flex; gap:8px; align-items:center; padding:10px 14px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+  .chip { font-size:12.5px; padding:4px 10px; border-radius:999px; border:1px solid var(--line2); color:var(--muted); }
+  .chip.on { background:var(--accent-soft); border-color:#c9d8fb; color:var(--accent); font-weight:500; }
+  .campo { padding:6px 10px; border:1px solid var(--line2); border-radius:6px; font-size:13px; color:var(--subtle); width:220px; }
+  table { width:100%; border-collapse:collapse; font-size:13.5px; font-variant-numeric:tabular-nums; }
+  th { text-align:left; font-weight:500; color:var(--muted); font-size:12.5px; padding:8px 14px; background:#fafbfc; border-bottom:1px solid var(--line); }
+  td { padding:9px 14px; border-bottom:1px solid #eef1f5; }
+  tr:hover td { background:#f8fafc; }
+  .num { text-align:right; }
+  .mono { font-family:ui-monospace,Menlo,monospace; font-size:12.5px; color:var(--muted); }
+  .bd { font-size:12px; font-weight:500; padding:2px 8px; border-radius:999px; }
+  .bd.ok { background:var(--ok-bg); color:var(--ok); } .bd.warn { background:var(--warn-bg); color:var(--warn); } .bd.bad { background:var(--bad-bg); color:var(--bad); }
+  .rodape { display:flex; justify-content:space-between; padding:9px 14px; color:var(--subtle); font-size:12.5px; }
+  .kv { display:grid; grid-template-columns:auto 1fr; gap:8px 14px; padding:12px 14px; font-size:13px; }
+  .kv dt { color:var(--muted); } .kv dd { margin:0; font-weight:500; text-align:right; }
+  .stats { display:grid; grid-template-columns:1fr 1fr; border-top:1px solid var(--line); }
+  .stats div { padding:10px 14px; border-right:1px solid var(--line); } .stats div:nth-child(2n) { border-right:0; }
+  .stats div:nth-child(n+3) { border-top:1px solid var(--line); }
+  .stats b { display:block; font-size:19px; font-weight:600; } .stats span { font-size:12px; color:var(--muted); }
+  .alerta { padding:10px 14px; font-size:13px; border-top:1px solid var(--line); }
+  .alerta div { display:flex; justify-content:space-between; padding:4px 0; }
+  .nota { padding:10px 14px; color:var(--muted); font-size:12.5px; }
+</style>
+</head>
+<body>
+<div class="seletor">
+  <button id="b1" onclick="mostrar(1)">Hoje: cara de site</button>
+  <button id="b2" class="on" onclick="mostrar(2)">Proposta: cara de sistema</button>
+</div>
+
+<!-- HOJE -->
+<div class="tela" id="t1">
+  <nav class="side"><div class="esc"><div class="av">C</div><div><b>CETEP/LNAB</b><span>Ano letivo 2026</span></div></div>
+    <div class="g">Início</div><div class="i">Dashboard</div><div class="i">Mensagens</div>
+    <div class="g">Gestão acadêmica</div><div class="i on">Turmas</div><div class="i">Disciplinas</div><div class="i">Estudantes</div>
+    <div class="g">Diário e avaliações</div><div class="i">Chamada e Diário</div><div class="i">Lançar Notas</div><div class="i">Resultados</div></nav>
+  <div class="main">
+    <div class="h-top">Início › Turmas › 1TIM1</div>
+    <div class="h-wrap">
+      <h1>Turma 1TIM1</h1><div class="sub">Técnico em Informática · 1ª série · Matutino</div>
+      <div class="h-card"><div class="h-grid">
+        <div class="h-stat"><b>10</b><span>Estudantes</span></div><div class="h-stat"><b>5</b><span>Disciplinas</span></div>
+        <div class="h-stat"><b>91%</b><span>Frequência média</span></div><div class="h-stat"><b>3</b><span>Em recuperação</span></div>
+      </div></div>
+      <div class="h-card">
+        <div class="h-aluno"><div><b>Alice Pereira 3</b><div class="sub">1TIM1-003</div></div><span class="h-btn">Ver ficha</span></div>
+        <div class="h-aluno"><div><b>Alice Rodrigues 4</b><div class="sub">1TIM1-004</div></div><span class="h-btn">Ver ficha</span></div>
+        <div class="h-aluno"><div><b>Felipe Oliveira 6</b><div class="sub">1TIM1-006</div></div><span class="h-btn">Ver ficha</span></div>
+        <div class="h-aluno"><div><b>Manuela Santos 2</b><div class="sub">1TIM1-002</div></div><span class="h-btn">Ver ficha</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROPOSTA -->
+<div class="tela on" id="t2">
+  <nav class="side"><div class="esc"><div class="av">C</div><div><b>CETEP/LNAB</b><span>Gestão escolar</span></div></div>
+    <div class="g">Início</div><div class="i">Painel</div><div class="i">Mensagens</div>
+    <div class="g">Gestão acadêmica</div><div class="i on">Turmas</div><div class="i">Disciplinas</div><div class="i">Estudantes</div>
+    <div class="g">Diário e avaliações</div><div class="i">Chamada e diário</div><div class="i">Lançar notas</div><div class="i">Resultados</div></nav>
+  <div class="main">
+    <div class="p-top">
+      <span class="p-ctx"><small>Ano letivo</small> <b>2026</b> ▾</span>
+      <span class="p-ctx"><small>Visão</small> <b>Administração</b> ▾</span>
+      <span class="p-busca">Buscar turma, estudante, disciplina…  Ctrl K</span>
+      <span class="p-sp"></span>
+      <span>🔔</span>
+      <span class="p-user"><span class="av">AG</span> Administrador ▾</span>
+    </div>
+    <div class="p-head">
+      <div class="p-crumb">Gestão acadêmica › Turmas › 1TIM1</div>
+      <div class="p-tit">
+        <div><h1>1TIM1 · Técnico em Informática</h1>
+          <div class="p-meta"><span>Série <b>1ª</b></span><span>Turno <b>Matutino</b></span><span>Esquema <b>Anual, 3 unidades</b></span><span>Unidade atual <b>3ª</b></span></div></div>
+        <div class="p-acoes"><span class="btn">Horário</span><span class="btn">Relatórios ▾</span><span class="btn pri">Fazer chamada</span></div>
+      </div>
+      <div class="p-abas"><span>Visão geral</span><span class="on">Estudantes</span><span>Disciplinas</span><span>Horário</span><span>Notas</span><span>Frequência</span><span>Ocorrências</span></div>
+    </div>
+    <div class="p-corpo">
+      <section class="pn">
+        <div class="tool"><span class="campo">Filtrar por nome ou matrícula</span><span class="chip on">Todos 10</span><span class="chip">Em recuperação 3</span><span class="chip">Abaixo da frequência 1</span><span class="chip">AEE 1</span><span class="p-sp"></span><span class="btn">Exportar</span><span class="btn">+ Estudante</span></div>
+        <table>
+          <thead><tr><th>Nº</th><th>Estudante</th><th>Matrícula</th><th class="num">Média</th><th class="num">Freq.</th><th>Situação</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Alice Pereira 3</td><td class="mono">1TIM1-003</td><td class="num">7,8</td><td class="num">96%</td><td><span class="bd ok">Aprovada</span></td></tr>
+            <tr><td>2</td><td>Alice Rodrigues 4</td><td class="mono">1TIM1-004</td><td class="num">5,2</td><td class="num">93%</td><td><span class="bd warn">Recuperação</span></td></tr>
+            <tr><td>3</td><td>Felipe Oliveira 6</td><td class="mono">1TIM1-006</td><td class="num">6,9</td><td class="num">88%</td><td><span class="bd ok">Aprovado</span></td></tr>
+            <tr><td>4</td><td>Manuela Santos 2</td><td class="mono">1TIM1-002</td><td class="num">8,4</td><td class="num">97%</td><td><span class="bd ok">Aprovada</span></td></tr>
+            <tr><td>5</td><td>Matheus Lima 8</td><td class="mono">1TIM1-008</td><td class="num">4,1</td><td class="num">71%</td><td><span class="bd bad">Abaixo da frequência</span></td></tr>
+            <tr><td>6</td><td>Matheus Rodrigues 5</td><td class="mono">1TIM1-005</td><td class="num">6,0</td><td class="num">90%</td><td><span class="bd ok">Aprovado</span></td></tr>
+            <tr><td>7</td><td>Pedro Silva 1</td><td class="mono">1TIM1-001</td><td class="num">5,6</td><td class="num">94%</td><td><span class="bd warn">Recuperação</span></td></tr>
+          </tbody>
+        </table>
+        <div class="rodape"><span>7 de 10 estudantes</span><span>‹ 1 2 ›</span></div>
+      </section>
+      <aside style="display:grid;gap:16px">
+        <section class="pn"><div class="pn-h"><h2>Resumo da turma</h2><small>3ª unidade</small></div>
+          <div class="stats"><div><b>10</b><span>Estudantes</span></div><div><b>5</b><span>Disciplinas</span></div><div><b>91%</b><span>Frequência média</span></div><div><b>3</b><span>Em recuperação</span></div></div></section>
+        <section class="pn"><div class="pn-h"><h2>Pendências</h2></div>
+          <div class="alerta"><div><span>Chamadas sem registro</span><b>2</b></div><div><span>Notas não lançadas</span><b>4</b></div><div><span>Ficha AEE sem ciência</span><b>1</b></div></div></section>
+        <section class="pn"><div class="pn-h"><h2>Dados da turma</h2></div>
+          <dl class="kv"><dt>Curso</dt><dd>Técnico em Informática</dd><dt>Modalidade</dt><dd>EPI</dd><dt>Sala</dt><dd>12</dd><dt>Coordenação</dt><dd>—</dd></dl></section>
+      </aside>
+    </div>
+  </div>
+</div>
+<script>
+function mostrar(n){ for (const i of [1,2]) { document.getElementById('t'+i).classList.toggle('on', i===n); document.getElementById('b'+i).classList.toggle('on', i===n) } }
+</script>
+</body>
+</html>

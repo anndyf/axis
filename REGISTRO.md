@@ -16,22 +16,24 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 - Fases 3a e 3b (papéis e permissões): branch `fase/3ab-papeis`. Instrução em `sessoes-nuvem/fase-3ab.md` nesta branch. A 3c (remover os booleanos e tirar a conta da plataforma da escola) fica para depois da validação.
 
 **Pronto para iniciar quando quiser**
-- Tipografia, etapa 2: títulos de seção maiores (hoje 12px em negrito), rótulos discretos, sem Maiúscula Em Cada Palavra. Liberada agora que as fases 0-1-2 entraram.
+- Layout com cara de sistema no computador + tipografia etapa 2 (uma sessão só): instrução em `sessoes-nuvem/layout-sistema.md`, prévia em `sessoes-nuvem/previa-layout.html`. Disparar DEPOIS do merge da fase 3a+3b.
 
 **Esperando decisão da dona do produto**
 - As 20 decisões de `docs/arquitetura/decisoes.md`. As 5 mais urgentes: D-03 (público-alvo), D-01 (núcleo e módulos), D-14 (quando a CETEP migra para matrícula por ano), D-06 (etapas de ensino no lançamento), D-04 (redes agora ou depois).
 - Preços dos planos (a fase 2 criou os planos com preço zerado).
 
 **Próximos passos**
-1. Fase 3a e tipografia etapa 2 (podem rodar juntas? a 3a mexe em schema e `can()`; a tipografia em telas: pouco conflito, mas melhor em sequência).
-2. Fases seguintes do roteiro conforme as decisões.
-3. Em produção (quando houver): rodar `prisma migrate deploy` e `npx tsx prisma/backfill/fase-2.ts` com backup verificado.
+1. Validar a fase 3a+3b quando a nuvem terminar.
+2. Disparar a sessão do layout de sistema (com a tipografia etapa 2).
+3. Fases seguintes do roteiro conforme as decisões.
+4. Em produção (quando houver): rodar `prisma migrate deploy` e `npx tsx prisma/backfill/fase-2.ts` com backup verificado.
 
 ---
 
 ## Histórico
 
 ### 20/10/2026
+- Deliberado o layout "cara de sistema" no computador (celular continua com cara de app): densidade equilibrada, painéis com borda, barra de ferramentas nas listas, fichas com abas (turma, estudante, usuário, AEE), conteúdo na largura toda. Barra superior só EXIBE o ano letivo; o seletor de consulta de anos anteriores fica para a fase 6, com somente leitura, faixa de aviso e volta automática ao ano atual (preocupação de usabilidade da dona do produto).
 - Decidido rodar as fases 3a + 3b juntas na nuvem (3c depois da validação, por ser a única que remove coisas).
 - Fases 0, 1 e 2 mergeadas (PR #14) e validadas localmente: migration `20261020120000_planos_e_assinaturas` aplicada nos dois bancos; backfill `prisma/backfill/fase-2.ts` criou 3 planos e 2 assinaturas, equivalente nas duas escolas, e na 2ª execução não criou nada; 437 testes passando. Conferido ao vivo: com o módulo de provas desligado na Horizonte, o menu some, a página mostra "Módulo indisponível" e a API responde 403; na CETEP nada muda. Inclui as correções de segurança da fase 0 (PDFs e `reportarEstudanteFaltante` exigem papel; questões conferem o módulo) e a trava `exigirModulo` em todas as rotas, actions e páginas, com teste que falha se alguma ficar de fora.
 - Revisão de arquitetura concluída na nuvem e mergeada (PR #12): inventário, domínio-alvo, personalização, módulos e planos, roteiro de migração em 12 fases, 20 decisões, schema-alvo. Apontou 3 possíveis falhas de segurança (PDFs sem checagem de papel, `reportarEstudanteFaltante` sem papel, módulos pagos sem trava no servidor), que entram na fase 0.
