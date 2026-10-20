@@ -163,8 +163,11 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  /* Só três pesos no sistema: 400, 500 e 600. font-bold (700) vira 600:
+     o negrito pesado em rótulos pequenos deixava a interface dura. */
+  --font-weight-bold: 600;
 
   /* superfícies */
   --color-canvas: var(--canvas);
@@ -267,12 +270,20 @@
   body {
     background: var(--canvas);
     color: var(--fg);
-    font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-    font-feature-settings: "cv11", "ss01";
+    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    /* Inter: "a" de um andar (cv11), dígitos abertos (ss01) e 1/I/l distintos (cv05) */
+    font-feature-settings: "cv11", "ss01", "cv05";
     -webkit-font-smoothing: antialiased;
   }
+  /* Títulos: peso 600 no máximo e espaçamento justo (Inter fica mais
+     refinada assim); o negrito pesado deixava os títulos duros */
   h1, h2, h3 {
-    letter-spacing: -0.015em;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+  }
+  /* Números alinhados em tabelas e indicadores */
+  table, .tabular-nums {
+    font-variant-numeric: tabular-nums;
   }
   /* Foco sempre visível, na cor de destaque */
   :focus-visible {
