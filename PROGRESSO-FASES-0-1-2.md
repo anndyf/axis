@@ -18,7 +18,7 @@ Escopo: `docs/arquitetura/roteiro-de-migracao.md`, fases 0, 1 e 2.
 | 2.1 | Fase 2: schema + migration + backfill | ✅ migration `20261020120000_planos_e_assinaturas`; `prisma/backfill/fase-2.ts` |
 | 2.2 | Fase 2: `getModulosAtivos` novo + equivalência + somente leitura | ✅ 420 testes |
 | 2.3 | Fase 2: painel da plataforma | ✅ modal "Assinatura" por escola; conferido no navegador |
-| 3 | Encerramento + PR | ⬜ |
+| 3 | Encerramento + PR | ✅ |
 
 ## Decisões tomadas sem confirmação
 
@@ -35,6 +35,7 @@ Escopo: `docs/arquitetura/roteiro-de-migracao.md`, fases 0, 1 e 2.
 - **Estados na fase 1**: derivados do `getModulosAtivos` atual. Hoje o menu só desliga itens com `planoMinimo`, então só **QST, PRV e FIN** podem ficar inativos; todos os outros módulos ficam ATIVO (nenhuma escola perde nada). PRV fica ativo se `provas` **ou** `simulados` estiver ativo (conservador).
 - **Exceção herdada no Banco de Questões**: o liga/desliga sempre valeu só para professores (a direção e o administrador continuavam usando). Mantido em `estadoParaUsuario` (regra pura, testada). A tela "módulo indisponível" mostra para QST o mesmo texto que o professor já via ("Módulo em Manutenção…").
 - **Mapa conservador** (`src/lib/modulos/mapa-rotas.ts`): no Núcleo ficaram os de uso misto — mensagens, portal do aluno, esquemas de avaliação (definem também a frequência), matriz curricular (gera as disciplinas da turma), cadastro básico de estudantes, importar/verificar horário de usuário e a action "reportar estudante faltante". SEC: ocorrências, importação CSV, sincronizar, promover turma. RES: relatórios/PDFs de turma, resultados, conselho. IND: professores pendentes.
+- **GET de `api/questoes` para professor com o banco desligado**: antes respondia; agora é barrado como o resto do módulo (a página já barrava o professor; quem usa esse GET fora da página é o gerador de provas, da gestão, que continua liberado).
 - **Achado extra (corrigido)**: a página do banco de questões listava para a gestão as disciplinas de **todas as escolas** (`where: {}`). Agora filtra pela escola da sessão.
 
 ### Fase 2
@@ -47,6 +48,51 @@ Escopo: `docs/arquitetura/roteiro-de-migracao.md`, fases 0, 1 e 2.
 - **Liga/desliga do banco de questões pela direção** continua podendo ligar o módulo numa escola Básico (como hoje). Fica para quando o toggle sair de `api/config` (passo "Depois" da fase 2).
 - **Painel**: botão "Assinatura" em cada linha abre plano, situação, fim do teste, limites, observações, módulos (Do plano / Ativo / Somente leitura / Inativo, com a origem) e histórico. "Colocar em somente leitura" = situação INADIMPLENTE. Sem preços.
 - **Selo "somente leitura" no menu**: não feito (a instrução limita as telas novas ao painel da plataforma). Quem tenta gravar num módulo em leitura recebe a mensagem "está em modo somente leitura…".
+
+## Para validar localmente
+
+```bash
+git fetch && git checkout fase/0-1-2-seguranca-modulos
+npm ci
+npx prisma migrate deploy                       # axis_dev
+DATABASE_URL=<axis_test> DIRECT_URL=<axis_test> npx prisma migrate deploy
+npx prisma generate
+npx tsx prisma/backfill/fase-2.ts               # cria planos e assinaturas e confere a equivalência
+npx tsx prisma/backfill/fase-2.ts               # 2ª vez: "0 assinaturas criadas", tudo "equivalente"
+npx tsc --noEmit                                # 0 erros
+npx vitest run                                  # 432 testes (eram 367)
+npm run dev
+```
+
+Para usar o painel da plataforma no banco de desenvolvimento, a conta `admin` da CETEP precisa da marca de plataforma: `npx tsx prisma/backfill-platform-admin.ts`.
+
+### Migration
+- `prisma/migrations/20261020120000_planos_e_assinaturas`: **só cria** (enums `ModuloId`, `EstadoModulo`, `SituacaoAssinatura`, `OrigemModulo`; tabelas `planos`, `planos_modulos`, `assinaturas`, `assinaturas_modulos`, `historico_assinaturas`). Não altera nem remove nada existente. Testada com `migrate deploy` sobre o axis_dev já populado pelos seeds.
+
+### Backfill (`prisma/backfill/fase-2.ts`)
+- Cria os planos BASICO, PRO e ENTERPRISE (se não existirem) com os módulos que cada um libera hoje.
+- Para cada escola **sem** assinatura: cria a assinatura do plano da escola, situação a partir do status (TRIAL → TESTE sem fim), início = data de criação da escola, e converte `EscolaModulo` em exceções por módulo (origem EXCECAO); registra no histórico.
+- Confere a equivalência (itens de menu e estado de cada módulo, modelo novo × antigo) para todas as escolas; diferença = código de saída 1. `--so-conferir` só confere.
+- Idempotente: escola com assinatura e plano existente não são tocados. Em host que não seja local exige `FORCE_BACKFILL=true` (para rodar na cópia da produção, com backup verificado).
+- Não mexe em `Escola.plano`, `Escola.status`, `PlanoTipo` nem `EscolaModulo` (remoção fica para depois da validação).
+
+### Testes novos
+- `src/lib/isolamento-escolas.test.ts`: aluno do portal barrado nos 3 PDFs de turma e na action `reportarEstudanteFaltante`; professor com o banco de questões desligado barrado em PUT/DELETE de `questoes/[id]`; `getTurmasForSelect` sem turmas de outra escola; direção de B não lê nem altera a assinatura de A. (Cada um falhou antes da correção.)
+- `src/lib/services/modulos.test.ts` e `src/lib/services/planos.test.ts`: regras puras (estado pelo catálogo, pela assinatura, somente leitura, exceção do banco de questões, conversão dos overrides, validações).
+- `src/lib/modulos/cobertura-modulos.test.ts`: **teste estático** — toda rota, action e página precisa estar no mapa e chamar a guarda do seu módulo; arquivo novo sem módulo faz o teste falhar.
+- `src/lib/modulos/modulos-desligados.test.ts`: **comportamento** — escola BASICO real (QST/PRV/FIN barrados nas rotas e páginas; direção continua no banco de questões; ENTERPRISE tudo ativo); escola "sem módulos" (todas as rotas, actions e páginas de módulo barradas, banco intacto); somente leitura (escrita barrada, leitura passa).
+- `src/lib/modulos/equivalencia-assinaturas.test.ts`: backfill em 10 cenários (planos, situações, toggles), equivalência e idempotência.
+- `src/lib/plataforma.test.ts`: rotas novas de assinatura (acesso só da plataforma, inadimplência = somente leitura, espelho no modelo antigo, "volta ao plano").
+
+### Telas para conferir
+- **CETEP (tudo ligado)**: navegar pelo menu inteiro como admin, direção, professor e aluno — nada deve mudar.
+- **Módulo indisponível**: no painel da plataforma, Assinatura da Horizonte → Gerador de Provas e Simulados = Inativo; entrar como `admin` em `horizonte.localhost:3000` → o menu perde Simulados e Gerador de Provas, `/dashboard/provas` mostra "Módulo indisponível". Voltar para "Do plano". Captura em `docs/capturas/fases-0-1-2/`.
+- **Banco de questões desligado pela direção** (Configurações): professor vê "Módulo em Manutenção" (mesmo texto de antes, agora na tela de módulo indisponível); direção continua usando.
+- **Painel da plataforma** (`/dashboard/plataforma`): botão "Assinatura" — plano, situação, fim do teste, limites, observações, módulos com origem e estado, histórico; "Colocar em somente leitura".
+- **Somente leitura**: com a situação Inadimplente, telas abrem, mas gravar (ex.: salvar chamada) responde "está em modo somente leitura".
+
+### Telas afetadas para avisar a escola
+Nenhuma para a CETEP. Mudanças visíveis só em escola sem o módulo (tela "Módulo indisponível") e no painel da plataforma.
 
 ## Como retomar
 Checkout de `fase/0-1-2-seguranca-modulos`, ler esta tabela, continuar do primeiro passo não ✅.
