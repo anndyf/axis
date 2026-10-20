@@ -65,3 +65,48 @@ Capturas: `npx tsx scripts/capturas.ts <fase>` com `npm run dev` rodando (`CHROM
 - [x] Chamada: "Salvar e replicar" no bloco do conteúdo (só aparece se houver turma para replicar). Salva a chamada e abre um bottom sheet com cada turma: marcar/desmarcar, data trocável (a sugestão é recalculada no servidor), aviso de "sem aula nesse dia" e, quando já há conteúdo, o texto atual com a opção "Substituir pelo novo conteúdo"; depois mostra o resultado por turma.
 - [x] Diário (`/dashboard/chamada/diario?turma=…`): aulas por unidade (1ª, 2ª, 3ª UNIDADE…) em seções recolhíveis (`<details>`, a unidade atual aberta), cada aula com dia da semana e data, tempos, situação, professor, conteúdo, faltas com nomes (e tempos, quando a aula tem 2+) e observações; botão Editar abre a chamada do dia.
 - Capturas: `docs/capturas/mobile-5-diario/` (inclui `replicar-conteudo-375.png`, com o `ricardo.prof`, que tem Português em várias turmas).
+
+### 6. Demais telas no padrão mobile — feito (sem mudar regras de negócio)
+- [x] Lançamento de notas: no celular, um cartão por aluno (nome sem corte, matrícula, ficha AEE, média no canto), cada unidade num bloco com os campos das avaliações em `type="text" inputMode="decimal"` (vírgula vira ponto), subtotal e "Infrequente" como botão de 44px; "Salvar notas" fixo no rodapé acima da barra inferior, com aviso de alterações pendentes. A tabela continua no desktop. "Notas" do início abre já na disciplina (`?disciplina=`).
+- [x] Portal do aluno: boletim em cartões por disciplina (média, situação, notas por unidade e frequência da disciplina); frequência e horário em cartões (fase 1).
+- [x] Frequência/infrequência da gestão: cartões por aluno (frequência, risco, faltas, sem justificativa, pode faltar); tabela no desktop.
+- [x] Turmas: filtros de turno/série largos e com 44px; ícones de ação (relatório, horário, promover, clonar, editar) com área de toque de 44px no celular.
+- [x] Resultados: sem padding duplicado no celular, dica longa só no desktop, campos com 16px, nome do curso e da turma sem reticências.
+- Capturas: `docs/capturas/mobile-6-telas/`.
+
+## Para validar localmente
+
+Subir com `npm run dev` e abrir em 375–390px (DevTools, modo celular) e em 1440px. Logins em `LOGINS_TESTE.md` (sem mudanças de acesso nesta sessão). As capturas "antes" estão em `docs/capturas/mobile-0-antes/` e as "depois" em `docs/capturas/mobile-<fase>/`.
+
+### Telas para conferir
+| Tela | Quem | Antes | Depois |
+|---|---|---|---|
+| Barra inferior + "Mais" (perfil, senha, tema, sair) | `professor`, `direcao`, `aee` | `mobile-0-antes/dashboard-*-375.png` | `mobile-1-navegacao/` |
+| Início do professor (destaque Agora/Próxima, Minhas turmas, filtros) | `professor`; com várias turmas: `ricardo.prof` | `mobile-0-antes/dashboard-professor-375.png` | `mobile-2-inicio-professor/` |
+| Chamada (cartões, falta por tempo, observação, salvar fixo) | `professor` → Chamada → Biologia (1º e 6º tempos) | `mobile-0-antes/chamada-fazer-375.png` | `mobile-3-chamada/` |
+| Calendário da disciplina (legenda, tocar no dia) | `professor` → chamada → "Calendário" (celular) ou coluna à esquerda (desktop) | — | `mobile-4-calendario/` |
+| Diário por unidade | `professor` → Diário | `mobile-0-antes/diario-375.png` | `mobile-5-diario/` |
+| Salvar e replicar | `ricardo.prof` (Português em várias turmas) → chamada → conteúdo → "Salvar e replicar" | — | `mobile-5-diario/replicar-conteudo-375.png` |
+| Lançamento de notas | `professor` → Notas | `mobile-0-antes/lancamento-notas-375.png` | `mobile-6-telas/notas-professor-*.png` |
+| Portal: boletim, frequência, horário | `1TIM1-001` | `mobile-0-antes/portal-375.png` | `mobile-6-telas/portal-*.png` |
+| Frequência (gestão), turmas, resultados | `direcao` | `mobile-0-antes/{frequencia,turmas,resultados}-375.png` | `mobile-6-telas/` |
+| Tema escuro | qualquer um → Mais → Tema | — | arquivos `-escuro` de cada fase |
+
+Conferir também: nenhuma página rola de lado em 375px; a barra inferior não cobre o botão de salvar nem o fim das listas; o menu lateral do desktop segue igual.
+
+### Migration criada
+- `prisma/migrations/20261020010000_falta_tempos_observacao_chamada/`: `Falta.tempos Int[]` e tabela `observacoes_chamada` (aula, aluno, texto, autor; única por aula + aluno). **Backfill**: as faltas existentes recebem os primeiros `quantidade` tempos da aula (`aula.tempos[1:quantidade]`); chamada diária fica com `[]`. `quantidade` não muda, então a frequência calculada é a mesma. Rodar `npx prisma migrate deploy` (e `npx prisma generate`, se o dev server já estiver de pé).
+
+### Testes novos (304 → 352)
+- Puros: `navegacao-mobile.test.ts`, `inicio-professor.test.ts`, `calendario-disciplina.test.ts`, `diario.test.ts`; `chamada.test.ts` ganhou falta por tempo.
+- Integração (`chamada-acoes.test.ts`): falta por tempo, observação (inclusive não vazar para o portal), replicar conteúdo; todos com escola A × B e professor × outro professor.
+
+### Decisões tomadas sem confirmação
+- "Estudantes" na barra do AEE abre o Atendimento AEE (o AEE não abre o cadastro geral).
+- "Diário" na barra abre uma lista de diários por turma (nova tela em `/dashboard/chamada/diario` sem parâmetros).
+- No celular, o avatar fica no início do cabeçalho das telas raiz; nas subtelas, o botão voltar ocupa esse lugar.
+- No início do professor (celular) saem os indicadores, a lista de chamadas pendentes e os atalhos (os números estão nos cartões; os atalhos duplicavam a barra). Atalhos também saem no celular dos painéis da gestão/pedagogia.
+- "Salvar e replicar": "mesmo professor" = o usuário logado (a gestão sem disciplinas não vê o botão); o conteúdo replicado é o já salvo na origem; datas futuras são aceitas se houver aula no horário (a aula nasce PREVISTA).
+- Diário: unidades em ordem com as aulas de cada uma em ordem crescente; a unidade atual abre expandida.
+- Sem contador de não lidas na barra inferior (fica no sino e no menu lateral).
+- Dados locais: apaguei no `axis_dev` as aulas de hoje de História e Português da 1TIM1 para mostrar o destaque "chamada pendente" nas capturas.
