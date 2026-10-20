@@ -1,8 +1,13 @@
 "use client"
 
 import { useCallback, useEffect, useState, type ReactNode } from "react"
-import DashboardSidebar, { type EscolaDoMenu } from "./DashboardSidebar"
+import { usePathname } from "next/navigation"
+import { Blocks, KeyRound, Search, UserRound } from "lucide-react"
+import DashboardSidebar, { papelDoUsuario, type EscolaDoMenu } from "./DashboardSidebar"
 import DashboardTopbar from "./DashboardTopbar"
+import BarraInferior from "./BarraInferior"
+import MenuMais from "./MenuMais"
+import { itemAtivo, navegacaoMobile } from "@/lib/services/navegacao-mobile"
 import { cn } from "@/components/ui/cn"
 
 export default function DashboardLayoutWrapper({
@@ -38,6 +43,13 @@ export default function DashboardLayoutWrapper({
   }
   const closeMobile = useCallback(() => setIsMobileOpen(false), [])
 
+  // Celular: barra inferior por perfil + painel "Mais" (o menu lateral fica para md+)
+  const pathname = usePathname()
+  const [maisAberto, setMaisAberto] = useState(false)
+  const nav = navegacaoMobile(user, modulosAtivos)
+  const ativo = itemAtivo(pathname, [...nav.barra, ...nav.mais])
+  const abrirBusca = () => window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true }))
+
   return (
     <>
       <DashboardSidebar
@@ -50,10 +62,29 @@ export default function DashboardLayoutWrapper({
         isMobileOpen={isMobileOpen}
         closeMobile={closeMobile}
       />
-      <div className={cn("flex min-h-screen min-w-0 flex-1 flex-col transition-[margin] duration-150 ease-out print:ml-0", isCollapsed ? "md:ml-16" : "md:ml-64")}>
-        <DashboardTopbar escola={escola} nome={user?.name} onOpenMobile={() => setIsMobileOpen(true)} />
+      {/* --barra-inferior (globals.css): espaço da barra do celular */}
+      <div className={cn(
+        "flex min-h-screen min-w-0 flex-1 flex-col transition-[margin] duration-150 ease-out print:ml-0",
+        "pb-[var(--barra-inferior)] print:pb-0",
+        isCollapsed ? "md:ml-16" : "md:ml-64"
+      )}>
+        <DashboardTopbar escola={escola} nome={user?.name} raizes={[...nav.barra, ...nav.mais].map((i) => i.href)} />
         <main className="flex min-w-0 flex-1 flex-col print:block">{children}</main>
       </div>
+      <BarraInferior itens={nav.barra} ativo={ativo} maisAberto={maisAberto} onMais={() => setMaisAberto(true)} />
+      <MenuMais
+        open={maisAberto}
+        onClose={() => setMaisAberto(false)}
+        itens={nav.mais}
+        ativo={ativo}
+        usuario={{ nome: user?.name, papel: papelDoUsuario(user) }}
+        conta={[
+          { rotulo: "Buscar", icone: Search, onClick: abrirBusca },
+          { rotulo: "Meu perfil", icone: UserRound, href: "/dashboard/perfil" },
+          { rotulo: "Trocar senha", icone: KeyRound, href: "/dashboard/perfil#senha" },
+          ...(user?.isSuperuser ? [{ rotulo: "Componentes", icone: Blocks, href: "/dashboard/ui" }] : []),
+        ]}
+      />
     </>
   )
 }

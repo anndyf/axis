@@ -19,12 +19,16 @@ import {
  */
 
 /** Calendário letivo da escola no ano (período + dias não letivos + extras), ou null se não configurado. */
-export async function carregarCalendario(escolaId: string, anoLetivo: number): Promise<(CalendarioEntrada & { fim: Date }) | null> {
+export async function carregarCalendario(escolaId: string, anoLetivo: number): Promise<(CalendarioEntrada & {
+  fim: Date
+  naoLetivos: { data: Date; turmaId: string | null; descricao: string }[]
+  extras: { data: Date; seguirHorarioDe: number; descricao: string }[]
+}) | null> {
   const periodo = await prisma.periodoLetivo.findUnique({ where: { escolaId_anoLetivo: { escolaId, anoLetivo } } })
   if (!periodo) return null
   const [naoLetivos, extras] = await Promise.all([
-    prisma.diaNaoLetivo.findMany({ where: { escolaId, data: { gte: periodo.inicio, lte: periodo.fim } }, select: { data: true, turmaId: true } }),
-    prisma.diaLetivoExtra.findMany({ where: { escolaId, data: { gte: periodo.inicio, lte: periodo.fim } }, select: { data: true, seguirHorarioDe: true } }),
+    prisma.diaNaoLetivo.findMany({ where: { escolaId, data: { gte: periodo.inicio, lte: periodo.fim } }, select: { data: true, turmaId: true, descricao: true } }),
+    prisma.diaLetivoExtra.findMany({ where: { escolaId, data: { gte: periodo.inicio, lte: periodo.fim } }, select: { data: true, seguirHorarioDe: true, descricao: true } }),
   ])
   return { inicio: periodo.inicio, fim: periodo.fim, naoLetivos, extras }
 }

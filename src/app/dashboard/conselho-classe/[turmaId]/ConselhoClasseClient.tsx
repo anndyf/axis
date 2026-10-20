@@ -906,7 +906,7 @@ export default function ConselhoClasseClient({
           </div>
 
           {/* Footer Fixo */}
-          <div className="sticky bottom-4 z-20 mt-6 rounded-lg border border-line bg-elevated/95 px-4 py-3 shadow-overlay backdrop-blur">
+          <div className="sticky bottom-[calc(var(--barra-inferior)+1rem)] z-20 mt-6 rounded-lg border border-line bg-elevated/95 px-4 py-3 shadow-overlay backdrop-blur">
             <div className="flex flex-col items-center justify-between gap-3 md:flex-row">
               <div className="flex items-center space-x-4">
                 <Gavel size={16} strokeWidth={1.75} className="text-fg-subtle" aria-hidden />

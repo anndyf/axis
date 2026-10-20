@@ -56,7 +56,7 @@ export default function MessageNotification() {
   if (!show || !latestMessage || isMessagesPage) return null
 
   return (
-    <div className="fixed bottom-6 right-6 z-[9999] animate-slide-up print:hidden">
+    <div className="fixed bottom-[calc(var(--barra-inferior)+1.5rem)] right-6 z-[9999] animate-slide-up print:hidden">
       <div className="bg-surface border border-line rounded-xl shadow-card p-1 flex items-center gap-4 max-w-sm overflow-hidden ring-1 ring-zinc-900/5">
         
         <div className="relative shrink-0 ml-1">

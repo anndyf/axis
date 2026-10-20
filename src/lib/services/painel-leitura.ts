@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { chaveData } from '@/lib/services/calendario'
+import { chaveData, normalizarTurno } from '@/lib/services/calendario'
 import { carregarEsquemaDaTurma, type EsquemaDaTurma } from '@/lib/services/notas-leitura'
 import { carregarCalendario, carregarFrequenciaDaTurma } from '@/lib/services/frequencia-leitura'
 import { aulasDoDia, diasComAulaAte, hojeNaEscola, inicioDaContagemDePendencias } from '@/lib/services/chamada'
@@ -120,6 +120,8 @@ export async function resumoGestao(escolaId: string, anoLetivo: number): Promise
 export interface AulaDeHoje {
   turmaId: string
   turmaNome: string
+  /** turno normalizado da turma (para achar o horário dos tempos em TempoAula) */
+  turno: string
   disciplinaId: string | null
   nome: string
   tempos: number[]
@@ -146,7 +148,7 @@ export async function resumoProfessor(escolaId: string, userId: string, anoLetiv
     orderBy: [{ turma: { nome: 'asc' } }, { nome: 'asc' }],
     select: {
       id: true, nome: true, turmaId: true,
-      turma: { select: { nome: true, cursoId: true, esquemaAvaliacaoId: true, _count: { select: { estudantes: true } } } },
+      turma: { select: { nome: true, turno: true, cursoId: true, esquemaAvaliacaoId: true, _count: { select: { estudantes: true } } } },
       _count: { select: { notas: true } },
     },
   })
@@ -168,11 +170,11 @@ export async function resumoProfessor(escolaId: string, userId: string, anoLetiv
       if (esquema?.registroFrequencia === 'POR_DIA') {
         if (vistas.has(d.turmaId) || dia.temposPorDisciplina.size === 0) continue
         vistas.add(d.turmaId)
-        aulasDeHoje.push({ turmaId: d.turmaId, turmaNome: d.turma.nome, disciplinaId: null, nome: 'Chamada diária', tempos: [], feita: feitas.has(`${d.turmaId}|`) })
+        aulasDeHoje.push({ turmaId: d.turmaId, turmaNome: d.turma.nome, turno: normalizarTurno(d.turma.turno), disciplinaId: null, nome: 'Chamada diária', tempos: [], feita: feitas.has(`${d.turmaId}|`) })
         continue
       }
       const tempos = dia.temposPorDisciplina.get(d.id) ?? []
-      if (tempos.length) aulasDeHoje.push({ turmaId: d.turmaId, turmaNome: d.turma.nome, disciplinaId: d.id, nome: d.nome, tempos, feita: feitas.has(`${d.turmaId}|${d.id}`) })
+      if (tempos.length) aulasDeHoje.push({ turmaId: d.turmaId, turmaNome: d.turma.nome, turno: normalizarTurno(d.turma.turno), disciplinaId: d.id, nome: d.nome, tempos, feita: feitas.has(`${d.turmaId}|${d.id}`) })
     }
     aulasDeHoje.sort((a, b) => (a.tempos[0] ?? 0) - (b.tempos[0] ?? 0) || a.turmaNome.localeCompare(b.turmaNome))
   }
@@ -201,6 +203,8 @@ export interface PendenciaDisciplina {
   turmaNome: string
   alunos: number
   chamadasPendentes: number
+  /** dia pendente mais recente (AAAA-MM-DD), para abrir a chamada direto */
+  ultimaPendente: string | null
   semNota: number
   professores: { id: string; nome: string }[]
 }
@@ -245,16 +249,18 @@ export async function pendenciasPorDisciplina(escolaId: string, anoLetivo: numbe
     if (porDia) {
       const professores = new Map<string, { id: string; nome: string }>()
       for (const d of turma.disciplinas) for (const p of pessoas(d.usuariosPermitidos)) professores.set(p.id, p)
+      const dias = cal ? diasComAulaAte(hoje, turma.id, cal, horario, null).filter((d) => !registradas.has(`${d}|`)) : []
       linhas.push({
         disciplinaId: null, disciplinaNome: 'Chamada diária', turmaId: turma.id, turmaNome: turma.nome, alunos: turma._count.estudantes,
-        chamadasPendentes: cal ? diasComAulaAte(hoje, turma.id, cal, horario, null).filter((d) => !registradas.has(`${d}|`)).length : 0,
+        chamadasPendentes: dias.length, ultimaPendente: dias.at(-1) ?? null,
         semNota: 0, professores: [...professores.values()],
       })
     }
     for (const d of turma.disciplinas) {
+      const dias = !porDia && cal ? diasComAulaAte(hoje, turma.id, cal, horario, d.id).filter((x) => !registradas.has(`${x}|${d.id}`)) : []
       linhas.push({
         disciplinaId: d.id, disciplinaNome: d.nome, turmaId: turma.id, turmaNome: turma.nome, alunos: turma._count.estudantes,
-        chamadasPendentes: !porDia && cal ? diasComAulaAte(hoje, turma.id, cal, horario, d.id).filter((x) => !registradas.has(`${x}|${d.id}`)).length : 0,
+        chamadasPendentes: dias.length, ultimaPendente: dias.at(-1) ?? null,
         semNota: Math.max(0, turma._count.estudantes - d._count.notas),
         professores: pessoas(d.usuariosPermitidos),
       })

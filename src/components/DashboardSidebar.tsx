@@ -156,7 +156,10 @@ export default function DashboardSidebar({
       <aside
         aria-label="Menu principal"
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex flex-col bg-sidebar text-sidebar-fg print:hidden",
+          // Celular: navegação pela barra inferior; o menu lateral só existe a partir de md
+          "fixed inset-y-0 left-0 z-50 flex-col bg-sidebar",
+          isMobileOpen ? "flex" : "hidden md:flex",
+          "text-sidebar-fg print:hidden",
           "transition-[width,transform] duration-150 ease-out",
           recolhido ? "w-16" : "w-64",
           isMobileOpen ? "translate-x-0 shadow-overlay" : "-translate-x-full md:translate-x-0"

@@ -7,7 +7,10 @@ const CONTROLE = cn(
   'placeholder:text-fg-subtle transition-[border-color,box-shadow] duration-150',
   'hover:border-line-strong focus:outline-none focus:border-accent focus:ring-3 focus:ring-ring/40',
   'disabled:cursor-not-allowed disabled:bg-subtle disabled:text-fg-disabled',
-  'aria-[invalid=true]:border-danger aria-[invalid=true]:focus:ring-danger/25'
+  'aria-[invalid=true]:border-danger aria-[invalid=true]:focus:ring-danger/25',
+  // Celular: campo preenchido em cinza claro (padrão de app) e texto de 16px,
+  // que evita o zoom automático do iOS ao focar
+  'max-md:border-transparent max-md:bg-subtle max-md:shadow-none max-md:text-base max-md:focus:bg-surface'
 )
 
 export function Label({ className, children, opcional, ...props }: LabelHTMLAttributes<HTMLLabelElement> & { opcional?: boolean }) {

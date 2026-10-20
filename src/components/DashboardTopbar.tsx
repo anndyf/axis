@@ -1,12 +1,12 @@
 "use client"
 
-import { usePathname } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
 import type { ReactNode } from "react"
 import Link from "next/link"
-import { Bell, Menu as MenuIcon } from "lucide-react"
+import { ArrowLeft, Bell } from "lucide-react"
 import { MODULOS } from "@/lib/modules"
 import { Breadcrumb, type Migalha } from "@/components/ui/PageHeader"
-import { MarcaEscola, type EscolaDoMenu } from "@/components/DashboardSidebar"
+import type { EscolaDoMenu } from "@/components/DashboardSidebar"
 import { Avatar } from "@/components/ui/Avatar"
 
 // Rótulos de subpáginas conhecidas; segmentos que são ids não aparecem
@@ -38,22 +38,45 @@ export function migalhasDaRota(pathname: string): Migalha[] {
   return migalhas
 }
 
-/** Barra superior (modelo A): migalhas à esquerda; mensagens e avatar do usuário à direita. */
-export default function DashboardTopbar({ escola, nome, onOpenMobile, acoes }: { escola: EscolaDoMenu; nome?: string | null; onOpenMobile: () => void; acoes?: ReactNode }) {
+/**
+ * Tela anterior no celular. As telas da barra e do "Mais" são raízes (sem
+ * voltar), a não ser com filtro na URL (ex.: um diário aberto volta para a
+ * lista de diários); nas demais, a migalha de cima.
+ */
+export function telaAnterior(pathname: string, temParametros: boolean, raizes: string[]): string | null {
+  if (raizes.includes(pathname)) return temParametros && pathname !== "/dashboard" ? pathname : null
+  const m = migalhasDaRota(pathname)
+  return m.length > 2 ? m[m.length - 2].href ?? null : null
+}
+
+/**
+ * Barra superior. Desktop (modelo A): migalhas à esquerda; mensagens e
+ * avatar à direita. Celular: cabeçalho enxuto de app - avatar no início
+ * (telas raiz) ou botão voltar (subtelas), título da tela e mensagens.
+ */
+export default function DashboardTopbar({ nome, acoes, raizes = [] }: { escola?: EscolaDoMenu; nome?: string | null; acoes?: ReactNode; raizes?: string[] }) {
   const pathname = usePathname()
+  const params = useSearchParams()
+  const migalhas = migalhasDaRota(pathname)
+  const voltar = telaAnterior(pathname, params.size > 0, raizes)
   return (
-    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-3 border-b border-line bg-surface/90 px-4 backdrop-blur supports-[backdrop-filter]:bg-surface/80 md:px-8 print:hidden">
-      <button type="button" onClick={onOpenMobile} aria-label="Abrir menu" className="-ml-1 rounded-full p-2 text-fg-muted hover:bg-subtle hover:text-fg md:hidden">
-        <MenuIcon size={20} strokeWidth={1.75} />
-      </button>
-      <span className="md:hidden"><MarcaEscola escola={escola} compacta /></span>
-      <Breadcrumb items={migalhasDaRota(pathname)} className="hidden min-w-0 flex-1 sm:block" />
-      <span className="min-w-0 flex-1 truncate text-sm font-medium text-fg sm:hidden">{migalhasDaRota(pathname).at(-1)?.label}</span>
+    <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b border-line bg-surface/90 px-2 backdrop-blur supports-[backdrop-filter]:bg-surface/80 md:h-16 md:gap-3 md:px-8 print:hidden">
+      {voltar ? (
+        <Link href={voltar} aria-label="Voltar" className="flex size-11 shrink-0 items-center justify-center rounded-full text-fg-muted hover:bg-subtle hover:text-fg md:hidden">
+          <ArrowLeft size={20} strokeWidth={1.75} />
+        </Link>
+      ) : (
+        <Link href="/dashboard/perfil" aria-label="Meu perfil" className="flex size-11 shrink-0 items-center justify-center rounded-full md:hidden">
+          <Avatar nome={nome} size="md" tom="destaque" />
+        </Link>
+      )}
+      <Breadcrumb items={migalhas} className="hidden min-w-0 flex-1 md:block" />
+      <span className="min-w-0 flex-1 truncate text-base font-semibold text-fg md:hidden" title={migalhas.at(-1)?.label}>{migalhas.at(-1)?.label}</span>
       {acoes && <div className="flex shrink-0 items-center gap-2">{acoes}</div>}
-      <Link href="/dashboard/mensagens" aria-label="Mensagens e comunicados" className="shrink-0 rounded-full p-2 text-fg-muted transition-colors duration-150 hover:bg-subtle hover:text-fg">
+      <Link href="/dashboard/mensagens" aria-label="Mensagens e comunicados" className="flex size-11 shrink-0 items-center justify-center rounded-full text-fg-muted transition-colors duration-150 hover:bg-subtle hover:text-fg md:size-10">
         <Bell size={20} strokeWidth={1.75} />
       </Link>
-      <Link href="/dashboard/perfil" aria-label="Meu perfil" className="shrink-0 rounded-full">
+      <Link href="/dashboard/perfil" aria-label="Meu perfil" className="hidden shrink-0 rounded-full md:block">
         <Avatar nome={nome} size="lg" tom="destaque" />
       </Link>
     </header>

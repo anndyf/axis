@@ -250,7 +250,7 @@ export default function EstudanteForm({ estudante, isEdit = false }: EstudanteFo
 
       {/* Toast Notification */}
       {resultMsg && (
-        <div className="fixed bottom-6 right-6 z-50 animate-slide-up">
+        <div className="fixed bottom-[calc(var(--barra-inferior)+1.5rem)] right-6 z-50 animate-slide-up">
           <div className={`flex items-center gap-3 bg-elevated text-fg px-4 py-3 rounded-lg shadow-overlay max-w-sm border border-line`} role="status">
             <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${resultMsg.ok ? 'bg-success-subtle text-success-fg' : 'bg-danger-subtle text-danger-fg'}`}>
               {resultMsg.ok ? <CheckCheck size={16} /> : <X size={16} />}

@@ -4,8 +4,10 @@
  *   npm run dev            # em outro terminal
  *   npx tsx scripts/capturas.ts <fase>
  *
- * Faz login com os usuários de LOGINS_TESTE.md e salva PNGs (1440px e 375px)
- * das telas principais em docs/capturas/<fase>/. Usa o banco do .env (dev)
+ * Faz login com os usuários de LOGINS_TESTE.md e salva PNGs (375, 390 e
+ * 1440px) das telas principais em docs/capturas/<fase>/. CAPTURAS_TEMA=dark
+ * captura no tema escuro (arquivos com sufixo -escuro); CAPTURAS_LARGURAS=375,1440
+ * e CAPTURAS_TELAS=chamada,diario restringem a rodada. Usa o banco do .env (dev)
  * só para descobrir ids (turma 1TIM1, disciplina, aluno) e para liberar a
  * troca de senha obrigatória da conta de portal de teste. Só roda em banco local.
  */
@@ -21,7 +23,9 @@ dotenv.config()
 const BASE = process.env.CAPTURAS_URL ?? 'http://localhost:3000'
 const fase = process.argv[2] ?? 'sem-fase'
 const saida = path.join('docs', 'capturas', fase)
-const LARGURAS = [1440, 375] as const
+const LARGURAS = (process.env.CAPTURAS_LARGURAS ?? '375,390,1440').split(',').map(Number)
+const TEMA = process.env.CAPTURAS_TEMA === 'dark' ? 'dark' : 'light'
+const SO = process.env.CAPTURAS_TELAS ? new Set(process.env.CAPTURAS_TELAS.split(',')) : null
 
 if (!/localhost|127\.0\.0\.1/.test(process.env.DATABASE_URL ?? '')) {
   console.error('DATABASE_URL não é local: este script é só para desenvolvimento.')
@@ -49,8 +53,15 @@ async function ids() {
 async function salvar(page: Page, nome: string, largura: number) {
   await page.waitForLoadState('networkidle').catch(() => {})
   await page.waitForTimeout(800)
+  // Viewport do tamanho da página: barras fixas (navegação inferior, salvar)
+  // aparecem no fim, como depois de rolar, e não no meio da captura
+  const viewport = page.viewportSize()!
+  const altura = await page.evaluate(() => document.documentElement.scrollHeight)
+  await page.setViewportSize({ width: viewport.width, height: Math.max(viewport.height, Math.min(altura, 12000)) })
+  await page.waitForTimeout(300)
   const bruto = await page.screenshot({ fullPage: true })
-  const arquivo = path.join(saida, `${nome}-${largura}.png`)
+  await page.setViewportSize(viewport)
+  const arquivo = path.join(saida, `${nome}-${largura}${TEMA === 'dark' ? '-escuro' : ''}.png`)
   // PNG com paleta: ~5x menor, suficiente para conferência
   await sharp(bruto).png({ palette: true, quality: 80, compressionLevel: 9 }).toFile(arquivo)
   console.log('  ', arquivo)
@@ -65,6 +76,7 @@ async function sessao(browser: Browser, largura: number, usuario?: string, senha
       return chave.startsWith('seen_') ? 'true' : original.call(this, chave)
     }
   })
+  await ctx.addCookies([{ name: 'axis_tema', value: TEMA, url: BASE }])
   const page = await ctx.newPage()
   if (usuario && senha) {
     await page.goto(`${BASE}/login`)
@@ -93,6 +105,7 @@ async function main() {
         ['frequencia', `/dashboard/frequencia?turma=${i.turma}`],
         ['boletim', `/dashboard/estudantes/${i.matricula}/boletim`],
         ['conselho', `/dashboard/conselho-classe/${i.turma}`],
+        ['resultados', '/dashboard/resultados'],
         ['configuracoes', '/dashboard/configuracoes'],
       ],
     },
@@ -103,15 +116,17 @@ async function main() {
         ['chamada', '/dashboard/chamada'],
         ['chamada-fazer', `/dashboard/chamada/fazer?turma=${i.turma}&disciplina=${i.disciplina}&data=${i.dataAula}`],
         ['diario', `/dashboard/chamada/diario?turma=${i.turma}&disciplina=${i.disciplina}`],
+        ['notas-professor', `/dashboard/notas/lancar/${i.turma}?disciplina=${i.disciplina}`],
       ],
     },
-    { usuario: '1TIM1-001', senha: '1TIM1-001', telas: [['portal', '/portal']] },
+    { usuario: '1TIM1-001', senha: '1TIM1-001', telas: [['portal', '/portal'], ['portal-boletim', '/portal?aba=boletim'], ['portal-frequencia', '/portal?aba=frequencia'], ['portal-horario', '/portal?aba=horario']] },
   ]
 
   for (const largura of LARGURAS) {
     for (const etapa of roteiro) {
+      if (SO && !etapa.telas.some(([n]) => SO.has(n))) continue
       const page = await sessao(browser, largura, etapa.usuario, etapa.senha)
-      for (const [nome, url] of etapa.telas) {
+      for (const [nome, url] of etapa.telas.filter(([n]) => !SO || SO.has(n))) {
         try {
           await page.goto(`${BASE}${url}`, { timeout: 120_000 })
           await salvar(page, nome, largura)

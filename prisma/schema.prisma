@@ -115,6 +115,7 @@ model User {
   disciplinasPermitidas Disciplina[]            @relation("DisciplinaUsuarios")
   turmasPermitidas      Turma[]                 @relation("TurmaUsuarios")
   aulasRegistradas      Aula[]                  @relation("AulaProfessor")
+  observacoesChamada    ObservacaoChamada[]     @relation("ObservacaoChamadaAutor")
   justificativas        Justificativa[]         @relation("JustificativaAutor")
   avaliacoesCriadas     AvaliacaoDisciplina[]   @relation("AvaliacaoCriador")
 
@@ -363,27 +364,28 @@ model Curso {
 }
 
 model Estudante {
-  id              String                @id @default(cuid())
-  matricula       String
-  nome            String
-  turmaId         String                @map("turma_id")
-  escolaId        String                @map("escola_id")
-  status          String?               @default("ATIVO")
-  turmaAnteriorId String?               @map("turma_anterior_id")
-  createdAt       DateTime              @default(now()) @map("created_at")
-  updatedAt       DateTime              @updatedAt @map("updated_at")
-  dataNascimento  DateTime?             @map("data_nascimento")
-  sexo            String?               @map("sexo")
-  aeeProfile      AEEProfile?           @relation("EstudanteAEE")
-  escola          Escola                @relation(fields: [escolaId], references: [id])
-  turma           Turma                 @relation(fields: [turmaId], references: [id], onDelete: Cascade)
-  turmaAnterior   Turma?                @relation("TurmaAnteriorEstudante", fields: [turmaAnteriorId], references: [id])
-  notas           NotaFinal[]
-  notasSimulado   NotaSimulado[]
-  portalAccess    User[]                @relation("UserEstudante")
-  ocorrencias     OcorrenciaEstudante[]
-  faltas          Falta[]
-  justificativas  Justificativa[]
+  id                 String                @id @default(cuid())
+  matricula          String
+  nome               String
+  turmaId            String                @map("turma_id")
+  escolaId           String                @map("escola_id")
+  status             String?               @default("ATIVO")
+  turmaAnteriorId    String?               @map("turma_anterior_id")
+  createdAt          DateTime              @default(now()) @map("created_at")
+  updatedAt          DateTime              @updatedAt @map("updated_at")
+  dataNascimento     DateTime?             @map("data_nascimento")
+  sexo               String?               @map("sexo")
+  aeeProfile         AEEProfile?           @relation("EstudanteAEE")
+  escola             Escola                @relation(fields: [escolaId], references: [id])
+  turma              Turma                 @relation(fields: [turmaId], references: [id], onDelete: Cascade)
+  turmaAnterior      Turma?                @relation("TurmaAnteriorEstudante", fields: [turmaAnteriorId], references: [id])
+  notas              NotaFinal[]
+  notasSimulado      NotaSimulado[]
+  portalAccess       User[]                @relation("UserEstudante")
+  ocorrencias        OcorrenciaEstudante[]
+  faltas             Falta[]
+  justificativas     Justificativa[]
+  observacoesChamada ObservacaoChamada[]
 
   @@unique([escolaId, matricula])
   @@index([nome])
@@ -942,27 +944,28 @@ enum SituacaoAula {
 // POR_AULA: uma linha por (turma, disciplina, dia), com `quantidade` = nº de
 // tempos da disciplina naquele dia. POR_DIA: disciplinaId null, quantidade 1.
 model Aula {
-  id           String       @id @default(cuid())
-  escolaId     String       @map("escola_id")
-  escola       Escola       @relation(fields: [escolaId], references: [id])
-  turmaId      String       @map("turma_id")
-  turma        Turma        @relation(fields: [turmaId], references: [id], onDelete: Cascade)
-  disciplinaId String?      @map("disciplina_id")
-  disciplina   Disciplina?  @relation(fields: [disciplinaId], references: [id], onDelete: Cascade)
-  professorId  String?      @map("professor_id")
-  professor    User?        @relation("AulaProfessor", fields: [professorId], references: [id], onDelete: SetNull)
-  data         DateTime     @db.Date
+  id           String              @id @default(cuid())
+  escolaId     String              @map("escola_id")
+  escola       Escola              @relation(fields: [escolaId], references: [id])
+  turmaId      String              @map("turma_id")
+  turma        Turma               @relation(fields: [turmaId], references: [id], onDelete: Cascade)
+  disciplinaId String?             @map("disciplina_id")
+  disciplina   Disciplina?         @relation(fields: [disciplinaId], references: [id], onDelete: Cascade)
+  professorId  String?             @map("professor_id")
+  professor    User?               @relation("AulaProfessor", fields: [professorId], references: [id], onDelete: SetNull)
+  data         DateTime            @db.Date
   // Tempos do horário cobertos (HorarioAula.horario); vazio na chamada diária
   tempos       Int[]
-  quantidade   Int          @default(1)
+  quantidade   Int                 @default(1)
   conteudo     String? // conteúdo ministrado
-  situacao     SituacaoAula @default(PREVISTA)
+  situacao     SituacaoAula        @default(PREVISTA)
   // turmaId|data|disciplinaId (ou DIA): garante uma aula por disciplina/dia
   // mesmo com disciplinaId nulo (unique composto não trata null como igual)
-  chave        String       @unique
-  createdAt    DateTime     @default(now()) @map("created_at")
-  updatedAt    DateTime     @updatedAt @map("updated_at")
+  chave        String              @unique
+  createdAt    DateTime            @default(now()) @map("created_at")
+  updatedAt    DateTime            @updatedAt @map("updated_at")
   faltas       Falta[]
+  observacoes  ObservacaoChamada[]
 
   @@index([escolaId])
   @@index([turmaId, data])
@@ -977,12 +980,36 @@ model Falta {
   aula        Aula      @relation(fields: [aulaId], references: [id], onDelete: Cascade)
   estudanteId String    @map("estudante_id")
   estudante   Estudante @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
-  // nº de tempos perdidos (1..aula.quantidade)
+  // nº de tempos perdidos (1..aula.quantidade) - é o que o motor de
+  // frequência usa; sempre igual a tempos.length quando a aula tem tempos
   quantidade  Int       @default(1)
+  // Quais tempos da aula o aluno perdeu (subconjunto de aula.tempos); vazio
+  // na chamada diária (aula sem tempos)
+  tempos      Int[]     @default([])
 
   @@unique([aulaId, estudanteId])
   @@index([estudanteId])
   @@map("faltas")
+}
+
+// Observação do professor sobre um aluno numa aula (presente ou faltoso).
+// Visível ao professor da disciplina e à gestão (chamada e diário); nunca
+// vai para o portal do aluno/responsável.
+model ObservacaoChamada {
+  id          String    @id @default(cuid())
+  aulaId      String    @map("aula_id")
+  aula        Aula      @relation(fields: [aulaId], references: [id], onDelete: Cascade)
+  estudanteId String    @map("estudante_id")
+  estudante   Estudante @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  texto       String
+  autorId     String?   @map("autor_id")
+  autor       User?     @relation("ObservacaoChamadaAutor", fields: [autorId], references: [id], onDelete: SetNull)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@unique([aulaId, estudanteId])
+  @@index([estudanteId])
+  @@map("observacoes_chamada")
 }
 
 enum TipoJustificativa {

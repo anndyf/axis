@@ -9,7 +9,8 @@ import { carregarCalendario } from "@/lib/services/frequencia-leitura"
 import { aulasDoDia, diasComAulaAte, hojeNaEscola, dataValida } from "@/lib/services/chamada"
 import { chaveData } from "@/lib/services/calendario"
 import { ClipboardCheck, BookOpen, CalendarOff, ChevronRight } from "lucide-react"
-import { Alert, Badge, Card, CardHeader, EmptyState, PageHeader, buttonClasses } from "@/components/ui"
+import { Alert, Badge, Card, EmptyState, PageHeader, buttonClasses } from "@/components/ui"
+import { rotuloTempos } from "@/lib/services/inicio-professor"
 import SeletorData from "./SeletorData"
 
 export const metadata = { title: 'Áxis - Chamada' }
@@ -111,45 +112,49 @@ export default async function ChamadaPage({ searchParams }: { searchParams: Prom
         </Alert>
       )}
 
-      <Card>
-        <CardHeader title={`Aulas de ${dataBR}${diaSemana !== null ? ` (${DIAS[diaSemana]})` : ""}`} />
-        {calendario && !letivo && <EmptyState icon={CalendarOff} title="Dia não letivo" description="Fim de semana, feriado ou recesso. Escolha outra data acima." className="py-8" />}
-        {letivo && doDia.length === 0 && <EmptyState icon={ClipboardCheck} title="Nenhuma aula sua neste dia" description="Só aparecem as disciplinas que estão no horário da turma neste dia da semana." className="py-8" />}
+      <section className="space-y-3">
+        <h2 className="text-base font-semibold text-fg">Aulas de {dataBR}{diaSemana !== null ? ` (${DIAS[diaSemana]})` : ""}</h2>
+        {calendario && !letivo && <Card><EmptyState icon={CalendarOff} title="Dia não letivo" description="Fim de semana, feriado ou recesso. Escolha outra data acima." className="py-8" /></Card>}
+        {letivo && doDia.length === 0 && <Card><EmptyState icon={ClipboardCheck} title="Nenhuma aula sua neste dia" description="Só aparecem as disciplinas que estão no horário da turma neste dia da semana." className="py-8" /></Card>}
         {doDia.length > 0 && (
-          <ul className="divide-y divide-line-subtle">
+          <ul className="grid gap-3 grid-cols-[repeat(auto-fill,minmax(min(100%,18rem),1fr))]">
             {doDia.map((i) => (
-              <li key={`${i.turmaId}-${i.disciplinaId}`} className="flex flex-wrap items-center gap-3 px-4 py-2.5 sm:px-5">
-                <span className="w-16 shrink-0 text-xs tabular-nums text-fg-subtle">{i.tempos.length ? i.tempos.map((t) => `${t}º`).join(", ") : "Dia"}</span>
-                <div className="min-w-[10rem] flex-1">
-                  <p className="text-13 font-medium text-fg">{i.nome}</p>
-                  <p className="text-xs text-fg-subtle">{i.turmaNome}</p>
+              <li key={`${i.turmaId}-${i.disciplinaId}`} className="flex flex-col gap-3 rounded-2xl border border-line bg-surface p-4 shadow-card">
+                <div className="flex items-start gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="break-words text-base font-semibold leading-snug text-fg">{i.nome}</p>
+                    <p className="text-13 text-fg-subtle"><span className="font-mono">{i.turmaNome}</span> · {rotuloTempos(i.tempos)}</p>
+                  </div>
+                  <Situacao situacao={i.situacao} />
                 </div>
-                <Situacao situacao={i.situacao} />
-                <Link href={link(i)} className={buttonClasses({ size: "sm", variant: i.situacao === "REALIZADA" ? "secondary" : "primary" })}>
+                <Link href={link(i)} className={buttonClasses({ variant: i.situacao === "REALIZADA" ? "secondary" : "primary", className: "min-h-11 w-full" })}>
                   {i.situacao === "REALIZADA" ? "Editar chamada" : "Fazer chamada"}
                 </Link>
               </li>
             ))}
           </ul>
         )}
-      </Card>
+      </section>
 
       {itens.length > 0 && (
-        <Card>
-          <CardHeader title="Diários" description="Aulas dadas, conteúdo ministrado e dias com aula sem chamada." />
-          <ul className="divide-y divide-line-subtle">
+        <section className="space-y-3">
+          <div>
+            <h2 className="text-base font-semibold text-fg">Diários</h2>
+            <p className="text-13 text-fg-subtle">Aulas dadas, conteúdo ministrado e dias com aula sem chamada.</p>
+          </div>
+          <ul className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
             {[...doDia, ...outros].map((i) => (
-              <li key={`d-${i.turmaId}-${i.disciplinaId}`}>
-                <Link href={linkDiario(i)} className="flex flex-wrap items-center gap-3 px-4 py-2.5 transition-colors duration-150 hover:bg-subtle/60 sm:px-5">
-                  <BookOpen size={16} strokeWidth={1.75} className="shrink-0 text-fg-subtle" aria-hidden />
-                  <p className="min-w-0 flex-1 truncate text-13 text-fg">{i.nome} <span className="text-fg-subtle">· {i.turmaNome}</span></p>
+              <li key={`d-${i.turmaId}-${i.disciplinaId}`} className="border-b border-line-subtle last:border-0">
+                <Link href={linkDiario(i)} className="flex min-h-14 items-center gap-3 px-4 py-3 transition-colors duration-150 hover:bg-subtle/60 sm:px-5">
+                  <BookOpen size={18} strokeWidth={1.75} className="shrink-0 text-fg-subtle" aria-hidden />
+                  <p className="min-w-0 flex-1 break-words text-sm text-fg">{i.nome} <span className="text-fg-subtle">· {i.turmaNome}</span></p>
                   {i.pendentes > 0 && <Badge tone="warning">{i.pendentes} {i.pendentes === 1 ? "pendente" : "pendentes"}</Badge>}
-                  <ChevronRight size={14} strokeWidth={1.75} className="text-fg-disabled" aria-hidden />
+                  <ChevronRight size={16} strokeWidth={1.75} className="shrink-0 text-fg-disabled" aria-hidden />
                 </Link>
               </li>
             ))}
           </ul>
-        </Card>
+        </section>
       )}
     </div>
   )

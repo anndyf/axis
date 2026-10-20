@@ -215,11 +215,11 @@ export default function TurmasListClient({
         </div>
 
         {/* Dropdowns & Reset */}
-        <div className="flex flex-wrap items-center gap-2 px-2 pb-2 md:pb-0">
+        <div className="flex w-full flex-wrap items-center gap-2 px-2 pb-2 md:w-auto md:pb-0">
           <select 
             value={selectedTurno || ""}
             onChange={(e) => setSelectedTurno(e.target.value || null)}
-            className="px-3 py-2 bg-canvas border-none rounded-xl text-xs font-semibold text-fg-muted focus:ring-2 focus:ring-ring outline-none cursor-pointer hover:bg-subtle transition-colors"
+            className="min-h-11 flex-1 px-3 py-2 bg-subtle border-none rounded-xl text-sm font-semibold text-fg-muted focus:ring-2 focus:ring-ring outline-none cursor-pointer hover:bg-subtle-hover transition-colors md:min-h-0 md:flex-none md:bg-canvas md:text-xs"
           >
             <option value="">Turnos</option>
             {turnosOptions.map(t => <option key={t} value={t}>{t}</option>)}
@@ -228,7 +228,7 @@ export default function TurmasListClient({
           <select 
             value={selectedSerie || ""}
             onChange={(e) => setSelectedSerie(e.target.value || null)}
-            className="px-3 py-2 bg-canvas border-none rounded-xl text-xs font-semibold text-fg-muted focus:ring-2 focus:ring-ring outline-none cursor-pointer hover:bg-subtle transition-colors"
+            className="min-h-11 flex-1 px-3 py-2 bg-subtle border-none rounded-xl text-sm font-semibold text-fg-muted focus:ring-2 focus:ring-ring outline-none cursor-pointer hover:bg-subtle-hover transition-colors md:min-h-0 md:flex-none md:bg-canvas md:text-xs"
           >
             <option value="">Séries</option>
             {seriesOptions.map(s => <option key={s} value={s}>{s}ª Série</option>)}
@@ -298,7 +298,7 @@ export default function TurmasListClient({
                               href={`/dashboard/turmas/${turma.id}/relatorio`}
                               title="Relatório Geral"
                               aria-label="Relatório Geral"
-                              className="p-1.5 text-fg-subtle hover:bg-subtle hover:text-fg rounded-md transition-colors duration-150"
+                              className="flex size-11 items-center justify-center text-fg-subtle hover:bg-subtle hover:text-fg rounded-md transition-colors duration-150 md:size-auto md:p-1.5"
                            >
                              <FileText className="w-3.5 h-3.5" />
                            </Link>
@@ -307,7 +307,7 @@ export default function TurmasListClient({
                                 href={`/dashboard/turmas/${turma.id}/horario`}
                                 title="Horário de Aulas"
                                 aria-label="Horário de Aulas"
-                                className="p-1.5 text-fg-subtle hover:bg-subtle hover:text-fg rounded-md transition-colors duration-150"
+                                className="flex size-11 items-center justify-center text-fg-subtle hover:bg-subtle hover:text-fg rounded-md transition-colors duration-150 md:size-auto md:p-1.5"
                              >
                                <Calendar className="w-3.5 h-3.5" />
                              </Link>
@@ -320,7 +320,7 @@ export default function TurmasListClient({
                                   disabled={!!promotingId || !!cloningId}
                                   title="Promover para Próxima Etapa (Move Alunos)"
                                   aria-label="Promover para Próxima Etapa (Move Alunos)"
-                                  className="p-1.5 text-fg-subtle hover:bg-subtle hover:text-fg rounded-md transition-colors duration-150 disabled:opacity-30"
+                                  className="flex size-11 items-center justify-center text-fg-subtle hover:bg-subtle hover:text-fg rounded-md transition-colors duration-150 md:size-auto md:p-1.5 disabled:opacity-30"
                                 >
                                   {promotingId === turma.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ArrowUpCircle className="w-3.5 h-3.5" />}
                                 </button>
@@ -329,7 +329,7 @@ export default function TurmasListClient({
                                   disabled={!!cloningId || !!promotingId}
                                   title="Clonar Estrutura (sem alunos)"
                                   aria-label="Clonar Estrutura (sem alunos)"
-                                  className="p-1.5 text-fg-subtle hover:bg-subtle hover:text-fg rounded-md transition-colors duration-150 disabled:opacity-30"
+                                  className="flex size-11 items-center justify-center text-fg-subtle hover:bg-subtle hover:text-fg rounded-md transition-colors duration-150 md:size-auto md:p-1.5 disabled:opacity-30"
                                 >
                                   {cloningId === turma.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Copy className="w-3.5 h-3.5" />}
                                 </button>
@@ -341,7 +341,7 @@ export default function TurmasListClient({
                                 href={`/dashboard/turmas/${turma.id}/editar`}
                                 title="Editar Turma"
                                 aria-label="Editar Turma"
-                                className="p-1.5 text-fg-subtle hover:bg-subtle hover:text-fg rounded-md transition-colors duration-150"
+                                className="flex size-11 items-center justify-center text-fg-subtle hover:bg-subtle hover:text-fg rounded-md transition-colors duration-150 md:size-auto md:p-1.5"
                              >
                                <Pencil className="w-3.5 h-3.5" />
                              </Link>

@@ -64,17 +64,35 @@ describe('planejarChamada', () => {
 
 describe('validarFaltas', () => {
   const turma = new Set(['a', 'b'])
-  it('aceita e descarta presença (0)', () => {
-    expect(validarFaltas([{ estudanteId: 'a', quantidade: 2 }, { estudanteId: 'b', quantidade: 0 }], turma, 2)).toEqual({ ok: true, faltas: [{ estudanteId: 'a', quantidade: 2 }] })
-    expect(validarFaltas([{ estudanteId: 'a' }], turma, 2)).toEqual({ ok: true, faltas: [{ estudanteId: 'a', quantidade: 1 }] })
+  const dupla = { tempos: [6, 1], quantidade: 2 }
+  const diaria = { tempos: [], quantidade: 1 }
+  it('aceita e descarta presença (0); sem tempos, entram os primeiros tempos da aula', () => {
+    expect(validarFaltas([{ estudanteId: 'a', quantidade: 2 }, { estudanteId: 'b', quantidade: 0 }], turma, dupla)).toEqual({ ok: true, faltas: [{ estudanteId: 'a', quantidade: 2, tempos: [1, 6] }] })
+    expect(validarFaltas([{ estudanteId: 'a' }], turma, dupla)).toEqual({ ok: true, faltas: [{ estudanteId: 'a', quantidade: 1, tempos: [1] }] })
   })
   it('recusa aluno de fora, repetido, quantidade fora do limite ou não inteira', () => {
-    expect(validarFaltas([{ estudanteId: 'z' }], turma, 2).ok).toBe(false)
-    expect(validarFaltas([{ estudanteId: 'a' }, { estudanteId: 'a' }], turma, 2).ok).toBe(false)
-    expect(validarFaltas([{ estudanteId: 'a', quantidade: 3 }], turma, 2).ok).toBe(false)
-    expect(validarFaltas([{ estudanteId: 'a', quantidade: 1.5 }], turma, 2).ok).toBe(false)
-    expect(validarFaltas([{ estudanteId: 'a', quantidade: -1 }], turma, 2).ok).toBe(false)
-    expect(validarFaltas('x', turma, 2).ok).toBe(false)
+    expect(validarFaltas([{ estudanteId: 'z' }], turma, dupla).ok).toBe(false)
+    expect(validarFaltas([{ estudanteId: 'a' }, { estudanteId: 'a' }], turma, dupla).ok).toBe(false)
+    expect(validarFaltas([{ estudanteId: 'a', quantidade: 3 }], turma, dupla).ok).toBe(false)
+    expect(validarFaltas([{ estudanteId: 'a', quantidade: 1.5 }], turma, dupla).ok).toBe(false)
+    expect(validarFaltas([{ estudanteId: 'a', quantidade: -1 }], turma, dupla).ok).toBe(false)
+    expect(validarFaltas('x', turma, dupla).ok).toBe(false)
+  })
+  it('falta por tempo: só tempos desta aula, sem repetir; quantidade = nº de tempos', () => {
+    expect(validarFaltas([{ estudanteId: 'a', tempos: [6] }], turma, dupla)).toEqual({ ok: true, faltas: [{ estudanteId: 'a', quantidade: 1, tempos: [6] }] })
+    // a quantidade do navegador não vale quando vêm os tempos
+    expect(validarFaltas([{ estudanteId: 'a', tempos: [6, 1], quantidade: 1 }], turma, dupla)).toEqual({ ok: true, faltas: [{ estudanteId: 'a', quantidade: 2, tempos: [1, 6] }] })
+    expect(validarFaltas([{ estudanteId: 'a', tempos: [] }], turma, dupla)).toEqual({ ok: true, faltas: [] })
+    expect(validarFaltas([{ estudanteId: 'a', tempos: [2] }], turma, dupla)).toEqual({ ok: false, erro: 'Tempo não pertence a esta aula.' })
+    expect(validarFaltas([{ estudanteId: 'a', tempos: [1, 1] }], turma, dupla).ok).toBe(false)
+    expect(validarFaltas([{ estudanteId: 'a', tempos: ['1'] }], turma, dupla).ok).toBe(false)
+    expect(validarFaltas([{ estudanteId: 'a', tempos: 1 }], turma, dupla).ok).toBe(false)
+  })
+  it('chamada diária: sem tempos, só quantidade', () => {
+    expect(validarFaltas([{ estudanteId: 'a' }], turma, diaria)).toEqual({ ok: true, faltas: [{ estudanteId: 'a', quantidade: 1, tempos: [] }] })
+    expect(validarFaltas([{ estudanteId: 'a', tempos: [] }], turma, diaria)).toEqual({ ok: true, faltas: [{ estudanteId: 'a', quantidade: 1, tempos: [] }] })
+    expect(validarFaltas([{ estudanteId: 'a', tempos: [1] }], turma, diaria).ok).toBe(false)
+    expect(validarFaltas([{ estudanteId: 'a', quantidade: 2 }], turma, diaria).ok).toBe(false)
   })
 })
 

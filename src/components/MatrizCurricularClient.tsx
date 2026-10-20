@@ -741,7 +741,7 @@ export default function MatrizCurricularClient({
 
       {/* Barra flutuante de ação em lote */}
       {selectedIds.size > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-slide-up">
+        <div className="fixed bottom-[calc(var(--barra-inferior)+1.5rem)] left-1/2 -translate-x-1/2 z-50 animate-slide-up">
           <div className="flex items-center gap-4 bg-elevated text-fg px-4 py-2.5 rounded-xl shadow-overlay border border-line">
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded-full bg-subtle text-fg flex items-center justify-center text-xs font-semibold tabular-nums">
@@ -774,7 +774,7 @@ export default function MatrizCurricularClient({
 
       {/* Toast de propagação para turmas */}
       {propagacaoMsg && (
-        <div className="fixed bottom-6 right-6 z-50 animate-slide-up">
+        <div className="fixed bottom-[calc(var(--barra-inferior)+1.5rem)] right-6 z-50 animate-slide-up">
           <div className="flex items-center gap-3 bg-elevated text-fg px-4 py-3 rounded-lg shadow-overlay border border-line max-w-sm" role="status">
             <div className="w-7 h-7 rounded-md bg-success-subtle text-success-fg flex items-center justify-center shrink-0">
               <BookOpen size={16} />

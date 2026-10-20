@@ -46,9 +46,9 @@ export function Indicador({ icone: Icone, tom, valor, rotulo, detalhe, href }: {
   )
 }
 
-export function Secao({ titulo, descricao, acao, children, id }: { titulo: string; descricao?: string; acao?: { rotulo: string; href: string }; children: ReactNode; id?: string }) {
+export function Secao({ titulo, descricao, acao, children, id, className }: { titulo: string; descricao?: string; acao?: { rotulo: string; href: string }; children: ReactNode; id?: string; className?: string }) {
   return (
-    <section id={id} className="min-w-0 scroll-mt-24 space-y-3">
+    <section id={id} className={cn("min-w-0 scroll-mt-24 space-y-3", className)}>
       <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
         <div className="min-w-0">
           <h2 className="text-lg font-semibold text-fg">{titulo}</h2>

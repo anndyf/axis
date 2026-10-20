@@ -62,7 +62,34 @@ export default async function FrequenciaPage({ searchParams }: { searchParams: P
           {!frequencia?.temChamada && <EmptyState icon={ClipboardCheck} title="Nenhuma chamada salva nesta turma ainda" description="A frequência aparece depois que os professores salvarem as primeiras chamadas." />}
           {frequencia?.temChamada && linhas.length === 0 && <EmptyState icon={CheckCircle2} title="Ninguém abaixo ou perto da frequência mínima" description="Use “Mostrar a turma toda” para ver todos os alunos." />}
           {linhas.length > 0 && (
-            <div className="overflow-x-auto">
+            <ul className="divide-y divide-line-subtle md:hidden">
+              {linhas.map((l) => {
+                const aluno = nomeAluno.get(l.estudanteId)
+                const abaixo = l.percentual !== null && !!frequencia && l.percentual < frequencia.regra.minimo
+                return (
+                  <li key={`m-${l.estudanteId}-${l.disciplinaId ?? ""}`}>
+                    <Link href={`/dashboard/estudantes/${aluno?.matricula}/boletim`} className="block px-4 py-3 transition-colors duration-150 hover:bg-subtle/60">
+                      <div className="flex items-start gap-3">
+                        <div className="min-w-0 flex-1">
+                          <p className="break-words text-sm font-medium text-fg">{aluno?.nome}</p>
+                          {l.disciplinaId && <p className="text-xs text-fg-subtle">{nomeDisc.get(l.disciplinaId)}</p>}
+                          <div className="mt-1"><Badge tone={TOM_RISCO[l.risco.level]} dot>{l.risco.message}</Badge></div>
+                        </div>
+                        <p className={`shrink-0 text-lg font-semibold tabular-nums ${abaixo ? "text-danger-fg" : "text-fg"}`}>{formatarFrequencia(l.percentual)}</p>
+                      </div>
+                      <dl className="mt-2 grid grid-cols-3 gap-2 text-center">
+                        <div className="rounded-xl bg-subtle px-2 py-1.5"><dt className="text-[11px] text-fg-subtle">Faltas</dt><dd className="text-13 font-medium tabular-nums text-fg">{l.faltas - l.faltasAbonadas} / {l.aulas}</dd></div>
+                        <div className="rounded-xl bg-subtle px-2 py-1.5"><dt className="text-[11px] text-fg-subtle">Sem justif.</dt><dd className="text-13 font-medium tabular-nums text-fg">{l.faltasSemJustificativa}</dd></div>
+                        <div className="rounded-xl bg-subtle px-2 py-1.5"><dt className="text-[11px] text-fg-subtle">Pode faltar</dt><dd className="text-13 font-medium tabular-nums text-fg">{l.faltasRestantesPermitidas === null ? "—" : Math.max(0, l.faltasRestantesPermitidas)}</dd></div>
+                      </dl>
+                    </Link>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+          {linhas.length > 0 && (
+            <div className="hidden overflow-x-auto md:block">
               <table className="w-full min-w-[40rem] text-13">
                 <thead>
                   <tr className="border-b border-line text-xs text-fg-subtle">
