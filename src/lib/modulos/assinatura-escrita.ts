@@ -72,48 +72,51 @@ export type MudancaAssinatura = {
 
 /** Altera a assinatura vigente (criando-a se faltar), registra o histórico e espelha no modelo antigo. */
 export async function alterarAssinatura(escolaId: string, mudanca: MudancaAssinatura, autorId: string) {
-  return prisma.$transaction(async (tx) => {
-    const atual = await vigenteOuCriada(tx, escolaId, autorId)
-    const data: Prisma.AssinaturaUncheckedUpdateInput = {}
-    const antes: Record<string, unknown> = {}
-    const depois: Record<string, unknown> = {}
-    if (mudanca.planoCodigo !== undefined && mudanca.planoCodigo !== atual.plano.codigo) {
-      const plano = await tx.plano.findUnique({ where: { codigo: mudanca.planoCodigo }, select: { id: true } })
-      if (!plano) throw new Error('PLANO_INVALIDO')
-      data.planoId = plano.id
-      antes.plano = atual.plano.codigo
-      depois.plano = mudanca.planoCodigo
+  return prisma.$transaction((tx) => alterarAssinaturaEm(tx, escolaId, mudanca, autorId))
+}
+
+/** Igual a alterarAssinatura, dentro de uma transação já aberta (para mudar escola e assinatura juntas). */
+export async function alterarAssinaturaEm(tx: Tx, escolaId: string, mudanca: MudancaAssinatura, autorId: string) {
+  const atual = await vigenteOuCriada(tx, escolaId, autorId)
+  const data: Prisma.AssinaturaUncheckedUpdateInput = {}
+  const antes: Record<string, unknown> = {}
+  const depois: Record<string, unknown> = {}
+  if (mudanca.planoCodigo !== undefined && mudanca.planoCodigo !== atual.plano.codigo) {
+    const plano = await tx.plano.findUnique({ where: { codigo: mudanca.planoCodigo }, select: { id: true } })
+    if (!plano) throw new Error('PLANO_INVALIDO')
+    data.planoId = plano.id
+    antes.plano = atual.plano.codigo
+    depois.plano = mudanca.planoCodigo
+  }
+  if (mudanca.situacao !== undefined && mudanca.situacao !== atual.situacao) {
+    data.situacao = mudanca.situacao
+    antes.situacao = atual.situacao
+    depois.situacao = mudanca.situacao
+  }
+  for (const campo of ['observacoes', 'limiteUsuarios', 'limiteEstudantes'] as const) {
+    if (mudanca[campo] !== undefined && mudanca[campo] !== atual[campo]) {
+      ;(data as Record<string, unknown>)[campo] = mudanca[campo]
+      antes[campo] = atual[campo]
+      depois[campo] = mudanca[campo]
     }
-    if (mudanca.situacao !== undefined && mudanca.situacao !== atual.situacao) {
-      data.situacao = mudanca.situacao
-      antes.situacao = atual.situacao
-      depois.situacao = mudanca.situacao
+  }
+  if (mudanca.fimTeste !== undefined) {
+    const atualTxt = atual.fimTeste ? atual.fimTeste.toISOString().slice(0, 10) : null
+    if (mudanca.fimTeste !== atualTxt) {
+      data.fimTeste = mudanca.fimTeste ? new Date(mudanca.fimTeste) : null
+      antes.fimTeste = atualTxt
+      depois.fimTeste = mudanca.fimTeste
     }
-    for (const campo of ['observacoes', 'limiteUsuarios', 'limiteEstudantes'] as const) {
-      if (mudanca[campo] !== undefined && mudanca[campo] !== atual[campo]) {
-        ;(data as Record<string, unknown>)[campo] = mudanca[campo]
-        antes[campo] = atual[campo]
-        depois[campo] = mudanca[campo]
-      }
-    }
-    if (mudanca.fimTeste !== undefined) {
-      const atualTxt = atual.fimTeste ? atual.fimTeste.toISOString().slice(0, 10) : null
-      if (mudanca.fimTeste !== atualTxt) {
-        data.fimTeste = mudanca.fimTeste ? new Date(mudanca.fimTeste) : null
-        antes.fimTeste = atualTxt
-        depois.fimTeste = mudanca.fimTeste
-      }
-    }
-    if (!Object.keys(depois).length) return atual.id
-    await tx.assinatura.update({ where: { id: atual.id }, data })
-    await tx.historicoAssinatura.create({ data: { assinaturaId: atual.id, autorId, descricao: 'Assinatura alterada', dados: { antes, depois } as Prisma.InputJsonValue } })
-    // Espelho no modelo antigo
-    const espelho: Prisma.EscolaUpdateInput = {}
-    if (typeof depois.plano === 'string' && ehPlanoLegado(depois.plano)) espelho.plano = depois.plano
-    if (depois.situacao) espelho.status = statusDaSituacao(depois.situacao as SituacaoAssinatura)
-    if (Object.keys(espelho).length) await tx.escola.update({ where: { id: escolaId }, data: espelho })
-    return atual.id
-  })
+  }
+  if (!Object.keys(depois).length) return atual.id
+  await tx.assinatura.update({ where: { id: atual.id }, data })
+  await tx.historicoAssinatura.create({ data: { assinaturaId: atual.id, autorId, descricao: 'Assinatura alterada', dados: { antes, depois } as Prisma.InputJsonValue } })
+  // Espelho no modelo antigo
+  const espelho: Prisma.EscolaUpdateInput = {}
+  if (typeof depois.plano === 'string' && ehPlanoLegado(depois.plano)) espelho.plano = depois.plano
+  if (depois.situacao) espelho.status = statusDaSituacao(depois.situacao as SituacaoAssinatura)
+  if (Object.keys(espelho).length) await tx.escola.update({ where: { id: escolaId }, data: espelho })
+  return atual.id
 }
 
 /**

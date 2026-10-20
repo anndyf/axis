@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { exigirAdminPlataforma, registrarAcaoPlataforma, SELECT_ESCOLA_PLATAFORMA } from '@/lib/plataforma'
-import { alterarAssinatura } from '@/lib/modulos/assinatura-escrita'
+import { alterarAssinaturaEm } from '@/lib/modulos/assinatura-escrita'
 import { situacaoDoStatus } from '@/lib/services/planos'
 
 export const runtime = 'nodejs'
@@ -42,20 +42,23 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ message: 'Escola não encontrada' }, { status: 404 })
     }
 
-    const escola = await prisma.escola.update({
-      where: { id },
-      data: {
-        ...(status !== undefined ? { status: status as Status } : {}),
-        ...(plano !== undefined ? { plano: plano as Plano } : {}),
-      },
-      select: SELECT_ESCOLA_PLATAFORMA,
+    // Escola e assinatura (de onde os módulos são lidos) mudam na mesma
+    // transação: se uma falhar, nenhuma muda e as duas não ficam divergentes.
+    const escola = await prisma.$transaction(async (tx) => {
+      const atualizada = await tx.escola.update({
+        where: { id },
+        data: {
+          ...(status !== undefined ? { status: status as Status } : {}),
+          ...(plano !== undefined ? { plano: plano as Plano } : {}),
+        },
+        select: SELECT_ESCOLA_PLATAFORMA,
+      })
+      await alterarAssinaturaEm(tx, id, {
+        ...(plano !== undefined ? { planoCodigo: plano } : {}),
+        ...(status !== undefined ? { situacao: situacaoDoStatus(status as Status) } : {}),
+      }, admin.id)
+      return atualizada
     })
-
-    // Mesma mudança na assinatura (fase 2), que é de onde os módulos são lidos
-    await alterarAssinatura(id, {
-      ...(plano !== undefined ? { planoCodigo: plano } : {}),
-      ...(status !== undefined ? { situacao: situacaoDoStatus(status as Status) } : {}),
-    }, admin.id)
 
     await registrarAcaoPlataforma(admin.id, 'ATUALIZAR_ESCOLA', id, {
       antes: { status: existente.status, plano: existente.plano },
