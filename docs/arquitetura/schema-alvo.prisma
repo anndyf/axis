@@ -822,3 +822,456 @@ model Reserva {
   @@unique([espacoId, data, turno, tempo])
   @@map("reservas")
 }
+
+// =============================================================================
+// 5. PESSOAS E CADASTROS  (dominio-alvo.md 2.2)
+// =============================================================================
+
+enum Sexo {
+  FEMININO
+  MASCULINO
+}
+
+/// Categorias do Censo Escolar.
+enum CorRaca {
+  NAO_DECLARADA
+  BRANCA
+  PRETA
+  PARDA
+  AMARELA
+  INDIGENA
+}
+
+enum Nacionalidade {
+  BRASILEIRA
+  BRASILEIRA_NASCIDA_NO_EXTERIOR_OU_NATURALIZADA
+  ESTRANGEIRA
+}
+
+enum ZonaResidencia {
+  URBANA
+  RURAL
+}
+
+enum LocalizacaoDiferenciada {
+  NAO_SE_APLICA
+  AREA_DE_ASSENTAMENTO
+  TERRA_INDIGENA
+  COMUNIDADE_QUILOMBOLA
+  COMUNIDADE_TRADICIONAL
+}
+
+/// [NOVO][FASE 5a] A pessoa, independente do papel (estudante, responsável,
+/// profissional). Uma por escola (decisão D-05); mantenedoraId fica para quando
+/// houver cadastro compartilhado em rede.
+model Pessoa {
+  id                      String                   @id @default(cuid())
+  escolaId                String                   @map("escola_id")
+  escola                  Escola                   @relation(fields: [escolaId], references: [id])
+  nomeCivil               String                   @map("nome_civil")
+  nomeSocial              String?                  @map("nome_social") // exibido nas telas quando preenchido
+  dataNascimento          DateTime?                @map("data_nascimento") @db.Date
+  sexo                    Sexo?
+  corRaca                 CorRaca?                 @map("cor_raca")
+  corRacaDeclaradaPor     String?                  @map("cor_raca_declarada_por") // "PROPRIO" (16+) | "RESPONSAVEL"
+  nacionalidade           Nacionalidade?
+  paisNascimento          String?                  @map("pais_nascimento") // código ISO/Censo
+  municipioNascimentoIbge String?                  @map("municipio_nascimento_ibge")
+  ufNascimento            String?                  @map("uf_nascimento")
+  cpf                     String?                  // validado; único por escola quando preenchido
+  profissao               String?
+  escolaridade            String?
+  fotoUrl                 String?                  @map("foto_url") // uso condicionado a Autorizacao USO_IMAGEM
+  // Endereço principal (Censo pede zona e localização diferenciada)
+  cep                     String?
+  logradouro              String?
+  numero                  String?
+  complemento             String?
+  bairro                  String?
+  municipioIbge           String?                  @map("municipio_ibge")
+  uf                      String?
+  zona                    ZonaResidencia?
+  localizacaoDiferenciada LocalizacaoDiferenciada? @map("localizacao_diferenciada")
+  camposExtras            Json                     @default("{}") @map("campos_extras") // campos personalizados NÃO sensíveis (personalizacao.md 3.2)
+  createdAt               DateTime                 @default(now()) @map("created_at")
+  updatedAt               DateTime                 @updatedAt @map("updated_at")
+  anonimizadaEm           DateTime?                @map("anonimizada_em") // LGPD [FASE 10]
+
+  documentos              DocumentoPessoa[]
+  contatos                ContatoPessoa[]
+  usuario                 Usuario?
+  estudante               Estudante?
+  profissional            Profissional?
+  responsavelDe           VinculoResponsavel[]
+  autorizacoesAssinadas   Autorizacao[]
+
+  @@unique([escolaId, cpf])
+  @@index([escolaId, nomeCivil])
+  @@map("pessoas")
+}
+
+enum TipoDocumento {
+  RG
+  CERTIDAO_NASCIMENTO_NOVA // matrícula de 32 dígitos
+  CERTIDAO_NASCIMENTO_ANTIGA // livro/folha/termo/cartório
+  CERTIDAO_CASAMENTO
+  NIS
+  CARTAO_SUS
+  PASSAPORTE
+  RNM // Registro Nacional Migratório
+  TITULO_ELEITOR
+  OUTRO
+}
+
+/// [NOVO][FASE 5a] Documentos sem 20 colunas vazias em Pessoa.
+model DocumentoPessoa {
+  id          String        @id @default(cuid())
+  pessoaId    String        @map("pessoa_id")
+  pessoa      Pessoa        @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
+  tipo        TipoDocumento
+  numero      String
+  orgaoEmissor String?      @map("orgao_emissor")
+  uf          String?
+  dataEmissao DateTime?     @map("data_emissao") @db.Date
+  extras      Json?         // certidão antiga: { livro, folha, termo, cartorio, municipio }
+  arquivoUrl  String?       @map("arquivo_url") // cópia digitalizada (opcional)
+
+  @@unique([pessoaId, tipo])
+  @@map("documentos_pessoa")
+}
+
+enum TipoContato {
+  CELULAR
+  RESIDENCIAL
+  TRABALHO
+  RECADO
+  EMAIL
+}
+
+/// [NOVO][FASE 5a]
+model ContatoPessoa {
+  id        String      @id @default(cuid())
+  pessoaId  String      @map("pessoa_id")
+  pessoa    Pessoa      @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
+  tipo      TipoContato
+  valor     String
+  whatsapp  Boolean     @default(false)
+  principal Boolean     @default(false)
+  observacao String?
+
+  @@index([pessoaId])
+  @@map("contatos_pessoa")
+}
+
+enum PoderPublicoTransporte {
+  MUNICIPAL
+  ESTADUAL
+}
+
+/// [MUDA][FASE 5a] Estudante = Pessoa no papel de aluno. Perde nome/data/sexo
+/// (vão para Pessoa) e turmaId/turmaAnteriorId/status (vão para Matricula/Enturmacao
+/// na fase 6). "matricula" de hoje vira "codigo" (o número que a escola usa).
+model Estudante {
+  id                   String                 @id @default(cuid())
+  escolaId             String                 @map("escola_id")
+  escola               Escola                 @relation(fields: [escolaId], references: [id])
+  pessoaId             String                 @unique @map("pessoa_id")
+  pessoa               Pessoa                 @relation(fields: [pessoaId], references: [id])
+  codigo               String                 // era Estudante.matricula
+  codigoInep           String?                @map("codigo_inep") // ID do aluno no Educacenso
+  codigoRede           String?                @map("codigo_rede") // RA / código da rede estadual/municipal
+  // Transporte escolar público (Censo)
+  usaTransportePublico Boolean?               @map("usa_transporte_publico")
+  poderPublicoTransporte PoderPublicoTransporte? @map("poder_publico_transporte")
+  veiculosTransporte   String[]               @map("veiculos_transporte") // lista do Censo: VAN, MICRO_ONIBUS, ONIBUS, BICICLETA, TRACAO_ANIMAL, EMBARCACAO_ATE_5...
+  observacoes          String?
+  camposExtras         Json                   @default("{}") @map("campos_extras")
+  createdAt            DateTime               @default(now()) @map("created_at")
+  updatedAt            DateTime               @updatedAt @map("updated_at")
+
+  responsaveis         VinculoResponsavel[]
+  saude                SaudeEstudante?
+  deficiencias         DeficienciaEstudante[]
+  recursosAvaliacao    RecursoAvaliacao[]
+  fichaAEE             FichaAEE?
+  planosAEE            PlanoAEE[]
+  restricoes           RestricaoJudicial[]
+  autorizacoes         Autorizacao[]
+  matriculas           Matricula[]
+  estudosAnteriores    EstudoAnterior[]
+  faltas               Falta[]
+  justificativas       Justificativa[]
+  observacoesChamada   ObservacaoChamada[]
+  ocorrencias          OcorrenciaEstudante[]
+  documentosEmitidos   DocumentoEmitido[]
+  notasSimulado        NotaSimulado[]
+
+  @@unique([escolaId, codigo])
+  @@index([escolaId])
+  @@map("estudantes")
+}
+
+enum Parentesco {
+  MAE
+  PAI
+  AVO
+  TIO
+  IRMAO
+  PADRASTO_MADRASTA
+  TUTOR
+  GUARDIAO
+  OUTRO_PARENTE
+  NAO_PARENTE // motorista, vizinho autorizado
+}
+
+/// [NOVO][FASE 5b] Vínculo estudante x pessoa responsável, com papéis independentes.
+model VinculoResponsavel {
+  id                     String     @id @default(cuid())
+  escolaId               String     @map("escola_id")
+  escola                 Escola     @relation(fields: [escolaId], references: [id])
+  estudanteId            String     @map("estudante_id")
+  estudante              Estudante  @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  pessoaId               String     @map("pessoa_id")
+  pessoa                 Pessoa     @relation(fields: [pessoaId], references: [id])
+  parentesco             Parentesco
+  filiacao               Int?       // 1 ou 2 ("filiação 1/2" do Censo e dos documentos)
+  responsavelLegal       Boolean    @default(false) @map("responsavel_legal")
+  responsavelFinanceiro  Boolean    @default(false) @map("responsavel_financeiro")
+  autorizadoBuscar       Boolean    @default(false) @map("autorizado_buscar")
+  moraCom                Boolean    @default(false) @map("mora_com")
+  contatoEmergencia      Boolean    @default(false) @map("contato_emergencia")
+  ordemEmergencia        Int?       @map("ordem_emergencia")
+  recebeComunicados      Boolean    @default(true) @map("recebe_comunicados")
+  acessoPortal           Boolean    @default(false) @map("acesso_portal")
+  inicio                 DateTime   @default(now())
+  fim                    DateTime?
+  camposExtras           Json       @default("{}") @map("campos_extras")
+
+  @@unique([estudanteId, pessoaId])
+  @@index([pessoaId])
+  @@map("vinculos_responsavel")
+}
+
+/// [NOVO][FASE 5b] SENSÍVEL: quem NÃO pode buscar / receber informações (ordem
+/// judicial ou pedido do responsável legal com documento). Só secretaria e direção.
+model RestricaoJudicial {
+  id           String    @id @default(cuid())
+  estudanteId  String    @map("estudante_id")
+  estudante    Estudante @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  pessoaNome   String    @map("pessoa_nome") // a pessoa restrita pode não estar cadastrada
+  pessoaId     String?   @map("pessoa_id")
+  descricao    String
+  documentoUrl String?   @map("documento_url")
+  inicio       DateTime  @db.Date
+  fim          DateTime? @db.Date
+
+  @@map("restricoes_judiciais")
+}
+
+/// [NOVO][FASE 5a] SENSÍVEL (LGPD art. 11). Professor vê só o "alerta" (alertaResumo).
+model SaudeEstudante {
+  id                    String    @id @default(cuid())
+  estudanteId           String    @unique @map("estudante_id")
+  estudante             Estudante @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  tipoSanguineo         String?   @map("tipo_sanguineo")
+  alergias              Json      @default("[]") // [{ tipo: "ALIMENTAR"|"MEDICAMENTOSA"|"OUTRA", descricao, gravidade }]
+  medicacoes            Json      @default("[]") // [{ nome, dose, horario, escolaAdministra, autorizacaoId }]
+  restricoesAlimentares String?   @map("restricoes_alimentares")
+  condicoesCronicas     String?   @map("condicoes_cronicas")
+  planoSaude            String?   @map("plano_saude")
+  orientacoesEmergencia String?   @map("orientacoes_emergencia")
+  alertaResumo          String?   @map("alerta_resumo") // ex.: "Alergia grave a amendoim" — o que o professor vê
+  camposSensiveis       Json      @default("{}") @map("campos_sensiveis") // campos personalizados sensíveis
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  @@map("saude_estudantes")
+}
+
+/// Tipos do Censo Escolar (Glossário da Educação Especial).
+enum TipoDeficiencia {
+  CEGUEIRA
+  BAIXA_VISAO
+  VISAO_MONOCULAR
+  SURDEZ
+  DEFICIENCIA_AUDITIVA
+  SURDOCEGUEIRA
+  DEFICIENCIA_FISICA
+  DEFICIENCIA_INTELECTUAL
+  DEFICIENCIA_MULTIPLA
+  TRANSTORNO_ESPECTRO_AUTISTA
+  ALTAS_HABILIDADES_SUPERDOTACAO
+}
+
+/// [NOVO][FASE 5a] SENSÍVEL. Registro para o Censo e para o AEE; CID é opcional
+/// e fica na FichaAEE (mais restrita).
+model DeficienciaEstudante {
+  id            String          @id @default(cuid())
+  estudanteId   String          @map("estudante_id")
+  estudante     Estudante       @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  tipo          TipoDeficiencia
+  comprovacao   String?         // "LAUDO", "PLANO_AEE", "OUTRO" (o Censo aceita outros documentos)
+  observacao    String?
+  registradoEm  DateTime        @default(now()) @map("registrado_em")
+
+  @@unique([estudanteId, tipo])
+  @@map("deficiencias_estudante")
+}
+
+enum TipoRecursoAvaliacao {
+  PROVA_AMPLIADA
+  PROVA_SUPERAMPLIADA
+  PROVA_BRAILE
+  LEDOR
+  TRANSCRITOR
+  INTERPRETE_LIBRAS
+  LEITURA_LABIAL
+  TEMPO_ADICIONAL
+  SALA_ESPECIAL
+  OUTRO
+}
+
+/// [NOVO][FASE 5a] Recursos para provas. Substitui AEEProfile.precisaProvaAdaptada/SalaEspecial.
+/// Visível ao professor da turma (ele monta a prova).
+model RecursoAvaliacao {
+  id          String               @id @default(cuid())
+  estudanteId String               @map("estudante_id")
+  estudante   Estudante            @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  tipo        TipoRecursoAvaliacao
+  observacao  String?
+
+  @@unique([estudanteId, tipo])
+  @@map("recursos_avaliacao")
+}
+
+/// [MUDA][FASE 5a] Era AEEProfile. Contato de emergência sai daqui (vai para
+/// VinculoResponsavel); recursos de prova saem (RecursoAvaliacao).
+model FichaAEE {
+  id               String          @id @default(cuid())
+  estudanteId      String          @unique @map("estudante_id")
+  estudante        Estudante       @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  cids             String[]        // OPCIONAL e mais restrito
+  condicao         String
+  recomendacoes    String          // o que o professor lê e confirma ciência
+  notasDirecao     String?         @map("notas_direcao")
+  fotoUrl          String?         @map("foto_url")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+  ciencias         CienciaAEE[]
+
+  @@map("fichas_aee")
+}
+
+/// [ATUAL] Era AEEAcknowledgement: professor confirmou leitura das recomendações.
+model CienciaAEE {
+  id             String       @id @default(cuid())
+  fichaId        String       @map("ficha_id")
+  ficha          FichaAEE     @relation(fields: [fichaId], references: [id], onDelete: Cascade)
+  profissionalId String       @map("profissional_id")
+  profissional   Profissional @relation(fields: [profissionalId], references: [id], onDelete: Cascade)
+  lidoEm         DateTime     @default(now()) @map("lido_em")
+
+  @@unique([fichaId, profissionalId])
+  @@map("ciencias_aee")
+}
+
+/// [NOVO][módulo AEE] PEI / Plano de AEE.
+model PlanoAEE {
+  id            String    @id @default(cuid())
+  estudanteId   String    @map("estudante_id")
+  estudante     Estudante @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  anoLetivoRotulo String  @map("ano_letivo_rotulo")
+  objetivos     String
+  estrategias   String
+  recursos      String?
+  avaliacao     String?   // acompanhamento periódico
+  autorId       String?   @map("autor_id") // Profissional
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@map("planos_aee")
+}
+
+enum TipoAutorizacao {
+  USO_IMAGEM_VOZ
+  SAIDA_DESACOMPANHADO
+  ATIVIDADE_EXTERNA // passeios, visitas
+  ADMINISTRAR_MEDICACAO
+  PARTICIPAR_PESQUISA
+  CIENCIA_LGPD
+  OUTRA
+}
+
+/// [NOVO][FASE 5b/10] Autorizações e termos, assinadas pelo responsável legal.
+model Autorizacao {
+  id             String          @id @default(cuid())
+  escolaId       String          @map("escola_id")
+  escola         Escola          @relation(fields: [escolaId], references: [id])
+  estudanteId    String          @map("estudante_id")
+  estudante      Estudante       @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  tipo           TipoAutorizacao
+  descricao      String?         // para ATIVIDADE_EXTERNA: qual passeio
+  autoriza       Boolean
+  assinadaPorId  String          @map("assinada_por_id")
+  assinadaPor    Pessoa          @relation(fields: [assinadaPorId], references: [id])
+  meio           String          // "PAPEL_DIGITALIZADO" | "PORTAL"
+  arquivoUrl     String?         @map("arquivo_url")
+  modeloVersao   String?         @map("modelo_versao") // texto do termo aceito
+  assinadaEm     DateTime        @default(now()) @map("assinada_em")
+  validaAte      DateTime?       @map("valida_ate") @db.Date
+  revogadaEm     DateTime?       @map("revogada_em")
+
+  @@index([escolaId, estudanteId])
+  @@map("autorizacoes")
+}
+
+enum VinculoFuncional {
+  EFETIVO
+  CONTRATO_TEMPORARIO
+  TERCEIRIZADO
+  CLT
+  OUTRO
+}
+
+/// [NOVO][FASE 3/4] Profissional = Pessoa no papel de funcionário. Professor
+/// aparece aqui; o que ele pode fazer vem do VinculoPapel da sua conta.
+model Profissional {
+  id                String           @id @default(cuid())
+  escolaId          String           @map("escola_id")
+  escola            Escola           @relation(fields: [escolaId], references: [id])
+  pessoaId          String           @unique @map("pessoa_id")
+  pessoa            Pessoa           @relation(fields: [pessoaId], references: [id])
+  funcoes           String[]         // lista do Censo: DOCENTE, AUXILIAR, PROFISSIONAL_APOIO, TRADUTOR_LIBRAS, GESTOR...
+  vinculo           VinculoFuncional?
+  matriculaFuncional String?         @map("matricula_funcional")
+  escolaridade      String?
+  formacao          Json?            // [{ curso, licenciatura, ano, instituicao }]
+  codigoInep        String?          @map("codigo_inep")
+  ativo             Boolean          @default(true)
+  docencias         Docencia[]
+  horarios          HorarioAula[]
+  reservas          Reserva[]
+  aulas             Aula[]
+  cienciasAEE       CienciaAEE[]
+  questoes          Questao[]
+  provas            Prova[]
+  planosEnsino      PlanoEnsino[]
+
+  @@map("profissionais")
+}
+
+/// [NOVO][FASE 4b] Quem dá aula de quê, em qual turma, de quando a quando.
+/// Substitui User.disciplinasPermitidas / turmasPermitidas; permite substituto.
+model Docencia {
+  id                String          @id @default(cuid())
+  profissionalId    String          @map("profissional_id")
+  profissional      Profissional    @relation(fields: [profissionalId], references: [id])
+  turmaComponenteId String          @map("turma_componente_id")
+  turmaComponente   TurmaComponente @relation(fields: [turmaComponenteId], references: [id], onDelete: Cascade)
+  funcao            String          @default("TITULAR") // TITULAR | AUXILIAR | SUBSTITUTO
+  inicio            DateTime        @db.Date
+  fim               DateTime?       @db.Date
+
+  @@index([profissionalId])
+  @@index([turmaComponenteId])
+  @@map("docencias")
+}
