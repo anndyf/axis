@@ -1,0 +1,289 @@
+// =============================================================================
+// SCHEMA-ALVO DE REFERÊNCIA — Áxis (revisão de arquitetura, out/2026)
+// =============================================================================
+//
+// ESTE ARQUIVO NÃO É USADO PELO APP E NÃO GERA MIGRATION.
+// É o desenho do modelo de dados para onde o roteiro (roteiro-de-migracao.md)
+// leva o sistema. Cada sessão de implementação copia para prisma/schema.prisma
+// só a parte da sua fase, com migrations aditivas e backfill.
+//
+// Convenções (as mesmas do schema atual):
+// - ids cuid, colunas em snake_case via @map, tabelas no plural via @@map;
+// - TODA tabela com dado de pessoa ou de vida escolar tem escolaId PRÓPRIO
+//   (isolamento direto, nunca "pelo caminho");
+// - nada da vida escolar é apagado: mudanças viram registros datados;
+// - dados sensíveis (saúde, deficiência, restrição judicial) em tabelas
+//   separadas, com permissão própria e registro de leitura (LeituraSensivel).
+//
+// Legenda nos comentários:
+//   [ATUAL]  já existe hoje e fica igual (ou quase)
+//   [MUDA]   existe hoje e muda (o comentário diz o quê)
+//   [NOVO]   não existe hoje
+//   [FASE n] fase do roteiro em que entra
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================================================
+// 1. PLATAFORMA, ASSINATURAS E MÓDULOS  (modulos-e-planos.md)
+// =============================================================================
+
+/// [NOVO][FASE 2] Catálogo comercial de planos (pacotes de módulos). Substitui o enum PlanoTipo.
+model Plano {
+  id               String         @id @default(cuid())
+  codigo           String         @unique // "ESSENCIAL", "PEDAGOGICO"...
+  nome             String
+  descricao        String?
+  ativoParaVenda   Boolean        @default(true) @map("ativo_para_venda")
+  ordem            Int            @default(0)
+  limiteEstudantes Int?           @map("limite_estudantes") // null = sem limite
+  limiteUsuarios   Int?           @map("limite_usuarios")
+  limiteArmazenamentoMb Int?      @map("limite_armazenamento_mb")
+  modulos          PlanoModulo[]
+  assinaturas      Assinatura[]
+
+  @@map("planos")
+}
+
+/// [NOVO][FASE 2] Módulos incluídos num plano.
+model PlanoModulo {
+  planoId  String   @map("plano_id")
+  plano    Plano    @relation(fields: [planoId], references: [id], onDelete: Cascade)
+  moduloId ModuloId @map("modulo_id")
+
+  @@id([planoId, moduloId])
+  @@map("planos_modulos")
+}
+
+/// Ids estáveis dos módulos (documento 4.2). O catálogo de MENU (ícone, rota)
+/// continua em src/lib/modules.ts e aponta para estes ids.
+enum ModuloId {
+  NUC // Núcleo (sempre ativo)
+  SEC // Secretaria Escolar
+  DIA // Diário de Classe e Frequência
+  NOT // Avaliação e Notas
+  RES // Conselho de Classe e Resultados
+  AEE // Inclusão e AEE
+  QST // Banco de Questões
+  PRV // Gerador de Provas e Simulados
+  PLA // Planejamento
+  COM // Comunicação e Portal da Família
+  REC // Recursos e Espaços
+  FIN // Financeiro Escolar
+  IND // Indicadores
+  DOC // Documentos Oficiais
+}
+
+enum EstadoModulo {
+  ATIVO
+  SOMENTE_LEITURA
+  INATIVO
+}
+
+enum SituacaoAssinatura {
+  TESTE
+  ATIVA
+  INADIMPLENTE
+  SUSPENSA
+  CANCELADA
+}
+
+/// [NOVO][FASE 2] Assinatura vigente de uma escola (ou de uma mantenedora, para redes).
+/// Substitui Escola.plano + Escola.status(TRIAL) + EscolaModulo.
+model Assinatura {
+  id               String             @id @default(cuid())
+  escolaId         String?            @map("escola_id")
+  escola           Escola?            @relation(fields: [escolaId], references: [id])
+  mantenedoraId    String?            @map("mantenedora_id") // assinatura de rede cobre as unidades
+  mantenedora      Mantenedora?       @relation(fields: [mantenedoraId], references: [id])
+  planoId          String             @map("plano_id")
+  plano            Plano              @relation(fields: [planoId], references: [id])
+  situacao         SituacaoAssinatura @default(TESTE)
+  inicio           DateTime           @db.Date
+  fim              DateTime?          @db.Date
+  fimTeste         DateTime?          @map("fim_teste") @db.Date
+  // Limites contratados (sobrescrevem os do plano quando preenchidos)
+  limiteEstudantes Int?               @map("limite_estudantes")
+  limiteUsuarios   Int?               @map("limite_usuarios")
+  limiteArmazenamentoMb Int?          @map("limite_armazenamento_mb")
+  observacoes      String?
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedAt        DateTime           @updatedAt @map("updated_at")
+  modulos          AssinaturaModulo[]
+  historico        HistoricoAssinatura[]
+
+  @@index([escolaId])
+  @@index([mantenedoraId])
+  @@map("assinaturas")
+}
+
+enum OrigemModulo {
+  PLANO
+  ADICIONAL // add-on contratado
+  CORTESIA
+  TESTE
+  EXCECAO // backfill do antigo EscolaModulo
+}
+
+/// [NOVO][FASE 2] Add-ons e exceções por módulo. O estado efetivo de um módulo =
+/// AssinaturaModulo (se houver) ?? (módulo no plano ? ATIVO : INATIVO), e
+/// SOMENTE_LEITURA quando a assinatura está INADIMPLENTE/fim de teste.
+model AssinaturaModulo {
+  id           String       @id @default(cuid())
+  assinaturaId String       @map("assinatura_id")
+  assinatura   Assinatura   @relation(fields: [assinaturaId], references: [id], onDelete: Cascade)
+  moduloId     ModuloId     @map("modulo_id")
+  origem       OrigemModulo
+  estado       EstadoModulo @default(ATIVO)
+  inicio       DateTime     @db.Date
+  fim          DateTime?    @db.Date
+  // fim do período somente leitura, depois vira INATIVO (decisão D-02)
+  leituraAte   DateTime?    @map("leitura_ate") @db.Date
+
+  @@unique([assinaturaId, moduloId])
+  @@map("assinaturas_modulos")
+}
+
+/// [NOVO][FASE 2] Toda mudança de assinatura (quem, quando, de/para).
+model HistoricoAssinatura {
+  id           String     @id @default(cuid())
+  assinaturaId String     @map("assinatura_id")
+  assinatura   Assinatura @relation(fields: [assinaturaId], references: [id], onDelete: Cascade)
+  descricao    String
+  dados        Json?      // de/para em JSON
+  autorId      String?    @map("autor_id")
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  @@map("historico_assinaturas")
+}
+
+// =============================================================================
+// 2. REDE, ESCOLA E CONFIGURAÇÕES
+// =============================================================================
+
+enum TipoMantenedora {
+  PUBLICA_MUNICIPAL
+  PUBLICA_ESTADUAL
+  PUBLICA_FEDERAL
+  PRIVADA
+  COMUNITARIA // comunitária, confessional ou filantrópica
+}
+
+/// [NOVO][FASE pós-11, mas tabela pode existir antes] Mantenedora/rede (D-04).
+/// Escola independente pode não ter mantenedora.
+model Mantenedora {
+  id          String          @id @default(cuid())
+  nome        String
+  cnpj        String?
+  tipo        TipoMantenedora
+  logoUrl     String?         @map("logo_url")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  escolas     Escola[]
+  assinaturas Assinatura[]
+
+  @@map("mantenedoras")
+}
+
+enum DependenciaAdministrativa {
+  FEDERAL
+  ESTADUAL
+  MUNICIPAL
+  PRIVADA
+}
+
+/// [MUDA] Escola continua sendo o tenant (subdomínio). Ganha dados oficiais;
+/// perde plano/EscolaModulo (vão para Assinatura).
+model Escola {
+  id                    String                     @id @default(cuid())
+  nome                  String
+  slug                  String                     @unique // subdomínio [ATUAL]
+  status                StatusEscola               @default(ATIVA) // [ATUAL] TRIAL migra para Assinatura.situacao
+  mantenedoraId         String?                    @map("mantenedora_id")
+  mantenedora           Mantenedora?               @relation(fields: [mantenedoraId], references: [id])
+  // Dados oficiais [NOVO][FASE 4]
+  codigoInep            String?                    @map("codigo_inep")
+  cnpj                  String?
+  dependencia           DependenciaAdministrativa?
+  atoAutorizacao        String?                    @map("ato_autorizacao") // ato de criação/autorização/credenciamento (vai nos documentos)
+  enderecoLinha         String?                    @map("endereco_linha")
+  municipioIbge         String?                    @map("municipio_ibge")
+  uf                    String?
+  localizacao           ZonaResidencia?            // urbana/rural (Censo)
+  telefone              String?
+  email                 String?
+  // Identidade visual [ATUAL]
+  logoUrl               String?                    @map("logo_url")
+  corPrimaria           String?                    @map("cor_primaria")
+  corSecundaria         String?                    @map("cor_secundaria")
+  emailDominio          String?                    @map("email_dominio")
+  createdAt             DateTime                   @default(now()) @map("created_at")
+  updatedAt             DateTime                   @updatedAt @map("updated_at")
+
+  assinaturas           Assinatura[]
+  usuarios              Usuario[]
+  vinculosPapel         VinculoPapel[]
+  papeis                Papel[]
+  nomenclaturas         Nomenclatura[]
+  camposPersonalizados  CampoPersonalizado[]
+  modelosFormulario     ModeloFormulario[]
+  modelosDocumento      ModeloDocumento[]
+  anosLetivos           AnoLetivo[]
+  cursos                Curso[]
+  componentes           ComponenteCurricular[]
+  areasConhecimento     AreaConhecimento[]
+  matrizes              MatrizCurricular[]
+  turmas                Turma[]
+  espacos               Espaco[]
+  temposAula            TempoAula[]
+  diasNaoLetivos        DiaNaoLetivo[]
+  diasLetivosExtras     DiaLetivoExtra[]
+  esquemasAvaliacao     EsquemaAvaliacao[]
+  pessoas               Pessoa[]
+  estudantes            Estudante[]
+  profissionais         Profissional[]
+  vinculosResponsavel   VinculoResponsavel[]
+  autorizacoes          Autorizacao[]
+  matriculas            Matricula[]
+  enturmacoes           Enturmacao[]
+  movimentacoes         Movimentacao[]
+  aulas                 Aula[]
+  justificativas        Justificativa[]
+  resultados            ResultadoComponente[]
+  documentosEmitidos    DocumentoEmitido[]
+  ocorrencias           Ocorrencia[]
+  questoes              Questao[]
+  provas                Prova[]
+  planosEnsino          PlanoEnsino[]
+  leiturasSensiveis     LeituraSensivel[]
+  auditLogs             AuditLog[]
+  comunicados           Comunicado[]
+
+  @@map("escolas")
+}
+
+enum StatusEscola {
+  ATIVA
+  SUSPENSA
+  CANCELADA
+}
+
+/// [NOVO][FASE 8a] Rótulos configuráveis (personalizacao.md 3.4.1). Sem linha = padrão da plataforma.
+model Nomenclatura {
+  id       String @id @default(cuid())
+  escolaId String @map("escola_id")
+  escola   Escola @relation(fields: [escolaId], references: [id])
+  conceito String // "etapa", "serie", "turma", "componente", "recuperacao"...
+  singular String // "Bimestre"
+  plural   String // "Bimestres"
+  genero   String @default("M") // "M" | "F" para artigos (o/a)
+
+  @@unique([escolaId, conceito])
+  @@map("nomenclaturas")
+}
