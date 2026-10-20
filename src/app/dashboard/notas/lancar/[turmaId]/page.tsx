@@ -12,6 +12,7 @@ export const runtime = 'nodejs'
 // import { getDisciplinasPermitidas } from "@/lib/data-fetching"
 import { Session } from "next-auth"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { can } from '@/lib/rbac'
 
 async function getTurmaData(turmaId: string, session: Session) {
   const turma = await prisma.turma.findUnique({
@@ -39,7 +40,7 @@ async function getTurmaData(turmaId: string, session: Session) {
     turmaId: turmaId
   }
 
-  if (!session.user.isSuperuser && !session.user.isDirecao) {
+  if (!can(session.user, 'escopo.escola')) {
     whereClause.usuariosPermitidos = {
       some: {
         id: session.user.id

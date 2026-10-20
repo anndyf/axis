@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { adicionarLogoNoPdf } from '@/lib/pdf-logo'
@@ -41,7 +42,7 @@ export const GET = rotaDoModulo('NOT', 'leitura', async function GET(
     })
 
     // Aluno do portal só baixa o próprio boletim
-    if (!estudante || (session.user.isPortalUser && estudante.id !== session.user.estudanteId)) {
+    if (!estudante || (can(session.user, 'portal.acessar') && estudante.id !== session.user.estudanteId)) {
       return NextResponse.json({ message: 'Estudante não encontrado' }, { status: 404 })
     }
 

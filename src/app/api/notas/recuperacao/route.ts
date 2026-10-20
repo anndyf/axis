@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
 import { StatusNota } from '@prisma/client'
 import { logAudit } from '@/lib/audit'
 import {
@@ -19,7 +20,7 @@ export const POST = rotaDoModulo('NOT', 'escrita', async function POST(request: 
   try {
     const session = await auth()
 
-    if (!session?.user?.escolaId || !(session.user.isStaff || session.user.isSuperuser)) {
+    if (!session?.user?.escolaId || !can(session.user, 'nota.tela')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
     const escolaId = session.user.escolaId

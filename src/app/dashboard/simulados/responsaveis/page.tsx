@@ -5,6 +5,7 @@ import ResponsaveisClient from "./ResponsaveisClient"
 import { prisma } from "@/lib/prisma"
 import { anoLetivoAtualDaEscola } from "@/lib/data-fetching"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { can } from '@/lib/rbac'
 
 export const metadata = {
   title: 'Áxis - Simulados'
@@ -17,7 +18,7 @@ export default async function ResponsaveisSimuladoPage() {
   const escolaId = session.user.escolaId
 
   const user = session.user as any
-  if (!user.isSuperuser && !user.isDirecao) {
+  if (!can(user, 'simulado.gerenciar')) {
     redirect("/dashboard/simulados")
   }
 

@@ -294,7 +294,6 @@ export function rotuloDoPapelPrincipal(papeis: readonly string[]): string {
     ['SECRETARIA', 'Secretaria'],
     ['COORDENACAO', 'Coordenação'],
     ['PROFESSOR', 'Professor'],
-    ['ESTUDANTE', 'Estudante'],
   ]
   return ordem.find(([c]) => papeis.includes(c))?.[1] ?? 'Gestão escolar'
 }

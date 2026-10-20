@@ -23,6 +23,7 @@ import Link from "next/link"
 import PlanoForm from "@/components/PlanoForm"
 import PlanoView from "@/components/PlanoView"
 import TeacherTipsModal from "@/components/TeacherTipsModal"
+import { can } from "@/lib/rbac"
 
 interface Plano {
   id: string
@@ -55,7 +56,7 @@ export default function PlanosClient() {
   const [professores, setProfessores] = useState<{id: string, name: string}[]>([])
   const [turmas, setTurmas] = useState<{id: string, nome: string}[]>([])
 
-  const isAdmin = session?.user?.isSuperuser || session?.user?.isDirecao
+  const isAdmin = can(session?.user, 'plano.acompanhar')
 
   const fetchPlanos = async () => {
     setLoading(true)

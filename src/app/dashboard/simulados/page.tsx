@@ -4,6 +4,7 @@ import SimuladosClient from "./SimuladosClient"
 import { prisma } from "@/lib/prisma"
 import { anoLetivoAtualDaEscola } from "@/lib/data-fetching"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { can } from '@/lib/rbac'
 
 export const metadata = {
   title: 'Áxis - Simulados'
@@ -19,7 +20,7 @@ export default async function SimuladosPage() {
 
   // Buscar turmas que o professor tem acesso ou todas para gestão
   let turmas = []
-  if (user.isSuperuser || user.isDirecao) {
+  if (can(user, 'simulado.gerenciar')) {
     turmas = await prisma.turma.findMany({
       where: { escolaId, anoLetivo: await anoLetivoAtualDaEscola(escolaId) },
       orderBy: { nome: 'asc' }
@@ -46,7 +47,7 @@ export default async function SimuladosPage() {
 
   // Buscar Provas de Simulado
   let provas = []
-  if (user.isSuperuser || user.isDirecao) {
+  if (can(user, 'simulado.gerenciar')) {
     // Prova nao tem escolaId proprio (turmaId e professorCriadorId sao ambos
     // opcionais, entao nao ha um caminho garantido) - filtra pelo que existir.
     // TODO: adicionar escolaId denormalizado em Prova para fechar isso de vez.

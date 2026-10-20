@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can, restritoADocencia } from '@/lib/rbac'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { adicionarLogoNoPdf } from '@/lib/pdf-logo'
@@ -26,7 +27,7 @@ export const GET = rotaDoModulo('RES', 'leitura', async function GET(
     const { id } = await params
 
     // Se for professor, não pode baixar relatório global de todas as matérias
-    if (session.user.isStaff && !session.user.isDirecao && !session.user.isSuperuser) {
+    if (restritoADocencia(session.user)) {
       return NextResponse.json({ message: 'Professores devem emitir relatórios individuais por disciplina' }, { status: 403 })
     }
 

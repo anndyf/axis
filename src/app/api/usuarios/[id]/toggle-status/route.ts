@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
 import { contaProtegidaDaPlataforma, MSG_CONTA_PROTEGIDA } from '@/lib/plataforma'
 import { rotaDoModulo } from '@/lib/modulos/guarda'
 
@@ -15,7 +16,7 @@ export const PUT = rotaDoModulo('NUC', 'escrita', async function PUT(
     const session = await auth()
 
     // Apenas superusuários podem alterar status
-    if (!session?.user?.escolaId || !session.user.isSuperuser) {
+    if (!session?.user?.escolaId || !can(session.user, 'usuario.gerenciar')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 403 })
     }
 

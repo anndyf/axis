@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
 import { validarEsquema, criarEstruturaEsquema, type EsquemaBody } from '@/lib/services/esquemas-avaliacao'
 import { rotaDoModulo } from '@/lib/modulos/guarda'
 
@@ -35,7 +36,7 @@ export const GET = rotaDoModulo('NUC', 'leitura', async function GET() {
 export const POST = rotaDoModulo('NUC', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session?.user?.escolaId || !session.user.isSuperuser) {
+    if (!session?.user?.escolaId || !can(session.user, 'configuracao.editar')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 403 })
     }
     const escolaId = session.user.escolaId

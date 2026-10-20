@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
 import { auth } from '@/lib/auth'
 import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const GET = rotaDoModulo('NUC', 'leitura', async function GET() {
   const session = await auth()
-  if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
+  if (!session || !can(session.user, 'turma.gerenciar')) {
     return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
   }
   if (!session.user.escolaId) {
@@ -45,7 +46,7 @@ export const GET = rotaDoModulo('NUC', 'leitura', async function GET() {
 // Rota para migrar questões de uma turma para outra
 export const POST = rotaDoModulo('NUC', 'escrita', async function POST(request: Request) {
   const session = await auth()
-  if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
+  if (!session || !can(session.user, 'turma.gerenciar')) {
     return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
   }
   if (!session.user.escolaId) {

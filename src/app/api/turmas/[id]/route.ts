@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
 import { revalidatePath } from 'next/cache'
 import { resolverEsquemaAvaliacaoId } from '@/lib/services/notas'
 import { contarNotasLancadas } from '@/lib/services/esquemas-padrao'
@@ -48,7 +49,7 @@ export const PUT = rotaDoModulo('NUC', 'escrita', async function PUT(
   try {
     const session = await auth()
 
-    if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
+    if (!session?.user?.escolaId || !can(session.user, 'turma.gerenciar')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 
@@ -139,7 +140,7 @@ export const DELETE = rotaDoModulo('NUC', 'escrita', async function DELETE(
   try {
     const session = await auth()
 
-    if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
+    if (!session?.user?.escolaId || !can(session.user, 'turma.gerenciar')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 

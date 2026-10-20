@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
 import { randomUUID } from 'crypto'
 import { revalidatePath } from 'next/cache'
 
@@ -35,7 +36,7 @@ export const POST = rotaDoModulo('NUC', 'escrita', async function POST(request: 
   try {
     const session = await auth()
     
-    if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
+    if (!session?.user?.escolaId || !can(session.user, 'turma.gerenciar')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 

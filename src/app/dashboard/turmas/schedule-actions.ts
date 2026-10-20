@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { bloqueioDoModulo } from "@/lib/modulos/guarda"
+import { can } from "@/lib/rbac"
 
 // Server actions podem ser chamadas direto pelo client com qualquer turmaId -
 // a turma precisa ser conferida contra a escola da sessão a cada chamada.
@@ -50,7 +51,7 @@ export async function saveSchedule(turmaId: string, items: ScheduleItem[]) {
   const bloqueado = await bloqueioDoModulo('DIA', 'escrita')
   if (bloqueado) return { error: bloqueado }
   const session = await auth()
-  if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
+  if (!session?.user?.escolaId || !can(session.user, 'turma.gerenciar')) {
     return { error: "Sem permissão" }
   }
   if (!(await turmaDaEscola(turmaId, session.user.escolaId))) {

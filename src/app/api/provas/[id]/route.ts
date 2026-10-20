@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
 import { provaDaEscola } from '@/lib/data-fetching'
 import { logAudit } from '@/lib/audit'
 import { rotaDoModulo } from '@/lib/modulos/guarda'
@@ -62,7 +63,7 @@ export const DELETE = rotaDoModulo('PRV', 'escrita', async function DELETE(
     if (!prova) return NextResponse.json({ message: 'Prova não encontrada' }, { status: 404 })
 
     // Apenas o criador ou admin pode excluir
-    const isAdmin = session.user.isSuperuser || session.user.isDirecao
+    const isAdmin = can(session.user, 'prova.gerenciar')
     if (!isAdmin && prova.professorCriadorId !== session.user.id) {
       return NextResponse.json({ message: 'Sem permissão para excluir' }, { status: 403 })
     }

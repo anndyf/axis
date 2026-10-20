@@ -5,6 +5,7 @@ import Link from "next/link"
 import { ArrowLeft, Plus } from "lucide-react"
 import UsuariosClient from "@/components/UsuariosClient"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { can } from '@/lib/rbac'
 
 export const metadata = {
   title: 'Áxis - Usuarios'
@@ -39,7 +40,7 @@ async function getUsuarios(escolaId: string) {
 export default async function UsuariosPage() {
   await paginaDoModulo('NUC')
   const session = await auth()
-  if (!session?.user?.escolaId || !session.user.isSuperuser) redirect("/dashboard")
+  if (!session?.user?.escolaId || !can(session.user, 'usuario.gerenciar')) redirect("/dashboard")
 
   const usuarios = await getUsuarios(session.user.escolaId)
   const pendentes = usuarios.filter(u => !u.isApproved).length

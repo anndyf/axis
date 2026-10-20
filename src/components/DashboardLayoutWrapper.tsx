@@ -9,6 +9,7 @@ import BarraInferior from "./BarraInferior"
 import MenuMais from "./MenuMais"
 import { itemAtivo, navegacaoMobile } from "@/lib/services/navegacao-mobile"
 import { cn } from "@/components/ui/cn"
+import { can } from "@/lib/rbac"
 
 export default function DashboardLayoutWrapper({
   children,
@@ -82,7 +83,7 @@ export default function DashboardLayoutWrapper({
           { rotulo: "Buscar", icone: Search, onClick: abrirBusca },
           { rotulo: "Meu perfil", icone: UserRound, href: "/dashboard/perfil" },
           { rotulo: "Trocar senha", icone: KeyRound, href: "/dashboard/perfil#senha" },
-          ...(user?.isSuperuser ? [{ rotulo: "Componentes", icone: Blocks, href: "/dashboard/ui" }] : []),
+          ...(can(user, "escola.administrar") ? [{ rotulo: "Componentes", icone: Blocks, href: "/dashboard/ui" }] : []),
         ]}
       />
     </>

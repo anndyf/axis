@@ -11,6 +11,7 @@ import ConfirmModal from "./ConfirmModal"
 import CloneTurmaModal from "./CloneTurmaModal"
 import PromoverTurmaModal from "./PromoverTurmaModal"
 import { ArrowUpCircle } from "lucide-react"
+import { can } from "@/lib/rbac"
 
 interface Turma {
   id: string
@@ -36,7 +37,8 @@ export default function TurmasListClient({
 }: TurmasListClientProps) {
   const router = useRouter()
   const { data: session } = useSession()
-  const isManagement = session?.user?.isSuperuser || (session?.user?.isDirecao && !session?.user?.isStaff)
+  // Era isSuperuser || (isDirecao && !isStaff): admin, ou gestão de turmas sem ser professor
+  const isManagement = can(session?.user, 'escola.administrar') || (can(session?.user, 'turma.gerenciar') && !can(session?.user, 'docencia.exercer'))
   // Estados de Filtro
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCurso, setSelectedCurso] = useState<string | null>(null)
@@ -313,7 +315,7 @@ export default function TurmasListClient({
                              </Link>
                            )}
                            
-                           {session?.user?.isSuperuser && (
+                           {can(session?.user, 'turma.promover') && (
                               <div className="flex items-center space-x-0.5">
                                 <button
                                   onClick={() => handlePromoteClick(turma)}

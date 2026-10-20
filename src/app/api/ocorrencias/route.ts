@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
 import { logAudit } from '@/lib/audit'
 import { rotaDoModulo } from '@/lib/modulos/guarda'
 
@@ -10,7 +11,7 @@ export const runtime = 'nodejs'
 export const GET = rotaDoModulo('SEC', 'leitura', async function GET(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
+    if (!session || !can(session.user, 'ocorrencia.gerenciar')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
     if (!session.user.escolaId) {
@@ -95,7 +96,7 @@ export const GET = rotaDoModulo('SEC', 'leitura', async function GET(request: Ne
 export const POST = rotaDoModulo('SEC', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
+    if (!session || !can(session.user, 'ocorrencia.gerenciar')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
     if (!session.user.escolaId) {

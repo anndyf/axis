@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { can } from "@/lib/rbac"
 import { anoLetivoAtualDaEscola } from "@/lib/data-fetching"
 import { NextRequest, NextResponse } from "next/server"
 import { rotaDoModulo } from '@/lib/modulos/guarda'
@@ -10,7 +11,7 @@ export const revalidate = 0
 export const GET = rotaDoModulo('PRV', 'leitura', async function GET(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
+    if (!session?.user?.escolaId || !can(session.user, 'simulado.gerenciar')) {
       return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
     }
     const escolaId = session.user.escolaId
@@ -46,7 +47,7 @@ export const GET = rotaDoModulo('PRV', 'leitura', async function GET(request: Ne
 export const POST = rotaDoModulo('PRV', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
+    if (!session?.user?.escolaId || !can(session.user, 'simulado.gerenciar')) {
       return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
     }
     const escolaId = session.user.escolaId
@@ -112,7 +113,7 @@ export const POST = rotaDoModulo('PRV', 'escrita', async function POST(request: 
 export const DELETE = rotaDoModulo('PRV', 'escrita', async function DELETE(request: NextRequest) {
     try {
       const session = await auth()
-      if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
+      if (!session?.user?.escolaId || !can(session.user, 'simulado.gerenciar')) {
         return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
       }
       const escolaId = session.user.escolaId

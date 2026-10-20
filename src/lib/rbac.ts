@@ -71,3 +71,12 @@ export function canLegado(u: Booleanos, acao: Acao): boolean {
 }
 
 export const ACOES_ANTIGAS: Acao[] = ['gestao', 'staff', 'superuser', 'aee', 'staffPuro']
+
+/**
+ * Professor que só enxerga as próprias turmas/disciplinas (era
+ * `isStaff && !isSuperuser && !isDirecao`). Quem tem escopo da escola
+ * (direção, secretaria, coordenação, admin) não fica restrito.
+ */
+export function restritoADocencia(user: RbacUser | null | undefined): boolean {
+  return can(user, 'docencia.exercer') && !can(user, 'escopo.escola')
+}

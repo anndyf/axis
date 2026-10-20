@@ -9,6 +9,7 @@ import EstudantesFilter from "./EstudantesFilter"
 import PortalActivationAction from "./PortalActivationAction"
 import PortalActionsMenu from "./PortalActionsMenu"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { can } from '@/lib/rbac'
 
 export const metadata = {
   title: 'Áxis - Estudantes'
@@ -136,7 +137,7 @@ export default async function EstudantesPage({
   const turno = typeof resolvedParams.turno === 'string' ? resolvedParams.turno : undefined
   const serie = typeof resolvedParams.serie === 'string' ? resolvedParams.serie : undefined
 
-  const isDirecao = session.user.isSuperuser || session.user.isDirecao
+  const isDirecao = can(session.user, 'escopo.escola')
   const hasFilters = !!(search || cursoId || turmaId || turno || serie)
 
   // Utilizando cast 'any' para evitar erros de lint stale com o cliente Prisma gerado
@@ -181,7 +182,7 @@ export default async function EstudantesPage({
     }))
     .sort((a, b) => a.nome.localeCompare(b.nome))
 
-  const podeGerir = session.user.isSuperuser || session.user.isDirecao
+  const podeGerir = can(session.user, 'estudante.editar')
   const acaoIcone = "p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg"
 
   return (

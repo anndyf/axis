@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import LaboratoriosClient from "./LaboratoriosClient"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { can } from '@/lib/rbac'
 
 export const metadata = {
   title: 'Áxis - Reserva de Laboratórios'
@@ -20,7 +21,7 @@ export default async function LaboratoriosPage() {
   })
 
   // Buscar turmas e disciplinas para o seletor
-  const isAdmin = session.user.isSuperuser || session.user.isDirecao
+  const isAdmin = can(session.user, 'laboratorio.gerenciar')
   
   let myTurmas: any[] = []
 

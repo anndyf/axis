@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
 import { provaDaEscola } from '@/lib/data-fetching'
 import { rotaDoModulo } from '@/lib/modulos/guarda'
 
@@ -21,7 +22,7 @@ export const GET = rotaDoModulo('PRV', 'leitura', async function GET(request: Ne
     const limit = parseInt(searchParams.get('limit') || '20', 10)
     const skip = (page - 1) * limit
 
-    const isAdmin = session.user.isSuperuser || session.user.isDirecao
+    const isAdmin = can(session.user, 'prova.gerenciar')
     const userId = session.user.id
 
     const where: any = isAdmin ? {} : { professorCriadorId: userId }

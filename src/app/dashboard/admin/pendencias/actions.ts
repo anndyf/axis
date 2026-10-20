@@ -4,12 +4,13 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
+import { can } from "@/lib/rbac"
 
 export async function resolvePendencia(messageId: string) {
   const session = await auth()
   const user = session?.user as any
   
-  if (!user?.escolaId || (!user.isSuperuser && !user.isDirecao)) {
+  if (!user?.escolaId || !can(user, 'pendencia.resolver')) {
     return { error: "Não autorizado" }
   }
 
@@ -69,7 +70,7 @@ export async function atribuirChamado(messageId: string, assignedToId: string | 
   const session = await auth()
   const user = session?.user as any
   
-  if (!user?.escolaId || (!user.isSuperuser && !user.isDirecao)) {
+  if (!user?.escolaId || !can(user, 'pendencia.resolver')) {
     return { error: "Não autorizado" }
   }
 
@@ -95,7 +96,7 @@ export async function mudarStatusChamado(messageId: string, status: any) {
   const session = await auth()
   const user = session?.user as any
   
-  if (!user?.escolaId || (!user.isSuperuser && !user.isDirecao)) {
+  if (!user?.escolaId || !can(user, 'pendencia.resolver')) {
     return { error: "Não autorizado" }
   }
 
@@ -118,7 +119,7 @@ export async function mudarPrioridadeChamado(messageId: string, priority: any) {
   const session = await auth()
   const user = session?.user as any
   
-  if (!user?.escolaId || (!user.isSuperuser && !user.isDirecao)) {
+  if (!user?.escolaId || !can(user, 'pendencia.resolver')) {
     return { error: "Não autorizado" }
   }
 
@@ -138,7 +139,7 @@ export async function enviarComunicadoGeral(subject: string, content: string, pr
   const session = await auth()
   const user = session?.user as any
   
-  if (!user?.escolaId || (!user.isSuperuser && !user.isDirecao)) {
+  if (!user?.escolaId || !can(user, 'pendencia.resolver')) {
     return { error: "Não autorizado" }
   }
 
@@ -166,7 +167,7 @@ export async function responderPendencia(parentId: string, content: string) {
   const session = await auth()
   const user = session?.user as any
   
-  if (!user?.escolaId || (!user.isSuperuser && !user.isDirecao)) {
+  if (!user?.escolaId || !can(user, 'pendencia.resolver')) {
     return { error: "Não autorizado" }
   }
 
@@ -211,7 +212,7 @@ export async function resolvePendenciasBulk(messageIds: string[]) {
   const session = await auth()
   const user = session?.user as any
   
-  if (!user?.escolaId || (!user.isSuperuser && !user.isDirecao)) {
+  if (!user?.escolaId || !can(user, 'pendencia.resolver')) {
     return { error: "Não autorizado" }
   }
 
@@ -235,7 +236,7 @@ export async function atualizarStatusPendencia(messageId: string, status: string
   const session = await auth()
   const user = session?.user as any
   
-  if (!user?.escolaId || (!user.isSuperuser && !user.isDirecao)) {
+  if (!user?.escolaId || !can(user, 'pendencia.resolver')) {
     return { error: "Não autorizado" }
   }
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
 import { contaProtegidaDaPlataforma, MSG_CONTA_PROTEGIDA } from '@/lib/plataforma'
 import { rotaDoModulo } from '@/lib/modulos/guarda'
 
@@ -10,7 +11,7 @@ export const POST = rotaDoModulo('NUC', 'escrita', async function POST(request: 
   try {
     const session = await auth()
 
-    if (!session?.user?.escolaId || !session.user.isSuperuser) {
+    if (!session?.user?.escolaId || !can(session.user, 'usuario.gerenciar')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 403 })
     }
     const escolaId = session.user.escolaId

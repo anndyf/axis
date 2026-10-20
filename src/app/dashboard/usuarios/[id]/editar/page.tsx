@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import UsuarioForm from "@/components/UsuarioForm"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { can } from '@/lib/rbac'
 
 export const metadata = {
   title: 'Áxis - Usuarios'
@@ -52,7 +53,7 @@ export default async function EditarUsuarioPage({
   await paginaDoModulo('NUC')
   const session = await auth()
 
-  if (!session?.user?.escolaId || !session.user.isSuperuser) {
+  if (!session?.user?.escolaId || !can(session.user, 'usuario.gerenciar')) {
     redirect("/dashboard")
   }
 

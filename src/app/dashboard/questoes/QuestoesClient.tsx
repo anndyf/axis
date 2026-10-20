@@ -28,6 +28,7 @@ import { useRouter } from "next/navigation"
 import QuestaoForm from "./QuestaoForm"
 import QuestaoPreviewModal from "./QuestaoPreviewModal"
 import TeacherTipsModal from "@/components/TeacherTipsModal"
+import { can } from "@/lib/rbac"
 
 export default function QuestoesClient({ user, turmas, disciplinas, metrics, questoesPorTurma, professores = [], areas = [], nomeEscola = 'Áxis' }: any) {
   const router = useRouter()
@@ -42,7 +43,7 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
     turmaId: '',
     disciplinaId: '',
     areaId: '',
-    status: (user.isSuperuser || user.isDirecao) ? 'PENDENTE' : '',
+    status: can(user, 'questao.moderar') ? 'PENDENTE' : '',
     unidade: '',
     tipo: '',
     search: '',
@@ -72,7 +73,7 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
     }
   ]
 
-  const isAdmin = user.isSuperuser || user.isDirecao
+  const isAdmin = can(user, 'questao.moderar')
 
   const fetchQuestoes = useCallback(async () => {
     setLoading(true)

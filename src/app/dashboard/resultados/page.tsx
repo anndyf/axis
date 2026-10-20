@@ -5,6 +5,7 @@ import { getTurmasPermitidas } from "@/lib/data-fetching"
 import { Session } from "next-auth"
 import ResultadosClient from "./ResultadosClient"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { can } from '@/lib/rbac'
 
 export const metadata = {
   title: 'Áxis - Resultados'
@@ -52,7 +53,7 @@ export default async function ResultadosPage() {
   }
 
   // Apenas Direção e TI podem ver resultados
-  if (!session.user.isSuperuser && !session.user.isDirecao) {
+  if (!can(session.user, 'resultado.ler')) {
     redirect("/dashboard")
   }
 

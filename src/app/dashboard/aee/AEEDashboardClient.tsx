@@ -11,6 +11,7 @@ import {
   PlusCircle, Edit3, Loader2
 } from "lucide-react"
 import { CIDS_AEE } from "@/lib/constants-aee"
+import { can } from "@/lib/rbac"
 
 export default function AEEDashboardClient({
   usuario,
@@ -26,7 +27,7 @@ export default function AEEDashboardClient({
   const router = useRouter()
   const [searchTerm, setSearchTerm] = useState("")
   const [filterTurma, setFilterTurma] = useState("")
-  const isDirecao = usuario.isDirecao || usuario.isSuperuser || (usuario as any).isAEE
+  const isDirecao = can(usuario, 'aee.gerenciar')
 
   // States
   const [activePanel, setActivePanel] = useState<'create' | 'edit' | null>(null)

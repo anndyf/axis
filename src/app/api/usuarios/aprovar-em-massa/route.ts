@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
 import { hash } from 'bcryptjs'
 import { enviarSenhaPorEmail } from '@/lib/mail'
 import { gerarSenhaProvisoria } from '@/lib/senha'
@@ -11,7 +12,7 @@ export const runtime = 'nodejs'
 export const POST = rotaDoModulo('NUC', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session?.user?.escolaId || !session.user.isSuperuser) {
+    if (!session?.user?.escolaId || !can(session.user, 'usuario.gerenciar')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 403 })
     }
 

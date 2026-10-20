@@ -6,6 +6,7 @@ import { getStudentPortalData } from "./actions"
 import { prisma } from "@/lib/prisma"
 import { precisaTrocarSenha } from "@/lib/data-fetching"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { can } from '@/lib/rbac'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -18,7 +19,7 @@ export default async function PortalPage({ searchParams }: { searchParams: Promi
     redirect("/login")
   }
 
-  if (!session.user.isPortalUser) {
+  if (!can(session.user, 'portal.acessar')) {
     redirect("/dashboard")
   }
 
