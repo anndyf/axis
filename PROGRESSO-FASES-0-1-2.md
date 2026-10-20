@@ -7,9 +7,9 @@ Escopo: `docs/arquitetura/roteiro-de-migracao.md`, fases 0, 1 e 2.
 
 | # | Etapa | Situação |
 |---|---|---|
-| 0 | Ambiente (npm ci, PostgreSQL, bancos, seeds, testes de base) | ⏳ |
-| 0.1 | Fase 0: testes que provam as falhas (PDFs, action, questoes/[id]) | ⬜ |
-| 0.2 | Fase 0: correções | ⬜ |
+| 0 | Ambiente (npm ci, PostgreSQL, bancos, seeds, testes de base) | ✅ 367 testes na base |
+| 0.1 | Fase 0: testes que provam as falhas (PDFs, action, questoes/[id]) | ✅ 7 testes novos, todos falharam antes da correção |
+| 0.2 | Fase 0: correções | ✅ 374 testes passando |
 | 0.3 | Fase 0: remover `api/public/v1/register`; ano letivo atual no lugar de 2026 fixo | ⬜ |
 | 1.1 | Fase 1: infraestrutura `exigirModulo` + mapa de rotas | ⬜ |
 | 1.2 | Fase 1: aplicação nas rotas de API | ⬜ |
@@ -22,7 +22,9 @@ Escopo: `docs/arquitetura/roteiro-de-migracao.md`, fases 0, 1 e 2.
 
 ## Decisões tomadas sem confirmação
 
-(preenchido ao longo da sessão)
+- **Fase 0 / PDFs**: os 3 PDFs passam a exigir `can(user, 'staff')` (toda a equipe: professor, AEE, direção, admin). Não restringi o professor às próprias disciplinas, para não tirar acesso de quem usa hoje.
+- **Fase 0 / reportarEstudanteFaltante**: exige `can(user, 'staff')`. Continua no arquivo `simulados/actions.ts` (mudar de lugar fica para a fase de Secretaria).
+- **Fase 0 / questoes/[id]**: PUT e DELETE seguem a mesma regra que o POST já tinha — o toggle do banco de questões vale para **professores**; direção e administrador continuam usando (comportamento atual da página e do POST).
 
 ## Como retomar
 Checkout de `fase/0-1-2-seguranca-modulos`, ler esta tabela, continuar do primeiro passo não ✅.

@@ -1,6 +1,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
+import { can } from '@/lib/rbac'
 import { prisma } from '@/lib/prisma'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
@@ -60,6 +61,10 @@ export async function GET(
 
     if (!session?.user?.escolaId) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+    }
+    // Relatório da turma inteira: só equipe (aluno do portal fica de fora)
+    if (!can(session.user, 'staff')) {
+      return NextResponse.json({ message: 'Acesso negado' }, { status: 403 })
     }
 
     const { id } = await params

@@ -119,7 +119,9 @@ afterAll(async () => {
     await prisma.esquemaAvaliacao.deleteMany({ where: { escolaId } })
     await prisma.areaConhecimento.deleteMany({ where: { escolaId } })
     await prisma.auditLog.deleteMany({ where: { user: { escolaId } } })
+    await prisma.messageRead.deleteMany({ where: { user: { escolaId } } })
     await prisma.globalConfig.deleteMany({ where: { escolaId } })
+    await prisma.escolaModulo.deleteMany({ where: { escolaId } })
     await prisma.user.deleteMany({ where: { escolaId } })
     await prisma.escola.delete({ where: { id: escolaId } })
   }
@@ -261,8 +263,9 @@ describe('isolamento entre escolas - escrita', () => {
 // Mesmas rotas, agora com um ALUNO DO PORTAL da própria escola B: rotas
 // de gestão/equipe precisam recusar mesmo dentro da escola certa.
 describe('permissões - aluno do portal', () => {
-  beforeAll(() => {
-    sessao.atual = { user: { ...sessaoDaEscolaB().user, id: 'portal-b', username: B.matricula, isSuperuser: false, isDirecao: false, isStaff: false, isAEE: false, isPortalUser: true, estudanteId: B.estudante } }
+  beforeAll(async () => {
+    const portal = await prisma.user.create({ data: { escolaId: B.escola, username: `portal-${SUFIXO}`, email: `portal-B@${SUFIXO}.t`, password: 'x', name: 'Aluno B (portal)', isPortalUser: true, estudanteId: B.estudante, isApproved: true } })
+    sessao.atual = { user: { ...sessaoDaEscolaB().user, id: portal.id, username: B.matricula, isSuperuser: false, isDirecao: false, isStaff: false, isAEE: false, isPortalUser: true, estudanteId: B.estudante } }
   })
   afterAll(() => { sessao.atual = sessaoDaEscolaB() })
 
@@ -295,6 +298,61 @@ describe('permissões - aluno do portal', () => {
     const { GET } = await rota('relatorios/professores-pendentes')
     const r = await chamar(GET, 'GET', '/api/relatorios/professores-pendentes')
     expect(RECUSADO).toContain(r.status)
+  })
+
+  // Fase 0 (roteiro 5.2): PDFs que conferiam só login + escola
+  const pdfsDaTurma: [string, string, () => Record<string, string>][] = [
+    ['PDF de resultados da turma', 'relatorio/resultados/[id]/pdf', () => ({ id: B.turma })],
+    ['PDF de status da turma', 'relatorio/status/[id]/pdf', () => ({ id: B.turma })],
+    ['PDF da turma por disciplina', 'relatorio/turma/[id]/disciplina/[disciplinaId]/pdf', () => ({ id: B.turma, disciplinaId: B.disciplina })],
+  ]
+  for (const [nome, caminho, params] of pdfsDaTurma) {
+    it(nome, async () => {
+      const { GET } = await rota(caminho)
+      const r = await chamar(GET, 'GET', '/x', params())
+      expect(RECUSADO, `${nome} respondeu ${r.status}`).toContain(r.status)
+    })
+  }
+
+  it('action reportarEstudanteFaltante (cria chamado para a secretaria)', async () => {
+    const { reportarEstudanteFaltante } = await import('@/app/dashboard/simulados/actions')
+    const antes = await prisma.message.count({ where: { escolaId: B.escola } })
+    const r = await reportarEstudanteFaltante(B.turma, 'HACK portal')
+    expect(r).toHaveProperty('error')
+    expect(await prisma.message.count({ where: { escolaId: B.escola } })).toBe(antes)
+  })
+})
+
+// Fase 0: o POST de questoes já confere o banco de questões; PUT/DELETE de
+// questoes/[id] precisam conferir também (professor com o módulo desligado).
+describe('módulo desligado - banco de questões (professor da escola B)', () => {
+  beforeAll(async () => {
+    await prisma.escolaModulo.upsert({
+      where: { escolaId_moduloId: { escolaId: B.escola, moduloId: 'banco-questoes' } },
+      update: { ativo: false },
+      create: { escolaId: B.escola, moduloId: 'banco-questoes', ativo: false },
+    })
+    sessao.atual = { user: { ...sessaoDaEscolaB().user, id: B.prof, username: 'prof-B', isSuperuser: false, isDirecao: false, isStaff: true, isAEE: false } }
+  })
+  afterAll(async () => {
+    await prisma.escolaModulo.deleteMany({ where: { escolaId: B.escola } })
+    sessao.atual = sessaoDaEscolaB()
+  })
+
+  it('editar a própria questão', async () => {
+    const { PUT } = await rota('questoes/[id]')
+    const r = await chamar(PUT, 'PUT', '/x', { id: B.questao }, { enunciado: 'HACK modulo' })
+    expect(r.status).toBe(403)
+  })
+
+  it('excluir a própria questão', async () => {
+    const { DELETE } = await rota('questoes/[id]')
+    const r = await chamar(DELETE, 'DELETE', '/x', { id: B.questao })
+    expect(r.status).toBe(403)
+  })
+
+  it('questão de B intacta', async () => {
+    expect((await prisma.questao.findUnique({ where: { id: B.questao } }))?.enunciado).toBe('Questao B')
   })
 })
 

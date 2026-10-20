@@ -3,6 +3,15 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { logAudit } from '@/lib/audit'
 import { turmasSaoDaEscola } from '@/lib/data-fetching'
+import { getModulosAtivos } from '@/lib/modules-server'
+
+/** Mesma regra do POST de questoes: professor só usa com o banco de questões ativo. */
+async function bancoDesligadoParaProfessor(user: { escolaId: string; isSuperuser: boolean; isDirecao: boolean }) {
+  if (user.isSuperuser || user.isDirecao) return false
+  const escola = await prisma.escola.findUnique({ where: { id: user.escolaId }, select: { plano: true } })
+  const modulosAtivos = await getModulosAtivos(user.escolaId, escola?.plano || 'BASICO')
+  return !modulosAtivos.includes('banco-questoes')
+}
 
 export const runtime = 'nodejs'
 
@@ -15,6 +24,9 @@ export async function PUT(
     const session = await auth()
     if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     const escolaId = session.user.escolaId
+    if (await bancoDesligadoParaProfessor(session.user)) {
+      return NextResponse.json({ message: 'Funcionalidade temporariamente desativada' }, { status: 403 })
+    }
 
     const body = await request.json()
     const { status, feedbackAdmin, enunciado, alternativaA, alternativaB, alternativaC, alternativaD, alternativaE, correta, dificuldade, muleta, imagemUrl, unidade, disciplinasIds, turmasIds, tipo } = body
@@ -109,6 +121,9 @@ export async function DELETE(
   try {
     const session = await auth()
     if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+    if (await bancoDesligadoParaProfessor(session.user)) {
+      return NextResponse.json({ message: 'Funcionalidade temporariamente desativada' }, { status: 403 })
+    }
 
     const questao = await prisma.questao.findFirst({ where: { id, professor: { escolaId: session.user.escolaId } } })
     if (!questao) return NextResponse.json({ message: 'Questão não encontrada' }, { status: 404 })
