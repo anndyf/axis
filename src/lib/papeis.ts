@@ -144,3 +144,15 @@ export async function papeisParaSessao(usuarioId: string, escolaId: string): Pro
 }
 
 export type { Booleanos }
+
+/**
+ * Cria a conta e os vínculos de papel dos booleanos dela, na mesma
+ * transação (caminhos que ainda criam pelos booleanos: acesso do estudante ao portal).
+ */
+export async function criarUsuarioComVinculos(args: { data: Prisma.UserUncheckedCreateInput }) {
+  return prisma.$transaction(async (tx) => {
+    const u = await tx.user.create({ data: args.data })
+    await sincronizarVinculosDosBooleanos(tx, u.id)
+    return u
+  })
+}

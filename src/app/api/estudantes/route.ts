@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { can } from '@/lib/rbac'
 import { rotaDoModulo } from '@/lib/modulos/guarda'
+import { criarUsuarioComVinculos } from '@/lib/papeis'
 
 export const runtime = 'nodejs'
 
@@ -76,7 +77,7 @@ export const POST = rotaDoModulo('NUC', 'escrita', async function POST(request: 
       const hashedPassword = await bcrypt.hash(matricula, 10)
       
       try {
-        await prisma.user.create({
+        await criarUsuarioComVinculos({
             data: {
               username: matricula,
               email: `${matricula}@axis.com`,

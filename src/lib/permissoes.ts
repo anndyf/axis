@@ -31,11 +31,16 @@ export const PERMISSOES = [
   'aee.atender', // é especialista AEE: menu reduzido ao atendimento
   'portal.acessar', // portal do estudante (não usa o painel da equipe)
 
+  // Painel inicial: visões "Administração" e "Professor"
+  'painel.gestao',
+  'painel.professor',
+
   // Escopo: enxerga todas as turmas e disciplinas da escola (sem isto, só as da docência)
   'escopo.escola',
 
   // Estudantes
-  'estudante.ler', // lista e busca de estudantes da escola
+  'estudante.ler', // tela de estudantes e busca rápida (Ctrl+K)
+  'estudante.buscar', // procurar estudante pelo nome/matrícula (seletores das telas da equipe)
   'estudante.editar', // cadastrar, editar, excluir, criar acesso ao portal
   'pendencia.resolver', // pendências de cadastro (estudante faltante etc.)
   'ocorrencia.gerenciar',
@@ -54,9 +59,10 @@ export const PERMISSOES = [
   // Diário, notas e resultados
   'frequencia.lancar', // chamada e diário
   'frequencia.acompanhar', // painel de frequência da escola
-  'avaliacao.lancar', // atividades/avaliações e notas por disciplina
-  'nota.lancar', // tela "Lançar notas" e recuperação final
+  'nota.lancar', // gravar notas e atividades/avaliações das disciplinas
+  'nota.tela', // telas "Lançar notas" e "Recuperação final" (eram isStaff || isSuperuser)
   'resultado.ler',
+  'indicador.ler', // professores com lançamentos pendentes
   'conselho.decidir',
   'relatorio.turma', // PDFs de relatório da turma
 
@@ -74,6 +80,8 @@ export const PERMISSOES = [
 
   // Recursos
   'laboratorio.gerenciar',
+  'calendario.gerenciar', // calendário letivo da escola
+  'financeiro.gerenciar',
 
   // Comunicação
   'mensagem.direcao.atender', // mensagens à direção; comunicados para o grupo da direção
@@ -128,12 +136,13 @@ const GESTAO = [
   'ocorrencia.gerenciar', 'aee.ficha.editar', 'turma.gerenciar', 'matriz.gerenciar',
   'frequencia.acompanhar', 'resultado.ler', 'conselho.decidir', 'plano.acompanhar',
   'questao.moderar', 'prova.gerenciar', 'simulado.gerenciar', 'laboratorio.gerenciar',
-  'mensagem.direcao.atender', 'identidade.editar',
+  'mensagem.direcao.atender', 'identidade.editar', 'indicador.ler', 'calendario.gerenciar',
+  'financeiro.gerenciar', 'painel.gestao',
 ] as const satisfies readonly Permissao[]
 
 const EQUIPE = [
-  'equipe.acessar', 'turma.ler', 'frequencia.lancar', 'avaliacao.lancar', 'relatorio.turma',
-  'plano.ler', 'questao.usar', 'simulado.ler',
+  'equipe.acessar', 'turma.ler', 'frequencia.lancar', 'nota.lancar', 'relatorio.turma',
+  'plano.ler', 'questao.usar', 'simulado.ler', 'estudante.buscar', 'painel.professor',
 ] as const satisfies readonly Permissao[]
 
 export const PAPEIS_SISTEMA: Record<CodigoPapel, DefinicaoPapel> = {
@@ -143,7 +152,7 @@ export const PAPEIS_SISTEMA: Record<CodigoPapel, DefinicaoPapel> = {
     escopo: 'ESCOLA',
     atribuivel: true,
     permissoes: [
-      ...GESTAO, ...EQUIPE, 'aee.ler', 'aee.gerenciar', 'nota.lancar', 'escola.administrar',
+      ...GESTAO, ...EQUIPE, 'aee.ler', 'aee.gerenciar', 'nota.tela', 'escola.administrar',
       'turma.promover', 'disciplina.gerenciar', 'mensagem.suporte.atender',
       'comunicado.receber.equipe', 'usuario.gerenciar', 'configuracao.editar', 'auditoria.ler',
     ],
@@ -161,9 +170,9 @@ export const PAPEIS_SISTEMA: Record<CodigoPapel, DefinicaoPapel> = {
     escopo: 'ESCOLA',
     atribuivel: true,
     permissoes: [
-      'escopo.escola', 'estudante.ler', 'estudante.editar', 'pendencia.resolver', 'turma.ler',
-      'turma.gerenciar', 'matriz.gerenciar', 'relatorio.turma', 'resultado.ler',
-      'laboratorio.gerenciar', 'comunicado.receber.equipe',
+      'painel.gestao', 'escopo.escola', 'estudante.ler', 'estudante.buscar', 'estudante.editar',
+      'pendencia.resolver', 'turma.ler', 'turma.gerenciar', 'matriz.gerenciar', 'relatorio.turma',
+      'resultado.ler', 'laboratorio.gerenciar', 'calendario.gerenciar', 'comunicado.receber.equipe',
     ],
   },
   COORDENACAO: {
@@ -172,8 +181,9 @@ export const PAPEIS_SISTEMA: Record<CodigoPapel, DefinicaoPapel> = {
     escopo: 'ESCOLA',
     atribuivel: true,
     permissoes: [
-      'escopo.escola', 'estudante.ler', 'ocorrencia.gerenciar', 'turma.ler', 'frequencia.lancar',
-      'frequencia.acompanhar', 'resultado.ler', 'conselho.decidir', 'relatorio.turma', 'plano.ler',
+      'painel.gestao', 'escopo.escola', 'estudante.ler', 'estudante.buscar', 'ocorrencia.gerenciar',
+      'turma.ler', 'frequencia.lancar', 'frequencia.acompanhar', 'resultado.ler', 'indicador.ler',
+      'conselho.decidir', 'relatorio.turma', 'plano.ler',
       'plano.acompanhar', 'questao.usar', 'questao.moderar', 'prova.gerenciar', 'simulado.ler',
       'simulado.gerenciar', 'comunicado.receber.equipe',
     ],
@@ -183,7 +193,7 @@ export const PAPEIS_SISTEMA: Record<CodigoPapel, DefinicaoPapel> = {
     descricao: 'Chamada, diário, notas e planos das suas turmas e disciplinas.',
     escopo: 'DOCENCIA',
     atribuivel: true,
-    permissoes: [...EQUIPE, 'docencia.exercer', 'nota.lancar', 'plano.elaborar', 'comunicado.receber.equipe'],
+    permissoes: [...EQUIPE, 'docencia.exercer', 'nota.tela', 'plano.elaborar', 'comunicado.receber.equipe'],
   },
   AEE: {
     nome: 'AEE',
@@ -235,6 +245,18 @@ export function papeisDosBooleanos(b: Booleanos): CodigoPapel[] {
   if (b.isAEE) papeis.push('AEE')
   if (b.isPortalUser) papeis.push('ESTUDANTE')
   return papeis
+}
+
+/** As 32 combinações dos booleanos de hoje (testes de equivalência). */
+export function combinacoesDosBooleanos(): Required<Booleanos>[] {
+  const chaves = ['isSuperuser', 'isDirecao', 'isStaff', 'isAEE', 'isPortalUser'] as const
+  const r: Required<Booleanos>[] = []
+  for (let m = 0; m < 1 << chaves.length; m++) {
+    const b = {} as Required<Booleanos>
+    chaves.forEach((k, i) => { b[k] = !!(m & (1 << i)) })
+    r.push(b)
+  }
+  return r
 }
 
 /** Caminho de volta, para a escrita dupla: os booleanos coerentes com os papéis. */

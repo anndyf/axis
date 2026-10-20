@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client'
 import * as dotenv from 'dotenv'
 import bcrypt from 'bcryptjs'
 import { vincularCursosSemEsquema } from '../src/lib/services/esquemas-padrao'
+import { sincronizarVinculosDosBooleanos } from '../src/lib/papeis'
 
 dotenv.config()
 
@@ -105,6 +106,11 @@ async function main() {
     },
   })
   console.log(`🎓 Estudante: ${estudante.nome} (${estudante.matricula})`)
+
+  // Fase 3: vínculos de papel a partir dos booleanos (mesma regra do backfill)
+  for (const u of await prisma.user.findMany({ where: { escolaId: escola.id }, select: { id: true } })) {
+    await sincronizarVinculosDosBooleanos(prisma, u.id)
+  }
 
   console.log('✅ Segunda escola provisionada com sucesso.')
   console.log('🔑 Login de teste: escolaId via subdomínio horizonte.localhost:3000, user: admin / pass: admin123')

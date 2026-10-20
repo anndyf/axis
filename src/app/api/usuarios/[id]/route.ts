@@ -5,6 +5,10 @@ import { contaProtegidaDaPlataforma, MSG_CONTA_PROTEGIDA } from '@/lib/plataform
 import { hash } from 'bcryptjs'
 import { logAudit } from '@/lib/audit'
 import { rotaDoModulo } from '@/lib/modulos/guarda'
+import { can } from '@/lib/rbac'
+import { gravarPapeis, papeisDoUsuarioNoBanco } from '@/lib/papeis'
+import { papeisDoPedido } from '@/lib/services/papeis-usuario'
+import { papeisDosBooleanos } from '@/lib/permissoes'
 
 export const runtime = 'nodejs'
 
@@ -16,7 +20,7 @@ export const PUT = rotaDoModulo('NUC', 'escrita', async function PUT(
   try {
     const session = await auth()
 
-    if (!session?.user?.escolaId || !session.user.isSuperuser) {
+    if (!session?.user?.escolaId || !can(session.user, 'usuario.gerenciar')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 403 })
     }
 
@@ -37,9 +41,17 @@ export const PUT = rotaDoModulo('NUC', 'escrita', async function PUT(
 
     const data = await request.json()
     const {
-      name, email, username, password,
-      isSuperuser, isDirecao, isStaff, isAEE, isActive, disciplinasIds
+      name, email, password, isActive, disciplinasIds
     } = data
+
+    // Papéis: do editor (papeis) ou, de um cliente antigo, dos booleanos.
+    // Conta ainda sem vínculo (antes do backfill) parte dos booleanos.
+    const noBanco = await papeisDoUsuarioNoBanco(prisma, id, session.user.escolaId)
+    const atuais = noBanco.length ? noBanco : papeisDosBooleanos(existingUser)
+    const pedido = papeisDoPedido(data, atuais)
+    if ('erro' in pedido) {
+      return NextResponse.json({ message: pedido.erro }, { status: 400 })
+    }
 
     // Regra de Exclusividade: Se houver novas disciplinas, remover de outros professores
     if (disciplinasIds && Array.isArray(disciplinasIds) && disciplinasIds.length > 0) {
@@ -56,10 +68,6 @@ export const PUT = rotaDoModulo('NUC', 'escrita', async function PUT(
       updateData.email = email
       updateData.username = email
     }
-    if (isSuperuser !== undefined) updateData.isSuperuser = isSuperuser
-    if (isDirecao !== undefined) updateData.isDirecao = isDirecao
-    if (isStaff !== undefined) updateData.isStaff = isStaff
-    if (isAEE !== undefined) updateData.isAEE = isAEE
     if (isActive !== undefined) updateData.isActive = isActive
     
     if (disciplinasIds !== undefined) {
@@ -74,17 +82,21 @@ export const PUT = rotaDoModulo('NUC', 'escrita', async function PUT(
 
     try {
       // Tentar atualização normal via Prisma Client
-        await prisma.user.update({
-          where: { id },
-          data: updateData
+        // Escrita dupla: vínculos de papel + booleanos coerentes, na mesma transação
+        await prisma.$transaction(async (tx) => {
+          await tx.user.update({
+            where: { id },
+            data: updateData
+          })
+          if (pedido.papeis) await gravarPapeis(tx, existingUser, pedido.papeis)
         })
-        
+
         await logAudit(
           session.user.id,
           'USUARIO',
           id,
           'UPDATE',
-          { fields: Object.keys(updateData).filter(k => k !== 'password') }
+          { fields: Object.keys(updateData).filter(k => k !== 'password'), ...(pedido.papeis ? { papeisAntes: atuais, papeis: pedido.papeis } : {}) }
         )
 
         return NextResponse.json({ message: 'Usuário atualizado com sucesso' })
@@ -101,10 +113,6 @@ export const PUT = rotaDoModulo('NUC', 'escrita', async function PUT(
         sqlFields.push(`email = $${valIdx++}`); values.push(email)
         sqlFields.push(`username = $${valIdx++}`); values.push(email) 
       }
-      if (isSuperuser !== undefined) { sqlFields.push(`is_superuser = $${valIdx++}`); values.push(!!isSuperuser) }
-      if (isDirecao !== undefined) { sqlFields.push(`is_direcao = $${valIdx++}`); values.push(!!isDirecao) }
-      if (isStaff !== undefined) { sqlFields.push(`is_staff = $${valIdx++}`); values.push(!!isStaff) }
-      if (isAEE !== undefined) { sqlFields.push(`is_aee = $${valIdx++}`); values.push(!!isAEE) }
       if (isActive !== undefined) { sqlFields.push(`is_active = $${valIdx++}`); values.push(!!isActive) }
       if (updateData.password) { sqlFields.push(`password = $${valIdx++}`); values.push(updateData.password) }
 
@@ -114,6 +122,9 @@ export const PUT = rotaDoModulo('NUC', 'escrita', async function PUT(
           UPDATE "users" SET ${sqlFields.join(', ')}, updated_at = NOW() WHERE id = $${valIdx}
         `, ...values)
       }
+
+      // Papéis (e os booleanos coerentes com eles)
+      if (pedido.papeis) await prisma.$transaction((tx) => gravarPapeis(tx, existingUser, pedido.papeis!))
 
       // Disciplinas precisam ser tratadas separadamente se houver alteração
       if (disciplinasIds !== undefined) {
@@ -151,7 +162,7 @@ export const DELETE = rotaDoModulo('NUC', 'escrita', async function DELETE(
   try {
     const session = await auth()
 
-    if (!session?.user?.escolaId || !session.user.isSuperuser) {
+    if (!session?.user?.escolaId || !can(session.user, 'usuario.gerenciar')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 403 })
     }
 

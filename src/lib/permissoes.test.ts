@@ -9,22 +9,12 @@ import {
   permissoesDosPapeis,
   normalizarPapeis,
   rotuloDoPapelPrincipal,
+  combinacoesDosBooleanos,
   type Booleanos,
 } from './permissoes'
 import { can, canLegado, ACOES_ANTIGAS } from './rbac'
 
-const CHAVES = ['isSuperuser', 'isDirecao', 'isStaff', 'isAEE', 'isPortalUser'] as const
-
-/** As 32 combinações dos booleanos de hoje. */
-export function todasAsCombinacoes(): Required<Booleanos>[] {
-  const r: Required<Booleanos>[] = []
-  for (let m = 0; m < 1 << CHAVES.length; m++) {
-    const b = {} as Required<Booleanos>
-    CHAVES.forEach((k, i) => { b[k] = !!(m & (1 << i)) })
-    r.push(b)
-  }
-  return r
-}
+const todasAsCombinacoes = combinacoesDosBooleanos
 
 /** Só os papéis (sem booleanos): obriga can() a decidir pelo modelo novo. */
 const soPapeis = (b: Booleanos) => ({ papeis: papeisDosBooleanos(b) })
@@ -124,11 +114,11 @@ describe('papéis novos (Secretaria e Coordenação) — tabela 2.5.1', () => {
 
   it('Secretaria: cadastro, turmas e matriz; sem notas, usuários ou configurações', () => {
     for (const p of ['estudante.ler', 'estudante.editar', 'pendencia.resolver', 'turma.gerenciar', 'matriz.gerenciar', 'escopo.escola'] as const) expect(can(sec, p), p).toBe(true)
-    for (const p of ['nota.lancar', 'avaliacao.lancar', 'usuario.gerenciar', 'configuracao.editar', 'conselho.decidir', 'aee.gerenciar'] as const) expect(can(sec, p), p).toBe(false)
+    for (const p of ['nota.lancar', 'nota.tela', 'usuario.gerenciar', 'configuracao.editar', 'conselho.decidir', 'aee.gerenciar'] as const) expect(can(sec, p), p).toBe(false)
   })
 
   it('Coordenação: diário, frequência, planos, resultados, conselho e questões; sem cadastro nem notas', () => {
     for (const p of ['frequencia.lancar', 'frequencia.acompanhar', 'plano.acompanhar', 'resultado.ler', 'conselho.decidir', 'questao.moderar', 'estudante.ler'] as const) expect(can(coord, p), p).toBe(true)
-    for (const p of ['estudante.editar', 'turma.gerenciar', 'nota.lancar', 'avaliacao.lancar', 'usuario.gerenciar', 'configuracao.editar'] as const) expect(can(coord, p), p).toBe(false)
+    for (const p of ['estudante.editar', 'turma.gerenciar', 'nota.lancar', 'nota.tela', 'usuario.gerenciar', 'configuracao.editar'] as const) expect(can(coord, p), p).toBe(false)
   })
 })

@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import * as dotenv from 'dotenv'
 import bcrypt from 'bcryptjs'
+import { sincronizarVinculosDosBooleanos } from '../src/lib/papeis'
 
 dotenv.config()
 
@@ -133,6 +134,11 @@ async function main() {
       },
     })
     console.log(`♿ Perfil AEE criado para ${estudanteAEE.nome} (1TIM1-003)`)
+  }
+
+  // Fase 3: vínculos de papel a partir dos booleanos (mesma regra do backfill)
+  for (const u of await prisma.user.findMany({ where: { escolaId: escolaId }, select: { id: true } })) {
+    await sincronizarVinculosDosBooleanos(prisma, u.id)
   }
 
   console.log('✅ Usuários de teste prontos. Veja LOGINS_TESTE.md.')
