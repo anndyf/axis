@@ -6,6 +6,8 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 - Ver no VS Code de outro computador: `git fetch origin` e depois `git show origin/registro:REGISTRO.md` (ou abrir a branch `registro`).
 - Como montar o ambiente e as regras do projeto: `CONTINUAR.md` na `main`.
 
+> **Para o Claude (em qualquer computador):** leia este arquivo e o `CONTINUAR.md` ao começar. A cada ação relevante (merge, sessão da nuvem iniciada ou concluída, validação, correção, decisão da dona do produto), atualize as seções "Agora" e "Histórico" (com data), faça commit e push direto na branch `registro`, sem PR. Não altere a `main` por causa deste arquivo.
+
 ---
 
 ## Agora
