@@ -12,6 +12,9 @@ declare module "next-auth" {
       isPlatformAdmin: boolean
       estudanteId: string | null
       escolaId: string
+      /** Fase 3: códigos dos papéis e permissões (null = sessão sem papéis; can() usa os booleanos) */
+      papeis?: string[] | null
+      permissoes?: string[] | null
     } & DefaultSession["user"]
   }
 
@@ -25,6 +28,9 @@ declare module "next-auth" {
     isPlatformAdmin: boolean
     estudanteId: string | null
     escolaId: string
+    /** Fase 3: códigos dos papéis e permissões (null = sessão sem papéis; can() usa os booleanos) */
+    papeis?: string[] | null
+    permissoes?: string[] | null
   }
 }
 
@@ -39,5 +45,8 @@ declare module "next-auth/jwt" {
     isPlatformAdmin: boolean
     estudanteId: string | null
     escolaId: string
+    /** Fase 3: códigos dos papéis e permissões (null = sessão sem papéis; can() usa os booleanos) */
+    papeis?: string[] | null
+    permissoes?: string[] | null
   }
 }

@@ -32,6 +32,8 @@ model Escola {
   ocorrencias       Ocorrencia[]
   escolaModulos     EscolaModulo[]
   assinaturas       Assinatura[]
+  papeis            Papel[]
+  vinculosPapel     VinculoPapel[]
   esquemasAvaliacao EsquemaAvaliacao[]
   periodoLetivos    PeriodoLetivo[]
   diaNaoLetivos     DiaNaoLetivo[]
@@ -245,11 +247,79 @@ model User {
   observacoesChamada    ObservacaoChamada[]     @relation("ObservacaoChamadaAutor")
   justificativas        Justificativa[]         @relation("JustificativaAutor")
   avaliacoesCriadas     AvaliacaoDisciplina[]   @relation("AvaliacaoCriador")
+  vinculosPapel         VinculoPapel[]
 
   @@unique([escolaId, email])
   @@unique([escolaId, username])
   @@index([escolaId])
   @@map("users")
+}
+
+// --- Papéis e permissões (fase 3 do roteiro; docs/arquitetura/dominio-alvo.md 2.5) ---
+// Os booleanos de User (isSuperuser, isDirecao, isStaff, isAEE, isPortalUser)
+// continuam sendo gravados até a fase 3c; o acesso passa a vir daqui.
+
+/// Papel = conjunto de permissões. Papéis de sistema têm escolaId nulo e
+/// sistema = true (o conteúdo vem de src/lib/permissoes.ts); a escola poderá
+/// criar papéis próprios (D-07).
+model Papel {
+  id         String           @id @default(cuid())
+  escolaId   String?          @map("escola_id")
+  escola     Escola?          @relation(fields: [escolaId], references: [id], onDelete: Cascade)
+  codigo     String
+  nome       String
+  descricao  String?
+  sistema    Boolean          @default(false)
+  createdAt  DateTime         @default(now()) @map("created_at")
+  updatedAt  DateTime         @updatedAt @map("updated_at")
+  permissoes PapelPermissao[]
+  vinculos   VinculoPapel[]
+
+  // + índice único parcial em codigo onde escola_id é nulo (na migration),
+  // porque o @@unique abaixo não impede dois papéis de sistema com o mesmo código
+  @@unique([escolaId, codigo])
+  @@map("papeis")
+}
+
+/// A permissão é um texto da lista FECHADA em src/lib/permissoes.ts.
+model PapelPermissao {
+  papelId   String @map("papel_id")
+  papel     Papel  @relation(fields: [papelId], references: [id], onDelete: Cascade)
+  permissao String
+
+  @@id([papelId, permissao])
+  @@map("papeis_permissoes")
+}
+
+enum EscopoPapel {
+  ESCOLA // toda a escola
+  CURSO
+  SERIE
+  TURMA
+  DOCENCIA // professor: derivado de disciplinasPermitidas/turmasPermitidas (Docencia na fase 4)
+  DEPENDENTES // responsável: só os estudantes vinculados
+  PROPRIO // estudante: só ele mesmo
+}
+
+/// Conta x escola x papel x escopo x vigência. Um vínculo por papel na
+/// escola nesta fase (escopos por curso/turma ficam para depois).
+model VinculoPapel {
+  id        String      @id @default(cuid())
+  usuarioId String      @map("usuario_id")
+  usuario   User        @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  escolaId  String      @map("escola_id")
+  escola    Escola      @relation(fields: [escolaId], references: [id])
+  papelId   String      @map("papel_id")
+  papel     Papel       @relation(fields: [papelId], references: [id])
+  escopo    EscopoPapel @default(ESCOLA)
+  escopoId  String?     @map("escopo_id") // id do curso/série/turma/estudante quando o escopo pedir
+  inicio    DateTime    @default(now())
+  fim       DateTime?
+  createdAt DateTime    @default(now()) @map("created_at")
+
+  @@unique([usuarioId, escolaId, papelId])
+  @@index([escolaId])
+  @@map("vinculos_papel")
 }
 
 model GlobalConfig {

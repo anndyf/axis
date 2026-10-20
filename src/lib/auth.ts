@@ -4,6 +4,7 @@ import Credentials from "next-auth/providers/credentials"
 import { CredentialsSignin } from "next-auth"
 import { excedeuLimite, registrarTentativa, limparTentativas } from "@/lib/limitador"
 import { prisma } from "@/lib/prisma"
+import { papeisParaSessao } from "@/lib/papeis"
 import bcrypt from "bcryptjs"
 import { headers } from "next/headers"
 
@@ -113,6 +114,15 @@ export const authConfig: NextAuthConfig = {
           console.error('Erro ao atualizar last_login:', error)
         }
 
+        // Fase 3: papéis e permissões vêm dos vínculos de papel. Conta sem
+        // vínculo (antes do backfill) fica sem eles e can() usa os booleanos.
+        let papeis: Awaited<ReturnType<typeof papeisParaSessao>> = null
+        try {
+          papeis = await papeisParaSessao(user.id, user.escolaId)
+        } catch (error) {
+          console.error('Erro ao carregar papéis:', error)
+        }
+
         return {
           id: user.id,
           email: user.email,
@@ -125,7 +135,9 @@ export const authConfig: NextAuthConfig = {
           isAEE: (user as any).isAEE || false,
           isPlatformAdmin: user.isPlatformAdmin,
           estudanteId: user.estudanteId,
-          escolaId: user.escolaId
+          escolaId: user.escolaId,
+          papeis: papeis?.papeis ?? null,
+          permissoes: papeis?.permissoes ?? null
         }
       }
     })
@@ -143,6 +155,8 @@ export const authConfig: NextAuthConfig = {
         token.isPlatformAdmin = (user as any).isPlatformAdmin
         token.estudanteId = (user as any).estudanteId
         token.escolaId = (user as any).escolaId
+        token.papeis = (user as any).papeis ?? null
+        token.permissoes = (user as any).permissoes ?? null
       }
       return token
     },
@@ -158,6 +172,8 @@ export const authConfig: NextAuthConfig = {
         session.user.isPlatformAdmin = token.isPlatformAdmin as boolean
         session.user.estudanteId = token.estudanteId as string
         session.user.escolaId = token.escolaId as string
+        session.user.papeis = (token.papeis as string[] | null | undefined) ?? null
+        session.user.permissoes = (token.permissoes as string[] | null | undefined) ?? null
       }
       return session
     }
