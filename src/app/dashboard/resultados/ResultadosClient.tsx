@@ -51,10 +51,10 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-32 space-y-8">
+      <main className="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 pt-2 pb-8 space-y-6 md:pt-4 md:pb-32 md:space-y-8">
         
         {/* Dica de Uso */}
-        <div className="bg-subtle border border-line rounded-lg p-5 flex items-start gap-4">
+        <div className="hidden bg-subtle border border-line rounded-lg p-5 items-start gap-4 md:flex">
           <div className="bg-surface p-2 rounded-xl shadow-sm border border-line flex-shrink-0 text-fg-subtle">
             <Info className="w-6 h-6" />
           </div>
@@ -67,33 +67,33 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
         </div>
 
         {/* Filtros Premium */}
-        <div className="bg-surface p-6 rounded-xl shadow-card border border-line flex flex-wrap gap-6 items-end relative overflow-hidden">
+        <div className="bg-surface p-4 rounded-2xl shadow-card border border-line flex flex-wrap gap-4 items-end relative overflow-hidden md:p-6 md:gap-6">
             
-            <div className="flex-1 min-w-[200px] space-y-2">
+            <div className="flex-1 min-w-[min(100%,200px)] space-y-2">
                 <label className="text-xs font-medium text-fg-subtle ml-2">Curso</label>
                 <select 
                     value={filterCurso}
                     onChange={(e) => setFilterCurso(e.target.value)}
-                    className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg px-6 py-4 text-sm focus:ring-2 focus:ring-zinc-500 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
+                    className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg px-4 py-3 text-base md:px-6 md:py-4 md:text-sm focus:ring-2 focus:ring-zinc-500 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
                 >
                     <option value="">Todos os Cursos</option>
                     {uniqueCursos.map((c: any) => <option key={c} value={c}>{c}</option>)}
                 </select>
             </div>
 
-            <div className="flex-1 min-w-[200px] space-y-2">
+            <div className="flex-1 min-w-[min(100%,200px)] space-y-2">
                 <label className="text-xs font-medium text-fg-subtle ml-2">Turno</label>
                 <select 
                     value={filterTurno}
                     onChange={(e) => setFilterTurno(e.target.value)}
-                    className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg px-6 py-4 text-sm focus:ring-2 focus:ring-zinc-500 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
+                    className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg px-4 py-3 text-base md:px-6 md:py-4 md:text-sm focus:ring-2 focus:ring-zinc-500 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
                 >
                     <option value="">Todos os Turnos</option>
                     {uniqueTurnos.map((t: any) => <option key={t} value={t}>{t}</option>)}
                 </select>
             </div>
 
-            <div className="flex-[2] min-w-[250px] space-y-2">
+            <div className="flex-[2] min-w-[min(100%,250px)] space-y-2">
                 <label className="text-xs font-medium text-fg-subtle ml-2">Pesquisar Turma</label>
                 <div className="relative group">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-canvas rounded-lg text-fg-subtle group-focus-within:text-fg-muted group-focus-within:bg-subtle transition-all">
@@ -104,7 +104,7 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
                         value={filterNome}
                         onChange={(e) => setFilterNome(e.target.value)}
                         placeholder="Ex: 1º Ano, Técnico em Enfermagem..."
-                        className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-zinc-500 transition-all font-medium text-fg-muted shadow-card placeholder:text-fg-disabled"
+                        className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-4 py-3 text-base md:pr-6 md:py-4 md:text-sm focus:ring-2 focus:ring-zinc-500 transition-all font-medium text-fg-muted shadow-card placeholder:text-fg-disabled"
                     />
                 </div>
             </div>
@@ -118,8 +118,8 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
         </div>
 
         {/* Turmas Grid Style Premium */}
-        <div className="bg-surface rounded-xl shadow-card border border-line p-8">
-          <div className="flex items-center justify-between mb-8">
+        <div className="md:bg-surface md:rounded-xl md:shadow-card md:border md:border-line md:p-8">
+          <div className="flex items-center justify-between mb-3 md:mb-8">
             <h2 className="text-xs font-semibold text-fg-subtle flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-subtle text-fg-muted flex items-center justify-center shadow-card">
                 <Users size={16} />
@@ -142,18 +142,18 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
                 <Link
                   key={turma.id}
                   href={`/dashboard/resultados/${turma.id}`}
-                  className="border border-line-strong rounded-2xl p-4 hover:border-zinc-500 hover:bg-subtle transition-all group bg-surface shadow-sm hover:shadow-card h-full flex flex-col justify-between"
+                  className="min-h-11 border border-line-strong rounded-2xl p-4 hover:border-zinc-500 hover:bg-subtle transition-all group bg-surface shadow-sm hover:shadow-card h-full flex flex-col justify-between"
                 >
                   <div>
-                    <h3 className="font-medium text-fg mb-3 group-hover:text-fg whitespace-nowrap truncate text-base tracking-tight" title={turma.nome}>
+                    <h3 className="font-semibold text-fg mb-2 break-words text-base tracking-tight">
                       {turma.nome}
                     </h3>
                     
                     <div className="space-y-1.5 text-sm text-fg-muted">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs font-medium text-fg-subtle truncate max-w-[60%]">{turma.curso || 'Ensino Médio'}</span>
+                      <div className="flex justify-between items-start gap-2">
+                        <span className="min-w-0 break-words text-xs font-medium text-fg-subtle">{turma.curso || 'Ensino Médio'}</span>
                         {turma.turno && (
-                          <span className="bg-subtle-hover/50 text-fg-muted text-xs font-medium px-1.5 py-0.5 rounded border border-line-strong/50">
+                          <span className="bg-subtle-hover/50 text-fg-muted text-xs font-medium px-1.5 py-0.5 rounded border border-line-strong/50 shrink-0">
                               {turma.turno}
                           </span>
                         )}

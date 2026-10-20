@@ -116,10 +116,10 @@ async function main() {
         ['chamada', '/dashboard/chamada'],
         ['chamada-fazer', `/dashboard/chamada/fazer?turma=${i.turma}&disciplina=${i.disciplina}&data=${i.dataAula}`],
         ['diario', `/dashboard/chamada/diario?turma=${i.turma}&disciplina=${i.disciplina}`],
-        ['notas-professor', `/dashboard/notas/lancar/${i.turma}`],
+        ['notas-professor', `/dashboard/notas/lancar/${i.turma}?disciplina=${i.disciplina}`],
       ],
     },
-    { usuario: '1TIM1-001', senha: '1TIM1-001', telas: [['portal', '/portal']] },
+    { usuario: '1TIM1-001', senha: '1TIM1-001', telas: [['portal', '/portal'], ['portal-boletim', '/portal?aba=boletim'], ['portal-frequencia', '/portal?aba=frequencia'], ['portal-horario', '/portal?aba=horario']] },
   ]
 
   for (const largura of LARGURAS) {
