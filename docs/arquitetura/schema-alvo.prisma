@@ -1275,3 +1275,494 @@ model Docencia {
   @@index([turmaComponenteId])
   @@map("docencias")
 }
+
+// =============================================================================
+// 6. VIDA ESCOLAR  (dominio-alvo.md 2.3)
+// =============================================================================
+
+enum TipoMatricula {
+  NOVA
+  REMATRICULA
+  TRANSFERENCIA_RECEBIDA
+  TRANSFERENCIA_INTERNA // veio de outro curso/turno da mesma escola
+  RECLASSIFICACAO
+  DEPENDENCIA // matrícula em componentes de dependência
+}
+
+/// Situação da MATRÍCULA (do ano). Mapeia direto para a 2ª etapa do Censo.
+enum SituacaoMatricula {
+  CURSANDO
+  APROVADO
+  APROVADO_CONSELHO
+  APROVADO_DEPENDENCIA
+  REPROVADO
+  REPROVADO_FALTA
+  TRANSFERIDO
+  TRANSFERIDO_INTERNAMENTE
+  ABANDONO // "deixou de frequentar"
+  FALECIDO
+  RECLASSIFICADO
+  CONCLUINTE
+  CANCELADA // matrícula feita por engano / desistência antes do início
+}
+
+/// [NOVO][FASE 6a] O vínculo do estudante com a escola NUM ANO LETIVO.
+model Matricula {
+  id                String             @id @default(cuid())
+  escolaId          String             @map("escola_id")
+  escola            Escola             @relation(fields: [escolaId], references: [id])
+  estudanteId       String             @map("estudante_id")
+  estudante         Estudante          @relation(fields: [estudanteId], references: [id])
+  anoLetivoId       String             @map("ano_letivo_id")
+  anoLetivo         AnoLetivo          @relation(fields: [anoLetivoId], references: [id])
+  cursoId           String             @map("curso_id")
+  curso             Curso              @relation(fields: [cursoId], references: [id])
+  serieId           String             @map("serie_id")
+  serie             Serie              @relation(fields: [serieId], references: [id])
+  turno             Turno
+  tipo              TipoMatricula      @default(NOVA)
+  situacao          SituacaoMatricula  @default(CURSANDO)
+  dataMatricula     DateTime           @map("data_matricula") @db.Date
+  dataSituacao      DateTime?          @map("data_situacao") @db.Date
+  matriculaOrigemId String?            @map("matricula_origem_id") // rematrícula / transferência interna
+  matriculaOrigem   Matricula?         @relation("MatriculaOrigem", fields: [matriculaOrigemId], references: [id])
+  derivadas         Matricula[]        @relation("MatriculaOrigem")
+  reconstruida      Boolean            @default(false) // criada pelo backfill a partir de turmaAnteriorId (fase 6a)
+  observacao        String?
+  camposExtras      Json               @default("{}") @map("campos_extras")
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+  enturmacoes       Enturmacao[]
+  movimentacoes     Movimentacao[]
+  resultados        ResultadoComponente[]
+  documentos        DocumentoEmitido[]
+
+  @@index([escolaId, anoLetivoId])
+  @@index([estudanteId])
+  @@map("matriculas")
+}
+
+enum MotivoSaidaTurma {
+  REMANEJAMENTO
+  TRANSFERENCIA
+  ABANDONO
+  CONCLUSAO // fim do ano
+  CANCELAMENTO
+  FALECIMENTO
+}
+
+/// [NOVO][FASE 6a] Passagem da matrícula por uma turma (com datas). Remanejamento
+/// = fechar uma e abrir outra. A lista de chamada de uma data usa estas datas.
+model Enturmacao {
+  id            String            @id @default(cuid())
+  escolaId      String            @map("escola_id")
+  escola        Escola            @relation(fields: [escolaId], references: [id])
+  matriculaId   String            @map("matricula_id")
+  matricula     Matricula         @relation(fields: [matriculaId], references: [id])
+  turmaId       String            @map("turma_id")
+  turma         Turma             @relation(fields: [turmaId], references: [id])
+  dataEntrada   DateTime          @map("data_entrada") @db.Date
+  dataSaida     DateTime?         @map("data_saida") @db.Date
+  motivoSaida   MotivoSaidaTurma? @map("motivo_saida")
+  numeroChamada Int?              @map("numero_chamada")
+  faltas        Falta[]
+
+  @@index([turmaId, dataEntrada])
+  @@index([matriculaId])
+  @@map("enturmacoes")
+}
+
+enum TipoMovimentacao {
+  MATRICULA
+  ENTURMACAO
+  REMANEJAMENTO
+  TRANSFERENCIA_INTERNA
+  TRANSFERENCIA_EXPEDIDA
+  TRANSFERENCIA_RECEBIDA
+  ABANDONO
+  RETORNO // voltou a frequentar
+  RECLASSIFICACAO
+  CONCLUSAO
+  CANCELAMENTO
+  FALECIMENTO
+  REABERTURA // ano/matrícula reaberta para correção
+  COMUNICACAO_CONSELHO_TUTELAR // ECA art. 56
+}
+
+/// [NOVO][FASE 6a] Livro da vida escolar: tudo o que aconteceu com a matrícula.
+model Movimentacao {
+  id                 String           @id @default(cuid())
+  escolaId           String           @map("escola_id")
+  escola             Escola           @relation(fields: [escolaId], references: [id])
+  matriculaId        String           @map("matricula_id")
+  matricula          Matricula        @relation(fields: [matriculaId], references: [id])
+  tipo               TipoMovimentacao
+  data               DateTime         @db.Date
+  escolaExternaNome  String?          @map("escola_externa_nome") // destino/origem fora do Áxis
+  escolaExternaInep  String?          @map("escola_externa_inep")
+  municipioExterno   String?          @map("municipio_externo")
+  observacao         String?
+  registradoPorId    String?          @map("registrado_por_id") // Usuario
+  documentoEmitidoId String?          @map("documento_emitido_id")
+  createdAt          DateTime         @default(now()) @map("created_at")
+
+  @@index([escolaId, data])
+  @@index([matriculaId])
+  @@map("movimentacoes")
+}
+
+/// [NOVO][FASE 6a] Estudos feitos em OUTRA escola (histórico e transferência recebida).
+model EstudoAnterior {
+  id            String    @id @default(cuid())
+  estudanteId   String    @map("estudante_id")
+  estudante     Estudante @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  ano           Int
+  serie         String
+  escolaNome    String    @map("escola_nome")
+  escolaInep    String?   @map("escola_inep")
+  municipio     String?
+  uf            String?
+  situacao      String    // como veio no documento de origem
+  componentes   Json      // [{ nome, cargaHoraria, resultado, frequencia }]
+  documentoUrl  String?   @map("documento_url")
+
+  @@index([estudanteId])
+  @@map("estudos_anteriores")
+}
+
+// =============================================================================
+// 7. DIÁRIO E FREQUÊNCIA  [ATUAL, ajustado]  (módulo DIA)
+// =============================================================================
+
+enum SituacaoAula {
+  PREVISTA
+  REALIZADA
+  CANCELADA
+}
+
+/// [ATUAL] disciplinaId -> turmaComponenteId (mesmo id, tabela renomeada).
+model Aula {
+  id                String              @id @default(cuid())
+  escolaId          String              @map("escola_id")
+  escola            Escola              @relation(fields: [escolaId], references: [id])
+  turmaId           String              @map("turma_id")
+  turma             Turma               @relation(fields: [turmaId], references: [id], onDelete: Cascade)
+  turmaComponenteId String?             @map("turma_componente_id") // null = chamada por dia
+  turmaComponente   TurmaComponente?    @relation(fields: [turmaComponenteId], references: [id], onDelete: Cascade)
+  profissionalId    String?             @map("profissional_id")
+  profissional      Profissional?       @relation(fields: [profissionalId], references: [id], onDelete: SetNull)
+  data              DateTime            @db.Date
+  tempos            Int[]
+  quantidade        Int                 @default(1)
+  conteudo          String?
+  situacao          SituacaoAula        @default(PREVISTA)
+  chave             String              @unique
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
+  faltas            Falta[]
+  observacoes       ObservacaoChamada[]
+
+  @@index([escolaId])
+  @@index([turmaId, data])
+  @@map("aulas")
+}
+
+/// [ATUAL] + enturmacaoId (fase 6a): a falta pertence à passagem do aluno pela turma.
+model Falta {
+  id           String      @id @default(cuid())
+  aulaId       String      @map("aula_id")
+  aula         Aula        @relation(fields: [aulaId], references: [id], onDelete: Cascade)
+  estudanteId  String      @map("estudante_id")
+  estudante    Estudante   @relation(fields: [estudanteId], references: [id])
+  enturmacaoId String?     @map("enturmacao_id")
+  enturmacao   Enturmacao? @relation(fields: [enturmacaoId], references: [id])
+  quantidade   Int         @default(1)
+  tempos       Int[]       @default([])
+
+  @@unique([aulaId, estudanteId])
+  @@index([estudanteId])
+  @@map("faltas")
+}
+
+/// [ATUAL]
+model ObservacaoChamada {
+  id          String    @id @default(cuid())
+  aulaId      String    @map("aula_id")
+  aula        Aula      @relation(fields: [aulaId], references: [id], onDelete: Cascade)
+  estudanteId String    @map("estudante_id")
+  estudante   Estudante @relation(fields: [estudanteId], references: [id])
+  texto       String
+  autorId     String?   @map("autor_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@unique([aulaId, estudanteId])
+  @@map("observacoes_chamada")
+}
+
+enum TipoJustificativa {
+  ATESTADO
+  ABONO_LEGAL
+  OUTRO
+}
+
+enum EfeitoJustificativa {
+  ABONA
+  SO_JUSTIFICA
+}
+
+/// [ATUAL]
+model Justificativa {
+  id              String              @id @default(cuid())
+  escolaId        String              @map("escola_id")
+  escola          Escola              @relation(fields: [escolaId], references: [id])
+  estudanteId     String              @map("estudante_id")
+  estudante       Estudante           @relation(fields: [estudanteId], references: [id])
+  inicio          DateTime            @db.Date
+  fim             DateTime            @db.Date
+  tipo            TipoJustificativa
+  efeito          EfeitoJustificativa
+  descricao       String?
+  documentoUrl    String?             @map("documento_url")
+  registradoPorId String?             @map("registrado_por_id")
+  createdAt       DateTime            @default(now()) @map("created_at")
+
+  @@index([escolaId, estudanteId])
+  @@map("justificativas")
+}
+
+// =============================================================================
+// 8. AVALIAÇÃO E RESULTADOS  [ATUAL, ajustado]  (módulos NOT e RES)
+// =============================================================================
+
+enum ModoRecuperacaoUnidade {
+  SUBSTITUI_SE_MAIOR
+  MEDIA_COM_UNIDADE
+}
+
+enum ModoRecuperacaoFinal {
+  SUBSTITUI_MENOR_UNIDADE
+  NOTA_MINIMA_ISOLADA
+  MEDIA_COM_FINAL
+}
+
+enum TipoNota {
+  NUMERICA
+  CONCEITUAL // [FASE pós-11] conceito A-E / atingiu-parcial-não atingiu
+  PARECER // [NOVO] parecer descritivo (infantil / anos iniciais)
+}
+
+enum FormaCalculo {
+  SOMA
+  MEDIA_ARITMETICA
+  MEDIA_PONDERADA
+  SOMA_COM_DIVISOR
+  MAIOR_NOTA
+}
+
+enum DefinicaoAtividades {
+  ESCOLA
+  PROFESSOR
+}
+
+enum RegistroFrequencia {
+  POR_AULA
+  POR_DIA
+}
+
+enum ApuracaoFrequencia {
+  GERAL
+  POR_COMPONENTE
+}
+
+/// [ATUAL] Conquista a manter: regra de avaliação configurável. Ganha conceito/parecer
+/// e limite de dependências (regra de aprovação da matrícula).
+model EsquemaAvaliacao {
+  id                      String                  @id @default(cuid())
+  escolaId                String                  @map("escola_id")
+  escola                  Escola                  @relation(fields: [escolaId], references: [id])
+  nome                    String
+  numUnidades             Int                     @map("num_unidades")
+  notaMinimaAprovacao     Float                   @default(5) @map("nota_minima_aprovacao")
+  recuperacaoUnidadeAtiva Boolean                 @default(false) @map("recuperacao_unidade_ativa")
+  modoRecuperacaoUnidade  ModoRecuperacaoUnidade? @map("modo_recuperacao_unidade")
+  recuperacaoFinalAtiva   Boolean                 @default(true) @map("recuperacao_final_ativa")
+  modoRecuperacaoFinal    ModoRecuperacaoFinal?   @default(NOTA_MINIMA_ISOLADA) @map("modo_recuperacao_final")
+  notaMinimaExameFinal    Float?                  @map("nota_minima_exame_final")
+  tipoNota                TipoNota                @default(NUMERICA) @map("tipo_nota")
+  conceitos               Json?                   // [NOVO] escala conceitual: [{ sigla:"A", rotulo, equivaleA?: 9 }]
+  notaMaxima              Float                   @default(10) @map("nota_maxima")
+  casasDecimais           Int                     @default(1) @map("casas_decimais")
+  formaCalculoFinal       FormaCalculo            @default(MEDIA_ARITMETICA) @map("forma_calculo_final")
+  divisorFinal            Float?                  @map("divisor_final")
+  definicaoAtividades     DefinicaoAtividades     @default(ESCOLA) @map("definicao_atividades")
+  registroFrequencia      RegistroFrequencia      @default(POR_AULA) @map("registro_frequencia")
+  apuracaoFrequencia      ApuracaoFrequencia      @default(GERAL) @map("apuracao_frequencia")
+  frequenciaMinima        Float                   @default(75) @map("frequencia_minima") // nunca abaixo do mínimo legal da etapa
+  maxDependencias         Int                     @default(0) @map("max_dependencias") // [NOVO] progressão parcial
+  createdAt               DateTime                @default(now()) @map("created_at")
+  updatedAt               DateTime                @updatedAt @map("updated_at")
+  unidades                EsquemaUnidade[]
+  cursos                  Curso[]
+  turmas                  Turma[]
+  turmaComponentes        TurmaComponente[]
+
+  @@index([escolaId])
+  @@map("esquemas_avaliacao")
+}
+
+/// [ATUAL]
+model EsquemaUnidade {
+  id                   String                @id @default(cuid())
+  esquemaId            String                @map("esquema_id")
+  esquema              EsquemaAvaliacao      @relation(fields: [esquemaId], references: [id], onDelete: Cascade)
+  ordem                Int
+  nome                 String
+  peso                 Float                 @default(1)
+  formaCalculo         FormaCalculo          @default(SOMA) @map("forma_calculo")
+  divisor              Float?
+  atividades           EsquemaAtividade[]
+  notas                NotaUnidade[]
+  etapaCalendarios     EtapaCalendario[]
+  avaliacoesDisciplina AvaliacaoDisciplina[]
+
+  @@unique([esquemaId, ordem])
+  @@map("esquema_unidades")
+}
+
+/// [ATUAL]
+model EsquemaAtividade {
+  id               String          @id @default(cuid())
+  esquemaUnidadeId String          @map("esquema_unidade_id")
+  esquemaUnidade   EsquemaUnidade  @relation(fields: [esquemaUnidadeId], references: [id], onDelete: Cascade)
+  nome             String
+  notaMaxima       Float           @map("nota_maxima")
+  peso             Float           @default(1)
+  ordem            Int
+  notas            NotaAtividade[]
+
+  @@map("esquema_atividades")
+}
+
+/// Situação do COMPONENTE (por disciplina). Separada da situação da matrícula.
+enum SituacaoComponente {
+  CURSANDO
+  EM_RECUPERACAO
+  APROVADO
+  APROVADO_RECUPERACAO
+  APROVADO_CONSELHO
+  REPROVADO_NOTA
+  REPROVADO_FALTA
+  DEPENDENCIA
+  DISPENSADO // aproveitamento de estudos
+}
+
+/// [MUDA][FASE 6a] Era NotaFinal (estudante x disciplina). Passa a ser
+/// matrícula x componente da turma: remanejamento não perde notas.
+/// rotuloRegimento guarda a sigla própria da escola (ex.: "CO") quando houver (D-19).
+model ResultadoComponente {
+  id                String              @id @default(cuid())
+  escolaId          String              @map("escola_id")
+  escola            Escola              @relation(fields: [escolaId], references: [id])
+  matriculaId       String              @map("matricula_id")
+  matricula         Matricula           @relation(fields: [matriculaId], references: [id])
+  turmaComponenteId String              @map("turma_componente_id")
+  turmaComponente   TurmaComponente     @relation(fields: [turmaComponenteId], references: [id])
+  nota              Float?
+  conceito          String?
+  parecer           String?
+  notaRecuperacao   Float?              @map("nota_recuperacao")
+  frequencia        Float?              // gravada no fechamento; durante o ano é calculada
+  situacao          SituacaoComponente  @default(CURSANDO)
+  modificadoPorId   String?             @map("modificado_por_id")
+  modificadoEm      DateTime            @default(now()) @map("modificado_em")
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
+  unidades          NotaUnidade[]
+  auditorias        ResultadoAudit[]
+
+  @@unique([matriculaId, turmaComponenteId])
+  @@index([turmaComponenteId])
+  @@map("resultados_componente")
+}
+
+/// [ATUAL] Era NotaFinalAudit.
+model ResultadoAudit {
+  id              String              @id @default(cuid())
+  resultadoId     String              @map("resultado_id")
+  resultado       ResultadoComponente @relation(fields: [resultadoId], references: [id], onDelete: Cascade)
+  notaAnterior    Float?              @map("nota_anterior")
+  notaAtual       Float?              @map("nota_atual")
+  situacao        SituacaoComponente
+  motivo          String?             // [NOVO] retificação após fechamento exige motivo
+  modificadoPorId String?             @map("modificado_por_id")
+  createdAt       DateTime            @default(now()) @map("created_at")
+
+  @@map("resultados_audit")
+}
+
+/// [ATUAL] notaFinalId -> resultadoId.
+model NotaUnidade {
+  id               String              @id @default(cuid())
+  resultadoId      String              @map("resultado_id")
+  resultado        ResultadoComponente @relation(fields: [resultadoId], references: [id], onDelete: Cascade)
+  esquemaUnidadeId String              @map("esquema_unidade_id")
+  esquemaUnidade   EsquemaUnidade      @relation(fields: [esquemaUnidadeId], references: [id])
+  notaCalculada    Float?              @map("nota_calculada")
+  notaRecuperacao  Float?              @map("nota_recuperacao")
+  conceito         String?             // [NOVO]
+  parecer          String?             // [NOVO]
+  origemTurmaId    String?             @map("origem_turma_id") // [NOVO] nota vinda de outra turma (remanejamento): só leitura
+  atividades       NotaAtividade[]
+  avaliacoes       NotaAvaliacao[]
+
+  @@unique([resultadoId, esquemaUnidadeId])
+  @@map("notas_unidades")
+}
+
+/// [ATUAL]
+model NotaAtividade {
+  id                 String           @id @default(cuid())
+  notaUnidadeId      String           @map("nota_unidade_id")
+  notaUnidade        NotaUnidade      @relation(fields: [notaUnidadeId], references: [id], onDelete: Cascade)
+  esquemaAtividadeId String           @map("esquema_atividade_id")
+  esquemaAtividade   EsquemaAtividade @relation(fields: [esquemaAtividadeId], references: [id])
+  valor              Float?
+
+  @@unique([notaUnidadeId, esquemaAtividadeId])
+  @@map("notas_atividades")
+}
+
+/// [ATUAL] disciplinaId -> turmaComponenteId.
+model AvaliacaoDisciplina {
+  id                String          @id @default(cuid())
+  turmaComponenteId String          @map("turma_componente_id")
+  turmaComponente   TurmaComponente @relation(fields: [turmaComponenteId], references: [id], onDelete: Cascade)
+  esquemaUnidadeId  String          @map("esquema_unidade_id")
+  esquemaUnidade    EsquemaUnidade  @relation(fields: [esquemaUnidadeId], references: [id], onDelete: Restrict)
+  nome              String
+  data              DateTime?       @db.Date
+  notaMaxima        Float           @map("nota_maxima")
+  peso              Float           @default(1)
+  ordem             Int
+  criadoPorId       String?         @map("criado_por_id")
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+  notas             NotaAvaliacao[]
+
+  @@index([turmaComponenteId, esquemaUnidadeId])
+  @@map("avaliacoes_disciplina")
+}
+
+/// [ATUAL]
+model NotaAvaliacao {
+  id            String              @id @default(cuid())
+  notaUnidadeId String              @map("nota_unidade_id")
+  notaUnidade   NotaUnidade         @relation(fields: [notaUnidadeId], references: [id], onDelete: Cascade)
+  avaliacaoId   String              @map("avaliacao_id")
+  avaliacao     AvaliacaoDisciplina @relation(fields: [avaliacaoId], references: [id], onDelete: Cascade)
+  valor         Float?
+
+  @@unique([notaUnidadeId, avaliacaoId])
+  @@map("notas_avaliacoes")
+}
