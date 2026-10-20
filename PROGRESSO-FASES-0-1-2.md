@@ -15,8 +15,8 @@ Escopo: `docs/arquitetura/roteiro-de-migracao.md`, fases 0, 1 e 2.
 | 1.2 | Fase 1: aplicação nas rotas de API | ✅ (páginas também) |
 | 1.3 | Fase 1: actions e páginas + página "módulo indisponível" | ✅ |
 | 1.4 | Fase 1: teste estático de cobertura + teste de comportamento | ✅ 402 testes |
-| 2.1 | Fase 2: schema + migration + backfill | ⬜ |
-| 2.2 | Fase 2: `getModulosAtivos` novo + equivalência + somente leitura | ⬜ |
+| 2.1 | Fase 2: schema + migration + backfill | ✅ migration `20261020120000_planos_e_assinaturas`; `prisma/backfill/fase-2.ts` |
+| 2.2 | Fase 2: `getModulosAtivos` novo + equivalência + somente leitura | ✅ 420 testes |
 | 2.3 | Fase 2: painel da plataforma | ⬜ |
 | 3 | Encerramento + PR | ⬜ |
 
@@ -36,6 +36,14 @@ Escopo: `docs/arquitetura/roteiro-de-migracao.md`, fases 0, 1 e 2.
 - **Exceção herdada no Banco de Questões**: o liga/desliga sempre valeu só para professores (a direção e o administrador continuavam usando). Mantido em `estadoParaUsuario` (regra pura, testada). A tela "módulo indisponível" mostra para QST o mesmo texto que o professor já via ("Módulo em Manutenção…").
 - **Mapa conservador** (`src/lib/modulos/mapa-rotas.ts`): no Núcleo ficaram os de uso misto — mensagens, portal do aluno, esquemas de avaliação (definem também a frequência), matriz curricular (gera as disciplinas da turma), cadastro básico de estudantes, importar/verificar horário de usuário e a action "reportar estudante faltante". SEC: ocorrências, importação CSV, sincronizar, promover turma. RES: relatórios/PDFs de turma, resultados, conselho. IND: professores pendentes.
 - **Achado extra (corrigido)**: a página do banco de questões listava para a gestão as disciplinas de **todas as escolas** (`where: {}`). Agora filtra pela escola da sessão.
+
+### Fase 2
+- **Assinatura.escolaId obrigatório** (no schema-alvo é opcional por causa da mantenedora, que ainda não existe). Sem `@@unique`: a vigente é a mais recente.
+- **Planos iniciais** BASICO/PRO/ENTERPRISE calculados do catálogo de hoje: Básico = todos os módulos menos QST, PRV e FIN; Pro e Enterprise = todos. Limite de usuários copiado (15/50/sem limite); o limite em uso continua sendo o antigo (`LIMITE_USUARIOS`), como pede o roteiro. Sem preços (D-11).
+- **Situação**: TRIAL → TESTE sem `fimTeste` (a definir: continua tudo liberado); ATIVA/SUSPENSA/CANCELADA iguais. Só INADIMPLENTE e teste vencido deixam módulos em somente leitura; suspensa e cancelada continuam tratadas no proxy (bloqueiam a escola inteira), por isso não mexem nos módulos.
+- **Overrides de EscolaModulo**: viram AssinaturaModulo (EXCECAO) por módulo. Override em item sem plano mínimo (não tinha efeito) é ignorado e relatado; módulo com itens divergentes (ex.: provas ligado e simulados desligado) fica ATIVO e é relatado.
+- **Leitura dupla**: `getModulosAtivos` e `estadosDaEscola` leem a assinatura; escola sem assinatura usa o modelo antigo (`getModulosAtivosLegado`, `estadosLegados`).
+- **Selo "somente leitura" no menu**: não feito (a instrução limita as telas novas ao painel da plataforma). Quem tenta gravar num módulo em leitura recebe a mensagem "está em modo somente leitura…".
 
 ## Como retomar
 Checkout de `fase/0-1-2-seguranca-modulos`, ler esta tabela, continuar do primeiro passo não ✅.

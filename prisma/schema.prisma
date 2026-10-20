@@ -31,6 +31,7 @@ model Escola {
   estudantes        Estudante[]
   ocorrencias       Ocorrencia[]
   escolaModulos     EscolaModulo[]
+  assinaturas       Assinatura[]
   esquemasAvaliacao EsquemaAvaliacao[]
   periodoLetivos    PeriodoLetivo[]
   diaNaoLetivos     DiaNaoLetivo[]
@@ -54,6 +55,132 @@ model EscolaModulo {
   @@unique([escolaId, moduloId])
   @@index([escolaId])
   @@map("escola_modulos")
+}
+
+// --- Planos e assinaturas (fase 2 do roteiro; docs/arquitetura/modulos-e-planos.md 4.5) ---
+// Convivem com Escola.plano, PlanoTipo e EscolaModulo até a validação; o
+// código lê daqui com fallback para o modelo antigo quando a escola ainda
+// não tem assinatura (src/lib/modulos/estados.ts).
+
+/// Ids estáveis dos módulos (documento 4.2). O catálogo de menu continua em src/lib/modules.ts.
+enum ModuloId {
+  NUC
+  SEC
+  DIA
+  NOT
+  RES
+  AEE
+  QST
+  PRV
+  PLA
+  COM
+  REC
+  FIN
+  IND
+  DOC
+}
+
+enum EstadoModulo {
+  ATIVO
+  SOMENTE_LEITURA
+  INATIVO
+}
+
+enum SituacaoAssinatura {
+  TESTE
+  ATIVA
+  INADIMPLENTE
+  SUSPENSA
+  CANCELADA
+}
+
+enum OrigemModulo {
+  PLANO
+  ADICIONAL
+  CORTESIA
+  TESTE
+  EXCECAO
+}
+
+/// Catálogo comercial de planos (pacotes de módulos). Substituirá o enum PlanoTipo.
+model Plano {
+  id                    String        @id @default(cuid())
+  codigo                String        @unique
+  nome                  String
+  descricao             String?
+  ativoParaVenda        Boolean       @default(true) @map("ativo_para_venda")
+  ordem                 Int           @default(0)
+  limiteEstudantes      Int?          @map("limite_estudantes")
+  limiteUsuarios        Int?          @map("limite_usuarios")
+  limiteArmazenamentoMb Int?          @map("limite_armazenamento_mb")
+  createdAt             DateTime      @default(now()) @map("created_at")
+  updatedAt             DateTime      @updatedAt @map("updated_at")
+  modulos               PlanoModulo[]
+  assinaturas           Assinatura[]
+
+  @@map("planos")
+}
+
+model PlanoModulo {
+  planoId  String   @map("plano_id")
+  plano    Plano    @relation(fields: [planoId], references: [id], onDelete: Cascade)
+  moduloId ModuloId @map("modulo_id")
+
+  @@id([planoId, moduloId])
+  @@map("planos_modulos")
+}
+
+/// Assinatura de uma escola (a vigente é a mais recente). Rede/mantenedora fica para depois.
+model Assinatura {
+  id                    String                @id @default(cuid())
+  escolaId              String                @map("escola_id")
+  escola                Escola                @relation(fields: [escolaId], references: [id])
+  planoId               String                @map("plano_id")
+  plano                 Plano                 @relation(fields: [planoId], references: [id])
+  situacao              SituacaoAssinatura    @default(TESTE)
+  inicio                DateTime              @db.Date
+  fim                   DateTime?             @db.Date
+  fimTeste              DateTime?             @map("fim_teste") @db.Date
+  limiteEstudantes      Int?                  @map("limite_estudantes")
+  limiteUsuarios        Int?                  @map("limite_usuarios")
+  limiteArmazenamentoMb Int?                  @map("limite_armazenamento_mb")
+  observacoes           String?
+  createdAt             DateTime              @default(now()) @map("created_at")
+  updatedAt             DateTime              @updatedAt @map("updated_at")
+  modulos               AssinaturaModulo[]
+  historico             HistoricoAssinatura[]
+
+  @@index([escolaId])
+  @@map("assinaturas")
+}
+
+/// Add-ons e exceções por módulo; sobrescrevem o que vem do plano.
+model AssinaturaModulo {
+  id           String       @id @default(cuid())
+  assinaturaId String       @map("assinatura_id")
+  assinatura   Assinatura   @relation(fields: [assinaturaId], references: [id], onDelete: Cascade)
+  moduloId     ModuloId     @map("modulo_id")
+  origem       OrigemModulo
+  estado       EstadoModulo @default(ATIVO)
+  inicio       DateTime     @db.Date
+  fim          DateTime?    @db.Date
+  leituraAte   DateTime?    @map("leitura_ate") @db.Date
+
+  @@unique([assinaturaId, moduloId])
+  @@map("assinaturas_modulos")
+}
+
+model HistoricoAssinatura {
+  id           String     @id @default(cuid())
+  assinaturaId String     @map("assinatura_id")
+  assinatura   Assinatura @relation(fields: [assinaturaId], references: [id], onDelete: Cascade)
+  descricao    String
+  dados        Json?
+  autorId      String?    @map("autor_id")
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  @@index([assinaturaId])
+  @@map("historico_assinaturas")
 }
 
 enum PlanoTipo {
