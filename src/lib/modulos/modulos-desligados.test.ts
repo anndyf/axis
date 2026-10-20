@@ -9,6 +9,7 @@
  *    página de módulo do mapa é chamada de verdade com sessão de direção.
  *    Nada pode ter mudado no banco.
  */
+/* eslint-disable @typescript-eslint/no-explicit-any -- mocks e respostas JSON genéricas */
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest'
 import fs from 'fs'
 import path from 'path'

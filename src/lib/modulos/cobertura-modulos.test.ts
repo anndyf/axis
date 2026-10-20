@@ -39,7 +39,7 @@ const paginas = todos.filter((f) => path.basename(f.rel) === 'page.tsx' && (f.re
 function funcoesExportadas(src: string): { nome: string; corpo: string }[] {
   const re = /^export async function (\w+)/gm
   const marcas = [...src.matchAll(re)].map((m) => ({ nome: m[1], ini: m.index! }))
-  return marcas.map((m, i) => {
+  return marcas.map((m) => {
     const prox = src.slice(m.ini + 1).search(/^export /m)
     const fim = prox === -1 ? src.length : m.ini + 1 + prox
     return { nome: m.nome, corpo: src.slice(m.ini, fim) }

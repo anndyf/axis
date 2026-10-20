@@ -56,7 +56,7 @@ export function respostaModuloIndisponivel(e: ModuloIndisponivel) {
  * Envolve um handler de rota: `export const GET = rotaDoModulo('NOT', 'leitura', async function GET(req) {...})`.
  * Leitura para consultas (GET e POSTs que só consultam), escrita para o resto.
  */
-export function rotaDoModulo<H extends (...args: any[]) => Promise<Response>>(modulo: ModuloId, acesso: Acesso, handler: H): H {
+export function rotaDoModulo<H extends (...args: never[]) => Promise<Response>>(modulo: ModuloId, acesso: Acesso, handler: H): H {
   if (modulo === 'NUC') return handler
   return (async (...args: Parameters<H>) => {
     const e = await bloqueio(modulo, acesso)
