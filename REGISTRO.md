@@ -13,24 +13,27 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 ## Agora
 
 **Rodando na nuvem**
-- Fases 0, 1 e 2 do roteiro de arquitetura (segurança, `exigirModulo` no servidor, planos/assinaturas). Branch `fase/0-1-2-seguranca-modulos`. Iniciada em 20/10. Quando terminar: validar localmente (migrations, testes, revisão de segurança).
+- Nada no momento.
 
 **Pronto para iniciar quando quiser**
-- Fase 3a (papéis e permissões) em paralelo: instrução em `docs/sessoes-nuvem/fase-3a.md`, numa sessão nova (branch `main`, Opus 5.5).
+- Fase 3a (papéis e permissões): instrução em `docs/sessoes-nuvem/fase-3a.md`, numa sessão nova (branch `main`, Opus 5.5).
+- Tipografia, etapa 2: títulos de seção maiores (hoje 12px em negrito), rótulos discretos, sem Maiúscula Em Cada Palavra. Liberada agora que as fases 0-1-2 entraram.
 
 **Esperando decisão da dona do produto**
 - As 20 decisões de `docs/arquitetura/decisoes.md`. As 5 mais urgentes: D-03 (público-alvo), D-01 (núcleo e módulos), D-14 (quando a CETEP migra para matrícula por ano), D-06 (etapas de ensino no lançamento), D-04 (redes agora ou depois).
+- Preços dos planos (a fase 2 criou os planos com preço zerado).
 
 **Próximos passos**
-1. Validar o PR das fases 0-1-2 quando a nuvem terminar.
-2. Tipografia, etapa 2: títulos de seção maiores (hoje 12px em negrito), rótulos discretos, sem Maiúscula Em Cada Palavra. Depois do PR das fases 0-1-2, porque mexe nas mesmas telas.
-3. Fases seguintes do roteiro conforme as decisões.
+1. Fase 3a e tipografia etapa 2 (podem rodar juntas? a 3a mexe em schema e `can()`; a tipografia em telas: pouco conflito, mas melhor em sequência).
+2. Fases seguintes do roteiro conforme as decisões.
+3. Em produção (quando houver): rodar `prisma migrate deploy` e `npx tsx prisma/backfill/fase-2.ts` com backup verificado.
 
 ---
 
 ## Histórico
 
 ### 20/10/2026
+- Fases 0, 1 e 2 mergeadas (PR #14) e validadas localmente: migration `20261020120000_planos_e_assinaturas` aplicada nos dois bancos; backfill `prisma/backfill/fase-2.ts` criou 3 planos e 2 assinaturas, equivalente nas duas escolas, e na 2ª execução não criou nada; 437 testes passando. Conferido ao vivo: com o módulo de provas desligado na Horizonte, o menu some, a página mostra "Módulo indisponível" e a API responde 403; na CETEP nada muda. Inclui as correções de segurança da fase 0 (PDFs e `reportarEstudanteFaltante` exigem papel; questões conferem o módulo) e a trava `exigirModulo` em todas as rotas, actions e páginas, com teste que falha se alguma ficar de fora.
 - Revisão de arquitetura concluída na nuvem e mergeada (PR #12): inventário, domínio-alvo, personalização, módulos e planos, roteiro de migração em 12 fases, 20 decisões, schema-alvo. Apontou 3 possíveis falhas de segurança (PDFs sem checagem de papel, `reportarEstudanteFaltante` sem papel, módulos pagos sem trava no servidor), que entram na fase 0.
 - Tipografia: fonte Inter no lugar da Geist, `font-bold` limitado a 600, títulos com peso 600 (PR #11, mergeado). Escolha da dona do produto: opção B da comparação, "o mais próximo de sistemas de gestão acadêmica".
 - Documento de passagem entre computadores `CONTINUAR.md` e instruções prontas em `docs/sessoes-nuvem/` (PR #13, mergeado).
