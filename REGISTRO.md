@@ -13,10 +13,9 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 ## Agora
 
 **Rodando na nuvem**
-- Nada no momento.
+- Fases 3a e 3b (papéis e permissões): branch `fase/3ab-papeis`. Instrução em `sessoes-nuvem/fase-3ab.md` nesta branch. A 3c (remover os booleanos e tirar a conta da plataforma da escola) fica para depois da validação.
 
 **Pronto para iniciar quando quiser**
-- Fase 3a (papéis e permissões): instrução em `docs/sessoes-nuvem/fase-3a.md`, numa sessão nova (branch `main`, Opus 5.5).
 - Tipografia, etapa 2: títulos de seção maiores (hoje 12px em negrito), rótulos discretos, sem Maiúscula Em Cada Palavra. Liberada agora que as fases 0-1-2 entraram.
 
 **Esperando decisão da dona do produto**
@@ -33,6 +32,7 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 ## Histórico
 
 ### 20/10/2026
+- Decidido rodar as fases 3a + 3b juntas na nuvem (3c depois da validação, por ser a única que remove coisas).
 - Fases 0, 1 e 2 mergeadas (PR #14) e validadas localmente: migration `20261020120000_planos_e_assinaturas` aplicada nos dois bancos; backfill `prisma/backfill/fase-2.ts` criou 3 planos e 2 assinaturas, equivalente nas duas escolas, e na 2ª execução não criou nada; 437 testes passando. Conferido ao vivo: com o módulo de provas desligado na Horizonte, o menu some, a página mostra "Módulo indisponível" e a API responde 403; na CETEP nada muda. Inclui as correções de segurança da fase 0 (PDFs e `reportarEstudanteFaltante` exigem papel; questões conferem o módulo) e a trava `exigirModulo` em todas as rotas, actions e páginas, com teste que falha se alguma ficar de fora.
 - Revisão de arquitetura concluída na nuvem e mergeada (PR #12): inventário, domínio-alvo, personalização, módulos e planos, roteiro de migração em 12 fases, 20 decisões, schema-alvo. Apontou 3 possíveis falhas de segurança (PDFs sem checagem de papel, `reportarEstudanteFaltante` sem papel, módulos pagos sem trava no servidor), que entram na fase 0.
 - Tipografia: fonte Inter no lugar da Geist, `font-bold` limitado a 600, títulos com peso 600 (PR #11, mergeado). Escolha da dona do produto: opção B da comparação, "o mais próximo de sistemas de gestão acadêmica".
