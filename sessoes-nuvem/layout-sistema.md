@@ -21,7 +21,7 @@ Ninguém vai acompanhar. Não pare para perguntar: na dúvida, escolha a opção
 - Capturas com Playwright (reaproveite scripts/capturas.ts) em 1440px, 1280px e 375px, claro e escuro, ANTES de começar e ao final de cada etapa, em docs/capturas/layout-sistema/<etapa>/. Olhe as capturas e corrija o que estiver desalinhado, apertado ou com rolagem horizontal. Confira que o celular não regrediu.
 
 ## Regras obrigatórias
-- Mudança VISUAL e de organização: não altere regras de negócio, consultas, permissões, a trava de módulos (`exigirModulo`) nem rotas de API. As abas só reorganizam telas que já existem (links para as rotas atuais ou rotas filhas que reaproveitam os mesmos componentes e consultas).
+- Mudança VISUAL e de organização (exceções explícitas: último acesso na etapa 7 e leitura do histórico na etapa 5): não altere regras de negócio, consultas, permissões, a trava de módulos (`exigirModulo`) nem rotas de API. As abas só reorganizam telas que já existem (links para as rotas atuais ou rotas filhas que reaproveitam os mesmos componentes e consultas).
 - Toda consulta continua filtrando pela escola da sessão; nada de dado novo vai ao navegador além do que a tela já mostrava; nunca o registro inteiro de User.
 - O teste de cobertura de módulos (src/lib/modulos/cobertura-modulos.test.ts) precisa continuar passando: rota/página nova entra no mapa de módulos com a guarda.
 - Use e amplie o design system (tokens em src/app/globals.css, componentes em src/components/ui). Atualize a vitrine /dashboard/ui com os componentes novos.
@@ -46,6 +46,26 @@ Ninguém vai acompanhar. Não pare para perguntar: na dúvida, escolha a opção
 
 ### 4. Listas e telas de trabalho
 Na ordem: turmas, estudantes, usuários, disciplinas, resultados, frequência/infrequência, conselho de classe, lançamento de notas, chamada e diário (desktop), mensagens, ocorrências, AEE, provas/questões/simulados, configurações. Em cada uma: `CabecalhoPagina` + `Painel` + `BarraFerramentas` + `Tabela`, sem mudar o que a tela faz. Dashboard inicial: painéis em grade usando a largura toda.
+
+### 5. Rastreabilidade visível
+- Rodapé discreto em fichas e registros (turma, estudante, usuário, ficha AEE, plano de ensino, ocorrência, avaliação): "Criado por Fulana em 12/03/2026 · Última alteração por Beltrano em 18/10/2026, 14:32", com os dados que já existem (createdAt/updatedAt, AuditLog, autores já gravados). Onde o autor não é gravado hoje, mostre só a data (não invente autor; registre em PROGRESSO-LAYOUT.md onde faltaria gravar).
+- Aba "Histórico" nas fichas com as entradas do AuditLog/NotaFinalAudit daquela entidade, só para quem já pode ver auditoria hoje (mesmas permissões da tela /dashboard/auditoria) e sempre filtrando pela escola da sessão. Teste de isolamento escola A × B e aluno do portal para a leitura do histórico.
+- Indicador de gravação nos formulários longos e no lançamento de notas/chamada: "Alterações não salvas" enquanto houver mudança pendente e "Salvo às 14:32" depois de gravar.
+
+### 6. Formulários e tabelas com rigor
+- Máscaras e validação no navegador (sem trocar a validação do servidor): CPF (com dígito verificador), telefone, CEP e datas, onde esses campos existirem; obrigatórios marcados; erro na linha do campo.
+- Formulários longos em seções numeradas (1. Dados pessoais, 2. Documentos…), com botão salvar fixo.
+- Tabelas: ordenação por coluna, seleção em lote onde já existe ação em lote, escolha de colunas visíveis (guardada no navegador) e exportar (CSV) do que está na tela, respeitando as permissões.
+
+### 7. Acabamento de produto maduro
+- Trocar todos os emojis das telas (há em 7 arquivos: 💡 ✅ ⚠ 🚨 📢 💬 👥 🏛 🛠) por ícones lucide-react no padrão do sistema.
+- Linguagem formal e consistente em mensagens de erro, sucesso, confirmação e estados vazios ("Não foi possível salvar. Tente novamente."). Sem tom informal.
+- Rodapé do sistema (desktop) com versão lida do package.json, links de Suporte, Termos e Privacidade (páginas simples, com texto provisório marcado como tal), e uma tela "Novidades" que lista as mudanças por versão (pode começar com as entregas recentes). NÃO altere o número da versão: isso é decisão da dona do produto; registre a sugestão em PROGRESSO-LAYOUT.md.
+- Após o login: aviso discreto "Seu último acesso foi em 19/10/2026 às 21:14". Pode exigir guardar o último acesso do usuário (coluna nova, migration aditiva gerada com prisma migrate diff, teste); grave no login, mostre o acesso ANTERIOR. Sem IP na tela.
+- Ajuda contextual: botão "?" no cabeçalho de cada tela principal abrindo um painel curto explicando para que a tela serve e os passos principais (textos objetivos em português).
+
+### 8. Impressão
+- Botão "Imprimir" com folha de estilo própria (sem menu, sem cores de fundo, cabeçalho com nome da escola, data/hora de impressão e paginação) em: lista de estudantes da turma, ficha do estudante, ficha AEE (respeitando permissão), diário da disciplina, resultados da turma e frequência/infrequência.
 
 ## Encerramento
 Em PROGRESSO-LAYOUT.md: "Para validar localmente" com as telas para conferir (capturas antes/depois por etapa, claro/escuro, desktop/celular), componentes novos e decisões tomadas sem confirmação. Abra o PR para `main` com esse resumo e marque `STATUS: CONCLUÍDO`.

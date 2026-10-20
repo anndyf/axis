@@ -16,11 +16,14 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 - Fases 3a e 3b (papéis e permissões): branch `fase/3ab-papeis`. Instrução em `sessoes-nuvem/fase-3ab.md` nesta branch. A 3c (remover os booleanos e tirar a conta da plataforma da escola) fica para depois da validação.
 
 **Pronto para iniciar quando quiser**
-- Layout com cara de sistema no computador + tipografia etapa 2 (uma sessão só): instrução em `sessoes-nuvem/layout-sistema.md`, prévia em `sessoes-nuvem/previa-layout.html`. Disparar DEPOIS do merge da fase 3a+3b.
+- Layout com cara de sistema no computador + tipografia etapa 2 + rastreabilidade visível, formulários/tabelas com rigor, acabamento de produto e impressão (uma sessão, 8 etapas): instrução em `sessoes-nuvem/layout-sistema.md`, prévia em `sessoes-nuvem/previa-layout.html`. Disparar DEPOIS do merge da fase 3a+3b.
+
+- Sessão de lógica (depois do layout): fechamento de unidade com cadeado em notas e chamadas, reabertura pela direção auditada. Instrução ainda a escrever.
 
 **Esperando decisão da dona do produto**
 - As 20 decisões de `docs/arquitetura/decisoes.md`. As 5 mais urgentes: D-03 (público-alvo), D-01 (núcleo e módulos), D-14 (quando a CETEP migra para matrícula por ano), D-06 (etapas de ensino no lançamento), D-04 (redes agora ou depois).
 - Preços dos planos (a fase 2 criou os planos com preço zerado).
+- Número da versão do sistema que aparecerá no rodapé (hoje 0.1.0).
 
 **Próximos passos**
 1. Validar a fase 3a+3b quando a nuvem terminar.
@@ -33,6 +36,7 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 ## Histórico
 
 ### 20/10/2026
+- Deliberado o que dá cara de sistema robusto: entram na sessão do layout a rastreabilidade visível (criado/alterado por, aba Histórico, "Salvo às"), máscaras e seções nos formulários, tabelas com ordenação e colunas, troca de emojis por ícones, linguagem formal, rodapé com versão/suporte/privacidade, "Novidades", último acesso após o login, ajuda "?" por tela e impressão. Documentos oficiais ficam na fase 9; o cadeado de unidade encerrada vira sessão de lógica própria.
 - Deliberado o layout "cara de sistema" no computador (celular continua com cara de app): densidade equilibrada, painéis com borda, barra de ferramentas nas listas, fichas com abas (turma, estudante, usuário, AEE), conteúdo na largura toda. Barra superior só EXIBE o ano letivo; o seletor de consulta de anos anteriores fica para a fase 6, com somente leitura, faixa de aviso e volta automática ao ano atual (preocupação de usabilidade da dona do produto).
 - Decidido rodar as fases 3a + 3b juntas na nuvem (3c depois da validação, por ser a única que remove coisas).
 - Fases 0, 1 e 2 mergeadas (PR #14) e validadas localmente: migration `20261020120000_planos_e_assinaturas` aplicada nos dois bancos; backfill `prisma/backfill/fase-2.ts` criou 3 planos e 2 assinaturas, equivalente nas duas escolas, e na 2ª execução não criou nada; 437 testes passando. Conferido ao vivo: com o módulo de provas desligado na Horizonte, o menu some, a página mostra "Módulo indisponível" e a API responde 403; na CETEP nada muda. Inclui as correções de segurança da fase 0 (PDFs e `reportarEstudanteFaltante` exigem papel; questões conferem o módulo) e a trava `exigirModulo` em todas as rotas, actions e páginas, com teste que falha se alguma ficar de fora.
