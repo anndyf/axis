@@ -27,7 +27,7 @@ export default async function QuestoesPage() {
   await prisma.globalConfig.upsert({
     where: { id: session.user.escolaId },
     update: {},
-    create: { id: session.user.escolaId, escolaId: session.user.escolaId }
+    create: { id: session.user.escolaId, escolaId: session.user.escolaId, anoLetivoAtual: new Date().getFullYear() }
   })
 
   const modulosAtivos = await getModulosAtivos(session.user.escolaId, escola?.plano || 'BASICO')

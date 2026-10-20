@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { provaDaEscola } from "@/lib/data-fetching"
 import ResponsaveisClient from "./ResponsaveisClient"
 import { prisma } from "@/lib/prisma"
+import { anoLetivoAtualDaEscola } from "@/lib/data-fetching"
 
 export const metadata = {
   title: 'Áxis - Simulados'
@@ -20,7 +21,7 @@ export default async function ResponsaveisSimuladoPage() {
 
   const [turmas, areas, professores, provas] = await Promise.all([
     prisma.turma.findMany({ 
-        where: { escolaId, anoLetivo: 2026 },
+        where: { escolaId, anoLetivo: await anoLetivoAtualDaEscola(escolaId) },
         orderBy: { nome: 'asc' } 
     }),
     prisma.areaConhecimento.findMany({

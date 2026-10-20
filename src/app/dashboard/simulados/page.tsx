@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import SimuladosClient from "./SimuladosClient"
 import { prisma } from "@/lib/prisma"
+import { anoLetivoAtualDaEscola } from "@/lib/data-fetching"
 
 export const metadata = {
   title: 'Áxis - Simulados'
@@ -18,7 +19,7 @@ export default async function SimuladosPage() {
   let turmas = []
   if (user.isSuperuser || user.isDirecao) {
     turmas = await prisma.turma.findMany({
-      where: { escolaId, anoLetivo: 2026 },
+      where: { escolaId, anoLetivo: await anoLetivoAtualDaEscola(escolaId) },
       orderBy: { nome: 'asc' }
     })
   } else {

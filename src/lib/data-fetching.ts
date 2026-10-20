@@ -7,6 +7,15 @@ export const getGlobalConfig = cache(async (escolaId: string) => {
 })
 
 /**
+ * Ano letivo atual da escola (configuração da escola; sem configuração, o ano
+ * do calendário). Substitui o 2026 fixo no código até a fase 4 (AnoLetivo).
+ */
+export async function anoLetivoAtualDaEscola(escolaId: string): Promise<number> {
+  const config = await getGlobalConfig(escolaId)
+  return config?.anoLetivoAtual || new Date().getFullYear()
+}
+
+/**
  * Retorna as disciplinas que o usuário tem permissão de acessar.
  * Se for superuser, retorna todas.
  * Se for staff (professor), retorna apenas as que estão na lista de disciplinasPermitidas.

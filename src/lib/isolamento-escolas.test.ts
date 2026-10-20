@@ -253,6 +253,13 @@ describe('isolamento entre escolas - escrita', () => {
     })
   }
 
+  it('turmas para selecionar em mensagens (action)', async () => {
+    const { getTurmasForSelect } = await import('@/app/dashboard/mensagens/actions')
+    const turmas = await getTurmasForSelect()
+    expect(semDadosDeA(JSON.stringify(turmas))).toEqual([])
+    expect(turmas.map((t: { id: string }) => t.id)).not.toContain(A.turma)
+  })
+
   it('renomear laboratório de A (id no corpo)', async () => {
     const { PATCH } = await rota('laboratorios')
     const r = await chamar(PATCH, 'PATCH', '/x', {}, { id: A.lab, nome: 'HACK' })
