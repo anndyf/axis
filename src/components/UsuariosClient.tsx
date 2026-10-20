@@ -5,21 +5,30 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
   Shield, GraduationCap, PauseCircle, Clock, CheckCircle2,
-  CheckCheck, Loader2, X, Users, Search, Filter, Accessibility
+  CheckCheck, Loader2, X, Users, Search, Filter, Accessibility, ShieldCheck, ClipboardList, BookOpen
 } from "lucide-react"
 import { Avatar } from "@/components/ui"
 import UserActions from "./UserActions"
+import { PAPEIS_SISTEMA, type CodigoPapel } from "@/lib/permissoes"
+
+/** Selo de cada papel na lista (Direção, Secretaria e Coordenação ganharam selo na fase 3b). */
+const SELO_PAPEL: Partial<Record<CodigoPapel, { rotulo: string; classe: string; icone: typeof Shield }>> = {
+  ADMINISTRADOR: { rotulo: "Admin", classe: "bg-accent-subtle text-accent-fg border-accent/25", icone: Shield },
+  DIRECAO: { rotulo: "Direção", classe: "bg-accent-subtle text-accent-fg border-accent/25", icone: ShieldCheck },
+  SECRETARIA: { rotulo: "Secretaria", classe: "bg-info-subtle text-info-fg border-info-line", icone: ClipboardList },
+  COORDENACAO: { rotulo: "Coordenação", classe: "bg-info-subtle text-info-fg border-info-line", icone: BookOpen },
+  PROFESSOR: { rotulo: "Professor", classe: "bg-subtle-hover text-fg border-line-strong", icone: GraduationCap },
+  AEE: { rotulo: "AEE", classe: "bg-success-subtle text-success-fg border-success-line", icone: Accessibility },
+}
 
 interface Usuario {
   id: string
   name: string | null
   email: string
   username: string | null
-  isSuperuser: boolean
-  isStaff: boolean
   isActive: boolean
   isApproved: boolean
-  isAEE?: boolean
+  papeis: CodigoPapel[]
   _count: { disciplinasPermitidas: number }
 }
 
@@ -65,8 +74,8 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
     ativos:     usuarios.filter(u => u.isApproved && u.isActive).length,
     pendentes:  usuarios.filter(u => !u.isApproved).length,
     pausados:   usuarios.filter(u => u.isApproved && !u.isActive).length,
-    professores:usuarios.filter(u => u.isStaff && !u.isSuperuser && u.isApproved).length,
-    admins:     usuarios.filter(u => u.isSuperuser).length,
+    professores:usuarios.filter(u => u.papeis.includes('PROFESSOR') && !u.papeis.includes('ADMINISTRADOR') && u.isApproved).length,
+    admins:     usuarios.filter(u => u.papeis.includes('ADMINISTRADOR')).length,
   }), [usuarios])
 
   const toggleSelect = (id: string) => {
@@ -292,7 +301,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
 
                   <td className="px-6 py-4 whitespace-nowrap text-center">
                     <div className="flex flex-col items-center gap-1.5">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex flex-wrap items-center justify-center gap-1.5">
                         {!usuario.isApproved ? (
                           <span className="px-2.5 py-0.5 inline-flex items-center text-xs font-medium rounded-full bg-warning-subtle text-warning-fg border border-warning-line">
                             <Clock className="w-3 h-3 mr-1" />
@@ -300,21 +309,16 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
                           </span>
                         ) : (
                           <>
-                            {usuario.isSuperuser && (
-                              <span className="px-2.5 py-0.5 inline-flex items-center text-xs font-medium rounded-full bg-accent-subtle text-accent-fg border border-accent/25">
-                                <Shield className="w-3 h-3 mr-1" />Admin
-                              </span>
-                            )}
-                             {usuario.isStaff && (
-                               <span className="px-2.5 py-0.5 inline-flex items-center text-xs font-medium rounded-full bg-subtle-hover text-fg border border-line-strong">
-                                 <GraduationCap className="w-3 h-3 mr-1" />Professor
-                               </span>
-                             )}
-                             {(usuario as any).isAEE && (
-                               <span className="px-2.5 py-0.5 inline-flex items-center text-xs font-medium rounded-full bg-success-subtle text-success-fg border border-success-line">
-                                 <Accessibility className="w-3 h-3 mr-1" />AEE
-                               </span>
-                             )}
+                            {usuario.papeis.map((c) => {
+                              const selo = SELO_PAPEL[c]
+                              if (!selo) return null
+                              const Icone = selo.icone
+                              return (
+                                <span key={c} title={PAPEIS_SISTEMA[c].nome} className={`px-2.5 py-0.5 inline-flex items-center text-xs font-medium rounded-full border ${selo.classe}`}>
+                                  <Icone className="w-3 h-3 mr-1" />{selo.rotulo}
+                                </span>
+                              )
+                            })}
                            </>
                         )}
                       </div>
@@ -332,7 +336,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
                   </td>
 
                   <td className="px-6 py-4 whitespace-nowrap text-center text-sm">
-                    {usuario.isSuperuser ? (
+                    {usuario.papeis.includes('ADMINISTRADOR') ? (
                       <span className="text-fg-muted font-medium text-xs bg-canvas px-3 py-1 rounded-lg border border-line">Controle Total</span>
                     ) : !usuario.isApproved ? (
                       <span className="text-fg-subtle italic text-xs font-medium">A aguardar</span>
@@ -349,8 +353,8 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
                       userName={usuario.name || ''}
                       isActive={usuario.isActive}
                       isApproved={usuario.isApproved}
-                      isSuperuser={usuario.isSuperuser}
-                      isStaff={usuario.isStaff}
+                      isSuperuser={usuario.papeis.includes('ADMINISTRADOR')}
+                      isStaff={usuario.papeis.includes('PROFESSOR')}
                     />
                   </td>
                 </tr>

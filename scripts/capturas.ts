@@ -42,7 +42,9 @@ async function ids() {
   const aula = await prisma.aula.findFirst({ where: { turmaId: turma.id, disciplinaId: disciplina.id }, orderBy: { data: 'desc' } })
   // Conta de portal de teste: libera a troca obrigatória de senha só no banco local
   await prisma.user.updateMany({ where: { escolaId: escola.id, username: '1TIM1-001' }, data: { deveTrocarSenha: false } })
+  const direcao = await prisma.user.findFirst({ where: { escolaId: escola.id, username: 'direcao' } })
   return {
+    direcao: direcao?.id ?? '',
     turma: turma.id,
     disciplina: disciplina.id,
     matricula: turma.estudantes[0].matricula,
@@ -119,6 +121,16 @@ async function main() {
         ['notas-professor', `/dashboard/notas/lancar/${i.turma}?disciplina=${i.disciplina}`],
       ],
     },
+    {
+      usuario: 'admin', senha: 'admin123',
+      telas: [
+        ['usuarios', '/dashboard/usuarios'],
+        ['usuario-novo', '/dashboard/usuarios/novo'],
+        ['usuario-editar', `/dashboard/usuarios/${i.direcao}/editar`],
+      ],
+    },
+    { usuario: 'secretaria', senha: 'secretaria123', telas: [['dashboard-secretaria', '/dashboard'], ['estudantes-secretaria', '/dashboard/estudantes']] },
+    { usuario: 'coordenacao', senha: 'coordenacao123', telas: [['dashboard-coordenacao', '/dashboard'], ['frequencia-coordenacao', `/dashboard/frequencia?turma=${i.turma}`]] },
     { usuario: '1TIM1-001', senha: '1TIM1-001', telas: [['portal', '/portal'], ['portal-boletim', '/portal?aba=boletim'], ['portal-frequencia', '/portal?aba=frequencia'], ['portal-horario', '/portal?aba=horario']] },
   ]
 

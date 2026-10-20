@@ -6,6 +6,7 @@ import { ArrowLeft, Plus } from "lucide-react"
 import UsuariosClient from "@/components/UsuariosClient"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
 import { can } from '@/lib/rbac'
+import { papeisDasContas } from '@/lib/papeis'
 
 export const metadata = {
   title: 'Áxis - Usuarios'
@@ -18,6 +19,7 @@ async function getUsuarios(escolaId: string) {
     SELECT
       u.id, u.name, u.email, u.username,
       u.is_superuser as "isSuperuser",
+      u.is_direcao as "isDirecao",
       u.is_staff as "isStaff",
       u.is_active as "isActive",
       u.is_approved as "isApproved",
@@ -28,9 +30,17 @@ async function getUsuarios(escolaId: string) {
     ORDER BY u.is_approved ASC, u.name ASC
   `
 
-  // Mapear para o formato que o componente Cliente espera (_count.disciplinasPermitidas)
+  const papeis = await papeisDasContas(escolaId, users)
+
+  // Só o que a lista mostra (os papéis no lugar dos booleanos)
   return users.map(u => ({
-    ...u,
+    id: u.id as string,
+    name: u.name as string | null,
+    email: u.email as string,
+    username: u.username as string | null,
+    isActive: u.isActive as boolean,
+    isApproved: u.isApproved as boolean,
+    papeis: papeis.get(u.id) ?? [],
     _count: {
       disciplinasPermitidas: u.disciplinasCount || 0
     }
@@ -64,7 +74,7 @@ export default async function UsuariosPage() {
                     </span>
                   )}
                 </h1>
-                <p className="text-sm text-fg-muted">Administradores e Professores</p>
+                <p className="text-sm text-fg-muted">Contas da equipe e seus papéis</p>
               </div>
             </div>
             <Link

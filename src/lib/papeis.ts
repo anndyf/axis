@@ -156,3 +156,18 @@ export async function criarUsuarioComVinculos(args: { data: Prisma.UserUnchecked
     return u
   })
 }
+
+/**
+ * Papéis de cada conta da escola, para as telas (lista de usuários).
+ * Conta ainda sem vínculo usa os booleanos (tabela 2.5.3).
+ */
+export async function papeisDasContas(escolaId: string, contas: ({ id: string } & Booleanos)[]): Promise<Map<string, CodigoPapel[]>> {
+  const agora = new Date()
+  const vinculos = await prisma.vinculoPapel.findMany({
+    where: { escolaId, usuarioId: { in: contas.map((c) => c.id) }, inicio: { lte: agora }, OR: [{ fim: null }, { fim: { gt: agora } }], papel: { OR: [{ escolaId: null }, { escolaId }] } },
+    select: { usuarioId: true, papel: { select: { codigo: true } } },
+  })
+  const porConta = new Map<string, string[]>()
+  for (const v of vinculos) porConta.set(v.usuarioId, [...(porConta.get(v.usuarioId) ?? []), v.papel.codigo])
+  return new Map(contas.map((c) => [c.id, porConta.has(c.id) ? normalizarPapeis(porConta.get(c.id)!) : papeisDosBooleanos(c)]))
+}
