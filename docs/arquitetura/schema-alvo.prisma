@@ -1766,3 +1766,321 @@ model NotaAvaliacao {
   @@unique([notaUnidadeId, avaliacaoId])
   @@map("notas_avaliacoes")
 }
+
+// =============================================================================
+// 9. DOCUMENTOS OFICIAIS  (módulo DOC — personalizacao.md 3.5)
+// =============================================================================
+
+enum TipoDocumentoEscolar {
+  DECLARACAO_MATRICULA
+  DECLARACAO_FREQUENCIA
+  DECLARACAO_TRANSFERENCIA
+  DECLARACAO_CONCLUSAO
+  BOLETIM
+  HISTORICO_ESCOLAR
+  ATA_RESULTADOS_FINAIS
+  FICHA_INDIVIDUAL
+  CERTIFICADO
+  AUTORIZACAO // termo para assinatura
+  OUTRO
+}
+
+/// [NOVO][FASE 9a] Modelo HTML com marcadores (sem código livre). Versão nova a
+/// cada alteração publicada; o de fábrica tem escolaId nulo e não é editável.
+model ModeloDocumento {
+  id         String               @id @default(cuid())
+  escolaId   String?              @map("escola_id")
+  escola     Escola?              @relation(fields: [escolaId], references: [id])
+  tipo       TipoDocumentoEscolar
+  nome       String
+  versao     Int                  @default(1)
+  conteudo   String               // HTML com {{marcadores}} e blocos prontos
+  ativo      Boolean              @default(true)
+  createdAt  DateTime             @default(now()) @map("created_at")
+  emitidos   DocumentoEmitido[]
+
+  @@unique([escolaId, tipo, nome, versao])
+  @@map("modelos_documento")
+}
+
+/// [NOVO][FASE 9a] Todo documento emitido, com código de verificação (QR).
+/// A página pública mostra só tipo, data, escola, nome abreviado e situação (D-17).
+model DocumentoEmitido {
+  id               String               @id @default(cuid())
+  escolaId         String               @map("escola_id")
+  escola           Escola               @relation(fields: [escolaId], references: [id])
+  tipo             TipoDocumentoEscolar
+  estudanteId      String?              @map("estudante_id")
+  estudante        Estudante?           @relation(fields: [estudanteId], references: [id])
+  matriculaId      String?              @map("matricula_id")
+  matricula        Matricula?           @relation(fields: [matriculaId], references: [id])
+  modeloId         String?              @map("modelo_id")
+  modelo           ModeloDocumento?     @relation(fields: [modeloId], references: [id])
+  codigoVerificacao String              @unique @map("codigo_verificacao") // curto, impresso + QR
+  hashConteudo     String               @map("hash_conteudo")
+  arquivoUrl       String?              @map("arquivo_url")
+  emitidoPorId     String               @map("emitido_por_id") // Usuario
+  emitidoEm        DateTime             @default(now()) @map("emitido_em")
+  canceladoEm      DateTime?            @map("cancelado_em")
+  motivoCancelamento String?            @map("motivo_cancelamento")
+  substituidoPorId String?              @map("substituido_por_id")
+
+  @@index([escolaId, emitidoEm])
+  @@map("documentos_emitidos")
+}
+
+// =============================================================================
+// 10. PERSONALIZAÇÃO  (personalizacao.md 3.2 e 3.3)
+// =============================================================================
+
+enum EntidadePersonalizavel {
+  ESTUDANTE
+  RESPONSAVEL // grava em VinculoResponsavel.camposExtras
+  PESSOA
+  MATRICULA
+  PROFISSIONAL
+  TURMA
+}
+
+enum TipoCampo {
+  TEXTO
+  TEXTO_LONGO
+  NUMERO
+  DATA
+  SIM_NAO
+  LISTA_UNICA
+  LISTA_MULTIPLA
+  TELEFONE
+  CPF
+  EMAIL
+  ARQUIVO
+}
+
+enum ObrigatoriedadeCampo {
+  NUNCA
+  NA_MATRICULA
+  SEMPRE
+}
+
+/// [NOVO][FASE 8b] Definição de campo personalizado. Valores ficam em
+/// <entidade>.camposExtras (JSONB) — ou em SaudeEstudante.camposSensiveis se sensivel.
+model CampoPersonalizado {
+  id              String                 @id @default(cuid())
+  escolaId        String                 @map("escola_id")
+  escola          Escola                 @relation(fields: [escolaId], references: [id])
+  entidade        EntidadePersonalizavel
+  chave           String                 // imutável após criada
+  rotulo          String
+  ajuda           String?
+  tipo            TipoCampo
+  opcoes          Json?                  // [{ valor, rotulo }]
+  obrigatoriedade ObrigatoriedadeCampo   @default(NUNCA)
+  validacao       Json?                  // { min, max, tamanho, padrao }
+  sensivel        Boolean                @default(false) // se true: nunca obrigatório, fora das exportações gerais, leitura registrada
+  exportavel      Boolean                @default(true)
+  filtravel       Boolean                @default(false) // cria índice GIN / filtro na lista
+  locais          String[]               // "FICHA", "MATRICULA", "PORTAL", "LISTA", "RELATORIO"
+  secao           String?
+  ordem           Int                    @default(0)
+  arquivado       Boolean                @default(false) // nunca apagar campo com dados
+  bloqueadoPelaRede Boolean              @default(false) @map("bloqueado_pela_rede")
+  createdAt       DateTime               @default(now()) @map("created_at")
+
+  @@unique([escolaId, entidade, chave])
+  @@map("campos_personalizados")
+}
+
+enum TipoFormulario {
+  MATRICULA_NOVA
+  REMATRICULA
+  ATUALIZACAO_CADASTRAL // pelo portal da família
+}
+
+/// [NOVO][FASE 8b] Formulário de matrícula configurável.
+model ModeloFormulario {
+  id        String           @id @default(cuid())
+  escolaId  String           @map("escola_id")
+  escola    Escola           @relation(fields: [escolaId], references: [id])
+  tipo      TipoFormulario
+  nome      String
+  ativo     Boolean          @default(true)
+  itens     ItemFormulario[]
+
+  @@unique([escolaId, tipo, nome])
+  @@map("modelos_formulario")
+}
+
+model ItemFormulario {
+  id          String           @id @default(cuid())
+  formularioId String          @map("formulario_id")
+  formulario  ModeloFormulario @relation(fields: [formularioId], references: [id], onDelete: Cascade)
+  secao       String
+  ordem       Int
+  // Exatamente um dos dois: campo padrão ("pessoa.cpf", "estudante.usaTransportePublico")
+  // ou campo personalizado (chave do CampoPersonalizado)
+  campoPadrao String?          @map("campo_padrao")
+  campoPersonalizadoChave String? @map("campo_personalizado_chave")
+  obrigatorio Boolean          @default(false) // itens fixos (nome, nascimento, responsável legal) são sempre obrigatórios, no código
+  ajuda       String?
+
+  @@map("itens_formulario")
+}
+
+// =============================================================================
+// 11. FERRAMENTAS PEDAGÓGICAS E OCORRÊNCIAS  (módulos QST, PRV, PLA, SEC)
+// =============================================================================
+
+enum QuestaoStatus {
+  PENDENTE
+  APROVADA
+  REJEITADA
+}
+
+enum Dificuldade {
+  FACIL
+  MEDIO
+  DIFICIL
+}
+
+/// [MUDA] Questao ganha escolaId próprio, tipo e habilidade (BNCC).
+/// Alternativas viram JSON (permite 4 ou 5 alternativas, ou dissertativa).
+model Questao {
+  id              String                 @id @default(cuid())
+  escolaId        String                 @map("escola_id")
+  escola          Escola                 @relation(fields: [escolaId], references: [id])
+  autorId         String                 @map("autor_id")
+  autor           Profissional           @relation(fields: [autorId], references: [id])
+  tipo            String                 @default("OBJETIVA") // OBJETIVA | DISSERTATIVA | VERDADEIRO_FALSO
+  enunciado       String
+  imagemUrl       String?                @map("imagem_url")
+  alternativas    Json?                  // [{ letra:"A", texto }]
+  correta         String?
+  dificuldade     Dificuldade            @default(MEDIO)
+  habilidade      String?                // código BNCC, ex. "EF09MA01"
+  status          QuestaoStatus          @default(PENDENTE)
+  feedback        String?
+  createdAt       DateTime               @default(now()) @map("created_at")
+  updatedAt       DateTime               @updatedAt @map("updated_at")
+  componentes     ComponenteCurricular[]
+  provas          Prova[]
+
+  @@index([escolaId])
+  @@map("questoes")
+}
+
+/// [MUDA] Prova ganha escolaId próprio.
+model Prova {
+  id               String         @id @default(cuid())
+  escolaId         String         @map("escola_id")
+  escola           Escola         @relation(fields: [escolaId], references: [id])
+  titulo           String
+  autorId          String?        @map("autor_id")
+  autor            Profissional?  @relation(fields: [autorId], references: [id])
+  turmaId          String?        @map("turma_id")
+  esquemaUnidadeOrdem Int?        @map("esquema_unidade_ordem") // era "unidade" Int
+  tipo             String?        // BIMESTRAL, SIMULADO...
+  observacao       String?
+  questoesSnapshot Json?          @map("questoes_snapshot") // [ATUAL] a prova não muda se a questão mudar
+  createdAt        DateTime       @default(now()) @map("created_at")
+  questoes         Questao[]
+  notasSimulado    NotaSimulado[]
+
+  @@index([escolaId])
+  @@map("provas")
+}
+
+/// [MUDA] Sem @default(2026); ano vem da prova/matrícula.
+model NotaSimulado {
+  id                 String    @id @default(cuid())
+  estudanteId        String    @map("estudante_id")
+  estudante          Estudante @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  provaId            String    @map("prova_id")
+  prova              Prova     @relation(fields: [provaId], references: [id], onDelete: Cascade)
+  nota               Float?
+  ausente            Boolean   @default(false)
+  notaSegundaChamada Float?    @map("nota_segunda_chamada")
+  lancadoPorId       String    @map("lancado_por_id")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  @@unique([estudanteId, provaId])
+  @@map("notas_simulados")
+}
+
+/// [MUDA] PlanoEnsino com escolaId e componente real (não texto).
+model PlanoEnsino {
+  id                 String       @id @default(cuid())
+  escolaId           String       @map("escola_id")
+  escola             Escola       @relation(fields: [escolaId], references: [id])
+  autorId            String       @map("autor_id")
+  autor              Profissional @relation(fields: [autorId], references: [id])
+  turmaComponenteIds String[]     @map("turma_componente_ids") // turmas/componentes a que o plano se aplica
+  periodoInicio      DateTime     @map("periodo_inicio") @db.Date
+  periodoFim         DateTime     @map("periodo_fim") @db.Date
+  indicadores        String
+  conteudos          String
+  metodologias       String
+  recursos           String
+  avaliacao          String
+  observacoes        String?
+  createdAt          DateTime     @default(now()) @map("created_at")
+  updatedAt          DateTime     @updatedAt @map("updated_at")
+
+  @@index([escolaId])
+  @@map("planos_ensino")
+}
+
+/// [MUDA] Ocorrência com tipo/gravidade/medida e ciência do responsável.
+model Ocorrencia {
+  id              String                @id @default(cuid())
+  escolaId        String                @map("escola_id")
+  escola          Escola                @relation(fields: [escolaId], references: [id])
+  titulo          String
+  descricao       String
+  tipo            String                // lista configurável (rótulo), ex. DISCIPLINAR, PEDAGOGICA, SAUDE
+  gravidade       String?               // LEVE | MEDIA | GRAVE
+  medida          String?               // advertência, conversa com responsável...
+  data            DateTime              @default(now())
+  registradoPorId String                @map("registrado_por_id") // Usuario
+  createdAt       DateTime              @default(now()) @map("created_at")
+  updatedAt       DateTime              @updatedAt @map("updated_at")
+  estudantes      OcorrenciaEstudante[]
+
+  @@index([escolaId, data])
+  @@map("ocorrencias")
+}
+
+model OcorrenciaEstudante {
+  id               String     @id @default(cuid())
+  ocorrenciaId     String     @map("ocorrencia_id")
+  ocorrencia       Ocorrencia @relation(fields: [ocorrenciaId], references: [id], onDelete: Cascade)
+  estudanteId      String     @map("estudante_id")
+  estudante        Estudante  @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  cienciaResponsavelEm DateTime? @map("ciencia_responsavel_em") // [NOVO] aceite pelo portal
+
+  @@unique([ocorrenciaId, estudanteId])
+  @@map("ocorrencia_estudantes")
+}
+
+// =============================================================================
+// 12. COMUNICAÇÃO  (módulo COM — esboço; detalhar na sessão do módulo)
+// =============================================================================
+
+/// [NOVO][pós-11] Separa "comunicado" (escola -> família/equipe, por grupo) do
+/// "chamado" (pedido de suporte/secretaria), hoje misturados em Message.
+model Comunicado {
+  id          String    @id @default(cuid())
+  escolaId    String    @map("escola_id")
+  escola      Escola    @relation(fields: [escolaId], references: [id])
+  titulo      String
+  conteudo    String
+  publico     Json      // { papeis: ["RESPONSAVEL"], turmaIds: [...], serieIds: [...] }
+  permiteResposta Boolean @default(false) @map("permite_resposta")
+  exigeCiencia    Boolean @default(false) @map("exige_ciencia")
+  autorId     String    @map("autor_id") // Usuario
+  publicadoEm DateTime? @map("publicado_em")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@index([escolaId, publicadoEm])
+  @@map("comunicados")
+}
