@@ -57,7 +57,7 @@ export const GET = rotaDoModulo('NUC', 'leitura', async function GET(request: Ne
 export const POST = rotaDoModulo('NUC', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session?.user?.escolaId || !can(session.user, "gestao")) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
+    if (!session?.user?.escolaId || !can(session.user, "matriz.gerenciar")) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
     const escolaId = session.user.escolaId
 
     const { nome, cursoId, serie, areaId, anoLetivo } = await request.json()
@@ -156,7 +156,7 @@ export const POST = rotaDoModulo('NUC', 'escrita', async function POST(request: 
 export const PATCH = rotaDoModulo('NUC', 'escrita', async function PATCH(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session?.user?.escolaId || !can(session.user, "gestao")) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
+    if (!session?.user?.escolaId || !can(session.user, "matriz.gerenciar")) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
     const escolaId = session.user.escolaId
 
     const { id, nome, areaId } = await request.json()
@@ -225,7 +225,7 @@ export const PATCH = rotaDoModulo('NUC', 'escrita', async function PATCH(request
 export const DELETE = rotaDoModulo('NUC', 'escrita', async function DELETE(request: NextRequest) {
     try {
       const session = await auth()
-      if (!session?.user?.escolaId || !can(session.user, "gestao")) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
+      if (!session?.user?.escolaId || !can(session.user, "matriz.gerenciar")) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
       const escolaId = session.user.escolaId
 
       const { searchParams } = new URL(request.url)

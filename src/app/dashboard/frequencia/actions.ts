@@ -18,7 +18,7 @@ type Resultado = { ok: true } | { erro: string }
 
 async function gestao() {
   const session = await auth()
-  if (!session?.user?.escolaId || session.user.isPortalUser || !can(session.user, "gestao")) return null
+  if (!session?.user?.escolaId || can(session.user, "portal.acessar") || !can(session.user, "frequencia.acompanhar")) return null
   return session.user
 }
 

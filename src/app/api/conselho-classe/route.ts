@@ -28,7 +28,7 @@ export const POST = rotaDoModulo('RES', 'escrita', async function POST(request: 
   try {
     const session = await auth()
 
-    if (!session?.user?.escolaId || !can(session.user, 'gestao')) {
+    if (!session?.user?.escolaId || !can(session.user, 'conselho.decidir')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
     const escolaId = session.user.escolaId

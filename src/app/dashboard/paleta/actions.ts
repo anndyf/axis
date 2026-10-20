@@ -20,7 +20,7 @@ const VAZIO: ResultadoPaleta = { turmas: [], estudantes: [] }
 export async function buscarNaPaleta(termo: string): Promise<ResultadoPaleta> {
   const session = await auth()
   const user = session?.user
-  if (!user?.escolaId || user.isPortalUser || (user as { isAEE?: boolean }).isAEE || !can(user, 'gestao')) return VAZIO
+  if (!user?.escolaId || can(user, 'portal.acessar') || can(user, 'aee.atender') || !can(user, 'estudante.ler')) return VAZIO
 
   const q = String(termo ?? '').trim().slice(0, 60)
   if (q.length < 2) return VAZIO

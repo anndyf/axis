@@ -15,7 +15,7 @@ export const PUT = rotaDoModulo('NUC', 'escrita', async function PUT(
   try {
     const session = await auth()
 
-    if (!session?.user?.escolaId || !can(session.user, 'gestao')) {
+    if (!session?.user?.escolaId || !can(session.user, 'estudante.editar')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 
@@ -80,7 +80,7 @@ export const DELETE = rotaDoModulo('NUC', 'escrita', async function DELETE(
   try {
     const session = await auth()
 
-    if (!session?.user?.escolaId || !can(session.user, 'gestao')) {
+    if (!session?.user?.escolaId || !can(session.user, 'estudante.editar')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 

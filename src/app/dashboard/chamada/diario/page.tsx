@@ -28,7 +28,7 @@ const SITUACAO: Record<string, string> = { REALIZADA: "Dada", CANCELADA: "Não d
 export default async function DiarioPage({ searchParams }: { searchParams: Promise<{ turma?: string; disciplina?: string }> }) {
   await paginaDoModulo('DIA')
   const session = await auth()
-  if (!session?.user?.escolaId || session.user.isPortalUser || !can(session.user, 'staff')) redirect("/dashboard")
+  if (!session?.user?.escolaId || can(session.user, 'portal.acessar') || !can(session.user, 'frequencia.lancar')) redirect("/dashboard")
   const escolaId = session.user.escolaId
   const { turma: turmaId, disciplina } = await searchParams
   if (!turmaId) return <IndiceDiarios />

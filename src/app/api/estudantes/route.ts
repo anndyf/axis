@@ -12,7 +12,7 @@ export const POST = rotaDoModulo('NUC', 'escrita', async function POST(request: 
   try {
     const session = await auth()
 
-    if (!session?.user?.escolaId || !can(session.user, 'gestao')) {
+    if (!session?.user?.escolaId || !can(session.user, 'estudante.editar')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
     const escolaId = session.user.escolaId
@@ -122,7 +122,7 @@ export const GET = rotaDoModulo('NUC', 'leitura', async function GET(request: Ne
   try {
     const session = await auth()
 
-    if (!session?.user?.escolaId || !can(session.user, 'staff')) {
+    if (!session?.user?.escolaId || !can(session.user, 'estudante.buscar')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 

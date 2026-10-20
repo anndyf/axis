@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic"
 export default async function IdentidadePage() {
   await paginaDoModulo('NUC')
   const session = await auth()
-  if (!session?.user?.escolaId || !can(session.user, "gestao")) redirect("/dashboard")
+  if (!session?.user?.escolaId || !can(session.user, "identidade.editar")) redirect("/dashboard")
   const escola = await prisma.escola.findUnique({
     where: { id: session.user.escolaId },
     select: { nome: true, logoUrl: true, corPrimaria: true },

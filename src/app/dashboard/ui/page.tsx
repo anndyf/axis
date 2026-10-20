@@ -10,6 +10,6 @@ export const metadata = { title: "Áxis - Componentes" }
 export default async function UiPage() {
   await paginaDoModulo('NUC')
   const session = await auth()
-  if (!session?.user || !can(session.user, "superuser")) redirect("/dashboard")
+  if (!session?.user || !can(session.user, "escola.administrar")) redirect("/dashboard")
   return <VitrineClient />
 }

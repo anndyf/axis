@@ -7,7 +7,7 @@ import { rotaDoModulo } from '@/lib/modulos/guarda'
 export const POST = rotaDoModulo('NUC', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session?.user?.escolaId || !can(session.user, 'gestao')) {
+    if (!session?.user?.escolaId || !can(session.user, 'matriz.gerenciar')) {
       return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
     }
     const escolaId = session.user.escolaId

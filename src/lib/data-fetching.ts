@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma"
+import { can } from '@/lib/rbac'
 import { Session } from "next-auth"
 import { cache } from "react"
 
@@ -35,7 +36,7 @@ export async function getDisciplinasPermitidas(session: Session) {
 
   console.log(`[getDisciplinasPermitidas] Config loaded: ${JSON.stringify(config)}, Resolved Year: ${currentYear}`)
 
-  if (session.user.isSuperuser || session.user.isDirecao) {
+  if (can(session.user, 'escopo.escola')) {
     return await prisma.disciplina.findMany({
       where: {
         turma: {
@@ -72,7 +73,7 @@ export async function getTurmasPermitidas(session: Session) {
   const currentYear = config?.anoLetivoAtual || new Date().getFullYear()
 
   // Se for admin, ignora filtros de disciplina mas continua restrito a escola
-  if (session.user.isSuperuser || session.user.isDirecao) {
+  if (can(session.user, 'escopo.escola')) {
     const all = await prisma.turma.findMany({
       where: {
         anoLetivo: currentYear,

@@ -891,7 +891,7 @@ export async function getMessageThread(messageId: string) {
 export async function assignTicket(ticketId: string) {
   const session = await auth()
   // Mesma regra do botão em MessagesClient: só a gestão assume chamados
-  if (!session?.user?.id || !session.user.escolaId || !can(session.user, 'gestao')) return { error: "Não autorizado" }
+  if (!session?.user?.id || !session.user.escolaId || !can(session.user, 'mensagem.direcao.atender')) return { error: "Não autorizado" }
 
   try {
     await prisma.message.update({
@@ -919,7 +919,7 @@ export async function updateTicketStatus(ticketId: string, status: string) {
       where: { id: ticketId, escolaId: session.user.escolaId },
       select: { senderId: true }
     })
-    if (!ticket || (!can(session.user, 'gestao') && ticket.senderId !== session.user.id)) {
+    if (!ticket || (!can(session.user, 'mensagem.direcao.atender') && ticket.senderId !== session.user.id)) {
       return { error: "Não autorizado" }
     }
 

@@ -38,7 +38,7 @@ export function estadoPermite(estado: EstadoModulo, acesso: Acesso): boolean {
  * plataforma (fase 2, depois da validação).
  */
 export function estadoParaUsuario(modulo: ModuloId, estado: EstadoModulo, usuario?: RbacUser | null): EstadoModulo {
-  if (modulo === 'QST' && estado !== 'ATIVO' && usuario && can(usuario, 'gestao')) return 'ATIVO'
+  if (modulo === 'QST' && estado !== 'ATIVO' && usuario && can(usuario, 'questao.moderar')) return 'ATIVO'
   return estado
 }
 

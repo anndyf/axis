@@ -7,7 +7,7 @@ import { rotaDoModulo } from '@/lib/modulos/guarda'
 export const GET = rotaDoModulo('IND', 'leitura', async function GET(request: Request) {
   try {
     const session = await auth();
-    if (!session?.user?.escolaId || !can(session.user, 'gestao')) {
+    if (!session?.user?.escolaId || !can(session.user, 'indicador.ler')) {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 

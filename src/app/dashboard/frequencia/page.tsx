@@ -22,7 +22,7 @@ const TOM_RISCO: Record<string, BadgeTone> = { CRITICAL: "danger", HIGH: "danger
 export default async function FrequenciaPage({ searchParams }: { searchParams: Promise<{ turma?: string; todos?: string }> }) {
   await paginaDoModulo('DIA')
   const session = await auth()
-  if (!session?.user?.escolaId || session.user.isPortalUser || !can(session.user, 'gestao')) redirect("/dashboard")
+  if (!session?.user?.escolaId || can(session.user, 'portal.acessar') || !can(session.user, 'frequencia.acompanhar')) redirect("/dashboard")
   const escolaId = session.user.escolaId
   const { turma: turmaId, todos } = await searchParams
 

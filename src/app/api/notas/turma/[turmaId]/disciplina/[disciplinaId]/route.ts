@@ -14,7 +14,7 @@ export const GET = rotaDoModulo('NOT', 'leitura', async function GET(
 ) {
   try {
     const session = await auth()
-    if (!session?.user?.escolaId || session.user.isPortalUser || !can(session.user, 'staff')) {
+    if (!session?.user?.escolaId || can(session.user, 'portal.acessar') || !can(session.user, 'nota.lancar')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
     const escolaId = session.user.escolaId
@@ -26,7 +26,7 @@ export const GET = rotaDoModulo('NOT', 'leitura', async function GET(
         id: disciplinaId,
         turmaId,
         turma: { escolaId },
-        ...(can(session.user, 'gestao') ? {} : { usuariosPermitidos: { some: { id: session.user.id } } }),
+        ...(can(session.user, 'escopo.escola') ? {} : { usuariosPermitidos: { some: { id: session.user.id } } }),
       },
       select: { id: true },
     })

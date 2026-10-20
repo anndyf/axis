@@ -11,7 +11,7 @@ export async function reportarEstudanteFaltante(turmaId: string, nomeEstudante: 
     const user = session?.user as any
     if (!user?.escolaId) return { error: "Não autorizado" }
     // Action pode ser chamada direto (sem passar pelo layout que barra o portal)
-    if (!can(user, "staff")) return { error: "Acesso negado" }
+    if (!can(user, "simulado.ler")) return { error: "Acesso negado" }
 
     // Obter turma
     const turma = await prisma.turma.findUnique({ where: { id: turmaId, escolaId: user.escolaId } })

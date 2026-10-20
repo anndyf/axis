@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic'
 export default async function FazerChamadaPage({ searchParams }: { searchParams: Promise<{ turma?: string; disciplina?: string; data?: string }> }) {
   await paginaDoModulo('DIA')
   const session = await auth()
-  if (!session?.user?.escolaId || session.user.isPortalUser || !can(session.user, 'staff')) redirect("/dashboard")
+  if (!session?.user?.escolaId || can(session.user, 'portal.acessar') || !can(session.user, 'frequencia.lancar')) redirect("/dashboard")
   const { turma, disciplina, data } = await searchParams
   if (!turma) redirect("/dashboard/chamada")
   const hoje = hojeNaEscola()

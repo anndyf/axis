@@ -22,7 +22,7 @@ export const POST = rotaDoModulo('AEE', 'escrita', async function POST(
   const { id: matricula } = await params
   const session = await auth()
 
-  if (!session?.user?.escolaId || !can(session.user, 'aee')) {
+  if (!session?.user?.escolaId || !can(session.user, 'aee.gerenciar')) {
     return NextResponse.json({ message: "Não autorizado" }, { status: 403 })
   }
 
@@ -80,7 +80,7 @@ export const DELETE = rotaDoModulo('AEE', 'escrita', async function DELETE(
   const { id: matricula } = await params
   const session = await auth()
 
-  if (!session?.user?.escolaId || !can(session.user, 'aee')) {
+  if (!session?.user?.escolaId || !can(session.user, 'aee.gerenciar')) {
     return NextResponse.json({ message: "Não autorizado" }, { status: 403 })
   }
 

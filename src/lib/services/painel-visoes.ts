@@ -4,9 +4,9 @@ import { can, type RbacUser } from '@/lib/rbac'
  * Visões do painel inicial (/dashboard). ÚNICO lugar que decide qual visão
  * cada usuário vê; as telas usam isto, nunca as marcas do usuário direto.
  * Só usa can() de rbac.ts, sem mudar permissões:
- *   administração = can('gestao')   (direção e superuser)
- *   pedagogia     = can('aee')      (AEE, direção e superuser)
- *   professor     = can('staff')    (professor, direção e superuser)
+ *   administração = can('painel.gestao')    (direção, admin; secretaria e coordenação)
+ *   pedagogia     = can('aee.ler')          (AEE, direção e admin)
+ *   professor     = can('painel.professor') (professor, direção e admin)
  * Cada bloco do painel ainda só aparece se o usuário puder abrir a tela de
  * origem (modulosVisiveis), então nenhuma visão mostra dados além do que o
  * menu já libera.
@@ -23,9 +23,9 @@ export const ROTULO_VISAO: Record<VisaoPainel, string> = {
 }
 
 const REGRA: Record<VisaoPainel, (u: RbacUser) => boolean> = {
-  administracao: (u) => can(u, 'gestao'),
-  pedagogia: (u) => can(u, 'aee'),
-  professor: (u) => can(u, 'staff'),
+  administracao: (u) => can(u, 'painel.gestao'),
+  pedagogia: (u) => can(u, 'aee.ler'),
+  professor: (u) => can(u, 'painel.professor'),
 }
 
 export function visoesDoUsuario(u: RbacUser): VisaoPainel[] {

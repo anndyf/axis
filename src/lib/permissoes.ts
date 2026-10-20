@@ -182,7 +182,7 @@ export const PAPEIS_SISTEMA: Record<CodigoPapel, DefinicaoPapel> = {
     atribuivel: true,
     permissoes: [
       'painel.gestao', 'escopo.escola', 'estudante.ler', 'estudante.buscar', 'ocorrencia.gerenciar',
-      'turma.ler', 'frequencia.lancar', 'frequencia.acompanhar', 'resultado.ler', 'indicador.ler',
+      'turma.ler', 'frequencia.acompanhar', 'resultado.ler', 'indicador.ler',
       'conselho.decidir', 'relatorio.turma', 'plano.ler',
       'plano.acompanhar', 'questao.usar', 'questao.moderar', 'prova.gerenciar', 'simulado.ler',
       'simulado.gerenciar', 'comunicado.receber.equipe',

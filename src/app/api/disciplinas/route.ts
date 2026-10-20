@@ -44,7 +44,7 @@ export const POST = rotaDoModulo('NUC', 'escrita', async function POST(request: 
   try {
     const session = await auth()
     
-    if (!session?.user?.escolaId || !can(session.user, 'gestao')) {
+    if (!session?.user?.escolaId || !can(session.user, 'turma.gerenciar')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 

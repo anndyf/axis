@@ -296,7 +296,7 @@ export default function DashboardSidebar({
         aberto={paletaAberta}
         onFechar={() => setPaletaAberta(false)}
         paginas={modulosVisiveis(user, modulosAtivos).map((m) => ({ nome: m.nome, rota: m.rota, grupo: m.grupo, icone: m.icone }))}
-        buscarRegistros={!user.isAEE && can(user, "gestao")}
+        buscarRegistros={!can(user, "aee.atender") && can(user, "estudante.ler")}
       />
     </>
   )

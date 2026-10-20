@@ -10,13 +10,13 @@ import { resolverEsquemaAvaliacaoId } from "@/lib/services/notas"
 export async function contextoDaDisciplina(disciplinaId: string) {
   const session = await auth()
   const user = session?.user
-  if (!user?.escolaId || user.isPortalUser || !can(user, "staff") || typeof disciplinaId !== "string") return null
+  if (!user?.escolaId || can(user, "portal.acessar") || !can(user, "nota.lancar") || typeof disciplinaId !== "string") return null
 
   const disciplina = await prisma.disciplina.findFirst({
     where: {
       id: disciplinaId,
       turma: { escolaId: user.escolaId },
-      ...(can(user, "gestao") ? {} : { usuariosPermitidos: { some: { id: user.id } } }),
+      ...(can(user, "escopo.escola") ? {} : { usuariosPermitidos: { some: { id: user.id } } }),
     },
     select: { id: true, nome: true, turma: { select: { id: true, nome: true, cursoId: true, esquemaAvaliacaoId: true } } },
   })

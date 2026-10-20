@@ -32,7 +32,7 @@ export const POST = rotaDoModulo('NOT', 'escrita', async function POST(request: 
   try {
     const session = await auth()
 
-    if (!session?.user?.escolaId || !can(session.user, 'staff')) {
+    if (!session?.user?.escolaId || !can(session.user, 'nota.lancar')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
     const escolaId = session.user.escolaId
@@ -60,7 +60,7 @@ export const POST = rotaDoModulo('NOT', 'escrita', async function POST(request: 
       return NextResponse.json({ message: 'Disciplina não encontrada' }, { status: 404 })
     }
     // Professor só lança nas disciplinas dele; gestão lança em qualquer uma da escola
-    if (!can(session.user, 'gestao') && disciplina.usuariosPermitidos.length === 0) {
+    if (!can(session.user, 'escopo.escola') && disciplina.usuariosPermitidos.length === 0) {
       return NextResponse.json({ message: 'Você não leciona esta disciplina' }, { status: 403 })
     }
 

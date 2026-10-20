@@ -10,7 +10,7 @@ import { normalizarHex, validarLogo } from "@/lib/services/identidade"
 // Identidade visual da escola - só gestão; a escola é sempre a da sessão.
 export async function salvarIdentidade(dados: { corPrimaria?: string | null; logoUrl?: string | null }): Promise<{ ok: true } | { erro: string }> {
   const session = await auth()
-  if (!session?.user?.escolaId || session.user.isPortalUser || !can(session.user, "gestao")) return { erro: "Não autorizado" }
+  if (!session?.user?.escolaId || can(session.user, "portal.acessar") || !can(session.user, "identidade.editar")) return { erro: "Não autorizado" }
 
   let cor: string | null = null
   if (dados?.corPrimaria) {

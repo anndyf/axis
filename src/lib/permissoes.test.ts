@@ -118,7 +118,7 @@ describe('papéis novos (Secretaria e Coordenação) — tabela 2.5.1', () => {
   })
 
   it('Coordenação: diário, frequência, planos, resultados, conselho e questões; sem cadastro nem notas', () => {
-    for (const p of ['frequencia.lancar', 'frequencia.acompanhar', 'plano.acompanhar', 'resultado.ler', 'conselho.decidir', 'questao.moderar', 'estudante.ler'] as const) expect(can(coord, p), p).toBe(true)
-    for (const p of ['estudante.editar', 'turma.gerenciar', 'nota.lancar', 'nota.tela', 'usuario.gerenciar', 'configuracao.editar'] as const) expect(can(coord, p), p).toBe(false)
+    for (const p of ['frequencia.acompanhar', 'plano.acompanhar', 'resultado.ler', 'conselho.decidir', 'questao.moderar', 'estudante.ler'] as const) expect(can(coord, p), p).toBe(true)
+    for (const p of ['frequencia.lancar', 'estudante.editar', 'turma.gerenciar', 'nota.lancar', 'nota.tela', 'usuario.gerenciar', 'configuracao.editar'] as const) expect(can(coord, p), p).toBe(false)
   })
 })
