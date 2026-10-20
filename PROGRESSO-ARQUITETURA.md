@@ -15,7 +15,7 @@ Sessão de **planejamento**: nada do sistema foi alterado; só `docs/arquitetura
 | 5 | [`docs/arquitetura/roteiro-de-migracao.md`](docs/arquitetura/roteiro-de-migracao.md) — fases sem quebrar a CETEP | ✅ |
 | 6 | [`docs/arquitetura/decisoes.md`](docs/arquitetura/decisoes.md) — o que precisa da dona do produto | ✅ |
 | 7 | [`docs/arquitetura/schema-alvo.prisma`](docs/arquitetura/schema-alvo.prisma) — schema de referência | ✅ (válido em `prisma validate` 6.19.2) |
-| 8 | Resumo executivo (abaixo) + pull request para `main` | ⏳ abrindo o pull request |
+| 8 | Resumo executivo (abaixo) + pull request para `main` ([anndyf/axis#12](https://github.com/anndyf/axis/pull/12)) | ✅ |
 
 ## Como retomar
 Fazer checkout de `planejamento/arquitetura`, ler esta tabela e continuar do primeiro passo que não está ✅.
@@ -48,3 +48,5 @@ Fazer checkout de `planejamento/arquitetura`, ler esta tabela e continuar do pri
 
 **Limites desta revisão.** Os sites do INEP, do i-Educar e da Secretaria da Educação da Bahia estavam inacessíveis a partir desta sessão; as referências vêm de buscas (títulos e trechos) e do conhecimento geral desses sistemas, com as fontes listadas no fim do `dominio-alvo.md`. Os campos do Censo devem ser conferidos no leiaute oficial do ano antes da fase 11.
 
+
+STATUS: CONCLUÍDO
