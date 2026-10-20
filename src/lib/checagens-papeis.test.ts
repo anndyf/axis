@@ -12,7 +12,7 @@
  */
 import { describe, it, expect } from 'vitest'
 import { PERMISSOES, papeisDosBooleanos, combinacoesDosBooleanos as todasAsCombinacoes, type Booleanos, type Permissao } from './permissoes'
-import { can, type RbacUser } from './rbac'
+import { can, restritoADocencia, type RbacUser } from './rbac'
 
 type B = Booleanos
 const gestao = (b: B) => !!(b.isSuperuser || b.isDirecao)
@@ -124,4 +124,19 @@ describe('casos por papel', () => {
     expect(can(DIR, 'staffPuro')).toBe(false)
     expect(can(papel('PROFESSOR', 'COORDENACAO'), 'escopo.escola')).toBe(true)
   })
+})
+
+describe('checagens compostas (negação ou combinação)', () => {
+  const compostas: [string, (b: B) => boolean, (u: RbacUser) => boolean][] = [
+    ['professor restrito à docência (isStaff && !isSuperuser && !isDirecao)', (b) => !!(b.isStaff && !b.isSuperuser && !b.isDirecao), (u) => restritoADocencia(u)],
+    ['menu sem AEE: !isAEE && gestao (estudantes, matriz...)', (b) => !b.isAEE && gestao(b), (u) => !can(u, 'aee.atender') && can(u, 'estudante.ler')],
+    ['laboratórios no menu: !isAEE', (b) => !b.isAEE, (u) => !can(u, 'aee.atender')],
+    ['TurmasListClient: isSuperuser || (isDirecao && !isStaff)', (b) => !!(b.isSuperuser || (b.isDirecao && !b.isStaff)), (u) => can(u, 'escola.administrar') || (can(u, 'turma.gerenciar') && !can(u, 'docencia.exercer'))],
+    ['portal ou sem equipe é barrado: isPortalUser || !staff', (b) => !!b.isPortalUser || !staff(b), (u) => can(u, 'portal.acessar') || !can(u, 'frequencia.lancar')],
+  ]
+  for (const [nome, antigo, novo] of compostas) {
+    it(nome, () => {
+      for (const b of todasAsCombinacoes()) expect(novo(daSessao(b)), JSON.stringify(b)).toBe(antigo(b))
+    })
+  }
 })

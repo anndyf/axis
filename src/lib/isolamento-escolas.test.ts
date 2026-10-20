@@ -220,6 +220,7 @@ describe('isolamento entre escolas - escrita', () => {
     ['editar ocorrência', 'ocorrencias/[id]', 'PUT', () => ({ id: A.ocorrencia }), () => ({ titulo: 'HACK', descricao: 'x', tipo: 'OUTRO', estudantesIds: [] })],
     ['excluir ocorrência', 'ocorrencias/[id]', 'DELETE', () => ({ id: A.ocorrencia }), () => undefined],
     ['editar usuário', 'usuarios/[id]', 'PUT', () => ({ id: A.prof }), () => ({ name: 'HACK' })],
+    ['dar papel a usuário de A (editor de papéis)', 'usuarios/[id]', 'PUT', () => ({ id: A.prof }), () => ({ papeis: ['ADMINISTRADOR', 'DIRECAO'] })],
     ['excluir usuário', 'usuarios/[id]', 'DELETE', () => ({ id: A.prof }), () => undefined],
     ['pausar usuário', 'usuarios/[id]/toggle-status', 'PUT', () => ({ id: A.prof }), () => ({ isActive: false })],
   ]
@@ -269,6 +270,24 @@ describe('isolamento entre escolas - escrita', () => {
     expect(RECUSADO).toContain((await chamar(a.PATCH, 'PATCH', '/x', { id: A.escola }, { situacao: 'CANCELADA' })).status)
     expect(RECUSADO).toContain((await chamar(m.PUT, 'PUT', '/x', { id: A.escola }, { moduloId: 'DIA', estado: 'INATIVO' })).status)
     expect(await prisma.assinatura.count({ where: { escolaId: A.escola } })).toBe(0)
+  })
+
+  // Fase 3: VinculoPapel (tabela nova com escolaId) - nada de A muda pelas rotas de B
+  it('vínculos de papel de A intactos depois das tentativas de B', async () => {
+    const vinculos = await prisma.vinculoPapel.findMany({ where: { usuarioId: A.prof } })
+    expect(vinculos.filter((v) => v.escolaId !== A.escola)).toEqual([])
+    const prof = await prisma.user.findUniqueOrThrow({ where: { id: A.prof } })
+    expect([prof.isSuperuser, prof.isDirecao, prof.isStaff]).toEqual([false, false, true])
+    expect(await prisma.vinculoPapel.count({ where: { escolaId: A.escola, usuario: { escolaId: B.escola } } })).toBe(0)
+  })
+
+  it('criar usuário em B não gera vínculo em A', async () => {
+    const { POST } = await rota('usuarios')
+    const r = await chamar(POST, 'POST', '/x', {}, { name: 'Novo B', email: `novo-b@${SUFIXO}.t`, papeis: ['SECRETARIA'] })
+    expect(r.status).toBe(201)
+    const novo = await prisma.user.findFirstOrThrow({ where: { email: `novo-b@${SUFIXO}.t` }, include: { vinculosPapel: { include: { papel: true } } } })
+    expect(novo.escolaId).toBe(B.escola)
+    expect(novo.vinculosPapel.map((v) => [v.escolaId, v.papel.codigo])).toEqual([[B.escola, 'SECRETARIA']])
   })
 
   it('renomear laboratório de A (id no corpo)', async () => {

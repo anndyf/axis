@@ -13,8 +13,8 @@ Escopo: `docs/arquitetura/roteiro-de-migracao.md`, fase 3 (só 3a e 3b; a 3c fic
 | 3a.3 | Backfill `prisma/backfill/fase-3a.ts` (idempotente, com conferência) | ✅ axis_dev: 20 vínculos; 2ª vez 0 |
 | 3a.4 | `can()` lê os papéis (sessão com papéis/permissões, atalhos antigos mantidos) | ✅ login carrega `papeis`/`permissoes` |
 | 3a.5 | Teste de equivalência (usuários do banco × ações antigas) | ✅ axis_dev 14 usuários / 84 comparações / 0 diferenças; vitest 32 combinações × 5 ações; 459 testes |
-| 3b.1 | Escrita dupla (criar/editar usuário grava vínculo e booleanos) | ⏳ |
-| 3b.2 | Migrar checagens soltas para `can(user, 'recurso.acao')`, por grupo, com testes por papel | ⏳ |
+| 3b.1 | Escrita dupla (criar/editar usuário grava vínculo e booleanos) | ✅ api/usuarios POST/PUT, portal do estudante, nova escola, seeds |
+| 3b.2 | Migrar checagens soltas para `can(user, 'recurso.acao')`, por grupo, com testes por papel | ✅ 536 testes (checagens × 32 combinações, rotas por papel, isolamento, plataforma) |
 | 3b.3 | Tela de Usuários: editor de papéis | ⏳ |
 | 3b.4 | Capturas (375px e 1440px) | ⏳ |
 | 4 | Encerramento + PR | ⏳ |
