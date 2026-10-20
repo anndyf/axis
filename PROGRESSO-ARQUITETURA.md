@@ -14,8 +14,8 @@ Sessão de **planejamento**: nada do sistema é alterado; só `docs/arquitetura/
 | 4 | `docs/arquitetura/modulos-e-planos.md` | ✅ |
 | 5 | `docs/arquitetura/roteiro-de-migracao.md` | ✅ |
 | 6 | `docs/arquitetura/decisoes.md` | ✅ |
-| 7 | `docs/arquitetura/schema-alvo.prisma` | ⏳ em andamento |
-| 8 | Resumo executivo (abaixo) + pull request para `main` | ⬜ |
+| 7 | `docs/arquitetura/schema-alvo.prisma` | ✅ (válido em `prisma validate` 6.19.2) |
+| 8 | Resumo executivo (abaixo) + pull request para `main` | ⏳ em andamento |
 
 ## Como retomar
 Fazer checkout de `planejamento/arquitetura`, ler esta tabela e continuar do primeiro passo que não está ✅.
