@@ -8,7 +8,7 @@ Escopo: `docs/arquitetura/roteiro-de-migracao.md`, fase 3 (só 3a e 3b; a 3c fic
 | # | Etapa | Situação |
 |---|---|---|
 | 0 | Ambiente (npm ci, PostgreSQL, bancos, seeds, backfill da fase 2, testes de base) | ✅ 437 testes na base |
-| 3a.1 | `src/lib/permissoes.ts`: lista fechada de permissões, papéis de sistema, conversão booleanos ⇄ papéis + testes | ⏳ |
+| 3a.1 | `src/lib/permissoes.ts`: lista fechada de permissões, papéis de sistema, conversão booleanos ⇄ papéis + testes; `can()` aceita papéis/permissões | ✅ 452 testes |
 | 3a.2 | Schema `Papel`, `PapelPermissao`, `VinculoPapel` + migration | ⏳ |
 | 3a.3 | Backfill `prisma/backfill/fase-3a.ts` (idempotente, com conferência) | ⏳ |
 | 3a.4 | `can()` lê os papéis (sessão com papéis/permissões, atalhos antigos mantidos) | ⏳ |
