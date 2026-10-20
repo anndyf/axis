@@ -9,8 +9,8 @@ Sessão de **planejamento**: nada do sistema é alterado; só `docs/arquitetura/
 |---|---|---|
 | 0 | Leitura do código, schema, planos e histórico | ✅ |
 | 1 | `docs/arquitetura/inventario.md` | ✅ |
-| 2 | `docs/arquitetura/dominio-alvo.md` | ⏳ em andamento |
-| 3 | `docs/arquitetura/personalizacao.md` | ⬜ |
+| 2 | `docs/arquitetura/dominio-alvo.md` | ✅ |
+| 3 | `docs/arquitetura/personalizacao.md` | ⏳ em andamento |
 | 4 | `docs/arquitetura/modulos-e-planos.md` | ⬜ |
 | 5 | `docs/arquitetura/roteiro-de-migracao.md` | ⬜ |
 | 6 | `docs/arquitetura/decisoes.md` | ⬜ |
