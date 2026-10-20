@@ -23,6 +23,12 @@ A `main` tem: avaliação configurável, calendário letivo, chamada e frequênc
 3. **Fases 0 a 3** de `docs/arquitetura/roteiro-de-migracao.md` (segurança, checagem de módulo no servidor, assinaturas, papéis) não dependem das decisões e podem começar.
 4. **Tipografia, etapa 2** (depois do merge da Inter): títulos de seção maiores em vez de 12px em negrito, rótulos discretos, sem Maiúscula Em Cada Palavra. Tela por tela.
 
+## Instruções prontas para a nuvem
+
+Em `docs/sessoes-nuvem/`, para colar em claude.ai/code (branch `main`, Opus 5.5):
+- `fases-0-1-2.md`: segurança, `exigirModulo` no servidor e, se der tempo, planos/assinaturas.
+- `fase-3a.md`: papéis e permissões com teste de equivalência. Pode rodar em paralelo com a anterior.
+
 ## Decisões já tomadas pela dona do produto
 
 - Chamada: falta marcada por tempo de aula; não pede senha para gravar; observação por aluno não aparece no portal do aluno/responsável.
