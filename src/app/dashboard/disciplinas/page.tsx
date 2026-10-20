@@ -4,6 +4,7 @@ import Link from "next/link"
 import { ArrowLeft, Plus, BookOpen } from "lucide-react"
 import { getDisciplinasPermitidas } from "@/lib/data-fetching"
 import DisciplinasList from "./DisciplinasList"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = {
   title: 'Áxis - Disciplinas'
@@ -12,6 +13,7 @@ export const metadata = {
 export const runtime = 'nodejs'
 
 export default async function DisciplinasPage() {
+  await paginaDoModulo('NUC')
   const session = await auth()
   
   if (!session) {

@@ -3,11 +3,12 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { can } from '@/lib/rbac'
 import { turmasSaoDaEscola } from '@/lib/data-fetching'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
 // GET all disciplinas
-export async function GET() {
+export const GET = rotaDoModulo('NUC', 'leitura', async function GET() {
   try {
     const session = await auth()
     
@@ -36,10 +37,10 @@ export async function GET() {
       { status: 500 }
     )
   }
-}
+})
 
 // POST create disciplina
-export async function POST(request: NextRequest) {
+export const POST = rotaDoModulo('NUC', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
     
@@ -142,4 +143,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+})

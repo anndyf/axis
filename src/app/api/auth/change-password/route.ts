@@ -4,13 +4,14 @@ import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 import bcrypt from "bcryptjs"
 import { z } from "zod"
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, "Senha atual é obrigatória"),
   newPassword: z.string().min(8, "Nova senha deve ter pelo menos 8 caracteres")
 })
 
-export async function PUT(req: Request) {
+export const PUT = rotaDoModulo('NUC', 'escrita', async function PUT(req: Request) {
   try {
     const session = await auth()
     
@@ -75,4 +76,4 @@ export async function PUT(req: Request) {
       { status: 500 }
     )
   }
-}
+})

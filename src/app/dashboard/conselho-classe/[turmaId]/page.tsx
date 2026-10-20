@@ -6,6 +6,7 @@ import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from "@/lib/services/no
 import { etapasDaNota } from "@/lib/services/notas"
 import { carregarFrequenciaDaTurma } from "@/lib/services/frequencia-leitura"
 import { frequenciaConsiderada } from "@/lib/services/frequencia"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = {
   title: 'Áxis - Conselho classe'
@@ -101,6 +102,7 @@ export default async function ConselhoClasseTurmaPage({
 }: {
   params: Promise<{ turmaId: string }>
 }) {
+  await paginaDoModulo('RES')
   const session = await auth()
 
   if (!session?.user?.escolaId) {

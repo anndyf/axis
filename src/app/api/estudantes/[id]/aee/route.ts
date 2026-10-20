@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { can } from "@/lib/rbac"
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 // O [id] da rota é a MATRÍCULA (é o que o front envia). AEEProfile.estudanteId
 // guarda o id técnico do estudante desde a troca de PK (Fase 3 multi-tenant),
@@ -14,7 +15,7 @@ async function resolverEstudanteId(escolaId: string, matricula: string) {
   return estudante?.id ?? null
 }
 
-export async function POST(
+export const POST = rotaDoModulo('AEE', 'escrita', async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -70,9 +71,9 @@ export async function POST(
     console.error("Erro AEE Save:", error)
     return NextResponse.json({ message: "Erro ao salvar: " + error.message }, { status: 500 })
   }
-}
+})
 
-export async function DELETE(
+export const DELETE = rotaDoModulo('AEE', 'escrita', async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -100,4 +101,4 @@ export async function DELETE(
     console.error("Erro AEE Delete:", error)
     return NextResponse.json({ message: "Erro ao excluir: " + error.message }, { status: 500 })
   }
-}
+})

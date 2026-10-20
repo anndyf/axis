@@ -11,6 +11,7 @@ export const runtime = 'nodejs'
 
 // import { getDisciplinasPermitidas } from "@/lib/data-fetching"
 import { Session } from "next-auth"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 async function getTurmaData(turmaId: string, session: Session) {
   const turma = await prisma.turma.findUnique({
@@ -64,6 +65,7 @@ export default async function LancarNotasTurmaPage({
   params: Promise<{ turmaId: string }>
   searchParams: Promise<{ disciplina?: string }>
 }) {
+  await paginaDoModulo('NOT')
   const session = await auth()
   
   if (!session) {

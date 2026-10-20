@@ -10,8 +10,10 @@ import { prisma } from "@/lib/prisma"
 import { getGlobalConfig } from "@/lib/data-fetching"
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export default async function OcorrenciasPage() {
+  await paginaDoModulo('SEC')
   const session = await auth()
   if (!session?.user?.escolaId) redirect("/login")
 

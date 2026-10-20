@@ -1,8 +1,9 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
-export async function GET() {
+export const GET = rotaDoModulo('REC', 'leitura', async function GET() {
   try {
     const session = await auth()
     if (!session?.user?.escolaId) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
@@ -16,9 +17,9 @@ export async function GET() {
   } catch (error) {
     return NextResponse.json({ message: "Erro ao buscar laboratórios" }, { status: 500 })
   }
-}
+})
 
-export async function POST(request: Request) {
+export const POST = rotaDoModulo('REC', 'escrita', async function POST(request: Request) {
   try {
     const session = await auth()
     if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
@@ -34,9 +35,9 @@ export async function POST(request: Request) {
   } catch (error) {
     return NextResponse.json({ message: "Erro ao criar laboratório" }, { status: 500 })
   }
-}
+})
 
-export async function PATCH(request: Request) {
+export const PATCH = rotaDoModulo('REC', 'escrita', async function PATCH(request: Request) {
   try {
     const session = await auth()
     if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
@@ -56,4 +57,4 @@ export async function PATCH(request: Request) {
   } catch (error) {
     return NextResponse.json({ message: "Erro ao editar laboratório" }, { status: 500 })
   }
-}
+})

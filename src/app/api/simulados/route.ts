@@ -3,11 +3,12 @@ import { prisma } from "@/lib/prisma"
 import { NextRequest, NextResponse } from "next/server"
 import { logAudit } from "@/lib/audit"
 import { provaDaEscola, anoLetivoAtualDaEscola } from "@/lib/data-fetching"
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-export async function GET(request: NextRequest) {
+export const GET = rotaDoModulo('PRV', 'leitura', async function GET(request: NextRequest) {
   try {
     const session = await auth()
     const user = session?.user as any
@@ -176,9 +177,9 @@ export async function GET(request: NextRequest) {
     console.error("Erro ao buscar estudantes para simulado:", error)
     return NextResponse.json({ message: "Erro interno do servidor" }, { status: 500 })
   }
-}
+})
 
-export async function POST(request: NextRequest) {
+export const POST = rotaDoModulo('PRV', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
     const user = session?.user as any
@@ -306,4 +307,4 @@ export async function POST(request: NextRequest) {
     console.error("Erro ao salvar notas de simulado:", error)
     return NextResponse.json({ message: "Erro ao salvar notas" }, { status: 500 })
   }
-}
+})

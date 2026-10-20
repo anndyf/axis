@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { turmasSaoDaEscola } from '@/lib/data-fetching'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export const GET = rotaDoModulo('PLA', 'leitura', async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
@@ -29,9 +30,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   } catch (err) {
     return NextResponse.json({ message: 'Erro ao buscar plano' }, { status: 500 })
   }
-}
+})
 
-export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export const PUT = rotaDoModulo('PLA', 'escrita', async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
@@ -79,9 +80,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     console.error(err)
     return NextResponse.json({ message: 'Erro ao editar plano' }, { status: 500 })
   }
-}
+})
 
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export const DELETE = rotaDoModulo('PLA', 'escrita', async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
@@ -100,4 +101,4 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
   } catch (err) {
     return NextResponse.json({ message: 'Erro ao excluir plano' }, { status: 500 })
   }
-}
+})

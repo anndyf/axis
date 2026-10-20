@@ -8,6 +8,7 @@ import { calcularMediaFinal, unidadesDeNotasSalvas, etapasDaNota } from "@/lib/s
 import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from "@/lib/services/notas-leitura"
 import { carregarFrequenciaDaTurma } from "@/lib/services/frequencia-leitura"
 import { situacaoComFrequencia, formatarFrequencia, ROTULO_REPROVADO_FALTA } from "@/lib/services/frequencia"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = {
   title: 'Áxis - Estudantes'
@@ -84,6 +85,7 @@ export default async function BoletimPage({
 }: {
   params: Promise<{ id: string }>
 }) {
+  await paginaDoModulo('NOT')
   const session = await auth()
 
   if (!session?.user?.escolaId) {

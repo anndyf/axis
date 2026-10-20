@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
-export async function GET(request: NextRequest) {
+export const GET = rotaDoModulo('PLA', 'leitura', async function GET(request: NextRequest) {
   try {
     const session = await auth()
     if (!session?.user) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
@@ -46,4 +47,4 @@ export async function GET(request: NextRequest) {
     console.error(err)
     return NextResponse.json({ message: 'Erro ao buscar dados de compatibilidade' }, { status: 500 })
   }
-}
+})

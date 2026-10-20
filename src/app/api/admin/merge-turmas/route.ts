@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
-export async function GET() {
+export const GET = rotaDoModulo('NUC', 'leitura', async function GET() {
   const session = await auth()
   if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
     return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
@@ -39,10 +40,10 @@ export async function GET() {
       counts: t._count
     }))
   })
-}
+})
 
 // Rota para migrar questões de uma turma para outra
-export async function POST(request: Request) {
+export const POST = rotaDoModulo('NUC', 'escrita', async function POST(request: Request) {
   const session = await auth()
   if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
     return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
@@ -134,4 +135,4 @@ export async function POST(request: Request) {
   } catch (error: any) {
     return NextResponse.json({ message: error.message }, { status: 500 })
   }
-}
+})

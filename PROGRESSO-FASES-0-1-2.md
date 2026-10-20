@@ -11,8 +11,8 @@ Escopo: `docs/arquitetura/roteiro-de-migracao.md`, fases 0, 1 e 2.
 | 0.1 | Fase 0: testes que provam as falhas (PDFs, action, questoes/[id]) | ✅ 7 testes novos, todos falharam antes da correção |
 | 0.2 | Fase 0: correções | ✅ 374 testes passando |
 | 0.3 | Fase 0: remover `api/public/v1/register`; ano letivo atual no lugar de 2026 fixo | ✅ |
-| 1.1 | Fase 1: infraestrutura `exigirModulo` + mapa de rotas | ⬜ |
-| 1.2 | Fase 1: aplicação nas rotas de API | ⬜ |
+| 1.1 | Fase 1: infraestrutura `exigirModulo` + mapa de rotas | ✅ |
+| 1.2 | Fase 1: aplicação nas rotas de API | ✅ (páginas também) |
 | 1.3 | Fase 1: actions e páginas + página "módulo indisponível" | ⬜ |
 | 1.4 | Fase 1: teste estático de cobertura + teste de comportamento | ⬜ |
 | 2.1 | Fase 2: schema + migration + backfill | ⬜ |

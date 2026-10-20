@@ -12,6 +12,7 @@ import { ClipboardCheck, BookOpen, CalendarOff, ChevronRight } from "lucide-reac
 import { Alert, Badge, Card, EmptyState, PageHeader, buttonClasses } from "@/components/ui"
 import { rotuloTempos } from "@/lib/services/inicio-professor"
 import SeletorData from "./SeletorData"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = { title: 'Áxis - Chamada' }
 export const runtime = 'nodejs'
@@ -32,6 +33,7 @@ interface Item {
 }
 
 export default async function ChamadaPage({ searchParams }: { searchParams: Promise<{ data?: string }> }) {
+  await paginaDoModulo('DIA')
   const session = await auth()
   if (!session?.user?.escolaId || session.user.isPortalUser || !can(session.user, 'staff')) redirect("/dashboard")
   const escolaId = session.user.escolaId

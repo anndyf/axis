@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
 import { NextResponse } from "next/server"
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
-export async function GET() {
+export const GET = rotaDoModulo('NUC', 'leitura', async function GET() {
   try {
     const session = await auth()
     if (!session?.user?.escolaId) {
@@ -17,4 +18,4 @@ export async function GET() {
   } catch (error) {
     return NextResponse.json({ error: "Erro ao buscar áreas" }, { status: 500 })
   }
-}
+})

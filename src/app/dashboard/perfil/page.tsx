@@ -1,5 +1,6 @@
 "use client"
 
+// @modulo NUC - página cliente; o Núcleo está sempre ativo (guarda nas rotas que ela chama)
 import { useState } from "react"
 import { Lock, Key, CheckCircle2, AlertCircle, Save } from "lucide-react"
 import { useSession } from "next-auth/react"

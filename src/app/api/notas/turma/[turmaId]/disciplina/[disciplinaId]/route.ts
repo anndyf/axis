@@ -4,10 +4,11 @@ import { prisma } from '@/lib/prisma'
 import { resolverEsquemaAvaliacaoId } from '@/lib/services/notas'
 import { atividadesDaDisciplina } from '@/lib/services/notas-leitura'
 import { can } from '@/lib/rbac'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
-export async function GET(
+export const GET = rotaDoModulo('NOT', 'leitura', async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ turmaId: string; disciplinaId: string }> }
 ) {
@@ -112,4 +113,4 @@ export async function GET(
     console.error('Erro ao buscar notas:', error)
     return NextResponse.json({ message: 'Erro ao buscar notas' }, { status: 500 })
   }
-}
+})

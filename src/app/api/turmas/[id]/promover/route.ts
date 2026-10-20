@@ -3,8 +3,9 @@ import { prisma } from "@/lib/prisma"
 import { anoLetivoAtualDaEscola } from '@/lib/data-fetching'
 import { NextResponse } from "next/server"
 import { revalidatePath } from "next/cache"
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
-export async function POST(
+export const POST = rotaDoModulo('SEC', 'escrita', async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -90,4 +91,4 @@ export async function POST(
     console.error("Erro ao promover turma:", error)
     return NextResponse.json({ message: "Erro interno ao promover turma" }, { status: 500 })
   }
-}
+})

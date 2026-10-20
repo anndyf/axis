@@ -3,8 +3,9 @@ import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
 import { can } from "@/lib/rbac"
 import { garantirEsquemasPadrao, esquemaPadraoParaModalidade } from "@/lib/services/esquemas-padrao"
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
-export async function POST(req: Request) {
+export const POST = rotaDoModulo('NUC', 'escrita', async function POST(req: Request) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId || !can(session.user, "gestao")) {
@@ -130,4 +131,4 @@ export async function POST(req: Request) {
       { status: 500 }
     )
   }
-}
+})

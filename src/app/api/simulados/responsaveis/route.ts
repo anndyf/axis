@@ -2,11 +2,12 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { anoLetivoAtualDaEscola } from "@/lib/data-fetching"
 import { NextRequest, NextResponse } from "next/server"
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-export async function GET(request: NextRequest) {
+export const GET = rotaDoModulo('PRV', 'leitura', async function GET(request: NextRequest) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
@@ -40,9 +41,9 @@ export async function GET(request: NextRequest) {
     console.error("Erro ao buscar responsáveis de simulado:", error)
     return NextResponse.json({ message: "Erro interno" }, { status: 500 })
   }
-}
+})
 
-export async function POST(request: NextRequest) {
+export const POST = rotaDoModulo('PRV', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
@@ -106,9 +107,9 @@ export async function POST(request: NextRequest) {
     console.error("Erro ao designar responsável:", error)
     return NextResponse.json({ message: "Erro ao salvar" }, { status: 500 })
   }
-}
+})
 
-export async function DELETE(request: NextRequest) {
+export const DELETE = rotaDoModulo('PRV', 'escrita', async function DELETE(request: NextRequest) {
     try {
       const session = await auth()
       if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
@@ -134,4 +135,4 @@ export async function DELETE(request: NextRequest) {
     } catch (error) {
       return NextResponse.json({ message: "Erro ao remover" }, { status: 500 })
     }
-}
+})

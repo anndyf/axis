@@ -2,8 +2,9 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 import { revalidatePath } from "next/cache"
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
-export async function POST(
+export const POST = rotaDoModulo('NUC', 'escrita', async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -65,4 +66,4 @@ export async function POST(
     console.error("Erro ao clonar turma:", error)
     return NextResponse.json({ message: "Erro interno ao clonar turma" }, { status: 500 })
   }
-}
+})

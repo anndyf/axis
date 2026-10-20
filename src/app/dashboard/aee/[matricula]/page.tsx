@@ -3,10 +3,12 @@ import { auth } from "@/lib/auth"
 import { redirect, notFound } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import AEEProfileClient from "./AEEProfileClient"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
 export default async function AEEPage({ params }: { params: Promise<{ matricula: string }> }) {
+  await paginaDoModulo('AEE')
   const session = await auth()
   if (!session?.user?.escolaId) redirect("/login")
 

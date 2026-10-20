@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import jsPDF from 'jspdf'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
-export async function GET(
+export const GET = rotaDoModulo('PLA', 'leitura', async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -134,4 +135,4 @@ export async function GET(
     console.error('Erro ao gerar PDF:', error)
     return NextResponse.json({ message: 'Erro ao gerar PDF' }, { status: 500 })
   }
-}
+})

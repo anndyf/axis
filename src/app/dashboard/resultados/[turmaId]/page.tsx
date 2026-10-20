@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import ResultadosClient from "./ResultadosClient"
 import { etapasDaNota } from "@/lib/services/notas"
 import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from "@/lib/services/notas-leitura"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = {
   title: 'Áxis - Resultados'
@@ -72,6 +73,7 @@ export default async function ResultadosTurmaPage({
 }: {
   params: Promise<{ turmaId: string }>
 }) {
+  await paginaDoModulo('RES')
   const session = await auth()
 
   if (!session?.user?.escolaId) {

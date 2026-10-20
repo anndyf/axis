@@ -5,12 +5,14 @@ import { can } from "@/lib/rbac"
 import { getGlobalConfig } from "@/lib/data-fetching"
 import { diasLetivos, chaveData } from "@/lib/services/calendario"
 import CalendarioClient from "./CalendarioClient"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = { title: 'Áxis - Calendário letivo' }
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export default async function CalendarioPage() {
+  await paginaDoModulo('NUC')
   const session = await auth()
   if (!session?.user?.escolaId || !can(session.user, 'gestao')) redirect("/dashboard")
   const escolaId = session.user.escolaId

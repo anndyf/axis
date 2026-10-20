@@ -3,12 +3,13 @@ import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 import { startOfWeek, endOfWeek, isAfter, startOfMonth, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 async function laboratorioDaEscola(laboratorioId: string, escolaId: string) {
   return prisma.laboratorio.findUnique({ where: { id: laboratorioId, escolaId }, select: { id: true } })
 }
 
-export async function GET(request: Request) {
+export const GET = rotaDoModulo('REC', 'leitura', async function GET(request: Request) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
@@ -60,9 +61,9 @@ export async function GET(request: Request) {
   } catch (error) {
     return NextResponse.json({ message: "Erro ao buscar reservas" }, { status: 500 })
   }
-}
+})
 
-export async function POST(request: Request) {
+export const POST = rotaDoModulo('REC', 'escrita', async function POST(request: Request) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
@@ -219,4 +220,4 @@ export async function POST(request: Request) {
     console.error("Erro ao criar reserva:", error)
     return NextResponse.json({ message: "Erro ao criar reserva" }, { status: 500 })
   }
-}
+})

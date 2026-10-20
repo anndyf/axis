@@ -4,12 +4,14 @@ import { provaDaEscola } from "@/lib/data-fetching"
 import ResponsaveisClient from "./ResponsaveisClient"
 import { prisma } from "@/lib/prisma"
 import { anoLetivoAtualDaEscola } from "@/lib/data-fetching"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = {
   title: 'Áxis - Simulados'
 }
 
 export default async function ResponsaveisSimuladoPage() {
+  await paginaDoModulo('PRV')
   const session = await auth()
   if (!session?.user?.escolaId) redirect("/login")
   const escolaId = session.user.escolaId

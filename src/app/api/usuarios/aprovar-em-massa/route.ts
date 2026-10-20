@@ -4,10 +4,11 @@ import { prisma } from '@/lib/prisma'
 import { hash } from 'bcryptjs'
 import { enviarSenhaPorEmail } from '@/lib/mail'
 import { gerarSenhaProvisoria } from '@/lib/senha'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
-export async function POST(request: NextRequest) {
+export const POST = rotaDoModulo('NUC', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId || !session.user.isSuperuser) {
@@ -68,4 +69,4 @@ export async function POST(request: NextRequest) {
     console.error('Erro na aprovação em massa:', error)
     return NextResponse.json({ message: 'Erro interno' }, { status: 500 })
   }
-}
+})

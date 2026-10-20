@@ -2,12 +2,14 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import UploadForm from "./UploadForm"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = {
   title: 'Áxis - Estudantes'
 }
 
 export default async function ImportarEstudantesPage() {
+  await paginaDoModulo('SEC')
   const session = await auth()
   
   if (!session?.user?.escolaId) {

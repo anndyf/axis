@@ -8,6 +8,7 @@ import { Avatar, Badge, EmptyState, PageHeader, buttonClasses } from "@/componen
 import EstudantesFilter from "./EstudantesFilter"
 import PortalActivationAction from "./PortalActivationAction"
 import PortalActionsMenu from "./PortalActionsMenu"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = {
   title: 'Áxis - Estudantes'
@@ -120,6 +121,7 @@ export default async function EstudantesPage({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
+  await paginaDoModulo('NUC')
   const session = await auth()
   
   if (!session?.user?.escolaId) {

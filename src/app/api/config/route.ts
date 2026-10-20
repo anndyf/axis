@@ -3,10 +3,11 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { getModulosAtivos } from '@/lib/modules-server'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
-export async function GET() {
+export const GET = rotaDoModulo('NUC', 'leitura', async function GET() {
   try {
   const session = await auth()
   if (!session?.user?.escolaId) {
@@ -49,9 +50,9 @@ export async function GET() {
   } catch (error) {
     return NextResponse.json({ message: 'Erro ao buscar config' }, { status: 500 })
   }
-}
+})
 
-export async function PUT(request: NextRequest) {
+export const PUT = rotaDoModulo('NUC', 'escrita', async function PUT(request: NextRequest) {
   try {
     const session = await auth()
     if (!session || !session.user.isSuperuser) {
@@ -90,4 +91,4 @@ export async function PUT(request: NextRequest) {
   } catch (error) {
     return NextResponse.json({ message: 'Erro ao atualizar config' }, { status: 500 })
   }
-}
+})

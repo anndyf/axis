@@ -7,10 +7,11 @@ import { enviarSenhaPorEmail } from '@/lib/mail'
 import { gerarSenhaProvisoria } from '@/lib/senha'
 import { podeAdicionarUsuarioStaff } from '@/lib/modules-server'
 import { LIMITE_USUARIOS } from '@/lib/modules'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
-export async function GET(request: NextRequest) {
+export const GET = rotaDoModulo('NUC', 'leitura', async function GET(request: NextRequest) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
@@ -45,9 +46,9 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     return NextResponse.json({ message: 'Erro ao buscar usuários' }, { status: 500 })
   }
-}
+})
 
-export async function POST(request: NextRequest) {
+export const POST = rotaDoModulo('NUC', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId || !session.user.isSuperuser) {
@@ -115,4 +116,4 @@ export async function POST(request: NextRequest) {
       detail: error.message || 'Erro desconhecido' 
     }, { status: 500 })
   }
-}
+})

@@ -3,12 +3,14 @@ import { getMessages, getUsersForSelect, getTurmasForSelect } from "./actions"
 import MessagesClient from "./MessagesClient"
 import { redirect } from "next/navigation"
 import { LifeBuoy } from "lucide-react"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = {
   title: 'Áxis - Mensagens'
 }
 
 export default async function MessagesPage() {
+  await paginaDoModulo('NUC')
   const session = await auth()
   
   if (!session?.user) {

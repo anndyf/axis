@@ -3,8 +3,9 @@ import { prisma } from "@/lib/prisma"
 import { auth } from "@/lib/auth"
 import { can } from "@/lib/rbac"
 import { garantirEsquemasPadrao, esquemaPadraoParaModalidade, contarNotasLancadas } from "@/lib/services/esquemas-padrao"
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
-export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const PUT = rotaDoModulo('NUC', 'escrita', async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId || !can(session.user, "gestao")) {
@@ -95,9 +96,9 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       { status: 500 }
     )
   }
-}
+})
 
-export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export const DELETE = rotaDoModulo('NUC', 'escrita', async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId || !can(session.user, "gestao")) {
@@ -125,4 +126,4 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
       { status: 500 }
     )
   }
-}
+})

@@ -3,10 +3,12 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import AEEDashboardClient from "./AEEDashboardClient"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
 export default async function AEEDashboardPage() {
+  await paginaDoModulo('AEE')
   const session = await auth()
   if (!session?.user?.escolaId) redirect("/login")
   const escolaId = session.user.escolaId

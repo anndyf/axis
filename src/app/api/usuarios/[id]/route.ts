@@ -4,10 +4,11 @@ import { prisma } from '@/lib/prisma'
 import { contaProtegidaDaPlataforma, MSG_CONTA_PROTEGIDA } from '@/lib/plataforma'
 import { hash } from 'bcryptjs'
 import { logAudit } from '@/lib/audit'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
-export async function PUT(
+export const PUT = rotaDoModulo('NUC', 'escrita', async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -140,9 +141,9 @@ export async function PUT(
       { status: 500 }
     )
   }
-}
+})
 
-export async function DELETE(
+export const DELETE = rotaDoModulo('NUC', 'escrita', async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -224,4 +225,4 @@ export async function DELETE(
       { status: 500 }
     )
   }
-}
+})

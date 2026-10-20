@@ -8,10 +8,11 @@ import autoTable from 'jspdf-autotable'
 import { adicionarLogoNoPdf } from '@/lib/pdf-logo'
 import { etapasDaNota } from '@/lib/services/notas'
 import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from '@/lib/services/notas-leitura'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
-export async function GET(
+export const GET = rotaDoModulo('RES', 'leitura', async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string, disciplinaId: string }> }
 ) {
@@ -169,4 +170,4 @@ export async function GET(
     console.error('Erro ao gerar PDF da disciplina:', error)
     return NextResponse.json({ message: 'Erro ao gerar PDF' }, { status: 500 })
   }
-}
+})

@@ -7,9 +7,10 @@ import { revalidatePath } from 'next/cache'
 export const runtime = 'nodejs'
 
 import { getTurmasPermitidas } from '@/lib/data-fetching'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 // GET all turmas (filtered by permissions)
-export async function GET() {
+export const GET = rotaDoModulo('NUC', 'leitura', async function GET() {
   try {
     const session = await auth()
     
@@ -27,10 +28,10 @@ export async function GET() {
       { status: 500 }
     )
   }
-}
+})
 
 // POST create turma
-export async function POST(request: NextRequest) {
+export const POST = rotaDoModulo('NUC', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
     
@@ -123,4 +124,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+})

@@ -9,12 +9,14 @@ import { notaMaximaDaEtapa } from "@/lib/services/avaliacoes-professor"
 import { chaveData } from "@/lib/services/calendario"
 import { ArrowLeft, ListChecks } from "lucide-react"
 import AvaliacoesClient from "./AvaliacoesClient"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = { title: 'Áxis - Minhas avaliações' }
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export default async function AvaliacoesPage({ searchParams }: { searchParams: Promise<{ disciplina?: string }> }) {
+  await paginaDoModulo('NOT')
   const session = await auth()
   if (!session?.user?.escolaId || session.user.isPortalUser || !can(session.user, 'staff')) redirect("/dashboard")
   const { disciplina: disciplinaId } = await searchParams

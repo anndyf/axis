@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import EstudanteForm from "@/components/EstudanteForm"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = {
   title: 'Áxis - Estudantes'
@@ -20,6 +21,7 @@ export default async function EditarEstudantePage({
 }: {
   params: Promise<{ id: string }>
 }) {
+  await paginaDoModulo('NUC')
   const session = await auth()
 
   if (!session?.user?.escolaId) {

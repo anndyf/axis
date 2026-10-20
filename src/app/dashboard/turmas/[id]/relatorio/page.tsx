@@ -7,6 +7,7 @@ import RelatorioClient from "./RelatorioClient"
 import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from "@/lib/services/notas-leitura"
 import { etapasDaNota } from "@/lib/services/notas"
 import { carregarFrequenciaDaTurma, resumoFrequenciaParaTela } from "@/lib/services/frequencia-leitura"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = {
   title: 'Áxis - Turmas'
@@ -54,6 +55,7 @@ export default async function RelatorioTurmaPage({
 }: {
   params: Promise<{ id: string }>
 }) {
+  await paginaDoModulo('RES')
   const session = await auth()
 
   if (!session?.user?.escolaId) {

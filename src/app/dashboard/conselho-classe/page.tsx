@@ -12,6 +12,7 @@ export const metadata = {
 export const runtime = 'nodejs'
 
 import ConselhoClasseList from "./ConselhoClasseList"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 async function getTurmasComConselho(session: any) {
   const turmasPermitidas = await getTurmasPermitidas(session)
@@ -85,6 +86,7 @@ async function getTurmasComConselho(session: any) {
 }
 
 export default async function ConselhoClassePage() {
+  await paginaDoModulo('RES')
   const session = await auth()
   
   if (!session) {

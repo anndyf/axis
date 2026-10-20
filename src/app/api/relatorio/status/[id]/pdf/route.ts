@@ -8,6 +8,7 @@ import autoTable from 'jspdf-autotable'
 import { adicionarLogoNoPdf } from '@/lib/pdf-logo'
 import { etapasDaNota, desistenteEmTodas } from '@/lib/services/notas'
 import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from '@/lib/services/notas-leitura'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
@@ -48,7 +49,7 @@ function getStatusAbbr(status: string) {
   return map[status] || '-'
 }
 
-export async function GET(
+export const GET = rotaDoModulo('RES', 'leitura', async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -358,4 +359,4 @@ export async function GET(
       { status: 500 }
     )
   }
-}
+})

@@ -6,10 +6,11 @@ import autoTable from 'jspdf-autotable'
 import { adicionarLogoNoPdf } from '@/lib/pdf-logo'
 import { carregarFrequenciaDaTurma } from '@/lib/services/frequencia-leitura'
 import { situacaoComFrequencia, formatarFrequencia, ROTULO_REPROVADO_FALTA } from '@/lib/services/frequencia'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
-export async function GET(
+export const GET = rotaDoModulo('NOT', 'leitura', async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -187,4 +188,4 @@ export async function GET(
       { status: 500 }
     )
   }
-}
+})

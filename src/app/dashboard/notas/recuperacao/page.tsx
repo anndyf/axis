@@ -12,6 +12,7 @@ export const runtime = 'nodejs'
 
 import { getTurmasPermitidas } from "@/lib/data-fetching"
 import { Session } from "next-auth"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 async function getTurmasComRecuperacao(session: Session) {
   // Buscar apenas as turmas que o usuário tem permissão
@@ -82,6 +83,7 @@ async function getTurmasComRecuperacao(session: Session) {
 }
 
 export default async function RecuperacaoPage() {
+  await paginaDoModulo('NOT')
   const session = await auth()
   
   if (!session) {

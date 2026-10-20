@@ -2,12 +2,14 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import LaboratoriosClient from "./LaboratoriosClient"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = {
   title: 'Áxis - Reserva de Laboratórios'
 }
 
 export default async function LaboratoriosPage() {
+  await paginaDoModulo('REC')
   const session = await auth()
   if (!session?.user?.escolaId) redirect("/login")
   const escolaId = session.user.escolaId

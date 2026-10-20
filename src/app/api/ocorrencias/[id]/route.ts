@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { logAudit } from '@/lib/audit'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
-export async function DELETE(
+export const DELETE = rotaDoModulo('SEC', 'escrita', async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
@@ -40,9 +41,9 @@ export async function DELETE(
     console.error('Erro ao excluir ocorrência:', error)
     return NextResponse.json({ message: 'Erro ao excluir ocorrência' }, { status: 500 })
   }
-}
+})
 
-export async function PUT(
+export const PUT = rotaDoModulo('SEC', 'escrita', async function PUT(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
@@ -103,4 +104,4 @@ export async function PUT(
     console.error('Erro ao atualizar ocorrência:', error)
     return NextResponse.json({ message: 'Erro ao atualizar ocorrência' }, { status: 500 })
   }
-}
+})

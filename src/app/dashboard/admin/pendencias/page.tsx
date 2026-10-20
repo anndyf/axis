@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import PendenciasClient from "./PendenciasClient"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = {
   title: "Pendências de Cadastro | Sistema de Notas",
@@ -15,6 +16,7 @@ export default async function PendenciasPage({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
+  await paginaDoModulo('NUC')
   const session = await auth()
   
   if (!session?.user?.escolaId) {

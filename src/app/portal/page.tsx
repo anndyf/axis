@@ -5,11 +5,13 @@ import PortalClient from "./PortalClient"
 import { getStudentPortalData } from "./actions"
 import { prisma } from "@/lib/prisma"
 import { precisaTrocarSenha } from "@/lib/data-fetching"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 export default async function PortalPage({ searchParams }: { searchParams: Promise<{ aba?: string }> }) {
+  await paginaDoModulo('NUC')
   const session = await auth()
 
   if (!session) {

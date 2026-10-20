@@ -11,10 +11,11 @@ import {
   unidadesDeNotasSalvas,
   type EsquemaConfig,
 } from '@/lib/services/notas'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
-export async function POST(request: NextRequest) {
+export const POST = rotaDoModulo('NOT', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
 
@@ -190,4 +191,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+})

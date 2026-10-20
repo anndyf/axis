@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import QuestoesClient from "./QuestoesClient"
 import { getTurmasPermitidas } from "@/lib/data-fetching"
-import { getModulosAtivos } from "@/lib/modules-server"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = {
   title: 'Áxis - Questoes'
@@ -12,6 +12,7 @@ export const metadata = {
 export const runtime = 'nodejs'
 
 export default async function QuestoesPage() {
+  await paginaDoModulo('QST')
   const session = await auth()
   if (!session) redirect("/login")
 
@@ -20,7 +21,7 @@ export default async function QuestoesPage() {
 
   const escola = await prisma.escola.findUnique({
     where: { id: session.user.escolaId },
-    select: { nome: true, plano: true }
+    select: { nome: true }
   })
 
   // Buscar configurações
@@ -30,24 +31,7 @@ export default async function QuestoesPage() {
     create: { id: session.user.escolaId, escolaId: session.user.escolaId, anoLetivoAtual: new Date().getFullYear() }
   })
 
-  const modulosAtivos = await getModulosAtivos(session.user.escolaId, escola?.plano || 'BASICO')
-
-  // Se professor e banco estiver desativado (por plano ou toggle da direção), bloqueia acesso
-  if (!session.user.isSuperuser && !session.user.isDirecao && !modulosAtivos.includes('banco-questoes')) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
-        <div className="w-20 h-20 bg-warning-subtle text-warning-fg rounded-full flex items-center justify-center mb-6">
-          <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 15c-.77 1.333.192 3 1.732 3z" />
-          </svg>
-        </div>
-        <h1 className="text-2xl font-medium text-fg">Módulo em Manutenção</h1>
-        <p className="text-fg-muted mt-2 max-w-md">
-          O Banco de Questões foi temporariamente desativado pela direção para manutenção ou atualização pedagógica.
-        </p>
-      </div>
-    )
-  }
+  // Banco de questões desligado: professor já foi redirecionado por paginaDoModulo('QST')
 
   // Buscar turmas e disciplinas para os filtros/seleção
   const turmasPermitidas = await getTurmasPermitidas(session)
@@ -58,7 +42,8 @@ export default async function QuestoesPage() {
   }))
 
   const disciplinasRaw = await prisma.disciplina.findMany({
-    where: isManagement ? {} : {
+    where: isManagement ? { turma: { escolaId: session.user.escolaId } } : {
+      turma: { escolaId: session.user.escolaId },
       usuariosPermitidos: {
         some: { id: userId }
       }

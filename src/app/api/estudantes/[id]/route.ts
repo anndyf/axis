@@ -3,11 +3,12 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { can } from '@/lib/rbac'
 import { logAudit } from '@/lib/audit'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
 // PUT update estudante
-export async function PUT(
+export const PUT = rotaDoModulo('NUC', 'escrita', async function PUT(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
@@ -69,10 +70,10 @@ export async function PUT(
       { status: 500 }
     )
   }
-}
+})
 
 // DELETE estudante
-export async function DELETE(
+export const DELETE = rotaDoModulo('NUC', 'escrita', async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
@@ -128,4 +129,4 @@ export async function DELETE(
       { status: 500 }
     )
   }
-}
+})
