@@ -37,6 +37,8 @@ const rotas = {
   usuario: () => import('@/app/api/usuarios/[id]/route'),
   status: () => import('@/app/api/usuarios/[id]/toggle-status/route'),
   transferir: () => import('@/app/api/usuarios/transferir/route'),
+  assinatura: () => import('@/app/api/plataforma/escolas/[id]/assinatura/route'),
+  modulos: () => import('@/app/api/plataforma/escolas/[id]/assinatura/modulos/route'),
 }
 
 beforeAll(async () => {
@@ -54,6 +56,8 @@ afterAll(async () => {
   for (const escolaId of criadas) {
     await prisma.auditLog.deleteMany({ where: { OR: [{ user: { escolaId } }, { entityId: escolaId }] } })
     await prisma.esquemaAvaliacao.deleteMany({ where: { escolaId } })
+    await prisma.assinatura.deleteMany({ where: { escolaId } })
+    await prisma.escolaModulo.deleteMany({ where: { escolaId } })
     await prisma.user.deleteMany({ where: { escolaId } })
     await prisma.escola.delete({ where: { id: escolaId } })
   }
@@ -119,6 +123,9 @@ describe('criação de escola', () => {
     expect(admin.email).toBe(`adm@${SUFIXO}.t`)
     expect(await prisma.esquemaAvaliacao.count({ where: { escolaId: r.corpo.id } })).toBe(2)
     expect(await prisma.auditLog.count({ where: { entityId: r.corpo.id, action: 'CRIAR_ESCOLA', userId: D.plataforma } })).toBe(1)
+    const assinatura = await prisma.assinatura.findFirstOrThrow({ where: { escolaId: r.corpo.id }, include: { plano: true } })
+    expect(assinatura.plano.codigo).toBe('PRO')
+    expect(assinatura.situacao).toBe('ATIVA')
   })
 })
 
@@ -163,5 +170,61 @@ describe('a conta de plataforma não pode ser tomada pela escola', () => {
     sessao.atual = comoPlataforma()
     const usuario = await rotas.usuario()
     expect((await chamar(usuario.PUT as Handler, 'PUT', { id: D.plataforma }, { name: 'Plataforma' })).status).toBe(200)
+  })
+})
+
+describe('assinatura e módulos da escola (fase 2)', () => {
+  it('superuser comum de escola não lê nem altera assinatura (nem a da própria escola)', async () => {
+    sessao.atual = comoSuperuserA()
+    const a = await rotas.assinatura()
+    const m = await rotas.modulos()
+    for (const id of [D.escolaA, D.escolaB]) {
+      expect((await chamar(a.GET as Handler, 'GET', { id })).status).toBe(403)
+      expect((await chamar(a.PATCH as Handler, 'PATCH', { id }, { situacao: 'ATIVA', planoCodigo: 'ENTERPRISE' })).status).toBe(403)
+      expect((await chamar(m.PUT as Handler, 'PUT', { id }, { moduloId: 'FIN', estado: 'ATIVO' })).status).toBe(403)
+    }
+    expect(await prisma.assinatura.count({ where: { escolaId: { in: [D.escolaA, D.escolaB] }, plano: { codigo: 'ENTERPRISE' } } })).toBe(0)
+  })
+
+  it('não deixa suspender a escola da própria conta pela assinatura', async () => {
+    sessao.atual = comoPlataforma()
+    const a = await rotas.assinatura()
+    expect((await chamar(a.PATCH as Handler, 'PATCH', { id: D.escolaA }, { situacao: 'SUSPENSA' })).status).toBe(409)
+  })
+
+  it('inadimplência deixa os módulos em somente leitura, com histórico e sem bloquear a escola', async () => {
+    sessao.atual = comoPlataforma()
+    const a = await rotas.assinatura()
+    const r = await chamar(a.PATCH as Handler, 'PATCH', { id: D.escolaA }, { situacao: 'INADIMPLENTE', planoCodigo: 'PRO' })
+    expect(r.status).toBe(200)
+    expect(r.corpo.assinatura).toMatchObject({ situacao: 'INADIMPLENTE', planoCodigo: 'PRO' })
+    const estado = (id: string) => r.corpo.modulos.find((x: any) => x.moduloId === id).estadoEfetivo
+    expect(estado('NUC')).toBe('ATIVO')
+    expect(estado('DIA')).toBe('SOMENTE_LEITURA')
+    expect(estado('PRV')).toBe('SOMENTE_LEITURA')
+    const escola = await prisma.escola.findUniqueOrThrow({ where: { id: D.escolaA } })
+    expect([escola.status, escola.plano]).toEqual(['ATIVA', 'PRO'])
+    expect(r.corpo.historico[0].descricao).toBe('Assinatura alterada')
+    // só campos da assinatura: nada de usuários da escola
+    expect(JSON.stringify(r.corpo)).not.toContain('hash-original')
+    expect((await chamar(a.PATCH as Handler, 'PATCH', { id: D.escolaA }, { situacao: 'ATIVA' })).corpo.modulos.find((x: any) => x.moduloId === 'DIA').estadoEfetivo).toBe('ATIVO')
+    expect((await chamar(a.PATCH as Handler, 'PATCH', { id: D.escolaA }, { planoCodigo: 'NAO-EXISTE' })).status).toBe(400)
+  })
+
+  it('módulo desligado pelo painel some da escola e é espelhado no modelo antigo; "volta ao plano" desfaz', async () => {
+    sessao.atual = comoPlataforma()
+    const m = await rotas.modulos()
+    const r = await chamar(m.PUT as Handler, 'PUT', { id: D.escolaA }, { moduloId: 'PRV', estado: 'INATIVO', origem: 'EXCECAO' })
+    expect(r.status).toBe(200)
+    expect(r.corpo.modulos.find((x: any) => x.moduloId === 'PRV')).toMatchObject({ doPlano: true, estadoEfetivo: 'INATIVO', excecao: { estado: 'INATIVO', origem: 'EXCECAO' } })
+    const espelho = await prisma.escolaModulo.findMany({ where: { escolaId: D.escolaA }, orderBy: { moduloId: 'asc' } })
+    expect(espelho.map((e) => [e.moduloId, e.ativo])).toEqual([['provas', false], ['simulados', false]])
+    const { getModulosAtivos } = await import('@/lib/modules-server')
+    expect(await getModulosAtivos(D.escolaA, 'PRO')).not.toContain('provas')
+
+    const volta = await chamar(m.PUT as Handler, 'PUT', { id: D.escolaA }, { moduloId: 'PRV', estado: null })
+    expect(volta.corpo.modulos.find((x: any) => x.moduloId === 'PRV')).toMatchObject({ excecao: null, estadoEfetivo: 'ATIVO' })
+    expect(await prisma.escolaModulo.count({ where: { escolaId: D.escolaA } })).toBe(0)
+    expect((await chamar(m.PUT as Handler, 'PUT', { id: D.escolaA }, { moduloId: 'NUC', estado: 'INATIVO' })).status).toBe(400)
   })
 })

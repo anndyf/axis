@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { exigirAdminPlataforma, registrarAcaoPlataforma, SELECT_ESCOLA_PLATAFORMA } from '@/lib/plataforma'
+import { alterarAssinatura } from '@/lib/modulos/assinatura-escrita'
+import { situacaoDoStatus } from '@/lib/services/planos'
 
 export const runtime = 'nodejs'
 
@@ -48,6 +50,12 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       },
       select: SELECT_ESCOLA_PLATAFORMA,
     })
+
+    // Mesma mudança na assinatura (fase 2), que é de onde os módulos são lidos
+    await alterarAssinatura(id, {
+      ...(plano !== undefined ? { planoCodigo: plano } : {}),
+      ...(status !== undefined ? { situacao: situacaoDoStatus(status as Status) } : {}),
+    }, admin.id)
 
     await registrarAcaoPlataforma(admin.id, 'ATUALIZAR_ESCOLA', id, {
       antes: { status: existente.status, plano: existente.plano },

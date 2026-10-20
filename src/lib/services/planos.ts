@@ -51,3 +51,65 @@ export function itensLegadosDoModulo(modulo: ModuloId): string[] {
 export function ehPlanoLegado(codigo: string): codigo is PlanoLegado {
   return codigo in ORDEM
 }
+
+const SITUACOES: SituacaoAssinatura[] = ['TESTE', 'ATIVA', 'INADIMPLENTE', 'SUSPENSA', 'CANCELADA']
+const DATA = /^\d{4}-\d{2}-\d{2}$/
+const dataOk = (v: unknown) => typeof v === 'string' && DATA.test(v) && !isNaN(new Date(`${v}T00:00:00Z`).getTime())
+const limiteOk = (v: unknown) => v === null || (typeof v === 'number' && Number.isInteger(v) && v >= 0)
+
+/** Valida o corpo do PATCH de assinatura do painel da plataforma (só os campos conhecidos). */
+export function validarMudancaAssinatura(corpo: unknown):
+  | { ok: true; mudanca: { planoCodigo?: string; situacao?: SituacaoAssinatura; fimTeste?: string | null; observacoes?: string | null; limiteUsuarios?: number | null; limiteEstudantes?: number | null } }
+  | { ok: false; erro: string } {
+  if (!corpo || typeof corpo !== 'object') return { ok: false, erro: 'Corpo inválido' }
+  const c = corpo as Record<string, unknown>
+  const m: Record<string, unknown> = {}
+  if (c.planoCodigo !== undefined) {
+    if (typeof c.planoCodigo !== 'string' || !c.planoCodigo) return { ok: false, erro: 'Plano inválido' }
+    m.planoCodigo = c.planoCodigo
+  }
+  if (c.situacao !== undefined) {
+    if (!SITUACOES.includes(c.situacao as SituacaoAssinatura)) return { ok: false, erro: 'Situação inválida' }
+    m.situacao = c.situacao
+  }
+  if (c.fimTeste !== undefined) {
+    if (c.fimTeste !== null && !dataOk(c.fimTeste)) return { ok: false, erro: 'Data de fim do teste inválida' }
+    m.fimTeste = c.fimTeste
+  }
+  if (c.observacoes !== undefined) {
+    if (c.observacoes !== null && typeof c.observacoes !== 'string') return { ok: false, erro: 'Observações inválidas' }
+    m.observacoes = typeof c.observacoes === 'string' ? c.observacoes.trim().slice(0, 2000) || null : null
+  }
+  for (const campo of ['limiteUsuarios', 'limiteEstudantes'] as const) {
+    if (c[campo] !== undefined) {
+      if (!limiteOk(c[campo])) return { ok: false, erro: 'Limite inválido' }
+      m[campo] = c[campo]
+    }
+  }
+  if (!Object.keys(m).length) return { ok: false, erro: 'Nada para atualizar' }
+  return { ok: true, mudanca: m }
+}
+
+const ORIGENS = ['ADICIONAL', 'CORTESIA', 'TESTE', 'EXCECAO'] as const
+const ESTADOS = ['ATIVO', 'SOMENTE_LEITURA', 'INATIVO'] as const
+
+/** Valida o corpo do PUT de módulo da assinatura. estado null = volta ao plano. */
+export function validarModuloAssinatura(corpo: unknown):
+  | { ok: true; moduloId: Exclude<ModuloId, 'NUC'>; alvo: { estado: (typeof ESTADOS)[number]; origem: (typeof ORIGENS)[number]; fim: string | null; leituraAte: string | null } | null }
+  | { ok: false; erro: string } {
+  if (!corpo || typeof corpo !== 'object') return { ok: false, erro: 'Corpo inválido' }
+  const c = corpo as Record<string, unknown>
+  if (!(MODULO_IDS as readonly unknown[]).includes(c.moduloId) || c.moduloId === 'NUC') return { ok: false, erro: 'Módulo inválido' }
+  const moduloId = c.moduloId as Exclude<ModuloId, 'NUC'>
+  if (c.estado === null) return { ok: true, moduloId, alvo: null }
+  if (!ESTADOS.includes(c.estado as (typeof ESTADOS)[number])) return { ok: false, erro: 'Estado inválido' }
+  const origem = c.origem ?? 'EXCECAO'
+  if (!ORIGENS.includes(origem as (typeof ORIGENS)[number])) return { ok: false, erro: 'Origem inválida' }
+  for (const campo of ['fim', 'leituraAte'] as const) {
+    if (c[campo] !== undefined && c[campo] !== null && !dataOk(c[campo])) return { ok: false, erro: 'Data inválida' }
+  }
+  return {
+    ok: true, moduloId,
+    alvo: { estado: c.estado as (typeof ESTADOS)[number], origem: origem as (typeof ORIGENS)[number], fim: (c.fim as string) ?? null, leituraAte: (c.leituraAte as string) ?? null },
+  }
+}

@@ -122,6 +122,7 @@ afterAll(async () => {
     await prisma.messageRead.deleteMany({ where: { user: { escolaId } } })
     await prisma.globalConfig.deleteMany({ where: { escolaId } })
     await prisma.escolaModulo.deleteMany({ where: { escolaId } })
+    await prisma.assinatura.deleteMany({ where: { escolaId } })
     await prisma.user.deleteMany({ where: { escolaId } })
     await prisma.escola.delete({ where: { id: escolaId } })
   }
@@ -258,6 +259,16 @@ describe('isolamento entre escolas - escrita', () => {
     const turmas = await getTurmasForSelect()
     expect(semDadosDeA(JSON.stringify(turmas))).toEqual([])
     expect(turmas.map((t: { id: string }) => t.id)).not.toContain(A.turma)
+  })
+
+  // Fase 2: Assinatura (tabela nova com escolaId) só pelo painel da plataforma
+  it('assinatura de A: direção de B não lê nem altera', async () => {
+    const a = await rota('plataforma/escolas/[id]/assinatura')
+    const m = await rota('plataforma/escolas/[id]/assinatura/modulos')
+    expect(RECUSADO).toContain((await chamar(a.GET, 'GET', '/x', { id: A.escola })).status)
+    expect(RECUSADO).toContain((await chamar(a.PATCH, 'PATCH', '/x', { id: A.escola }, { situacao: 'CANCELADA' })).status)
+    expect(RECUSADO).toContain((await chamar(m.PUT, 'PUT', '/x', { id: A.escola }, { moduloId: 'DIA', estado: 'INATIVO' })).status)
+    expect(await prisma.assinatura.count({ where: { escolaId: A.escola } })).toBe(0)
   })
 
   it('renomear laboratório de A (id no corpo)', async () => {

@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { getModulosAtivos } from '@/lib/modules-server'
+import { definirModuloDaAssinatura } from '@/lib/modulos/assinatura-escrita'
 import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
@@ -63,11 +64,9 @@ export const PUT = rotaDoModulo('NUC', 'escrita', async function PUT(request: Ne
     const { isBancoQuestoesAtivo, anoLetivoAtual } = body
 
     if (isBancoQuestoesAtivo !== undefined) {
-      await prisma.escolaModulo.upsert({
-        where: { escolaId_moduloId: { escolaId: session.user.escolaId, moduloId: 'banco-questoes' } },
-        update: { ativo: isBancoQuestoesAtivo },
-        create: { escolaId: session.user.escolaId, moduloId: 'banco-questoes', ativo: isBancoQuestoesAtivo }
-      })
+      // Grava na assinatura (exceção do módulo QST) e espelha em EscolaModulo.
+      // O liga/desliga vale só para professores (ver estadoParaUsuario).
+      await definirModuloDaAssinatura(session.user.escolaId, 'QST', { estado: isBancoQuestoesAtivo ? 'ATIVO' : 'INATIVO', origem: 'EXCECAO' }, session.user.id)
     }
 
     const data: any = {}

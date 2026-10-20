@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 import { exigirAdminPlataforma, registrarAcaoPlataforma, SELECT_ESCOLA_PLATAFORMA } from '@/lib/plataforma'
 import { garantirEsquemasPadrao } from '@/lib/services/esquemas-padrao'
+import { criarAssinaturaDoModeloAntigo } from '@/lib/modulos/assinatura-escrita'
 
 export const runtime = 'nodejs'
 
@@ -92,6 +93,9 @@ export async function POST(request: NextRequest) {
 
       // Esquemas de avaliação padrão (anual e semestral), como no onboarding
       await garantirEsquemasPadrao(tx, novaEscola.id)
+
+      // Assinatura do plano escolhido (fase 2: planos e assinaturas no banco)
+      await criarAssinaturaDoModeloAntigo(tx, novaEscola.id, admin.id, 'Assinatura criada com a escola')
 
       return novaEscola
     })

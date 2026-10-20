@@ -20,69 +20,27 @@
  */
 import * as dotenv from 'dotenv'
 import { prisma } from '@/lib/prisma'
-import { MODULOS } from '@/lib/modules'
-import { planosIniciais, situacaoDoStatus } from '@/lib/services/planos'
-import { excecoesDosOverrides, diferencasDeModulos } from '@/lib/services/modulos'
+import { diferencasDeModulos } from '@/lib/services/modulos'
+import { garantirPlanosIniciais, criarAssinaturaDoModeloAntigo } from '@/lib/modulos/assinatura-escrita'
 import { getModulosAtivos, getModulosAtivosLegado } from '@/lib/modules-server'
 import { estadosDaEscola, estadosLegados } from '@/lib/modulos/estados'
 
-const ORDEM = { BASICO: 0, PRO: 1, ENTERPRISE: 2 } as const
-
-export async function garantirPlanosIniciais() {
-  const criados: string[] = []
-  for (const p of planosIniciais()) {
-    const existe = await prisma.plano.findUnique({ where: { codigo: p.codigo }, select: { id: true } })
-    if (existe) continue
-    await prisma.plano.create({
-      data: {
-        codigo: p.codigo, nome: p.nome, ordem: p.ordem, limiteUsuarios: p.limiteUsuarios,
-        modulos: { create: p.modulos.map((moduloId) => ({ moduloId })) },
-      },
-    })
-    criados.push(p.codigo)
-  }
-  return criados
-}
+export { garantirPlanosIniciais }
 
 export async function backfillFase2(opcoes: { escolaIds?: string[]; autorId?: string } = {}) {
   const planosCriados = await garantirPlanosIniciais()
-  const planos = new Map((await prisma.plano.findMany({ select: { id: true, codigo: true } })).map((p) => [p.codigo, p.id]))
   const escolas = await prisma.escola.findMany({
     where: opcoes.escolaIds ? { id: { in: opcoes.escolaIds } } : {},
-    select: { id: true, nome: true, plano: true, status: true, createdAt: true, escolaModulos: { select: { moduloId: true, ativo: true } }, _count: { select: { assinaturas: true } } },
+    select: { id: true, nome: true },
+    orderBy: { createdAt: 'asc' },
   })
-  const hoje = new Date(new Date().toISOString().slice(0, 10))
   const criadas: string[] = []
   const avisos: string[] = []
   for (const escola of escolas) {
-    if (escola._count.assinaturas > 0) continue
-    const r = excecoesDosOverrides(MODULOS, escola.escolaModulos, (itemId) => {
-      const item = MODULOS.find((m) => m.id === itemId)
-      return !item?.planoMinimo || ORDEM[escola.plano] >= ORDEM[item.planoMinimo]
-    })
+    // a função confere dentro da transação se a escola já tem assinatura
+    const r = await prisma.$transaction((tx) => criarAssinaturaDoModeloAntigo(tx, escola.id, opcoes.autorId ?? null, 'Assinatura criada pelo backfill da fase 2'))
+    if (r.criada) criadas.push(escola.nome)
     avisos.push(...r.avisos.map((a) => `${escola.nome}: ${a}`))
-    await prisma.$transaction(async (tx) => {
-      // confere de novo dentro da transação (duas execuções ao mesmo tempo)
-      if (await tx.assinatura.count({ where: { escolaId: escola.id } })) return
-      await tx.assinatura.create({
-        data: {
-          escolaId: escola.id,
-          planoId: planos.get(escola.plano)!,
-          situacao: situacaoDoStatus(escola.status),
-          inicio: new Date(escola.createdAt.toISOString().slice(0, 10)),
-          observacoes: 'Criada pelo backfill da fase 2 a partir de Escola.plano/status e EscolaModulo.',
-          modulos: { create: r.excecoes.map((e) => ({ moduloId: e.moduloId, estado: e.estado, origem: 'EXCECAO' as const, inicio: hoje })) },
-          historico: {
-            create: {
-              descricao: 'Assinatura criada pelo backfill da fase 2',
-              autorId: opcoes.autorId ?? null,
-              dados: { plano: escola.plano, status: escola.status, overrides: escola.escolaModulos, excecoes: r.excecoes, avisos: r.avisos },
-            },
-          },
-        },
-      })
-      criadas.push(escola.nome)
-    })
   }
   return { planosCriados, criadas, avisos }
 }
