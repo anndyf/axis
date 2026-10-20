@@ -14,6 +14,7 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 
 **Rodando na nuvem**
 - Fases 3a e 3b (papéis e permissões): branch `fase/3ab-papeis`. Instrução em `sessoes-nuvem/fase-3ab.md` nesta branch. A 3c (remover os booleanos e tirar a conta da plataforma da escola) fica para depois da validação.
+  - Andamento em 20/10: 3a com os primeiros commits no GitHub (permissões, papéis de sistema, `can()` lendo papéis, tabelas Papel/PapelPermissao/VinculoPapel, backfill e teste de equivalência). Falta a 3b e o PR.
 
 **Pronto para iniciar quando quiser**
 - Layout com cara de sistema no computador + tipografia etapa 2 + rastreabilidade visível, formulários/tabelas com rigor, acabamento de produto e impressão (uma sessão, 8 etapas): instrução em `sessoes-nuvem/layout-sistema.md`, prévia em `sessoes-nuvem/previa-layout.html`. Disparar DEPOIS do merge da fase 3a+3b.
