@@ -341,6 +341,24 @@ describe('permissões - aluno do portal', () => {
   })
 })
 
+// Fase 0: a equipe continua baixando os PDFs da turma - inclusive quem é só
+// AEE (sem o papel de professor), que já tinha acesso antes da correção.
+describe('PDFs da turma: AEE sem papel de professor continua com acesso', () => {
+  const pdfs: [string, string, () => Record<string, string>][] = [
+    ['PDF de resultados da turma', 'relatorio/resultados/[id]/pdf', () => ({ id: B.turma })],
+    ['PDF de status da turma', 'relatorio/status/[id]/pdf', () => ({ id: B.turma })],
+    ['PDF da turma por disciplina', 'relatorio/turma/[id]/disciplina/[disciplinaId]/pdf', () => ({ id: B.turma, disciplinaId: B.disciplina })],
+  ]
+  for (const [nome, caminho, params] of pdfs) {
+    it(nome, async () => {
+      sessao.atual = { user: { ...sessaoDaEscolaB().user, isSuperuser: false, isDirecao: false, isStaff: false, isAEE: true, isPortalUser: false, estudanteId: null } }
+      const { GET } = await rota(caminho)
+      const r = await chamar(GET, 'GET', '/x', params())
+      expect(r.status, `${nome} respondeu ${r.status}`).toBe(200)
+    })
+  }
+})
+
 // Fase 0: o POST de questoes já confere o banco de questões; PUT/DELETE de
 // questoes/[id] precisam conferir também (professor com o módulo desligado).
 describe('módulo desligado - banco de questões (professor da escola B)', () => {

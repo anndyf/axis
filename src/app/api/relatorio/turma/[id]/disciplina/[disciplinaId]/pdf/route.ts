@@ -22,8 +22,8 @@ export const GET = rotaDoModulo('RES', 'leitura', async function GET(
     if (!session?.user?.escolaId) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
-    // Relatório da turma inteira: só equipe (aluno do portal fica de fora)
-    if (!can(session.user, 'staff')) {
+    // Relatório da turma inteira: só equipe, inclusive AEE (aluno do portal fica de fora)
+    if (!can(session.user, 'staff') && !can(session.user, 'aee')) {
       return NextResponse.json({ message: 'Acesso negado' }, { status: 403 })
     }
     const escolaId = session.user.escolaId

@@ -94,6 +94,11 @@ Para usar o painel da plataforma no banco de desenvolvimento, a conta `admin` da
 ### Telas afetadas para avisar a escola
 Nenhuma para a CETEP. Mudanças visíveis só em escola sem o módulo (tela "Módulo indisponível") e no painel da plataforma.
 
+## Ajustes da revisão (20/10)
+- **PATCH da escola no painel da plataforma agora é atômico**: `Escola` e assinatura mudam na mesma transação (`alterarAssinaturaEm`). Antes eram dois passos separados; se o segundo falhasse, o painel mostrava um plano/status e os módulos (lidos da assinatura) seguiam o antigo. Teste: `src/lib/plataforma-atomico.test.ts` (falha simulada na assinatura → escola não muda; conferido que o teste pega o comportamento antigo).
+- **PDFs da turma liberados também para quem é só AEE** (`can(user, 'staff') || can(user, 'aee')`): a regra só com `staff` tirava o acesso de usuário AEE sem o papel de professor, que baixava antes. Aluno do portal continua recusado. Teste em `isolamento-escolas.test.ts`.
+- Resultado: `npx vitest run` 437 testes passando.
+
 ## Como retomar
 Checkout de `fase/0-1-2-seguranca-modulos`, ler esta tabela, continuar do primeiro passo não ✅.
 
