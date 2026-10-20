@@ -1,0 +1,2090 @@
+// =============================================================================
+// SCHEMA-ALVO DE REFERÊNCIA — Áxis (revisão de arquitetura, out/2026)
+// =============================================================================
+//
+// ESTE ARQUIVO NÃO É USADO PELO APP E NÃO GERA MIGRATION.
+// É o desenho do modelo de dados para onde o roteiro (roteiro-de-migracao.md)
+// leva o sistema. Cada sessão de implementação copia para prisma/schema.prisma
+// só a parte da sua fase, com migrations aditivas e backfill.
+//
+// Convenções (as mesmas do schema atual):
+// - ids cuid, colunas em snake_case via @map, tabelas no plural via @@map;
+// - TODA tabela com dado de pessoa ou de vida escolar tem escolaId PRÓPRIO
+//   (isolamento direto, nunca "pelo caminho");
+// - nada da vida escolar é apagado: mudanças viram registros datados;
+// - dados sensíveis (saúde, deficiência, restrição judicial) em tabelas
+//   separadas, com permissão própria e registro de leitura (LeituraSensivel).
+//
+// Legenda nos comentários:
+//   [ATUAL]  já existe hoje e fica igual (ou quase)
+//   [MUDA]   existe hoje e muda (o comentário diz o quê)
+//   [NOVO]   não existe hoje
+//   [FASE n] fase do roteiro em que entra
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================================================
+// 1. PLATAFORMA, ASSINATURAS E MÓDULOS  (modulos-e-planos.md)
+// =============================================================================
+
+/// [NOVO][FASE 2] Catálogo comercial de planos (pacotes de módulos). Substitui o enum PlanoTipo.
+model Plano {
+  id                    String        @id @default(cuid())
+  codigo                String        @unique // "ESSENCIAL", "PEDAGOGICO"...
+  nome                  String
+  descricao             String?
+  ativoParaVenda        Boolean       @default(true) @map("ativo_para_venda")
+  ordem                 Int           @default(0)
+  limiteEstudantes      Int?          @map("limite_estudantes") // null = sem limite
+  limiteUsuarios        Int?          @map("limite_usuarios")
+  limiteArmazenamentoMb Int?          @map("limite_armazenamento_mb")
+  modulos               PlanoModulo[]
+  assinaturas           Assinatura[]
+
+  @@map("planos")
+}
+
+/// [NOVO][FASE 2] Módulos incluídos num plano.
+model PlanoModulo {
+  planoId  String   @map("plano_id")
+  plano    Plano    @relation(fields: [planoId], references: [id], onDelete: Cascade)
+  moduloId ModuloId @map("modulo_id")
+
+  @@id([planoId, moduloId])
+  @@map("planos_modulos")
+}
+
+/// Ids estáveis dos módulos (documento 4.2). O catálogo de MENU (ícone, rota)
+/// continua em src/lib/modules.ts e aponta para estes ids.
+enum ModuloId {
+  NUC // Núcleo (sempre ativo)
+  SEC // Secretaria Escolar
+  DIA // Diário de Classe e Frequência
+  NOT // Avaliação e Notas
+  RES // Conselho de Classe e Resultados
+  AEE // Inclusão e AEE
+  QST // Banco de Questões
+  PRV // Gerador de Provas e Simulados
+  PLA // Planejamento
+  COM // Comunicação e Portal da Família
+  REC // Recursos e Espaços
+  FIN // Financeiro Escolar
+  IND // Indicadores
+  DOC // Documentos Oficiais
+}
+
+enum EstadoModulo {
+  ATIVO
+  SOMENTE_LEITURA
+  INATIVO
+}
+
+enum SituacaoAssinatura {
+  TESTE
+  ATIVA
+  INADIMPLENTE
+  SUSPENSA
+  CANCELADA
+}
+
+/// [NOVO][FASE 2] Assinatura vigente de uma escola (ou de uma mantenedora, para redes).
+/// Substitui Escola.plano + Escola.status(TRIAL) + EscolaModulo.
+model Assinatura {
+  id                    String                @id @default(cuid())
+  escolaId              String?               @map("escola_id")
+  escola                Escola?               @relation(fields: [escolaId], references: [id])
+  mantenedoraId         String?               @map("mantenedora_id") // assinatura de rede cobre as unidades
+  mantenedora           Mantenedora?          @relation(fields: [mantenedoraId], references: [id])
+  planoId               String                @map("plano_id")
+  plano                 Plano                 @relation(fields: [planoId], references: [id])
+  situacao              SituacaoAssinatura    @default(TESTE)
+  inicio                DateTime              @db.Date
+  fim                   DateTime?             @db.Date
+  fimTeste              DateTime?             @map("fim_teste") @db.Date
+  // Limites contratados (sobrescrevem os do plano quando preenchidos)
+  limiteEstudantes      Int?                  @map("limite_estudantes")
+  limiteUsuarios        Int?                  @map("limite_usuarios")
+  limiteArmazenamentoMb Int?                  @map("limite_armazenamento_mb")
+  observacoes           String?
+  createdAt             DateTime              @default(now()) @map("created_at")
+  updatedAt             DateTime              @updatedAt @map("updated_at")
+  modulos               AssinaturaModulo[]
+  historico             HistoricoAssinatura[]
+
+  @@index([escolaId])
+  @@index([mantenedoraId])
+  @@map("assinaturas")
+}
+
+enum OrigemModulo {
+  PLANO
+  ADICIONAL // add-on contratado
+  CORTESIA
+  TESTE
+  EXCECAO // backfill do antigo EscolaModulo
+}
+
+/// [NOVO][FASE 2] Add-ons e exceções por módulo. O estado efetivo de um módulo =
+/// AssinaturaModulo (se houver) ?? (módulo no plano ? ATIVO : INATIVO), e
+/// SOMENTE_LEITURA quando a assinatura está INADIMPLENTE/fim de teste.
+model AssinaturaModulo {
+  id           String       @id @default(cuid())
+  assinaturaId String       @map("assinatura_id")
+  assinatura   Assinatura   @relation(fields: [assinaturaId], references: [id], onDelete: Cascade)
+  moduloId     ModuloId     @map("modulo_id")
+  origem       OrigemModulo
+  estado       EstadoModulo @default(ATIVO)
+  inicio       DateTime     @db.Date
+  fim          DateTime?    @db.Date
+  // fim do período somente leitura, depois vira INATIVO (decisão D-02)
+  leituraAte   DateTime?    @map("leitura_ate") @db.Date
+
+  @@unique([assinaturaId, moduloId])
+  @@map("assinaturas_modulos")
+}
+
+/// [NOVO][FASE 2] Toda mudança de assinatura (quem, quando, de/para).
+model HistoricoAssinatura {
+  id           String     @id @default(cuid())
+  assinaturaId String     @map("assinatura_id")
+  assinatura   Assinatura @relation(fields: [assinaturaId], references: [id], onDelete: Cascade)
+  descricao    String
+  dados        Json? // de/para em JSON
+  autorId      String?    @map("autor_id")
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  @@map("historico_assinaturas")
+}
+
+// =============================================================================
+// 2. REDE, ESCOLA E CONFIGURAÇÕES
+// =============================================================================
+
+enum TipoMantenedora {
+  PUBLICA_MUNICIPAL
+  PUBLICA_ESTADUAL
+  PUBLICA_FEDERAL
+  PRIVADA
+  COMUNITARIA // comunitária, confessional ou filantrópica
+}
+
+/// [NOVO][FASE pós-11, mas tabela pode existir antes] Mantenedora/rede (D-04).
+/// Escola independente pode não ter mantenedora.
+model Mantenedora {
+  id          String          @id @default(cuid())
+  nome        String
+  cnpj        String?
+  tipo        TipoMantenedora
+  logoUrl     String?         @map("logo_url")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  escolas     Escola[]
+  assinaturas Assinatura[]
+
+  @@map("mantenedoras")
+}
+
+enum DependenciaAdministrativa {
+  FEDERAL
+  ESTADUAL
+  MUNICIPAL
+  PRIVADA
+}
+
+/// [MUDA] Escola continua sendo o tenant (subdomínio). Ganha dados oficiais;
+/// perde plano/EscolaModulo (vão para Assinatura).
+model Escola {
+  id             String                     @id @default(cuid())
+  nome           String
+  slug           String                     @unique // subdomínio [ATUAL]
+  status         StatusEscola               @default(ATIVA) // [ATUAL] TRIAL migra para Assinatura.situacao
+  mantenedoraId  String?                    @map("mantenedora_id")
+  mantenedora    Mantenedora?               @relation(fields: [mantenedoraId], references: [id])
+  // Dados oficiais [NOVO][FASE 4]
+  codigoInep     String?                    @map("codigo_inep")
+  cnpj           String?
+  dependencia    DependenciaAdministrativa?
+  atoAutorizacao String?                    @map("ato_autorizacao") // ato de criação/autorização/credenciamento (vai nos documentos)
+  enderecoLinha  String?                    @map("endereco_linha")
+  municipioIbge  String?                    @map("municipio_ibge")
+  uf             String?
+  localizacao    ZonaResidencia? // urbana/rural (Censo)
+  telefone       String?
+  email          String?
+  // Identidade visual [ATUAL]
+  logoUrl        String?                    @map("logo_url")
+  corPrimaria    String?                    @map("cor_primaria")
+  corSecundaria  String?                    @map("cor_secundaria")
+  emailDominio   String?                    @map("email_dominio")
+  createdAt      DateTime                   @default(now()) @map("created_at")
+  updatedAt      DateTime                   @updatedAt @map("updated_at")
+
+  assinaturas          Assinatura[]
+  usuarios             Usuario[]
+  vinculosPapel        VinculoPapel[]
+  papeis               Papel[]
+  nomenclaturas        Nomenclatura[]
+  camposPersonalizados CampoPersonalizado[]
+  modelosFormulario    ModeloFormulario[]
+  modelosDocumento     ModeloDocumento[]
+  anosLetivos          AnoLetivo[]
+  cursos               Curso[]
+  componentes          ComponenteCurricular[]
+  areasConhecimento    AreaConhecimento[]
+  matrizes             MatrizCurricular[]
+  turmas               Turma[]
+  espacos              Espaco[]
+  temposAula           TempoAula[]
+  diasNaoLetivos       DiaNaoLetivo[]
+  diasLetivosExtras    DiaLetivoExtra[]
+  esquemasAvaliacao    EsquemaAvaliacao[]
+  pessoas              Pessoa[]
+  estudantes           Estudante[]
+  profissionais        Profissional[]
+  vinculosResponsavel  VinculoResponsavel[]
+  autorizacoes         Autorizacao[]
+  matriculas           Matricula[]
+  enturmacoes          Enturmacao[]
+  movimentacoes        Movimentacao[]
+  aulas                Aula[]
+  justificativas       Justificativa[]
+  resultados           ResultadoComponente[]
+  documentosEmitidos   DocumentoEmitido[]
+  ocorrencias          Ocorrencia[]
+  questoes             Questao[]
+  provas               Prova[]
+  planosEnsino         PlanoEnsino[]
+  leiturasSensiveis    LeituraSensivel[]
+  auditLogs            AuditLog[]
+  comunicados          Comunicado[]
+
+  @@map("escolas")
+}
+
+enum StatusEscola {
+  ATIVA
+  SUSPENSA
+  CANCELADA
+}
+
+/// [NOVO][FASE 8a] Rótulos configuráveis (personalizacao.md 3.4.1). Sem linha = padrão da plataforma.
+model Nomenclatura {
+  id       String @id @default(cuid())
+  escolaId String @map("escola_id")
+  escola   Escola @relation(fields: [escolaId], references: [id])
+  conceito String // "etapa", "serie", "turma", "componente", "recuperacao"...
+  singular String // "Bimestre"
+  plural   String // "Bimestres"
+  genero   String @default("M") // "M" | "F" para artigos (o/a)
+
+  @@unique([escolaId, conceito])
+  @@map("nomenclaturas")
+}
+
+// =============================================================================
+// 3. ACESSO: CONTAS, PAPÉIS E PERMISSÕES  (dominio-alvo.md 2.5)
+// =============================================================================
+
+/// [MUDA][FASE 3] Era "User". Só a conta de acesso; quem a pessoa é fica em Pessoa,
+/// o que ela pode fica em VinculoPapel. Os booleanos isSuperuser/isDirecao/isStaff/
+/// isAEE/isPortalUser e estudanteId SAEM (fase 3c / 5c).
+/// Contas da plataforma (dona do Áxis) têm escolaId nulo e plataforma = true.
+model Usuario {
+  id                String                  @id @default(cuid())
+  escolaId          String?                 @map("escola_id")
+  escola            Escola?                 @relation(fields: [escolaId], references: [id])
+  plataforma        Boolean                 @default(false) // substitui isPlatformAdmin
+  pessoaId          String?                 @unique @map("pessoa_id")
+  pessoa            Pessoa?                 @relation(fields: [pessoaId], references: [id])
+  email             String?
+  username          String
+  password          String
+  ativo             Boolean                 @default(true)
+  aprovado          Boolean                 @default(false) // cadastro de professor pendente [ATUAL]
+  deveTrocarSenha   Boolean                 @default(false) @map("deve_trocar_senha")
+  ultimoAcesso      DateTime?               @map("ultimo_acesso")
+  createdAt         DateTime                @default(now()) @map("created_at")
+  updatedAt         DateTime                @updatedAt @map("updated_at")
+  vinculos          VinculoPapel[]
+  tokens            TokenRedefinicaoSenha[]
+  leiturasSensiveis LeituraSensivel[]
+  auditLogs         AuditLog[]
+
+  @@unique([escolaId, username])
+  @@unique([escolaId, email])
+  @@map("usuarios")
+}
+
+/// [NOVO][FASE 3a] Papel = conjunto de permissões. Papéis de sistema têm escolaId nulo
+/// e sistema = true; escola pode criar papéis próprios a partir das permissões (D-07).
+model Papel {
+  id         String           @id @default(cuid())
+  escolaId   String?          @map("escola_id")
+  escola     Escola?          @relation(fields: [escolaId], references: [id])
+  codigo     String // "DIRECAO", "SECRETARIA", "COORDENACAO", "PROFESSOR", "AEE", "RESPONSAVEL", "ESTUDANTE", "MANTENEDORA", "FINANCEIRO"
+  nome       String
+  sistema    Boolean          @default(false)
+  permissoes PapelPermissao[]
+  vinculos   VinculoPapel[]
+
+  @@unique([escolaId, codigo])
+  @@map("papeis")
+}
+
+/// [NOVO][FASE 3a] A permissão é um texto da lista FECHADA em src/lib/permissoes.ts
+/// ("estudante.ler", "estudante.saude.ler", "nota.lancar", "matricula.movimentar"...).
+/// Não é tabela de propósito: o código só reconhece permissões que conhece.
+model PapelPermissao {
+  papelId   String @map("papel_id")
+  papel     Papel  @relation(fields: [papelId], references: [id], onDelete: Cascade)
+  permissao String
+
+  @@id([papelId, permissao])
+  @@map("papeis_permissoes")
+}
+
+enum EscopoPapel {
+  ESCOLA // toda a escola
+  CURSO
+  SERIE
+  TURMA
+  DOCENCIA // professor: derivado das suas Docencia (turma x componente)
+  DEPENDENTES // responsável: só os estudantes vinculados
+  PROPRIO // estudante: só ele mesmo
+}
+
+/// [NOVO][FASE 3a] Conta x escola x papel x escopo x vigência.
+/// can(contexto, 'nota.lancar', { turmaId }) resolve por aqui.
+model VinculoPapel {
+  id        String      @id @default(cuid())
+  usuarioId String      @map("usuario_id")
+  usuario   Usuario     @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  escolaId  String      @map("escola_id")
+  escola    Escola      @relation(fields: [escolaId], references: [id])
+  papelId   String      @map("papel_id")
+  papel     Papel       @relation(fields: [papelId], references: [id])
+  escopo    EscopoPapel @default(ESCOLA)
+  escopoId  String?     @map("escopo_id") // id do curso/série/turma quando o escopo pedir
+  inicio    DateTime    @default(now())
+  fim       DateTime?
+
+  @@index([usuarioId])
+  @@index([escolaId])
+  @@map("vinculos_papel")
+}
+
+/// [ATUAL] Link de redefinição de senha.
+model TokenRedefinicaoSenha {
+  id        String    @id @default(cuid())
+  usuarioId String    @map("usuario_id")
+  usuario   Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique @map("token_hash")
+  expiraEm  DateTime  @map("expira_em")
+  usadoEm   DateTime? @map("usado_em")
+  criadoEm  DateTime  @default(now()) @map("criado_em")
+
+  @@index([usuarioId])
+  @@map("tokens_redefinicao_senha")
+}
+
+/// [ATUAL] Limitador de tentativas.
+model TentativaAcesso {
+  id       String   @id @default(cuid())
+  chave    String
+  criadoEm DateTime @default(now()) @map("criado_em")
+
+  @@index([chave, criadoEm])
+  @@map("tentativas_acesso")
+}
+
+/// [MUDA][FASE 0/3] AuditLog ganha escolaId próprio.
+model AuditLog {
+  id         String   @id @default(cuid())
+  escolaId   String?  @map("escola_id")
+  escola     Escola?  @relation(fields: [escolaId], references: [id])
+  entityType String   @map("entity_type")
+  entityId   String   @map("entity_id")
+  action     String
+  details    String?
+  ipAddress  String?  @map("ip_address")
+  usuarioId  String   @map("usuario_id")
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([escolaId, createdAt])
+  @@index([entityType, entityId])
+  @@map("audit_logs")
+}
+
+/// [NOVO][FASE 5a] LGPD: quem LEU dado sensível (ficha AEE, saúde, deficiência,
+/// restrição judicial, campos personalizados sensíveis), quando e para quê.
+model LeituraSensivel {
+  id          String   @id @default(cuid())
+  escolaId    String   @map("escola_id")
+  escola      Escola   @relation(fields: [escolaId], references: [id])
+  usuarioId   String   @map("usuario_id")
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id])
+  estudanteId String   @map("estudante_id")
+  recurso     String // "saude", "aee", "deficiencia", "restricao", "campo:<chave>"
+  finalidade  String? // opcional: "conselho de classe", "atendimento"
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([escolaId, estudanteId])
+  @@index([usuarioId, createdAt])
+  @@map("leituras_sensiveis")
+}
+
+// =============================================================================
+// 4. ESTRUTURA DA ESCOLA  (dominio-alvo.md 2.4)
+// =============================================================================
+
+enum SituacaoAnoLetivo {
+  PLANEJAMENTO
+  ABERTO
+  EM_FECHAMENTO
+  ENCERRADO
+}
+
+/// [MUDA][FASE 4a] Era PeriodoLetivo; absorve GlobalConfig.anoLetivoAtual (atual = true).
+/// Pode representar um semestre (técnico subsequente/EJA): "2027.1".
+model AnoLetivo {
+  id         String            @id @default(cuid())
+  escolaId   String            @map("escola_id")
+  escola     Escola            @relation(fields: [escolaId], references: [id])
+  ano        Int
+  rotulo     String // "2027" ou "2027.1"
+  inicio     DateTime          @db.Date
+  fim        DateTime          @db.Date
+  situacao   SituacaoAnoLetivo @default(PLANEJAMENTO)
+  atual      Boolean           @default(false) // o ano que abre por padrão nas telas
+  etapas     EtapaCalendario[]
+  turmas     Turma[]
+  matriculas Matricula[]
+
+  @@unique([escolaId, rotulo])
+  @@map("anos_letivos")
+}
+
+/// [ATUAL] Datas de cada unidade (etapa de avaliação) num ano.
+model EtapaCalendario {
+  id               String         @id @default(cuid())
+  anoLetivoId      String         @map("ano_letivo_id")
+  anoLetivo        AnoLetivo      @relation(fields: [anoLetivoId], references: [id], onDelete: Cascade)
+  esquemaUnidadeId String         @map("esquema_unidade_id")
+  esquemaUnidade   EsquemaUnidade @relation(fields: [esquemaUnidadeId], references: [id], onDelete: Cascade)
+  inicio           DateTime       @db.Date
+  fim              DateTime       @db.Date
+  prazoLancamento  DateTime?      @map("prazo_lancamento") @db.Date
+
+  @@unique([anoLetivoId, esquemaUnidadeId])
+  @@map("etapas_calendario")
+}
+
+enum TipoDiaNaoLetivo {
+  FERIADO
+  RECESSO
+  PLANEJAMENTO
+  OUTRO
+}
+
+/// [ATUAL]
+model DiaNaoLetivo {
+  id        String           @id @default(cuid())
+  escolaId  String           @map("escola_id")
+  escola    Escola           @relation(fields: [escolaId], references: [id])
+  data      DateTime         @db.Date
+  tipo      TipoDiaNaoLetivo
+  descricao String
+  turmaId   String?          @map("turma_id")
+  turma     Turma?           @relation(fields: [turmaId], references: [id], onDelete: Cascade)
+
+  @@index([escolaId, data])
+  @@map("dias_nao_letivos")
+}
+
+/// [ATUAL]
+model DiaLetivoExtra {
+  id              String   @id @default(cuid())
+  escolaId        String   @map("escola_id")
+  escola          Escola   @relation(fields: [escolaId], references: [id])
+  data            DateTime @db.Date
+  seguirHorarioDe Int      @map("seguir_horario_de")
+  descricao       String
+
+  @@unique([escolaId, data])
+  @@map("dias_letivos_extras")
+}
+
+enum Turno {
+  MATUTINO
+  VESPERTINO
+  NOTURNO
+  INTEGRAL
+}
+
+/// [MUDA][FASE 4a] turno vira enum (hoje texto normalizado).
+model TempoAula {
+  id       String @id @default(cuid())
+  escolaId String @map("escola_id")
+  escola   Escola @relation(fields: [escolaId], references: [id])
+  turno    Turno
+  ordem    Int
+  inicio   String // "07:00"
+  fim      String // "07:50"
+
+  @@unique([escolaId, turno, ordem])
+  @@map("tempos_aula")
+}
+
+enum Modalidade {
+  REGULAR
+  EDUCACAO_PROFISSIONAL
+  EJA
+  EDUCACAO_ESPECIAL
+}
+
+enum FormaAvaliacaoPadrao {
+  NOTA
+  CONCEITO
+  PARECER
+}
+
+/// [NOVO][FASE 4a] Catálogo NACIONAL (sem escolaId), mantido pelo Áxis, com o
+/// código da etapa no Censo. Ex.: creche, pré-escola, EF 1º ano ... 9º ano,
+/// EM 1ª-3ª série, técnico integrado/concomitante/subsequente, EJA, PROEJA, FIC.
+model EtapaEnsino {
+  id               String               @id // código estável, ex. "EF_AF_6", "EM_1", "TEC_INTEGRADO_1"
+  codigoCenso      String?              @map("codigo_censo")
+  nome             String
+  modalidade       Modalidade
+  ordem            Int
+  idadeReferencia  Int?                 @map("idade_referencia")
+  avaliacaoPadrao  FormaAvaliacaoPadrao @default(NOTA) @map("avaliacao_padrao")
+  frequenciaMinima Float                @default(75) @map("frequencia_minima") // 60 na pré-escola (LDB art. 31)
+  series           Serie[]
+
+  @@map("etapas_ensino")
+}
+
+enum RegimeCurso {
+  ANUAL
+  SEMESTRAL
+  MODULAR
+}
+
+/// [MUDA][FASE 4a] Curso deixa de ter modalidade/turnos em texto. Para escola de
+/// ensino regular, os cursos são criados pelo assistente ("Ensino Fundamental"...).
+model Curso {
+  id                 String             @id @default(cuid())
+  escolaId           String             @map("escola_id")
+  escola             Escola             @relation(fields: [escolaId], references: [id])
+  nome               String
+  sigla              String
+  modalidade         Modalidade
+  regime             RegimeCurso        @default(ANUAL)
+  eixoTecnologico    String?            @map("eixo_tecnologico") // técnico
+  habilitacao        String? // técnico: "Técnico em Informática"
+  cargaHorariaTotal  Int?               @map("carga_horaria_total")
+  turnos             Turno[]
+  esquemaAvaliacaoId String?            @map("esquema_avaliacao_id")
+  esquemaAvaliacao   EsquemaAvaliacao?  @relation(fields: [esquemaAvaliacaoId], references: [id])
+  ativo              Boolean            @default(true)
+  series             Serie[]
+  matrizes           MatrizCurricular[]
+  matriculas         Matricula[]
+
+  @@unique([escolaId, sigla])
+  @@map("cursos")
+}
+
+/// [NOVO][FASE 4a] Série/ano/módulo/período do curso. Nome livre ("1ª série",
+/// "6º ano", "Módulo I", "Grupo 4"); etapaEnsinoId liga ao Censo.
+model Serie {
+  id             String       @id @default(cuid())
+  cursoId        String       @map("curso_id")
+  curso          Curso        @relation(fields: [cursoId], references: [id], onDelete: Cascade)
+  etapaEnsinoId  String       @map("etapa_ensino_id")
+  etapaEnsino    EtapaEnsino  @relation(fields: [etapaEnsinoId], references: [id])
+  nome           String
+  ordem          Int
+  // Para rematrícula automática (aprovado -> próxima série) [FASE 7]
+  proximaSerieId String?      @map("proxima_serie_id")
+  proximaSerie   Serie?       @relation("SerieSeguinte", fields: [proximaSerieId], references: [id])
+  anteriores     Serie[]      @relation("SerieSeguinte")
+  turmas         TurmaSerie[]
+  matriculas     Matricula[]
+  matrizItens    MatrizItem[]
+
+  @@unique([cursoId, ordem])
+  @@map("series")
+}
+
+/// [ATUAL]
+model AreaConhecimento {
+  id          String                 @id @default(cuid())
+  escolaId    String                 @map("escola_id")
+  escola      Escola                 @relation(fields: [escolaId], references: [id])
+  nome        String
+  componentes ComponenteCurricular[]
+
+  @@unique([escolaId, nome])
+  @@map("areas_conhecimento")
+}
+
+enum ParteCurricular {
+  BASE_NACIONAL_COMUM
+  PARTE_DIVERSIFICADA
+  FORMACAO_TECNICA
+  ITINERARIO_FORMATIVO
+}
+
+/// [NOVO][FASE 4b] Catálogo de componentes da escola: "Matemática" existe UMA vez.
+/// abreviacao substitui o dicionário fixo da Bahia nos PDFs.
+model ComponenteCurricular {
+  id          String            @id @default(cuid())
+  escolaId    String            @map("escola_id")
+  escola      Escola            @relation(fields: [escolaId], references: [id])
+  nome        String
+  abreviacao  String?
+  codigo      String?
+  codigoCenso String?           @map("codigo_censo")
+  areaId      String?           @map("area_id")
+  area        AreaConhecimento? @relation(fields: [areaId], references: [id])
+  parte       ParteCurricular   @default(BASE_NACIONAL_COMUM)
+  ativo       Boolean           @default(true)
+  matrizItens MatrizItem[]
+  ofertas     TurmaComponente[]
+  questoes    Questao[]
+
+  @@unique([escolaId, nome])
+  @@map("componentes_curriculares")
+}
+
+/// [MUDA][FASE 4b] Matriz com escolaId e vigência; itens por série e componente.
+model MatrizCurricular {
+  id        String       @id @default(cuid())
+  escolaId  String       @map("escola_id")
+  escola    Escola       @relation(fields: [escolaId], references: [id])
+  cursoId   String       @map("curso_id")
+  curso     Curso        @relation(fields: [cursoId], references: [id])
+  nome      String
+  vigenteDe Int          @map("vigente_de") // ano de início; turmas de quem entrou antes seguem a matriz antiga
+  itens     MatrizItem[]
+
+  @@unique([cursoId, vigenteDe])
+  @@map("matrizes_curriculares")
+}
+
+model MatrizItem {
+  id                String               @id @default(cuid())
+  matrizId          String               @map("matriz_id")
+  matriz            MatrizCurricular     @relation(fields: [matrizId], references: [id], onDelete: Cascade)
+  serieId           String               @map("serie_id")
+  serie             Serie                @relation(fields: [serieId], references: [id])
+  componenteId      String               @map("componente_id")
+  componente        ComponenteCurricular @relation(fields: [componenteId], references: [id])
+  cargaHorariaAnual Int?                 @map("carga_horaria_anual") // em horas
+  aulasSemanais     Int?                 @map("aulas_semanais")
+  obrigatorio       Boolean              @default(true)
+  reprova           Boolean              @default(true) // entra no cálculo de aprovação
+  avaliacao         FormaAvaliacaoPadrao @default(NOTA) // ou só frequência/parecer
+
+  @@unique([matrizId, serieId, componenteId])
+  @@map("matrizes_itens")
+}
+
+enum TipoAtendimentoTurma {
+  ESCOLARIZACAO
+  AEE // sala de recursos, contraturno
+  ATIVIDADE_COMPLEMENTAR
+}
+
+/// [MUDA][FASE 4a] Turma com chaves reais (sem curso/turno/serie/modalidade em texto),
+/// ano letivo obrigatório, sala, vagas e suporte a multisseriada (TurmaSerie).
+/// Excluir turma NÃO apaga estudantes (não há mais cascata para Estudante).
+model Turma {
+  id                 String               @id @default(cuid())
+  escolaId           String               @map("escola_id")
+  escola             Escola               @relation(fields: [escolaId], references: [id])
+  anoLetivoId        String               @map("ano_letivo_id")
+  anoLetivo          AnoLetivo            @relation(fields: [anoLetivoId], references: [id])
+  nome               String // código livre da escola: "1TELN1E", "6º A"
+  turno              Turno
+  tipoAtendimento    TipoAtendimentoTurma @default(ESCOLARIZACAO) @map("tipo_atendimento")
+  codigoInep         String?              @map("codigo_inep")
+  capacidade         Int?
+  salaId             String?              @map("sala_id")
+  sala               Espaco?              @relation(fields: [salaId], references: [id])
+  esquemaAvaliacaoId String?              @map("esquema_avaliacao_id") // override do curso [ATUAL]
+  esquemaAvaliacao   EsquemaAvaliacao?    @relation(fields: [esquemaAvaliacaoId], references: [id])
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @updatedAt @map("updated_at")
+  series             TurmaSerie[]
+  componentes        TurmaComponente[]
+  enturmacoes        Enturmacao[]
+  horarios           HorarioAula[]
+  aulas              Aula[]
+  diasNaoLetivos     DiaNaoLetivo[]
+
+  @@index([escolaId, anoLetivoId])
+  @@map("turmas")
+}
+
+/// [NOVO][FASE 4a] Séries atendidas pela turma (1 na maioria; várias na multisseriada).
+model TurmaSerie {
+  turmaId String @map("turma_id")
+  turma   Turma  @relation(fields: [turmaId], references: [id], onDelete: Cascade)
+  serieId String @map("serie_id")
+  serie   Serie  @relation(fields: [serieId], references: [id])
+
+  @@id([turmaId, serieId])
+  @@map("turmas_series")
+}
+
+/// [MUDA][FASE 4b] Era "Disciplina". A tabela é RENOMEADA mantendo os ids, para não
+/// mexer nas chaves de NotaFinal/Aula/HorarioAula/AvaliacaoDisciplina.
+model TurmaComponente {
+  id                 String                @id @default(cuid())
+  escolaId           String                @map("escola_id") // [NOVO] isolamento direto
+  turmaId            String                @map("turma_id")
+  turma              Turma                 @relation(fields: [turmaId], references: [id], onDelete: Restrict)
+  componenteId       String                @map("componente_id")
+  componente         ComponenteCurricular  @relation(fields: [componenteId], references: [id])
+  cargaHoraria       Int?                  @map("carga_horaria") // aulas previstas no período [ATUAL]
+  esquemaAvaliacaoId String?               @map("esquema_avaliacao_id")
+  esquemaAvaliacao   EsquemaAvaliacao?     @relation(fields: [esquemaAvaliacaoId], references: [id])
+  docencias          Docencia[]
+  horarios           HorarioAula[]
+  aulas              Aula[]
+  avaliacoes         AvaliacaoDisciplina[]
+  resultados         ResultadoComponente[]
+
+  @@unique([turmaId, componenteId])
+  @@index([escolaId])
+  @@map("turmas_componentes")
+}
+
+/// [MUDA][FASE 4b] Horário com vigência e só chaves (texto legado removido).
+model HorarioAula {
+  id                String          @id @default(cuid())
+  turmaId           String          @map("turma_id")
+  turma             Turma           @relation(fields: [turmaId], references: [id], onDelete: Cascade)
+  diaSemana         Int             @map("dia_semana")
+  tempo             Int // = TempoAula.ordem no turno da turma
+  turmaComponenteId String          @map("turma_componente_id")
+  turmaComponente   TurmaComponente @relation(fields: [turmaComponenteId], references: [id], onDelete: Cascade)
+  profissionalId    String?         @map("profissional_id")
+  profissional      Profissional?   @relation(fields: [profissionalId], references: [id], onDelete: SetNull)
+  vigenteDe         DateTime        @map("vigente_de") @db.Date
+  vigenteAte        DateTime?       @map("vigente_ate") @db.Date
+
+  @@index([turmaId, diaSemana])
+  @@map("horarios_aula")
+}
+
+/// [MUDA][FASE pós-11 / REC] Era "Laboratorio": qualquer espaço (sala, laboratório, quadra).
+model Espaco {
+  id         String    @id @default(cuid())
+  escolaId   String    @map("escola_id")
+  escola     Escola    @relation(fields: [escolaId], references: [id])
+  nome       String
+  tipo       String // "SALA", "LABORATORIO", "QUADRA", "BIBLIOTECA"...
+  capacidade Int?
+  reservavel Boolean   @default(false)
+  descricao  String?
+  turmas     Turma[]
+  reservas   Reserva[]
+
+  @@unique([escolaId, nome])
+  @@map("espacos")
+}
+
+/// [MUDA] Era ReservaLaboratorio.
+model Reserva {
+  id                String       @id @default(cuid())
+  espacoId          String       @map("espaco_id")
+  espaco            Espaco       @relation(fields: [espacoId], references: [id], onDelete: Cascade)
+  profissionalId    String       @map("profissional_id")
+  profissional      Profissional @relation(fields: [profissionalId], references: [id], onDelete: Cascade)
+  data              DateTime     @db.Date
+  turno             Turno
+  tempo             Int
+  turmaComponenteId String?      @map("turma_componente_id")
+  createdAt         DateTime     @default(now()) @map("created_at")
+
+  @@unique([espacoId, data, turno, tempo])
+  @@map("reservas")
+}
+
+// =============================================================================
+// 5. PESSOAS E CADASTROS  (dominio-alvo.md 2.2)
+// =============================================================================
+
+enum Sexo {
+  FEMININO
+  MASCULINO
+}
+
+/// Categorias do Censo Escolar.
+enum CorRaca {
+  NAO_DECLARADA
+  BRANCA
+  PRETA
+  PARDA
+  AMARELA
+  INDIGENA
+}
+
+enum Nacionalidade {
+  BRASILEIRA
+  BRASILEIRA_NASCIDA_NO_EXTERIOR_OU_NATURALIZADA
+  ESTRANGEIRA
+}
+
+enum ZonaResidencia {
+  URBANA
+  RURAL
+}
+
+enum LocalizacaoDiferenciada {
+  NAO_SE_APLICA
+  AREA_DE_ASSENTAMENTO
+  TERRA_INDIGENA
+  COMUNIDADE_QUILOMBOLA
+  COMUNIDADE_TRADICIONAL
+}
+
+/// [NOVO][FASE 5a] A pessoa, independente do papel (estudante, responsável,
+/// profissional). Uma por escola (decisão D-05); mantenedoraId fica para quando
+/// houver cadastro compartilhado em rede.
+model Pessoa {
+  id                      String                   @id @default(cuid())
+  escolaId                String                   @map("escola_id")
+  escola                  Escola                   @relation(fields: [escolaId], references: [id])
+  nomeCivil               String                   @map("nome_civil")
+  nomeSocial              String?                  @map("nome_social") // exibido nas telas quando preenchido
+  dataNascimento          DateTime?                @map("data_nascimento") @db.Date
+  sexo                    Sexo?
+  corRaca                 CorRaca?                 @map("cor_raca")
+  corRacaDeclaradaPor     String?                  @map("cor_raca_declarada_por") // "PROPRIO" (16+) | "RESPONSAVEL"
+  nacionalidade           Nacionalidade?
+  paisNascimento          String?                  @map("pais_nascimento") // código ISO/Censo
+  municipioNascimentoIbge String?                  @map("municipio_nascimento_ibge")
+  ufNascimento            String?                  @map("uf_nascimento")
+  cpf                     String? // validado; único por escola quando preenchido
+  profissao               String?
+  escolaridade            String?
+  fotoUrl                 String?                  @map("foto_url") // uso condicionado a Autorizacao USO_IMAGEM
+  // Endereço principal (Censo pede zona e localização diferenciada)
+  cep                     String?
+  logradouro              String?
+  numero                  String?
+  complemento             String?
+  bairro                  String?
+  municipioIbge           String?                  @map("municipio_ibge")
+  uf                      String?
+  zona                    ZonaResidencia?
+  localizacaoDiferenciada LocalizacaoDiferenciada? @map("localizacao_diferenciada")
+  camposExtras            Json                     @default("{}") @map("campos_extras") // campos personalizados NÃO sensíveis (personalizacao.md 3.2)
+  createdAt               DateTime                 @default(now()) @map("created_at")
+  updatedAt               DateTime                 @updatedAt @map("updated_at")
+  anonimizadaEm           DateTime?                @map("anonimizada_em") // LGPD [FASE 10]
+
+  documentos            DocumentoPessoa[]
+  contatos              ContatoPessoa[]
+  usuario               Usuario?
+  estudante             Estudante?
+  profissional          Profissional?
+  responsavelDe         VinculoResponsavel[]
+  autorizacoesAssinadas Autorizacao[]
+
+  @@unique([escolaId, cpf])
+  @@index([escolaId, nomeCivil])
+  @@map("pessoas")
+}
+
+enum TipoDocumento {
+  RG
+  CERTIDAO_NASCIMENTO_NOVA // matrícula de 32 dígitos
+  CERTIDAO_NASCIMENTO_ANTIGA // livro/folha/termo/cartório
+  CERTIDAO_CASAMENTO
+  NIS
+  CARTAO_SUS
+  PASSAPORTE
+  RNM // Registro Nacional Migratório
+  TITULO_ELEITOR
+  OUTRO
+}
+
+/// [NOVO][FASE 5a] Documentos sem 20 colunas vazias em Pessoa.
+model DocumentoPessoa {
+  id           String        @id @default(cuid())
+  pessoaId     String        @map("pessoa_id")
+  pessoa       Pessoa        @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
+  tipo         TipoDocumento
+  numero       String
+  orgaoEmissor String?       @map("orgao_emissor")
+  uf           String?
+  dataEmissao  DateTime?     @map("data_emissao") @db.Date
+  extras       Json? // certidão antiga: { livro, folha, termo, cartorio, municipio }
+  arquivoUrl   String?       @map("arquivo_url") // cópia digitalizada (opcional)
+
+  @@unique([pessoaId, tipo])
+  @@map("documentos_pessoa")
+}
+
+enum TipoContato {
+  CELULAR
+  RESIDENCIAL
+  TRABALHO
+  RECADO
+  EMAIL
+}
+
+/// [NOVO][FASE 5a]
+model ContatoPessoa {
+  id         String      @id @default(cuid())
+  pessoaId   String      @map("pessoa_id")
+  pessoa     Pessoa      @relation(fields: [pessoaId], references: [id], onDelete: Cascade)
+  tipo       TipoContato
+  valor      String
+  whatsapp   Boolean     @default(false)
+  principal  Boolean     @default(false)
+  observacao String?
+
+  @@index([pessoaId])
+  @@map("contatos_pessoa")
+}
+
+enum PoderPublicoTransporte {
+  MUNICIPAL
+  ESTADUAL
+}
+
+/// [MUDA][FASE 5a] Estudante = Pessoa no papel de aluno. Perde nome/data/sexo
+/// (vão para Pessoa) e turmaId/turmaAnteriorId/status (vão para Matricula/Enturmacao
+/// na fase 6). "matricula" de hoje vira "codigo" (o número que a escola usa).
+model Estudante {
+  id                     String                  @id @default(cuid())
+  escolaId               String                  @map("escola_id")
+  escola                 Escola                  @relation(fields: [escolaId], references: [id])
+  pessoaId               String                  @unique @map("pessoa_id")
+  pessoa                 Pessoa                  @relation(fields: [pessoaId], references: [id])
+  codigo                 String // era Estudante.matricula
+  codigoInep             String?                 @map("codigo_inep") // ID do aluno no Educacenso
+  codigoRede             String?                 @map("codigo_rede") // RA / código da rede estadual/municipal
+  // Transporte escolar público (Censo)
+  usaTransportePublico   Boolean?                @map("usa_transporte_publico")
+  poderPublicoTransporte PoderPublicoTransporte? @map("poder_publico_transporte")
+  veiculosTransporte     String[]                @map("veiculos_transporte") // lista do Censo: VAN, MICRO_ONIBUS, ONIBUS, BICICLETA, TRACAO_ANIMAL, EMBARCACAO_ATE_5...
+  observacoes            String?
+  camposExtras           Json                    @default("{}") @map("campos_extras")
+  createdAt              DateTime                @default(now()) @map("created_at")
+  updatedAt              DateTime                @updatedAt @map("updated_at")
+
+  responsaveis       VinculoResponsavel[]
+  saude              SaudeEstudante?
+  deficiencias       DeficienciaEstudante[]
+  recursosAvaliacao  RecursoAvaliacao[]
+  fichaAEE           FichaAEE?
+  planosAEE          PlanoAEE[]
+  restricoes         RestricaoJudicial[]
+  autorizacoes       Autorizacao[]
+  matriculas         Matricula[]
+  estudosAnteriores  EstudoAnterior[]
+  faltas             Falta[]
+  justificativas     Justificativa[]
+  observacoesChamada ObservacaoChamada[]
+  ocorrencias        OcorrenciaEstudante[]
+  documentosEmitidos DocumentoEmitido[]
+  notasSimulado      NotaSimulado[]
+
+  @@unique([escolaId, codigo])
+  @@index([escolaId])
+  @@map("estudantes")
+}
+
+enum Parentesco {
+  MAE
+  PAI
+  AVO
+  TIO
+  IRMAO
+  PADRASTO_MADRASTA
+  TUTOR
+  GUARDIAO
+  OUTRO_PARENTE
+  NAO_PARENTE // motorista, vizinho autorizado
+}
+
+/// [NOVO][FASE 5b] Vínculo estudante x pessoa responsável, com papéis independentes.
+model VinculoResponsavel {
+  id                    String     @id @default(cuid())
+  escolaId              String     @map("escola_id")
+  escola                Escola     @relation(fields: [escolaId], references: [id])
+  estudanteId           String     @map("estudante_id")
+  estudante             Estudante  @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  pessoaId              String     @map("pessoa_id")
+  pessoa                Pessoa     @relation(fields: [pessoaId], references: [id])
+  parentesco            Parentesco
+  filiacao              Int? // 1 ou 2 ("filiação 1/2" do Censo e dos documentos)
+  responsavelLegal      Boolean    @default(false) @map("responsavel_legal")
+  responsavelFinanceiro Boolean    @default(false) @map("responsavel_financeiro")
+  autorizadoBuscar      Boolean    @default(false) @map("autorizado_buscar")
+  moraCom               Boolean    @default(false) @map("mora_com")
+  contatoEmergencia     Boolean    @default(false) @map("contato_emergencia")
+  ordemEmergencia       Int?       @map("ordem_emergencia")
+  recebeComunicados     Boolean    @default(true) @map("recebe_comunicados")
+  acessoPortal          Boolean    @default(false) @map("acesso_portal")
+  inicio                DateTime   @default(now())
+  fim                   DateTime?
+  camposExtras          Json       @default("{}") @map("campos_extras")
+
+  @@unique([estudanteId, pessoaId])
+  @@index([pessoaId])
+  @@map("vinculos_responsavel")
+}
+
+/// [NOVO][FASE 5b] SENSÍVEL: quem NÃO pode buscar / receber informações (ordem
+/// judicial ou pedido do responsável legal com documento). Só secretaria e direção.
+model RestricaoJudicial {
+  id           String    @id @default(cuid())
+  estudanteId  String    @map("estudante_id")
+  estudante    Estudante @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  pessoaNome   String    @map("pessoa_nome") // a pessoa restrita pode não estar cadastrada
+  pessoaId     String?   @map("pessoa_id")
+  descricao    String
+  documentoUrl String?   @map("documento_url")
+  inicio       DateTime  @db.Date
+  fim          DateTime? @db.Date
+
+  @@map("restricoes_judiciais")
+}
+
+/// [NOVO][FASE 5a] SENSÍVEL (LGPD art. 11). Professor vê só o "alerta" (alertaResumo).
+model SaudeEstudante {
+  id                    String    @id @default(cuid())
+  estudanteId           String    @unique @map("estudante_id")
+  estudante             Estudante @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  tipoSanguineo         String?   @map("tipo_sanguineo")
+  alergias              Json      @default("[]") // [{ tipo: "ALIMENTAR"|"MEDICAMENTOSA"|"OUTRA", descricao, gravidade }]
+  medicacoes            Json      @default("[]") // [{ nome, dose, horario, escolaAdministra, autorizacaoId }]
+  restricoesAlimentares String?   @map("restricoes_alimentares")
+  condicoesCronicas     String?   @map("condicoes_cronicas")
+  planoSaude            String?   @map("plano_saude")
+  orientacoesEmergencia String?   @map("orientacoes_emergencia")
+  alertaResumo          String?   @map("alerta_resumo") // ex.: "Alergia grave a amendoim" — o que o professor vê
+  camposSensiveis       Json      @default("{}") @map("campos_sensiveis") // campos personalizados sensíveis
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  @@map("saude_estudantes")
+}
+
+/// Tipos do Censo Escolar (Glossário da Educação Especial).
+enum TipoDeficiencia {
+  CEGUEIRA
+  BAIXA_VISAO
+  VISAO_MONOCULAR
+  SURDEZ
+  DEFICIENCIA_AUDITIVA
+  SURDOCEGUEIRA
+  DEFICIENCIA_FISICA
+  DEFICIENCIA_INTELECTUAL
+  DEFICIENCIA_MULTIPLA
+  TRANSTORNO_ESPECTRO_AUTISTA
+  ALTAS_HABILIDADES_SUPERDOTACAO
+}
+
+/// [NOVO][FASE 5a] SENSÍVEL. Registro para o Censo e para o AEE; CID é opcional
+/// e fica na FichaAEE (mais restrita).
+model DeficienciaEstudante {
+  id           String          @id @default(cuid())
+  estudanteId  String          @map("estudante_id")
+  estudante    Estudante       @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  tipo         TipoDeficiencia
+  comprovacao  String? // "LAUDO", "PLANO_AEE", "OUTRO" (o Censo aceita outros documentos)
+  observacao   String?
+  registradoEm DateTime        @default(now()) @map("registrado_em")
+
+  @@unique([estudanteId, tipo])
+  @@map("deficiencias_estudante")
+}
+
+enum TipoRecursoAvaliacao {
+  PROVA_AMPLIADA
+  PROVA_SUPERAMPLIADA
+  PROVA_BRAILE
+  LEDOR
+  TRANSCRITOR
+  INTERPRETE_LIBRAS
+  LEITURA_LABIAL
+  TEMPO_ADICIONAL
+  SALA_ESPECIAL
+  OUTRO
+}
+
+/// [NOVO][FASE 5a] Recursos para provas. Substitui AEEProfile.precisaProvaAdaptada/SalaEspecial.
+/// Visível ao professor da turma (ele monta a prova).
+model RecursoAvaliacao {
+  id          String               @id @default(cuid())
+  estudanteId String               @map("estudante_id")
+  estudante   Estudante            @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  tipo        TipoRecursoAvaliacao
+  observacao  String?
+
+  @@unique([estudanteId, tipo])
+  @@map("recursos_avaliacao")
+}
+
+/// [MUDA][FASE 5a] Era AEEProfile. Contato de emergência sai daqui (vai para
+/// VinculoResponsavel); recursos de prova saem (RecursoAvaliacao).
+model FichaAEE {
+  id            String       @id @default(cuid())
+  estudanteId   String       @unique @map("estudante_id")
+  estudante     Estudante    @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  cids          String[] // OPCIONAL e mais restrito
+  condicao      String
+  recomendacoes String // o que o professor lê e confirma ciência
+  notasDirecao  String?      @map("notas_direcao")
+  fotoUrl       String?      @map("foto_url")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+  ciencias      CienciaAEE[]
+
+  @@map("fichas_aee")
+}
+
+/// [ATUAL] Era AEEAcknowledgement: professor confirmou leitura das recomendações.
+model CienciaAEE {
+  id             String       @id @default(cuid())
+  fichaId        String       @map("ficha_id")
+  ficha          FichaAEE     @relation(fields: [fichaId], references: [id], onDelete: Cascade)
+  profissionalId String       @map("profissional_id")
+  profissional   Profissional @relation(fields: [profissionalId], references: [id], onDelete: Cascade)
+  lidoEm         DateTime     @default(now()) @map("lido_em")
+
+  @@unique([fichaId, profissionalId])
+  @@map("ciencias_aee")
+}
+
+/// [NOVO][módulo AEE] PEI / Plano de AEE.
+model PlanoAEE {
+  id              String    @id @default(cuid())
+  estudanteId     String    @map("estudante_id")
+  estudante       Estudante @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  anoLetivoRotulo String    @map("ano_letivo_rotulo")
+  objetivos       String
+  estrategias     String
+  recursos        String?
+  avaliacao       String? // acompanhamento periódico
+  autorId         String?   @map("autor_id") // Profissional
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("planos_aee")
+}
+
+enum TipoAutorizacao {
+  USO_IMAGEM_VOZ
+  SAIDA_DESACOMPANHADO
+  ATIVIDADE_EXTERNA // passeios, visitas
+  ADMINISTRAR_MEDICACAO
+  PARTICIPAR_PESQUISA
+  CIENCIA_LGPD
+  OUTRA
+}
+
+/// [NOVO][FASE 5b/10] Autorizações e termos, assinadas pelo responsável legal.
+model Autorizacao {
+  id            String          @id @default(cuid())
+  escolaId      String          @map("escola_id")
+  escola        Escola          @relation(fields: [escolaId], references: [id])
+  estudanteId   String          @map("estudante_id")
+  estudante     Estudante       @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  tipo          TipoAutorizacao
+  descricao     String? // para ATIVIDADE_EXTERNA: qual passeio
+  autoriza      Boolean
+  assinadaPorId String          @map("assinada_por_id")
+  assinadaPor   Pessoa          @relation(fields: [assinadaPorId], references: [id])
+  meio          String // "PAPEL_DIGITALIZADO" | "PORTAL"
+  arquivoUrl    String?         @map("arquivo_url")
+  modeloVersao  String?         @map("modelo_versao") // texto do termo aceito
+  assinadaEm    DateTime        @default(now()) @map("assinada_em")
+  validaAte     DateTime?       @map("valida_ate") @db.Date
+  revogadaEm    DateTime?       @map("revogada_em")
+
+  @@index([escolaId, estudanteId])
+  @@map("autorizacoes")
+}
+
+enum VinculoFuncional {
+  EFETIVO
+  CONTRATO_TEMPORARIO
+  TERCEIRIZADO
+  CLT
+  OUTRO
+}
+
+/// [NOVO][FASE 3/4] Profissional = Pessoa no papel de funcionário. Professor
+/// aparece aqui; o que ele pode fazer vem do VinculoPapel da sua conta.
+model Profissional {
+  id                 String            @id @default(cuid())
+  escolaId           String            @map("escola_id")
+  escola             Escola            @relation(fields: [escolaId], references: [id])
+  pessoaId           String            @unique @map("pessoa_id")
+  pessoa             Pessoa            @relation(fields: [pessoaId], references: [id])
+  funcoes            String[] // lista do Censo: DOCENTE, AUXILIAR, PROFISSIONAL_APOIO, TRADUTOR_LIBRAS, GESTOR...
+  vinculo            VinculoFuncional?
+  matriculaFuncional String?           @map("matricula_funcional")
+  escolaridade       String?
+  formacao           Json? // [{ curso, licenciatura, ano, instituicao }]
+  codigoInep         String?           @map("codigo_inep")
+  ativo              Boolean           @default(true)
+  docencias          Docencia[]
+  horarios           HorarioAula[]
+  reservas           Reserva[]
+  aulas              Aula[]
+  cienciasAEE        CienciaAEE[]
+  questoes           Questao[]
+  provas             Prova[]
+  planosEnsino       PlanoEnsino[]
+
+  @@map("profissionais")
+}
+
+/// [NOVO][FASE 4b] Quem dá aula de quê, em qual turma, de quando a quando.
+/// Substitui User.disciplinasPermitidas / turmasPermitidas; permite substituto.
+model Docencia {
+  id                String          @id @default(cuid())
+  profissionalId    String          @map("profissional_id")
+  profissional      Profissional    @relation(fields: [profissionalId], references: [id])
+  turmaComponenteId String          @map("turma_componente_id")
+  turmaComponente   TurmaComponente @relation(fields: [turmaComponenteId], references: [id], onDelete: Cascade)
+  funcao            String          @default("TITULAR") // TITULAR | AUXILIAR | SUBSTITUTO
+  inicio            DateTime        @db.Date
+  fim               DateTime?       @db.Date
+
+  @@index([profissionalId])
+  @@index([turmaComponenteId])
+  @@map("docencias")
+}
+
+// =============================================================================
+// 6. VIDA ESCOLAR  (dominio-alvo.md 2.3)
+// =============================================================================
+
+enum TipoMatricula {
+  NOVA
+  REMATRICULA
+  TRANSFERENCIA_RECEBIDA
+  TRANSFERENCIA_INTERNA // veio de outro curso/turno da mesma escola
+  RECLASSIFICACAO
+  DEPENDENCIA // matrícula em componentes de dependência
+}
+
+/// Situação da MATRÍCULA (do ano). Mapeia direto para a 2ª etapa do Censo.
+enum SituacaoMatricula {
+  CURSANDO
+  APROVADO
+  APROVADO_CONSELHO
+  APROVADO_DEPENDENCIA
+  REPROVADO
+  REPROVADO_FALTA
+  TRANSFERIDO
+  TRANSFERIDO_INTERNAMENTE
+  ABANDONO // "deixou de frequentar"
+  FALECIDO
+  RECLASSIFICADO
+  CONCLUINTE
+  CANCELADA // matrícula feita por engano / desistência antes do início
+}
+
+/// [NOVO][FASE 6a] O vínculo do estudante com a escola NUM ANO LETIVO.
+model Matricula {
+  id                String                @id @default(cuid())
+  escolaId          String                @map("escola_id")
+  escola            Escola                @relation(fields: [escolaId], references: [id])
+  estudanteId       String                @map("estudante_id")
+  estudante         Estudante             @relation(fields: [estudanteId], references: [id])
+  anoLetivoId       String                @map("ano_letivo_id")
+  anoLetivo         AnoLetivo             @relation(fields: [anoLetivoId], references: [id])
+  cursoId           String                @map("curso_id")
+  curso             Curso                 @relation(fields: [cursoId], references: [id])
+  serieId           String                @map("serie_id")
+  serie             Serie                 @relation(fields: [serieId], references: [id])
+  turno             Turno
+  tipo              TipoMatricula         @default(NOVA)
+  situacao          SituacaoMatricula     @default(CURSANDO)
+  dataMatricula     DateTime              @map("data_matricula") @db.Date
+  dataSituacao      DateTime?             @map("data_situacao") @db.Date
+  matriculaOrigemId String?               @map("matricula_origem_id") // rematrícula / transferência interna
+  matriculaOrigem   Matricula?            @relation("MatriculaOrigem", fields: [matriculaOrigemId], references: [id])
+  derivadas         Matricula[]           @relation("MatriculaOrigem")
+  reconstruida      Boolean               @default(false) // criada pelo backfill a partir de turmaAnteriorId (fase 6a)
+  observacao        String?
+  camposExtras      Json                  @default("{}") @map("campos_extras")
+  createdAt         DateTime              @default(now()) @map("created_at")
+  updatedAt         DateTime              @updatedAt @map("updated_at")
+  enturmacoes       Enturmacao[]
+  movimentacoes     Movimentacao[]
+  resultados        ResultadoComponente[]
+  documentos        DocumentoEmitido[]
+
+  @@index([escolaId, anoLetivoId])
+  @@index([estudanteId])
+  @@map("matriculas")
+}
+
+enum MotivoSaidaTurma {
+  REMANEJAMENTO
+  TRANSFERENCIA
+  ABANDONO
+  CONCLUSAO // fim do ano
+  CANCELAMENTO
+  FALECIMENTO
+}
+
+/// [NOVO][FASE 6a] Passagem da matrícula por uma turma (com datas). Remanejamento
+/// = fechar uma e abrir outra. A lista de chamada de uma data usa estas datas.
+model Enturmacao {
+  id            String            @id @default(cuid())
+  escolaId      String            @map("escola_id")
+  escola        Escola            @relation(fields: [escolaId], references: [id])
+  matriculaId   String            @map("matricula_id")
+  matricula     Matricula         @relation(fields: [matriculaId], references: [id])
+  turmaId       String            @map("turma_id")
+  turma         Turma             @relation(fields: [turmaId], references: [id])
+  dataEntrada   DateTime          @map("data_entrada") @db.Date
+  dataSaida     DateTime?         @map("data_saida") @db.Date
+  motivoSaida   MotivoSaidaTurma? @map("motivo_saida")
+  numeroChamada Int?              @map("numero_chamada")
+  faltas        Falta[]
+
+  @@index([turmaId, dataEntrada])
+  @@index([matriculaId])
+  @@map("enturmacoes")
+}
+
+enum TipoMovimentacao {
+  MATRICULA
+  ENTURMACAO
+  REMANEJAMENTO
+  TRANSFERENCIA_INTERNA
+  TRANSFERENCIA_EXPEDIDA
+  TRANSFERENCIA_RECEBIDA
+  ABANDONO
+  RETORNO // voltou a frequentar
+  RECLASSIFICACAO
+  CONCLUSAO
+  CANCELAMENTO
+  FALECIMENTO
+  REABERTURA // ano/matrícula reaberta para correção
+  COMUNICACAO_CONSELHO_TUTELAR // ECA art. 56
+}
+
+/// [NOVO][FASE 6a] Livro da vida escolar: tudo o que aconteceu com a matrícula.
+model Movimentacao {
+  id                 String           @id @default(cuid())
+  escolaId           String           @map("escola_id")
+  escola             Escola           @relation(fields: [escolaId], references: [id])
+  matriculaId        String           @map("matricula_id")
+  matricula          Matricula        @relation(fields: [matriculaId], references: [id])
+  tipo               TipoMovimentacao
+  data               DateTime         @db.Date
+  escolaExternaNome  String?          @map("escola_externa_nome") // destino/origem fora do Áxis
+  escolaExternaInep  String?          @map("escola_externa_inep")
+  municipioExterno   String?          @map("municipio_externo")
+  observacao         String?
+  registradoPorId    String?          @map("registrado_por_id") // Usuario
+  documentoEmitidoId String?          @map("documento_emitido_id")
+  createdAt          DateTime         @default(now()) @map("created_at")
+
+  @@index([escolaId, data])
+  @@index([matriculaId])
+  @@map("movimentacoes")
+}
+
+/// [NOVO][FASE 6a] Estudos feitos em OUTRA escola (histórico e transferência recebida).
+model EstudoAnterior {
+  id           String    @id @default(cuid())
+  estudanteId  String    @map("estudante_id")
+  estudante    Estudante @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  ano          Int
+  serie        String
+  escolaNome   String    @map("escola_nome")
+  escolaInep   String?   @map("escola_inep")
+  municipio    String?
+  uf           String?
+  situacao     String // como veio no documento de origem
+  componentes  Json // [{ nome, cargaHoraria, resultado, frequencia }]
+  documentoUrl String?   @map("documento_url")
+
+  @@index([estudanteId])
+  @@map("estudos_anteriores")
+}
+
+// =============================================================================
+// 7. DIÁRIO E FREQUÊNCIA  [ATUAL, ajustado]  (módulo DIA)
+// =============================================================================
+
+enum SituacaoAula {
+  PREVISTA
+  REALIZADA
+  CANCELADA
+}
+
+/// [ATUAL] disciplinaId -> turmaComponenteId (mesmo id, tabela renomeada).
+model Aula {
+  id                String              @id @default(cuid())
+  escolaId          String              @map("escola_id")
+  escola            Escola              @relation(fields: [escolaId], references: [id])
+  turmaId           String              @map("turma_id")
+  turma             Turma               @relation(fields: [turmaId], references: [id], onDelete: Cascade)
+  turmaComponenteId String?             @map("turma_componente_id") // null = chamada por dia
+  turmaComponente   TurmaComponente?    @relation(fields: [turmaComponenteId], references: [id], onDelete: Cascade)
+  profissionalId    String?             @map("profissional_id")
+  profissional      Profissional?       @relation(fields: [profissionalId], references: [id], onDelete: SetNull)
+  data              DateTime            @db.Date
+  tempos            Int[]
+  quantidade        Int                 @default(1)
+  conteudo          String?
+  situacao          SituacaoAula        @default(PREVISTA)
+  chave             String              @unique
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
+  faltas            Falta[]
+  observacoes       ObservacaoChamada[]
+
+  @@index([escolaId])
+  @@index([turmaId, data])
+  @@map("aulas")
+}
+
+/// [ATUAL] + enturmacaoId (fase 6a): a falta pertence à passagem do aluno pela turma.
+model Falta {
+  id           String      @id @default(cuid())
+  aulaId       String      @map("aula_id")
+  aula         Aula        @relation(fields: [aulaId], references: [id], onDelete: Cascade)
+  estudanteId  String      @map("estudante_id")
+  estudante    Estudante   @relation(fields: [estudanteId], references: [id])
+  enturmacaoId String?     @map("enturmacao_id")
+  enturmacao   Enturmacao? @relation(fields: [enturmacaoId], references: [id])
+  quantidade   Int         @default(1)
+  tempos       Int[]       @default([])
+
+  @@unique([aulaId, estudanteId])
+  @@index([estudanteId])
+  @@map("faltas")
+}
+
+/// [ATUAL]
+model ObservacaoChamada {
+  id          String    @id @default(cuid())
+  aulaId      String    @map("aula_id")
+  aula        Aula      @relation(fields: [aulaId], references: [id], onDelete: Cascade)
+  estudanteId String    @map("estudante_id")
+  estudante   Estudante @relation(fields: [estudanteId], references: [id])
+  texto       String
+  autorId     String?   @map("autor_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@unique([aulaId, estudanteId])
+  @@map("observacoes_chamada")
+}
+
+enum TipoJustificativa {
+  ATESTADO
+  ABONO_LEGAL
+  OUTRO
+}
+
+enum EfeitoJustificativa {
+  ABONA
+  SO_JUSTIFICA
+}
+
+/// [ATUAL]
+model Justificativa {
+  id              String              @id @default(cuid())
+  escolaId        String              @map("escola_id")
+  escola          Escola              @relation(fields: [escolaId], references: [id])
+  estudanteId     String              @map("estudante_id")
+  estudante       Estudante           @relation(fields: [estudanteId], references: [id])
+  inicio          DateTime            @db.Date
+  fim             DateTime            @db.Date
+  tipo            TipoJustificativa
+  efeito          EfeitoJustificativa
+  descricao       String?
+  documentoUrl    String?             @map("documento_url")
+  registradoPorId String?             @map("registrado_por_id")
+  createdAt       DateTime            @default(now()) @map("created_at")
+
+  @@index([escolaId, estudanteId])
+  @@map("justificativas")
+}
+
+// =============================================================================
+// 8. AVALIAÇÃO E RESULTADOS  [ATUAL, ajustado]  (módulos NOT e RES)
+// =============================================================================
+
+enum ModoRecuperacaoUnidade {
+  SUBSTITUI_SE_MAIOR
+  MEDIA_COM_UNIDADE
+}
+
+enum ModoRecuperacaoFinal {
+  SUBSTITUI_MENOR_UNIDADE
+  NOTA_MINIMA_ISOLADA
+  MEDIA_COM_FINAL
+}
+
+enum TipoNota {
+  NUMERICA
+  CONCEITUAL // [FASE pós-11] conceito A-E / atingiu-parcial-não atingiu
+  PARECER // [NOVO] parecer descritivo (infantil / anos iniciais)
+}
+
+enum FormaCalculo {
+  SOMA
+  MEDIA_ARITMETICA
+  MEDIA_PONDERADA
+  SOMA_COM_DIVISOR
+  MAIOR_NOTA
+}
+
+enum DefinicaoAtividades {
+  ESCOLA
+  PROFESSOR
+}
+
+enum RegistroFrequencia {
+  POR_AULA
+  POR_DIA
+}
+
+enum ApuracaoFrequencia {
+  GERAL
+  POR_COMPONENTE
+}
+
+/// [ATUAL] Conquista a manter: regra de avaliação configurável. Ganha conceito/parecer
+/// e limite de dependências (regra de aprovação da matrícula).
+model EsquemaAvaliacao {
+  id                      String                  @id @default(cuid())
+  escolaId                String                  @map("escola_id")
+  escola                  Escola                  @relation(fields: [escolaId], references: [id])
+  nome                    String
+  numUnidades             Int                     @map("num_unidades")
+  notaMinimaAprovacao     Float                   @default(5) @map("nota_minima_aprovacao")
+  recuperacaoUnidadeAtiva Boolean                 @default(false) @map("recuperacao_unidade_ativa")
+  modoRecuperacaoUnidade  ModoRecuperacaoUnidade? @map("modo_recuperacao_unidade")
+  recuperacaoFinalAtiva   Boolean                 @default(true) @map("recuperacao_final_ativa")
+  modoRecuperacaoFinal    ModoRecuperacaoFinal?   @default(NOTA_MINIMA_ISOLADA) @map("modo_recuperacao_final")
+  notaMinimaExameFinal    Float?                  @map("nota_minima_exame_final")
+  tipoNota                TipoNota                @default(NUMERICA) @map("tipo_nota")
+  conceitos               Json? // [NOVO] escala conceitual: [{ sigla:"A", rotulo, equivaleA?: 9 }]
+  notaMaxima              Float                   @default(10) @map("nota_maxima")
+  casasDecimais           Int                     @default(1) @map("casas_decimais")
+  formaCalculoFinal       FormaCalculo            @default(MEDIA_ARITMETICA) @map("forma_calculo_final")
+  divisorFinal            Float?                  @map("divisor_final")
+  definicaoAtividades     DefinicaoAtividades     @default(ESCOLA) @map("definicao_atividades")
+  registroFrequencia      RegistroFrequencia      @default(POR_AULA) @map("registro_frequencia")
+  apuracaoFrequencia      ApuracaoFrequencia      @default(GERAL) @map("apuracao_frequencia")
+  frequenciaMinima        Float                   @default(75) @map("frequencia_minima") // nunca abaixo do mínimo legal da etapa
+  maxDependencias         Int                     @default(0) @map("max_dependencias") // [NOVO] progressão parcial
+  createdAt               DateTime                @default(now()) @map("created_at")
+  updatedAt               DateTime                @updatedAt @map("updated_at")
+  unidades                EsquemaUnidade[]
+  cursos                  Curso[]
+  turmas                  Turma[]
+  turmaComponentes        TurmaComponente[]
+
+  @@index([escolaId])
+  @@map("esquemas_avaliacao")
+}
+
+/// [ATUAL]
+model EsquemaUnidade {
+  id                   String                @id @default(cuid())
+  esquemaId            String                @map("esquema_id")
+  esquema              EsquemaAvaliacao      @relation(fields: [esquemaId], references: [id], onDelete: Cascade)
+  ordem                Int
+  nome                 String
+  peso                 Float                 @default(1)
+  formaCalculo         FormaCalculo          @default(SOMA) @map("forma_calculo")
+  divisor              Float?
+  atividades           EsquemaAtividade[]
+  notas                NotaUnidade[]
+  etapaCalendarios     EtapaCalendario[]
+  avaliacoesDisciplina AvaliacaoDisciplina[]
+
+  @@unique([esquemaId, ordem])
+  @@map("esquema_unidades")
+}
+
+/// [ATUAL]
+model EsquemaAtividade {
+  id               String          @id @default(cuid())
+  esquemaUnidadeId String          @map("esquema_unidade_id")
+  esquemaUnidade   EsquemaUnidade  @relation(fields: [esquemaUnidadeId], references: [id], onDelete: Cascade)
+  nome             String
+  notaMaxima       Float           @map("nota_maxima")
+  peso             Float           @default(1)
+  ordem            Int
+  notas            NotaAtividade[]
+
+  @@map("esquema_atividades")
+}
+
+/// Situação do COMPONENTE (por disciplina). Separada da situação da matrícula.
+enum SituacaoComponente {
+  CURSANDO
+  EM_RECUPERACAO
+  APROVADO
+  APROVADO_RECUPERACAO
+  APROVADO_CONSELHO
+  REPROVADO_NOTA
+  REPROVADO_FALTA
+  DEPENDENCIA
+  DISPENSADO // aproveitamento de estudos
+}
+
+/// [MUDA][FASE 6a] Era NotaFinal (estudante x disciplina). Passa a ser
+/// matrícula x componente da turma: remanejamento não perde notas.
+/// rotuloRegimento guarda a sigla própria da escola (ex.: "CO") quando houver (D-19).
+model ResultadoComponente {
+  id                String             @id @default(cuid())
+  escolaId          String             @map("escola_id")
+  escola            Escola             @relation(fields: [escolaId], references: [id])
+  matriculaId       String             @map("matricula_id")
+  matricula         Matricula          @relation(fields: [matriculaId], references: [id])
+  turmaComponenteId String             @map("turma_componente_id")
+  turmaComponente   TurmaComponente    @relation(fields: [turmaComponenteId], references: [id])
+  nota              Float?
+  conceito          String?
+  parecer           String?
+  notaRecuperacao   Float?             @map("nota_recuperacao")
+  frequencia        Float? // gravada no fechamento; durante o ano é calculada
+  situacao          SituacaoComponente @default(CURSANDO)
+  modificadoPorId   String?            @map("modificado_por_id")
+  modificadoEm      DateTime           @default(now()) @map("modificado_em")
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+  unidades          NotaUnidade[]
+  auditorias        ResultadoAudit[]
+
+  @@unique([matriculaId, turmaComponenteId])
+  @@index([turmaComponenteId])
+  @@map("resultados_componente")
+}
+
+/// [ATUAL] Era NotaFinalAudit.
+model ResultadoAudit {
+  id              String              @id @default(cuid())
+  resultadoId     String              @map("resultado_id")
+  resultado       ResultadoComponente @relation(fields: [resultadoId], references: [id], onDelete: Cascade)
+  notaAnterior    Float?              @map("nota_anterior")
+  notaAtual       Float?              @map("nota_atual")
+  situacao        SituacaoComponente
+  motivo          String? // [NOVO] retificação após fechamento exige motivo
+  modificadoPorId String?             @map("modificado_por_id")
+  createdAt       DateTime            @default(now()) @map("created_at")
+
+  @@map("resultados_audit")
+}
+
+/// [ATUAL] notaFinalId -> resultadoId.
+model NotaUnidade {
+  id               String              @id @default(cuid())
+  resultadoId      String              @map("resultado_id")
+  resultado        ResultadoComponente @relation(fields: [resultadoId], references: [id], onDelete: Cascade)
+  esquemaUnidadeId String              @map("esquema_unidade_id")
+  esquemaUnidade   EsquemaUnidade      @relation(fields: [esquemaUnidadeId], references: [id])
+  notaCalculada    Float?              @map("nota_calculada")
+  notaRecuperacao  Float?              @map("nota_recuperacao")
+  conceito         String? // [NOVO]
+  parecer          String? // [NOVO]
+  origemTurmaId    String?             @map("origem_turma_id") // [NOVO] nota vinda de outra turma (remanejamento): só leitura
+  atividades       NotaAtividade[]
+  avaliacoes       NotaAvaliacao[]
+
+  @@unique([resultadoId, esquemaUnidadeId])
+  @@map("notas_unidades")
+}
+
+/// [ATUAL]
+model NotaAtividade {
+  id                 String           @id @default(cuid())
+  notaUnidadeId      String           @map("nota_unidade_id")
+  notaUnidade        NotaUnidade      @relation(fields: [notaUnidadeId], references: [id], onDelete: Cascade)
+  esquemaAtividadeId String           @map("esquema_atividade_id")
+  esquemaAtividade   EsquemaAtividade @relation(fields: [esquemaAtividadeId], references: [id])
+  valor              Float?
+
+  @@unique([notaUnidadeId, esquemaAtividadeId])
+  @@map("notas_atividades")
+}
+
+/// [ATUAL] disciplinaId -> turmaComponenteId.
+model AvaliacaoDisciplina {
+  id                String          @id @default(cuid())
+  turmaComponenteId String          @map("turma_componente_id")
+  turmaComponente   TurmaComponente @relation(fields: [turmaComponenteId], references: [id], onDelete: Cascade)
+  esquemaUnidadeId  String          @map("esquema_unidade_id")
+  esquemaUnidade    EsquemaUnidade  @relation(fields: [esquemaUnidadeId], references: [id], onDelete: Restrict)
+  nome              String
+  data              DateTime?       @db.Date
+  notaMaxima        Float           @map("nota_maxima")
+  peso              Float           @default(1)
+  ordem             Int
+  criadoPorId       String?         @map("criado_por_id")
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+  notas             NotaAvaliacao[]
+
+  @@index([turmaComponenteId, esquemaUnidadeId])
+  @@map("avaliacoes_disciplina")
+}
+
+/// [ATUAL]
+model NotaAvaliacao {
+  id            String              @id @default(cuid())
+  notaUnidadeId String              @map("nota_unidade_id")
+  notaUnidade   NotaUnidade         @relation(fields: [notaUnidadeId], references: [id], onDelete: Cascade)
+  avaliacaoId   String              @map("avaliacao_id")
+  avaliacao     AvaliacaoDisciplina @relation(fields: [avaliacaoId], references: [id], onDelete: Cascade)
+  valor         Float?
+
+  @@unique([notaUnidadeId, avaliacaoId])
+  @@map("notas_avaliacoes")
+}
+
+// =============================================================================
+// 9. DOCUMENTOS OFICIAIS  (módulo DOC — personalizacao.md 3.5)
+// =============================================================================
+
+enum TipoDocumentoEscolar {
+  DECLARACAO_MATRICULA
+  DECLARACAO_FREQUENCIA
+  DECLARACAO_TRANSFERENCIA
+  DECLARACAO_CONCLUSAO
+  BOLETIM
+  HISTORICO_ESCOLAR
+  ATA_RESULTADOS_FINAIS
+  FICHA_INDIVIDUAL
+  CERTIFICADO
+  AUTORIZACAO // termo para assinatura
+  OUTRO
+}
+
+/// [NOVO][FASE 9a] Modelo HTML com marcadores (sem código livre). Versão nova a
+/// cada alteração publicada; o de fábrica tem escolaId nulo e não é editável.
+model ModeloDocumento {
+  id        String               @id @default(cuid())
+  escolaId  String?              @map("escola_id")
+  escola    Escola?              @relation(fields: [escolaId], references: [id])
+  tipo      TipoDocumentoEscolar
+  nome      String
+  versao    Int                  @default(1)
+  conteudo  String // HTML com {{marcadores}} e blocos prontos
+  ativo     Boolean              @default(true)
+  createdAt DateTime             @default(now()) @map("created_at")
+  emitidos  DocumentoEmitido[]
+
+  @@unique([escolaId, tipo, nome, versao])
+  @@map("modelos_documento")
+}
+
+/// [NOVO][FASE 9a] Todo documento emitido, com código de verificação (QR).
+/// A página pública mostra só tipo, data, escola, nome abreviado e situação (D-17).
+model DocumentoEmitido {
+  id                 String               @id @default(cuid())
+  escolaId           String               @map("escola_id")
+  escola             Escola               @relation(fields: [escolaId], references: [id])
+  tipo               TipoDocumentoEscolar
+  estudanteId        String?              @map("estudante_id")
+  estudante          Estudante?           @relation(fields: [estudanteId], references: [id])
+  matriculaId        String?              @map("matricula_id")
+  matricula          Matricula?           @relation(fields: [matriculaId], references: [id])
+  modeloId           String?              @map("modelo_id")
+  modelo             ModeloDocumento?     @relation(fields: [modeloId], references: [id])
+  codigoVerificacao  String               @unique @map("codigo_verificacao") // curto, impresso + QR
+  hashConteudo       String               @map("hash_conteudo")
+  arquivoUrl         String?              @map("arquivo_url")
+  emitidoPorId       String               @map("emitido_por_id") // Usuario
+  emitidoEm          DateTime             @default(now()) @map("emitido_em")
+  canceladoEm        DateTime?            @map("cancelado_em")
+  motivoCancelamento String?              @map("motivo_cancelamento")
+  substituidoPorId   String?              @map("substituido_por_id")
+
+  @@index([escolaId, emitidoEm])
+  @@map("documentos_emitidos")
+}
+
+// =============================================================================
+// 10. PERSONALIZAÇÃO  (personalizacao.md 3.2 e 3.3)
+// =============================================================================
+
+enum EntidadePersonalizavel {
+  ESTUDANTE
+  RESPONSAVEL // grava em VinculoResponsavel.camposExtras
+  PESSOA
+  MATRICULA
+  PROFISSIONAL
+  TURMA
+}
+
+enum TipoCampo {
+  TEXTO
+  TEXTO_LONGO
+  NUMERO
+  DATA
+  SIM_NAO
+  LISTA_UNICA
+  LISTA_MULTIPLA
+  TELEFONE
+  CPF
+  EMAIL
+  ARQUIVO
+}
+
+enum ObrigatoriedadeCampo {
+  NUNCA
+  NA_MATRICULA
+  SEMPRE
+}
+
+/// [NOVO][FASE 8b] Definição de campo personalizado. Valores ficam em
+/// <entidade>.camposExtras (JSONB) — ou em SaudeEstudante.camposSensiveis se sensivel.
+model CampoPersonalizado {
+  id                String                 @id @default(cuid())
+  escolaId          String                 @map("escola_id")
+  escola            Escola                 @relation(fields: [escolaId], references: [id])
+  entidade          EntidadePersonalizavel
+  chave             String // imutável após criada
+  rotulo            String
+  ajuda             String?
+  tipo              TipoCampo
+  opcoes            Json? // [{ valor, rotulo }]
+  obrigatoriedade   ObrigatoriedadeCampo   @default(NUNCA)
+  validacao         Json? // { min, max, tamanho, padrao }
+  sensivel          Boolean                @default(false) // se true: nunca obrigatório, fora das exportações gerais, leitura registrada
+  exportavel        Boolean                @default(true)
+  filtravel         Boolean                @default(false) // cria índice GIN / filtro na lista
+  locais            String[] // "FICHA", "MATRICULA", "PORTAL", "LISTA", "RELATORIO"
+  secao             String?
+  ordem             Int                    @default(0)
+  arquivado         Boolean                @default(false) // nunca apagar campo com dados
+  bloqueadoPelaRede Boolean                @default(false) @map("bloqueado_pela_rede")
+  createdAt         DateTime               @default(now()) @map("created_at")
+
+  @@unique([escolaId, entidade, chave])
+  @@map("campos_personalizados")
+}
+
+enum TipoFormulario {
+  MATRICULA_NOVA
+  REMATRICULA
+  ATUALIZACAO_CADASTRAL // pelo portal da família
+}
+
+/// [NOVO][FASE 8b] Formulário de matrícula configurável.
+model ModeloFormulario {
+  id       String           @id @default(cuid())
+  escolaId String           @map("escola_id")
+  escola   Escola           @relation(fields: [escolaId], references: [id])
+  tipo     TipoFormulario
+  nome     String
+  ativo    Boolean          @default(true)
+  itens    ItemFormulario[]
+
+  @@unique([escolaId, tipo, nome])
+  @@map("modelos_formulario")
+}
+
+model ItemFormulario {
+  id                      String           @id @default(cuid())
+  formularioId            String           @map("formulario_id")
+  formulario              ModeloFormulario @relation(fields: [formularioId], references: [id], onDelete: Cascade)
+  secao                   String
+  ordem                   Int
+  // Exatamente um dos dois: campo padrão ("pessoa.cpf", "estudante.usaTransportePublico")
+  // ou campo personalizado (chave do CampoPersonalizado)
+  campoPadrao             String?          @map("campo_padrao")
+  campoPersonalizadoChave String?          @map("campo_personalizado_chave")
+  obrigatorio             Boolean          @default(false) // itens fixos (nome, nascimento, responsável legal) são sempre obrigatórios, no código
+  ajuda                   String?
+
+  @@map("itens_formulario")
+}
+
+// =============================================================================
+// 11. FERRAMENTAS PEDAGÓGICAS E OCORRÊNCIAS  (módulos QST, PRV, PLA, SEC)
+// =============================================================================
+
+enum QuestaoStatus {
+  PENDENTE
+  APROVADA
+  REJEITADA
+}
+
+enum Dificuldade {
+  FACIL
+  MEDIO
+  DIFICIL
+}
+
+/// [MUDA] Questao ganha escolaId próprio, tipo e habilidade (BNCC).
+/// Alternativas viram JSON (permite 4 ou 5 alternativas, ou dissertativa).
+model Questao {
+  id           String                 @id @default(cuid())
+  escolaId     String                 @map("escola_id")
+  escola       Escola                 @relation(fields: [escolaId], references: [id])
+  autorId      String                 @map("autor_id")
+  autor        Profissional           @relation(fields: [autorId], references: [id])
+  tipo         String                 @default("OBJETIVA") // OBJETIVA | DISSERTATIVA | VERDADEIRO_FALSO
+  enunciado    String
+  imagemUrl    String?                @map("imagem_url")
+  alternativas Json? // [{ letra:"A", texto }]
+  correta      String?
+  dificuldade  Dificuldade            @default(MEDIO)
+  habilidade   String? // código BNCC, ex. "EF09MA01"
+  status       QuestaoStatus          @default(PENDENTE)
+  feedback     String?
+  createdAt    DateTime               @default(now()) @map("created_at")
+  updatedAt    DateTime               @updatedAt @map("updated_at")
+  componentes  ComponenteCurricular[]
+  provas       Prova[]
+
+  @@index([escolaId])
+  @@map("questoes")
+}
+
+/// [MUDA] Prova ganha escolaId próprio.
+model Prova {
+  id                  String         @id @default(cuid())
+  escolaId            String         @map("escola_id")
+  escola              Escola         @relation(fields: [escolaId], references: [id])
+  titulo              String
+  autorId             String?        @map("autor_id")
+  autor               Profissional?  @relation(fields: [autorId], references: [id])
+  turmaId             String?        @map("turma_id")
+  esquemaUnidadeOrdem Int?           @map("esquema_unidade_ordem") // era "unidade" Int
+  tipo                String? // BIMESTRAL, SIMULADO...
+  observacao          String?
+  questoesSnapshot    Json?          @map("questoes_snapshot") // [ATUAL] a prova não muda se a questão mudar
+  createdAt           DateTime       @default(now()) @map("created_at")
+  questoes            Questao[]
+  notasSimulado       NotaSimulado[]
+
+  @@index([escolaId])
+  @@map("provas")
+}
+
+/// [MUDA] Sem @default(2026); ano vem da prova/matrícula.
+model NotaSimulado {
+  id                 String    @id @default(cuid())
+  estudanteId        String    @map("estudante_id")
+  estudante          Estudante @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  provaId            String    @map("prova_id")
+  prova              Prova     @relation(fields: [provaId], references: [id], onDelete: Cascade)
+  nota               Float?
+  ausente            Boolean   @default(false)
+  notaSegundaChamada Float?    @map("nota_segunda_chamada")
+  lancadoPorId       String    @map("lancado_por_id")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  @@unique([estudanteId, provaId])
+  @@map("notas_simulados")
+}
+
+/// [MUDA] PlanoEnsino com escolaId e componente real (não texto).
+model PlanoEnsino {
+  id                 String       @id @default(cuid())
+  escolaId           String       @map("escola_id")
+  escola             Escola       @relation(fields: [escolaId], references: [id])
+  autorId            String       @map("autor_id")
+  autor              Profissional @relation(fields: [autorId], references: [id])
+  turmaComponenteIds String[]     @map("turma_componente_ids") // turmas/componentes a que o plano se aplica
+  periodoInicio      DateTime     @map("periodo_inicio") @db.Date
+  periodoFim         DateTime     @map("periodo_fim") @db.Date
+  indicadores        String
+  conteudos          String
+  metodologias       String
+  recursos           String
+  avaliacao          String
+  observacoes        String?
+  createdAt          DateTime     @default(now()) @map("created_at")
+  updatedAt          DateTime     @updatedAt @map("updated_at")
+
+  @@index([escolaId])
+  @@map("planos_ensino")
+}
+
+/// [MUDA] Ocorrência com tipo/gravidade/medida e ciência do responsável.
+model Ocorrencia {
+  id              String                @id @default(cuid())
+  escolaId        String                @map("escola_id")
+  escola          Escola                @relation(fields: [escolaId], references: [id])
+  titulo          String
+  descricao       String
+  tipo            String // lista configurável (rótulo), ex. DISCIPLINAR, PEDAGOGICA, SAUDE
+  gravidade       String? // LEVE | MEDIA | GRAVE
+  medida          String? // advertência, conversa com responsável...
+  data            DateTime              @default(now())
+  registradoPorId String                @map("registrado_por_id") // Usuario
+  createdAt       DateTime              @default(now()) @map("created_at")
+  updatedAt       DateTime              @updatedAt @map("updated_at")
+  estudantes      OcorrenciaEstudante[]
+
+  @@index([escolaId, data])
+  @@map("ocorrencias")
+}
+
+model OcorrenciaEstudante {
+  id                   String     @id @default(cuid())
+  ocorrenciaId         String     @map("ocorrencia_id")
+  ocorrencia           Ocorrencia @relation(fields: [ocorrenciaId], references: [id], onDelete: Cascade)
+  estudanteId          String     @map("estudante_id")
+  estudante            Estudante  @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  cienciaResponsavelEm DateTime?  @map("ciencia_responsavel_em") // [NOVO] aceite pelo portal
+
+  @@unique([ocorrenciaId, estudanteId])
+  @@map("ocorrencia_estudantes")
+}
+
+// =============================================================================
+// 12. COMUNICAÇÃO  (módulo COM — esboço; detalhar na sessão do módulo)
+// =============================================================================
+
+/// [NOVO][pós-11] Separa "comunicado" (escola -> família/equipe, por grupo) do
+/// "chamado" (pedido de suporte/secretaria), hoje misturados em Message.
+model Comunicado {
+  id              String    @id @default(cuid())
+  escolaId        String    @map("escola_id")
+  escola          Escola    @relation(fields: [escolaId], references: [id])
+  titulo          String
+  conteudo        String
+  publico         Json // { papeis: ["RESPONSAVEL"], turmaIds: [...], serieIds: [...] }
+  permiteResposta Boolean   @default(false) @map("permite_resposta")
+  exigeCiencia    Boolean   @default(false) @map("exige_ciencia")
+  autorId         String    @map("autor_id") // Usuario
+  publicadoEm     DateTime? @map("publicado_em")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  @@index([escolaId, publicadoEm])
+  @@map("comunicados")
+}
+
+// "Chamado" (suporte/pedidos à secretaria, hoje Message/MessageRead/MessageDelete)
+// fica como está até a sessão do módulo COM, que decide a divisão final.
+// Plataforma: o painel da dona do Áxis lê Assinatura/Plano; não há tabela própria.
