@@ -239,6 +239,31 @@ export function calcularStatus(
  * Monta o EsquemaConfig a partir da linha do banco (EsquemaAvaliacao) -
  * evita que cada rota/página copie campo a campo e esqueça os novos.
  */
+/**
+ * Menor nota de recuperação final que aprova o aluno, pelo próprio
+ * calcularStatus (vale para os três modos: nota isolada, média com a final
+ * e substituir a menor unidade). Busca binária na escala do esquema, no
+ * passo das casas decimais. 0 = já aprovado sem recuperação; null = não há
+ * recuperação final, notas incompletas ou nenhuma nota até o máximo aprova.
+ */
+export function notaNecessariaNaRecuperacao(resultado: MediaFinalResultado, esquema: EsquemaConfig, notaMaxima: number): number | null {
+  if (!esquema.recuperacaoFinalAtiva || !resultado.completo) return null
+  if (calcularStatus(resultado, esquema) === 'APROVADO') return 0
+  const casas = esquema.casasDecimais ?? 1
+  const passo = 10 ** -casas
+  const total = Math.round(notaMaxima / passo)
+  const aprova = (k: number) => calcularStatus(resultado, esquema, arredonda(k * passo, casas)) === 'APROVADO_RECUPERACAO'
+  if (!aprova(total)) return null
+  let lo = 0
+  let hi = total
+  while (lo < hi) {
+    const meio = Math.floor((lo + hi) / 2)
+    if (aprova(meio)) hi = meio
+    else lo = meio + 1
+  }
+  return arredonda(lo * passo, casas)
+}
+
 export function paraEsquemaConfig(esquema: {
   numUnidades: number
   notaMinimaAprovacao: number

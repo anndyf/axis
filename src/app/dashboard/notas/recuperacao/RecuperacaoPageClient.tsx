@@ -30,7 +30,7 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
     },
     {
       title: "Nota Substitutiva",
-      description: "A nota de recuperação substitui o resultado final se for superior a 5.0.",
+      description: "A situação final segue a regra de recuperação do esquema de avaliação de cada turma.",
       icon: <CheckCircle2 className="w-5 h-5 text-warning-fg" />,
       color: "orange"
     },

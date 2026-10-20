@@ -8,6 +8,7 @@ import {
   etapasDaNota,
   desistenteEmTodas,
   unidadesDeNotasSalvas,
+  notaNecessariaNaRecuperacao,
   type EsquemaConfig,
   type UnidadeInput,
 } from './notas'
@@ -318,5 +319,41 @@ describe('notaRecuperacaoValida', () => {
     expect(notaRecuperacaoValida(-1, 10)).toBe(true) // não realizou
     expect(notaRecuperacaoValida(null, 10)).toBe(true)
     expect(notaRecuperacaoValida(NaN, 10)).toBe(false)
+  })
+})
+
+describe('notaNecessariaNaRecuperacao', () => {
+  const tres = (a: number, b: number, c: number) => [unidadeSimples(a), unidadeSimples(b), unidadeSimples(c)]
+
+  it('NOTA_MINIMA_ISOLADA: precisa do mínimo do esquema (6, não 5)', () => {
+    const esquema: EsquemaConfig = { ...esquemaLegado3, notaMinimaAprovacao: 6, modoRecuperacaoFinal: 'NOTA_MINIMA_ISOLADA' }
+    expect(notaNecessariaNaRecuperacao(calcularMediaFinal(tres(4, 4, 4), esquema), esquema, 10)).toBe(6)
+  })
+
+  it('MEDIA_COM_FINAL: média 4 e mínimo 6 pede 7,9 ((4 + 7,9) / 2 = 5,95, arredonda para 6,0)', () => {
+    const esquema: EsquemaConfig = { ...esquemaLegado3, notaMinimaAprovacao: 6, modoRecuperacaoFinal: 'MEDIA_COM_FINAL' }
+    expect(notaNecessariaNaRecuperacao(calcularMediaFinal(tres(4, 4, 4), esquema), esquema, 10)).toBe(7.9)
+  })
+
+  it('bate com calcularStatus logo abaixo e no valor encontrado (substitui a menor unidade)', () => {
+    const esquema: EsquemaConfig = { ...esquemaLegado3, notaMinimaAprovacao: 6 }
+    const r = calcularMediaFinal(tres(3, 6, 6), esquema)
+    const n = notaNecessariaNaRecuperacao(r, esquema, 10)!
+    expect(calcularStatus(r, esquema, n)).toBe('APROVADO_RECUPERACAO')
+    expect(calcularStatus(r, esquema, Math.round((n - 0.1) * 10) / 10)).toBe('RECUPERACAO')
+  })
+
+  it('escala 100 usa o máximo do esquema', () => {
+    const esquema: EsquemaConfig = { ...esquemaLegado3, notaMinimaAprovacao: 60, modoRecuperacaoFinal: 'NOTA_MINIMA_ISOLADA' }
+    expect(notaNecessariaNaRecuperacao(calcularMediaFinal(tres(40, 40, 40), esquema), esquema, 100)).toBe(60)
+  })
+
+  it('null quando nenhuma nota aprova, sem recuperação final ou com notas incompletas; 0 se já aprovado', () => {
+    const media: EsquemaConfig = { ...esquemaLegado3, notaMinimaAprovacao: 6, modoRecuperacaoFinal: 'MEDIA_COM_FINAL' }
+    expect(notaNecessariaNaRecuperacao(calcularMediaFinal(tres(1, 1, 1), media), media, 10)).toBeNull()
+    const sem: EsquemaConfig = { ...esquemaLegado3, recuperacaoFinalAtiva: false }
+    expect(notaNecessariaNaRecuperacao(calcularMediaFinal(tres(4, 4, 4), sem), sem, 10)).toBeNull()
+    expect(notaNecessariaNaRecuperacao(calcularMediaFinal([unidadeSimples(4), unidadeSimples(null), unidadeSimples(4)], media), media, 10)).toBeNull()
+    expect(notaNecessariaNaRecuperacao(calcularMediaFinal(tres(8, 8, 8), media), media, 10)).toBe(0)
   })
 })

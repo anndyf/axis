@@ -2,6 +2,8 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import RecuperacaoClient from "./RecuperacaoClient"
+import { calcularMediaFinal, notaNecessariaNaRecuperacao, unidadesDeNotasSalvas } from "@/lib/services/notas"
+import { carregarEsquemaDaTurma } from "@/lib/services/notas-leitura"
 
 export const metadata = {
   title: 'Áxis - Notas'
@@ -47,7 +49,7 @@ async function getNotasRecuperacao(turmaId: string, session: Session) {
             },
             include: {
               disciplina: true,
-              unidades: { select: { notaCalculada: true } }
+              unidades: { select: { esquemaUnidadeId: true, notaCalculada: true, notaRecuperacao: true } }
             }
           }
         }
@@ -56,6 +58,15 @@ async function getNotasRecuperacao(turmaId: string, session: Session) {
   })
 
   if (!turma) return null
+
+  // Nota mínima que cada aluno precisa na recuperação final, pelo motor e
+  // pelo esquema da turma (antes a tela usava 5 fixo)
+  const esquema = await carregarEsquemaDaTurma(turma)
+  const notaNecessaria = (unidades: any[]) => {
+    if (!esquema) return null
+    const resultado = calcularMediaFinal(unidadesDeNotasSalvas(esquema.etapas, unidades), esquema.config)
+    return notaNecessariaNaRecuperacao(resultado, esquema.config, esquema.notaMaxima)
+  }
 
   // 3. Flatten notas, filtrando apenas disciplinas permitidas e completas
   // (mesmo raciocínio do superset acima: nota < 5 sozinho pode só
@@ -75,14 +86,16 @@ async function getNotasRecuperacao(turmaId: string, session: Session) {
         estudanteNome: estudante.nome,
         disciplinaId: nota.disciplinaId,
         disciplinaNome: nota.disciplina.nome,
-        notaRecuperacao: nota.notaRecuperacao
+        notaRecuperacao: nota.notaRecuperacao,
+        notaNecessaria: notaNecessaria(nota.unidades)
       }))
   )
 
   return {
     turma,
     notasRecuperacao,
-    disciplinas
+    disciplinas,
+    notaMaxima: esquema?.notaMaxima ?? 10
   }
 }
 
@@ -110,6 +123,7 @@ export default async function RecuperacaoTurmaPage({
       turmaNome={data.turma.nome}
       notasRecuperacao={data.notasRecuperacao}
       disciplinas={data.disciplinas}
+      notaMaxima={data.notaMaxima}
     />
   )
 }
