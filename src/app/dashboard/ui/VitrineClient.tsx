@@ -172,7 +172,7 @@ export default function VitrineClient() {
           <p className="text-sm">14 · Texto padrão da interface</p>
           <p className="text-13 text-fg-muted">13 · Texto secundário e tabelas</p>
           <p className="text-xs text-fg-subtle">12 · Rótulos e legendas</p>
-          <p className="font-mono text-13">Geist Mono · 1TIM1-001 · 2026</p>
+          <p className="font-mono text-13">Geist Mono · 1TIM1-001 · 2026 (texto: Inter)</p>
         </div>
       </Secao>
     </div>

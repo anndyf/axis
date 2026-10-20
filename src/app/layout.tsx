@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers";
 import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
@@ -9,9 +9,12 @@ import { cookies } from "next/headers";
 import { COOKIE_TEMA, temaValido } from "@/lib/tema";
 import { DESTAQUE_PADRAO, variaveisDaEscola } from "@/lib/services/identidade";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Inter: a fonte de interface mais usada em sistemas de gestão; ótima leitura
+// em tamanhos pequenos e números tabulares. Geist Mono segue para códigos.
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
@@ -76,7 +79,7 @@ export default async function RootLayout({
         <link rel="apple-touch-icon" sizes="72x72" href="/icon-72x72.png" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${inter.variable} ${geistMono.variable} antialiased`}
       >
         <NextTopLoader 
           color="var(--accent)"
