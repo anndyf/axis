@@ -17,7 +17,7 @@ Escopo: `docs/arquitetura/roteiro-de-migracao.md`, fase 3 (só 3a e 3b; a 3c fic
 | 3b.2 | Migrar checagens soltas para `can(user, 'recurso.acao')`, por grupo, com testes por papel | ✅ 536 testes (checagens × 32 combinações, rotas por papel, isolamento, plataforma) |
 | 3b.3 | Tela de Usuários: editor de papéis | ✅ |
 | 3b.4 | Capturas (375px e 1440px) | ✅ `docs/capturas/fase-3/` |
-| 4 | Encerramento + PR | ⏳ |
+| 4 | Encerramento + PR | ✅ https://github.com/anndyf/axis/pull/15 |
 
 ## Decisões tomadas sem confirmação
 
@@ -136,3 +136,5 @@ Só a tela de Usuários (editor de papéis no lugar das caixas, selos novos, sem
 
 ## Como retomar
 Checkout de `fase/3ab-papeis`, ler esta tabela, continuar do primeiro passo não ✅.
+
+STATUS: CONCLUÍDO
