@@ -180,6 +180,9 @@ export default function LancarNotasTurmaClient({
     })
   }
 
+  // Mesmo mínimo usado na cor da média (antes o subtotal usava 5 fixo)
+  const minimoAprovacao = esquema?.notaMinimaAprovacao ?? 5
+
   const calcularSubtotalUnidade = (estudanteId: string, unidade: EsquemaUnidade): number | null => {
     const estado = notas[estudanteId]?.[unidade.id]
     if (!estado) return null
@@ -308,7 +311,7 @@ export default function LancarNotasTurmaClient({
     },
     {
       title: "Acompanhamento",
-      description: "Médias abaixo de 5.0 são destacadas em vermelho para intervenção pedagógica.",
+      description: "Médias abaixo do mínimo de aprovação da turma são destacadas em vermelho para intervenção pedagógica.",
       icon: <TrendingUp className="w-5 h-5 text-warning-fg" />,
       color: "orange"
     }
@@ -606,7 +609,7 @@ export default function LancarNotasTurmaClient({
                                 )
                               })}
                               <td key={`${u.id}-subtotal`} className="px-2 py-4 text-center bg-canvas/60">
-                                <span className={`text-sm font-bold ${subtotal !== null && subtotal < 5 ? 'text-danger-fg' : 'text-fg-muted'}`}>
+                                <span className={`text-sm font-bold ${subtotal !== null && subtotal < minimoAprovacao ? 'text-danger-fg' : 'text-fg-muted'}`}>
                                   {subtotal !== null ? subtotal.toFixed(1) : '-'}
                                 </span>
                               </td>
@@ -665,7 +668,7 @@ export default function LancarNotasTurmaClient({
                               <legend className="sr-only">{u.nome}</legend>
                               <div className="flex items-center gap-2">
                                 <span className="min-w-0 flex-1 text-13 font-medium text-fg">{u.nome}</span>
-                                {subtotal !== null && <span className={`text-13 font-semibold tabular-nums ${subtotal < 5 ? 'text-danger-fg' : 'text-fg-muted'}`}>Subtotal {subtotal.toFixed(1)}</span>}
+                                {subtotal !== null && <span className={`text-13 font-semibold tabular-nums ${subtotal < minimoAprovacao ? 'text-danger-fg' : 'text-fg-muted'}`}>Subtotal {subtotal.toFixed(1)}</span>}
                                 <button
                                   type="button"
                                   aria-pressed={ue.isDesistente}

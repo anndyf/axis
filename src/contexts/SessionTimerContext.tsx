@@ -100,10 +100,12 @@ export function SessionTimerProvider({ children }: { children: ReactNode }) {
   )
 }
 
+// Temporizador neutro para renderizações fora do provedor. O provedor envolve
+// o app inteiro (src/components/Providers.tsx), mas uma navegação no meio do
+// carregamento interrompe a renderização e o React pode montar um trecho da
+// página sem ele; lançar erro aí derrubava a tela (selo "1 Issue" do Next).
+const TIMER_NEUTRO: SessionTimerContextType = { timeLeft: TIMEOUT_DURATION / 1000, showWarning: false, resetTimer: () => {} }
+
 export function useSessionTimer() {
-  const context = useContext(SessionTimerContext)
-  if (!context) {
-    throw new Error('useSessionTimer deve ser usado dentro de SessionTimerProvider')
-  }
-  return context
+  return useContext(SessionTimerContext) ?? TIMER_NEUTRO
 }

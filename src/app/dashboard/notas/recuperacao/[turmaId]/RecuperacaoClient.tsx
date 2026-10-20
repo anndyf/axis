@@ -28,19 +28,27 @@ interface NotaRecuperacao {
   disciplinaId: string
   disciplinaNome: string
   notaRecuperacao?: number | null
+  /** menor nota de recuperação que aprova (motor + esquema); null = nenhuma */
+  notaNecessaria: number | null
 }
 
 export default function RecuperacaoTurmaClient({
   turmaId,
   turmaNome,
   notasRecuperacao,
-  disciplinas
+  disciplinas,
+  notaMaxima
 }: {
   turmaId: string
   turmaNome: string
   notasRecuperacao: NotaRecuperacao[]
   disciplinas: { id: string; nome: string }[]
+  notaMaxima: number
 }) {
+  // Prévia: a situação final é recalculada no servidor ao salvar
+  const aprova = (n: NotaRecuperacao, valor: string) =>
+    valor !== '' && valor !== '-1' && n.notaNecessaria !== null && parseFloat(valor) >= n.notaNecessaria
+
   const router = useRouter()
   const [disciplinaSelecionada, setDisciplinaSelecionada] = useState("")
   const [loading, setLoading] = useState(false)
@@ -89,7 +97,7 @@ export default function RecuperacaoTurmaClient({
   const recuperacaoTips = [
     {
       title: "Recuperação Final",
-      description: "A nota substitui o resultado final se for superior a 5.0.",
+      description: "Abaixo de cada campo aparece a nota que o aluno precisa, pela regra do esquema da turma.",
       icon: <TrendingUp className="w-5 h-5 text-danger-fg" />,
       color: "rose"
     },
@@ -114,7 +122,7 @@ export default function RecuperacaoTurmaClient({
 
   const stats = {
     total: filteredNotas.length,
-    aprovados: filteredNotas.filter(n => (parseFloat(notas[n.id]) >= 5 && notas[n.id] !== '-1')).length
+    aprovados: filteredNotas.filter(n => aprova(n, notas[n.id] ?? '')).length
   }
 
   return (
@@ -252,13 +260,12 @@ export default function RecuperacaoTurmaClient({
                   filteredNotas.map((nota, index) => {
                     const currentVal = notas[nota.id] || ''
                     const isFaltou = currentVal === '-1'
-                    const num = parseFloat(currentVal)
                     const isModified = currentVal !== originalNotas[nota.id] && !saving
 
                     let status = { text: 'PENDENTE', class: 'text-zinc-300' }
                     if (currentVal) {
                       if (isFaltou) status = { text: 'DE CONSELHO', class: 'text-danger-fg bg-danger-subtle border-danger-line' }
-                      else if (num >= 5) status = { text: 'APROVADO', class: 'text-success-fg bg-success-subtle border-success-line' }
+                      else if (aprova(nota, currentVal)) status = { text: 'APROVADO', class: 'text-success-fg bg-success-subtle border-success-line' }
                       else status = { text: 'DE CONSELHO', class: 'text-danger-fg bg-danger-subtle border-danger-line' }
                     }
 
@@ -281,7 +288,8 @@ export default function RecuperacaoTurmaClient({
                         </td>
                         <td className="px-4 py-4 text-center">
                           <input
-                            type="number" step="0.1"
+                            type="number" step="0.1" min={0} max={notaMaxima} inputMode="decimal"
+                            aria-label={`Nota de recuperação de ${nota.estudanteNome}`}
                             value={isFaltou || nota.status === 'DESISTENTE' ? '' : currentVal} 
                             disabled={isFaltou || nota.status === 'DESISTENTE'}
                             onChange={(e) => handleNotaChange(nota.id, e.target.value)}
@@ -291,6 +299,9 @@ export default function RecuperacaoTurmaClient({
                              }`}
                              placeholder={nota.status === 'DESISTENTE' ? "-" : "0.0"}
                           />
+                          {nota.status !== 'DESISTENTE' && nota.notaNecessaria !== null && nota.notaNecessaria > 0 && (
+                            <span className="mt-1 block text-xs text-fg-subtle tabular-nums">precisa {nota.notaNecessaria.toFixed(1).replace('.', ',')}</span>
+                          )}
                         </td>
                         <td className="px-4 py-4 text-center">
                            <input type="checkbox" checked={isFaltou} onChange={(e) => toggleNaoRealizou(nota.id, e.target.checked)} className="w-5 h-5 text-danger-fg border-line-strong rounded-lg cursor-pointer transition-all active:scale-90" />
