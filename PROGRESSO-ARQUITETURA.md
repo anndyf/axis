@@ -8,8 +8,8 @@ Sessão de **planejamento**: nada do sistema é alterado; só `docs/arquitetura/
 | # | Documento | Situação |
 |---|---|---|
 | 0 | Leitura do código, schema, planos e histórico | ✅ |
-| 1 | `docs/arquitetura/inventario.md` | ⏳ em andamento |
-| 2 | `docs/arquitetura/dominio-alvo.md` | ⬜ |
+| 1 | `docs/arquitetura/inventario.md` | ✅ |
+| 2 | `docs/arquitetura/dominio-alvo.md` | ⏳ em andamento |
 | 3 | `docs/arquitetura/personalizacao.md` | ⬜ |
 | 4 | `docs/arquitetura/modulos-e-planos.md` | ⬜ |
 | 5 | `docs/arquitetura/roteiro-de-migracao.md` | ⬜ |
