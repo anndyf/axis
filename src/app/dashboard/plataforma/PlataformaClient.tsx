@@ -1,9 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { Building2, Plus, Users, GraduationCap, Ban, PlayCircle } from "lucide-react"
+import { Building2, Plus, Users, GraduationCap, Ban, PlayCircle, CreditCard } from "lucide-react"
 import NovaEscolaModal from "@/components/NovaEscolaModal"
 import ConfirmModal from "@/components/ConfirmModal"
+import AssinaturaModal from "./AssinaturaModal"
 
 interface Escola {
   id: string
@@ -31,6 +32,7 @@ export default function PlataformaClient({ escolasIniciais }: { escolasIniciais:
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [escolaParaSuspender, setEscolaParaSuspender] = useState<Escola | null>(null)
   const [processandoId, setProcessandoId] = useState<string | null>(null)
+  const [assinaturaDe, setAssinaturaDe] = useState<string | null>(null)
 
   const atualizarEscola = async (id: string, data: { status?: string; plano?: string }) => {
     setProcessandoId(id)
@@ -132,7 +134,14 @@ export default function PlataformaClient({ escolasIniciais }: { escolasIniciais:
                         <GraduationCap size={14} className="text-slate-300" /> {escola._count.estudantes}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 text-right whitespace-nowrap">
+                      <button
+                        onClick={() => setAssinaturaDe(escola.id)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 mr-2 rounded-xl text-[11px] font-bold uppercase tracking-wide transition-all bg-slate-50 text-slate-600 hover:bg-slate-100"
+                      >
+                        <CreditCard size={13} />
+                        Assinatura
+                      </button>
                       {escola.status === 'CANCELADA' ? (
                         <span className="text-[11px] text-slate-300 font-medium uppercase">Cancelada</span>
                       ) : (
@@ -162,6 +171,12 @@ export default function PlataformaClient({ escolasIniciais }: { escolasIniciais:
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={onSuccess}
+      />
+
+      <AssinaturaModal
+        escolaId={assinaturaDe}
+        onClose={() => setAssinaturaDe(null)}
+        onAtualizada={(e) => setEscolas(prev => prev.map(x => x.id === e.id ? { ...x, plano: e.plano, status: e.status } : x))}
       />
 
       <ConfirmModal

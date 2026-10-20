@@ -17,7 +17,7 @@ Escopo: `docs/arquitetura/roteiro-de-migracao.md`, fases 0, 1 e 2.
 | 1.4 | Fase 1: teste estático de cobertura + teste de comportamento | ✅ 402 testes |
 | 2.1 | Fase 2: schema + migration + backfill | ✅ migration `20261020120000_planos_e_assinaturas`; `prisma/backfill/fase-2.ts` |
 | 2.2 | Fase 2: `getModulosAtivos` novo + equivalência + somente leitura | ✅ 420 testes |
-| 2.3 | Fase 2: painel da plataforma | ⬜ |
+| 2.3 | Fase 2: painel da plataforma | ✅ modal "Assinatura" por escola; conferido no navegador |
 | 3 | Encerramento + PR | ⬜ |
 
 ## Decisões tomadas sem confirmação
@@ -43,6 +43,9 @@ Escopo: `docs/arquitetura/roteiro-de-migracao.md`, fases 0, 1 e 2.
 - **Situação**: TRIAL → TESTE sem `fimTeste` (a definir: continua tudo liberado); ATIVA/SUSPENSA/CANCELADA iguais. Só INADIMPLENTE e teste vencido deixam módulos em somente leitura; suspensa e cancelada continuam tratadas no proxy (bloqueiam a escola inteira), por isso não mexem nos módulos.
 - **Overrides de EscolaModulo**: viram AssinaturaModulo (EXCECAO) por módulo. Override em item sem plano mínimo (não tinha efeito) é ignorado e relatado; módulo com itens divergentes (ex.: provas ligado e simulados desligado) fica ATIVO e é relatado.
 - **Leitura dupla**: `getModulosAtivos` e `estadosDaEscola` leem a assinatura; escola sem assinatura usa o modelo antigo (`getModulosAtivosLegado`, `estadosLegados`).
+- **Escrita**: criar escola cria a assinatura; mudar plano/status pela tabela do painel muda também a assinatura; o liga/desliga do banco de questões em Configurações grava a exceção QST. Toda escrita na assinatura é espelhada em `Escola.plano`/`Escola.status` (o proxy ainda lê o status; INADIMPLENTE vira ATIVA lá) e em `EscolaModulo` para os itens pagos (QST, PRV, FIN), para o modelo antigo seguir coerente até ser removido.
+- **Liga/desliga do banco de questões pela direção** continua podendo ligar o módulo numa escola Básico (como hoje). Fica para quando o toggle sair de `api/config` (passo "Depois" da fase 2).
+- **Painel**: botão "Assinatura" em cada linha abre plano, situação, fim do teste, limites, observações, módulos (Do plano / Ativo / Somente leitura / Inativo, com a origem) e histórico. "Colocar em somente leitura" = situação INADIMPLENTE. Sem preços.
 - **Selo "somente leitura" no menu**: não feito (a instrução limita as telas novas ao painel da plataforma). Quem tenta gravar num módulo em leitura recebe a mensagem "está em modo somente leitura…".
 
 ## Como retomar
