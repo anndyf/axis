@@ -18,7 +18,7 @@ Escopo: `docs/arquitetura/roteiro-de-migracao.md`, fases 0, 1 e 2.
 | 2.1 | Fase 2: schema + migration + backfill | ✅ migration `20261020120000_planos_e_assinaturas`; `prisma/backfill/fase-2.ts` |
 | 2.2 | Fase 2: `getModulosAtivos` novo + equivalência + somente leitura | ✅ 420 testes |
 | 2.3 | Fase 2: painel da plataforma | ✅ modal "Assinatura" por escola; conferido no navegador |
-| 3 | Encerramento + PR | ✅ |
+| 3 | Encerramento + PR | ✅ https://github.com/anndyf/axis/pull/14 |
 
 ## Decisões tomadas sem confirmação
 
@@ -96,3 +96,5 @@ Nenhuma para a CETEP. Mudanças visíveis só em escola sem o módulo (tela "Mó
 
 ## Como retomar
 Checkout de `fase/0-1-2-seguranca-modulos`, ler esta tabela, continuar do primeiro passo não ✅.
+
+STATUS: CONCLUÍDO
