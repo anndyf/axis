@@ -1,4 +1,5 @@
 "use server"
+// @modulo NUC - Núcleo sempre ativo; sem checagem de módulo (ver src/lib/modulos/mapa-rotas.ts)
 
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"

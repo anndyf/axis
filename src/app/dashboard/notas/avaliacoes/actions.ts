@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { contextoDaDisciplina } from "@/lib/avaliacoes-acesso"
 import { validarAvaliacoesDaEtapa, validarDadosAvaliacao } from "@/lib/services/avaliacoes-professor"
+import { bloqueioDoModulo } from "@/lib/modulos/guarda"
 
 // Avaliações criadas pelo professor (esquema com definicaoAtividades =
 // PROFESSOR). Toda ação confere papel, escola e se o professor leciona a
@@ -38,6 +39,8 @@ async function conferirTeto(
 }
 
 export async function criarAvaliacao(disciplinaId: string, esquemaUnidadeId: string, entrada: unknown): Promise<Resultado> {
+  const bloqueado = await bloqueioDoModulo('NOT', 'escrita')
+  if (bloqueado) return { erro: bloqueado }
   const ctx = await contextoParaEditar(disciplinaId)
   if ("erro" in ctx) return { erro: ctx.erro! }
   const dados = validarDadosAvaliacao(entrada)
@@ -80,6 +83,8 @@ async function avaliacaoComContexto(id: string) {
  * nota máxima e peso não (mudariam notas de etapa já calculadas).
  */
 export async function editarAvaliacao(id: string, entrada: unknown): Promise<Resultado> {
+  const bloqueado = await bloqueioDoModulo('NOT', 'escrita')
+  if (bloqueado) return { erro: bloqueado }
   const alvo = await avaliacaoComContexto(id)
   if (!alvo) return { erro: "Avaliação não encontrada" }
   const { avaliacao, ctx } = alvo
@@ -103,6 +108,8 @@ export async function editarAvaliacao(id: string, entrada: unknown): Promise<Res
 
 /** Remove uma avaliação ainda sem notas lançadas. */
 export async function removerAvaliacao(id: string): Promise<Resultado> {
+  const bloqueado = await bloqueioDoModulo('NOT', 'escrita')
+  if (bloqueado) return { erro: bloqueado }
   const alvo = await avaliacaoComContexto(id)
   if (!alvo) return { erro: "Avaliação não encontrada" }
   if (alvo.avaliacao.notas.length > 0) return { erro: "Já há notas lançadas nesta avaliação. Apague as notas antes de removê-la." }

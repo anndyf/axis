@@ -1,4 +1,5 @@
 
+// @modulo NUC - Núcleo sempre ativo; sem checagem de módulo (ver src/lib/modulos/mapa-rotas.ts)
 'use server';
 
 import { auth } from "@/lib/auth"

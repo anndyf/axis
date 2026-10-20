@@ -13,8 +13,8 @@ Escopo: `docs/arquitetura/roteiro-de-migracao.md`, fases 0, 1 e 2.
 | 0.3 | Fase 0: remover `api/public/v1/register`; ano letivo atual no lugar de 2026 fixo | ✅ |
 | 1.1 | Fase 1: infraestrutura `exigirModulo` + mapa de rotas | ✅ |
 | 1.2 | Fase 1: aplicação nas rotas de API | ✅ (páginas também) |
-| 1.3 | Fase 1: actions e páginas + página "módulo indisponível" | ⬜ |
-| 1.4 | Fase 1: teste estático de cobertura + teste de comportamento | ⬜ |
+| 1.3 | Fase 1: actions e páginas + página "módulo indisponível" | ✅ |
+| 1.4 | Fase 1: teste estático de cobertura + teste de comportamento | ⏳ estático ✅; comportamento em andamento |
 | 2.1 | Fase 2: schema + migration + backfill | ⬜ |
 | 2.2 | Fase 2: `getModulosAtivos` novo + equivalência + somente leitura | ⬜ |
 | 2.3 | Fase 2: painel da plataforma | ⬜ |

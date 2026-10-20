@@ -4,6 +4,7 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
+import { bloqueioDoModulo } from "@/lib/modulos/guarda"
 
 // Server actions podem ser chamadas direto pelo client com qualquer turmaId -
 // a turma precisa ser conferida contra a escola da sessão a cada chamada.
@@ -12,6 +13,8 @@ async function turmaDaEscola(turmaId: string, escolaId: string) {
 }
 
 export async function getSchedule(turmaId: string) {
+  const bloqueado = await bloqueioDoModulo('DIA', 'leitura')
+  if (bloqueado) return { error: bloqueado }
   const session = await auth()
   if (!session?.user?.escolaId || !(await turmaDaEscola(turmaId, session.user.escolaId))) {
     return { error: "Sem permissão" }
@@ -44,6 +47,8 @@ export type ScheduleItem = {
  * não define texto nem professor.
  */
 export async function saveSchedule(turmaId: string, items: ScheduleItem[]) {
+  const bloqueado = await bloqueioDoModulo('DIA', 'escrita')
+  if (bloqueado) return { error: bloqueado }
   const session = await auth()
   if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
     return { error: "Sem permissão" }
