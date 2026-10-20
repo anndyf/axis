@@ -14,7 +14,7 @@ Escopo: `docs/arquitetura/roteiro-de-migracao.md`, fases 0, 1 e 2.
 | 1.1 | Fase 1: infraestrutura `exigirModulo` + mapa de rotas | ✅ |
 | 1.2 | Fase 1: aplicação nas rotas de API | ✅ (páginas também) |
 | 1.3 | Fase 1: actions e páginas + página "módulo indisponível" | ✅ |
-| 1.4 | Fase 1: teste estático de cobertura + teste de comportamento | ⏳ estático ✅; comportamento em andamento |
+| 1.4 | Fase 1: teste estático de cobertura + teste de comportamento | ✅ 402 testes |
 | 2.1 | Fase 2: schema + migration + backfill | ⬜ |
 | 2.2 | Fase 2: `getModulosAtivos` novo + equivalência + somente leitura | ⬜ |
 | 2.3 | Fase 2: painel da plataforma | ⬜ |
@@ -29,6 +29,13 @@ Escopo: `docs/arquitetura/roteiro-de-migracao.md`, fases 0, 1 e 2.
 - **Fase 0 / ano letivo**: helper `anoLetivoAtualDaEscola(escolaId)` em `src/lib/data-fetching.ts` (configuração da escola; sem ela, o ano do calendário). Trocado em `api/simulados` (leitura e gravação de `NotaSimulado` e responsáveis), `api/simulados/responsaveis` (padrão de GET e POST), `turmas/[id]/promover` (`|| 2026`), páginas `simulados` e `simulados/responsaveis`, action `getTurmasForSelect` e a criação de `GlobalConfig` na página de questões. Como a CETEP está com o ano atual configurado em 2026, nada muda para ela. Mantidos: o seletor de anos 2024–2027 da matriz (tela) e o `@default(2026)` do schema (sai na fase 4). O "___/___/2026" do cabeçalho de prova impressa virou o ano corrente.
 - **Achado extra (corrigido)**: `getTurmasForSelect` (mensagens) não filtrava por escola — a gestão via turmas de todas as escolas. Agora filtra; teste novo no isolamento (falhou antes, passa depois).
 - **Achado anotado (não corrigido)**: `reportarEstudanteFaltante` monta HTML com o nome digitado sem escapar. Hoje o conteúdo principal não é renderizado como HTML bruto (a tela de pendências extrai os campos por expressão regular), então não há injeção ativa; fica para a mudança de lugar dessa action.
+
+### Fase 1
+- **Forma das guardas**: rotas usam `export const GET = rotaDoModulo('NOT', 'leitura', async function GET(...) {...})` (o acesso é explícito: GET = leitura; POST que só consulta, como `questoes/check-duplicate`, também é leitura). Server actions não usam envoltório porque arquivos `"use server"` só podem exportar funções async: a primeira linha de cada ação é `const bloqueado = await bloqueioDoModulo('DIA', 'escrita'); if (bloqueado) return { erro: bloqueado }` (chave `error` em `schedule-actions.ts`, que já usava esse formato). Páginas: `await paginaDoModulo('X')` na primeira linha. Arquivos de action do Núcleo e as 3 páginas cliente do Núcleo levam o marcador `@modulo NUC` (o Núcleo está sempre ativo).
+- **Estados na fase 1**: derivados do `getModulosAtivos` atual. Hoje o menu só desliga itens com `planoMinimo`, então só **QST, PRV e FIN** podem ficar inativos; todos os outros módulos ficam ATIVO (nenhuma escola perde nada). PRV fica ativo se `provas` **ou** `simulados` estiver ativo (conservador).
+- **Exceção herdada no Banco de Questões**: o liga/desliga sempre valeu só para professores (a direção e o administrador continuavam usando). Mantido em `estadoParaUsuario` (regra pura, testada). A tela "módulo indisponível" mostra para QST o mesmo texto que o professor já via ("Módulo em Manutenção…").
+- **Mapa conservador** (`src/lib/modulos/mapa-rotas.ts`): no Núcleo ficaram os de uso misto — mensagens, portal do aluno, esquemas de avaliação (definem também a frequência), matriz curricular (gera as disciplinas da turma), cadastro básico de estudantes, importar/verificar horário de usuário e a action "reportar estudante faltante". SEC: ocorrências, importação CSV, sincronizar, promover turma. RES: relatórios/PDFs de turma, resultados, conselho. IND: professores pendentes.
+- **Achado extra (corrigido)**: a página do banco de questões listava para a gestão as disciplinas de **todas as escolas** (`where: {}`). Agora filtra pela escola da sessão.
 
 ## Como retomar
 Checkout de `fase/0-1-2-seguranca-modulos`, ler esta tabela, continuar do primeiro passo não ✅.
