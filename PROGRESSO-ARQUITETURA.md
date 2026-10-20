@@ -11,8 +11,8 @@ Sessão de **planejamento**: nada do sistema é alterado; só `docs/arquitetura/
 | 1 | `docs/arquitetura/inventario.md` | ✅ |
 | 2 | `docs/arquitetura/dominio-alvo.md` | ✅ |
 | 3 | `docs/arquitetura/personalizacao.md` | ✅ |
-| 4 | `docs/arquitetura/modulos-e-planos.md` | ⏳ em andamento |
-| 5 | `docs/arquitetura/roteiro-de-migracao.md` | ⬜ |
+| 4 | `docs/arquitetura/modulos-e-planos.md` | ✅ |
+| 5 | `docs/arquitetura/roteiro-de-migracao.md` | ⏳ em andamento |
 | 6 | `docs/arquitetura/decisoes.md` | ⬜ |
 | 7 | `docs/arquitetura/schema-alvo.prisma` | ⬜ |
 | 8 | Resumo executivo (abaixo) + pull request para `main` | ⬜ |

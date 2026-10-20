@@ -15,7 +15,7 @@
 ## 1.1 Como ler as tabelas
 
 - **Módulo proposto**: a "caixa" vendável à qual o item deveria pertencer. Siglas usadas (definidas no documento 4):
-  `NUC` Núcleo (obrigatório) · `SEC` Secretaria Escolar · `DIA` Diário de Classe e Frequência · `NOT` Avaliação e Notas · `RES` Conselho e Resultados · `AEE` Inclusão/AEE · `PRV` Avaliações e Provas (banco de questões, gerador, simulados) · `PLA` Planejamento · `COM` Comunicação e Portal da Família · `REC` Recursos (laboratórios/espaços) · `FIN` Financeiro · `IND` Indicadores · `DOC` Documentos oficiais · `PLT` Plataforma (ferramenta interna da dona do Áxis, não é vendida).
+  `NUC` Núcleo (obrigatório) · `SEC` Secretaria Escolar · `DIA` Diário de Classe e Frequência · `NOT` Avaliação e Notas · `RES` Conselho e Resultados · `AEE` Inclusão/AEE · `QST` Banco de Questões · `PRV` Gerador de Provas e Simulados · `PLA` Planejamento · `COM` Comunicação e Portal da Família · `REC` Recursos (laboratórios/espaços) · `FIN` Financeiro · `IND` Indicadores · `DOC` Documentos oficiais · `PLT` Plataforma (ferramenta interna da dona do Áxis, não é vendida).
 - **Destino**: `Manter` (fica como está), `Ampliar` (fica, mas ganha campos/funções), `Refazer` (a ideia fica, a estrutura muda), `Remover` (sai ou é absorvido por outra coisa).
 - **"Checa módulo?"**: se o servidor confere que a escola contratou aquele módulo. Hoje a resposta é quase sempre **não** — o módulo só esconde o item do menu (`modulosVisiveis()` em `src/lib/modules.ts`). Quem souber o endereço abre a tela ou chama a API.
 - **Papéis hoje** são booleanos em `User`: `isSuperuser` (administrador da escola), `isDirecao`, `isStaff` (professor/equipe), `isAEE`, `isPortalUser` (aluno no portal), `isPlatformAdmin` (dona do Áxis). As regras ficam em `can()` (`src/lib/rbac.ts`) com 5 ações: `gestao`, `staff`, `superuser`, `aee`, `staffPuro`. Muitas rotas ainda conferem os booleanos direto, sem `can()`.
@@ -87,7 +87,7 @@
 | Entidade | O que guarda | Escola? | Módulo | Problemas | Destino |
 |---|---|---|---|---|---|
 | `PlanoEnsino` | Plano de ensino do professor (texto) | **não** (via professor) | PLA | Sem `escolaId`; disciplina em texto (`disciplinaNome`); não liga ao diário | **Ampliar** |
-| `Questao` | Questão objetiva A–E, dificuldade, status de aprovação | **não** (via professor) | PRV | Sem `escolaId`; só objetiva com 5 alternativas fixas; sem habilidade BNCC | **Ampliar** (`escolaId`, tipos de questão, habilidade) |
+| `Questao` | Questão objetiva A–E, dificuldade, status de aprovação | **não** (via professor) | QST | Sem `escolaId`; só objetiva com 5 alternativas fixas; sem habilidade BNCC | **Ampliar** (`escolaId`, tipos de questão, habilidade) |
 | `Prova` | Prova montada (snapshot das questões) | **não** (via turma/professor) | PRV | Sem `escolaId`; `unidade` Int e `tipo` texto | **Ampliar** |
 | `NotaSimulado` | Nota de simulado por aluno/área/unidade | via estudante | PRV | `anoLetivo @default(2026)` fixo; unicidade removida (pode duplicar) | **Ampliar** |
 | `ResponsavelSimulado` | Professor responsável por lançar o simulado | via turma | PRV | Nome confunde com "responsável do aluno"; `anoLetivo @default(2026)` | **Renomear** (`AplicadorSimulado`) |
@@ -131,7 +131,7 @@
 | `/dashboard/conselho-classe` (+ `[turmaId]`) | Conselho de classe | gestão | **só login** na página (API confere `gestao`) | não | RES | Página abre para qualquer equipe; ação é barrada só na API | Ampliar (guarda na página) |
 | `/dashboard/planos` | Planos de ensino | professor, gestão | só login | não | PLA | — | Ampliar |
 | `/dashboard/matriz` | Matriz curricular | gestão | inline | não | PLA (ou NUC) | Sem `escolaId` na tabela | Refazer |
-| `/dashboard/questoes` | Banco de questões | professor, gestão | inline | **sim** (`banco-questoes`, exceto admin) | PRV | — | Manter (padrão a generalizar) |
+| `/dashboard/questoes` | Banco de questões | professor, gestão | inline | **sim** (`banco-questoes`, exceto admin) | QST | — | Manter (padrão a generalizar) |
 | `/dashboard/provas` | Gerador de provas | gestão | inline | **não** (só menu) | PRV | Cabeçalho do PDF com textos do CETEP (plano multi-tenant, seção 8) | Ampliar |
 | `/dashboard/simulados` (+ `responsaveis`) | Simulados e responsáveis | equipe | inline | **não** (só menu) | PRV | — | Ampliar |
 | `/dashboard/financeiro` | Esqueleto do financeiro | gestão | `can('gestao')` | **sim** | FIN | Sem requisito de produto | Refazer quando houver requisito |
@@ -183,8 +183,8 @@
 | `relatorios/professores-pendentes` | GET | Professores com lançamento pendente | `can('gestao')` | — | IND | — | Manter |
 | `planos`, `planos/[id]`, `planos/[id]/pdf`, `planos/relatorio/pdf` | vários | Planos de ensino | inline | **não** | PLA | — | Manter + módulo |
 | `planos/utils/compativeis` | GET | Turmas compatíveis para replicar plano | só login (usa o próprio usuário) | — | PLA | Baixo risco | Manter |
-| `questoes`, `questoes/[id]` | GET, POST, PUT, DELETE | Banco de questões | inline | **sim** só no POST de `questoes` | PRV | Checagem parcial (GET/PUT/DELETE não conferem) | Completar |
-| `questoes/check-duplicate` | POST | Detecta questão duplicada do professor | só login | não | PRV | — | Manter + módulo |
+| `questoes`, `questoes/[id]` | GET, POST, PUT, DELETE | Banco de questões | inline | **sim** só no POST de `questoes` | QST | Checagem parcial (GET/PUT/DELETE não conferem) | Completar |
+| `questoes/check-duplicate` | POST | Detecta questão duplicada do professor | só login | não | QST | — | Manter + módulo |
 | `provas`, `provas/[id]`, `provas/filtros` | GET, POST, DELETE | Gerador de provas | inline | **não** | PRV | — | Manter + módulo |
 | `simulados`, `simulados/responsaveis` | GET, POST, DELETE | Simulados | inline | **não** | PRV | — | Manter + módulo |
 | `laboratorios`, `laboratorios/reservas`, `reservas/[id]` | GET, POST, PATCH, DELETE | Laboratórios e reservas | inline | **não** | REC | — | Manter + módulo |
