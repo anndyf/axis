@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { contaProtegidaDaPlataforma, MSG_CONTA_PROTEGIDA } from '@/lib/plataforma'
 import { hash } from 'bcryptjs'
 import { logAudit } from '@/lib/audit'
 
@@ -27,6 +28,10 @@ export async function PUT(
 
     if (!existingUser) {
       return NextResponse.json({ message: 'Usuário não encontrado' }, { status: 404 })
+    }
+
+    if (contaProtegidaDaPlataforma(existingUser, session.user)) {
+      return NextResponse.json({ message: MSG_CONTA_PROTEGIDA }, { status: 403 })
     }
 
     const data = await request.json()
@@ -157,6 +162,10 @@ export async function DELETE(
     const userToDelete = await prisma.user.findUnique({ where: { id, escolaId: session.user.escolaId } })
     if (!userToDelete) {
       return NextResponse.json({ message: 'Usuário não encontrado' }, { status: 404 })
+    }
+
+    if (contaProtegidaDaPlataforma(userToDelete, session.user)) {
+      return NextResponse.json({ message: MSG_CONTA_PROTEGIDA }, { status: 403 })
     }
 
     try {

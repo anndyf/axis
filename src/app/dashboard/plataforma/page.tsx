@@ -1,6 +1,6 @@
-import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
+import { exigirAdminPlataforma, SELECT_ESCOLA_PLATAFORMA } from "@/lib/plataforma"
 import PlataformaClient from "./PlataformaClient"
 
 export const metadata = {
@@ -10,14 +10,12 @@ export const metadata = {
 export const runtime = 'nodejs'
 
 export default async function PlataformaPage() {
-  const session = await auth()
-
-  if (!session?.user?.isPlatformAdmin) {
+  if (!(await exigirAdminPlataforma())) {
     redirect("/dashboard")
   }
 
   const escolas = await prisma.escola.findMany({
-    include: { _count: { select: { users: true, estudantes: true } } },
+    select: SELECT_ESCOLA_PLATAFORMA,
     orderBy: { createdAt: 'desc' }
   })
 

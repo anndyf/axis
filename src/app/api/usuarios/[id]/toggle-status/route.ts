@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { contaProtegidaDaPlataforma, MSG_CONTA_PROTEGIDA } from '@/lib/plataforma'
 
 export const runtime = 'nodejs'
 
@@ -32,6 +33,10 @@ export async function PUT(
     const existing = await prisma.user.findUnique({ where: { id, escolaId: session.user.escolaId } })
     if (!existing) {
       return NextResponse.json({ message: 'Usuário não encontrado' }, { status: 404 })
+    }
+
+    if (contaProtegidaDaPlataforma(existing, session.user)) {
+      return NextResponse.json({ message: MSG_CONTA_PROTEGIDA }, { status: 403 })
     }
 
     const user = await prisma.user.update({

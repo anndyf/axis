@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { contaProtegidaDaPlataforma, MSG_CONTA_PROTEGIDA } from '@/lib/plataforma'
 
 export const runtime = 'nodejs'
 
@@ -31,6 +32,10 @@ export async function POST(request: NextRequest) {
 
     if (!fromUser || !toUser) {
       return NextResponse.json({ message: 'Um ou ambos os usuários não foram encontrados' }, { status: 404 })
+    }
+    // A transferência desativa o usuário de origem
+    if (contaProtegidaDaPlataforma(fromUser, session.user)) {
+      return NextResponse.json({ message: MSG_CONTA_PROTEGIDA }, { status: 403 })
     }
 
     // Executar a transferência em uma transação
