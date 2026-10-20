@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { provaDaEscola } from '@/lib/data-fetching'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
-export async function GET(request: NextRequest) {
+export const GET = rotaDoModulo('PRV', 'leitura', async function GET(request: NextRequest) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
@@ -83,9 +84,9 @@ export async function GET(request: NextRequest) {
     console.error('Erro ao buscar provas:', error)
     return NextResponse.json({ message: 'Erro interno' }, { status: 500 })
   }
-}
+})
 
-export async function POST(request: NextRequest) {
+export const POST = rotaDoModulo('PRV', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
@@ -175,4 +176,4 @@ export async function POST(request: NextRequest) {
       stack: error.stack
     }, { status: 500 })
   }
-}
+})

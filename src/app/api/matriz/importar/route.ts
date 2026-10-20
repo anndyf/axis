@@ -2,8 +2,9 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { can } from "@/lib/rbac"
 import { NextRequest, NextResponse } from "next/server"
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
-export async function POST(request: NextRequest) {
+export const POST = rotaDoModulo('NUC', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId || !can(session.user, 'gestao')) {
@@ -65,4 +66,4 @@ export async function POST(request: NextRequest) {
     console.error("Erro ao importar matriz:", error)
     return NextResponse.json({ message: "Erro ao importar disciplinas" }, { status: 500 })
   }
-}
+})

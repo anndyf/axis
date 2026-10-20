@@ -5,6 +5,7 @@ import ScheduleEditor from "@/app/dashboard/turmas/[id]/horario/ScheduleEditor"
 import { getSchedule } from "../../schedule-actions"
 import { getGlobalConfig } from "@/lib/data-fetching"
 import { diasLetivos, aulasPrevistasPorDisciplina, normalizarTurno } from "@/lib/services/calendario"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = {
   title: 'Áxis - Turmas'
@@ -13,6 +14,7 @@ export const metadata = {
 export const runtime = 'nodejs'
 
 export default async function SchedulePage(props: { params: Promise<{ id: string }> }) {
+  await paginaDoModulo('DIA')
   const params = await props.params
   const session = await auth()
 

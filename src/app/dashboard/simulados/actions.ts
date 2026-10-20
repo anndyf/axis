@@ -1,13 +1,17 @@
 "use server"
+// @modulo NUC - Núcleo sempre ativo; sem checagem de módulo (ver src/lib/modulos/mapa-rotas.ts)
 
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { can } from "@/lib/rbac"
 
 export async function reportarEstudanteFaltante(turmaId: string, nomeEstudante: string, matricula?: string, observacao?: string) {
   try {
     const session = await auth()
     const user = session?.user as any
     if (!user?.escolaId) return { error: "Não autorizado" }
+    // Action pode ser chamada direto (sem passar pelo layout que barra o portal)
+    if (!can(user, "staff")) return { error: "Acesso negado" }
 
     // Obter turma
     const turma = await prisma.turma.findUnique({ where: { id: turmaId, escolaId: user.escolaId } })

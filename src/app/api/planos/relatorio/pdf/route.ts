@@ -3,10 +3,11 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
-export async function GET(request: NextRequest) {
+export const GET = rotaDoModulo('PLA', 'leitura', async function GET(request: NextRequest) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId) {
@@ -114,4 +115,4 @@ export async function GET(request: NextRequest) {
     console.error(error)
     return NextResponse.json({ message: 'Erro ao gerar relatório' }, { status: 500 })
   }
-}
+})

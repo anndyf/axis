@@ -123,7 +123,7 @@ export default function ProvaPrintView({ prova, options, nomeEscola = 'Áxis', l
                             <div className="font-bold text-[10pt] tracking-widest">{turma?.nome}</div>
                             <div className="flex gap-1 items-end">
                               <span className="font-bold text-[10pt]">DATA:</span>
-                              <span className="font-bold text-[10pt]">___/___/2026</span>
+                              <span className="font-bold text-[10pt]">___/___/{new Date().getFullYear()}</span>
                             </div>
                           </div>
                         </div>

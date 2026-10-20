@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { turmasSaoDaEscola } from '@/lib/data-fetching'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
-export async function POST(request: NextRequest) {
+export const POST = rotaDoModulo('PLA', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId || !session.user.isStaff) {
@@ -50,9 +51,9 @@ export async function POST(request: NextRequest) {
     console.error(err)
     return NextResponse.json({ message: 'Erro ao criar plano de ensino' }, { status: 500 })
   }
-}
+})
 
-export async function GET(request: NextRequest) {
+export const GET = rotaDoModulo('PLA', 'leitura', async function GET(request: NextRequest) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
@@ -124,4 +125,4 @@ export async function GET(request: NextRequest) {
     console.error(err)
     return NextResponse.json({ message: 'Erro ao buscar planos de ensino' }, { status: 500 })
   }
-}
+})

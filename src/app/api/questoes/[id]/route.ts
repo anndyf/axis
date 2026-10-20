@@ -3,10 +3,11 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { logAudit } from '@/lib/audit'
 import { turmasSaoDaEscola } from '@/lib/data-fetching'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
-export async function PUT(
+export const PUT = rotaDoModulo('QST', 'escrita', async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -99,9 +100,9 @@ export async function PUT(
     console.error('Erro ao atualizar questão:', error)
     return NextResponse.json({ message: 'Erro interno ao atualizar' }, { status: 500 })
   }
-}
+})
 
-export async function DELETE(
+export const DELETE = rotaDoModulo('QST', 'escrita', async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -137,4 +138,4 @@ export async function DELETE(
   } catch (error) {
     return NextResponse.json({ message: 'Erro ao deletar' }, { status: 500 })
   }
-}
+})

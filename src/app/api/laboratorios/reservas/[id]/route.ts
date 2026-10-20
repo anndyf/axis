@@ -1,8 +1,9 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
-export async function DELETE(
+export const DELETE = rotaDoModulo('REC', 'escrita', async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -34,4 +35,4 @@ export async function DELETE(
   } catch (error) {
     return NextResponse.json({ message: "Erro ao cancelar reserva" }, { status: 500 })
   }
-}
+})

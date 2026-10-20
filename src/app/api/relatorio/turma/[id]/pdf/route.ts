@@ -8,10 +8,11 @@ import { etapasDaNota, desistenteEmTodas } from '@/lib/services/notas'
 import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from '@/lib/services/notas-leitura'
 import { carregarFrequenciaDaTurma } from '@/lib/services/frequencia-leitura'
 import { frequenciaConsiderada, formatarFrequencia, ROTULO_REPROVADO_FALTA } from '@/lib/services/frequencia'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
-export async function GET(
+export const GET = rotaDoModulo('RES', 'leitura', async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -241,4 +242,4 @@ export async function GET(
       { status: 500 }
     )
   }
-}
+})

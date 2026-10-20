@@ -4,11 +4,12 @@ import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { resolverEsquemaAvaliacaoId } from '@/lib/services/notas'
 import { contarNotasLancadas } from '@/lib/services/esquemas-padrao'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
 // GET single turma
-export async function GET(
+export const GET = rotaDoModulo('NUC', 'leitura', async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -36,10 +37,10 @@ export async function GET(
       { status: 500 }
     )
   }
-}
+})
 
 // PUT update turma
-export async function PUT(
+export const PUT = rotaDoModulo('NUC', 'escrita', async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -122,10 +123,10 @@ export async function PUT(
       { status: 500 }
     )
   }
-}
+})
 
 // DELETE turma
-export async function DELETE(
+export const DELETE = rotaDoModulo('NUC', 'escrita', async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -212,4 +213,4 @@ export async function DELETE(
       { status: 500 }
     )
   }
-}
+})

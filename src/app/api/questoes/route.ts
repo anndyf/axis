@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { logAudit } from '@/lib/audit'
-import { getModulosAtivos } from '@/lib/modules-server'
 import { turmasSaoDaEscola } from '@/lib/data-fetching'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
-export async function GET(request: NextRequest) {
+export const GET = rotaDoModulo('QST', 'leitura', async function GET(request: NextRequest) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
@@ -131,21 +131,14 @@ export async function GET(request: NextRequest) {
     console.error('Erro ao buscar questões:', error)
     return NextResponse.json({ message: 'Erro interno' }, { status: 500 })
   }
-}
+})
 
-export async function POST(request: NextRequest) {
+export const POST = rotaDoModulo('QST', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
 
-    // Verificar se a funcionalidade está ativa para professores (por plano ou toggle da direção)
-    if (!session.user.isSuperuser && !session.user.isDirecao) {
-      const escola = await prisma.escola.findUnique({ where: { id: session.user.escolaId }, select: { plano: true } })
-      const modulosAtivos = await getModulosAtivos(session.user.escolaId, escola?.plano || 'BASICO')
-      if (!modulosAtivos.includes('banco-questoes')) {
-        return NextResponse.json({ message: 'Funcionalidade temporariamente desativada' }, { status: 403 })
-      }
-    }
+    // Banco de questões desligado para professores: barrado em rotaDoModulo('QST')
 
     const body = await request.json()
     const { 
@@ -192,4 +185,4 @@ export async function POST(request: NextRequest) {
     console.error('Erro ao criar questão:', error)
     return NextResponse.json({ message: 'Erro ao salvar: ' + (error?.message || error) }, { status: 500 })
   }
-}
+})

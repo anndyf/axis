@@ -1,5 +1,6 @@
 "use client"
 
+// @modulo NUC - página cliente; o Núcleo está sempre ativo (guarda nas rotas que ela chama)
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Check, AlertCircle, Save, ClipboardList, ChevronRight, CalendarDays, Palette, type LucideIcon } from "lucide-react"

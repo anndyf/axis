@@ -1,12 +1,14 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
+import { can } from '@/lib/rbac'
 import { prisma } from '@/lib/prisma'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { adicionarLogoNoPdf } from '@/lib/pdf-logo'
 import { etapasDaNota, desistenteEmTodas } from '@/lib/services/notas'
 import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from '@/lib/services/notas-leitura'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
@@ -51,7 +53,7 @@ function getStatusAbbr(status: string) {
   return map[status] || '-'
 }
 
-export async function GET(
+export const GET = rotaDoModulo('RES', 'leitura', async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -60,6 +62,10 @@ export async function GET(
 
     if (!session?.user?.escolaId) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
+    }
+    // Relatório da turma inteira: só equipe, inclusive AEE (aluno do portal fica de fora)
+    if (!can(session.user, 'staff') && !can(session.user, 'aee')) {
+      return NextResponse.json({ message: 'Acesso negado' }, { status: 403 })
     }
 
     const { id } = await params
@@ -365,4 +371,4 @@ export async function GET(
     console.error('Erro:', error)
     return NextResponse.json({ message: 'Erro ao gerar PDF' }, { status: 500 })
   }
-}
+})

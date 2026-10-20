@@ -3,10 +3,12 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { getModulosAtivos } from '@/lib/modules-server'
+import { definirModuloDaAssinatura } from '@/lib/modulos/assinatura-escrita'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
-export async function GET() {
+export const GET = rotaDoModulo('NUC', 'leitura', async function GET() {
   try {
   const session = await auth()
   if (!session?.user?.escolaId) {
@@ -49,9 +51,9 @@ export async function GET() {
   } catch (error) {
     return NextResponse.json({ message: 'Erro ao buscar config' }, { status: 500 })
   }
-}
+})
 
-export async function PUT(request: NextRequest) {
+export const PUT = rotaDoModulo('NUC', 'escrita', async function PUT(request: NextRequest) {
   try {
     const session = await auth()
     if (!session || !session.user.isSuperuser) {
@@ -62,11 +64,9 @@ export async function PUT(request: NextRequest) {
     const { isBancoQuestoesAtivo, anoLetivoAtual } = body
 
     if (isBancoQuestoesAtivo !== undefined) {
-      await prisma.escolaModulo.upsert({
-        where: { escolaId_moduloId: { escolaId: session.user.escolaId, moduloId: 'banco-questoes' } },
-        update: { ativo: isBancoQuestoesAtivo },
-        create: { escolaId: session.user.escolaId, moduloId: 'banco-questoes', ativo: isBancoQuestoesAtivo }
-      })
+      // Grava na assinatura (exceção do módulo QST) e espelha em EscolaModulo.
+      // O liga/desliga vale só para professores (ver estadoParaUsuario).
+      await definirModuloDaAssinatura(session.user.escolaId, 'QST', { estado: isBancoQuestoesAtivo ? 'ATIVO' : 'INATIVO', origem: 'EXCECAO' }, session.user.id)
     }
 
     const data: any = {}
@@ -90,4 +90,4 @@ export async function PUT(request: NextRequest) {
   } catch (error) {
     return NextResponse.json({ message: 'Erro ao atualizar config' }, { status: 500 })
   }
-}
+})

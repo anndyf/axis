@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma"
 import { can } from "@/lib/rbac"
 import { revalidatePath } from "next/cache"
 import { dataValida } from "@/lib/services/chamada"
+import { bloqueioDoModulo } from "@/lib/modulos/guarda"
 
 // Cadastro de justificativas/atestados - só gestão. Toda ação confere papel
 // e escola da sessão; o aluno recebido é conferido contra a escola.
@@ -29,6 +30,8 @@ export async function criarJustificativa(dados: {
   efeito: string
   descricao?: string
 }): Promise<Resultado> {
+  const bloqueado = await bloqueioDoModulo('DIA', 'escrita')
+  if (bloqueado) return { erro: bloqueado }
   const user = await gestao()
   if (!user) return { erro: "Não autorizado" }
   const { estudanteId, inicio, fim, tipo, efeito } = dados ?? ({} as typeof dados)
@@ -56,6 +59,8 @@ export async function criarJustificativa(dados: {
 }
 
 export async function removerJustificativa(id: string): Promise<Resultado> {
+  const bloqueado = await bloqueioDoModulo('DIA', 'escrita')
+  if (bloqueado) return { erro: bloqueado }
   const user = await gestao()
   if (!user) return { erro: "Não autorizado" }
   const { count } = await prisma.justificativa.deleteMany({ where: { id: String(id), escolaId: user.escolaId } })

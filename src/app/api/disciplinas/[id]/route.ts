@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { can } from '@/lib/rbac'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
 // PUT update disciplina
-export async function PUT(
+export const PUT = rotaDoModulo('NUC', 'escrita', async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -79,10 +80,10 @@ export async function PUT(
       { status: 500 }
     )
   }
-}
+})
 
 // DELETE disciplina
-export async function DELETE(
+export const DELETE = rotaDoModulo('NUC', 'escrita', async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -129,4 +130,4 @@ export async function DELETE(
       { status: 500 }
     )
   }
-}
+})

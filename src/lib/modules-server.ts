@@ -1,16 +1,30 @@
 import { PlanoTipo } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { MODULOS, ORDEM_PLANO, LIMITE_USUARIOS } from '@/lib/modules'
+import { assinaturaVigente, dadosDaAssinatura } from '@/lib/modulos/assinatura'
+import { estadosDaAssinatura, itensAtivosPelosEstados } from '@/lib/services/modulos'
+import { hojeNaEscola } from '@/lib/services/chamada'
 
 /**
- * Resolve quais módulos estão disponíveis para uma escola, combinando o
- * plano contratado com eventuais overrides em EscolaModulo (que sempre
- * vencem, pra cima ou pra baixo, independente do plano).
+ * Itens do catálogo de menu disponíveis para a escola. Lê a assinatura
+ * (fase 2); escola ainda sem assinatura cai no modelo antigo (plano +
+ * EscolaModulo) - "leitura dupla" do roteiro, até o backfill cobrir todas.
  *
  * Server-only (consulta o banco) - por isso fica separado de src/lib/modules.ts,
  * que precisa ser importável por componentes client (ex. DashboardSidebar).
  */
 export async function getModulosAtivos(escolaId: string, plano: PlanoTipo): Promise<string[]> {
+  const assinatura = await assinaturaVigente(escolaId)
+  if (!assinatura) return getModulosAtivosLegado(escolaId, plano)
+  return itensAtivosPelosEstados(MODULOS, estadosDaAssinatura(dadosDaAssinatura(assinatura), hojeNaEscola()))
+}
+
+/**
+ * Modelo antigo: plano contratado + overrides em EscolaModulo (que sempre
+ * vencem, pra cima ou pra baixo, independente do plano). Mantido para o
+ * fallback e para o teste de equivalência; sai depois da validação da fase 2.
+ */
+export async function getModulosAtivosLegado(escolaId: string, plano: PlanoTipo): Promise<string[]> {
   const overrides = await prisma.escolaModulo.findMany({ where: { escolaId } })
   const overrideMap = new Map(overrides.map((o) => [o.moduloId, o.ativo]))
 

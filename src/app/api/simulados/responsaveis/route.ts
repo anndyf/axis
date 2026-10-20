@@ -1,11 +1,13 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { anoLetivoAtualDaEscola } from "@/lib/data-fetching"
 import { NextRequest, NextResponse } from "next/server"
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-export async function GET(request: NextRequest) {
+export const GET = rotaDoModulo('PRV', 'leitura', async function GET(request: NextRequest) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
@@ -15,7 +17,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const turmaId = searchParams.get("turmaId") || undefined
-    const anoLetivo = searchParams.get("anoLetivo") ? parseInt(searchParams.get("anoLetivo")!) : 2026
+    const anoLetivo = searchParams.get("anoLetivo") ? parseInt(searchParams.get("anoLetivo")!) : await anoLetivoAtualDaEscola(escolaId)
 
     // ResponsavelSimulado nao tem escolaId proprio - o escopo e feito via
     // relacao com a turma, que sempre pertence a uma unica escola.
@@ -39,9 +41,9 @@ export async function GET(request: NextRequest) {
     console.error("Erro ao buscar responsáveis de simulado:", error)
     return NextResponse.json({ message: "Erro interno" }, { status: 500 })
   }
-}
+})
 
-export async function POST(request: NextRequest) {
+export const POST = rotaDoModulo('PRV', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
@@ -49,7 +51,9 @@ export async function POST(request: NextRequest) {
     }
     const escolaId = session.user.escolaId
 
-    const { userId, turmaId, areaId, provaId, unidade, anoLetivo = 2026 } = await request.json()
+    const body = await request.json()
+    const { userId, turmaId, areaId, provaId, unidade } = body
+    const anoLetivo: number = body.anoLetivo ?? await anoLetivoAtualDaEscola(escolaId)
 
     if (!userId || !turmaId || (!areaId && !provaId)) {
       return NextResponse.json({ message: "Preencha os campos obrigatórios (Usuário, Turma, Prova/Área)" }, { status: 400 })
@@ -103,9 +107,9 @@ export async function POST(request: NextRequest) {
     console.error("Erro ao designar responsável:", error)
     return NextResponse.json({ message: "Erro ao salvar" }, { status: 500 })
   }
-}
+})
 
-export async function DELETE(request: NextRequest) {
+export const DELETE = rotaDoModulo('PRV', 'escrita', async function DELETE(request: NextRequest) {
     try {
       const session = await auth()
       if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
@@ -131,4 +135,4 @@ export async function DELETE(request: NextRequest) {
     } catch (error) {
       return NextResponse.json({ message: "Erro ao remover" }, { status: 500 })
     }
-}
+})

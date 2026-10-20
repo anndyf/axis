@@ -15,6 +15,7 @@ import { rotuloTempos } from "@/lib/services/inicio-professor"
 import { calendarioDaDisciplina } from "@/lib/services/calendario-disciplina"
 import CalendarioDisciplina from "@/components/CalendarioDisciplina"
 import { Badge, Card, CardBody, CardHeader, EmptyState, PageHeader, Stat, buttonClasses } from "@/components/ui"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = { title: 'Áxis - Diário de classe' }
 export const runtime = 'nodejs'
@@ -25,6 +26,7 @@ const DIAS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sáb
 const SITUACAO: Record<string, string> = { REALIZADA: "Dada", CANCELADA: "Não dada", PREVISTA: "Chamada não salva" }
 
 export default async function DiarioPage({ searchParams }: { searchParams: Promise<{ turma?: string; disciplina?: string }> }) {
+  await paginaDoModulo('DIA')
   const session = await auth()
   if (!session?.user?.escolaId || session.user.isPortalUser || !can(session.user, 'staff')) redirect("/dashboard")
   const escolaId = session.user.escolaId

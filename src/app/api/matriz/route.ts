@@ -2,8 +2,9 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { can } from "@/lib/rbac"
 import { NextRequest, NextResponse } from "next/server"
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
-export async function GET(request: NextRequest) {
+export const GET = rotaDoModulo('NUC', 'leitura', async function GET(request: NextRequest) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
@@ -51,9 +52,9 @@ export async function GET(request: NextRequest) {
     console.error("ERRO GET /api/matriz:", error)
     return NextResponse.json({ message: "Erro ao buscar matriz", error: String(error) }, { status: 500 })
   }
-}
+})
 
-export async function POST(request: NextRequest) {
+export const POST = rotaDoModulo('NUC', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId || !can(session.user, "gestao")) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
@@ -149,10 +150,10 @@ export async function POST(request: NextRequest) {
     console.error("ERRO POST /api/matriz:", error)
     return NextResponse.json({ message: "Erro ao criar item na matriz", error: String(error) }, { status: 500 })
   }
-}
+})
 
 
-export async function PATCH(request: NextRequest) {
+export const PATCH = rotaDoModulo('NUC', 'escrita', async function PATCH(request: NextRequest) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId || !can(session.user, "gestao")) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
@@ -219,9 +220,9 @@ export async function PATCH(request: NextRequest) {
     console.error("ERRO PATCH /api/matriz:", error)
     return NextResponse.json({ message: "Erro ao atualizar", error: String(error) }, { status: 500 })
   }
-}
+})
 
-export async function DELETE(request: NextRequest) {
+export const DELETE = rotaDoModulo('NUC', 'escrita', async function DELETE(request: NextRequest) {
     try {
       const session = await auth()
       if (!session?.user?.escolaId || !can(session.user, "gestao")) return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
@@ -243,4 +244,4 @@ export async function DELETE(request: NextRequest) {
     } catch (error) {
       return NextResponse.json({ message: "Erro ao remover" }, { status: 500 })
     }
-}
+})

@@ -1,9 +1,8 @@
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
-import { prisma } from "@/lib/prisma"
 import { can } from "@/lib/rbac"
-import { getModulosAtivos } from "@/lib/modules-server"
 import { DollarSign } from "lucide-react"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = {
   title: 'Áxis - Financeiro'
@@ -15,15 +14,9 @@ export const runtime = 'nodejs'
 // exposto na Sidebar/dashboard ainda - acessível só por URL direta, até
 // haver requisito de produto real para o que o módulo precisa fazer.
 export default async function FinanceiroPage() {
+  await paginaDoModulo('FIN')
   const session = await auth()
   if (!session?.user?.escolaId || !can(session.user, 'gestao')) {
-    redirect("/dashboard")
-  }
-
-  const escola = await prisma.escola.findUnique({ where: { id: session.user.escolaId }, select: { plano: true } })
-  const modulosAtivos = await getModulosAtivos(session.user.escolaId, escola?.plano || 'BASICO')
-
-  if (!modulosAtivos.includes('financeiro')) {
     redirect("/dashboard")
   }
 

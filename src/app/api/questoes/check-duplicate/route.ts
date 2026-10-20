@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 function normalizeText(text: string) {
     if (!text) return ''
@@ -13,7 +14,7 @@ function normalizeText(text: string) {
         .replace(/[^a-z0-9]/g, '') // Keep only alphanumeric
 }
 
-export async function POST(req: Request) {
+export const POST = rotaDoModulo('QST', 'leitura', async function POST(req: Request) {
   try {
     const session = await auth()
     if (!session?.user?.id) {
@@ -71,4 +72,4 @@ export async function POST(req: Request) {
     console.error('Error checking duplicate:', error)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
-}
+})

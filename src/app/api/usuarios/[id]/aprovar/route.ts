@@ -4,10 +4,11 @@ import { prisma } from '@/lib/prisma'
 import { hash } from 'bcryptjs'
 import { enviarSenhaPorEmail } from '@/lib/mail'
 import { gerarSenhaProvisoria } from '@/lib/senha'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
-export async function POST(
+export const POST = rotaDoModulo('NUC', 'escrita', async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -63,4 +64,4 @@ export async function POST(
       { status: 500 }
     )
   }
-}
+})

@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { validarEsquema, criarEstruturaEsquema, type EsquemaBody } from '@/lib/services/esquemas-avaliacao'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
-export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export const PUT = rotaDoModulo('NUC', 'escrita', async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId || !session.user.isSuperuser) {
@@ -73,9 +74,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     console.error('Erro ao atualizar esquema de avaliação:', error)
     return NextResponse.json({ message: 'Erro ao atualizar esquema de avaliação' }, { status: 500 })
   }
-}
+})
 
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export const DELETE = rotaDoModulo('NUC', 'escrita', async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
     if (!session?.user?.escolaId || !session.user.isSuperuser) {
@@ -111,4 +112,4 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     console.error('Erro ao remover esquema de avaliação:', error)
     return NextResponse.json({ message: 'Erro ao remover esquema de avaliação' }, { status: 500 })
   }
-}
+})

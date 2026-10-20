@@ -12,6 +12,7 @@ import {
   type UnidadePayload,
   type LancamentoAluno,
 } from '@/lib/services/lancamento-notas'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
@@ -27,7 +28,7 @@ interface NotaInputPayload {
  * um item inválido (nota fora do limite, aluno de outra turma/escola,
  * disciplina diferente) não salva nada.
  */
-export async function POST(request: NextRequest) {
+export const POST = rotaDoModulo('NOT', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
 
@@ -190,4 +191,4 @@ export async function POST(request: NextRequest) {
     await reportarErro(error, { metodo: 'POST', caminho: '/api/notas/lancar' })
     return NextResponse.json({ message: 'Erro ao processar notas' }, { status: 500 })
   }
-}
+})

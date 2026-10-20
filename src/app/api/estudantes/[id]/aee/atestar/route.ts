@@ -2,8 +2,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
-export async function POST(
+export const POST = rotaDoModulo('AEE', 'escrita', async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -70,4 +71,4 @@ export async function POST(
     console.error("Erro AEE Atestar:", error)
     return NextResponse.json({ message: "Erro ao atestar: " + error.message }, { status: 500 })
   }
-}
+})

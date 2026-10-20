@@ -6,6 +6,7 @@ import { logAudit } from '@/lib/audit'
 import { reportarErro } from '@/lib/monitoramento'
 import { can } from '@/lib/rbac'
 import { calcularMediaFinal, resolverEsquemaAvaliacaoId, paraEsquemaConfig, unidadesDeNotasSalvas, notaRecuperacaoValida, type EsquemaConfig } from '@/lib/services/notas'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 class ErroValidacao extends Error {}
 
@@ -23,7 +24,7 @@ const DECISOES_CONSELHO_VALIDAS: StatusNota[] = [
   'CONSERVADO',
 ]
 
-export async function POST(request: NextRequest) {
+export const POST = rotaDoModulo('RES', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
 
@@ -185,4 +186,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+})

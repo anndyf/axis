@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { logAudit } from '@/lib/audit'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
 // GET ocorrencias com filtros
-export async function GET(request: NextRequest) {
+export const GET = rotaDoModulo('SEC', 'leitura', async function GET(request: NextRequest) {
   try {
     const session = await auth()
     if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
@@ -88,10 +89,10 @@ export async function GET(request: NextRequest) {
     console.error('Erro ao buscar ocorrências:', error)
     return NextResponse.json({ message: 'Erro ao buscar ocorrências' }, { status: 500 })
   }
-}
+})
 
 // POST criar ocorrência
-export async function POST(request: NextRequest) {
+export const POST = rotaDoModulo('SEC', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
     if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
@@ -158,4 +159,4 @@ export async function POST(request: NextRequest) {
     console.error('Erro ao criar ocorrência:', error)
     return NextResponse.json({ message: 'Erro ao criar ocorrência' }, { status: 500 })
   }
-}
+})

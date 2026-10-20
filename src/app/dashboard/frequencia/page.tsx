@@ -11,6 +11,7 @@ import { UserX, ClipboardCheck, CheckCircle2 } from "lucide-react"
 import { Alert, Badge, Card, CardHeader, EmptyState, PageHeader, buttonClasses, type BadgeTone } from "@/components/ui"
 import SeletorTurma from "./SeletorTurma"
 import JustificativasClient from "./JustificativasClient"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = { title: 'Áxis - Frequência' }
 export const runtime = 'nodejs'
@@ -19,6 +20,7 @@ export const dynamic = 'force-dynamic'
 const TOM_RISCO: Record<string, BadgeTone> = { CRITICAL: "danger", HIGH: "danger", MEDIUM: "warning", LOW: "success", NONE: "neutral" }
 
 export default async function FrequenciaPage({ searchParams }: { searchParams: Promise<{ turma?: string; todos?: string }> }) {
+  await paginaDoModulo('DIA')
   const session = await auth()
   if (!session?.user?.escolaId || session.user.isPortalUser || !can(session.user, 'gestao')) redirect("/dashboard")
   const escolaId = session.user.escolaId

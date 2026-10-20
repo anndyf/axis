@@ -3,10 +3,11 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { provaDaEscola } from '@/lib/data-fetching'
 import { logAudit } from '@/lib/audit'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
-export async function GET(
+export const GET = rotaDoModulo('PRV', 'leitura', async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -42,9 +43,9 @@ export async function GET(
     console.error('Erro ao buscar prova:', error)
     return NextResponse.json({ message: 'Erro interno' }, { status: 500 })
   }
-}
+})
 
-export async function DELETE(
+export const DELETE = rotaDoModulo('PRV', 'escrita', async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -83,5 +84,5 @@ export async function DELETE(
     console.error('Erro ao excluir prova:', error)
     return NextResponse.json({ message: 'Erro ao excluir prova' }, { status: 500 })
   }
-}
+})
 

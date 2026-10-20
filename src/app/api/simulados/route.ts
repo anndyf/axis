@@ -2,12 +2,13 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { NextRequest, NextResponse } from "next/server"
 import { logAudit } from "@/lib/audit"
-import { provaDaEscola } from "@/lib/data-fetching"
+import { provaDaEscola, anoLetivoAtualDaEscola } from "@/lib/data-fetching"
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-export async function GET(request: NextRequest) {
+export const GET = rotaDoModulo('PRV', 'leitura', async function GET(request: NextRequest) {
   try {
     const session = await auth()
     const user = session?.user as any
@@ -27,6 +28,7 @@ export async function GET(request: NextRequest) {
     if (!user.escolaId || !(await prisma.turma.findUnique({ where: { id: turmaId, escolaId: user.escolaId }, select: { id: true } }))) {
       return NextResponse.json({ message: "Turma não encontrada" }, { status: 404 })
     }
+    const anoLetivo = await anoLetivoAtualDaEscola(user.escolaId)
 
     // Busca estudantes da turma com suas notas de simulado
     const estudantes = await prisma.estudante.findMany({
@@ -37,11 +39,11 @@ export async function GET(request: NextRequest) {
           where: provaId ? {
             provaId,
             unidade: parseInt(unidade),
-            anoLetivo: 2026
+            anoLetivo
           } : {
             areaId,
             unidade: parseInt(unidade),
-            anoLetivo: 2026
+            anoLetivo
           },
           include: {
             lancadoBy: {
@@ -58,7 +60,7 @@ export async function GET(request: NextRequest) {
 
     // BUSCAR RESPONSÁVEL
     let responsavelName: string | null = null;
-    let whereResponsavelQuery: any = { turmaId, anoLetivo: 2026 }
+    let whereResponsavelQuery: any = { turmaId, anoLetivo }
     if (provaId) {
       whereResponsavelQuery.provaId = provaId
     } else {
@@ -175,9 +177,9 @@ export async function GET(request: NextRequest) {
     console.error("Erro ao buscar estudantes para simulado:", error)
     return NextResponse.json({ message: "Erro interno do servidor" }, { status: 500 })
   }
-}
+})
 
-export async function POST(request: NextRequest) {
+export const POST = rotaDoModulo('PRV', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
     const user = session?.user as any
@@ -203,10 +205,11 @@ export async function POST(request: NextRequest) {
     if (idPorMatricula.size !== new Set(matriculas).size) {
       return NextResponse.json({ message: "Estudante não encontrado nesta turma" }, { status: 400 })
     }
+    const anoLetivo = await anoLetivoAtualDaEscola(user.escolaId)
 
     // Verificação de permissão rigorosa
     if (!user.isSuperuser && !user.isDirecao) {
-      let whereResponsavel: any = { userId: user.id, turmaId, anoLetivo: 2026 }
+      let whereResponsavel: any = { userId: user.id, turmaId, anoLetivo }
       if (provaId) whereResponsavel.provaId = provaId
       else whereResponsavel.areaId = areaId
       
@@ -224,7 +227,7 @@ export async function POST(request: NextRequest) {
     // Buscar notas de simulado existentes no banco
     const whereExisting: any = {
       unidade: parseInt(unidade),
-      anoLetivo: 2026,
+      anoLetivo,
       estudanteId: { in: [...idPorMatricula.values()] }
     }
     if (provaId) whereExisting.provaId = provaId
@@ -279,7 +282,7 @@ export async function POST(request: NextRequest) {
                 nota: parsedNota,
                 ausente: isAusente,
                 notaSegundaChamada: parsedNotaSegundaChamada,
-                anoLetivo: 2026,
+                anoLetivo,
                 lancadoById: user.id
               }
             })
@@ -304,4 +307,4 @@ export async function POST(request: NextRequest) {
     console.error("Erro ao salvar notas de simulado:", error)
     return NextResponse.json({ message: "Erro ao salvar notas" }, { status: 500 })
   }
-}
+})

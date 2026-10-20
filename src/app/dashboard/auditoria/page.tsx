@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { Prisma } from "@prisma/client"
 import { ChevronLeft, Search, Filter, Download, User as UserIcon, Calendar, Activity, Database, Shield, History, Clock, ShieldAlert } from "lucide-react"
 import Link from "next/link"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = {
   title: 'Áxis - Auditoria'
@@ -17,6 +18,7 @@ export default async function AuditoriaPage({
 }: { 
   searchParams: { q?: string, entity?: string, page?: string, user?: string } 
 }) {
+  await paginaDoModulo('NUC')
   const session = await auth()
 
   // Apenas Superuser pode acessar auditoria

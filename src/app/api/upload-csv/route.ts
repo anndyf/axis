@@ -3,10 +3,11 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { can } from '@/lib/rbac'
 import { revalidatePath } from 'next/cache'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
-export async function POST(request: NextRequest) {
+export const POST = rotaDoModulo('SEC', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
 
@@ -142,4 +143,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+})

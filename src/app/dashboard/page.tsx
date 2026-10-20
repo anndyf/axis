@@ -22,6 +22,7 @@ import { ROTULO_VISAO, visaoEfetiva, visoesDoUsuario, type VisaoPainel } from "@
 import { cn } from "@/components/ui/cn"
 import TeacherTipsModal from "@/components/TeacherTipsModal"
 import { Atalhos, Aviso, Cartao, CartaoProgresso, Chip, dataCurta, GradeCartoes, Indicador, Item, Lista, Secao, TOM } from "@/components/painel/ui"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = { title: "Áxis - Painel" }
 export const dynamic = "force-dynamic"
@@ -48,6 +49,7 @@ const pendenciasDaEscolaCache = unstable_cache(
  * de origem.
  */
 export default async function DashboardPage({ searchParams }: { searchParams: Promise<{ visao?: string }> }) {
+  await paginaDoModulo('NUC')
   const session = await auth()
   if (!session?.user?.escolaId) redirect("/login")
   const user = session.user

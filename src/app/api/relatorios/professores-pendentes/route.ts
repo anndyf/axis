@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
 import { can } from '@/lib/rbac';
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
-export async function GET(request: Request) {
+export const GET = rotaDoModulo('IND', 'leitura', async function GET(request: Request) {
   try {
     const session = await auth();
     if (!session?.user?.escolaId || !can(session.user, 'gestao')) {
@@ -54,4 +55,4 @@ export async function GET(request: Request) {
     console.error('Erro ao gerar relatório:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-}
+})

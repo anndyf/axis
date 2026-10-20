@@ -1,8 +1,10 @@
 "use server"
+// @modulo NUC - Núcleo sempre ativo; sem checagem de módulo (ver src/lib/modulos/mapa-rotas.ts)
 
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { can } from "@/lib/rbac"
+import { anoLetivoAtualDaEscola } from "@/lib/data-fetching"
 import { revalidatePath } from "next/cache"
 import { Resend } from 'resend';
 import nodemailer from 'nodemailer';
@@ -646,7 +648,8 @@ export async function getTurmasForSelect() {
 
     const user = session.user as any
     const isTeacherOnly = user.isStaff && !user.isSuperuser && !user.isDirecao
-    const where: any = { anoLetivo: 2026 }
+    if (!user.escolaId) return []
+    const where: any = { escolaId: user.escolaId, anoLetivo: await anoLetivoAtualDaEscola(user.escolaId) }
 
     if (isTeacherOnly) {
         where.disciplinas = {

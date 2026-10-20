@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import EsquemaAvaliacaoClient from "./EsquemaAvaliacaoClient"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = {
   title: 'Áxis - Esquemas de Avaliação'
@@ -10,6 +11,7 @@ export const metadata = {
 export const runtime = 'nodejs'
 
 export default async function EsquemasAvaliacaoPage() {
+  await paginaDoModulo('NUC')
   const session = await auth()
 
   if (!session?.user?.escolaId || !session.user.isSuperuser) {

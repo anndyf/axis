@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
@@ -63,7 +64,7 @@ function normalizarCodTurma(codigo: string): string {
 
 
 
-export async function POST(
+export const POST = rotaDoModulo('NUC', 'escrita', async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -185,4 +186,4 @@ export async function POST(
     console.error('Erro verificar-horario:', error)
     return NextResponse.json({ message: 'Erro interno: ' + error.message }, { status: 500 })
   }
-}
+})

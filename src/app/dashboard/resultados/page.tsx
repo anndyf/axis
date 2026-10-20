@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { getTurmasPermitidas } from "@/lib/data-fetching"
 import { Session } from "next-auth"
 import ResultadosClient from "./ResultadosClient"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = {
   title: 'Áxis - Resultados'
@@ -43,6 +44,7 @@ async function getTurmasResultados(session: Session) {
 }
 
 export default async function ResultadosPage() {
+  await paginaDoModulo('RES')
   const session = await auth()
   
   if (!session) {

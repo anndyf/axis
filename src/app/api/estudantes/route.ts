@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { can } from '@/lib/rbac'
+import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
 // POST create estudante
-export async function POST(request: NextRequest) {
+export const POST = rotaDoModulo('NUC', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
 
@@ -113,10 +114,10 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+})
 
 // GET buscar estudantes
-export async function GET(request: NextRequest) {
+export const GET = rotaDoModulo('NUC', 'leitura', async function GET(request: NextRequest) {
   try {
     const session = await auth()
 
@@ -158,4 +159,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     )
   }
-}
+})

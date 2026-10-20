@@ -10,6 +10,7 @@ export const metadata = {
 }
 
 import { Session } from "next-auth"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
@@ -104,6 +105,7 @@ export default async function RecuperacaoTurmaPage({
 }: {
   params: Promise<{ turmaId: string }>
 }) {
+  await paginaDoModulo('NOT')
   const session = await auth()
 
   if (!session?.user?.escolaId) {

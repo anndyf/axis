@@ -9,6 +9,7 @@ import { carregarCalendario, anoLetivoDaTurma } from "@/lib/services/frequencia-
 import { planejarChamada, validarFaltas, hojeNaEscola, dataValida, chaveAula } from "@/lib/services/chamada"
 import { decidirReplicacao, disciplinasParaReplicar, sugerirData, temposNoDia } from "@/lib/services/diario"
 import { chaveData } from "@/lib/services/calendario"
+import { bloqueioDoModulo } from "@/lib/modulos/guarda"
 
 // Server actions podem ser chamadas direto pelo navegador: toda ação confere
 // sessão, papel e escola, e todo id recebido é conferido contra a escola.
@@ -40,6 +41,8 @@ async function usuario() {
  * disciplina.
  */
 export async function abrirChamada(turmaId: string, disciplinaId: string | null, data: string): Promise<ChamadaAberta | Erro> {
+  const bloqueado = await bloqueioDoModulo('DIA', 'escrita')
+  if (bloqueado) return { erro: bloqueado }
   const user = await usuario()
   if (!user) return { erro: "Não autorizado" }
   if (!dataValida(data)) return { erro: "Data inválida." }
@@ -125,6 +128,8 @@ async function aulaComAcesso(aulaId: string) {
  * Sem senha: o login identifica o professor e a aula guarda quem salvou.
  */
 export async function salvarChamada(aulaId: string, faltas: { estudanteId: string; tempos?: number[]; quantidade?: number }[], conteudo: string): Promise<{ ok: true } | Erro> {
+  const bloqueado = await bloqueioDoModulo('DIA', 'escrita')
+  if (bloqueado) return { erro: bloqueado }
   const ctx = await aulaComAcesso(aulaId)
   if (!ctx) return { erro: "Aula não encontrada" }
   const { user, aula } = ctx
@@ -146,6 +151,8 @@ export async function salvarChamada(aulaId: string, faltas: { estudanteId: strin
 
 /** Marca a aula como não dada: deixa de contar na frequência (as faltas ficam guardadas, sem efeito). */
 export async function cancelarAula(aulaId: string, motivo: string): Promise<{ ok: true } | Erro> {
+  const bloqueado = await bloqueioDoModulo('DIA', 'escrita')
+  if (bloqueado) return { erro: bloqueado }
   const ctx = await aulaComAcesso(aulaId)
   if (!ctx) return { erro: "Aula não encontrada" }
   const texto = typeof motivo === "string" ? motivo.trim().slice(0, 5000) : ""
@@ -160,6 +167,8 @@ export async function cancelarAula(aulaId: string, motivo: string): Promise<{ ok
  * sessão; o aluno precisa ser da turma da aula.
  */
 export async function salvarObservacao(aulaId: string, estudanteId: string, texto: string): Promise<{ ok: true } | Erro> {
+  const bloqueado = await bloqueioDoModulo('DIA', 'escrita')
+  if (bloqueado) return { erro: bloqueado }
   const ctx = await aulaComAcesso(aulaId)
   if (!ctx) return { erro: "Aula não encontrada" }
   const { user, aula } = ctx
@@ -236,6 +245,8 @@ async function contextoDoDestino(escolaId: string, turmaId: string, disciplinaId
 
 /** Opções do "Salvar e replicar": destinos com a data sugerida (ou `datas[disciplinaId]`, se pedida). */
 export async function opcoesReplicacao(aulaId: string, datas: Record<string, string> = {}): Promise<{ conteudo: string; alvos: AlvoReplicacao[] } | Erro> {
+  const bloqueado = await bloqueioDoModulo('DIA', 'leitura')
+  if (bloqueado) return { erro: bloqueado }
   const ctx = await destinosDaReplicacao(aulaId)
   if (!ctx) return { erro: "Aula não encontrada" }
   const { user, aula, destinos, calendario } = ctx
@@ -267,6 +278,8 @@ export type ResultadoReplicacao = { disciplinaId: string; status: "gravado" | "c
  * é trocado com `sobrescrever` (confirmação na tela).
  */
 export async function replicarConteudo(aulaId: string, alvos: { disciplinaId: string; data: string; sobrescrever?: boolean }[]): Promise<{ resultados: ResultadoReplicacao[] } | Erro> {
+  const bloqueado = await bloqueioDoModulo('DIA', 'escrita')
+  if (bloqueado) return { erro: bloqueado }
   const ctx = await destinosDaReplicacao(aulaId)
   if (!ctx) return { erro: "Aula não encontrada" }
   const { user, aula, destinos, calendario } = ctx

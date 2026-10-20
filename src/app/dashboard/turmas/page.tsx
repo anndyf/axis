@@ -12,10 +12,12 @@ import {
 import { getTurmasPermitidas } from "@/lib/data-fetching"
 import { decodeTurma } from "@/lib/turma-utils"
 import TurmasListClient from "@/components/TurmasListClient"
+import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
 
 export default async function TurmasPage() {
+  await paginaDoModulo('NUC')
   const session = await auth()
   
   if (!session) {
