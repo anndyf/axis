@@ -9,10 +9,12 @@ import { atividadesDaDisciplina } from '@/lib/services/notas-leitura'
 import {
   montarLancamentoAluno,
   ErroLancamento,
+  unidadeMudou,
   type UnidadePayload,
   type LancamentoAluno,
 } from '@/lib/services/lancamento-notas'
 import { rotaDoModulo } from '@/lib/modulos/guarda'
+import { contextoCadeado, verificarNotaUnidade, STATUS_CADEADO } from '@/lib/cadeado-unidade'
 
 export const runtime = 'nodejs'
 
@@ -109,23 +111,39 @@ export const POST = rotaDoModulo('NOT', 'escrita', async function POST(request: 
     })
     const existentePorAluno = new Map(existentes.map((n) => [n.estudanteId, n]))
 
+    // Cadeado (depois da regra de quem leciona): etapa encerrada não muda
+    const cadeado = await contextoCadeado(escolaId, disciplina.turma.id)
+    const trancadas = new Map<string, string>()
+    for (const u of esquema.unidades) {
+      const r = cadeado ? verificarNotaUnidade(cadeado, disciplinaId, u.id) : { ok: true as const }
+      if (!r.ok) trancadas.set(u.id, r.mensagem)
+    }
+
     // 1) Valida e calcula o lote inteiro, sem gravar nada
     const plano: { estudante: (typeof estudantes)[number]; lancamento: LancamentoAluno; existente: (typeof existentes)[number] | undefined }[] = []
     for (const item of notas) {
       const estudante = porMatricula.get(item.estudanteId)!
       const existente = existentePorAluno.get(estudante.id)
+      const unidadesExistentes = (existente?.unidades ?? []).map((u) => ({
+        ...u,
+        atividades: porProfessor
+          ? u.avaliacoes.map((a) => ({ esquemaAtividadeId: a.avaliacaoId, valor: a.valor }))
+          : u.atividades,
+      }))
       const lancamento = montarLancamentoAluno(
         esquemaLancamento,
         item.unidades,
-        (existente?.unidades ?? []).map((u) => ({
-          ...u,
-          atividades: porProfessor
-            ? u.avaliacoes.map((a) => ({ esquemaAtividadeId: a.avaliacaoId, valor: a.valor }))
-            : u.atividades,
-        })),
+        unidadesExistentes,
         existente?.status as StatusNota | undefined,
         item.estudanteId
       )
+      // Etapa encerrada: recusa o lote se ela mudaria; se não muda, não é regravada
+      for (const u of lancamento.unidades) {
+        const mensagem = trancadas.get(u.esquemaUnidadeId)
+        if (mensagem && unidadeMudou(u, unidadesExistentes.find((e) => e.esquemaUnidadeId === u.esquemaUnidadeId))) {
+          return NextResponse.json({ message: mensagem }, { status: STATUS_CADEADO })
+        }
+      }
       if (lancamento.tocado) plano.push({ estudante, lancamento, existente })
     }
 
@@ -143,6 +161,7 @@ export const POST = rotaDoModulo('NOT', 'escrita', async function POST(request: 
         ids.push({ notaId, criado: !existente })
 
         for (const u of lancamento.unidades) {
+          if (trancadas.has(u.esquemaUnidadeId)) continue
           const campos = { notaCalculada: u.notaCalculada, notaRecuperacao: u.notaRecuperacao, isDesistente: u.isDesistente }
           const notaUnidade = await tx.notaUnidade.upsert({
             where: { notaFinalId_esquemaUnidadeId: { notaFinalId: notaId, esquemaUnidadeId: u.esquemaUnidadeId } },

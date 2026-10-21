@@ -13,6 +13,7 @@ import {
   type EsquemaConfig,
 } from '@/lib/services/notas'
 import { rotaDoModulo } from '@/lib/modulos/guarda'
+import { contextoCadeado, verificarRecuperacaoOuConselho, STATUS_CADEADO, type ContextoCadeado } from '@/lib/cadeado-unidade'
 
 export const runtime = 'nodejs'
 
@@ -56,6 +57,22 @@ export const POST = rotaDoModulo('NOT', 'escrita', async function POST(request: 
         // Mas podemos permitir o salvamento sem o modificador se necessário, 
         // ou pedir para logar novamente.
         return NextResponse.json({ message: 'Sessão expirada ou usuário não encontrado. Por favor, saia e entre novamente no sistema.' }, { status: 401 })
+    }
+
+    // Cadeado (depois da regra de quem leciona): a recuperação final segue a
+    // última unidade do esquema. Conferido para o lote inteiro antes de
+    // gravar qualquer nota (a gravação abaixo não é atômica).
+    const alvos = await prisma.notaFinal.findMany({
+      where: { id: { in: notas.map((n: { notaId?: unknown }) => String(n?.notaId)) }, estudante: { escolaId }, disciplina: { usuariosPermitidos: { some: { id: userId } } } },
+      select: { disciplinaId: true, disciplina: { select: { turmaId: true } } },
+    })
+    const contextos = new Map<string, ContextoCadeado | null>()
+    for (const a of alvos) {
+      const turmaId = a.disciplina.turmaId
+      if (!contextos.has(turmaId)) contextos.set(turmaId, await contextoCadeado(escolaId, turmaId))
+      const ctx = contextos.get(turmaId)
+      const r = ctx ? verificarRecuperacaoOuConselho(ctx, a.disciplinaId) : { ok: true as const }
+      if (!r.ok) return NextResponse.json({ message: r.mensagem }, { status: STATUS_CADEADO })
     }
 
     // Processar cada nota de recuperação

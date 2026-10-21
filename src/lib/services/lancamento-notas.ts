@@ -162,3 +162,16 @@ export function montarLancamentoAluno(
     })),
   }
 }
+
+/**
+ * A etapa recebida muda o que já está gravado? (cadeado de unidade: numa
+ * etapa encerrada, só passa o lote que não altera nada nela.) Compara o que
+ * o professor lança - atividades, recuperação, infrequente - e não a nota
+ * calculada, que deriva delas.
+ */
+export function unidadeMudou(nova: UnidadeParaSalvar, existente: UnidadeExistente | undefined): boolean {
+  if (nova.isDesistente !== (existente?.isDesistente ?? false)) return true
+  if ((nova.notaRecuperacao ?? null) !== (existente?.notaRecuperacao ?? null)) return true
+  const salvos = new Map((existente?.atividades ?? []).map((a) => [a.esquemaAtividadeId, a.valor ?? null]))
+  return nova.atividades.some((a) => (a.valor ?? null) !== (salvos.get(a.esquemaAtividadeId) ?? null))
+}
