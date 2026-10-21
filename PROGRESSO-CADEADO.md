@@ -12,7 +12,7 @@ Ambiente: PostgreSQL 16 local, `axis_dev` e `axis_test` com `timezone = America/
 - [ ] Etapa 5 — telas
 - [ ] Encerramento (PR)
 
-**Próximo passo:** Etapa 3 (resto) / Etapa 4 — escrever `src/lib/cadeado-unidade.ts` (situação das unidades + podeGravarNotaUnidade/podeGravarAula/podeGravarRecuperacaoOuConselho) e as actions de encerrar/desfazer/reabrir/revogar.
+**Próximo passo:** Etapa 4 — aplicar o cadeado nos pontos de gravação (api/notas/lancar, api/notas/recuperacao, api/conselho-classe, chamada/actions.ts, notas/avaliacoes/actions.ts e demais) + teste de cobertura + testes de integração.
 
 ## Etapa 1 — fuso
 - `logAudit` (src/lib/audit.ts) grava UTC verdadeiro (`@default(now())` do Prisma). O caminho alternativo em SQL bruto foi retirado (morto: o modelo `auditLog` sempre existe; e um `Date` do JS passado como parâmetro de SQL bruto é convertido para a hora local do banco — conferido).
