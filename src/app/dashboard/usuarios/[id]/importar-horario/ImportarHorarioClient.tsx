@@ -217,11 +217,11 @@ export default function ImportarHorarioClient({
                 <p className="text-2xl font-semibold text-success-fg">{resultado.encontrados.length}</p>
                 <p className="text-xs font-bold text-success-fg mt-1">Encontrados</p>
               </div>
-              <div className={`rounded-lg border p-4 text-center${resultado.naoEncontrados.length > 0 ? 'bg-danger-subtle border-danger-line' : 'bg-canvas border-line'}`}>
-                <p className={`text-2xl font-semibold${resultado.naoEncontrados.length > 0 ? 'text-danger-fg' : 'text-fg-subtle'}`}>
+              <div className={`rounded-lg border p-4 text-center ${resultado.naoEncontrados.length > 0 ? 'bg-danger-subtle border-danger-line' : 'bg-canvas border-line'}`}>
+                <p className={`text-2xl font-semibold ${resultado.naoEncontrados.length > 0 ? 'text-danger-fg' : 'text-fg-subtle'}`}>
                   {resultado.naoEncontrados.length}
                 </p>
-                <p className={`text-xs font-bold mt-1${resultado.naoEncontrados.length > 0 ? 'text-danger' : 'text-fg-subtle'}`}>Não encontrados</p>
+                <p className={`text-xs font-bold mt-1 ${resultado.naoEncontrados.length > 0 ? 'text-danger' : 'text-fg-subtle'}`}>Não encontrados</p>
               </div>
             </div>
 
@@ -252,7 +252,7 @@ export default function ImportarHorarioClient({
                   {novasParaVincular.map((e, i) => (
                     <label
                       key={i}
-                      className={`flex items-center gap-4 px-4 py-3.5 cursor-pointer transition-colors${
+                      className={`flex items-center gap-4 px-4 py-3.5 cursor-pointer transition-colors ${
                         confirmados.has(e.discId) ? 'bg-success-subtle' : 'hover:bg-canvas'
                       }`}
                     >
@@ -275,7 +275,7 @@ export default function ImportarHorarioClient({
                           </p>
                         )}
                       </div>
-                      <CheckCircle2 className={`w-4 h-4 shrink-0${confirmados.has(e.discId) ? 'text-success-fg' : 'text-fg-disabled'}`} />
+                      <CheckCircle2 className={`w-4 h-4 shrink-0 ${confirmados.has(e.discId) ? 'text-success-fg' : 'text-fg-disabled'}`} />
                     </label>
                   ))}
                 </div>

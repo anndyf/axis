@@ -167,7 +167,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
             )}
             <button
                onClick={() => setShowOnlySelected(!showOnlySelected)}
-               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border${
+               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
                  showOnlySelected 
                  ? 'bg-accent-subtle text-accent-fg border-accent shadow-card' 
                  : 'bg-surface text-fg-subtle border-line hover:border-line-strong'
@@ -233,7 +233,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
               return (
                 <div 
                   key={turmaKey} 
-                  className={`bg-surface rounded-xl border transition-all overflow-hidden${
+                  className={`bg-surface rounded-xl border transition-all overflow-hidden ${
                     isExpanded ? 'ring-2 ring-zinc-900 border-transparent shadow-card' : 'border-line-strong hover:border-zinc-400'
                   }`}
                 >
@@ -243,7 +243,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
                     className="w-full px-4 py-3 flex items-center justify-between hover:bg-canvas transition-colors text-left"
                   >
                     <div className="flex items-center space-x-4">
-                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all${
+                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all ${
                         isExpanded ? 'bg-subtle border border-line text-fg' : 'bg-subtle-hover text-fg-muted'
                       }`}>
                         <School className="w-6 h-6" />
@@ -278,17 +278,17 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
                           return (
                             <label 
                               key={disc.id} 
-                              className={`group flex flex-col p-4 rounded-lg border-2 transition-all cursor-pointer relative${
+                              className={`group flex flex-col p-4 rounded-lg border-2 transition-all cursor-pointer relative ${
                                 isSelected 
                                   ? 'bg-subtle border-zinc-700 shadow-sm' 
                                   : 'bg-surface border-line hover:border-line-strong'
-                              }${outroProfessor && !isSelected ? 'border-warning-line bg-warning-subtle' : ''}`}
+                              } ${outroProfessor && !isSelected ? 'border-warning-line bg-warning-subtle' : ''}`}
                             >
                               <div className="flex items-center justify-between w-full">
-                                <span className={`text-sm font-semibold flex-grow${isSelected ? 'text-accent-fg' : 'text-fg-muted'}`}>
+                                <span className={`text-sm font-semibold flex-grow ${isSelected ? 'text-accent-fg' : 'text-fg-muted'}`}>
                                   {disc.nome}
                                 </span>
-                                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all${
+                                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
                                   isSelected ? 'border-zinc-700 bg-zinc-700' : 'border-line-strong group-hover:border-line-strong'
                                 }`}>
                                   <input

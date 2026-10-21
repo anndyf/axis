@@ -97,7 +97,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
 
       <main className="space-y-4">
         {aviso && (
-          <div className={`p-4 rounded-xl border text-sm flex items-center gap-2${aviso.tipo === "ok" ? "bg-success-subtle border-success-line text-success-fg" : "bg-danger-subtle border-danger-line text-danger-fg"}`}>
+          <div className={`p-4 rounded-xl border text-sm flex items-center gap-2 ${aviso.tipo === "ok" ? "bg-success-subtle border-success-line text-success-fg" : "bg-danger-subtle border-danger-line text-danger-fg"}`}>
             {aviso.tipo === "ok" ? <CheckCircle2 className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}
             {aviso.texto}
           </div>
@@ -181,7 +181,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
                                 ))}
                               </select>
                               {disciplinaId && (
-                                <span className={`text-xs font-medium mt-0.5 truncate w-full px-1${professor ? "text-fg-subtle" : "text-warning-fg"}`}>
+                                <span className={`text-xs font-medium mt-0.5 truncate w-full px-1 ${professor ? "text-fg-subtle" : "text-warning-fg"}`}>
                                   {professor ?? "sem professor vinculado"}
                                 </span>
                               )}
@@ -225,7 +225,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
                     <tr key={d.id}>
                       <td className="px-4 py-2 text-fg">{d.nome}</td>
                       <td className="px-4 py-2 text-center">{temposSemana.get(d.id) ?? 0}</td>
-                      <td className={`px-4 py-2 text-center${abaixo ? "text-danger-fg font-medium" : ""}`}>{previstas ? prev : "—"}</td>
+                      <td className={`px-4 py-2 text-center ${abaixo ? "text-danger-fg font-medium" : ""}`}>{previstas ? prev : "—"}</td>
                       <td className="px-4 py-2 text-center text-fg-subtle">{d.cargaHoraria ?? "—"}</td>
                     </tr>
                   )

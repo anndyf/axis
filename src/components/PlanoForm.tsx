@@ -1,5 +1,6 @@
 "use client"
 
+import { erroDeData } from "@/lib/navegador/mascaras"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { 
@@ -94,6 +95,9 @@ export default function PlanoForm({ plano, onSuccess, onClose }: PlanoFormProps)
     setFormData({ ...formData, turmasIds: current })
   }
 
+  // Validação no navegador (o servidor continua validando): fim não pode ser antes do início
+  const erroFim = erroDeData(formData.periodoFim, { min: formData.periodoInicio || undefined, rotuloMin: "à data de início" })
+
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
       <div className="bg-surface w-full max-w-4xl max-h-[90vh] rounded-xl shadow-overlay flex flex-col overflow-hidden animate-pop-in border border-line-subtle">
@@ -156,8 +160,9 @@ export default function PlanoForm({ plano, onSuccess, onClose }: PlanoFormProps)
                     <label className="text-xs font-bold text-fg-subtle ml-1">Fim</label>
                     <div className="relative">
                       <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-fg-subtle" />
-                      <input type="date" required className="w-full h-10 pl-8 pr-3 bg-canvas border border-line-subtle rounded-xl text-xs font-semibold text-fg-muted" value={formData.periodoFim} onChange={e => setFormData({...formData, periodoFim: e.target.value})} />
+                      <input type="date" required min={formData.periodoInicio || undefined} aria-invalid={!!erroFim || undefined} aria-describedby={erroFim ? "plano-erro-fim" : undefined} className="w-full h-10 pl-8 pr-3 bg-canvas border border-line-subtle rounded-xl text-xs font-semibold text-fg-muted aria-[invalid=true]:border-danger" value={formData.periodoFim} onChange={e => setFormData({...formData, periodoFim: e.target.value})} />
                     </div>
+                    {erroFim && <p id="plano-erro-fim" role="alert" className="text-xs text-danger-fg">{erroFim}</p>}
                  </div>
               </div>
 
@@ -185,7 +190,7 @@ export default function PlanoForm({ plano, onSuccess, onClose }: PlanoFormProps)
                           {disciplinaData[selectedDisc][selectedClusterKey].map((turma: Turma) => (
                               <button
                                 key={turma.id} type="button" onClick={() => toggleTurma(turma.id)}
-                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all${
+                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                                   formData.turmasIds.includes(turma.id) ? 'bg-accent text-on-accent shadow-card ' : 'bg-canvas text-fg-subtle border border-line-subtle hover:bg-subtle'
                                 }`}
                               >
@@ -221,7 +226,7 @@ export default function PlanoForm({ plano, onSuccess, onClose }: PlanoFormProps)
 
 function TextField({ icon, title, value, onChange, placeholder, rows = 4, full = false }: any) {
     return (
-        <div className={`space-y-1.5${full ? 'md:col-span-2' : ''}`}>
+        <div className={`space-y-1.5 ${full ? 'md:col-span-2' : ''}`}>
             <label className="text-xs font-bold text-fg-subtle ml-1 flex items-center gap-2">
                 {icon} {title}
             </label>

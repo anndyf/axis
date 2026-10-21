@@ -233,7 +233,7 @@ export default function RecuperacaoTurmaClient({
           </div>
 
           {message && (
-            <div className={`p-3 flex items-center gap-2 border-b${message.type === 'success' ? 'bg-success-subtle text-success-fg border-success-line' : 'bg-danger-subtle text-danger-fg border-danger-line'}`}>
+            <div className={`p-3 flex items-center gap-2 border-b ${message.type === 'success' ? 'bg-success-subtle text-success-fg border-success-line' : 'bg-danger-subtle text-danger-fg border-danger-line'}`}>
               {message.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
               <span className="text-sm font-medium">{message.text}</span>
             </div>
@@ -303,7 +303,7 @@ export default function RecuperacaoTurmaClient({
                             value={isFaltou || nota.status === 'DESISTENTE' ? '' : currentVal} 
                             disabled={!podeLancar || isFaltou || nota.status === 'DESISTENTE'}
                             onChange={(e) => handleNotaChange(nota.id, e.target.value)}
-                             className={`w-16 h-9 text-center border-2 rounded-xl text-base font-medium transition-all outline-none${
+                             className={`w-16 h-9 text-center border-2 rounded-xl text-base font-medium transition-all outline-none ${
                                  !podeLancar ? 'cursor-default border-transparent bg-transparent text-fg' :
                                  isFaltou || nota.status === 'DESISTENTE' ? 'bg-subtle-hover border-line text-fg-disabled pointer-events-none' : 
                                  isModified ? 'border-danger bg-surface ring-4 ring-danger/30 shadow-sm' : 'border-line bg-canvas focus:bg-surface focus:border-danger'
@@ -318,7 +318,7 @@ export default function RecuperacaoTurmaClient({
                            <input type="checkbox" checked={isFaltou} disabled={!podeLancar} onChange={(e) => toggleNaoRealizou(nota.id, e.target.checked)} className="w-5 h-5 text-danger-fg border-line-strong rounded-lg cursor-pointer transition-all" />
                         </td>
                         <td className="px-4 py-4 text-center">
-                            <span className={`inline-block whitespace-nowrap px-3 py-1 rounded-full text-xs font-medium border${
+                            <span className={`inline-block whitespace-nowrap px-3 py-1 rounded-full text-xs font-medium border ${
                               nota.status === 'DESISTENTE' ? 'text-danger-fg bg-danger-subtle border-danger-line' : status.class
                             }`}>
                              {nota.status === 'DESISTENTE' ? 'DESISTENTE' : status.text}

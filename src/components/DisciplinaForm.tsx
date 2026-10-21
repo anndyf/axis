@@ -360,13 +360,13 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
                                               return (
                                                 <label 
                                                   key={t.id} 
-                                                  className={`flex items-center p-2 rounded border cursor-pointer transition-all duration-200 group${
+                                                  className={`flex items-center p-2 rounded border cursor-pointer transition-all duration-200 group ${
                                                     isSelected 
                                                       ? 'bg-accent-subtle border-accent/25 ring-1 ring-ring' 
                                                       : 'hover:bg-canvas border-line'
                                                   }`}
                                                 >
-                                                  <div className={`flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center mr-2 transition-colors${
+                                                  <div className={`flex-shrink-0 w-4 h-4 rounded border flex items-center justify-center mr-2 transition-colors ${
                                                     isSelected ? 'bg-accent border-accent' : 'border-line-strong bg-surface'
                                                   }`}>
                                                     {isSelected && <CheckSquare className="w-3 h-3 text-white" />}
@@ -380,7 +380,7 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
                                                       }}
                                                     />
                                                   </div>
-                                                  <span className={`text-xs font-medium${isSelected ? 'text-accent-fg' : 'text-fg-muted'}`}>
+                                                  <span className={`text-xs font-medium ${isSelected ? 'text-accent-fg' : 'text-fg-muted'}`}>
                                                     {t.nome}
                                                   </span>
                                                 </label>

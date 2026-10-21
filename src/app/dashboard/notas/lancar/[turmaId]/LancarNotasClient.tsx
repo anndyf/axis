@@ -424,7 +424,7 @@ export default function LancarNotasTurmaClient({
           </div>
 
           {message && (
-            <div className={`p-3 flex items-center gap-2 border-b${message.type === 'success' ? 'bg-success-subtle text-success-fg border-success-line' : 'bg-danger-subtle text-danger-fg border-danger-line'}`}>
+            <div className={`p-3 flex items-center gap-2 border-b ${message.type === 'success' ? 'bg-success-subtle text-success-fg border-success-line' : 'bg-danger-subtle text-danger-fg border-danger-line'}`}>
               {message.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
               <span className="text-sm font-medium">{message.text}</span>
             </div>
@@ -521,16 +521,16 @@ export default function LancarNotasTurmaClient({
                     const isDesistenteGeral = statusMap[estudante.matricula] === 'DESISTENTE'
 
                     return (
-                      <tr key={estudante.matricula} className={`hover:bg-canvas transition-colors${isDesistenteGeral ? 'bg-warning-subtle grayscale-[0.5]' : ''}`}>
+                      <tr key={estudante.matricula} className={`hover:bg-canvas transition-colors ${isDesistenteGeral ? 'bg-warning-subtle grayscale-[0.5]' : ''}`}>
                         <td className="px-3 py-2 text-sm text-fg-subtle font-medium text-center">{index + 1}</td>
                         <td className="px-3 py-2">
                           <div className="flex flex-col relative group/name">
                              <div className="flex items-center gap-2">
-                                <span className={`text-sm font-medium${isDesistenteGeral ? 'text-warning-fg' : 'text-fg'}`}>{estudante.nome}</span>
+                                <span className={`text-sm font-medium ${isDesistenteGeral ? 'text-warning-fg' : 'text-fg'}`}>{estudante.nome}</span>
                                 {estudante.aeeProfile && (
                                    <Link
                                      href={`/dashboard/aee/${estudante.matricula}`}
-                                     className={`p-1.5 rounded-full border-2 transition-all flex items-center justify-center${
+                                     className={`p-1.5 rounded-full border-2 transition-all flex items-center justify-center ${
                                        estudante.aeeProfile.acknowledgements.length > 0
                                        ? 'bg-success-subtle border-success text-success-fg'
                                        : 'bg-warning-subtle border-warning text-warning-fg animate-pulse'
@@ -560,7 +560,7 @@ export default function LancarNotasTurmaClient({
                                     type="number" step="0.1" inputMode="decimal"
                                     value={val}
                                     onChange={(e) => atividade && handleAtividadeChange(estudante.matricula, u.id, atividade.id, e.target.value, atividade.notaMaxima)}
-                                    className={`w-10 h-8 text-center border rounded-md text-sm font-medium transition-all outline-none${
+                                    className={`w-10 h-8 text-center border rounded-md text-sm font-medium transition-all outline-none ${
                                       unidadeEstado.isDesistente ? 'bg-warning-subtle border-warning-line text-warning-fg' :
                                       isModified ? 'border-zinc-400 bg-surface ring-4 ring-zinc-500/5' : 'border-line bg-canvas focus:bg-surface focus:border-zinc-400'
                                     }`}
@@ -569,7 +569,7 @@ export default function LancarNotasTurmaClient({
                                   <button
                                       type="button"
                                       onClick={() => handleDesistenteChange(estudante.matricula, u.id, !unidadeEstado.isDesistente)}
-                                      className={`absolute -right-3 -bottom-2 p-1.5 rounded-full transition-all flex items-center justify-center${
+                                      className={`absolute -right-3 -bottom-2 p-1.5 rounded-full transition-all flex items-center justify-center ${
                                           unidadeEstado.isDesistente
                                           ? 'bg-warning-subtle text-warning-fg scale-100 z-10 ring-2 ring-white'
                                           : 'bg-surface text-fg-disabled hover:text-warning-fg hover:bg-warning-subtle scale-100 opacity-60 hover:opacity-100 group-hover:opacity-100 border border-line-strong z-10'
@@ -599,7 +599,7 @@ export default function LancarNotasTurmaClient({
                                         type="number" step="0.1" inputMode="decimal"
                                         value={val}
                                         onChange={(e) => handleAtividadeChange(estudante.matricula, u.id, a.id, e.target.value, a.notaMaxima)}
-                                        className={`w-10 h-9 text-center border-2 rounded-xl text-sm font-medium transition-all outline-none${
+                                        className={`w-10 h-9 text-center border-2 rounded-xl text-sm font-medium transition-all outline-none ${
                                           unidadeEstado.isDesistente ? 'bg-warning-subtle border-warning-line text-warning-fg' :
                                           isModified ? 'border-zinc-400 bg-surface ring-4 ring-zinc-500/5' : 'border-line bg-canvas focus:bg-surface focus:border-zinc-400'
                                         }`}
@@ -609,7 +609,7 @@ export default function LancarNotasTurmaClient({
                                         <button
                                             type="button"
                                             onClick={() => handleDesistenteChange(estudante.matricula, u.id, !unidadeEstado.isDesistente)}
-                                            className={`absolute -right-3 -bottom-2 p-1.5 rounded-full transition-all flex items-center justify-center${
+                                            className={`absolute -right-3 -bottom-2 p-1.5 rounded-full transition-all flex items-center justify-center ${
                                                 unidadeEstado.isDesistente
                                                 ? 'bg-warning-subtle text-warning-fg scale-100 z-10 ring-2 ring-white'
                                                 : 'bg-surface text-fg-disabled hover:text-warning-fg hover:bg-warning-subtle scale-100 opacity-60 hover:opacity-100 group-hover:opacity-100 border border-line-strong z-10'
@@ -624,7 +624,7 @@ export default function LancarNotasTurmaClient({
                                 )
                               })}
                               <td key={`${u.id}-subtotal`} className="px-2 py-4 text-center bg-canvas/60">
-                                <span className={`text-sm font-bold${subtotal !== null && subtotal < minimoAprovacao ? 'text-danger-fg' : 'text-fg-muted'}`}>
+                                <span className={`text-sm font-bold ${subtotal !== null && subtotal < minimoAprovacao ? 'text-danger-fg' : 'text-fg-muted'}`}>
                                   {subtotal !== null ? subtotal.toFixed(1) : '-'}
                                 </span>
                               </td>
@@ -632,7 +632,7 @@ export default function LancarNotasTurmaClient({
                           )
                         })}
                         <td className="px-3 py-2 text-center">
-                          <span className={`text-base font-medium${getStatusColor(media)}`}>{media.texto}</span>
+                          <span className={`text-base font-medium ${getStatusColor(media)}`}>{media.texto}</span>
                         </td>
                       </tr>
                     )
@@ -662,7 +662,7 @@ export default function LancarNotasTurmaClient({
                           <p className="flex flex-wrap items-center gap-2 break-words text-base font-medium text-fg">
                             {estudante.nome}
                             {estudante.aeeProfile && (
-                              <Link href={`/dashboard/aee/${estudante.matricula}`} aria-label={estudante.aeeProfile.acknowledgements.length > 0 ? "Ficha AEE (lida)" : "Ficha AEE: leitura pendente"} className={`flex size-8 items-center justify-center rounded-full border-2${estudante.aeeProfile.acknowledgements.length > 0 ? 'border-success bg-success-subtle text-success-fg' : 'border-warning bg-warning-subtle text-warning-fg'}`}>
+                              <Link href={`/dashboard/aee/${estudante.matricula}`} aria-label={estudante.aeeProfile.acknowledgements.length > 0 ? "Ficha AEE (lida)" : "Ficha AEE: leitura pendente"} className={`flex size-8 items-center justify-center rounded-full border-2 ${estudante.aeeProfile.acknowledgements.length > 0 ? 'border-success bg-success-subtle text-success-fg' : 'border-warning bg-warning-subtle text-warning-fg'}`}>
                                 <Accessibility className="size-4" />
                               </Link>
                             )}
@@ -671,7 +671,7 @@ export default function LancarNotasTurmaClient({
                         </div>
                         <div className="shrink-0 text-right">
                           <p className="text-xs text-fg-subtle">Média</p>
-                          <p className={`text-lg font-semibold tabular-nums${getStatusColor(media)}`}>{media.texto}</p>
+                          <p className={`text-lg font-semibold tabular-nums ${getStatusColor(media)}`}>{media.texto}</p>
                         </div>
                       </div>
                       <div className="mt-3 space-y-3">
@@ -679,16 +679,16 @@ export default function LancarNotasTurmaClient({
                           const ue = estado[u.id] || { isDesistente: false, atividades: {} }
                           const subtotal = isSimples ? null : calcularSubtotalUnidade(estudante.matricula, u)
                           return (
-                            <fieldset key={u.id} className={`rounded-xl p-3${ue.isDesistente ? 'bg-warning-subtle' : 'bg-subtle'}`}>
+                            <fieldset key={u.id} className={`rounded-xl p-3 ${ue.isDesistente ? 'bg-warning-subtle' : 'bg-subtle'}`}>
                               <legend className="sr-only">{u.nome}</legend>
                               <div className="flex items-center gap-2">
                                 <span className="min-w-0 flex-1 text-13 font-medium text-fg">{u.nome}</span>
-                                {subtotal !== null && <span className={`text-13 font-semibold tabular-nums${subtotal < minimoAprovacao ? 'text-danger-fg' : 'text-fg-muted'}`}>Subtotal {subtotal.toFixed(1)}</span>}
+                                {subtotal !== null && <span className={`text-13 font-semibold tabular-nums ${subtotal < minimoAprovacao ? 'text-danger-fg' : 'text-fg-muted'}`}>Subtotal {subtotal.toFixed(1)}</span>}
                                 <button
                                   type="button"
                                   aria-pressed={ue.isDesistente}
                                   onClick={() => handleDesistenteChange(estudante.matricula, u.id, !ue.isDesistente)}
-                                  className={`flex min-h-9 items-center gap-1 rounded-full px-3 text-xs font-medium${ue.isDesistente ? 'bg-surface text-warning-fg' : 'text-fg-subtle'}`}
+                                  className={`flex min-h-9 items-center gap-1 rounded-full px-3 text-xs font-medium ${ue.isDesistente ? 'bg-surface text-warning-fg' : 'text-fg-subtle'}`}
                                 >
                                   <UserMinus size={14} aria-hidden /> Infrequente
                                 </button>
@@ -710,7 +710,7 @@ export default function LancarNotasTurmaClient({
                                           value={val}
                                           onChange={(e) => onNota(estudante.matricula, u.id, a.id, e.target.value, a.notaMaxima)}
                                           aria-label={`${u.nome}, ${a.nome}: nota de ${estudante.nome}`}
-                                          className={`mt-1 h-11 w-full rounded-lg border px-3 text-center text-base font-medium tabular-nums outline-none focus:border-accent focus:ring-3 focus:ring-ring/40${val !== orig && !saving ? 'border-accent bg-surface' : 'border-transparent bg-surface'}`}
+                                          className={`mt-1 h-11 w-full rounded-lg border px-3 text-center text-base font-medium tabular-nums outline-none focus:border-accent focus:ring-3 focus:ring-ring/40 ${val !== orig && !saving ? 'border-accent bg-surface' : 'border-transparent bg-surface'}`}
                                           placeholder="—"
                                         />
                                       </label>
@@ -814,7 +814,7 @@ export default function LancarNotasTurmaClient({
 
             <button
               onClick={() => setFeedbackModal(null)}
-              className={`w-full py-3.5 rounded-lg font-semibold text-sm transition-all${
+              className={`w-full py-3.5 rounded-lg font-semibold text-sm transition-all ${
                 feedbackModal.type === 'success'
                   ? 'bg-accent text-on-accent hover:bg-accent-hover '
                   : 'bg-danger text-on-accent hover:bg-danger '

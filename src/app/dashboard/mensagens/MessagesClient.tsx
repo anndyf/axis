@@ -297,13 +297,13 @@ export default function MessagesClient({
               <div className="flex bg-subtle p-1.5 rounded-lg w-full sm:w-auto">
                 <button
                   onClick={() => setActiveTab("inbox")}
-                  className={`px-4 py-3 text-xs font-bold rounded-xl transition-all${activeTab === 'inbox' ? 'bg-surface text-accent-fg shadow-sm' : 'text-fg-subtle hover:text-fg-muted'}`}
+                  className={`px-4 py-3 text-xs font-bold rounded-xl transition-all ${activeTab === 'inbox' ? 'bg-surface text-accent-fg shadow-sm' : 'text-fg-subtle hover:text-fg-muted'}`}
                 >
                   Fila de Chamados
                 </button>
                 <button
                   onClick={() => setActiveTab("sent")}
-                  className={`px-4 py-3 text-xs font-bold rounded-xl transition-all${activeTab === 'sent' ? 'bg-surface text-accent-fg shadow-sm' : 'text-fg-subtle hover:text-fg-muted'}`}
+                  className={`px-4 py-3 text-xs font-bold rounded-xl transition-all ${activeTab === 'sent' ? 'bg-surface text-accent-fg shadow-sm' : 'text-fg-subtle hover:text-fg-muted'}`}
                 >
                   Meus Chamados
                 </button>
@@ -340,7 +340,7 @@ export default function MessagesClient({
                   <div 
                     key={msg.id}
                     onClick={() => handleSelectMessage(msg)}
-                    className={`group p-4 rounded-xl cursor-pointer transition-all border flex flex-col justify-between min-h-[160px]${
+                    className={`group p-4 rounded-xl cursor-pointer transition-all border flex flex-col justify-between min-h-[160px] ${
                       isUnread 
                         ? 'bg-accent-subtle border-accent/25 shadow-card ' 
                         : 'bg-surface border-line hover:border-accent/25 hover:shadow-card '
@@ -349,11 +349,11 @@ export default function MessagesClient({
                     <div>
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className={`px-2 py-1 rounded-lg text-xs font-semibold border${style.bg}${style.text}${style.border}`}>
+                          <span className={`px-2 py-1 rounded-lg text-xs font-semibold border ${style.bg} ${style.text} ${style.border}`}>
                             {style.label}
                           </span>
                           {!msg.isResolved && msg.category !== 'GERAL' && (
-                            <span className={`px-2 py-1 rounded-lg text-xs font-semibold${statusData.color}border border-current opacity-80`}>
+                            <span className={`px-2 py-1 rounded-lg text-xs font-semibold ${statusData.color} border border-current opacity-80`}>
                               {statusData.label}
                             </span>
                           )}
@@ -366,7 +366,7 @@ export default function MessagesClient({
                         )}
                       </div>
                       
-                      <h4 className={`text-base leading-tight mb-2${isUnread ? 'font-semibold text-fg' : 'font-bold text-fg'}`}>
+                      <h4 className={`text-base leading-tight mb-2 ${isUnread ? 'font-semibold text-fg' : 'font-bold text-fg'}`}>
                         {msg.ticketNumber ? <span className="text-accent-fg mr-2">#{msg.ticketNumber}</span> : ''}
                         {msg.subject.replace(/\[Ticket\]|\[Cadastro Pendente\]/gi, '').trim() || 'Sem Assunto'}
                       </h4>
@@ -382,7 +382,7 @@ export default function MessagesClient({
                     </div>
 
                     <div className="flex items-center justify-between mt-auto pt-4 border-t border-line-subtle/80">
-                      <span className={`text-xs font-semibold${priorityData.color}`}>
+                      <span className={`text-xs font-semibold ${priorityData.color}`}>
                         Prio: {priorityData.label}
                       </span>
                       <span className="text-xs font-bold text-fg-subtle">
@@ -642,7 +642,7 @@ export default function MessagesClient({
                     <span className="text-xs font-semibold text-fg-subtle">
                       CHAMADO #{selectedMessage.ticketNumber || selectedMessage.id.substring(selectedMessage.id.length - 6).toUpperCase()}
                     </span>
-                    <span className={`px-2 py-0.5 rounded-md text-xs font-semibold border${getCatStyles(selectedMessage.category).bg}${getCatStyles(selectedMessage.category).text}${getCatStyles(selectedMessage.category).border}`}>
+                    <span className={`px-2 py-0.5 rounded-md text-xs font-semibold border ${getCatStyles(selectedMessage.category).bg} ${getCatStyles(selectedMessage.category).text} ${getCatStyles(selectedMessage.category).border}`}>
                       {getCatStyles(selectedMessage.category).label}
                     </span>
                   </div>
@@ -712,12 +712,12 @@ export default function MessagesClient({
                 const isMe = m.senderId === currentUserId
                 return (
                   <div key={m.id} className="animate-slide-up">
-                    <div className={`w-full p-4 rounded-xl border${
+                    <div className={`w-full p-4 rounded-xl border ${
                       isMe ? 'bg-surface border-accent/25' : 'bg-surface border-line'
                     }`}>
                       <div className="flex items-center justify-between mb-6 pb-5 border-b border-line-subtle">
                         <div className="flex items-center gap-4">
-                           <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-semibold text-lg${
+                           <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-semibold text-lg ${
                              isMe ? 'bg-accent text-on-accent shadow-card ' : 'bg-subtle text-fg-muted'
                            }`}>
                              {m.sender?.name?.charAt(0) || m.sender?.username?.charAt(0) || '?'}

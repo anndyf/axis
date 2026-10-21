@@ -158,7 +158,7 @@ export default async function AuditoriaPage({
           <div className="flex flex-wrap gap-2 w-full md:w-auto">
             <Link 
               href={`/dashboard/auditoria?${userFilter ? `user=${userFilter}&` : ''}${query ? `q=${query}` : ''}`} 
-              className={`px-4 py-2 rounded-xl text-xs font-medium border transition-all${
+              className={`px-4 py-2 rounded-xl text-xs font-medium border transition-all ${
                 !entityFilter ? 'bg-surface border border-line border-zinc-700 text-fg' : 'border-line-strong text-fg-muted hover:bg-canvas'
               }`}
             >
@@ -168,7 +168,7 @@ export default async function AuditoriaPage({
               <Link 
                 key={filter} 
                 href={`/dashboard/auditoria?entity=${filter}${query ? `&q=${query}` : ''}${userFilter ? `&user=${userFilter}` : ''}`}
-                className={`px-4 py-2 rounded-xl text-xs font-medium border transition-all${
+                className={`px-4 py-2 rounded-xl text-xs font-medium border transition-all ${
                   entityFilter === filter ? 'bg-surface border border-line border-zinc-700 text-fg' : 'border-line-strong text-fg-muted hover:bg-canvas'
                 }`}
               >
@@ -221,7 +221,7 @@ export default async function AuditoriaPage({
                     </div>
                   </td>
                   <td className="px-4 py-2.5">
-                    <span className={`px-3 py-1 rounded-lg text-xs font-medium${
+                    <span className={`px-3 py-1 rounded-lg text-xs font-medium ${
                       log.action === 'INSERT' ? 'bg-success-subtle text-success-fg' :
                       log.action === 'UPDATE' ? 'bg-subtle text-fg-muted' :
                       'bg-danger-subtle text-danger-fg'
@@ -325,7 +325,7 @@ export default async function AuditoriaPage({
           <div className="bg-canvas border-t border-line px-4 py-4 flex items-center justify-between">
             <Link 
               href={page > 1 ? `/dashboard/auditoria?page=${page - 1}${entityFilter ? `&entity=${entityFilter}` : ''}${query ? `&q=${query}` : ''}${userFilter ? `&user=${userFilter}` : ''}` : '#'} 
-              className={`px-4 py-2 rounded-lg text-xs font-medium transition-all${
+              className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${
                 page > 1 ? 'bg-surface border border-line-strong text-fg-muted hover:bg-subtle' : 'opacity-50 cursor-not-allowed bg-subtle text-fg-subtle border border-line'
               }`}
             >
@@ -336,7 +336,7 @@ export default async function AuditoriaPage({
             </span>
             <Link 
               href={logs.length === limit ? `/dashboard/auditoria?page=${page + 1}${entityFilter ? `&entity=${entityFilter}` : ''}${query ? `&q=${query}` : ''}${userFilter ? `&user=${userFilter}` : ''}` : '#'} 
-              className={`px-4 py-2 rounded-lg text-xs font-medium transition-all${
+              className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${
                 logs.length === limit ? 'bg-surface border border-line-strong text-fg-muted hover:bg-subtle' : 'opacity-50 cursor-not-allowed bg-subtle text-fg-subtle border border-line'
               }`}
             >

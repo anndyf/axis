@@ -326,7 +326,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                       key={mod}
                       type="button"
                       onClick={() => setFormData(prev => ({ ...prev, modalidade: mod, curso: "", turno: "" }))}
-                      className={`py-2.5 rounded-xl font-semibold text-xs transition-all border-2${
+                      className={`py-2.5 rounded-xl font-semibold text-xs transition-all border-2 ${
                         formData.modalidade === mod 
                         ? 'bg-accent-subtle border-accent text-accent-fg shadow-card' 
                         : 'bg-canvas border-line-subtle text-fg hover:border-line hover:bg-surface'
@@ -407,7 +407,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                       <button
                         key={s} type="button"
                         onClick={() => setFormData(p => ({ ...p, serie: s }))}
-                        className={`flex-1 py-2.5 rounded-lg font-semibold text-sm transition-all border${
+                        className={`flex-1 py-2.5 rounded-lg font-semibold text-sm transition-all border ${
                           formData.serie === s 
                           ? 'bg-success-subtle border-success-line text-success-fg shadow-card' 
                           : 'bg-canvas border-transparent text-fg hover:bg-subtle'
@@ -433,7 +433,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                       <button
                         key={n} type="button"
                         onClick={() => setFormData(p => ({ ...p, numero: n }))}
-                        className={`flex-1 py-2.5 rounded-lg font-semibold text-sm transition-all border${
+                        className={`flex-1 py-2.5 rounded-lg font-semibold text-sm transition-all border ${
                           formData.numero === n
                           ? 'bg-accent border-accent text-on-accent shadow-card' 
                           : 'bg-canvas border-transparent text-fg hover:bg-subtle'
@@ -470,15 +470,15 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                 {!isEdit && (
                   <div className="md:col-span-2 bg-canvas p-4 rounded-lg flex items-center justify-between group cursor-pointer" onClick={() => setImportarMatriz(!importarMatriz)}>
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all${importarMatriz ? 'bg-accent shadow-card ' : 'bg-subtle-hover'}`}>
-                        <Layers className={`w-5 h-5${importarMatriz ? 'text-white' : 'text-fg-subtle'}`} />
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${importarMatriz ? 'bg-accent shadow-card ' : 'bg-subtle-hover'}`}>
+                        <Layers className={`w-5 h-5 ${importarMatriz ? 'text-white' : 'text-fg-subtle'}`} />
                       </div>
                       <div>
                         <p className="text-xs font-bold text-fg">Importar Matriz Curricular</p>
                         <p className="text-xs text-fg-subtle font-medium leading-none">Cadastrar disciplinas padrão automaticamente</p>
                       </div>
                     </div>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all${importarMatriz ? 'bg-accent border-accent' : 'border-line-strong'}`}>
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${importarMatriz ? 'bg-accent border-accent' : 'border-line-strong'}`}>
                       {importarMatriz && <div className="w-2 h-2 bg-surface rounded-full" />}
                     </div>
                   </div>

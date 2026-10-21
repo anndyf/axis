@@ -344,7 +344,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
           ) : (
             <>
           {message && (
-            <div className={`mb-6 p-4 rounded-lg${
+            <div className={`mb-6 p-4 rounded-lg ${
               message.type === 'success' ? 'bg-success-subtle border border-success-line text-success-fg' : 
               message.type === 'error' ? 'bg-danger-subtle border border-danger-line text-danger-fg' : 
               'bg-subtle border border-line-strong text-accent-fg'
@@ -380,7 +380,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
                 <label className="block text-sm font-medium text-fg mb-2">Turma de Destino <span className="text-danger-fg">*</span></label>
                 <div className="relative">
                     <div className="relative group">
-                        <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors${showTurmaDropdown ? 'text-fg' : 'text-fg-subtle'}`} />
+                        <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${showTurmaDropdown ? 'text-fg' : 'text-fg-subtle'}`} />
                         <input 
                             type="text"
                             placeholder="Digite o nome da turma para buscar..."
@@ -391,7 +391,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
                                 if (manualTurma) setManualTurma("")
                             }}
                             onFocus={() => setShowTurmaDropdown(true)}
-                            className={`w-full pl-11 pr-10 py-3 border rounded-lg focus:ring-2 focus:ring-zinc-500 transition-all bg-surface font-medium text-fg-muted outline-none${!manualTurma && preview.length > 0 ? 'border-danger-line ring-2 ring-danger/30' : 'border-accent/25 hover:border-accent'}`}
+                            className={`w-full pl-11 pr-10 py-3 border rounded-lg focus:ring-2 focus:ring-zinc-500 transition-all bg-surface font-medium text-fg-muted outline-none ${!manualTurma && preview.length > 0 ? 'border-danger-line ring-2 ring-danger/30' : 'border-accent/25 hover:border-accent'}`}
                         />
                         {(turmaSearch || manualTurma) && (
                             <button 
@@ -424,18 +424,18 @@ export default function UploadForm({ turmas }: UploadFormProps) {
                                             setTurmaSearch(t.nome)
                                             setShowTurmaDropdown(false)
                                         }}
-                                        className={`w-full text-left px-4 py-3 text-sm transition-all flex items-center justify-between border-b border-line-subtle last:border-none${
+                                        className={`w-full text-left px-4 py-3 text-sm transition-all flex items-center justify-between border-b border-line-subtle last:border-none ${
                                             manualTurma === t.nome 
                                             ? 'bg-accent z-10' 
                                             : 'text-fg-muted hover:bg-canvas'
                                         }`}
                                     >
                                         <div className="flex flex-col">
-                                            <span className={`font-semibold${manualTurma === t.nome ? 'text-white' : 'text-fg font-bold'}`}>
+                                            <span className={`font-semibold ${manualTurma === t.nome ? 'text-white' : 'text-fg font-bold'}`}>
                                                 {t.nome}
                                             </span>
                                             {(t.modalidade || t.turno) && (
-                                                <span className={`text-xs font-bold mt-0.5${manualTurma === t.nome ? 'text-fg-disabled' : 'text-fg-subtle'}`}>
+                                                <span className={`text-xs font-bold mt-0.5 ${manualTurma === t.nome ? 'text-fg-disabled' : 'text-fg-subtle'}`}>
                                                     {t.modalidade} {t.turno && `· ${t.turno}`}
                                                 </span>
                                             )}
@@ -498,7 +498,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
               <Link href="/dashboard/estudantes" className="px-4 py-3 text-fg hover:bg-subtle-hover rounded-lg transition-colors">Cancelar</Link>
               <button 
                 type="submit" disabled={loading || preview.length === 0 || !manualTurma.trim()}
-                className={`flex items-center space-x-2 text-fg px-4 py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed${syncMode ? ' bg-danger hover:bg-danger ' : ' bg-surface border border-line hover:bg-subtle'}`}
+                className={`flex items-center space-x-2 text-fg px-4 py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed ${syncMode ? ' bg-danger hover:bg-danger ' : ' bg-surface border border-line hover:bg-subtle'}`}
               >
                 <Upload className="w-5 h-5" />
                 <span>{loading ? 'Importando...' : (syncMode ? 'Sincronizar Turma' : 'Importar Turma')}</span>

@@ -353,7 +353,7 @@ export default function MatrizCurricularClient({
                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-subtle">
                       <GraduationCap size={15} />
                     </div>
-                    <span className={`truncate${selectedCurso ? 'text-fg' : 'text-fg-subtle font-normal'}`}>
+                    <span className={`truncate ${selectedCurso ? 'text-fg' : 'text-fg-subtle font-normal'}`}>
                       {selectedCurso
                         ? (() => {
                             const c = cursosLocais.find(curr => curr.id === selectedCurso);
@@ -361,7 +361,7 @@ export default function MatrizCurricularClient({
                           })()
                         : 'Selecione o Curso...'}
                     </span>
-                    <ChevronDown size={14} className={`ml-auto shrink-0 text-fg-subtle transition-transform${showCursoDropdown ? 'rotate-180' : ''}`} />
+                    <ChevronDown size={14} className={`ml-auto shrink-0 text-fg-subtle transition-transform ${showCursoDropdown ? 'rotate-180' : ''}`} />
                   </button>
 
                   {showCursoDropdown && (
@@ -378,13 +378,13 @@ export default function MatrizCurricularClient({
                           <p className="px-4 py-4 text-xs text-fg-subtle text-center">Nenhum curso encontrado</p>
                         )}
                         {cursosFiltrados.map((c) => (
-                          <div key={c.id} className={`flex items-center group transition-colors${selectedCurso === c.id ? 'bg-accent-subtle' : 'hover:bg-canvas'}`}>
+                          <div key={c.id} className={`flex items-center group transition-colors ${selectedCurso === c.id ? 'bg-accent-subtle' : 'hover:bg-canvas'}`}>
                             <button
                               type="button"
                               onClick={() => { setSelectedCurso(c.id); setShowCursoDropdown(false) }}
                               className="flex-1 text-left px-4 py-2.5 min-w-0"
                             >
-                              <span className={`block text-sm font-semibold truncate${selectedCurso === c.id ? 'text-accent-fg' : 'text-fg-muted'}`}>{c.nome}</span>
+                              <span className={`block text-sm font-semibold truncate ${selectedCurso === c.id ? 'text-accent-fg' : 'text-fg-muted'}`}>{c.nome}</span>
                               <span className="text-xs font-bold text-fg-subtle">{c.modalidade} · {c.turnos?.join(', ') || '—'}</span>
                             </button>
                             {/* Ações: editar e excluir */}
@@ -603,7 +603,7 @@ export default function MatrizCurricularClient({
                   {itemsFiltradosNaLista.map((item) => (
                     <tr
                       key={item.id}
-                      className={`transition-colors group cursor-pointer${
+                      className={`transition-colors group cursor-pointer ${
                         selectedIds.has(item.id)
                           ? 'bg-accent-subtle'
                           : 'hover:bg-canvas/50'
@@ -633,7 +633,7 @@ export default function MatrizCurricularClient({
                       </td>
                       <td className="px-4 py-4">
                         <div className="flex items-center gap-3">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors${
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
                             selectedIds.has(item.id)
                               ? 'bg-accent-subtle text-accent-fg'
                               : 'bg-subtle text-fg-subtle group-hover:bg-accent-subtle group-hover:text-accent-fg'

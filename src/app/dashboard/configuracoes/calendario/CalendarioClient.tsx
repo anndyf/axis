@@ -84,7 +84,7 @@ export default function CalendarioClient(props: Props) {
       />
 
       {aviso && (
-        <div className={`px-4 py-3 rounded-lg border text-13 flex items-center gap-2${aviso.tipo === "ok" ? "bg-success-subtle border-success-line text-success-fg" : "bg-danger-subtle border-danger-line text-danger-fg"}`}>
+        <div className={`px-4 py-3 rounded-lg border text-13 flex items-center gap-2 ${aviso.tipo === "ok" ? "bg-success-subtle border-success-line text-success-fg" : "bg-danger-subtle border-danger-line text-danger-fg"}`}>
           {aviso.tipo === "ok" ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
           {aviso.texto}
         </div>
@@ -147,7 +147,7 @@ export default function CalendarioClient(props: Props) {
           <select value={novoNaoLetivo.tipo} onChange={(e) => setNovoNaoLetivo({ ...novoNaoLetivo, tipo: e.target.value })} className={input}>
             {TIPOS.map((t) => <option key={t.id} value={t.id}>{t.nome}</option>)}
           </select>
-          <input placeholder="Descrição (ex.: Tiradentes)" value={novoNaoLetivo.descricao} onChange={(e) => setNovoNaoLetivo({ ...novoNaoLetivo, descricao: e.target.value })} className={`${input}flex-1 min-w-48`} />
+          <input placeholder="Descrição (ex.: Tiradentes)" value={novoNaoLetivo.descricao} onChange={(e) => setNovoNaoLetivo({ ...novoNaoLetivo, descricao: e.target.value })} className={`${input} flex-1 min-w-48`} />
           <button disabled={pendente} className={botaoSecundario} onClick={() => executar(async () => {
             const r = await adicionarDiaNaoLetivo(novoNaoLetivo.data, novoNaoLetivo.tipo, novoNaoLetivo.descricao)
             if ("ok" in r) setNovoNaoLetivo({ data: "", tipo: "FERIADO", descricao: "" })
@@ -177,7 +177,7 @@ export default function CalendarioClient(props: Props) {
           <select value={novoExtra.seguirHorarioDe} onChange={(e) => setNovoExtra({ ...novoExtra, seguirHorarioDe: Number(e.target.value) })} className={input}>
             {[1, 2, 3, 4, 5].map((d) => <option key={d} value={d}>Horário de {DIAS[d]}</option>)}
           </select>
-          <input placeholder="Descrição" value={novoExtra.descricao} onChange={(e) => setNovoExtra({ ...novoExtra, descricao: e.target.value })} className={`${input}flex-1 min-w-48`} />
+          <input placeholder="Descrição" value={novoExtra.descricao} onChange={(e) => setNovoExtra({ ...novoExtra, descricao: e.target.value })} className={`${input} flex-1 min-w-48`} />
           <button disabled={pendente} className={botaoSecundario} onClick={() => executar(async () => {
             const r = await adicionarDiaLetivoExtra(novoExtra.data, novoExtra.seguirHorarioDe, novoExtra.descricao)
             if ("ok" in r) setNovoExtra({ data: "", seguirHorarioDe: 1, descricao: "" })

@@ -299,10 +299,10 @@ export default function PlanosClient() {
                             <div key={turmaNome} className="bg-surface">
                                 <button 
                                     onClick={() => toggleTurmaExpansion(turmaNome)}
-                                    className={`w-full px-4 py-2.5 flex items-center justify-between transition-all hover:bg-canvas/80 group${isExpanded ? 'bg-canvas border-b border-line' : ''}`}
+                                    className={`w-full px-4 py-2.5 flex items-center justify-between transition-all hover:bg-canvas/80 group ${isExpanded ? 'bg-canvas border-b border-line' : ''}`}
                                 >
                                     <div className="flex items-center gap-5">
-                                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-500${isExpanded ? 'bg-zinc-600 text-white shadow-card rotate-6' : 'bg-subtle-hover text-fg-subtle group-hover:bg-surface group-hover:shadow-card'}`}>
+                                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-500 ${isExpanded ? 'bg-zinc-600 text-white shadow-card rotate-6' : 'bg-subtle-hover text-fg-subtle group-hover:bg-surface group-hover:shadow-card'}`}>
                                             <Users size={20} />
                                         </div>
                                         <div className="text-left">
@@ -313,7 +313,7 @@ export default function PlanosClient() {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all duration-300${isExpanded ? 'bg-canvas border-line-strong text-fg-muted rotate-90' : 'bg-surface border-line text-fg-disabled group-hover:border-line-strong'}`}>
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all duration-300 ${isExpanded ? 'bg-canvas border-line-strong text-fg-muted rotate-90' : 'bg-surface border-line text-fg-disabled group-hover:border-line-strong'}`}>
                                         <ChevronRight size={16} />
                                     </div>
                                 </button>
@@ -341,7 +341,7 @@ export default function PlanosClient() {
                                                                 <tr key={plano.id} className="group hover:bg-canvas/30 transition-all">
                                                                     <td className="px-4 py-2.5">
                                                                         <div className="flex items-center gap-4">
-                                                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all${current ? 'bg-success-subtle text-success-fg shadow-sm border border-success-line' : 'bg-canvas text-fg-subtle border border-line group-hover:bg-surface'}`}>
+                                                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${current ? 'bg-success-subtle text-success-fg shadow-sm border border-success-line' : 'bg-canvas text-fg-subtle border border-line group-hover:bg-surface'}`}>
                                                                                 <FileText size={18} />
                                                                             </div>
                                                                             <div className="flex flex-col">

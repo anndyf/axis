@@ -295,7 +295,7 @@ const ManualSelectorModal = ({ isOpen, onClose, onSelect, questions, selectedIds
             filtered.map((q: any) => (
               <div 
                 key={q.id} 
-                className={`p-4 rounded-lg border transition-all cursor-pointer group${
+                className={`p-4 rounded-lg border transition-all cursor-pointer group ${
                   selectedIds.includes(q.id) 
                   ? 'border-accent bg-accent-subtle' 
                   : 'border-line-subtle hover:border-accent/25 hover:shadow-card'
@@ -304,7 +304,7 @@ const ManualSelectorModal = ({ isOpen, onClose, onSelect, questions, selectedIds
               >
                 <div className="flex justify-between gap-4 mb-2">
                   <div className="text-sm text-fg font-medium line-clamp-3 leading-relaxed" dangerouslySetInnerHTML={{ __html: q.enunciado }} />
-                  <div className={`mt-1 shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all${
+                  <div className={`mt-1 shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
                     selectedIds.includes(q.id) 
                     ? 'bg-accent border-accent' 
                     : 'border-line bg-surface'
@@ -319,7 +319,7 @@ const ManualSelectorModal = ({ isOpen, onClose, onSelect, questions, selectedIds
                     </span>
                   )}
                   <div 
-                    className={`w-2 h-2 rounded-full shrink-0${q.tipo === 'RECUPERACAO' ? 'bg-warning' : 'bg-accent'}`} 
+                    className={`w-2 h-2 rounded-full shrink-0 ${q.tipo === 'RECUPERACAO' ? 'bg-warning' : 'bg-accent'}`} 
                     title={q.tipo === 'RECUPERACAO' ? 'Questão de Segunda Chamada' : 'Questão Normal'}
                   />
                   <span className="text-xs font-bold px-2 py-0.5 rounded bg-surface border border-line-subtle text-fg-subtle">{q.dificuldade}</span>
@@ -887,7 +887,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
         <div className="flex flex-wrap bg-subtle p-1.5 rounded-lg gap-1 w-full sm:w-auto overflow-x-auto no-scrollbar">
           <button
             onClick={() => setActiveTab('gerador')}
-            className={`flex-1 sm:flex-none px-4 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 whitespace-nowrap${
+            className={`flex-1 sm:flex-none px-4 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 whitespace-nowrap ${
               activeTab === 'gerador'
               ? 'bg-surface text-accent-fg shadow-sm'
               : 'text-fg-subtle hover:text-fg-muted'
@@ -898,7 +898,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
           </button>
           <button
             onClick={() => setActiveTab('historico')}
-            className={`flex-1 sm:flex-none px-4 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 whitespace-nowrap${
+            className={`flex-1 sm:flex-none px-4 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 whitespace-nowrap ${
               activeTab === 'historico'
               ? 'bg-surface text-accent-fg shadow-sm'
               : 'text-fg-subtle hover:text-fg-muted'
@@ -1059,22 +1059,22 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                   <button 
                     onClick={() => setLayoutColunas(1)}
                     disabled={isAmpliada}
-                    className={`py-1.5 px-3 rounded-lg text-xs font-bold transition-all${
+                    className={`py-1.5 px-3 rounded-lg text-xs font-bold transition-all ${
                       layoutColunas === 1 && !isAmpliada
                       ? 'bg-surface text-accent-fg shadow-sm' 
                       : 'text-fg-subtle hover:text-fg-muted'
-                    }disabled:opacity-30`}
+                    } disabled:opacity-30`}
                   >
                     1 Coluna
                   </button>
                   <button 
                     onClick={() => setLayoutColunas(2)}
                     disabled={isAmpliada}
-                    className={`py-1.5 px-3 rounded-lg text-xs font-bold transition-all${
+                    className={`py-1.5 px-3 rounded-lg text-xs font-bold transition-all ${
                       layoutColunas === 2 && !isAmpliada
                       ? 'bg-surface text-accent-fg shadow-sm' 
                       : 'text-fg-subtle hover:text-fg-muted'
-                    }disabled:opacity-30`}
+                    } disabled:opacity-30`}
                   >
                     2 Colunas
                   </button>
@@ -1082,7 +1082,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
 
                 <button 
                   onClick={() => setIsAmpliada(!isAmpliada)}
-                  className={`flex-1 flex items-center justify-between gap-3 px-4 py-2 rounded-xl border-2 transition-all group${
+                  className={`flex-1 flex items-center justify-between gap-3 px-4 py-2 rounded-xl border-2 transition-all group ${
                     isAmpliada 
                     ? 'bg-warning-subtle border-warning text-warning-fg shadow-sm' 
                     : 'bg-canvas border-line-subtle text-fg-subtle hover:border-warning-line hover:text-warning-fg'
@@ -1095,8 +1095,8 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                       <p className="text-xs font-medium opacity-70 leading-tight">Acessibilidade</p>
                     </div>
                   </div>
-                  <div className={`w-8 h-4 rounded-full relative transition-colors${isAmpliada ? 'bg-warning' : 'bg-subtle-hover'}`}>
-                    <div className={`absolute top-0.5 w-3 h-3 bg-surface rounded-full transition-all${isAmpliada ? 'right-0.5' : 'left-0.5'}`} />
+                  <div className={`w-8 h-4 rounded-full relative transition-colors ${isAmpliada ? 'bg-warning' : 'bg-subtle-hover'}`}>
+                    <div className={`absolute top-0.5 w-3 h-3 bg-surface rounded-full transition-all ${isAmpliada ? 'right-0.5' : 'left-0.5'}`} />
                   </div>
                 </button>
               </div>
@@ -1142,13 +1142,13 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                 {config.map((c, idx) => {
                   const isHighlighted = isDisciplinaInArea(c.nome, areaConhecimento);
                   return (
-                  <div key={idx} className={`flex items-center justify-between p-3 rounded-xl border transition-colors${
+                  <div key={idx} className={`flex items-center justify-between p-3 rounded-xl border transition-colors ${
                     isHighlighted ? 'bg-success-subtle border-success-line hover:border-success-line' : 'bg-canvas/50 border-line-subtle hover:border-accent/25'
                   }`}>
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
-                         <span className={`text-sm font-medium truncate max-w-[200px]${isHighlighted ? 'text-success-fg' : 'text-fg-muted'}`}>{c.nome}</span>
-                         <span className={`text-xs font-bold bg-surface px-1.5 py-0.5 rounded border${isHighlighted ? 'text-success-fg border-success-line' : 'text-fg-subtle border-line'}`} title="Questões disponíveis nesta turma">
+                         <span className={`text-sm font-medium truncate max-w-[200px] ${isHighlighted ? 'text-success-fg' : 'text-fg-muted'}`}>{c.nome}</span>
+                         <span className={`text-xs font-bold bg-surface px-1.5 py-0.5 rounded border ${isHighlighted ? 'text-success-fg border-success-line' : 'text-fg-subtle border-line'}`} title="Questões disponíveis nesta turma">
                            {filteredAvailableQuestions.filter((q: any) => 
                              q.disciplinas?.some((d: any) => normalizeText(d.nome || "") === normalizeText(c.nome || ""))
                            ).length}
@@ -1245,7 +1245,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                       if (saved) alert("Prova salva no histórico com sucesso!")
                     }}
                     disabled={loading || !!lastSavedProva}
-                    className={`px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all disabled:opacity-50${
+                    className={`px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all disabled:opacity-50 ${
                         lastSavedProva 
                         ? "bg-success-subtle text-success-fg border border-success-line cursor-not-allowed" 
                         : "bg-surface hover:bg-canvas text-accent-fg border border-accent/25"
@@ -1263,7 +1263,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                         generatePDF(null)
                     }}
                     disabled={loading}
-                    className={`px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all disabled:opacity-50${
+                    className={`px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all disabled:opacity-50 ${
                         !lastSavedProva ? 'bg-zinc-300 text-fg-subtle cursor-not-allowed' : 'bg-accent hover:bg-accent-hover text-on-accent'
                     }`}
                   >
@@ -1281,7 +1281,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-semibold text-accent-fg">Questão {idx + 1} • {q.disciplinas[0]?.nome}</span>
                         <div 
-                          className={`w-2 h-2 rounded-full${q.tipo === 'RECUPERACAO' ? 'bg-warning' : 'bg-accent'}`} 
+                          className={`w-2 h-2 rounded-full ${q.tipo === 'RECUPERACAO' ? 'bg-warning' : 'bg-accent'}`} 
                           title={q.tipo === 'RECUPERACAO' ? 'Questão de Segunda Chamada' : 'Questão Normal'}
                         />
                       </div>
@@ -1683,12 +1683,12 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                   {['A', 'B', 'C', 'D', 'E'].map(letter => (
-                    <div key={letter} className={`p-3 rounded-xl border flex gap-3${
+                    <div key={letter} className={`p-3 rounded-xl border flex gap-3 ${
                       q.correta === letter 
                       ? 'bg-success-subtle border-success-line text-success-fg font-bold' 
                       : 'bg-canvas border-line-subtle text-fg-subtle'
                     }`}>
-                      <span className={`w-5 h-5 rounded-full shrink-0 flex items-center justify-center text-xs${
+                      <span className={`w-5 h-5 rounded-full shrink-0 flex items-center justify-center text-xs ${
                         q.correta === letter ? 'bg-success text-white' : 'bg-subtle-hover text-fg-subtle'
                       }`}>
                         {letter}
@@ -1712,22 +1712,22 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
                 <button 
                   onClick={() => setLocalLayout(1)}
                   disabled={localAmpliada}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                     localLayout === 1 && !localAmpliada
                     ? 'bg-surface text-accent-fg shadow-sm' 
                     : 'text-fg-subtle hover:text-fg-muted'
-                  }disabled:opacity-30`}
+                  } disabled:opacity-30`}
                 >
                   1 Coluna
                 </button>
                 <button 
                   onClick={() => setLocalLayout(2)}
                   disabled={localAmpliada}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                     localLayout === 2 && !localAmpliada
                     ? 'bg-surface text-accent-fg shadow-sm' 
                     : 'text-fg-subtle hover:text-fg-muted'
-                  }disabled:opacity-30`}
+                  } disabled:opacity-30`}
                 >
                   2 Colunas
                 </button>
@@ -1736,7 +1736,7 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
 
             <button 
               onClick={() => setLocalAmpliada(!localAmpliada)}
-              className={`flex items-center gap-3 px-4 py-1.5 rounded-xl border-2 transition-all group${
+              className={`flex items-center gap-3 px-4 py-1.5 rounded-xl border-2 transition-all group ${
                 localAmpliada 
                 ? 'bg-warning-subtle border-warning text-warning-fg' 
                 : 'bg-canvas border-line-subtle text-fg-subtle hover:border-warning-line'
@@ -1749,8 +1749,8 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
                   <p className="text-xs font-medium opacity-70 leading-tight">Acessibilidade</p>
                 </div>
               </div>
-              <div className={`w-8 h-4 rounded-full relative transition-colors${localAmpliada ? 'bg-warning' : 'bg-subtle-hover'}`}>
-                <div className={`absolute top-0.5 w-3 h-3 bg-surface rounded-full transition-all${localAmpliada ? 'right-0.5' : 'left-0.5'}`} />
+              <div className={`w-8 h-4 rounded-full relative transition-colors ${localAmpliada ? 'bg-warning' : 'bg-subtle-hover'}`}>
+                <div className={`absolute top-0.5 w-3 h-3 bg-surface rounded-full transition-all ${localAmpliada ? 'right-0.5' : 'left-0.5'}`} />
               </div>
             </button>
           </div>

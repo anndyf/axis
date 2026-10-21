@@ -233,7 +233,7 @@ export default function ResponsaveisClient({
               </div>
 
               {message && (
-                <div className={`p-3 rounded-xl flex items-center gap-2 text-xs font-medium animate-slide-up${
+                <div className={`p-3 rounded-xl flex items-center gap-2 text-xs font-medium animate-slide-up ${
                   message.type === 'success' ? 'bg-success-subtle text-success-fg' : 'bg-danger-subtle text-danger-fg'
                 }`}>
                   {message.type === 'success' ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}

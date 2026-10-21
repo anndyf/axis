@@ -227,13 +227,13 @@ export default function PendenciasClient({
           <div className="flex bg-surface p-1 rounded-lg border border-line">
             <button 
               onClick={() => updateFilters({ status: 'pendente' })}
-              className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all${!serverFilters.showResolved ? 'bg-accent text-on-accent shadow-card' : 'text-fg-subtle hover:bg-canvas'}`}
+              className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${!serverFilters.showResolved ? 'bg-accent text-on-accent shadow-card' : 'text-fg-subtle hover:bg-canvas'}`}
             >
               Pendências
             </button>
             <button 
               onClick={() => updateFilters({ status: 'resolvido' })}
-              className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all${serverFilters.showResolved ? 'bg-accent text-on-accent shadow-card' : 'text-fg-subtle hover:bg-canvas'}`}
+              className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${serverFilters.showResolved ? 'bg-accent text-on-accent shadow-card' : 'text-fg-subtle hover:bg-canvas'}`}
             >
               Histórico / Resolvidos
             </button>
@@ -300,7 +300,7 @@ export default function PendenciasClient({
                   {group.items.map((item) => {
                     const isExpanded = expandedPendencies.has(item.id)
                     return (
-                      <div key={item.id} className={`bg-surface rounded-xl border border-line overflow-hidden hover: transition-all${item.isResolved ? 'opacity-75 grayscale-[0.3]' : ''}`}>
+                      <div key={item.id} className={`bg-surface rounded-xl border border-line overflow-hidden hover: transition-all ${item.isResolved ? 'opacity-75 grayscale-[0.3]' : ''}`}>
                         <div className="p-4 flex flex-col md:flex-row gap-4 items-start md:items-center">
                           <div className="flex-1 space-y-4">
                             <div className="flex flex-wrap items-center gap-3">
@@ -308,7 +308,7 @@ export default function PendenciasClient({
                                 <Clock size={14} /> {item.date}
                               </span>
                               {item.internalStatus && (
-                                <span className={`px-3 py-1 text-xs font-semibold rounded-lg border flex items-center gap-1.5${statusOptions.find(s => s.label === item.internalStatus)?.color || 'bg-subtle text-fg-muted border-line'}`}>
+                                <span className={`px-3 py-1 text-xs font-semibold rounded-lg border flex items-center gap-1.5 ${statusOptions.find(s => s.label === item.internalStatus)?.color || 'bg-subtle text-fg-muted border-line'}`}>
                                   <Tag size={10} /> {item.internalStatus}
                                 </span>
                               )}

@@ -516,12 +516,12 @@ export default function AEEDashboardClient({
                                   {CIDS_AEE.filter(c => c.code.includes(cidSearch.toUpperCase()) || c.label.toUpperCase().includes(cidSearch.toUpperCase())).map(c => (
                                      <button 
                                         key={c.code} onClick={() => toggleCID(c.code)}
-                                        className={`flex items-center justify-between px-4 py-3 rounded-xl border text-xs font-bold transition-all text-left group${
+                                        className={`flex items-center justify-between px-4 py-3 rounded-xl border text-xs font-bold transition-all text-left group ${
                                            formData.cids.includes(c.code) ? 'bg-accent-subtle text-accent-fg border-accent' : 'bg-surface text-fg-muted border-line hover:bg-subtle'
                                         }`}
                                      >
                                         <div className="flex items-center gap-3">
-                                           <span className={`px-2 py-0.5 rounded font-semibold border${formData.cids.includes(c.code) ? 'bg-surface border-accent/25' : 'bg-subtle border-line text-fg'}`}>{c.code}</span>
+                                           <span className={`px-2 py-0.5 rounded font-semibold border ${formData.cids.includes(c.code) ? 'bg-surface border-accent/25' : 'bg-subtle border-line text-fg'}`}>{c.code}</span>
                                            <span className="opacity-90 line-clamp-1">{c.label}</span>
                                         </div>
                                         {formData.cids.includes(c.code) && <CheckCircle2 size={14} className="text-white" />}
@@ -572,18 +572,18 @@ export default function AEEDashboardClient({
                                  <button 
                                     key={item.id} disabled={!isEditing}
                                     onClick={() => setFormData(f => ({ ...f, [item.id]: !isSelected }))}
-                                    className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left group${
+                                    className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left group ${
                                        isSelected 
                                           ? 'bg-accent-subtle text-accent-fg border-accent'
                                           : 'bg-surface border-line text-fg-muted hover:border-line-strong'
-                                    }${!isEditing && 'cursor-default opacity-100'}`}
+                                    } ${!isEditing && 'cursor-default opacity-100'}`}
                                  >
-                                    <div className={`p-3 rounded-xl transition-colors${isSelected ? 'bg-surface text-accent-fg' : 'bg-canvas text-fg-subtle group-hover:text-fg-muted'}`}>
+                                    <div className={`p-3 rounded-xl transition-colors ${isSelected ? 'bg-surface text-accent-fg' : 'bg-canvas text-fg-subtle group-hover:text-fg-muted'}`}>
                                        <Icon size={20} />
                                     </div>
                                     <div>
                                        <span className="text-sm font-semibold block mb-0.5">{item.label}</span>
-                                       <span className={`text-xs font-bold${isSelected ? 'text-accent-fg/70' : 'text-fg-subtle'}`}>
+                                       <span className={`text-xs font-bold ${isSelected ? 'text-accent-fg/70' : 'text-fg-subtle'}`}>
                                           {isSelected ? 'Configuração Ativada' : 'Não Solicitado'}
                                        </span>
                                     </div>
@@ -613,7 +613,7 @@ export default function AEEDashboardClient({
                                   rows={field.rows} readOnly={!isEditing}
                                   value={(formData as any)[field.id]} onChange={e => setFormData(f => ({ ...f, [field.id]: e.target.value }))}
                                   placeholder={isEditing ? field.placeholder : 'Nenhuma informação cadastrada no prontuário.'}
-                                  className={`w-full bg-canvas border border-line-subtle rounded-lg px-4 py-3 text-base font-medium text-fg leading-relaxed outline-none transition-all placeholder:text-fg-disabled${isEditing ? 'focus:bg-surface focus:ring-4 focus:ring-zinc-100 focus:border-line-strong' : 'cursor-default border-transparent'}`}
+                                  className={`w-full bg-canvas border border-line-subtle rounded-lg px-4 py-3 text-base font-medium text-fg leading-relaxed outline-none transition-all placeholder:text-fg-disabled ${isEditing ? 'focus:bg-surface focus:ring-4 focus:ring-zinc-100 focus:border-line-strong' : 'cursor-default border-transparent'}`}
                                />
                             </div>
                          )
@@ -631,7 +631,7 @@ export default function AEEDashboardClient({
                                rows={4} readOnly={!isEditing} value={formData.notasDirecao}
                                onChange={e => setFormData(f => ({ ...f, notasDirecao: e.target.value }))}
                                placeholder="Notas administrativas, controle de laudos, renovações e acompanhamento interno da gestão..."
-                               className={`w-full bg-surface border border-line rounded-lg px-3 py-2.5 text-sm text-fg leading-relaxed transition-colors duration-150 placeholder:text-fg-subtle${isEditing ? 'focus:border-accent' : 'cursor-default border-transparent'}`}
+                               className={`w-full bg-surface border border-line rounded-lg px-3 py-2.5 text-sm text-fg leading-relaxed transition-colors duration-150 placeholder:text-fg-subtle ${isEditing ? 'focus:border-accent' : 'cursor-default border-transparent'}`}
                             />
                             <p className="text-xs text-fg-subtle text-right">Visível apenas para a direção e superusuários</p>
                          </div>
@@ -654,7 +654,7 @@ export default function AEEDashboardClient({
                                <input 
                                   type="text" readOnly={!isEditing} value={formData.contatoNome}
                                   onChange={e => setFormData(f => ({ ...f, contatoNome: e.target.value }))}
-                                  className={`w-full bg-canvas border border-line-subtle rounded-xl px-4 py-3 text-sm font-bold text-fg-muted outline-none transition-all${isEditing ? 'focus:bg-surface focus:border-line' : 'border-transparent bg-transparent pl-1 cursor-default'}`}
+                                  className={`w-full bg-canvas border border-line-subtle rounded-xl px-4 py-3 text-sm font-bold text-fg-muted outline-none transition-all ${isEditing ? 'focus:bg-surface focus:border-line' : 'border-transparent bg-transparent pl-1 cursor-default'}`}
                                />
                             </div>
                             <div className="space-y-2">
@@ -662,7 +662,7 @@ export default function AEEDashboardClient({
                                <input 
                                   type="text" readOnly={!isEditing} value={formData.contatoTelefone}
                                   onChange={e => setFormData(f => ({ ...f, contatoTelefone: formatPhone(e.target.value) }))}
-                                  className={`w-full bg-canvas border border-line-subtle rounded-xl px-4 py-3 text-sm font-bold text-fg-muted outline-none font-mono transition-all${isEditing ? 'focus:bg-surface focus:border-line' : 'border-transparent bg-transparent pl-1 cursor-default'}`}
+                                  className={`w-full bg-canvas border border-line-subtle rounded-xl px-4 py-3 text-sm font-bold text-fg-muted outline-none font-mono transition-all ${isEditing ? 'focus:bg-surface focus:border-line' : 'border-transparent bg-transparent pl-1 cursor-default'}`}
                                />
                             </div>
                          </div>
@@ -734,9 +734,9 @@ export default function AEEDashboardClient({
                                return Array.from(profsMap.entries()).map(([id, name]) => {
                                   const lidoAt = lidosMap.get(id)
                                   return (
-                                     <div key={id} className={`p-5 rounded-xl border transition-all${lidoAt ? 'bg-surface border-success-line shadow-card ' : 'bg-canvas/50 border-line-subtle opacity-60'}`}>
+                                     <div key={id} className={`p-5 rounded-xl border transition-all ${lidoAt ? 'bg-surface border-success-line shadow-card ' : 'bg-canvas/50 border-line-subtle opacity-60'}`}>
                                         <div className="flex items-center gap-4">
-                                           <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-semibold text-xs${lidoAt ? 'bg-success text-white' : 'bg-surface text-fg-disabled border border-line-subtle'}`}>
+                                           <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-semibold text-xs ${lidoAt ? 'bg-success text-white' : 'bg-surface text-fg-disabled border border-line-subtle'}`}>
                                               {name.charAt(0)}
                                            </div>
                                            <div className="min-w-0">

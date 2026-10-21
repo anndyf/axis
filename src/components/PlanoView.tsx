@@ -137,7 +137,7 @@ export default function PlanoView({ planoId, onClose }: PlanoViewProps) {
 
 function ViewSection({ icon, title, content, full = false }: any) {
     return (
-        <div className={`space-y-2${full ? 'md:col-span-2' : ''}`}>
+        <div className={`space-y-2 ${full ? 'md:col-span-2' : ''}`}>
             <label className="text-xs font-bold text-fg-subtle ml-1 flex items-center gap-1.5">
                 {icon} {title}
             </label>

@@ -138,7 +138,7 @@ export default function IdentidadeClient({ nomeEscola, corInicial, logoInicial, 
                 <span className="truncate text-xs font-semibold text-sidebar-fg">{nomeEscola}</span>
               </div>
               {[{ i: LayoutDashboard, t: "Dashboard" }, { i: ClipboardCheck, t: "Chamada", ativo: true }, { i: FileText, t: "Lançar notas" }, { i: Users, t: "Turmas" }].map(({ i: Icone, t, ativo }) => (
-                <div key={t} className={`flex h-7 min-w-0 items-center gap-2 rounded-full px-2 text-xs${ativo ? "bg-sidebar-active font-medium text-sidebar-fg" : "text-sidebar-fg-muted"}`}>
+                <div key={t} className={`flex h-7 min-w-0 items-center gap-2 rounded-full px-2 text-xs ${ativo ? "bg-sidebar-active font-medium text-sidebar-fg" : "text-sidebar-fg-muted"}`}>
                   <Icone size={14} strokeWidth={1.75} className="shrink-0" /> <span className="truncate">{t}</span>
                 </div>
               ))}

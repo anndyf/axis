@@ -100,7 +100,7 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
     if (viewMode === 'STATUS') {
       const config = getStatusConfig(nota.status)
       return (
-        <span className={`w-5 h-5 rounded flex items-center justify-center text-xs font-medium${config.color}${config.text}`}>
+        <span className={`w-5 h-5 rounded flex items-center justify-center text-xs font-medium ${config.color} ${config.text}`}>
           {config.label}
         </span>
       )
@@ -123,7 +123,7 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
     
     const numValue = typeof value === 'string' ? parseFloat(value) : value
     return (
-      <span className={`text-xs${getNotaStyle(numValue)}`}>
+      <span className={`text-xs ${getNotaStyle(numValue)}`}>
         {numValue < 0 ? 'DS' : numValue.toFixed(1)}
       </span>
     )
@@ -148,13 +148,13 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
                       key={item.id}
                       title={typeof item.id === 'number' ? nomesEtapas[item.id] : undefined}
                       onClick={() => setViewMode(item.id)}
-                      className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-medium transition-all${
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
                         active 
                         ? 'bg-subtle border border-line text-fg shadow-card active:scale-95' 
                         : 'text-fg-muted hover:text-fg hover:bg-surface/50'
                       }`}
                     >
-                      <Icon className={`w-3.5 h-3.5${active ? 'text-fg' : 'text-fg-subtle'}`} />
+                      <Icon className={`w-3.5 h-3.5 ${active ? 'text-fg' : 'text-fg-subtle'}`} />
                       <span className="">{item.label}</span>
                     </button>
                   )
@@ -202,7 +202,7 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
                { id: 'DS_U', badge: 'DS', label: 'Unid. Des', color: 'bg-white border border-zinc-300', text: 'text-black' }
              ].map((item) => (
                <div key={item.id} className="flex items-center space-x-1.5" title={item.label}>
-                 <span className={`w-5 h-5 rounded flex items-center justify-center text-xs font-medium${item.color}${item.text || 'text-white'}`}>
+                 <span className={`w-5 h-5 rounded flex items-center justify-center text-xs font-medium ${item.color} ${item.text || 'text-white'}`}>
                    {item.badge || item.id}
                  </span>
                  <span className="text-xs font-medium text-fg-muted">{item.label}</span>
@@ -254,12 +254,12 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
                       <tr 
                         key={estudante.matricula} 
                         onClick={() => setSelectedStudentId(isSelected ? null : estudante.matricula)}
-                        className={`group hover:bg-canvas transition-colors cursor-pointer${rowBg}`}
+                        className={`group hover:bg-canvas transition-colors cursor-pointer ${rowBg}`}
                       >
-                        <td className={`h-9 px-1 text-center text-xs font-medium text-fg-subtle sticky left-0 group-hover:bg-canvas transition-colors z-10 border-r border-line${rowBg}`}>
+                        <td className={`h-9 px-1 text-center text-xs font-medium text-fg-subtle sticky left-0 group-hover:bg-canvas transition-colors z-10 border-r border-line ${rowBg}`}>
                           {(idx + 1).toString().padStart(2, '0')}
                         </td>
-                        <td className={`h-9 px-1.5 text-sm tracking-tight font-medium text-fg sticky left-10 group-hover:bg-canvas transition-colors z-10 border-r border-line-strong shadow-[2px_0_5px_rgba(0,0,0,0.02)] whitespace-nowrap${rowBg}`}>
+                        <td className={`h-9 px-1.5 text-sm tracking-tight font-medium text-fg sticky left-10 group-hover:bg-canvas transition-colors z-10 border-r border-line-strong shadow-[2px_0_5px_rgba(0,0,0,0.02)] whitespace-nowrap ${rowBg}`}>
                            <div className="flex items-center gap-1.5">
                               {estudante.nome}
                               {estudante.aeeProfile && (

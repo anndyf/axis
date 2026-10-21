@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Accessibility, CheckCircle2, Pencil, Save, Trash2, Upload, Users } from "lucide-react"
 import { Alert, Button, CabecalhoPagina, IndicadorGravacao, RodapeRastreio, Checkbox, Field, Input, ListaDescritiva, Painel, Textarea, buttonClasses } from "@/components/ui"
 import { useToast } from "@/components/ui/Toast"
+import { mascaraTelefone, telefoneValido } from "@/lib/navegador/mascaras"
 import { CIDS_AEE } from "@/lib/constants-aee"
 import { can } from "@/lib/rbac"
 
@@ -133,7 +134,10 @@ export default function AEEProfileClient({
   const [gravado, setGravado] = useState(() => JSON.stringify(formData))
   const [salvoEm, setSalvoEm] = useState<Date | null>(null)
   const alteracoesPendentes = editando && JSON.stringify(formData) !== gravado
-  const salvarESair = async () => { if (await handleSave()) setEditando(false) }
+  const salvarESair = async () => {
+    if (!telefoneValido(formData.contatoTelefone)) { toast('Confira o telefone do contato de emergência.', 'error'); return }
+    if (await handleSave()) setEditando(false)
+  }
   const nomeCid = (code: string) => CIDS_AEE.find((c: any) => c.code === code)?.label || 'CID específico'
   const minhaLeitura = perfilExistente?.acknowledgements?.find((ack: any) => ack.user.id === usuario.id)?.readAt
 
@@ -265,7 +269,7 @@ export default function AEEProfileClient({
             {editando ? (
               <div className="space-y-3">
                 <Field label="Nome do contato">{(p) => <Input {...p} value={formData.contatoNome} onChange={(e) => setFormData({ ...formData, contatoNome: e.target.value })} placeholder="Ex.: Maria (mãe)" />}</Field>
-                <Field label="Telefone">{(p) => <Input {...p} inputMode="tel" value={formData.contatoTelefone} onChange={(e) => setFormData({ ...formData, contatoTelefone: formatPhone(e.target.value) })} placeholder="(00) 00000-0000" className="font-mono" />}</Field>
+                <Field label="Telefone" hint="Com DDD." error={telefoneValido(formData.contatoTelefone) ? undefined : "Informe o telefone com DDD: (00) 00000-0000."}>{(p) => <Input {...p} type="tel" inputMode="tel" autoComplete="tel" value={formData.contatoTelefone} onChange={(e) => setFormData({ ...formData, contatoTelefone: mascaraTelefone(e.target.value) })} placeholder="(00) 00000-0000" className="font-mono" />}</Field>
               </div>
             ) : (
               <ListaDescritiva colunas={1} itens={[

@@ -507,12 +507,12 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-semibold text-fg-muted">#CMRB{q.id.slice(-4).toUpperCase()}</span>
                       <div 
-                        className={`w-2 h-2 rounded-full${q.tipo === 'RECUPERACAO' ? 'bg-warning' : 'bg-accent'}`} 
+                        className={`w-2 h-2 rounded-full ${q.tipo === 'RECUPERACAO' ? 'bg-warning' : 'bg-accent'}`} 
                         title={q.tipo === 'RECUPERACAO' ? 'Questão de Segunda Chamada' : 'Questão Normal'}
                       />
                     </div>
                     {q.unidade ? (
-                      <span className={`text-xs font-bold px-2 py-0.5 rounded-full${q.unidade == 1 ? 'bg-accent-subtle text-accent-fg' : 'bg-success-subtle text-success-fg'}`}>
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${q.unidade == 1 ? 'bg-accent-subtle text-accent-fg' : 'bg-success-subtle text-success-fg'}`}>
                         {q.unidade}ª Unidade
                       </span>
                     ) : (

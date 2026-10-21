@@ -277,7 +277,7 @@ export default function LaboratoriosClient({
                      setMessage({ type: 'error', text: "Selecione pelo menos um horário na grade abaixo." })
                    }
                  }}
-                 className={`flex items-center gap-2 px-4 py-3 rounded-lg font-bold transition-all${
+                 className={`flex items-center gap-2 px-4 py-3 rounded-lg font-bold transition-all ${
                    selectedSlots.length > 0 
                      ? 'bg-success text-white ' 
                      : 'bg-surface border-2 border-line text-fg-subtle'
@@ -363,7 +363,7 @@ export default function LaboratoriosClient({
          {/* Grade de Horários */}
          <div className="lg:col-span-3 space-y-4">
             {message && (
-              <div className={`p-4 rounded-lg flex items-center gap-3 animate-slide-up${
+              <div className={`p-4 rounded-lg flex items-center gap-3 animate-slide-up ${
                 message.type === 'success' ? 'bg-success-subtle border border-success-line text-success-fg' : 'bg-danger-subtle border border-danger-line text-danger-fg'
               }`}>
                 {message.type === 'success' ? <CheckCircle2 size={18}/> : <AlertCircle size={18}/>}
@@ -387,12 +387,12 @@ export default function LaboratoriosClient({
                            {weekDays.map(day => {
                              const isToday = isSameDay(day, new Date())
                              return (
-                               <th key={day.toISOString()} className={`p-4 text-center border-b border-line-subtle min-w-[140px]${isToday ? 'bg-accent-subtle' : ''}`}>
+                               <th key={day.toISOString()} className={`p-4 text-center border-b border-line-subtle min-w-[140px] ${isToday ? 'bg-accent-subtle' : ''}`}>
                                  <div className="flex flex-col items-center gap-0.5">
-                                   <span className={`text-xs font-bold${isToday ? 'text-accent-fg' : 'text-fg-subtle'}`}>
+                                   <span className={`text-xs font-bold ${isToday ? 'text-accent-fg' : 'text-fg-subtle'}`}>
                                      {format(day, "EEEE", { locale: ptBR })}
                                    </span>
-                                   <span className={`text-xs font-medium${isToday ? 'text-accent-fg' : 'text-fg-subtle'}`}>
+                                   <span className={`text-xs font-medium ${isToday ? 'text-accent-fg' : 'text-fg-subtle'}`}>
                                      {format(day, "dd/MM")}
                                    </span>
                                  </div>
@@ -411,11 +411,11 @@ export default function LaboratoriosClient({
                                  const reserva = getReservaForSlot(turno.id, horario, day)
                                  const isMyReserva = reserva?.userId === currentUser.id
                                  return (
-                                   <td key={day.toISOString()} className={`p-2 border-b border-line-subtle border-l border-line-subtle${isSameDay(day, new Date()) ? 'bg-accent-subtle' : ''}`}>
+                                   <td key={day.toISOString()} className={`p-2 border-b border-line-subtle border-l border-line-subtle ${isSameDay(day, new Date()) ? 'bg-accent-subtle' : ''}`}>
                                      {reserva ? (
-                                       <div className={`p-3 rounded-xl border relative group${isMyReserva ? 'bg-success-subtle border-success-line text-success-fg' : 'bg-surface border-line text-fg-muted shadow-sm'}`}>
+                                       <div className={`p-3 rounded-xl border relative group ${isMyReserva ? 'bg-success-subtle border-success-line text-success-fg' : 'bg-surface border-line text-fg-muted shadow-sm'}`}>
                                          <p className="text-xs font-bold line-clamp-1">{reserva.user?.name || reserva.user?.username}</p>
-                                         <p className={`text-xs font-medium line-clamp-1${isMyReserva ? 'text-success-fg/80' : 'text-fg-subtle'}`}>{reserva.disciplina || "Uso Técnico"}</p>
+                                         <p className={`text-xs font-medium line-clamp-1 ${isMyReserva ? 'text-success-fg/80' : 'text-fg-subtle'}`}>{reserva.disciplina || "Uso Técnico"}</p>
                                          
                                          {(isMyReserva || isAdmin) && (
                                            <button 
@@ -445,7 +445,7 @@ export default function LaboratoriosClient({
                                              setShowModal(true)
                                            }
                                          }}
-                                         className={`w-full h-10 rounded-xl border transition-all flex items-center justify-center group${
+                                         className={`w-full h-10 rounded-xl border transition-all flex items-center justify-center group ${
                                            selectedSlots.find(s => s.data === format(day, 'yyyy-MM-dd') && s.turno === turno.id && s.horario === horario)
                                              ? 'bg-accent-subtle border-accent text-accent-fg ring-4 ring-zinc-900/10'
                                              : 'border-dashed border-line hover:border-zinc-900 hover:bg-surface'
@@ -497,7 +497,7 @@ export default function LaboratoriosClient({
 
               <div className="p-4 space-y-4">
                  {message && (
-                   <div className={`p-4 rounded-lg flex items-center gap-3 animate-fade-in${
+                   <div className={`p-4 rounded-lg flex items-center gap-3 animate-fade-in ${
                      message.type === 'success' ? 'bg-success-subtle border border-success-line text-success-fg' : 'bg-danger-subtle border border-danger-line text-danger-fg'
                    }`}>
                      {message.type === 'success' ? <CheckCircle2 size={18}/> : <AlertCircle size={18}/>}

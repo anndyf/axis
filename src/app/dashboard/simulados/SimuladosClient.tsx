@@ -476,7 +476,7 @@ export default function SimuladosClient({
                 <div className="flex bg-canvas p-1.5 rounded-lg border border-line-subtle">
                   <button
                     onClick={() => setSelectedUnidade("1")}
-                    className={`flex-1 py-2.5 text-sm font-medium rounded-xl transition-all${
+                    className={`flex-1 py-2.5 text-sm font-medium rounded-xl transition-all ${
                       selectedUnidade === "1" ? 'bg-surface text-danger-fg shadow-sm' : 'text-fg-subtle hover:text-fg-muted hover:bg-subtle-hover/50'
                     }`}
                   >
@@ -484,7 +484,7 @@ export default function SimuladosClient({
                   </button>
                   <button
                     onClick={() => setSelectedUnidade("2")}
-                    className={`flex-1 py-2.5 text-sm font-medium rounded-xl transition-all${
+                    className={`flex-1 py-2.5 text-sm font-medium rounded-xl transition-all ${
                       selectedUnidade === "2" ? 'bg-surface text-danger-fg shadow-sm' : 'text-fg-subtle hover:text-fg-muted hover:bg-subtle-hover/50'
                     }`}
                   >
@@ -566,7 +566,7 @@ export default function SimuladosClient({
           </div>
 
           {message && (
-            <div className={`p-3 flex items-center gap-2 border-b${message.type === 'success' ? 'bg-success-subtle text-success-fg border-success-line' : 'bg-danger-subtle text-danger-fg border-danger-line'}`}>
+            <div className={`p-3 flex items-center gap-2 border-b ${message.type === 'success' ? 'bg-success-subtle text-success-fg border-success-line' : 'bg-danger-subtle text-danger-fg border-danger-line'}`}>
               {message.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
               <span className="text-xs font-medium">{message.text}</span>
             </div>
@@ -653,7 +653,7 @@ export default function SimuladosClient({
                                 checked={isFalta} 
                                 onChange={(e) => handleAusenteChange(est.matricula, e.target.checked)}
                                 disabled={!canLaunch}
-                                className={`w-5 h-5 rounded-md border-2 border-line-strong text-warning-fg focus:ring-warning/30${ausenteUnsaved ? 'ring-4 ring-warning/30' : ''}`}
+                                className={`w-5 h-5 rounded-md border-2 border-line-strong text-warning-fg focus:ring-warning/30 ${ausenteUnsaved ? 'ring-4 ring-warning/30' : ''}`}
                               />
                             </label>
                          </td>
@@ -664,7 +664,7 @@ export default function SimuladosClient({
                               value={notasTemp[est.matricula]}
                               onChange={(e) => handleNotaChange(est.matricula, e.target.value)}
                               disabled={!canLaunch || isFalta}
-                               className={`w-12 text-center py-2 print:py-0 print:w-full border-2 print:border-0 rounded-xl print:rounded-none text-base print:text-sm font-medium outline-none transition-all${
+                               className={`w-12 text-center py-2 print:py-0 print:w-full border-2 print:border-0 rounded-xl print:rounded-none text-base print:text-sm font-medium outline-none transition-all ${
                                  isFalta ? 'bg-subtle text-fg-subtle border-line cursor-not-allowed' :
                                  notaUnsaved ? 'border-zinc-400 bg-surface ring-4 ring-zinc-500/5' :
                                  !hasNota ? 'border-line bg-canvas focus:bg-surface focus:border-zinc-400' :
@@ -682,7 +682,7 @@ export default function SimuladosClient({
                                  value={notaSegundaChamadaTemp[est.matricula] || ""}
                                  onChange={(e) => handleSegundaChamadaChange(est.matricula, e.target.value)}
                                  disabled={!canLaunch}
-                                 className={`w-12 text-center py-2 print:py-0 print:w-full border-2 print:border-0 rounded-xl print:rounded-none text-base print:text-sm font-medium outline-none transition-all${
+                                 className={`w-12 text-center py-2 print:py-0 print:w-full border-2 print:border-0 rounded-xl print:rounded-none text-base print:text-sm font-medium outline-none transition-all ${
                                     segundaChamadaUnsaved ? 'border-zinc-400 bg-surface ring-4 ring-zinc-500/5' :
                                     !notaSegundaChamadaTemp[est.matricula] ? 'border-line bg-canvas focus:bg-surface focus:border-zinc-400' :
                                     'border-line bg-surface text-fg focus:border-zinc-400'
@@ -696,7 +696,7 @@ export default function SimuladosClient({
                         </td>
                         <td className="px-4 py-3.5 print:py-1.5 print:px-2 text-center">
                           {hasNota ? (
-                            <span className={`inline-flex px-3 py-1 print:px-0 print:py-0 rounded-full print:rounded-none text-xs print:text-xs font-semibold border print:border-none print:shadow-none print:bg-transparent print:text-fg-muted${
+                            <span className={`inline-flex px-3 py-1 print:px-0 print:py-0 rounded-full print:rounded-none text-xs print:text-xs font-semibold border print:border-none print:shadow-none print:bg-transparent print:text-fg-muted ${
                               isFalta && nota2 < 0 ? 'bg-warning-subtle text-warning-fg border-warning-line' :
                               isAltaPerformance ? 'bg-success-subtle text-success-fg border-success-line' : 
                               isNaMedia ? 'bg-subtle-hover text-fg border-line-strong' :

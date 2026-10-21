@@ -126,7 +126,7 @@ export default function RelatorioClient({
                   {/* Accordion Header */}
                   <div 
                     onClick={() => toggleStudent(estudante.matricula)}
-                    className={`flex items-center justify-between p-4 cursor-pointer hover:bg-canvas transition-colors${isExpanded ? 'bg-canvas' : ''}`}
+                    className={`flex items-center justify-between p-4 cursor-pointer hover:bg-canvas transition-colors ${isExpanded ? 'bg-canvas' : ''}`}
                   >
                     <div className="flex items-center gap-4 flex-1">
                       <span className="text-xs font-bold text-fg-subtle w-6">{index + 1}</span>
@@ -152,14 +152,14 @@ export default function RelatorioClient({
                           return (
                             <div className="text-center" title={f ? `${f.faltas} faltas em ${f.aulas} aulas` : undefined}>
                               <p className="text-xs font-bold text-fg-subtle">Frequência</p>
-                              <span className={`text-sm font-bold${f?.percentual != null && f.percentual < frequencia.minimo ? 'text-danger-fg' : 'text-fg-muted'}`}>
+                              <span className={`text-sm font-bold ${f?.percentual != null && f.percentual < frequencia.minimo ? 'text-danger-fg' : 'text-fg-muted'}`}>
                                 {formatarFrequencia(f?.percentual ?? null)}
                               </span>
                             </div>
                           )
                         })()}
                         <div className="text-center w-24">
-                          <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full${statusColor}`}>
+                          <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full ${statusColor}`}>
                             {statusText}
                           </span>
                         </div>
@@ -220,10 +220,10 @@ export default function RelatorioClient({
                                     <td className="px-4 py-2 text-center">{nota.notaRecuperacao?.toFixed(1) ?? '-'}</td>
                                     {frequencia && (() => {
                                       const p = frequencia.porAluno[estudante.id]?.porDisciplina[disc.id]?.percentual ?? null
-                                      return <td className={`px-4 py-2 text-center${p !== null && p < frequencia.minimo ? 'text-danger-fg font-semibold' : ''}`}>{formatarFrequencia(p)}</td>
+                                      return <td className={`px-4 py-2 text-center ${p !== null && p < frequencia.minimo ? 'text-danger-fg font-semibold' : ''}`}>{formatarFrequencia(p)}</td>
                                     })()}
                                     <td className="px-4 py-2 text-center">
-                                      <span className={`px-2 py-0.5 rounded text-xs font-bold${getStatusColor(nota.status)}`}>
+                                      <span className={`px-2 py-0.5 rounded text-xs font-bold ${getStatusColor(nota.status)}`}>
                                         {nota.status}
                                       </span>
                                     </td>

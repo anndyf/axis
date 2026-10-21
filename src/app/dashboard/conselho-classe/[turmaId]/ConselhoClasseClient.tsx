@@ -492,7 +492,7 @@ export default function ConselhoClasseClient({
                       }
                       
                       return (
-                        <td key={disc} className={`border border-zinc-400 px-1 py-1 text-center font-medium${bgColor}${textColor}`}>
+                        <td key={disc} className={`border border-zinc-400 px-1 py-1 text-center font-medium ${bgColor} ${textColor}`}>
                           <div className="flex flex-col items-center leading-tight">
                             <span className="text-xs font-medium">{statusAbrev}</span>
                             {notaFinal !== null && notaFinal !== undefined && (
@@ -542,13 +542,13 @@ export default function ConselhoClasseClient({
         <form onSubmit={handleSubmit}>
           {/* Mensagem */}
           {message && (
-            <div className={`mb-4 p-5 rounded-xl animate-slide-up${
+            <div className={`mb-4 p-5 rounded-xl animate-slide-up ${
               message.type === 'success' 
                 ? 'bg-success-subtle border border-success-line text-success-fg shadow-sm' 
                 : 'bg-danger-subtle border border-danger-line text-danger-fg shadow-sm'
             }`}>
               <div className="flex items-center space-x-3">
-                <div className={`p-1.5 rounded-xl${message.type === 'success' ? 'bg-success' : 'bg-danger'}`}>
+                <div className={`p-1.5 rounded-xl ${message.type === 'success' ? 'bg-success' : 'bg-danger'}`}>
                   <AlertCircle className="w-5 h-5 text-white" />
                 </div>
                 <span className="font-medium text-sm tracking-tight">{message.text}</span>
@@ -606,7 +606,7 @@ export default function ConselhoClasseClient({
                   <button 
                     type="button"
                     onClick={() => setShowInstructions(!showInstructions)}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-medium transition-all${
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
                       showInstructions 
                       ? 'bg-zinc-800 text-white shadow-card' 
                       : 'bg-surface text-fg-subtle border border-line-strong hover:border-accent/25 hover:text-accent-fg font-medium'
@@ -710,9 +710,9 @@ export default function ConselhoClasseClient({
               return (
                 <div 
                   key={estudanteId} 
-                  className={`bg-surface rounded-lg transition-all duration-300 border${
+                  className={`bg-surface rounded-lg transition-all duration-300 border ${
                     isExpanded ? 'shadow-card border-line-strong' : 'border-line'
-                  }${
+                  } ${
                     todasResolvidas ? 'bg-success-subtle border-success-line' : ''
                   }`}
                 >
@@ -720,18 +720,18 @@ export default function ConselhoClasseClient({
                   <button
                     type="button"
                     onClick={() => toggleStudent(estudanteId)}
-                    className={`w-full px-4 py-3 flex items-center justify-between text-left transition-colors rounded-lg${
+                    className={`w-full px-4 py-3 flex items-center justify-between text-left transition-colors rounded-lg ${
                       isExpanded ? 'bg-surface' : 'hover:bg-surface/30'
                     }`}
                   >
                     <div className="flex items-center space-x-4">
-                      <div className={`size-8 rounded-full flex items-center justify-center font-medium text-xs transition-all${
+                      <div className={`size-8 rounded-full flex items-center justify-center font-medium text-xs transition-all ${
                         todasResolvidas ? 'bg-success text-white' : 'bg-subtle-hover text-fg-muted border border-line-strong'
                       }`}>
                         {todasResolvidas ? <CheckCircle2 className="w-5 h-5" /> : data.nome.charAt(0)}
                       </div>
                       <div>
-                        <h3 className={`text-base font-medium tracking-tight${
+                        <h3 className={`text-base font-medium tracking-tight ${
                           todasResolvidas ? 'text-success-fg' : 'text-fg'
                         }`}>
                           {data.nome}
@@ -744,7 +744,7 @@ export default function ConselhoClasseClient({
                             </span>
                           )}
                           
-                          <span className={`text-xs font-medium px-2 py-0.5 rounded-md${
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded-md ${
                              todasResolvidas ? 'bg-success-subtle text-success-fg border border-success-line' : 'bg-accent-subtle text-accent-fg border border-accent/25'
                           }`}>
                             {levadasAoConselho} {levadasAoConselho === 1 ? 'Matéria' : 'Matérias'} analit.
@@ -766,7 +766,7 @@ export default function ConselhoClasseClient({
                              <span className="text-xs font-medium">Concluído</span>
                           </div>
                        )}
-                       <div className={`p-1.5 rounded-lg border transition-all${isExpanded ? 'bg-surface border-accent/25 text-accent-fg shadow-sm' : 'bg-surface border-line text-fg-subtle'}`}>
+                       <div className={`p-1.5 rounded-lg border transition-all ${isExpanded ? 'bg-surface border-accent/25 text-accent-fg shadow-sm' : 'bg-surface border-line text-fg-subtle'}`}>
                          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                        </div>
                     </div>
@@ -819,7 +819,7 @@ export default function ConselhoClasseClient({
                                 }
 
                                 return (
-                                  <tr key={nota.id} className={`group transition-all hover:bg-subtle/50 even:bg-surface${isResolvida ? 'opacity-70' : ''}`}>
+                                  <tr key={nota.id} className={`group transition-all hover:bg-subtle/50 even:bg-surface ${isResolvida ? 'opacity-70' : ''}`}>
                                      <td className="px-4 py-4 rounded-l-xl text-sm font-medium text-fg-disabled">
                                       {nota.originalIndex + 1}
                                     </td>
@@ -835,7 +835,7 @@ export default function ConselhoClasseClient({
                                             </span>
                                           ))}
                                           {nota.frequencia !== null && nota.frequencia !== undefined && (
-                                            <span className={`px-1.5 py-0.5 text-xs font-medium border rounded${nota.abaixoMinimoFrequencia ? 'bg-danger-subtle text-danger-fg border-danger-line' : 'bg-canvas text-fg-subtle border-line'}`} title={`Frequência mínima: ${frequenciaMinima}%`}>
+                                            <span className={`px-1.5 py-0.5 text-xs font-medium border rounded ${nota.abaixoMinimoFrequencia ? 'bg-danger-subtle text-danger-fg border-danger-line' : 'bg-canvas text-fg-subtle border-line'}`} title={`Frequência mínima: ${frequenciaMinima}%`}>
                                               FREQ {formatarFrequencia(nota.frequencia)}{nota.abaixoMinimoFrequencia && ' · abaixo do mínimo'}
                                             </span>
                                           )}
@@ -848,7 +848,7 @@ export default function ConselhoClasseClient({
                                       </div>
                                     </td>
                                      <td className="px-4 py-4 text-center">
-                                        <span className={`text-lg font-medium font-mono${mediaCalculada < notaMinima ? 'text-danger-fg' : 'text-fg-muted'}`}>
+                                        <span className={`text-lg font-medium font-mono ${mediaCalculada < notaMinima ? 'text-danger-fg' : 'text-fg-muted'}`}>
                                           {mediaCalculada.toFixed(1)}
                                         </span>
                                     </td>
@@ -859,7 +859,7 @@ export default function ConselhoClasseClient({
                                          key={`${nota.id}-${notaRecVal}`}
                                          onBlur={(e) => handleNotaRecChange(nota.id, e.target.value)}
                                          disabled={isApproved}
-                                         className={`w-16 h-9 text-center rounded-md text-base font-medium border outline-none transition-all${
+                                         className={`w-16 h-9 text-center rounded-md text-base font-medium border outline-none transition-all ${
                                            isApproved 
                                            ? 'bg-success-subtle text-success-fg border-success-line cursor-not-allowed font-medium' 
                                            : 'bg-danger-subtle text-danger-fg border-danger-line focus:border-danger-line focus:ring-2 focus:ring-danger/30'
@@ -887,7 +887,7 @@ export default function ConselhoClasseClient({
                                               </option>
                                             ))}
                                           </select>
-                                          <div className={`absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none${isApproved ? 'text-success-fg' : iconColor}`}>
+                                          <div className={`absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none ${isApproved ? 'text-success-fg' : iconColor}`}>
                                             <ChevronDown className="w-3.5 h-3.5" />
                                           </div>
                                         </div>
@@ -973,7 +973,7 @@ export default function ConselhoClasseClient({
                             <td className="px-4 py-4 text-center font-medium text-fg-muted text-xs">
                               {notaRecVal !== null && notaRecVal !== undefined ? notaRecVal.toFixed(1) : '-'}
                             </td>
-                            <td className={`px-4 py-4 text-center text-xs font-medium${statusOpt?.color || 'text-fg'}`}>
+                            <td className={`px-4 py-4 text-center text-xs font-medium ${statusOpt?.color || 'text-fg'}`}>
                               {statusOpt?.label || status}
                             </td>
                           </tr>

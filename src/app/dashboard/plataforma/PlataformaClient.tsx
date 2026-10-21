@@ -110,7 +110,7 @@ export default function PlataformaClient({ escolasIniciais }: { escolasIniciais:
                       <p className="text-[11px] text-slate-400 font-medium tracking-wide">{escola.slug}.axis.com</p>
                     </td>
                     <td className="px-4 py-4">
-                      <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-wide border${statusBadge[escola.status] || 'bg-slate-50 text-slate-500 border-slate-200'}`}>
+                      <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-wide border ${statusBadge[escola.status] || 'bg-slate-50 text-slate-500 border-slate-200'}`}>
                         {labelStatus[escola.status] || escola.status}
                       </span>
                     </td>
@@ -148,7 +148,7 @@ export default function PlataformaClient({ escolasIniciais }: { escolasIniciais:
                         <button
                           onClick={() => setEscolaParaSuspender(escola)}
                           disabled={processandoId === escola.id}
-                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold tracking-wide transition-all${
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold tracking-wide transition-all ${
                             escola.status === 'SUSPENSA'
                               ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
                               : 'bg-amber-50 text-amber-600 hover:bg-amber-100'
