@@ -72,8 +72,8 @@ export default function PortalActivationAction({
                       {hasUser ? <ShieldCheck size={24} /> : <ShieldAlert size={24} />}
                    </div>
                    <div>
-                      <h3 className="font-bold text-fg tracking-tight">Gestão de Acesso</h3>
-                      <p className="text-xs font-semibold text-fg-subtle">Ativação do Portal do Aluno</p>
+                      <h3 className="font-bold text-fg tracking-tight">Gestão de acesso</h3>
+                      <p className="text-xs font-semibold text-fg-subtle">Ativação do portal do aluno</p>
                    </div>
                 </div>
                 <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-subtle rounded-full transition-colors">
@@ -101,7 +101,7 @@ export default function PortalActivationAction({
                    </p>
                    
                    <div className="space-y-2">
-                      <label className="text-xs font-semibold text-fg-subtle ml-1">Confirmar Matrícula</label>
+                      <label className="text-xs font-semibold text-fg-subtle ml-1">Confirmar matrícula</label>
                       <input 
                         type="text" 
                         value={matricula}

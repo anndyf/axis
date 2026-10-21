@@ -25,7 +25,7 @@ export default async function FinanceiroPage() {
       <div className="w-16 h-16 bg-subtle text-fg-muted rounded-lg flex items-center justify-center mx-auto">
         <DollarSign className="w-8 h-8" />
       </div>
-      <h1 className="text-2xl font-medium text-fg">Módulo Financeiro</h1>
+      <h1 className="text-2xl font-medium text-fg">Módulo financeiro</h1>
       <p className="text-fg-muted">Em breve.</p>
     </div>
   )

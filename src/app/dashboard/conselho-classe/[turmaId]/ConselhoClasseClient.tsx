@@ -210,7 +210,7 @@ export default function ConselhoClasseClient({
       })
 
       if (response.ok) {
-        setMessage({ type: 'success', text: 'Decisões do conselho salvas com sucesso!' })
+        setMessage({ type: 'success', text: 'Decisões do conselho salvas com sucesso.' })
         router.refresh()
         setTimeout(() => setMessage(null), 5000)
       } else {
@@ -218,7 +218,7 @@ export default function ConselhoClasseClient({
         setMessage({ type: 'error', text: error.message || 'Erro ao salvar decisões' })
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Erro ao conectar com o servidor' })
+      setMessage({ type: 'error', text: 'Não foi possível conectar ao servidor. Tente novamente.' })
     } finally {
       setLoading(false)
     }
@@ -354,23 +354,23 @@ export default function ConselhoClasseClient({
       `}</style>
 
       {/* Versão para impressão - Tabela */}
-      <div className="print-only p-6 bg-surface">
+      <div className="print-only p-4 bg-surface">
         {/* Marca d'água */}
         <div className="print-watermark">
           Powered by Áxis
         </div>
         
         {/* Cabeçalho e Legenda lado a lado */}
-        <div className="mb-3 flex items-start justify-between gap-6">
+        <div className="mb-3 flex items-start justify-between gap-4">
           {/* Identificação - Esquerda */}
           <div className="flex-1">
             <p className="text-xs font-medium text-fg-muted mb-1 leading-tight">
-              Centro Territorial de Educação Profissional do Litoral Norte e Agreste Baiano
+              Centro territorial de educação profissional do litoral norte e agreste baiano
             </p>
             <div className="flex items-center gap-2 mb-1">
               <div className="text-fg font-medium text-lg">Áxis</div>
               <div className="text-fg-disabled">|</div>
-              <h1 className="text-xl font-medium text-fg">Conselho de Classe Final</h1>
+              <h1 className="text-xl font-medium text-fg">Conselho de classe final</h1>
             </div>
             <h2 className="text-lg font-medium text-fg mb-0.5">{turmaNome}</h2>
             {turmaCurso && <p className="text-sm font-medium text-fg-muted">{turmaCurso} {turmaTurno && `- ${turmaTurno}`}</p>}
@@ -512,8 +512,8 @@ export default function ConselhoClasseClient({
     <div className="no-print">
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
       <header className="mb-6 border-b border-line pb-4 no-print">
-        <div className="max-w-7xl mx-auto py-4">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div className="py-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div className="flex items-center space-x-5">
               <Link
                 href="/dashboard/conselho-classe"
@@ -538,11 +538,11 @@ export default function ConselhoClasseClient({
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-32 space-y-8 no-print">
+      <main className="pt-4 pb-32 space-y-5 no-print">
         <form onSubmit={handleSubmit}>
           {/* Mensagem */}
           {message && (
-            <div className={`mb-8 p-5 rounded-xl animate-slide-up ${
+            <div className={`mb-4 p-5 rounded-xl animate-slide-up ${
               message.type === 'success' 
                 ? 'bg-success-subtle border border-success-line text-success-fg shadow-sm' 
                 : 'bg-danger-subtle border border-danger-line text-danger-fg shadow-sm'
@@ -557,7 +557,7 @@ export default function ConselhoClasseClient({
           )}
 
           {/* Dashboard de Visão Geral */}
-          <div className="mb-6 bg-surface p-1.5 rounded-xl border border-line-strong shadow-card overflow-hidden">
+          <div className="mb-6 bg-surface p-1.5 rounded-xl border border-line-strong overflow-hidden">
             <div className="p-4">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 {/* Métricas Rápidas */}
@@ -585,7 +585,7 @@ export default function ConselhoClasseClient({
                         <span className="text-xs font-medium text-success-fg">{concluidos} Concluídos</span>
                       </div>
                       <div className="px-3 py-1.5 bg-warning-subtle rounded-xl border border-warning-line flex items-center space-x-2">
-                        <div className="w-1 h-1 bg-warning rounded-full animate-pulse" />
+                        <div className="w-1 h-1 bg-warning rounded-full" />
                         <span className="text-xs font-medium text-warning-fg">{pendentes} Pendentes</span>
                       </div>
                     </div>
@@ -620,14 +620,14 @@ export default function ConselhoClasseClient({
 
               {/* Instruções Expansíveis */}
               {showInstructions && (
-                <div className="mt-8 p-8 bg-surface rounded-xl border border-line animate-slide-up">
+                <div className="mt-4 p-4 bg-surface rounded-xl border border-line animate-slide-up">
                   <div className="flex items-start space-x-5">
-                    <div className="p-3 bg-accent rounded-lg shadow-card">
+                    <div className="p-3 bg-accent rounded-lg">
                       <Gavel className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-base font-medium text-fg tracking-tight">Guia Rápido do Conselho</h3>
-                      <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-8">
+                      <h3 className="text-base font-medium text-fg tracking-tight">Guia rápido do conselho</h3>
+                      <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
                           <span className="text-xs font-medium text-accent-fg">Passo 01</span>
                           <p className="text-xs text-fg-subtle leading-relaxed font-medium">Clique no nome do aluno para abrir a lista de matérias com pendência.</p>
@@ -638,7 +638,7 @@ export default function ConselhoClasseClient({
                         </div>
                         <div className="space-y-2">
                           <span className="text-xs font-medium text-accent-fg">Passo 03</span>
-                          <p className="text-xs text-fg-subtle leading-relaxed font-medium">Defina a <b>Decisão Final</b> e use o botão <b>Gravar</b> no rodapé fixo.</p>
+                          <p className="text-xs text-fg-subtle leading-relaxed font-medium">Defina a <b>Decisão final</b> e use o botão <b>Gravar</b> no rodapé fixo.</p>
                         </div>
                       </div>
                     </div>
@@ -647,7 +647,7 @@ export default function ConselhoClasseClient({
               )}
 
               {/* Legenda Minimalista */}
-              <div className="mt-8 pt-6 border-t border-line-subtle flex flex-wrap items-center gap-8 px-2">
+              <div className="mt-4 pt-6 border-t border-line-subtle flex flex-wrap items-center gap-4 px-2">
                 <span className="text-xs font-medium text-fg-disabled">Legenda de Estados:</span>
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 rounded-full bg-success" />
@@ -674,7 +674,7 @@ export default function ConselhoClasseClient({
           </div>
 
           {/* Listagem por Estudante */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             {Object.entries(
               notasConselho.reduce((acc, nota) => {
                 if (!acc[nota.estudanteId]) {
@@ -710,7 +710,7 @@ export default function ConselhoClasseClient({
               return (
                 <div 
                   key={estudanteId} 
-                  className={`bg-surface rounded-lg shadow-sm transition-all duration-300 border ${
+                  className={`bg-surface rounded-lg transition-all duration-300 border ${
                     isExpanded ? 'shadow-card border-line-strong' : 'border-line'
                   } ${
                     todasResolvidas ? 'bg-success-subtle border-success-line' : ''
@@ -774,14 +774,14 @@ export default function ConselhoClasseClient({
 
                   {/* Listagem de Disciplinas (Sanfonado) */}
                   {isExpanded && (
-                    <div className="px-6 pb-6 pt-2 animate-slide-up">
+                    <div className="px-4 pb-6 pt-2 animate-slide-up">
                       <div className="overflow-x-auto">
                         <table className="w-full">
                           <thead>
                             <tr className="border-b border-line">
                                <th className="px-4 py-3 text-left text-sm font-medium text-fg-subtle w-10">#</th>
                               <th className="px-4 py-3 text-left text-sm font-medium text-fg-subtle text-nowrap">Disciplina</th>
-                              <th className="px-4 py-3 text-center text-sm font-medium text-fg-subtle">Média Anual</th>
+                              <th className="px-4 py-3 text-center text-sm font-medium text-fg-subtle">Média anual</th>
                               <th className="px-4 py-3 text-center text-sm font-medium text-fg-subtle text-nowrap">Nota Rec.</th>
                               <th className="px-4 py-3 text-left text-sm font-medium text-accent-fg">Decisão</th>
                             </tr>
@@ -932,9 +932,9 @@ export default function ConselhoClasseClient({
         {showConfirmModal && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-900/40 backdrop-blur-sm p-4 animate-fade-in">
             <div className="bg-surface rounded-xl shadow-overlay max-w-2xl w-full flex flex-col max-h-[90vh] animate-pop-in">
-              <div className="p-8 border-b border-line-subtle flex items-center justify-between">
+              <div className="p-4 border-b border-line-subtle flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-medium text-fg">Revisar Decisões</h3>
+                  <h3 className="text-xl font-medium text-fg">Revisar decisões</h3>
                   <p className="text-xs font-medium text-fg-subtle mt-1">Confira os dados antes de consolidar no sistema</p>
                 </div>
                 <button 
@@ -946,14 +946,14 @@ export default function ConselhoClasseClient({
                 </button>
               </div>
               
-              <div className="p-8 overflow-y-auto flex-1 custom-scrollbar">
-                <div className="bg-surface rounded-xl border border-line overflow-hidden shadow-card font-mono">
+              <div className="p-4 overflow-y-auto flex-1 custom-scrollbar">
+                <div className="bg-surface rounded-xl border border-line overflow-hidden font-mono">
                   <table className="w-full text-left">
                     <thead className="bg-subtle-hover/50 text-fg-subtle font-medium text-xs">
                       <tr>
-                        <th className="px-6 py-4">Estudante / Disciplina</th>
-                        <th className="px-6 py-4 text-center">Nota Rec.</th>
-                        <th className="px-6 py-4 text-center">Decisão</th>
+                        <th className="px-4 py-4">Estudante / Disciplina</th>
+                        <th className="px-4 py-4 text-center">Nota Rec.</th>
+                        <th className="px-4 py-4 text-center">Decisão</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-line-subtle bg-surface">
@@ -966,14 +966,14 @@ export default function ConselhoClasseClient({
 
                         return (
                           <tr key={notaId}>
-                            <td className="px-6 py-4">
+                            <td className="px-4 py-4">
                               <p className="font-medium text-fg text-xs">{nota.estudanteNome}</p>
                               <p className="text-xs text-fg-subtle font-medium mt-0.5">{nota.disciplinaNome}</p>
                             </td>
-                            <td className="px-6 py-4 text-center font-medium text-fg-muted text-xs">
+                            <td className="px-4 py-4 text-center font-medium text-fg-muted text-xs">
                               {notaRecVal !== null && notaRecVal !== undefined ? notaRecVal.toFixed(1) : '-'}
                             </td>
-                            <td className={`px-6 py-4 text-center text-xs font-medium ${statusOpt?.color || 'text-fg'}`}>
+                            <td className={`px-4 py-4 text-center text-xs font-medium ${statusOpt?.color || 'text-fg'}`}>
                               {statusOpt?.label || status}
                             </td>
                           </tr>
@@ -984,21 +984,21 @@ export default function ConselhoClasseClient({
                 </div>
               </div>
 
-              <div className="p-8 border-t border-line-subtle flex justify-end space-x-4 bg-subtle/50 rounded-b-[2.5rem]">
+              <div className="p-4 border-t border-line-subtle flex justify-end space-x-4 bg-subtle/50 rounded-b-[2.5rem]">
                 <button
                   type="button"
                   onClick={() => setShowConfirmModal(false)}
-                  className="px-8 py-3 rounded-lg font-medium text-fg-subtle hover:bg-surface transition-all text-sm"
+                  className="px-4 py-3 rounded-lg font-medium text-fg-subtle hover:bg-surface transition-all text-sm"
                 >
                   Voltar
                 </button>
                 <button
                   type="button"
                   onClick={handleConfirmSave}
-                  className="px-10 py-3 rounded-lg bg-accent text-on-accent font-medium hover:bg-accent-hover shadow-card transition-all flex items-center space-x-3 active:scale-95 text-xs"
+                  className="px-4 py-3 rounded-lg bg-accent text-on-accent font-medium hover:bg-accent-hover transition-all flex items-center space-x-3 text-xs"
                 >
                   <Save className="w-4 h-4" />
-                  <span>Gravar Permanentemente</span>
+                  <span>Gravar permanentemente</span>
                 </button>
               </div>
             </div>

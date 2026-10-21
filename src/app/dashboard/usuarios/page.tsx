@@ -2,7 +2,8 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import Link from "next/link"
-import { ArrowLeft, Plus } from "lucide-react"
+import { Plus } from "lucide-react"
+import { CabecalhoPagina, buttonClasses } from "@/components/ui"
 import UsuariosClient from "@/components/UsuariosClient"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
 import { can } from '@/lib/rbac'
@@ -56,42 +57,21 @@ export default async function UsuariosPage() {
   const pendentes = usuarios.filter(u => !u.isApproved).length
 
   return (
-    <div className="pb-20">
-      {/* Header */}
-      <header className="mb-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex min-w-0 items-center gap-3">
-              <Link href="/dashboard" aria-label="Voltar" className="hidden sm:inline-flex p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg">
-                <ArrowLeft className="w-5 h-5 text-fg-muted" />
-              </Link>
-              <div>
-                <h1 className="text-2xl font-semibold tracking-tight text-fg">
-                  Gerenciar Usuários
-                  {pendentes > 0 && (
-                    <span className="px-2.5 py-0.5 text-xs font-bold bg-warning-subtle text-warning-fg border border-warning-line rounded-full animate-pulse">
-                      {pendentes} pendente{pendentes !== 1 ? 's' : ''}
-                    </span>
-                  )}
-                </h1>
-                <p className="text-sm text-fg-muted">Contas da equipe e seus papéis</p>
-              </div>
-            </div>
-            <Link
-              href="/dashboard/usuarios/novo"
-              className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
-            >
-              <Plus size={16} strokeWidth={1.75} />
-              <span>Novo Usuário</span>
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <UsuariosClient usuarios={usuarios} />
-      </main>
+    <div className="pb-20 md:pb-0">
+      <CabecalhoPagina
+        titulo="Usuários"
+        descricao="Contas da equipe, papéis e aprovação de cadastros."
+        dados={[
+          { rotulo: "Contas", valor: usuarios.length },
+          ...(pendentes > 0 ? [{ rotulo: "Pendentes", valor: <span className="text-warning-fg">{pendentes}</span> }] : []),
+        ]}
+        acoes={
+          <Link href="/dashboard/usuarios/novo" className={buttonClasses()}>
+            <Plus size={16} strokeWidth={1.75} aria-hidden /> Novo usuário
+          </Link>
+        }
+      />
+      <UsuariosClient usuarios={usuarios} />
     </div>
   )
 }

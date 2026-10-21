@@ -2,9 +2,9 @@
 
 import { useState, useMemo } from "react"
 import Link from "next/link"
-import { ArrowLeft, Download, CheckCircle2, FileText, GraduationCap, AlertTriangle, TrendingDown, Info, Printer } from "lucide-react"
+import { ArrowLeft, Download, CheckCircle2, FileText, GraduationCap, AlertTriangle, TrendingDown, Info } from "lucide-react"
 import TeacherTipsModal from "@/components/TeacherTipsModal"
-import { buttonClasses } from "@/components/ui"
+import { BotaoImprimir, buttonClasses } from "@/components/ui"
 import { analyzeRisk } from "@/lib/risk-analysis"
 import type { EtapaDaNota } from "@/lib/services/notas"
 
@@ -130,7 +130,7 @@ export default function ResultadosTurmaClient({
             if (n.nota !== null && n.nota !== undefined) {
                  return (
                      <div className="flex flex-col items-center justify-center gap-[1px]" title="Infrequente (Desistente)">
-                         <span className={`w-5 h-5 rounded flex items-center justify-center text-xs font-medium ${config.color} ${config.text} shadow-sm`}>{label}</span>
+                         <span className={`w-5 h-5 rounded flex items-center justify-center text-xs font-medium ${config.color} ${config.text}`}>{label}</span>
                          <span className="text-[7px] font-semibold bg-warning-subtle text-warning-fg px-1 rounded">INF</span>
                      </div>
                  )
@@ -143,7 +143,7 @@ export default function ResultadosTurmaClient({
         }
 
         return (
-            <span className={`w-5 h-5 rounded flex items-center justify-center text-xs font-medium ${config.color} ${config.text} shadow-sm`}>
+            <span className={`w-5 h-5 rounded flex items-center justify-center text-xs font-medium ${config.color} ${config.text}`}>
               {label}
             </span>
         )
@@ -233,12 +233,13 @@ export default function ResultadosTurmaClient({
       
       {/* Header Premium */}
       <header className="mb-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div className="py-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div className="flex min-w-0 items-center gap-3">
               <Link
                 href="/dashboard/resultados"
-                className="w-10 h-10 bg-surface border border-line-strong rounded-xl flex items-center justify-center text-fg-muted hover:bg-canvas transition-all shadow-sm hover:translate-x-[-2px]"
+                data-sem-impressao
+                className="w-10 h-10 bg-surface border border-line-strong rounded-xl flex items-center justify-center text-fg-muted hover:bg-canvas transition-all hover:translate-x-[-2px]"
               >
                 <ArrowLeft className="w-5 h-5" />
               </Link>
@@ -254,7 +255,7 @@ export default function ResultadosTurmaClient({
             </div>
             
             <div className="flex flex-wrap items-center gap-3">
-              <div role="group" aria-label="Visualização" className="flex items-center gap-0.5 rounded-lg border border-line bg-subtle p-0.5">
+              <div role="group" aria-label="Visualização" data-sem-impressao className="flex items-center gap-0.5 rounded-lg border border-line bg-subtle p-0.5">
                 {[
                   { id: 'FINAL', label: 'Status', icon: CheckCircle2 },
                   ...nomesEtapas.map((_, i) => ({ id: `UNIDADE_${i + 1}`, label: `Und ${i + 1}`, icon: FileText }))
@@ -288,15 +289,16 @@ export default function ResultadosTurmaClient({
                 <Download size={16} strokeWidth={1.75} />
                 <span>PDF</span>
               </a>
+              <BotaoImprimir />
             </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="py-4">
         {/* Compact Summary & Legend Row */}
-        <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 mb-6 bg-surface p-4 rounded-2xl border border-line-strong shadow-sm">
+        <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 mb-6 bg-surface p-4 rounded-2xl border border-line-strong">
           {/* Metrics */}
           <div className="flex items-center space-x-6 px-2">
             <div>
@@ -331,7 +333,7 @@ export default function ResultadosTurmaClient({
         </div>
 
         {/* Ultra Compact Matriz */}
-        <div className="bg-surface rounded-2xl shadow-card border border-line overflow-hidden relative">
+        <div className="bg-surface rounded-2xl border border-line overflow-hidden relative">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
@@ -407,14 +409,11 @@ export default function ResultadosTurmaClient({
                           </td>
                         ))}
                         <td className={`h-9 px-2 text-center sticky right-0 bg-surface border-l border-line group-hover:bg-canvas transition-colors z-10 ${rowBg}`}>
-                           <div className={`
-                             inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border transition-all
-                             ${worstRisk.level === 'CRITICAL' ? 'bg-danger-subtle border-danger-line' : 
+                           <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border transition-all ${worstRisk.level === 'CRITICAL' ? 'bg-danger-subtle border-danger-line' : 
                                worstRisk.level === 'HIGH' ? 'bg-warning-subtle border-warning-line' :
                                worstRisk.level === 'MEDIUM' ? 'bg-warning-subtle border-warning-line' :
-                               'bg-canvas border-line'}
-                           `} title={worstRisk.message}>
-                             {worstRisk.level === 'CRITICAL' && <AlertTriangle size={10} className="text-danger-fg animate-pulse" />}
+                               'bg-canvas border-line'}`} title={worstRisk.message}>
+                             {worstRisk.level === 'CRITICAL' && <AlertTriangle size={10} className="text-danger-fg" />}
                              {worstRisk.level === 'HIGH' && <TrendingDown size={10} className="text-warning-fg" />}
                              {worstRisk.level === 'MEDIUM' && <Info size={10} className="text-warning-fg" />}
                              

@@ -38,7 +38,7 @@ export function Dialog({ open, onClose, title, description, children, footer, si
         aria-describedby={description ? descricaoId : undefined}
         tabIndex={-1}
         className={cn(
-          'relative flex max-h-[90vh] w-full flex-col rounded-t-2xl border border-line bg-elevated shadow-overlay outline-none sm:rounded-2xl',
+          'relative flex max-h-[90vh] w-full flex-col rounded-t-modal border border-line bg-elevated shadow-overlay outline-none sm:rounded-modal',
           'animate-pop-in',
           size === 'sm' ? 'sm:max-w-sm' : size === 'lg' ? 'sm:max-w-2xl' : size === 'xl' ? 'sm:max-w-5xl' : 'sm:max-w-lg'
         )}

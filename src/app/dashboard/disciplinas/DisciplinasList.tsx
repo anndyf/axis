@@ -3,7 +3,10 @@
 import { useState, useMemo } from "react"
 import Link from "next/link"
 import { BookOpen, ChevronRight, Sun, Sunset, Moon, Clock, Pencil, Search } from "lucide-react"
-import { EmptyState } from "@/components/ui"
+import { useRouter } from "next/navigation"
+import { EmptyState, Painel, RodapeTabela, Table, TableContainer, TableEmpty, TBody, TD, TH, THead, TR, type DirecaoOrdem } from "@/components/ui"
+import { BarraFerramentas } from "@/components/ui/BarraFerramentas"
+import { baixarCSV } from "@/lib/navegador/csv"
 
 const CONTROLE = "h-9 w-full rounded-lg border border-line bg-surface px-3 text-sm text-fg transition-colors duration-150 placeholder:text-fg-subtle hover:border-line-strong focus:border-accent"
 
@@ -95,8 +98,78 @@ export default function DisciplinasList({ disciplinas }: DisciplinasListProps) {
 
   const rotulo = (t: string) => t.charAt(0).toUpperCase() + t.slice(1).toLowerCase()
 
+  // Desktop: ordenação da tabela
+  const router = useRouter()
+  const [ordem, setOrdem] = useState<{ coluna: "nome" | "turma" | "notas"; direcao: DirecaoOrdem }>({ coluna: "turma", direcao: "asc" })
+  const ordenar = (coluna: typeof ordem.coluna) => setOrdem((o) => ({ coluna, direcao: o.coluna === coluna && o.direcao === "asc" ? "desc" : "asc" }))
+  const ordenadas = useMemo(() => {
+    const s = [...filteredDisciplinas].sort((a, b) =>
+      ordem.coluna === "notas" ? a._count.notas - b._count.notas
+        : ordem.coluna === "turma" ? a.turma.nome.localeCompare(b.turma.nome, "pt-BR", { numeric: true }) || a.nome.localeCompare(b.nome, "pt-BR")
+        : a.nome.localeCompare(b.nome, "pt-BR"))
+    return ordem.direcao === "asc" ? s : s.reverse()
+  }, [filteredDisciplinas, ordem])
+
   return (
-    <div className="space-y-6">
+    <>
+    {/* Desktop: lista de trabalho */}
+    <Painel semRecuo className="hidden md:block">
+      <BarraFerramentas
+        noPainel
+        busca={{ valor: searchTerm, onChange: setSearchTerm, placeholder: "Buscar disciplina ou turma" }}
+        filtros={
+          <>
+            <select value={filterTurno} onChange={(e) => setFilterTurno(e.target.value)} aria-label="Turno" className="h-8 rounded-md border border-line bg-surface px-2 text-13 text-fg-muted hover:border-line-strong focus:border-accent focus:outline-none">
+              <option value="">Todos os turnos</option>
+              {uniqueTurnos.map((t: any) => <option key={t} value={t}>{rotulo(t)}</option>)}
+            </select>
+            <select value={filterTurma} onChange={(e) => setFilterTurma(e.target.value)} aria-label="Turma" className="h-8 rounded-md border border-line bg-surface px-2 text-13 text-fg-muted hover:border-line-strong focus:border-accent focus:outline-none">
+              <option value="">Todas as turmas</option>
+              {uniqueTurmas.map((t: any) => <option key={t} value={t}>{t}</option>)}
+            </select>
+          </>
+        }
+        onExportar={() => baixarCSV("Disciplinas", [
+          { titulo: "Disciplina", valor: (d: Disciplina) => d.nome },
+          { titulo: "Turma", valor: (d: Disciplina) => d.turma.nome },
+          { titulo: "Turno", valor: (d: Disciplina) => (d.turma.turno ? rotulo(d.turma.turno) : "") },
+          { titulo: "Notas lançadas", valor: (d: Disciplina) => d._count.notas },
+        ], ordenadas)}
+      />
+      <TableContainer semBorda>
+        <Table>
+          <THead>
+            <TR>
+              <TH ordem={ordem.coluna === "nome" ? ordem.direcao : null} onOrdenar={() => ordenar("nome")}>Disciplina</TH>
+              <TH ordem={ordem.coluna === "turma" ? ordem.direcao : null} onOrdenar={() => ordenar("turma")}>Turma</TH>
+              <TH>Turno</TH>
+              <TH numeric ordem={ordem.coluna === "notas" ? ordem.direcao : null} onOrdenar={() => ordenar("notas")}>Notas lançadas</TH>
+              <TH className="text-right"><span className="sr-only">Ações</span></TH>
+            </TR>
+          </THead>
+          <TBody>
+            {ordenadas.map((d) => (
+              <TR key={d.id} onClick={() => router.push(`/dashboard/disciplinas/${d.id}/editar`)}>
+                <TD className="font-medium">{d.nome}</TD>
+                <TD><Link href={`/dashboard/turmas/${d.turma.id}`} onClick={(e) => e.stopPropagation()} className="text-fg-muted hover:text-fg hover:underline">{d.turma.nome}</Link></TD>
+                <TD className="text-fg-muted">{d.turma.turno ? rotulo(d.turma.turno) : "—"}</TD>
+                <TD numeric className="text-fg-muted">{d._count.notas}</TD>
+                <TD className="w-0">
+                  <Link href={`/dashboard/disciplinas/${d.id}/editar`} onClick={(e) => e.stopPropagation()} aria-label={`Editar ${d.nome} (${d.turma.nome})`} title="Editar disciplina" className="flex size-8 items-center justify-center rounded-md text-fg-subtle hover:bg-subtle hover:text-fg">
+                    <Pencil size={16} strokeWidth={1.75} />
+                  </Link>
+                </TD>
+              </TR>
+            ))}
+            {ordenadas.length === 0 && <TableEmpty colSpan={5}>Nenhuma disciplina encontrada com estes filtros.</TableEmpty>}
+          </TBody>
+        </Table>
+      </TableContainer>
+      <RodapeTabela total={ordenadas.length} singular="disciplina" plural="disciplinas" />
+    </Painel>
+
+    {/* Celular: por turno e turma (como antes) */}
+    <div className="space-y-4 md:hidden">
       {/* Filtros */}
       <div className="bg-surface p-4 rounded-2xl border border-line flex flex-col md:flex-row gap-3 md:items-end">
         <div className="flex-1 w-full space-y-1.5">
@@ -134,7 +207,7 @@ export default function DisciplinasList({ disciplinas }: DisciplinasListProps) {
       {sortedTurnos.length === 0 ? (
         <EmptyState icon={Search} title="Nenhuma disciplina encontrada" description="Tente ajustar os filtros de busca." className="rounded-lg border border-dashed border-line bg-surface" />
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-5">
       {sortedTurnos.map(turno => (
         <section key={turno} className="space-y-3" aria-label={rotulo(turno)}>
           <div className="flex items-center gap-2">
@@ -191,5 +264,6 @@ export default function DisciplinasList({ disciplinas }: DisciplinasListProps) {
         </div>
       )}
     </div>
+    </>
   )
 }

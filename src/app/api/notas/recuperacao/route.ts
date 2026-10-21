@@ -69,7 +69,9 @@ export const POST = rotaDoModulo('NOT', 'escrita', async function POST(request: 
 
         // Buscar nota original, escopada a escola do chamador
         const notaOriginal = await prisma.notaFinal.findFirst({
-          where: { id: notaId, estudante: { escolaId } },
+          // Só quem leciona a disciplina grava a recuperação (antes qualquer
+          // professor da escola gravava em disciplina de outro)
+          where: { id: notaId, estudante: { escolaId }, disciplina: { usuariosPermitidos: { some: { id: userId } } } },
           include: {
             estudante: { select: { turma: { select: { cursoId: true, esquemaAvaliacaoId: true } } } },
             unidades: { select: { esquemaUnidadeId: true, notaCalculada: true, notaRecuperacao: true } }

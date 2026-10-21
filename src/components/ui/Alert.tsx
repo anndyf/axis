@@ -16,7 +16,7 @@ const ICONES = { info: Info, success: CheckCircle2, warning: AlertTriangle, dang
 export function Alert({ tone = 'info', title, children, className }: { tone?: Tom; title?: ReactNode; children?: ReactNode; className?: string }) {
   const Icone = ICONES[tone]
   return (
-    <div role={tone === 'danger' ? 'alert' : 'status'} className={cn('flex gap-2.5 rounded-xl border px-3.5 py-3 text-13', ESTILO[tone], className)}>
+    <div role={tone === 'danger' ? 'alert' : 'status'} className={cn('flex gap-2.5 rounded-painel border px-3.5 py-2.5 text-13', ESTILO[tone], className)}>
       <Icone size={16} strokeWidth={1.75} className="mt-px shrink-0" aria-hidden />
       <div className="min-w-0 space-y-0.5">
         {title && <p className="font-medium">{title}</p>}

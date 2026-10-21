@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { ChevronRight } from 'lucide-react'
 import { cn } from './cn'
+import { CabecalhoPagina } from './CabecalhoPagina'
 
 export interface Migalha {
   label: string
@@ -31,7 +32,10 @@ export function Breadcrumb({ items, className }: { items: Migalha[]; className?:
   )
 }
 
-/** Cabeçalho de página: (migalhas) título, descrição e ações. */
+/**
+ * Cabeçalho de página antigo: agora é o CabecalhoPagina (caminho, título,
+ * descrição e ações), para as telas que ainda usam esta API.
+ */
 export function PageHeader({ title, description, actions, breadcrumb, className }: {
   title: ReactNode
   description?: ReactNode
@@ -39,16 +43,5 @@ export function PageHeader({ title, description, actions, breadcrumb, className 
   breadcrumb?: Migalha[]
   className?: string
 }) {
-  return (
-    <header className={cn('mb-6 space-y-2', className)}>
-      {breadcrumb && <Breadcrumb items={breadcrumb} />}
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="min-w-0">
-          <h1 className="text-2xl font-semibold tracking-tight text-fg">{title}</h1>
-          {description && <p className="mt-1 max-w-2xl text-sm text-fg-muted">{description}</p>}
-        </div>
-        {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
-      </div>
-    </header>
-  )
+  return <CabecalhoPagina titulo={title} descricao={description} acoes={actions} caminho={breadcrumb} className={className} />
 }

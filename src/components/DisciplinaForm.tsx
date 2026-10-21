@@ -94,7 +94,7 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
     setError("")
 
     if (!isEdit && selectedTurmas.length === 0) {
-      setError("Selecione pelo menos uma turma")
+      setError("Selecione pelo menos uma turma.")
       setLoading(false)
       return
     }
@@ -136,7 +136,7 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
         setIsErrorModalOpen(true)
       }
     } catch (err) {
-      setError('Erro ao conectar com o servidor')
+      setError('Não foi possível conectar ao servidor. Tente novamente.')
       setIsErrorModalOpen(true)
     } finally {
       setLoading(false)
@@ -168,7 +168,7 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
       }
     } catch (err) {
       console.error('Erro ao excluir:', err)
-      setError('Erro ao conectar com o servidor')
+      setError('Não foi possível conectar ao servidor. Tente novamente.')
       setIsErrorModalOpen(true)
       setIsConfirmModalOpen(false)
     } finally {
@@ -194,8 +194,8 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
         loading={deleteLoading}
       />
       {/* Header */}
-      <header className="bg-surface shadow-sm border-b border-line">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <header className="bg-surface border-b border-line">
+        <div className="max-w-7xl mx-auto px-4 sm:px-4 lg:px-4 py-4">
           <div className="flex items-center space-x-4">
             <Link
               href="/dashboard/disciplinas"
@@ -216,14 +216,14 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
       </header>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <form onSubmit={handleSubmit} className="bg-surface rounded-xl shadow-sm border border-line p-6">
-          <div className="space-y-8">
+      <main className="max-w-4xl mx-auto px-4 sm:px-4 lg:px-4 py-4">
+        <form onSubmit={handleSubmit} className="bg-surface rounded-xl border border-line p-4">
+          <div className="space-y-5">
             {/* Seção 1: Dados da Disciplina */}
             <div>
               <h3 className="text-lg font-semibold text-fg mb-4 flex items-center">
                 <span className="w-8 h-8 rounded-full bg-accent-subtle text-accent-fg flex items-center justify-center text-sm mr-3">1</span>
-                Informações da Disciplina
+                Informações da disciplina
               </h3>
               
               <div className="pl-11">
@@ -314,9 +314,9 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
                       className="text-sm font-medium text-accent-fg hover:text-accent-fg flex items-center transition-colors"
                     >
                       {selectedTurmas.length === turmas.length ? (
-                        <><CheckSquare className="w-4 h-4 mr-1" /> Desmarcar Todas</>
+                        <><CheckSquare className="w-4 h-4 mr-1" /> Desmarcar todas</>
                       ) : (
-                        <><Square className="w-4 h-4 mr-1" /> Selecionar Todas</>
+                        <><Square className="w-4 h-4 mr-1" /> Selecionar todas</>
                       )}
                     </button>
                   )}
@@ -339,7 +339,7 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
                       ))}
                     </select>
                  ) : (
-                   <div className="max-h-[500px] overflow-y-auto pr-2 custom-scrollbar space-y-6">
+                   <div className="max-h-[500px] overflow-y-auto pr-2 custom-scrollbar space-y-4">
                      {sortedTurnos.map(turno => (
                         <div key={turno}>
                            <h4 className="flex items-center text-sm font-semibold text-fg mb-3 pb-1 border-b border-line-subtle">
@@ -398,14 +398,14 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
             </div>
           </div>
 
-          <div className="mt-8 flex items-center justify-between pt-6 border-t border-line-subtle">
+          <div className="mt-4 flex items-center justify-between pt-6 border-t border-line-subtle">
             <div>
               {isEdit && (
                 <button
                   type="button"
                   onClick={() => setIsConfirmModalOpen(true)}
                   disabled={loading || deleteLoading}
-                  className="px-6 py-3 text-danger-fg hover:bg-danger-subtle rounded-lg transition-colors disabled:opacity-50 font-medium"
+                  className="px-4 py-3 text-danger-fg hover:bg-danger-subtle rounded-lg transition-colors disabled:opacity-50 font-medium"
                 >
                   Excluir
                 </button>
@@ -414,14 +414,14 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
             <div className="flex space-x-4">
               <Link
                 href="/dashboard/disciplinas"
-                className="px-6 py-3 text-fg-muted hover:bg-subtle rounded-lg transition-colors font-medium"
+                className="px-4 py-3 text-fg-muted hover:bg-subtle rounded-lg transition-colors font-medium"
               >
                 Cancelar
               </Link>
               <button
                 type="submit"
                 disabled={loading || (!isEdit && selectedTurmas.length === 0)}
-                className="flex items-center space-x-2 bg-accent text-on-accent px-8 py-3 rounded-lg hover:bg-accent-hover transition-all shadow-card disabled:opacity-50 font-medium"
+                className="flex items-center space-x-2 bg-accent text-on-accent px-4 py-3 rounded-lg hover:bg-accent-hover transition-all disabled:opacity-50 font-medium"
               >
                 {loading ? (
                   <>

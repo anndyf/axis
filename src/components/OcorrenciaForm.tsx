@@ -97,7 +97,7 @@ export default function OcorrenciaForm({
         onSuccess()
       } else {
         const err = await res.json()
-        alert(err.message || "Erro ao salvar")
+        alert(err.message || "Não foi possível salvar. Tente novamente.")
       }
     } catch (error) {
       console.error("Erro ao salvar ocorrência:", error)
@@ -110,9 +110,9 @@ export default function OcorrenciaForm({
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/80 backdrop-blur-sm animate-fade-in">
       <div className="bg-surface rounded-xl shadow-overlay w-full max-w-4xl overflow-hidden animate-pop-in flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="px-8 py-6 border-b border-line-subtle flex justify-between items-center bg-canvas/50">
+        <div className="px-4 py-3 border-b border-line-subtle flex justify-between items-center bg-canvas/50">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-subtle border border-line text-fg rounded-lg flex items-center justify-center shadow-card">
+            <div className="w-12 h-12 bg-subtle border border-line text-fg rounded-lg flex items-center justify-center">
               <UserPlus size={22} />
             </div>
             <div>
@@ -131,27 +131,27 @@ export default function OcorrenciaForm({
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-5 custom-scrollbar">
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-xs font-bold text-fg-subtle ml-1">Título da Ocorrência</label>
+              <label className="text-xs font-bold text-fg-subtle ml-1">Título da ocorrência</label>
               <input
                 required
                 type="text"
                 value={formData.titulo}
                 onChange={e => setFormData({ ...formData, titulo: e.target.value })}
                 placeholder="Ex: Entrega de documentação pendente"
-                className="w-full bg-canvas border-transparent rounded-lg px-6 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium placeholder:text-fg-disabled shadow-card"
+                className="w-full bg-canvas border-transparent rounded-lg px-4 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium placeholder:text-fg-disabled"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold text-fg-subtle ml-1">Tipo de Evento</label>
+              <label className="text-xs font-bold text-fg-subtle ml-1">Tipo de evento</label>
               <select
                 value={formData.tipo}
                 onChange={e => setFormData({ ...formData, tipo: e.target.value })}
-                className="w-full bg-canvas border-transparent rounded-lg px-6 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium shadow-card appearance-none cursor-pointer"
+                className="w-full bg-canvas border-transparent rounded-lg px-4 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium appearance-none cursor-pointer"
               >
                 <option value="Comportamental">Comportamental</option>
                 <option value="Pedagógica">Pedagógica</option>
@@ -163,18 +163,18 @@ export default function OcorrenciaForm({
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold text-fg-subtle ml-1">Data do Evento</label>
+              <label className="text-xs font-bold text-fg-subtle ml-1">Data do evento</label>
               <input
                 type="date"
                 value={formData.data}
                 onChange={e => setFormData({ ...formData, data: e.target.value })}
-                className="w-full bg-canvas border-transparent rounded-lg px-6 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium shadow-card cursor-pointer"
+                className="w-full bg-canvas border-transparent rounded-lg px-4 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium cursor-pointer"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-bold text-fg-subtle ml-1">Estudantes Envolvidos</label>
+            <label className="text-xs font-bold text-fg-subtle ml-1">Estudantes envolvidos</label>
             
             {/* Multi-select students */}
             <div className="space-y-4">
@@ -185,7 +185,7 @@ export default function OcorrenciaForm({
                   placeholder="Pesquise para adicionar estudantes..."
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
-                  className="w-full bg-canvas border-transparent rounded-lg pl-12 pr-6 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium placeholder:text-fg-disabled shadow-card"
+                  className="w-full bg-canvas border-transparent rounded-lg pl-12 pr-6 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium placeholder:text-fg-disabled"
                 />
                 
                 {/* Search Results Dropdown */}
@@ -196,7 +196,7 @@ export default function OcorrenciaForm({
                         key={est.matricula}
                         type="button"
                         onClick={() => toggleEstudante(est)}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-canvas transition-colors border-b border-line-subtle last:border-0"
+                        className="w-full px-4 py-4 flex items-center justify-between hover:bg-canvas transition-colors border-b border-line-subtle last:border-0"
                       >
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 bg-subtle rounded-xl flex items-center justify-center font-bold text-fg-subtle">
@@ -240,21 +240,21 @@ export default function OcorrenciaForm({
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-bold text-fg-subtle ml-1">Descrição Detalhada</label>
+            <label className="text-xs font-bold text-fg-subtle ml-1">Descrição detalhada</label>
             <textarea
               required
               rows={12}
               value={formData.descricao}
               onChange={e => setFormData({ ...formData, descricao: e.target.value })}
               placeholder="Descreva detalhadamente o ocorrido..."
-              className="w-full bg-canvas border-transparent rounded-xl px-8 py-6 text-base focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium placeholder:text-fg-disabled shadow-card resize-none"
+              className="w-full bg-canvas border-transparent rounded-xl px-4 py-3 text-base focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium placeholder:text-fg-disabled resize-none"
             />
           </div>
 
         </form>
 
         {/* Footer */}
-        <div className="px-8 py-6 border-t border-line-subtle bg-canvas/50 flex gap-4">
+        <div className="px-4 py-3 border-t border-line-subtle bg-canvas/50 flex gap-4">
           <button 
             type="button"
             onClick={onClose}
@@ -266,7 +266,7 @@ export default function OcorrenciaForm({
             type="button"
             onClick={handleSubmit}
             disabled={saving}
-            className="flex-3 py-4 bg-accent text-on-accent text-sm font-bold rounded-lg shadow-card hover:bg-accent-hover transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3 px-10"
+            className="flex-3 py-4 bg-accent text-on-accent text-sm font-bold rounded-lg hover:bg-accent-hover transition-all disabled:opacity-50 flex items-center justify-center gap-3 px-4"
           >
             {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save size={18} />}
             {saving ? 'SALVANDO...' : 'CONFIRMAR E REGISTRAR'}

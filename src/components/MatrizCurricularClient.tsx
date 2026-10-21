@@ -160,7 +160,7 @@ export default function MatrizCurricularClient({
       const totalPropagadas = respostas.reduce((acc: number, r: any) => acc + (r.propagadas ?? 0), 0)
       if (totalPropagadas > 0) {
         setPropagacaoMsg(
-          `✅ ${nomes.length} disciplina(s) adicionada(s) à matriz e propagada(s) para ${totalPropagadas} turma(s) existente(s)!`
+          `${nomes.length} disciplina(s) adicionada(s) à matriz e propagada(s) para ${totalPropagadas} turma(s) existente(s)!`
         )
         setTimeout(() => setPropagacaoMsg(null), 5000)
       }
@@ -187,7 +187,7 @@ export default function MatrizCurricularClient({
       const data = await res.json()
       if (res.ok) {
         if (data.propagadas > 0) {
-          setPropagacaoMsg(`✅ Sincronizado: ${data.nome} atualizada em ${data.propagadas} turmas!`)
+          setPropagacaoMsg(`Sincronizado: ${data.nome} atualizada em ${data.propagadas} turmas.`)
           setTimeout(() => setPropagacaoMsg(null), 5000)
         }
         setEditingId(null)
@@ -249,7 +249,7 @@ export default function MatrizCurricularClient({
         alert(data.message || 'Erro ao excluir curso')
       }
     } catch {
-      alert('Erro ao conectar com o servidor')
+      alert('Não foi possível conectar ao servidor. Tente novamente.')
     } finally {
       setDeletingCursoId(null)
     }
@@ -269,7 +269,7 @@ export default function MatrizCurricularClient({
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
       <header className="mb-6">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div className="flex min-w-0 items-center gap-3">
               <Link
                 href="/dashboard"
@@ -278,7 +278,7 @@ export default function MatrizCurricularClient({
                 <ArrowLeft size={16} strokeWidth={1.75} />
               </Link>
               <div>
-                <h1 className="text-2xl font-semibold tracking-tight text-fg">Matriz Curricular</h1>
+                <h1 className="text-2xl font-semibold tracking-tight text-fg">Matriz curricular</h1>
                 <p className="text-sm text-fg-muted">Definição de disciplinas padrão por curso e série</p>
               </div>
             </div>
@@ -287,10 +287,10 @@ export default function MatrizCurricularClient({
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-32 space-y-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-4 lg:px-4 pt-4 pb-32 space-y-5">
         
         {/* Filtros Premium */}
-        <div className="bg-surface p-5 rounded-xl shadow-card border border-line-subtle flex flex-wrap gap-4 items-end relative overflow-visible">
+        <div className="bg-surface p-5 rounded-xl border border-line-subtle flex flex-wrap gap-4 items-end relative overflow-visible">
 
             {/* Modalidade */}
             <div className="flex-1 min-w-[130px] max-w-[180px] space-y-1.5">
@@ -467,8 +467,8 @@ export default function MatrizCurricularClient({
 
             {/* Badge de disciplinas */}
             <div className="shrink-0 pb-0.5">
-                <div className="flex items-center gap-1.5 bg-accent text-on-accent px-3 py-2.5 rounded-xl shadow-card">
-                    <span className="w-1.5 h-1.5 rounded-full bg-surface/70 animate-pulse" />
+                <div className="flex items-center gap-1.5 bg-accent text-on-accent px-3 py-2.5 rounded-xl">
+                    <span className="w-1.5 h-1.5 rounded-full bg-surface/70" />
                     <span className="text-xs font-semibold whitespace-nowrap">{itemsFiltradosNaLista.length} disciplinas</span>
                 </div>
             </div>
@@ -476,7 +476,7 @@ export default function MatrizCurricularClient({
 
         {/* Formulário de Lançamento em Lote */}
         {selectedCurso && (
-          <div className="bg-surface p-6 rounded-2xl shadow-sm border border-line">
+          <div className="bg-surface p-4 rounded-2xl border border-line">
             <h2 className="text-base font-semibold text-fg mb-4 flex items-center gap-2">
                <Plus size={20} className="text-accent-fg" />
                Adicionar Disciplinas à Matriz
@@ -493,13 +493,13 @@ export default function MatrizCurricularClient({
                 />
               </div>
               <div className="md:col-span-4 space-y-1.5">
-                <label className="text-xs font-semibold text-fg-subtle ml-1">Área do Simulado</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1">Área do simulado</label>
                 <select
                   value={novaArea}
                   onChange={(e) => setNovaArea(e.target.value)}
                   className="w-full bg-canvas border-none rounded-xl px-4 py-4 text-base font-semibold text-fg-muted focus:ring-2 focus:ring-ring transition-all outline-none h-[60px] appearance-none cursor-pointer"
                 >
-                  <option value="">Sem Área Vinculada</option>
+                  <option value="">Sem área vinculada</option>
                   {areas.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
                 </select>
               </div>
@@ -507,7 +507,7 @@ export default function MatrizCurricularClient({
                 <button
                   type="submit"
                   disabled={saving || !novoNome}
-                  className="w-full bg-accent border border-accent text-on-accent font-semibold h-[60px] rounded-xl shadow-card transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95 text-sm"
+                  className="w-full bg-accent border border-accent text-on-accent font-semibold h-[60px] rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-sm"
                 >
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                   Lançar na Matriz
@@ -518,11 +518,11 @@ export default function MatrizCurricularClient({
         )}
 
         {/* Listagem da Matriz */}
-        <div className="bg-surface rounded-2xl shadow-sm border border-line overflow-hidden">
+        <div className="bg-surface rounded-2xl border border-line overflow-hidden">
           <div className="p-4 border-b border-line-subtle bg-canvas/50 flex flex-col sm:flex-row items-center justify-between gap-4">
             <h2 className="text-lg font-semibold text-fg-muted flex items-center gap-2">
                <BookOpen size={20} className="text-fg-subtle" />
-               Componentes Curriculares Definidos
+               Componentes curriculares definidos
             </h2>
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
               <div className="relative w-full sm:w-64">
@@ -557,17 +557,17 @@ export default function MatrizCurricularClient({
 
           <div className="overflow-x-auto">
             {!selectedCurso && !searchTerm ? (
-              <div className="p-20 text-center space-y-4">
+              <div className="p-8 text-center space-y-4">
                 <Search className="w-12 h-12 text-fg-disabled mx-auto" />
                 <p className="text-sm font-semibold text-fg-subtle">Selecione um curso para ver a matriz</p>
               </div>
             ) : loading ? (
-              <div className="p-20 text-center flex flex-col items-center gap-3">
+              <div className="p-8 text-center flex flex-col items-center gap-3">
                 <Loader2 className="w-8 h-8 text-accent-fg animate-spin" />
                 <p className="text-sm font-semibold text-fg-subtle">Sincronizando dados...</p>
               </div>
             ) : items.length === 0 ? (
-              <div className="p-20 text-center space-y-3">
+              <div className="p-8 text-center space-y-3">
                  <AlertCircle className="w-10 h-10 text-fg-disabled mx-auto" />
                  <p className="text-sm font-semibold text-fg-subtle">Matriz vazia para esta configuração</p>
               </div>
@@ -595,8 +595,8 @@ export default function MatrizCurricularClient({
                     {searchTerm && (
                       <th className="px-4 py-4 text-xs font-semibold text-fg-subtle">Curso / Série</th>
                     )}
-                    <th className="px-6 py-4 text-xs font-semibold text-fg-subtle">Área Vinculada</th>
-                    <th className="px-6 py-4 text-xs font-semibold text-fg-subtle text-right">Ação</th>
+                    <th className="px-4 py-4 text-xs font-semibold text-fg-subtle">Área vinculada</th>
+                    <th className="px-4 py-4 text-xs font-semibold text-fg-subtle text-right">Ação</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-line-subtle/80">
@@ -671,7 +671,7 @@ export default function MatrizCurricularClient({
                           </div>
                         </td>
                       )}
-                      <td className="px-6 py-4" onClick={e => e.stopPropagation()}>
+                      <td className="px-4 py-4" onClick={e => e.stopPropagation()}>
                         {editingId === item.id ? (
                           <select
                             value={editArea}
@@ -689,7 +689,7 @@ export default function MatrizCurricularClient({
                           <span className="text-fg-disabled text-xs font-medium italic">Não vinculada</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-right" onClick={e => e.stopPropagation()}>
+                      <td className="px-4 py-4 text-right" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-end gap-1">
                           {editingId === item.id ? (
                             <>

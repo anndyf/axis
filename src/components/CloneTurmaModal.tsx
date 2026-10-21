@@ -89,7 +89,7 @@ export default function CloneTurmaModal({
               <Copy className="w-5 h-5 text-success-fg" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-fg">Clonar Turma</h3>
+              <h3 className="text-lg font-semibold text-fg">Clonar turma</h3>
               <p className="text-xs text-fg-subtle font-medium">{turmaOriginal?.nome}</p>
             </div>
           </div>
@@ -113,7 +113,7 @@ export default function CloneTurmaModal({
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-fg-subtle ml-1">Novo Turno</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1">Novo turno</label>
                 <select
                   value={turno}
                   onChange={(e) => setTurno(e.target.value)}
@@ -136,7 +136,7 @@ export default function CloneTurmaModal({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-fg-subtle ml-1">Nome Final da Turma</label>
+              <label className="text-xs font-semibold text-fg-subtle ml-1">Nome final da turma</label>
               <input
                 type="text"
                 value={nome}

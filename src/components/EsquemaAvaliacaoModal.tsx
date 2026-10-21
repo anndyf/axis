@@ -223,7 +223,7 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
         setError(data.message || 'Erro ao salvar esquema')
       }
     } catch {
-      setError('Erro ao conectar com o servidor')
+      setError('Não foi possível conectar ao servidor. Tente novamente.')
     } finally {
       setLoading(false)
     }
@@ -262,7 +262,7 @@ export default function EsquemaAvaliacaoModal({ isOpen, onClose, onSuccess, esqu
           {/* Nome + escala */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="col-span-2">
-              <label className={labelClass}>Nome do Esquema</label>
+              <label className={labelClass}>Nome do esquema</label>
               <input required type="text" placeholder="Ex: Anual 4 Bimestres" value={nome} onChange={e => setNome(e.target.value)} className={inputClass} />
             </div>
             <div>

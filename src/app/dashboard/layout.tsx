@@ -4,9 +4,16 @@ import { prisma } from "@/lib/prisma"
 import SessionTimer from "@/components/SessionTimer"
 import MessageNotification from "@/components/MessageNotification"
 import DashboardLayoutWrapper from "@/components/DashboardLayoutWrapper"
+import RodapeSistema from "@/components/RodapeSistema"
+import AvisoUltimoAcesso from "@/components/AvisoUltimoAcesso"
+import { textoUltimoAcesso } from "@/lib/ultimo-acesso"
 import { getGlobalConfig, precisaTrocarSenha } from "@/lib/data-fetching"
 import { getModulosAtivos } from "@/lib/modules-server"
 import { can } from "@/lib/rbac"
+import { visoesDisponiveis } from "@/lib/services/painel-visoes-servidor"
+import { CaminhoAutomatico } from "@/components/ui/CaminhoAutomatico"
+import { AjudaTela } from "@/components/ui/AjudaTela"
+import { CabecalhoImpressao } from "@/components/ui/Impressao"
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -50,27 +57,37 @@ export default async function DashboardLayout({
   }
 
   const modulosAtivos = await getModulosAtivos(session.user.escolaId, escola?.plano || 'BASICO')
+  const visoes = await visoesDisponiveis(session.user, session.user.escolaId, config.anoLetivoAtual)
+  // Último acesso: só as duas datas da própria conta (sem IP)
+  const acesso = await prisma.user.findFirst({ where: { id: session.user.id, escolaId: session.user.escolaId }, select: { lastLogin: true, acessoAnterior: true } })
 
   return (
     <div className="flex font-sans text-fg print:block print:min-h-0">
       <SessionTimer />
       <MessageNotification />
+      <AvisoUltimoAcesso
+        texto={acesso?.acessoAnterior ? textoUltimoAcesso(acesso.acessoAnterior) : null}
+        loginAtual={acesso?.lastLogin ? acesso.lastLogin.toISOString() : null}
+      />
       <DashboardLayoutWrapper
         user={session.user}
         escola={{ nome: escola?.nome ?? "Áxis", logoUrl: escola?.logoUrl ?? null }}
         modulosAtivos={modulosAtivos}
         anoLetivo={config.anoLetivoAtual}
+        visoes={visoes}
       >
-        <div className="mx-auto w-full max-w-[1400px] flex-1 px-4 py-6 md:px-8 md:py-8 print:p-0">
+        {/* Área de trabalho: ocupa a largura disponível. O caminho automático
+            some quando a tela traz o próprio CabecalhoPagina (globals.css). */}
+        <div className="w-full min-w-0 flex-1 px-pagina py-pagina-y print:p-0">
+          <div className="caminho-layout mb-3 hidden items-center gap-1 md:flex print:hidden">
+            <CaminhoAutomatico />
+            <AjudaTela />
+          </div>
+          <CabecalhoImpressao escola={escola?.nome || "Áxis"} />
           {children}
         </div>
 
-        <footer className="border-t border-line-subtle px-4 py-4 md:px-8 print:hidden">
-          <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-2 text-xs text-fg-subtle">
-            <span>Áxis · Sistema de Gestão Escolar · © {new Date().getFullYear()} {escola?.nome || "Áxis"}</span>
-            <span>Desenvolvido por <span className="text-fg-muted">Andressa Mirella</span></span>
-          </div>
-        </footer>
+        <RodapeSistema escola={escola?.nome || "Áxis"} />
       </DashboardLayoutWrapper>
     </div>
   )

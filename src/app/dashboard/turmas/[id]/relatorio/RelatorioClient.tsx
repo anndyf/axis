@@ -56,7 +56,7 @@ export default function RelatorioClient({
   }
 
   return (
-    <main className="mx-auto max-w-7xl">
+    <main className="">
 
       {/* Botão para Modal de Professores */}
       <div className="mb-4 flex justify-end">
@@ -83,8 +83,8 @@ export default function RelatorioClient({
       )}
 
       {/* Lista de Estudantes (Accordion) */}
-      <div className="bg-surface rounded-xl shadow-sm border border-line-strong overflow-hidden">
-        <div className="px-6 py-4 bg-canvas border-b border-line-strong">
+      <div className="bg-surface rounded-xl border border-line-strong overflow-hidden">
+        <div className="px-4 py-4 bg-canvas border-b border-line-strong">
           <h3 className="text-lg font-medium text-fg">
             {isProfessorOnly ? 'Estudantes Matriculados' : 'Desempenho Detalhado dos Estudantes'}
           </h3>
@@ -142,9 +142,9 @@ export default function RelatorioClient({
                     </div>
                     
                     {!isProfessorOnly && (
-                      <div className="flex items-center gap-6 pr-4 hidden md:flex">
+                      <div className="flex items-center gap-4 pr-4 hidden md:flex">
                         <div className="text-center">
-                          <p className="text-xs font-bold text-fg-subtle">Média Geral</p>
+                          <p className="text-xs font-bold text-fg-subtle">Média geral</p>
                           <span className="text-sm font-bold text-fg-muted">{media}</span>
                         </div>
                         {frequencia && (() => {
@@ -253,11 +253,11 @@ export default function RelatorioClient({
       {showProfessorsModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
           <div className="bg-surface rounded-lg shadow-overlay w-full max-w-2xl max-h-[85vh] flex flex-col animate-pop-in">
-            <div className="flex items-center justify-between p-6 border-b border-line-subtle">
+            <div className="flex items-center justify-between p-4 border-b border-line-subtle">
               <div>
                 <h3 className="text-xl font-bold text-fg flex items-center gap-2">
                   <BookOpen className="w-6 h-6 text-accent-fg" />
-                  Corpo Docente da Turma
+                  Corpo docente da turma
                 </h3>
                 <p className="text-sm text-fg-subtle mt-1">{turma.nome}</p>
               </div>
@@ -269,16 +269,16 @@ export default function RelatorioClient({
               </button>
             </div>
             
-            <div className="p-6 overflow-y-auto">
+            <div className="p-4 overflow-y-auto">
               {professoresList.length === 0 ? (
-                <div className="text-center py-8 text-fg-subtle">
+                <div className="text-center py-4 text-fg-subtle">
                   <Users className="w-12 h-12 mx-auto text-fg-disabled mb-3" />
                   <p>Nenhum professor vinculado às disciplinas desta turma.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {professoresList.map(prof => (
-                    <div key={prof.id} className="p-4 rounded-xl border border-line bg-canvas hover:bg-surface hover:border-accent/25 transition-colors shadow-sm">
+                    <div key={prof.id} className="p-4 rounded-xl border border-line bg-canvas hover:bg-surface hover:border-accent/25 transition-colors">
                       <div className="flex items-start gap-3">
                         <div className="w-10 h-10 rounded-full bg-accent-subtle flex items-center justify-center text-accent-fg font-bold shrink-0">
                           {prof.name.charAt(0).toUpperCase()}
@@ -304,7 +304,7 @@ export default function RelatorioClient({
             <div className="p-4 border-t border-line-subtle bg-canvas rounded-b-2xl flex justify-end">
               <button
                 onClick={() => setShowProfessorsModal(false)}
-                className="px-6 py-2 bg-zinc-800 text-white font-medium rounded-lg hover:bg-zinc-700 transition-colors"
+                className="px-4 py-2 bg-zinc-800 text-white font-medium rounded-lg hover:bg-zinc-700 transition-colors"
               >
                 Fechar
               </button>

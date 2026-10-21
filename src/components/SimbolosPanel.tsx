@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronDown, ChevronUp } from "lucide-react"
+import { ChevronDown, ChevronUp, Lightbulb } from "lucide-react"
 
 const CATEGORIAS = [
   {
@@ -206,7 +206,7 @@ export default function SimbolosPanel({ inputRef, onInsertQuill, onInsert }: Sim
       >
         <div className="flex items-center gap-2">
           <span className="text-base">𝛴</span>
-          <span className="text-xs font-semibold text-fg-muted">Símbolos Especiais</span>
+          <span className="text-xs font-semibold text-fg-muted">Símbolos especiais</span>
           <span className="text-xs text-fg-subtle font-medium">Mat. · Quím. · Lógica · Conjuntos</span>
         </div>
         {open 
@@ -250,8 +250,8 @@ export default function SimbolosPanel({ inputRef, onInsertQuill, onInsert }: Sim
             ))}
           </div>
 
-          <p className="px-3 pb-2.5 text-xs text-fg-subtle font-medium">
-            💡 Passe o mouse sobre o símbolo para ver o nome. Clique para inserir no campo ativo.
+          <p className="flex items-start gap-1.5 px-3 pb-2.5 text-xs text-fg-subtle font-medium">
+            <Lightbulb size={13} strokeWidth={1.75} aria-hidden className="mt-px shrink-0" /> Passe o mouse sobre o símbolo para ver o nome. Clique para inserir no campo ativo.
           </p>
         </div>
       )}

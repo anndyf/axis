@@ -51,7 +51,7 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
         setErroExclusao(data.message || 'Erro ao excluir esquema')
       }
     } catch {
-      setErroExclusao('Erro ao conectar com o servidor')
+      setErroExclusao('Não foi possível conectar ao servidor. Tente novamente.')
     } finally {
       setExcluindo(false)
     }
@@ -60,13 +60,13 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
   return (
     <div className="">
       <header className="mb-6">
-        <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
             <Link href="/dashboard/configuracoes" aria-label="Voltar" className="hidden sm:inline-flex p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg">
               <ArrowLeft size={16} strokeWidth={1.75} />
             </Link>
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight text-fg">Esquemas de Avaliação</h1>
+              <h1 className="text-2xl font-semibold tracking-tight text-fg">Esquemas de avaliação</h1>
               <p className="text-sm text-fg-muted">Unidades, atividades e regras de recuperação por escola</p>
             </div>
           </div>
@@ -75,33 +75,33 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
             className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
           >
             <Plus size={16} strokeWidth={1.75} />
-            <span>Novo Esquema</span>
+            <span>Novo esquema</span>
           </button>
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="py-4">
         {esquemas.length === 0 ? (
-          <div className="bg-surface rounded-xl shadow-card border border-line p-20 text-center">
-            <div className="w-20 h-20 bg-canvas rounded-xl flex items-center justify-center mx-auto mb-6">
+          <div className="bg-surface rounded-xl border border-line p-8 text-center">
+            <div className="w-12 h-12 bg-canvas rounded-xl flex items-center justify-center mx-auto mb-6">
               <ClipboardList className="w-10 h-10 text-fg-disabled" />
             </div>
             <h3 className="text-2xl font-medium text-fg mb-2">Nenhum esquema cadastrado</h3>
-            <p className="text-fg-muted font-medium mb-8 max-w-xs mx-auto text-sm">
+            <p className="text-fg-muted font-medium mb-4 max-w-xs mx-auto text-sm">
               Crie o primeiro esquema de avaliação da escola.
             </p>
             <button
               onClick={abrirNovo}
-              className="inline-flex items-center space-x-2 bg-accent text-on-accent px-8 py-4 rounded-lg hover:bg-accent-hover transition-all font-medium text-xs shadow-card active:scale-95"
+              className="inline-flex items-center space-x-2 bg-accent text-on-accent px-4 py-4 rounded-lg hover:bg-accent-hover transition-all font-medium text-xs"
             >
               <Plus size={16} />
-              <span>Criar Esquema</span>
+              <span>Criar esquema</span>
             </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {esquemas.map(esquema => (
-              <div key={esquema.id} className="bg-surface border border-line rounded-xl p-6 shadow-sm hover:shadow-card transition-all">
+              <div key={esquema.id} className="bg-surface border border-line rounded-xl p-4 hover: transition-all">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2.5 rounded-lg bg-subtle text-fg-muted">

@@ -122,10 +122,10 @@ export default function EstudantesFilter({ cursos, turmas, totalResults }: Filte
   }
 
   return (
-    <div className="p-4 sm:p-5 border-b border-line">
+    <div className="border-b border-line-subtle px-painel py-3 md:flex md:flex-wrap md:items-center md:gap-3 md:py-2.5">
       {/* Busca + total */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
-        <div className="flex-1 relative">
+      <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center md:mb-0">
+        <div className="relative flex-1 md:w-64 md:flex-none">
            <label htmlFor="estudantes-busca" className="sr-only">Buscar por nome ou matrícula</label>
            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-fg-subtle">
              {isPending ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} strokeWidth={1.75} />}
@@ -134,7 +134,7 @@ export default function EstudantesFilter({ cursos, turmas, totalResults }: Filte
              id="estudantes-busca"
              type="search"
              placeholder="Buscar por nome ou matrícula..."
-             className="block w-full h-9 pl-9 pr-3 border border-line rounded-lg bg-surface text-sm text-fg placeholder:text-fg-subtle transition-colors duration-150 hover:border-line-strong focus:border-accent"
+             className="block w-full h-9 pl-9 pr-3 border border-line rounded-lg bg-surface text-sm md:h-8 md:text-13 text-fg placeholder:text-fg-subtle transition-colors duration-150 hover:border-line-strong focus:border-accent"
              value={search}
              onChange={(e) => setSearch(e.target.value)}
            />
@@ -146,15 +146,15 @@ export default function EstudantesFilter({ cursos, turmas, totalResults }: Filte
       </div>
 
       {/* Bottom Row: Filters + Clear */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+      <div className="grid grid-cols-2 gap-2 md:flex md:flex-1 md:flex-wrap md:items-center">
         {/* Curso Filter */}
         <div>
           <select
-            className="block w-full h-9 pl-3 pr-8 text-sm text-fg bg-surface border border-line rounded-lg transition-colors duration-150 hover:border-line-strong focus:border-accent"
+            className="block w-full h-9 pl-3 pr-8 text-sm md:h-8 md:w-auto md:text-13 text-fg bg-surface border border-line rounded-lg transition-colors duration-150 hover:border-line-strong focus:border-accent"
             value={cursoId}
             onChange={(e) => handleCursoChange(e.target.value)}
           >
-            <option value="">Cursos</option>
+            <option value="">Todos os cursos</option>
             {cursos.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.nome}
@@ -166,11 +166,11 @@ export default function EstudantesFilter({ cursos, turmas, totalResults }: Filte
         {/* Turno Filter */}
         <div>
           <select
-            className="block w-full h-9 pl-3 pr-8 text-sm text-fg bg-surface border border-line rounded-lg transition-colors duration-150 hover:border-line-strong focus:border-accent"
+            className="block w-full h-9 pl-3 pr-8 text-sm md:h-8 md:w-auto md:text-13 text-fg bg-surface border border-line rounded-lg transition-colors duration-150 hover:border-line-strong focus:border-accent"
             value={turno}
             onChange={(e) => handleTurnoChange(e.target.value)}
           >
-            <option value="">Turnos</option>
+            <option value="">Todos os turnos</option>
             <option value="Matutino">Matutino</option>
             <option value="Vespertino">Vespertino</option>
             <option value="Noturno">Noturno</option>
@@ -180,11 +180,11 @@ export default function EstudantesFilter({ cursos, turmas, totalResults }: Filte
         {/* Serie Filter */}
         <div>
           <select
-            className="block w-full h-9 pl-3 pr-8 text-sm text-fg bg-surface border border-line rounded-lg transition-colors duration-150 hover:border-line-strong focus:border-accent"
+            className="block w-full h-9 pl-3 pr-8 text-sm md:h-8 md:w-auto md:text-13 text-fg bg-surface border border-line rounded-lg transition-colors duration-150 hover:border-line-strong focus:border-accent"
             value={serie}
             onChange={(e) => handleSerieChange(e.target.value)}
           >
-            <option value="">Séries</option>
+            <option value="">Todas as séries</option>
             <option value="1">1º Ano</option>
             <option value="2">2º Ano</option>
             <option value="3">3º Ano</option>
@@ -195,12 +195,12 @@ export default function EstudantesFilter({ cursos, turmas, totalResults }: Filte
         {/* Turma Filter */}
         <div>
           <select
-            className="block w-full h-9 pl-3 pr-8 text-sm text-fg bg-surface border border-line rounded-lg transition-colors duration-150 hover:border-line-strong focus:border-accent disabled:bg-subtle disabled:text-fg-disabled"
+            className="block w-full h-9 pl-3 pr-8 text-sm md:h-8 md:w-auto md:text-13 text-fg bg-surface border border-line rounded-lg transition-colors duration-150 hover:border-line-strong focus:border-accent disabled:bg-subtle disabled:text-fg-disabled"
             value={turmaId}
             onChange={(e) => handleTurmaChange(e.target.value)}
             disabled={!cursoId && !turno && !serie && turmas.length > 50} 
           >
-            <option value="">Turmas</option>
+            <option value="">Todas as turmas</option>
             {filteredTurmas.map((t) => (
               <option key={t.id} value={t.id}>
                 {t.nome}
@@ -212,11 +212,11 @@ export default function EstudantesFilter({ cursos, turmas, totalResults }: Filte
         {/* Clear Button */}
         <button 
            onClick={handleClearFilters}
-           className="col-span-2 md:col-span-1 flex h-9 items-center justify-center gap-1.5 px-3 text-13 font-medium text-fg-muted rounded-lg transition-colors duration-150 hover:bg-subtle hover:text-fg"
+           className="col-span-2 flex h-9 items-center md:h-8 justify-center gap-1.5 px-3 text-13 font-medium text-fg-muted rounded-lg transition-colors duration-150 hover:bg-subtle hover:text-fg"
            title="Limpar todos os filtros"
         >
            <FilterX size={16} strokeWidth={1.75} aria-hidden />
-           <span>Limpar</span>
+           <span>Limpar filtros</span>
         </button>
       </div>
     </div>

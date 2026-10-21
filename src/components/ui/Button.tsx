@@ -6,10 +6,10 @@ export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'
 export type ButtonSize = 'sm' | 'md'
 
 const VARIANTES: Record<ButtonVariant, string> = {
-  primary: 'bg-accent text-on-accent hover:bg-accent-hover shadow-card',
-  secondary: 'bg-surface text-fg border border-line hover:bg-subtle hover:border-line-strong shadow-card',
+  primary: 'bg-accent text-on-accent hover:bg-accent-hover',
+  secondary: 'bg-surface text-fg border border-line hover:bg-subtle hover:border-line-strong',
   ghost: 'text-fg-muted hover:bg-subtle hover:text-fg',
-  danger: 'bg-danger text-white hover:bg-[color-mix(in_oklab,var(--danger)_86%,black)] shadow-card',
+  danger: 'bg-danger text-white hover:bg-[color-mix(in_oklab,var(--danger)_86%,black)]',
 }
 
 const TAMANHOS: Record<ButtonSize, string> = {
@@ -20,9 +20,11 @@ const TAMANHOS: Record<ButtonSize, string> = {
 /** Classes de botão - para usar em <Link> ou <a> com o mesmo visual. */
 export function buttonClasses({ variant = 'primary', size = 'md', className }: { variant?: ButtonVariant; size?: ButtonSize; className?: string } = {}) {
   return cn(
-    'inline-flex items-center justify-center shrink-0 whitespace-nowrap rounded-lg font-medium select-none',
+    'inline-flex items-center justify-center shrink-0 whitespace-nowrap rounded-control font-medium select-none',
     'transition-colors duration-150 disabled:pointer-events-none disabled:opacity-50',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
+    // ação de tela não vai para o papel
+    'print:hidden',
     VARIANTES[variant],
     TAMANHOS[size],
     className

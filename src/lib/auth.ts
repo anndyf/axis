@@ -5,6 +5,7 @@ import { CredentialsSignin } from "next-auth"
 import { excedeuLimite, registrarTentativa, limparTentativas } from "@/lib/limitador"
 import { prisma } from "@/lib/prisma"
 import { papeisParaSessao } from "@/lib/papeis"
+import { registrarAcesso } from './ultimo-acesso'
 import bcrypt from "bcryptjs"
 import { headers } from "next/headers"
 
@@ -104,12 +105,10 @@ export const authConfig: NextAuthConfig = {
 
         await limparTentativas(chaveLimite)
 
-        // Atualizar data do último acesso via SQL para contornar cache de schema
-        // Envolvido em try/catch para que falha no update não impeça o login
+        // Último acesso: guarda o anterior (aviso depois do login) e grava o
+        // atual. Em try/catch para que falha no update não impeça o login
         try {
-          await prisma.$executeRaw`
-            UPDATE "users" SET last_login = NOW() WHERE id = ${user.id}
-          `
+          await registrarAcesso(user.id)
         } catch (error) {
           console.error('Erro ao atualizar last_login:', error)
         }

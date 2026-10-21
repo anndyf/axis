@@ -68,7 +68,7 @@ export default function ImportarHorarioClient({
           .map((e: Encontrado) => e.discId)
       ))
     } catch {
-      setErro("Erro de conexão com o servidor")
+      setErro("Não foi possível conectar ao servidor. Tente novamente.")
     } finally {
       setVerificando(false)
     }
@@ -91,7 +91,7 @@ export default function ImportarHorarioClient({
       setSucesso(true)
       setTimeout(() => router.push(`/dashboard/usuarios/${usuario.id}/disciplinas`), 1500)
     } catch {
-      setErro("Erro de conexão com o servidor")
+      setErro("Não foi possível conectar ao servidor. Tente novamente.")
     } finally {
       setImportando(false)
     }
@@ -110,44 +110,33 @@ export default function ImportarHorarioClient({
 
   return (
     <div className="">
-      {/* Header */}
-      <header className="mb-6">
-        <div className="max-w-4xl mx-auto px-6 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-4">
-            <Link
-              href={`/dashboard/usuarios/${usuario.id}/disciplinas`}
-              className="p-2 hover:bg-subtle rounded-xl transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-fg-muted" />
-            </Link>
-            <div>
-              <h1 className="text-2xl font-semibold tracking-tight text-fg">Importar Horário</h1>
-              <p className="text-sm text-fg-muted">
-                Professor: {usuario.name}
-              </p>
-            </div>
-          </div>
-
-          {resultado && confirmados.size > 0 && !sucesso && (
-            <button
-              onClick={handleImportar}
-              disabled={importando}
-              className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
-            >
-              {importando
-                ? <Loader2 size={16} className="animate-spin" />
-                : <CheckCheck size={16} />}
-              Vincular {confirmados.size} disciplina{confirmados.size !== 1 ? 's' : ''}
-            </button>
-          )}
+      {/* Dentro da ficha do usuário (nome e abas vêm do layout) */}
+      <div className="mb-4 flex max-w-leitura flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Link href={`/dashboard/usuarios/${usuario.id}/disciplinas`} aria-label="Voltar para disciplinas e turmas" className="rounded-md p-1 text-fg-subtle hover:bg-subtle hover:text-fg">
+            <ArrowLeft size={16} strokeWidth={1.75} />
+          </Link>
+          <p className="text-sm text-fg-muted">Importar horário do professor</p>
         </div>
-      </header>
+        {resultado && confirmados.size > 0 && !sucesso && (
+          <button
+            onClick={handleImportar}
+            disabled={importando}
+            className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
+          >
+            {importando
+              ? <Loader2 size={16} className="animate-spin" />
+              : <CheckCheck size={16} />}
+            Vincular {confirmados.size} disciplina{confirmados.size !== 1 ? 's' : ''}
+          </button>
+        )}
+      </div>
 
-      <main className="max-w-4xl mx-auto px-6 py-8 space-y-6">
+      <main className="max-w-leitura space-y-4">
 
         {/* Sucesso */}
         {sucesso && (
-          <div className="bg-success-subtle border border-success-line rounded-lg p-6 flex items-center gap-4">
+          <div className="bg-success-subtle border border-success-line rounded-lg p-4 flex items-center gap-4">
             <div className="w-12 h-12 bg-success-subtle rounded-xl flex items-center justify-center">
               <CheckCheck className="w-6 h-6 text-success-fg" />
             </div>
@@ -160,8 +149,8 @@ export default function ImportarHorarioClient({
 
         {/* Área de cola */}
         {!sucesso && (
-          <div className="bg-surface rounded-lg border border-line shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-line-subtle flex items-center justify-between">
+          <div className="bg-surface rounded-lg border border-line overflow-hidden">
+            <div className="px-4 py-4 border-b border-line-subtle flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-accent-subtle rounded-lg flex items-center justify-center">
                   <ClipboardPaste className="w-4 h-4 text-accent-fg" />
@@ -186,17 +175,17 @@ export default function ImportarHorarioClient({
               onChange={e => { setTexto(e.target.value); setResultado(null) }}
               placeholder={"2TIM2(Inst Manu Computadores)\n2TIM3(Inst Manu Computadores)\n2TNDV1(MATEMATICA)\n2TIN1E(INST MANUT COMPUTADORES)\n..."}
               rows={8}
-              className="w-full px-6 py-4 font-mono text-sm text-fg-muted bg-canvas/50 focus:outline-none focus:bg-surface resize-none transition-colors"
+              className="w-full px-4 py-4 font-mono text-sm text-fg-muted bg-canvas/50 focus:outline-none focus:bg-surface resize-none transition-colors"
             />
 
-            <div className="px-6 py-4 border-t border-line-subtle flex items-center justify-between">
+            <div className="px-4 py-4 border-t border-line-subtle flex items-center justify-between">
               <p className="text-xs text-fg-subtle">
                 {texto.match(/\w+\([^)]+\)/g)?.length ?? 0} par(es) identificado(s) no texto
               </p>
               <button
                 onClick={handleVerificar}
                 disabled={!texto.trim() || verificando}
-                className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-5 py-2.5 rounded-xl font-semibold text-sm transition-all disabled:opacity-40 active:scale-95"
+                className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-5 py-2.5 rounded-xl font-semibold text-sm transition-all disabled:opacity-40"
               >
                 {verificando
                   ? <Loader2 size={16} className="animate-spin" />
@@ -238,8 +227,8 @@ export default function ImportarHorarioClient({
 
             {/* Novas para vincular */}
             {novasParaVincular.length > 0 && (
-              <div className="bg-surface rounded-lg border border-line shadow-sm overflow-hidden">
-                <div className="px-6 py-4 border-b border-line-subtle flex items-center justify-between">
+              <div className="bg-surface rounded-lg border border-line overflow-hidden">
+                <div className="px-4 py-4 border-b border-line-subtle flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-success-fg" />
                     <h3 className="text-sm font-bold text-fg">
@@ -263,7 +252,7 @@ export default function ImportarHorarioClient({
                   {novasParaVincular.map((e, i) => (
                     <label
                       key={i}
-                      className={`flex items-center gap-4 px-6 py-3.5 cursor-pointer transition-colors ${
+                      className={`flex items-center gap-4 px-4 py-3.5 cursor-pointer transition-colors ${
                         confirmados.has(e.discId) ? 'bg-success-subtle' : 'hover:bg-canvas'
                       }`}
                     >
@@ -296,7 +285,7 @@ export default function ImportarHorarioClient({
             {/* Já vinculadas */}
             {jaVinculadas.length > 0 && (
               <div className="bg-surface rounded-lg border border-line overflow-hidden">
-                <div className="px-6 py-4 border-b border-line-subtle flex items-center gap-2">
+                <div className="px-4 py-4 border-b border-line-subtle flex items-center gap-2">
                   <BookOpen className="w-4 h-4 text-accent" />
                   <h3 className="text-sm font-bold text-fg">
                     Já vinculadas ({jaVinculadas.length})
@@ -304,7 +293,7 @@ export default function ImportarHorarioClient({
                 </div>
                 <div className="divide-y divide-line-subtle">
                   {jaVinculadas.map((e, i) => (
-                    <div key={i} className="flex items-center gap-4 px-6 py-3 opacity-60">
+                    <div key={i} className="flex items-center gap-4 px-4 py-3 opacity-60">
                       <span className="text-xs font-semibold text-fg-subtle bg-subtle px-2 py-1 rounded-lg font-mono">
                         {e.turmaCode}
                       </span>
@@ -321,7 +310,7 @@ export default function ImportarHorarioClient({
             {/* Não encontrados */}
             {resultado.naoEncontrados.length > 0 && (
               <div className="bg-surface rounded-lg border border-danger-line overflow-hidden">
-                <div className="px-6 py-4 border-b border-danger-line flex items-center gap-2">
+                <div className="px-4 py-4 border-b border-danger-line flex items-center gap-2">
                   <XCircle className="w-4 h-4 text-danger" />
                   <h3 className="text-sm font-bold text-fg">
                     Não encontrados ({resultado.naoEncontrados.length})
@@ -329,7 +318,7 @@ export default function ImportarHorarioClient({
                 </div>
                 <div className="divide-y divide-danger-line">
                   {resultado.naoEncontrados.map((n, i) => (
-                    <div key={i} className="px-6 py-4">
+                    <div key={i} className="px-4 py-4">
                       <div className="flex items-start gap-3">
                         <span className="text-xs font-semibold text-danger bg-danger-subtle px-2 py-1 rounded-lg font-mono shrink-0">
                           {n.turmaCode}

@@ -203,15 +203,15 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
         tips={questaoTips}
       />
 
-      <div className="max-w-[1600px] mx-auto px-4 md:px-8 py-8">
+      <div className="py-2">
         
         
         
         {/* Header with Inline Metrics */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          <div className="flex items-center gap-6">
-            <h1 className="text-3xl font-bold text-fg">Banco de Questões</h1>
-            <div className="hidden lg:flex items-center gap-4 bg-surface px-4 py-2 rounded-lg border border-line shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+          <div className="flex items-center gap-4">
+            <h1 className="text-xl font-bold text-fg">Banco de questões</h1>
+            <div className="hidden lg:flex items-center gap-4 bg-surface px-4 py-2 rounded-lg border border-line">
               <div className="flex items-center gap-2">
                 <span className="text-xs text-fg-subtle font-semibold">Total:</span>
                 <span className="text-sm font-bold text-fg">{metrics?.totalAprovadas || 0}</span>
@@ -231,18 +231,18 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
 
           <button
             onClick={() => { setEditingQuestao(null); setShowForm(true); }}
-            className="flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-5 py-2.5 rounded-lg font-semibold transition-all active:scale-95"
+            className="flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-5 py-2.5 rounded-lg font-semibold transition-all"
           >
             <Plus size={18} />
-            Nova Questão
+            Nova questão
           </button>
         </div>
 
         {/* Filters Area */}
-        <div className="bg-surface p-5 md:p-6 rounded-2xl border border-line/60 shadow-sm mb-10">
+        <div className="bg-surface p-5 md:p-4 rounded-2xl border border-line/60 mb-5">
           <div className="flex items-center gap-2 mb-5">
             <Filter className="w-5 h-5 text-fg-subtle" />
-            <h2 className="text-base font-bold text-fg">Filtros e Ações</h2>
+            <h2 className="text-base font-bold text-fg">Filtros e ações</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-5">
             <div>
@@ -260,7 +260,7 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-fg mb-1.5">Área de Conhecimento</label>
+              <label className="block text-sm font-semibold text-fg mb-1.5">Área de conhecimento</label>
               <div className="relative">
                 <select 
                   value={filters.areaId}
@@ -379,7 +379,7 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
                 >
                   <option value="">Todos os Tipos</option>
                   <option value="NORMAL">Normal</option>
-                  <option value="RECUPERACAO">Segunda Chamada</option>
+                  <option value="RECUPERACAO">Segunda chamada</option>
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-fg-subtle w-4 h-4 pointer-events-none" />
               </div>
@@ -391,7 +391,7 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
                   onClick={() => setFilters({ turmaId: '', disciplinaId: '', areaId: '', status: '', unidade: '', tipo: '', search: '', professorId: '' })}
                   className="w-full px-3 py-2 text-fg-muted bg-subtle hover:bg-subtle-hover font-bold rounded-lg transition-all text-xs flex items-center justify-center gap-1.5"
                 >
-                  <X size={14} /> Limpar Filtros
+                  <X size={14} /> Limpar filtros
                 </button>
               )}
               {isAdmin && (
@@ -407,7 +407,7 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
                   }}
                   className="w-full h-8 px-3 text-fg bg-surface border border-line hover:bg-subtle font-medium rounded-md transition-colors duration-150 text-13 flex items-center justify-center gap-1.5"
                 >
-                  <CheckCircle2 size={14} /> Selecionar Pendentes
+                  <CheckCircle2 size={14} /> Selecionar pendentes
                 </button>
               )}
             </div>
@@ -416,7 +416,7 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
 
         {/* Bulk Actions Bar */}
         {selectedIds.length > 0 && isAdmin && (
-          <div className="fixed bottom-[calc(var(--barra-inferior)+2rem)] left-1/2 -translate-x-1/2 z-50 bg-zinc-900 text-white px-6 py-4 rounded-xl shadow-overlay flex items-center gap-6 animate-slide-up">
+          <div className="fixed bottom-[calc(var(--barra-inferior)+2rem)] left-1/2 -translate-x-1/2 z-50 bg-zinc-900 text-white px-4 py-4 rounded-xl shadow-overlay flex items-center gap-4 animate-slide-up">
             <div className="flex items-center gap-3 pr-6 border-r border-zinc-700">
               <div className="bg-accent text-on-accent w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold">
                 {selectedIds.length}
@@ -452,10 +452,10 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
 
         {/* Header Results Info */}
         {!loading && (
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 mt-8 px-1">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 mt-4 px-1">
             <h2 className="text-lg font-semibold text-fg tracking-tight flex items-center gap-4">
               Resultados
-              <div className="hidden sm:flex items-center gap-3 ml-2 bg-surface px-3 py-1.5 rounded-lg border border-line-subtle shadow-sm">
+              <div className="hidden sm:flex items-center gap-3 ml-2 bg-surface px-3 py-1.5 rounded-lg border border-line-subtle">
                 <div className="flex items-center gap-1.5">
                   <div className="w-2 h-2 rounded-full bg-accent"></div>
                   <span className="text-xs font-bold text-fg-subtle">Normal</span>
@@ -466,26 +466,26 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
                 </div>
               </div>
             </h2>
-            <div className="bg-accent-subtle text-accent-fg px-3 py-1 rounded-full text-xs font-bold shadow-sm self-start sm:self-auto">
+            <div className="bg-accent-subtle text-accent-fg px-3 py-1 rounded-full text-xs font-bold self-start sm:self-auto">
               {questoes.length} {questoes.length === 1 ? 'questão encontrada' : 'questões encontradas'}
             </div>
           </div>
         )}
 
         {/* Card Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {loading ? (
-            <div className="col-span-full py-20 text-center">
+            <div className="col-span-full py-10 text-center">
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-accent mx-auto mb-4"></div>
               <p className="text-fg-subtle font-medium">Carregando...</p>
             </div>
           ) : questoes.length === 0 ? (
-            <div className="col-span-full py-20 text-center bg-surface rounded-xl border border-dashed border-line-strong">
+            <div className="col-span-full py-10 text-center bg-surface rounded-xl border border-dashed border-line-strong">
               <p className="text-fg-subtle font-medium">Nenhuma questão encontrada com estes filtros.</p>
             </div>
           ) : (
             paginatedQuestoes.map((q: any) => (
-              <div key={q.id} className="bg-surface rounded-xl border border-line shadow-sm overflow-hidden flex flex-col hover:shadow-card transition-shadow">
+              <div key={q.id} className="bg-surface rounded-xl border border-line overflow-hidden flex flex-col hover: transition-shadow">
                 <div className="p-5 flex flex-col h-full relative">
                   {/* Admin Checkbox */}
                   {isAdmin && (
@@ -574,7 +574,7 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
         
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex justify-center mt-8 gap-2">
+          <div className="flex justify-center mt-4 gap-2">
             <button 
               disabled={currentPage === 1}
               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}

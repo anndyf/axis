@@ -19,7 +19,7 @@ export function MarcaAcesso({ escola, sobreDestaque }: { escola: EscolaDoAcesso;
       )}
       <span className="min-w-0">
         <span className={`block truncate text-sm font-semibold ${sobreDestaque ? "text-on-accent" : "text-fg"}`}>{escola.nome}</span>
-        <span className={`block text-xs ${sobreDestaque ? "text-on-accent/75" : "text-fg-subtle"}`}>Sistema de Gestão Escolar</span>
+        <span className={`block text-xs ${sobreDestaque ? "text-on-accent/75" : "text-fg-subtle"}`}>Sistema de gestão escolar</span>
       </span>
     </span>
   )

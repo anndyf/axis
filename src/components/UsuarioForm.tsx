@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Accessibility, BookOpen, Check, ClipboardList, Fingerprint, GraduationCap, Mail, ShieldCheck, type LucideIcon } from "lucide-react"
-import { Alert, Button, Card, CardBody, CardFooter, CardHeader, Field, Input, PageHeader, PasswordInput, cn } from "@/components/ui"
+import { Alert, BarraSalvar, Button, Card, CardBody, CardFooter, CardHeader, Field, Input, CabecalhoPagina, IndicadorGravacao, PasswordInput, cn } from "@/components/ui"
 import { Dialog } from "@/components/ui/Dialog"
 import { PAPEIS_ATRIBUIVEIS, PAPEIS_SISTEMA, type CodigoPapel } from "@/lib/permissoes"
 
@@ -41,6 +41,9 @@ export default function UsuarioForm({ usuario, isEdit = false }: { usuario?: Usu
   const [erro, setErro] = useState("")
   const [salvando, setSalvando] = useState(false)
   const [confirmar, setConfirmar] = useState(false)
+  // "Alterações não salvas" enquanto algo difere do que veio do servidor
+  const alterado = nome !== (usuario?.name ?? "") || email !== (usuario?.email ?? "") || senha !== "" ||
+    [...papeis].sort().join() !== [...(usuario?.papeis ?? ["PROFESSOR"])].sort().join()
   const protegida = !!usuario?.protegida
 
   const alternar = (c: CodigoPapel) => setPapeis((atual) => (atual.includes(c) ? atual.filter((p) => p !== c) : [...atual, c]))
@@ -62,9 +65,9 @@ export default function UsuarioForm({ usuario, isEdit = false }: { usuario?: Usu
         return
       }
       const data = await res.json().catch(() => ({}))
-      setErro(`${data.message || "Erro ao salvar"}${data.detail ? `: ${data.detail}` : ""}`)
+      setErro(`${data.message || "Não foi possível salvar. Tente novamente."}${data.detail ? `: ${data.detail}` : ""}`)
     } catch {
-      setErro("Erro ao conectar com o servidor")
+      setErro("Não foi possível conectar ao servidor. Tente novamente.")
     } finally {
       setSalvando(false)
       setConfirmar(false)
@@ -74,12 +77,9 @@ export default function UsuarioForm({ usuario, isEdit = false }: { usuario?: Usu
   const papeisExtras = (usuario?.papeis ?? []).filter((p) => !PAPEIS_ATRIBUIVEIS.includes(p))
 
   return (
-    <div className="mx-auto max-w-3xl space-y-4 pb-24">
-      <PageHeader
-        title={isEdit ? "Editar usuário" : "Novo usuário"}
-        description={isEdit ? "Dados de acesso e papéis da conta" : "A senha provisória é enviada por e-mail"}
-        breadcrumb={[{ label: "Usuários", href: "/dashboard/usuarios" }, { label: isEdit ? (usuario?.name || usuario?.email || "Editar") : "Novo" }]}
-      />
+    <div className="max-w-leitura space-y-4 pb-24">
+      {/* Na edição, nome e abas vêm da ficha do usuário (layout) */}
+      {!isEdit && <CabecalhoPagina titulo="Novo usuário" descricao="A senha provisória é enviada por e-mail." />}
 
       {protegida && (
         <Alert tone="warning" title="Conta da plataforma">
@@ -93,7 +93,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: { usuario?: Usu
         className="space-y-4"
       >
         <Card>
-          <CardHeader title="Dados de acesso" />
+          <CardHeader title="1. Dados de acesso" />
           <CardBody className="grid gap-4 sm:grid-cols-2">
             <Field label="Nome completo" className="sm:col-span-2">
               {(p) => <Input {...p} required value={nome} disabled={protegida} onChange={(e) => setNome(e.target.value)} autoComplete="name" />}
@@ -121,7 +121,7 @@ export default function UsuarioForm({ usuario, isEdit = false }: { usuario?: Usu
         </Card>
 
         <Card>
-          <CardHeader title="Papéis" description="Escolha um ou mais. A conta soma o que cada papel libera." />
+          <CardHeader title="2. Papéis" description="Escolha um ou mais. A conta soma o que cada papel libera." />
           <CardBody>
             <fieldset disabled={protegida}>
               <legend className="sr-only">Papéis da conta</legend>
@@ -168,10 +168,10 @@ export default function UsuarioForm({ usuario, isEdit = false }: { usuario?: Usu
           </CardBody>
         </Card>
 
-        <div className="sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-10 flex justify-end gap-2 rounded-xl border border-line bg-surface/95 p-3 shadow-card backdrop-blur md:static md:border-0 md:bg-transparent md:p-0 md:shadow-none">
-          <Button variant="secondary" onClick={() => router.push("/dashboard/usuarios")}>Cancelar</Button>
+        <BarraSalvar estado={<IndicadorGravacao pendente={alterado} salvando={salvando} />}>
+          <Button variant="secondary" onClick={() => router.push(isEdit && usuario ? `/dashboard/usuarios/${usuario.id}` : "/dashboard/usuarios")}>Cancelar</Button>
           <Button type="submit" disabled={protegida} loading={salvando}>{isEdit ? "Salvar alterações" : "Criar usuário"}</Button>
-        </div>
+        </BarraSalvar>
       </form>
 
       <Dialog

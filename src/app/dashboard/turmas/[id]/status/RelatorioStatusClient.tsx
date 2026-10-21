@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react"
 import Link from "next/link"
-import { ArrowLeft, Download, Filter, FileText, CheckCircle2, AlertCircle, UserMinus, Clock, MoreHorizontal, GraduationCap, Accessibility } from "lucide-react"
+import { Download, Filter, FileText, CheckCircle2, AlertCircle, UserMinus, Clock, MoreHorizontal, GraduationCap, Accessibility } from "lucide-react"
 import type { EtapaDaNota } from "@/lib/services/notas"
 
 // número = índice da etapa (U1, U2, ...) do esquema da turma
@@ -100,7 +100,7 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
     if (viewMode === 'STATUS') {
       const config = getStatusConfig(nota.status)
       return (
-        <span className={`w-5 h-5 rounded flex items-center justify-center text-xs font-medium ${config.color} ${config.text} shadow-sm`}>
+        <span className={`w-5 h-5 rounded flex items-center justify-center text-xs font-medium ${config.color} ${config.text}`}>
           {config.label}
         </span>
       )
@@ -131,33 +131,11 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
 
   return (
     <div className="">
-      {/* Header Premium */}
-      <header className="mb-6">
-        <div className="max-w-[1600px] mx-auto px-6 py-4">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="flex min-w-0 items-center gap-3">
-              <Link
-                href="/dashboard/turmas"
-                className="w-10 h-10 bg-surface border border-line-strong rounded-xl flex items-center justify-center text-fg-muted hover:bg-canvas transition-all shadow-sm hover:translate-x-[-2px]"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Link>
-              <div>
-                <div className="flex items-center space-x-2 mb-0.5">
-                  <h1 className="text-2xl font-semibold tracking-tight text-fg">RESULTADO - {turma.nome}</h1>
-                  <span className="px-2 py-0.5 bg-zinc-700 text-white text-xs font-medium rounded-md leading-none">
-                    Realtime
-                  </span>
-                </div>
-                <p className="text-xs font-medium text-fg-subtle flex items-center">
-                  <span className="text-fg-muted mr-2 font-medium">{turma.nome}</span>
-                  • {turma.curso} • {turma.turno}
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="bg-subtle-hover/50 p-1 rounded-lg flex items-center border border-line-strong/50 shadow-card">
+      {/* Dentro da ficha da turma: visão (situação, unidades, final) e PDF */}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-fg-muted">Situação dos estudantes por disciplina</p>
+        <div className="flex flex-wrap items-center gap-3">
+              <div className="bg-subtle-hover/50 p-1 rounded-lg flex items-center border border-line-strong/50">
                 {([
                   { id: 'STATUS', label: 'Status', icon: CheckCircle2 },
                   ...nomesEtapas.map((_, i) => ({ id: i, label: `Und ${i + 1}`, icon: FileText })),
@@ -176,7 +154,7 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
                         : 'text-fg-muted hover:text-fg hover:bg-surface/50'
                       }`}
                     >
-                      <Icon className={`w-3.5 h-3.5 ${active ? 'text-white' : 'text-fg-subtle'}`} />
+                      <Icon className={`w-3.5 h-3.5 ${active ? 'text-fg' : 'text-fg-subtle'}`} />
                       <span className="">{item.label}</span>
                     </button>
                   )
@@ -187,20 +165,18 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
                 href={`/api/relatorio/status/${turma.id}/pdf`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center space-x-2 bg-surface border border-line text-fg px-5 py-2.5 rounded-lg hover:bg-subtle transition-all shadow-card active:scale-95 font-medium text-xs"
+                className="flex items-center space-x-2 bg-surface border border-line text-fg px-5 py-2.5 rounded-lg hover:bg-subtle transition-all font-medium text-xs"
               >
                 <Download className="w-4 h-4" />
                 <span>PDF</span>
               </a>
             </div>
-          </div>
-        </div>
-      </header>
+      </div>
 
       {/* Main Content */}
-      <main className="max-w-[1600px] mx-auto px-4 py-6">
+      <main className="py-3">
         {/* Compact Summary & Legend Row */}
-        <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 mb-6 bg-surface p-4 rounded-2xl border border-line-strong shadow-sm">
+        <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 mb-6 bg-surface p-4 rounded-2xl border border-line-strong">
           {/* Metrics */}
           <div className="flex items-center space-x-6 px-2">
             <div>
@@ -236,7 +212,7 @@ export default function RelatorioStatusClient({ turma, nomesEtapas, notaMinimaAp
         </div>
 
         {/* Ultra Compact Matriz */}
-        <div className="bg-surface rounded-2xl shadow-card border border-line overflow-hidden relative">
+        <div className="bg-surface rounded-2xl border border-line overflow-hidden relative">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>

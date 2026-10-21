@@ -19,7 +19,7 @@ export default function SessionTimer() {
       <div className="bg-surface rounded-2xl shadow-overlay p-8 max-w-sm w-full mx-4 border border-line text-center relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-warning animate-[pulse_1s_infinite]" />
         
-        <h3 className="text-xl font-semibold text-fg mb-2">Sessão Expirando</h3>
+        <h3 className="text-xl font-semibold text-fg mb-2">Sessão expirando</h3>
         <p className="text-fg-muted mb-6">
           Por inatividade, você será desconectado em:
         </p>
@@ -32,7 +32,7 @@ export default function SessionTimer() {
           onClick={resetTimer}
           className="w-full bg-accent text-on-accent font-semibold py-3 px-4 rounded-xl hover:bg-accent-hover transition-all active:scale-95 shadow-card"
         >
-          Continuar Conectado
+          Continuar conectado
         </button>
       </div>
     </div>

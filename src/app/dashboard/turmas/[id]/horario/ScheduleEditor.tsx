@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowLeft, Save, Loader2, Calendar, Info, AlertTriangle, CheckCircle2 } from "lucide-react"
+import { Save, Loader2, Calendar, Info, AlertTriangle, CheckCircle2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { saveSchedule } from "../../schedule-actions"
@@ -65,13 +65,13 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
         })
       const r = await saveSchedule(turma.id, items)
       if ("error" in r) {
-        setAviso({ tipo: "erro", texto: r.error ?? "Erro ao salvar" })
+        setAviso({ tipo: "erro", texto: r.error ?? "Não foi possível salvar. Tente novamente." })
       } else {
         setAviso({ tipo: "ok", texto: "Horário salvo." })
         router.refresh()
       }
     } catch {
-      setAviso({ tipo: "erro", texto: "Erro ao salvar" })
+      setAviso({ tipo: "erro", texto: "Não foi possível salvar. Tente novamente." })
     } finally {
       setSaving(false)
     }
@@ -79,36 +79,23 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
 
   return (
     <div className="">
-      <header className="mb-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <Link href="/dashboard/turmas" aria-label="Voltar" className="hidden sm:inline-flex p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg">
-                <ArrowLeft className="w-5 h-5 text-fg-muted" />
-              </Link>
-              <div>
-                <h1 className="text-2xl font-semibold tracking-tight text-fg">
-                  <Calendar className="w-6 h-6 text-fg-muted" />
-                  Horário: {turma.nome}
-                </h1>
-                <p className="text-sm text-fg-muted">
-                  {turma.curso} • {turma.anoLetivo}
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
-            >
-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              <span className="text-xs font-medium">Salvar Alterações</span>
-            </button>
-          </div>
+      {/* Dentro da ficha da turma (o cabeçalho com o nome vem do layout) */}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2 text-sm text-fg-muted">
+          <Calendar size={16} strokeWidth={1.75} aria-hidden className="text-fg-subtle" />
+          Horário semanal da turma
         </div>
-      </header>
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
+        >
+          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          Salvar horário
+        </button>
+      </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <main className="space-y-4">
         {aviso && (
           <div className={`p-4 rounded-xl border text-sm flex items-center gap-2 ${aviso.tipo === "ok" ? "bg-success-subtle border-success-line text-success-fg" : "bg-danger-subtle border-danger-line text-danger-fg"}`}>
             {aviso.tipo === "ok" ? <CheckCircle2 className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}
@@ -116,7 +103,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
           </div>
         )}
 
-        <div className="bg-subtle border border-line rounded-xl p-6 flex items-start gap-4">
+        <div className="bg-subtle border border-line rounded-xl p-4 flex items-start gap-4">
           <div className="w-10 h-10 bg-subtle-hover rounded-lg flex items-center justify-center shrink-0">
             <Info className="w-5 h-5 text-fg-muted" />
           </div>
@@ -149,7 +136,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
           </div>
         )}
 
-        <div className="bg-surface rounded-xl shadow-card border border-line-strong overflow-hidden">
+        <div className="bg-surface rounded-xl border border-line-strong overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1000px]">
               <thead>
@@ -180,7 +167,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
                         const disciplinaId = schedule[key] ?? ""
                         const professor = disciplinaPorId.get(disciplinaId)?.professor
                         return (
-                          <td key={day.id} className="p-2 border-r border-line last:border-0 h-20">
+                          <td key={day.id} className="p-2 border-r border-line last:border-0 h-12">
                             <div className="h-full flex flex-col items-center justify-center text-center">
                               <select
                                 aria-label={`${day.label}, ${period}º horário`}
@@ -211,7 +198,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
         </div>
 
         {/* Carga horária */}
-        <div className="bg-surface rounded-2xl shadow-sm border border-line overflow-hidden">
+        <div className="bg-surface rounded-2xl border border-line overflow-hidden">
           <div className="p-4 border-b border-line">
             <h2 className="font-medium text-fg">Aulas por disciplina</h2>
             <p className="text-xs text-fg-subtle">

@@ -46,7 +46,7 @@ export default function UserActions({
         alert(data.message || "Erro ao aprovar usuário")
       }
     } catch (err) {
-      alert("Erro na conexão com o servidor")
+      alert("Não foi possível conectar ao servidor. Tente novamente.")
     } finally {
       setLoading(false)
     }
@@ -70,7 +70,7 @@ export default function UserActions({
         alert(error.message || 'Erro ao excluir usuário')
       }
     } catch (err) {
-      alert('Erro na conexão com o servidor')
+      alert('Não foi possível conectar ao servidor. Tente novamente.')
     } finally {
       setLoading(false)
     }
@@ -94,13 +94,13 @@ export default function UserActions({
 
       if (res.ok) {
         router.refresh()
-        alert(`Usuário ${isActive ? 'pausado' : 'reativado'} com sucesso!`)
+        alert(`Usuário ${isActive ? 'pausado' : 'reativado'} com sucesso.`)
       } else {
         const error = await res.json()
-        alert(error.message || `Erro ao ${action} usuário`)
+        alert(error.message || `Não foi possível ${action} o usuário. Tente novamente.`)
       }
     } catch (err) {
-      alert('Erro na conexão com o servidor')
+      alert('Não foi possível conectar ao servidor. Tente novamente.')
     } finally {
       setLoading(false)
     }

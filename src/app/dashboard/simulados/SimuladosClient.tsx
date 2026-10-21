@@ -179,7 +179,7 @@ export default function SimuladosClient({
         setMessage({ type: 'error', text: data.message || 'Erro ao carregar estudantes' })
       }
     } catch (err) {
-      setMessage({ type: 'error', text: 'Erro de conexão' })
+      setMessage({ type: 'error', text: 'Não foi possível conectar ao servidor. Tente novamente.' })
     } finally {
       setLoading(false)
     }
@@ -256,7 +256,7 @@ export default function SimuladosClient({
       })
 
       if (res.ok) {
-        setMessage({ type: 'success', text: 'Notas salvas com sucesso!' })
+        setMessage({ type: 'success', text: 'Notas salvas.' })
         setShowModal(false)
         setOriginalNotas({...notasTemp})
         setOriginalAusentes({...ausentesTemp})
@@ -269,7 +269,7 @@ export default function SimuladosClient({
         setMessage({ type: 'error', text: data.message || 'Erro ao salvar notas' })
       }
     } catch (err) {
-      setMessage({ type: 'error', text: 'Erro de conexão ao salvar' })
+      setMessage({ type: 'error', text: 'Não foi possível salvar: falha de conexão. Tente novamente.' })
     } finally {
       setSaving(false)
     }
@@ -346,8 +346,8 @@ export default function SimuladosClient({
     <div className="print:bg-surface print:min-h-0">
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
       <header className="mb-6 border-b border-line pb-4 print:hidden">
-        <div className="max-w-7xl mx-auto py-4">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div className="py-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div className="flex items-center space-x-5">
               <Link
                 href="/dashboard"
@@ -365,9 +365,9 @@ export default function SimuladosClient({
               {can(user, 'simulado.gerenciar') && (
                 <Link 
                   href="/dashboard/simulados/responsaveis"
-                  className="flex items-center gap-2 bg-accent text-on-accent px-6 py-3 rounded-lg font-medium hover:bg-accent-hover transition-all text-xs active:scale-95 shadow-card"
+                  className="flex items-center gap-2 bg-accent text-on-accent px-4 py-3 rounded-lg font-medium hover:bg-accent-hover transition-all text-xs"
                 >
-                  <Users size={16} /> Designar Responsáveis
+                  <Users size={16} /> Designar responsáveis
                 </Link>
               )}
             </div>
@@ -376,13 +376,13 @@ export default function SimuladosClient({
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-32 space-y-8 print:p-0 print:m-0 print:space-y-4">
+      <main className="pt-4 pb-32 space-y-5 print:p-0 print:m-0 print:space-y-4">
         
         {/* Print Header */}
         <div className="hidden print:block border-b-2 border-zinc-800 pb-4 mb-6">
            <div className="flex justify-between items-end">
               <div>
-                 <h1 className="text-2xl font-bold text-fg">Lista de Lançamento de Simulado</h1>
+                 <h1 className="text-2xl font-bold text-fg">Lista de lançamento de simulado</h1>
                  <p className="text-sm font-medium text-fg-muted mt-1">
                     Turma: {turmas.find(t => t.id === selectedTurma)?.nome || 'Não selecionada'} • 
                     Prova: {provas.find((p: any) => p.id === selectedProva)?.titulo || 'Não selecionada'} • 
@@ -403,7 +403,7 @@ export default function SimuladosClient({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 print:hidden">
           {simuTips.map((tip, index) => (
              <div key={index} className="bg-surface border border-line p-4 rounded-2xl flex items-start gap-3">
-                <div className={`shrink-0 p-3 rounded-lg bg-subtle text-fg-muted transition-all shadow-card`}>
+                <div className={`shrink-0 p-3 rounded-lg bg-subtle text-fg-muted transition-all`}>
                    {tip.icon}
                 </div>
                 <div className="min-w-0 break-words">
@@ -415,10 +415,10 @@ export default function SimuladosClient({
         </div>
 
         {/* Filtros Premium */}
-        <div className="bg-surface p-6 rounded-xl shadow-card border border-line flex flex-wrap gap-6 items-end relative overflow-hidden print:hidden">
+        <div className="bg-surface p-4 rounded-xl border border-line flex flex-wrap gap-4 items-end relative overflow-hidden print:hidden">
             
             <div className="flex-1 min-w-[200px] space-y-2">
-                <label className="text-xs font-medium text-fg-subtle ml-2">Filtrar por Turma</label>
+                <label className="text-xs font-medium text-fg-subtle ml-2">Filtrar por turma</label>
                 <div className="relative group">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-canvas rounded-lg text-fg-subtle group-focus-within:text-danger-fg group-focus-within:bg-danger-subtle transition-all">
                     <Users size={16} />
@@ -426,7 +426,7 @@ export default function SimuladosClient({
                   <select
                     value={selectedTurma}
                     onChange={(e) => setSelectedTurma(e.target.value)}
-                    className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-danger/30 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
+                    className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-danger/30 transition-all appearance-none cursor-pointer font-medium text-fg-muted"
                   >
                     <option value="">Selecione a Turma...</option>
                     {turmas.map((t) => <option key={t.id} value={t.id}>{t.nome}</option>)}
@@ -448,7 +448,7 @@ export default function SimuladosClient({
                       value={selectedArea}
                       onChange={(e) => setSelectedArea(e.target.value)}
                       disabled={!selectedTurma}
-                      className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-danger/30 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
+                      className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-danger/30 transition-all appearance-none cursor-pointer font-medium text-fg-muted"
                     >
                       <option value="">Selecione a Área...</option>
                       {areas.map((a) => <option key={a.id} value={a.id}>{a.nome}</option>)}
@@ -458,7 +458,7 @@ export default function SimuladosClient({
                       value={selectedProva}
                       onChange={(e) => setSelectedProva(e.target.value)}
                       disabled={!selectedTurma}
-                      className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-danger/30 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
+                      className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-danger/30 transition-all appearance-none cursor-pointer font-medium text-fg-muted"
                     >
                       <option value="">Selecione a Prova...</option>
                       {provas.filter(p => {
@@ -473,7 +473,7 @@ export default function SimuladosClient({
 
                         <div className="flex-1 min-w-[200px] space-y-2">
                 <label className="text-xs font-medium text-fg-subtle ml-2">Unidade / Etapa</label>
-                <div className="flex bg-canvas p-1.5 rounded-lg shadow-card border border-line-subtle">
+                <div className="flex bg-canvas p-1.5 rounded-lg border border-line-subtle">
                   <button
                     onClick={() => setSelectedUnidade("1")}
                     className={`flex-1 py-2.5 text-sm font-medium rounded-xl transition-all ${
@@ -507,12 +507,12 @@ export default function SimuladosClient({
         
         
         {/* Lançamento Estilo Resultados */}
-        <div className="bg-surface rounded-2xl shadow-sm border border-line-strong overflow-hidden print:shadow-none print:border-none print:rounded-none">
+        <div className="bg-surface rounded-2xl border border-line-strong overflow-hidden print:shadow-none print:border-none print:rounded-none">
           <div className="p-4 border-b border-line bg-canvas/10 flex flex-col md:flex-row md:items-center justify-between gap-4 print:hidden">
             <div>
                <h2 className="text-lg font-medium text-fg flex items-center gap-2">
                  <Users size={20} className="text-fg-subtle" />
-                 Matriz de Avaliação Somativa
+                 Matriz de avaliação somativa
                </h2>
                <div className="mt-2">
                  {responsavelName && (
@@ -541,13 +541,13 @@ export default function SimuladosClient({
                   placeholder="Filtrar por nome..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full bg-surface border border-line-strong rounded-lg pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-zinc-500/10 focus:border-zinc-400 transition-all shadow-sm"
+                  className="w-full bg-surface border border-line-strong rounded-lg pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-zinc-500/10 focus:border-zinc-400 transition-all"
                 />
               </div>
               {selectedUnidade === "2" && selectedProva && (
                 <button
                   onClick={() => setShowGabaritoModal(true)}
-                  className="flex items-center gap-2 bg-accent-subtle hover:bg-accent-subtle text-accent-fg px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm border border-accent/25"
+                  className="flex items-center gap-2 bg-accent-subtle hover:bg-accent-subtle text-accent-fg px-4 py-2 rounded-lg text-sm font-medium transition-all border border-accent/25"
                   title="Ver Gabarito"
                 >
                   <BookOpen size={16} />
@@ -556,7 +556,7 @@ export default function SimuladosClient({
               )}
               <button
                 onClick={() => window.print()}
-                className="flex items-center gap-2 bg-subtle hover:bg-subtle-hover text-fg-muted px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm border border-line"
+                className="flex items-center gap-2 bg-subtle hover:bg-subtle-hover text-fg-muted px-4 py-2 rounded-lg text-sm font-medium transition-all border border-line"
                 title="Imprimir lista"
               >
                 <Printer size={16} />
@@ -583,10 +583,10 @@ export default function SimuladosClient({
                   setMissingStudentForm(p => ({ ...p, turmaId: selectedTurma }))
                   setShowMissingStudentModal(true)
                 }}
-                className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-4 py-2 rounded-xl text-xs font-semibold transition-all shadow-card active:scale-95 shrink-0"
+                className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-4 py-2 rounded-xl text-xs font-semibold transition-all shrink-0"
               >
                 <UserPlus size={14} />
-                Reportar Ausência
+                Reportar ausência
               </button>
             </div>
           )}
@@ -596,26 +596,26 @@ export default function SimuladosClient({
               <thead className="bg-canvas border-b border-line-strong">
                 <tr>
                   <th className="px-4 py-4 w-12 text-center text-sm font-medium text-fg-subtle border-b">#</th>
-                  <th className="px-6 py-4 print:py-2 print:px-2 text-sm print:text-xs font-medium text-fg-subtle border-b print:border-zinc-800">Estudante</th>
+                  <th className="px-4 py-4 print:py-2 print:px-2 text-sm print:text-xs font-medium text-fg-subtle border-b print:border-zinc-800">Estudante</th>
                   <th className="px-2 py-4 print:py-2 print:px-2 text-sm print:text-xs font-medium text-fg-subtle w-24 text-center border-b print:border-zinc-800">Falta</th>
                   <th className="px-4 py-4 print:py-2 print:px-2 text-sm print:text-xs font-medium text-fg-subtle w-32 text-center border-b print:border-zinc-800">Nota</th>
                   <th className="px-4 py-4 print:py-2 print:px-2 text-sm print:text-xs font-medium text-fg-subtle w-32 text-center border-b print:border-zinc-800">2ª Chamada</th>
-                  <th className="px-6 py-4 print:py-2 print:px-2 text-sm print:text-xs font-medium text-fg-subtle text-center border-b print:border-zinc-800">Status</th>
+                  <th className="px-4 py-4 print:py-2 print:px-2 text-sm print:text-xs font-medium text-fg-subtle text-center border-b print:border-zinc-800">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
                 {loading ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-16 text-center">
+                    <td colSpan={6} className="px-4 py-16 text-center">
                       <div className="flex flex-col items-center gap-2">
                         <Loader2 className="w-8 h-8 text-fg-muted animate-spin" />
-                        <p className="text-fg-subtle text-xs font-medium animate-pulse">Sincronizando...</p>
+                        <p className="text-fg-subtle text-xs font-medium">Sincronizando...</p>
                       </div>
                     </td>
                   </tr>
                 ) : filteredEstudantes.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-16 text-center text-fg-disabled">
+                    <td colSpan={6} className="px-4 py-16 text-center text-fg-disabled">
                       <BarChart3 className="w-12 h-12 opacity-20 mx-auto mb-3" />
                       <p className="text-xs font-medium">Selecione os filtros para iniciar</p>
                     </td>
@@ -640,7 +640,7 @@ export default function SimuladosClient({
                     return (
                       <tr key={est.matricula} className="hover:bg-canvas transition-colors print:border-b print:border-line">
                          <td className="px-4 py-3.5 text-center text-sm font-bold text-fg-subtle">{index + 1}</td>
-                         <td className="px-6 py-3.5 print:py-1.5 print:px-2">
+                         <td className="px-4 py-3.5 print:py-1.5 print:px-2">
                            <div className="flex flex-col">
                              <span className="text-base print:text-sm font-medium text-fg-muted print:text-fg">{est.nome}</span>
                              <span className="text-xs print:text-xs font-medium text-fg-subtle">Matrícula: {est.matricula}</span>
@@ -664,7 +664,7 @@ export default function SimuladosClient({
                               value={notasTemp[est.matricula]}
                               onChange={(e) => handleNotaChange(est.matricula, e.target.value)}
                               disabled={!canLaunch || isFalta}
-                               className={`w-20 text-center py-2 print:py-0 print:w-full border-2 print:border-0 rounded-xl print:rounded-none text-base print:text-sm font-medium outline-none transition-all ${
+                               className={`w-12 text-center py-2 print:py-0 print:w-full border-2 print:border-0 rounded-xl print:rounded-none text-base print:text-sm font-medium outline-none transition-all ${
                                  isFalta ? 'bg-subtle text-fg-subtle border-line cursor-not-allowed' :
                                  notaUnsaved ? 'border-zinc-400 bg-surface ring-4 ring-zinc-500/5' :
                                  !hasNota ? 'border-line bg-canvas focus:bg-surface focus:border-zinc-400' :
@@ -682,7 +682,7 @@ export default function SimuladosClient({
                                  value={notaSegundaChamadaTemp[est.matricula] || ""}
                                  onChange={(e) => handleSegundaChamadaChange(est.matricula, e.target.value)}
                                  disabled={!canLaunch}
-                                 className={`w-20 text-center py-2 print:py-0 print:w-full border-2 print:border-0 rounded-xl print:rounded-none text-base print:text-sm font-medium outline-none transition-all ${
+                                 className={`w-12 text-center py-2 print:py-0 print:w-full border-2 print:border-0 rounded-xl print:rounded-none text-base print:text-sm font-medium outline-none transition-all ${
                                     segundaChamadaUnsaved ? 'border-zinc-400 bg-surface ring-4 ring-zinc-500/5' :
                                     !notaSegundaChamadaTemp[est.matricula] ? 'border-line bg-canvas focus:bg-surface focus:border-zinc-400' :
                                     'border-line bg-surface text-fg focus:border-zinc-400'
@@ -694,9 +694,9 @@ export default function SimuladosClient({
                              <span className="text-fg-disabled">-</span>
                           )}
                         </td>
-                        <td className="px-6 py-3.5 print:py-1.5 print:px-2 text-center">
+                        <td className="px-4 py-3.5 print:py-1.5 print:px-2 text-center">
                           {hasNota ? (
-                            <span className={`inline-flex px-3 py-1 print:px-0 print:py-0 rounded-full print:rounded-none text-xs print:text-xs font-semibold border print:border-none shadow-sm print:shadow-none print:bg-transparent print:text-fg-muted ${
+                            <span className={`inline-flex px-3 py-1 print:px-0 print:py-0 rounded-full print:rounded-none text-xs print:text-xs font-semibold border print:border-none print:shadow-none print:bg-transparent print:text-fg-muted ${
                               isFalta && nota2 < 0 ? 'bg-warning-subtle text-warning-fg border-warning-line' :
                               isAltaPerformance ? 'bg-success-subtle text-success-fg border-success-line' : 
                               isNaMedia ? 'bg-subtle-hover text-fg border-line-strong' :
@@ -705,7 +705,7 @@ export default function SimuladosClient({
                               {isFalta && nota2 < 0 ? 'Faltou' : isAltaPerformance ? 'Alta Performance' : isNaMedia ? 'Na Média' : 'Abaixo da Média'}
                             </span>
                           ) : (
-                            <span className="text-fg-disabled text-xs font-medium italic opacity-50">Não Lançado</span>
+                            <span className="text-fg-disabled text-xs font-medium italic opacity-50">Não lançado</span>
                           )}
                         </td>
                       </tr>
@@ -724,7 +724,7 @@ export default function SimuladosClient({
                <button
                  onClick={handleSubmit}
                  disabled={saving || !hasUnsavedChanges()}
-                  className="w-full md:w-auto flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-8 py-3 rounded-lg font-medium text-xs shadow-card transition-all active:scale-95 disabled:opacity-50"
+                  className="w-full md:w-auto flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-4 py-3 rounded-lg font-medium text-xs transition-all disabled:opacity-50"
                >
                  {saving ? <Loader2 className="w-4 h-4 animate-spin text-white" /> : <Save size={16} />}
                  {saving ? 'SINCRONIZANDO...' : 'SALVAR RESULTADO'}
@@ -737,19 +737,19 @@ export default function SimuladosClient({
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
           <div className="bg-surface rounded-xl shadow-overlay w-full max-w-lg overflow-hidden animate-pop-in border border-white">
-            <div className="px-6 py-5 border-b border-line flex justify-between items-center bg-canvas">
+            <div className="px-4 py-2.5 border-b border-line flex justify-between items-center bg-canvas">
               <div className="flex items-center gap-3">
-                 <div className="w-10 h-10 bg-zinc-600 text-white rounded-xl flex items-center justify-center shadow-card"><Save size={20}/></div>
+                 <div className="w-10 h-10 bg-zinc-600 text-white rounded-xl flex items-center justify-center"><Save size={20}/></div>
                   <div>
-                     <h3 className="text-lg font-medium text-fg">Consolidar Dados</h3>
+                     <h3 className="text-lg font-medium text-fg">Consolidar dados</h3>
                     <p className="text-xs font-medium text-fg-subtle">Revise as alterações do Simulado</p>
                   </div>
               </div>
               <button onClick={() => setShowModal(false)} className="p-2 hover:bg-zinc-300 rounded-xl transition-all"><X size={20}/></button>
             </div>
-            <div className="p-6 max-h-[60vh] overflow-y-auto space-y-3 bg-canvas/20 custom-scrollbar">
+            <div className="p-4 max-h-[60vh] overflow-y-auto space-y-3 bg-canvas/20 custom-scrollbar">
               {estudantes.filter(e => notasTemp[e.matricula] !== originalNotas[e.matricula]).map((est, i) => (
-                 <div key={i} className="flex items-center justify-between bg-surface p-3 rounded-2xl border border-line shadow-sm">
+                 <div key={i} className="flex items-center justify-between bg-surface p-3 rounded-2xl border border-line">
                    <span className="text-sm font-medium text-fg-muted truncate pr-4">{est.nome}</span>
                    <div className="flex gap-2">
                       <span className="text-xs font-medium bg-canvas text-fg-muted px-2.5 py-1 rounded-lg border border-line">
@@ -759,20 +759,20 @@ export default function SimuladosClient({
                 </div>
               ))}
             </div>
-            <div className="p-6 border-t border-line bg-surface">
+            <div className="p-4 border-t border-line bg-surface">
               <div className="flex justify-end gap-3 w-full">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-6 py-3 rounded-xl font-medium text-fg-muted hover:bg-subtle-hover transition-all text-xs flex-1 md:flex-none text-center"
+                  className="px-4 py-3 rounded-xl font-medium text-fg-muted hover:bg-subtle-hover transition-all text-xs flex-1 md:flex-none text-center"
                 >
-                  Continuar Editando
+                  Continuar editando
                 </button>
                 <button
                   type="button"
                   onClick={handleSave}
                   disabled={saving}
-                  className="px-8 py-3 bg-zinc-600 text-white rounded-xl font-medium hover:bg-zinc-700 transition-all shadow-card flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 text-xs flex-1 md:flex-none"
+                  className="px-4 py-3 bg-zinc-600 text-white rounded-xl font-medium hover:bg-zinc-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-xs flex-1 md:flex-none"
                 >
                   {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                   {saving ? 'Confirmando...' : 'Confirmar e Salvar'}
@@ -789,19 +789,19 @@ export default function SimuladosClient({
       {showWelcomeModal && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
           <div className="bg-surface rounded-xl shadow-overlay w-full max-w-md overflow-hidden animate-pop-in text-center">
-            <div className="p-8 pt-10">
-              <div className="w-20 h-20 bg-accent-subtle text-accent-fg rounded-full flex items-center justify-center mx-auto mb-6 shadow-card border border-accent/25">
+            <div className="p-4 pt-10">
+              <div className="w-12 h-12 bg-accent-subtle text-accent-fg rounded-full flex items-center justify-center mx-auto mb-6 border border-accent/25">
                  <CheckCircle2 size={40} />
               </div>
-              <h3 className="text-2xl font-medium text-fg tracking-tight mb-2">Área de Lançamento</h3>
+              <h3 className="text-2xl font-medium text-fg tracking-tight mb-2">Área de lançamento</h3>
               <p className="text-sm text-fg-subtle leading-relaxed">
                 Você foi designado(a) como <strong>Responsável</strong> pela correção e lançamento das notas do Simulado desta turma na {selectedUnidade}ª Unidade.
               </p>
             </div>
-            <div className="p-6 bg-canvas border-t border-line-subtle">
+            <div className="p-4 bg-canvas border-t border-line-subtle">
               <button
                 onClick={() => setShowWelcomeModal(false)}
-                className="w-full py-3.5 bg-accent hover:bg-accent-hover text-on-accent rounded-xl font-bold text-xs transition-all shadow-card active:scale-95"
+                className="w-full py-3.5 bg-accent hover:bg-accent-hover text-on-accent rounded-xl font-bold text-xs transition-all"
               >
                 Ciente, iniciar lançamentos
               </button>
@@ -835,14 +835,14 @@ export default function SimuladosClient({
       {showGabaritoModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
           <div className="bg-surface rounded-xl shadow-overlay w-full max-w-xl overflow-hidden animate-pop-in">
-            <div className="px-6 py-5 border-b border-line flex justify-between items-center bg-canvas">
+            <div className="px-4 py-2.5 border-b border-line flex justify-between items-center bg-canvas">
               <h3 className="text-lg font-medium text-fg flex items-center gap-2">
                 <Target size={20} className="text-accent-fg"/>
-                Gabarito da Prova
+                Gabarito da prova
               </h3>
               <button onClick={() => setShowGabaritoModal(false)} className="p-2 hover:bg-subtle-hover rounded-xl transition-all"><X size={20}/></button>
             </div>
-            <div className="p-6 max-h-[60vh] overflow-y-auto space-y-3 custom-scrollbar">
+            <div className="p-4 max-h-[60vh] overflow-y-auto space-y-3 custom-scrollbar">
               <table className="w-full text-left border-collapse">
                 <thead className="bg-canvas border-b border-line-strong">
                   <tr>
@@ -870,17 +870,17 @@ export default function SimuladosClient({
       {showMissingStudentModal && (
         <div className="fixed inset-0 bg-zinc-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-fade-in">
           <div className="bg-surface rounded-xl shadow-overlay max-w-md w-full overflow-hidden animate-pop-in">
-            <div className="p-6 border-b border-line-subtle flex justify-between items-center bg-canvas">
+            <div className="p-4 border-b border-line-subtle flex justify-between items-center bg-canvas">
               <h3 className="text-xl font-bold text-fg flex items-center gap-2">
                 <UserPlus className="w-5 h-5 text-accent-fg" />
-                Reportar Ausência
+                Reportar ausência
               </h3>
               <button onClick={() => setShowMissingStudentModal(false)} className="p-2 text-fg-subtle hover:text-fg-muted hover:bg-subtle-hover rounded-full transition-all">
                 <X size={20} />
               </button>
             </div>
             
-            <form onSubmit={handleReportMissingStudent} className="p-6 space-y-4">
+            <form onSubmit={handleReportMissingStudent} className="p-4 space-y-4">
               <p className="text-sm text-fg-subtle mb-6">
                 Informe os dados abaixo para que a secretaria possa cadastrar o aluno corretamente.
               </p>
@@ -941,7 +941,7 @@ export default function SimuladosClient({
                     "Aluno novo na turma",
                     "Transferência interna",
                     "Remanejamento",
-                    "Erro no cadastro",
+                    "Não foi possível concluir o cadastro. Tente novamente.",
                     "Matrícula recente"
                   ].map((motivo) => (
                     <button
@@ -967,7 +967,7 @@ export default function SimuladosClient({
                 <button
                   type="submit"
                   disabled={submittingMissingStudent}
-                  className="flex-1 py-3 text-sm font-medium text-on-accent bg-accent hover:bg-accent-hover rounded-xl transition-all flex items-center justify-center gap-2 shadow-card disabled:opacity-50"
+                  className="flex-1 py-3 text-sm font-medium text-on-accent bg-accent hover:bg-accent-hover rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {submittingMissingStudent ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                   Enviar Solicitação

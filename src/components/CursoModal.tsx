@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { X, Save, Loader2, GraduationCap, Hash, Pencil } from "lucide-react"
+import { X, Save, Loader2, GraduationCap, Hash, Pencil, Lightbulb, AlertTriangle } from "lucide-react"
 
 export interface CursoParaEditar {
   id: string
@@ -176,7 +176,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
         }
       }
     } catch {
-      setError('Erro ao conectar com o servidor')
+      setError('Não foi possível conectar ao servidor. Tente novamente.')
     } finally {
       setLoading(false)
     }
@@ -218,7 +218,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
           <div className="space-y-5">
             {/* Nome */}
             <div className="group">
-              <label className="block text-xs font-semibold text-fg-subtle mb-1.5 ml-1">Nome do Curso</label>
+              <label className="block text-xs font-semibold text-fg-subtle mb-1.5 ml-1">Nome do curso</label>
               <input
                 required type="text" placeholder="Ex: Técnico em Meio Ambiente"
                 value={formData.nome}
@@ -254,8 +254,8 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
                 <Hash className="w-4 h-4 text-fg-subtle absolute left-4 top-1/2 -translate-y-1/2" />
               </div>
               {!isEdit && formData.modalidades.length > 1 && (
-                <p className="text-xs text-fg-subtle mt-1.5 ml-1">
-                  💡 Será combinada com cada modalidade (ex: {formData.sigla || "MA"}_EPTM)
+                <p className="flex items-center gap-1 text-xs text-fg-subtle mt-1.5 ml-1">
+                  <Lightbulb size={13} strokeWidth={1.75} aria-hidden /> Será combinada com cada modalidade (ex: {formData.sigla || "MA"}_EPTM)
                 </p>
               )}
             </div>
@@ -287,8 +287,8 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
                 ))}
               </div>
               {isEdit && (
-                <p className="text-xs text-fg-subtle ml-1">
-                  ⚠️ A modalidade não pode ser alterada após a criação.
+                <p className="flex items-center gap-1 text-xs text-fg-subtle ml-1">
+                  <AlertTriangle size={13} strokeWidth={1.75} aria-hidden /> A modalidade não pode ser alterada após a criação.
                 </p>
               )}
 
@@ -311,7 +311,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
             {/* Nível de Ensino */}
             <div className="space-y-2">
               <label className="block text-xs font-semibold text-fg-subtle mb-2 ml-1">
-                Nível de Ensino <span className="normal-case font-medium text-fg-disabled">(opcional)</span>
+                Nível de ensino <span className="normal-case font-medium text-fg-disabled">(opcional)</span>
               </label>
               <div className="flex flex-wrap gap-2">
                 {NIVEIS_ENSINO.map(n => (
@@ -333,7 +333,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
             {/* Esquema de Avaliação */}
             <div className="group">
               <label className="block text-xs font-semibold text-fg-subtle mb-1.5 ml-1">
-                Esquema de Avaliação <span className="normal-case font-medium text-fg-disabled">(opcional)</span>
+                Esquema de avaliação <span className="normal-case font-medium text-fg-disabled">(opcional)</span>
               </label>
               <select
                 value={formData.esquemaAvaliacaoId}
@@ -349,7 +349,7 @@ export default function CursoModal({ isOpen, onClose, onSuccess, cursoParaEditar
 
             {/* Turnos */}
             <div className="space-y-2">
-              <label className="block text-xs font-semibold text-fg-subtle mb-2 ml-1">Turnos Disponíveis</label>
+              <label className="block text-xs font-semibold text-fg-subtle mb-2 ml-1">Turnos disponíveis</label>
               <div className="flex flex-wrap gap-2">
                 {TURNOS.map(t => (
                   <button

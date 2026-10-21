@@ -68,32 +68,32 @@ export default function ProfilePage() {
         setError(data.message || "Erro ao alterar senha")
       }
     } catch (err) {
-      setError("Erro na conexão com o servidor")
+      setError("Não foi possível conectar ao servidor. Tente novamente.")
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-leitura space-y-5">
       <div>
-        <h1 className="text-3xl font-medium text-fg tracking-tight flex items-center gap-3">
+        <h1 className="text-xl font-medium text-fg tracking-tight flex items-center gap-3">
           <div className="w-10 h-10 bg-subtle-hover rounded-xl flex items-center justify-center">
             <Lock className="w-6 h-6 text-fg-muted" />
           </div>
-          Meu Perfil
+          Meu perfil
         </h1>
         <p className="text-fg-muted font-medium ml-14">Gerencie suas informações de acesso.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* User Info Card */}
-        <div className="md:col-span-1 space-y-6">
-          <div className="bg-surface rounded-xl p-6 shadow-card border border-line relative overflow-hidden group">
+        <div className="md:col-span-1 space-y-4">
+          <div className="bg-surface rounded-xl p-4 border border-line relative overflow-hidden group">
              <div className="absolute top-0 left-0 w-full h-24 bg-zinc-500" />
              
-             <div className="relative flex flex-col items-center mt-8">
-                <div className="w-20 h-20 bg-surface p-1 rounded-full shadow-card">
+             <div className="relative flex flex-col items-center mt-4">
+                <div className="w-12 h-12 bg-surface p-1 rounded-full">
                   <div className="w-full h-full rounded-full bg-subtle-hover flex items-center justify-center text-2xl font-medium text-fg-muted">
                     {session?.user?.name?.charAt(0).toUpperCase() || "U"}
                   </div>
@@ -115,16 +115,16 @@ export default function ProfilePage() {
 
         {/* Change Password Form */}
         <div id="senha" className="md:col-span-2 scroll-mt-20">
-          <div className="bg-surface rounded-xl p-8 shadow-card border border-line">
+          <div className="bg-surface rounded-xl p-4 border border-line">
             <h2 className="text-xl font-medium text-fg mb-6 flex items-center gap-2">
               <Key className="w-5 h-5 text-fg-muted" />
-              Alterar Senha
+              Alterar senha
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
                 <label className="text-xs font-medium text-fg-subtle ml-1">
-                  Senha Atual
+                  Senha atual
                 </label>
                 <input
                   type="password"
@@ -138,7 +138,7 @@ export default function ProfilePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-2">
                   <label className="text-xs font-medium text-fg-subtle ml-1">
-                    Nova Senha
+                    Nova senha
                   </label>
                   <input
                     type="password"
@@ -151,7 +151,7 @@ export default function ProfilePage() {
 
                 <div className="space-y-2">
                   <label className="text-xs font-medium text-fg-subtle ml-1">
-                    Confirmar Nova Senha
+                    Confirmar nova senha
                   </label>
                   <input
                     type="password"
@@ -182,14 +182,14 @@ export default function ProfilePage() {
                   type="button"
                   onClick={() => handleSubmit()}
                   disabled={loading}
-                  className="h-12 px-8 bg-accent text-on-accent rounded-xl font-medium shadow-card hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2 group"
+                  className="h-12 px-4 bg-accent text-on-accent rounded-xl font-medium hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2 group"
                 >
                   {loading ? (
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   ) : (
                     <>
-                      <Save className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                      Salvar Alterações
+                      <Save className="w-4 h-4 group- transition-transform" />
+                      Salvar alterações
                     </>
                   )}
                 </button>
@@ -202,12 +202,12 @@ export default function ProfilePage() {
       {/* Modal de Confirmação para Senha */}
       {showConfirm && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-surface w-full max-w-sm rounded-xl p-8 shadow-overlay animate-pop-in">
+          <div className="bg-surface w-full max-w-sm rounded-xl p-4 shadow-overlay animate-pop-in">
             <div className="w-16 h-16 bg-subtle text-fg-muted rounded-lg flex items-center justify-center mb-6">
               <Key className="w-8 h-8" />
             </div>
             <h3 className="text-2xl font-medium text-fg mb-2">Alterar Senha?</h3>
-            <p className="text-fg-muted font-medium mb-8">
+            <p className="text-fg-muted font-medium mb-4">
               Sua senha atual será substituída pela nova. Deseja confirmar esta ação?
             </p>
             <div className="grid grid-cols-2 gap-4">
@@ -219,7 +219,7 @@ export default function ProfilePage() {
               </button>
               <button 
                 onClick={() => handleSubmit()}
-                className="py-4 rounded-lg font-medium bg-accent text-on-accent hover:bg-accent-hover transition-all shadow-card"
+                className="py-4 rounded-lg font-medium bg-accent text-on-accent hover:bg-accent-hover transition-all"
               >
                 Confirmar
               </button>

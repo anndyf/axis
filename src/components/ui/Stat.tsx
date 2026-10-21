@@ -32,7 +32,7 @@ export function Stat({ label, value, hint, delta, inverter, href, className }: {
       {hint && <p className="mt-1 text-xs text-fg-subtle">{hint}</p>}
     </>
   )
-  const base = cn('block rounded-2xl border border-line bg-surface p-5 shadow-card', className)
+  const base = cn('block rounded-painel border border-line bg-surface p-4', className)
   return href ? (
     <Link href={href} className={cn(base, 'transition-colors duration-150 hover:border-line-strong')}>{conteudo}</Link>
   ) : (

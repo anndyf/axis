@@ -14,7 +14,7 @@ import { agruparPorUnidade, unidadeAtual } from "@/lib/services/diario"
 import { rotuloTempos } from "@/lib/services/inicio-professor"
 import { calendarioDaDisciplina } from "@/lib/services/calendario-disciplina"
 import CalendarioDisciplina from "@/components/CalendarioDisciplina"
-import { Badge, Card, CardBody, CardHeader, EmptyState, PageHeader, Stat, buttonClasses } from "@/components/ui"
+import { Badge, BotaoImprimir, Card, CardBody, CardHeader, EmptyState, PageHeader, Stat, buttonClasses } from "@/components/ui"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = { title: 'Áxis - Diário de classe' }
@@ -33,8 +33,10 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
   const { turma: turmaId, disciplina } = await searchParams
   if (!turmaId) return <IndiceDiarios />
 
-  const acesso = await acessoChamada(session.user, turmaId, disciplina ?? null)
+  const acesso = await acessoChamada(session.user, turmaId, disciplina ?? null, "leitura")
   if (!acesso) redirect("/dashboard/chamada")
+  // Gravar (fazer/editar chamada) é só de quem leciona; gestão aqui só visualiza
+  const podeGravar = !!(await acessoChamada(session.user, turmaId, disciplina ?? null, "escrita"))
   const { turma } = acesso
   const disciplinaId = acesso.disciplina?.id ?? null
 
@@ -76,12 +78,12 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
     : null
 
   const linkChamada = (d: string) => `/dashboard/chamada/fazer?turma=${turma.id}${disciplinaId ? `&disciplina=${disciplinaId}` : ""}&data=${d}`
-  const linkBase = linkChamada("")
+  const linkBase = podeGravar ? linkChamada("") : null
   const diasCalendario = calendario ? calendarioDaDisciplina({ calendario, turmaId: turma.id, disciplinaId, horario, aulas, hoje }) : null
   return (
-    <div className={diasCalendario ? "mx-auto max-w-6xl md:grid md:grid-cols-[15rem_minmax(0,1fr)] md:items-start md:gap-6" : "mx-auto max-w-4xl"}>
+    <div className={diasCalendario ? "md:grid md:grid-cols-[15rem_minmax(0,1fr)] md:items-start md:gap-6 print:block" : ""}>
       {diasCalendario && (
-        <aside aria-label="Calendário da disciplina" className="sticky top-20 hidden max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-2xl border border-line bg-surface p-3 shadow-card md:block">
+        <aside aria-label="Calendário da disciplina" data-sem-impressao className="sticky top-20 hidden max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-2xl border border-line bg-surface p-3 shadow-card md:block">
           <CalendarioDisciplina dias={diasCalendario} linkBase={linkBase} hoje={hoje} modo="coluna" />
         </aside>
       )}
@@ -89,7 +91,7 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
       <PageHeader
         title={`Diário de classe — ${acesso.disciplina?.nome ?? "Chamada diária"}`}
         description={`${turma.nome} · ${ano}`}
-        actions={<Link href="/dashboard/chamada" className={buttonClasses({ variant: "ghost", className: "max-md:hidden" })}><ArrowLeft size={16} strokeWidth={1.75} /> Chamada</Link>}
+        actions={<><BotaoImprimir /><Link href="/dashboard/chamada" className={buttonClasses({ variant: "ghost", className: "max-md:hidden" })}><ArrowLeft size={16} strokeWidth={1.75} /> Chamada</Link></>}
       />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -111,7 +113,9 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
           <CardHeader title="Dias com aula sem chamada" description="Toque no dia para fazer a chamada." />
           <CardBody className="flex flex-wrap gap-1.5">
             {pendentes.slice(0, 60).map((d) => (
-              <Link key={d} href={linkChamada(d)} className="rounded-md border border-line bg-surface px-2 py-1 text-xs tabular-nums text-fg-muted transition-colors duration-150 hover:border-line-strong hover:text-fg">{dataBR(d)}</Link>
+              podeGravar
+                ? <Link key={d} href={linkChamada(d)} className="rounded-md border border-line bg-surface px-2 py-1 text-xs tabular-nums text-fg-muted transition-colors duration-150 hover:border-line-strong hover:text-fg">{dataBR(d)}</Link>
+                : <span key={d} className="rounded-md border border-line bg-surface px-2 py-1 text-xs tabular-nums text-fg-muted">{dataBR(d)}</span>
             ))}
             {pendentes.length > 60 && <span className="px-2 py-1 text-xs text-fg-subtle">e mais {pendentes.length - 60}</span>}
           </CardBody>
@@ -153,7 +157,7 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
                               {a.professor && <span>· {a.professor.name || a.professor.username}</span>}
                             </p>
                           </div>
-                          <Link href={linkChamada(a.data)} className={buttonClasses({ size: "sm", variant: "secondary", className: "min-h-9" })} aria-label={`Editar a chamada de ${dataBR(a.data)}`}>Editar</Link>
+                          {podeGravar && <Link href={linkChamada(a.data)} className={buttonClasses({ size: "sm", variant: "secondary", className: "min-h-9" })} aria-label={`Editar a chamada de ${dataBR(a.data)}`}>Editar</Link>}
                         </div>
                         <p className="mt-2 whitespace-pre-line break-words text-13 text-fg">{a.conteudo || <span className="text-fg-subtle">Sem conteúdo registrado</span>}</p>
                         {a.situacao === "REALIZADA" && (
@@ -204,7 +208,7 @@ async function IndiceDiarios() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="space-y-6">
       <PageHeader title="Diário de classe" description="Aulas dadas, conteúdo ministrado e faltas por disciplina." />
       {grupos.length === 0 ? (
         <Card><EmptyState icon={BookOpen} title="Nenhuma disciplina vinculada" description="Peça à gestão para vincular suas disciplinas." /></Card>

@@ -69,10 +69,10 @@ export default function IdentidadeClient({ nomeEscola, corInicial, logoInicial, 
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       <Card>
         <CardHeader title="Configuração" />
-        <CardBody className="space-y-6">
+        <CardBody className="space-y-4">
           <Field label="Cor da escola" hint={`Aparece só como detalhe: faixa de boas-vindas e marca no menu. Botões, links e menu seguem o azul Áxis. Formato #RRGGBB; em branco, usa o azul (${corPadrao}).`} error={corInvalida ? "Cor inválida. Use o formato #RRGGBB." : undefined}>
             {(p) => (
               <div className="flex items-center gap-2">
@@ -166,7 +166,7 @@ export default function IdentidadeClient({ nomeEscola, corInicial, logoInicial, 
             </div>
             <div className="hidden flex-col justify-end bg-accent p-4 text-on-accent sm:flex">
               <p className="text-sm font-semibold">{nomeEscola}</p>
-              <p className="text-xs opacity-80">Sistema de Gestão Escolar</p>
+              <p className="text-xs opacity-80">Sistema de gestão escolar</p>
             </div>
           </div>
         </CardBody>

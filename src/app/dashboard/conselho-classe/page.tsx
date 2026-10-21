@@ -12,6 +12,8 @@ export const metadata = {
 export const runtime = 'nodejs'
 
 import ConselhoClasseList from "./ConselhoClasseList"
+import TabelaConselho from "./TabelaConselho"
+import { CabecalhoPagina } from "@/components/ui"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 async function getTurmasComConselho(session: any) {
@@ -95,6 +97,7 @@ export default async function ConselhoClassePage() {
 
   const grupos = await getTurmasComConselho(session)
   const turnos = Object.keys(grupos)
+  const lista = Object.values(grupos).flatMap((porCurso) => Object.values(porCurso).flat())
 
   const conselhoTips = [
     {
@@ -119,30 +122,21 @@ export default async function ConselhoClassePage() {
 
   return (
     <div className="">
-      {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
-      <header className="mb-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="flex min-w-0 items-center gap-3">
-              <Link
-                href="/dashboard"
-                aria-label="Voltar" className="hidden sm:inline-flex p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg"
-              >
-                <ArrowLeft size={16} strokeWidth={1.75} />
-              </Link>
-              <div>
-                <h1 className="text-2xl font-semibold tracking-tight text-fg">Conselho de Classe</h1>
-                <p className="text-sm text-fg-muted">Gestão de deliberações e fechamento das turmas</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <CabecalhoPagina
+        titulo="Conselho de classe"
+        descricao="Deliberações sobre estudantes que não atingiram a média após a recuperação final."
+        dados={[
+          { rotulo: "Turmas", valor: lista.length },
+          { rotulo: "Com pendência", valor: lista.filter((t) => !t.isResolvido).length },
+        ]}
+      />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-32 space-y-8">
+      {lista.length > 0 && <TabelaConselho turmas={lista} />}
+
+      <main className={lista.length > 0 ? "space-y-8 pb-32 md:hidden" : "space-y-8 pb-32 md:pb-0"}>
         
         {/* Dicas Fixas - Estilo Resultados */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:hidden">
           {conselhoTips.map((tip, index) => (
              <div key={index} className="bg-surface border border-line p-4 rounded-2xl flex items-start gap-3">
                 <div className={`p-3 rounded-lg bg-subtle text-fg-muted transition-all shadow-card`}>

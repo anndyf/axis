@@ -3,7 +3,7 @@
 import { useState, useEffect, Fragment } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Button, EmptyState, PageHeader, buttonClasses } from "@/components/ui"
+import { Button, EmptyState, IndicadorGravacao, PageHeader, buttonClasses, horaCurta } from "@/components/ui"
 import {
   ArrowLeft,
   Save,
@@ -21,8 +21,7 @@ import {
   Accessibility,
   Printer,
   Info,
-  ChevronDown
-} from "lucide-react"
+  ChevronDown, Eye } from "lucide-react"
 import { calcularNotaUnidade, calcularMediaFinal, paraEsquemaConfig, type EsquemaConfig, type UnidadeInput, type FormaCalculo } from "@/lib/services/notas"
 
 interface Estudante {
@@ -110,7 +109,10 @@ export default function LancarNotasTurmaClient({
   const [notas, setNotas] = useState<Record<string, NotaState>>({})
   const [originalNotas, setOriginalNotas] = useState<Record<string, NotaState>>({})
   const [loading, setLoading] = useState(false)
+  // Só quem leciona a disciplina lança; Direção/Administrador só visualizam
+  const [podeLancar, setPodeLancar] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [salvoEm, setSalvoEm] = useState<Date | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const [feedbackModal, setFeedbackModal] = useState<{ type: 'success' | 'error', text: string } | null>(null)
@@ -224,7 +226,7 @@ export default function LancarNotasTurmaClient({
   }
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); if (!disciplinaSelecionada) { setMessage({ type: 'error', text: 'Selecione uma disciplina' }); return; }
+    e.preventDefault(); if (!disciplinaSelecionada) { setMessage({ type: 'error', text: 'Selecione uma disciplina.' }); return; }
     setShowModal(true);
   }
 
@@ -244,9 +246,10 @@ export default function LancarNotasTurmaClient({
       const response = await fetch('/api/notas/lancar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ notas: notasArray }) });
       if (response.ok) {
         setOriginalNotas(JSON.parse(JSON.stringify(notas)));
+        setSalvoEm(new Date());
         setFeedbackModal({
           type: 'success',
-          text: `As notas de ${selectedDiscName || 'disciplina'} da turma ${turmaNome} foram salvas com sucesso no banco de dados!`
+          text: `As notas de ${selectedDiscName || 'disciplina'} da turma ${turmaNome} foram salvas.`
         });
         router.refresh();
       }
@@ -254,13 +257,13 @@ export default function LancarNotasTurmaClient({
         const error = await response.json();
         setFeedbackModal({
           type: 'error',
-          text: error.message || 'Ocorreu um erro ao tentar salvar as notas. Verifique as informações.'
+          text: error.message || 'Não foi possível salvar as notas. Confira os valores e tente novamente.'
         });
       }
     } catch (error) {
       setFeedbackModal({
         type: 'error',
-        text: 'Erro de conexão com o servidor. Verifique sua conexão com a internet.'
+        text: 'Não foi possível conectar ao servidor. Verifique a internet e tente novamente.'
       });
     } finally { setSaving(false) }
   }
@@ -270,7 +273,8 @@ export default function LancarNotasTurmaClient({
       setLoading(true)
       fetch(`/api/notas/turma/${turmaId}/disciplina/${disciplinaSelecionada}`)
         .then(res => res.json())
-        .then((data: { esquema: EsquemaInfo, notas: any[] }) => {
+        .then((data: { esquema: EsquemaInfo, notas: any[], podeLancar?: boolean }) => {
+          setPodeLancar(data.podeLancar !== false)
           setEsquema(data.esquema)
           const dict: Record<string, NotaState> = {}
           const status: Record<string, string> = {}
@@ -305,7 +309,7 @@ export default function LancarNotasTurmaClient({
     },
     {
       title: "Status de Aluno",
-      description: "Marque como infrequente aquele aluno que não frequenta ou só apareceu para fazer a prova, clicando no ícone lateral (👥).",
+      description: "Marque como infrequente aquele aluno que não frequenta ou só apareceu para fazer a prova, clicando no ícone ao lado da nota.",
       icon: <UserMinus className="w-5 h-5 text-fg-muted" />,
       color: "blue"
     },
@@ -326,7 +330,7 @@ export default function LancarNotasTurmaClient({
     : 6
 
   return (
-    <div className="mx-auto max-w-7xl">
+    <div className="">
       <PageHeader
         title={disciplinaSelecionada ? selectedDiscName : "Lançar notas"}
         description={`Turma ${turmaNome}`}
@@ -344,7 +348,8 @@ export default function LancarNotasTurmaClient({
                 <Printer size={16} strokeWidth={1.75} /> <span className="hidden md:inline">Imprimir mapa</span>
               </a>
             )}
-            {hasUnsavedChanges() && (
+            {podeLancar && disciplinaSelecionada && <IndicadorGravacao pendente={hasUnsavedChanges()} salvando={saving} salvoEm={salvoEm} className="hidden md:inline-flex" />}
+            {podeLancar && hasUnsavedChanges() && (
               <Button onClick={handleSubmit} loading={saving} className="hidden md:inline-flex">
                 {!saving && <Save size={16} strokeWidth={1.75} />} {saving ? "Salvando…" : "Salvar notas"}
               </Button>
@@ -353,10 +358,10 @@ export default function LancarNotasTurmaClient({
         }
       />
 
-      <main className="space-y-6">
+      <main className="space-y-4">
 
         {/* Dicas de uso: recolhidas para não competir com a tabela */}
-        <details className="group rounded-2xl border border-line bg-surface shadow-card">
+        <details className="group rounded-2xl border border-line bg-surface">
           <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-13 font-medium text-fg-muted hover:text-fg">
             <Info size={16} strokeWidth={1.75} className="text-fg-subtle" aria-hidden /> Como funciona o lançamento
             <ChevronDown size={14} strokeWidth={1.75} className="ml-auto transition-transform duration-150 group-open:rotate-180" aria-hidden />
@@ -375,7 +380,7 @@ export default function LancarNotasTurmaClient({
         </details>
 
         {/* Filtros Estilo Simulados */}
-        <div className="bg-surface p-5 rounded-2xl shadow-sm border border-line flex flex-wrap gap-5 items-end">
+        <div className="bg-surface p-5 rounded-2xl border border-line flex flex-wrap gap-5 items-end">
             <div className="flex-1 min-w-[min(100%,300px)] space-y-1.5">
                 <label className="text-sm font-medium text-fg-subtle ml-1">Disciplina</label>
                 <div className="relative">
@@ -400,11 +405,11 @@ export default function LancarNotasTurmaClient({
         </div>
 
         {/* Lançamento Estilo Simulados */}
-        <div className="bg-surface rounded-2xl shadow-sm border border-line-strong overflow-hidden">
+        <div className="bg-surface rounded-2xl border border-line-strong overflow-hidden">
           <div className="p-4 border-b border-line bg-canvas/10 flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-medium text-fg flex items-center gap-2">
               <Users size={20} className="text-fg-subtle" />
-              <span className="hidden md:inline">Matriz de Rendimento Acadêmico</span><span className="md:hidden">Alunos</span>
+              <span className="hidden md:inline">Matriz de rendimento acadêmico</span><span className="md:hidden">Alunos</span>
             </h2>
             <div className="relative w-full md:max-w-xs">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-subtle" />
@@ -413,7 +418,7 @@ export default function LancarNotasTurmaClient({
                 placeholder="Filtrar por nome..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-surface border border-line-strong rounded-lg pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-zinc-500/10 focus:border-zinc-400 transition-all shadow-sm"
+                className="w-full bg-surface border border-line-strong rounded-lg pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-zinc-500/10 focus:border-zinc-400 transition-all"
               />
             </div>
           </div>
@@ -432,34 +437,44 @@ export default function LancarNotasTurmaClient({
                 Nesta turma o professor define as avaliações de cada unidade.
                 {esquema.unidades.some(u => u.atividades.length === 0) && ' Unidades sem avaliação ainda não recebem nota.'}
               </span>
-              <Link href={`/dashboard/notas/avaliacoes?disciplina=${disciplinaSelecionada}`} className="font-medium underline">Minhas avaliações</Link>
+              {podeLancar && <Link href={`/dashboard/notas/avaliacoes?disciplina=${disciplinaSelecionada}`} className="font-medium underline">Minhas avaliações</Link>}
             </div>
           )}
 
+          {disciplinaSelecionada && !podeLancar && (
+            <div className="flex items-center gap-2 border-b border-line bg-info-subtle px-painel py-2.5 text-13 text-info-fg" role="status">
+              <Eye size={16} strokeWidth={1.75} aria-hidden />
+              <span><strong className="font-medium">Somente leitura.</strong> Apenas o professor da disciplina lança e altera notas; a direção e a administração visualizam.</span>
+            </div>
+          )}
+
+          {/* disabled no fieldset bloqueia todos os campos quando é só leitura */}
+          {/* Só leitura: campos bloqueados com aparência de texto, sem os botões de marcar infrequente */}
+          <fieldset disabled={!podeLancar} className="contents [&_input:disabled]:cursor-default [&_input:disabled]:border-transparent [&_input:disabled]:bg-transparent [&_input:disabled]:text-fg [&_input:disabled]:opacity-100 [&_input:disabled]:shadow-none [&_button:disabled]:hidden">
           <div className="hidden overflow-x-auto md:block">
             <table className="w-full text-left">
               <thead className="bg-canvas border-b border-line-strong">
                 {esquema && !isSimples ? (
                   <>
                     <tr>
-                      <th rowSpan={2} className="px-6 py-4 text-xs font-medium text-fg-subtle w-12 text-center align-bottom">#</th>
-                      <th rowSpan={2} className="px-6 py-4 text-xs font-medium text-fg-subtle align-bottom">Estudante</th>
+                      <th rowSpan={2} className="px-3 py-2 text-rotulo font-medium text-fg-muted w-12 text-center align-bottom">#</th>
+                      <th rowSpan={2} className="px-3 py-2 text-rotulo font-medium text-fg-muted align-bottom">Estudante</th>
                       {esquema.unidades.map(u => (
-                        <th key={u.id} colSpan={u.atividades.length + 1} className="px-4 py-2 text-xs font-medium text-fg-subtle text-center border-l border-line">
+                        <th key={u.id} colSpan={u.atividades.length + 1} className="px-2 py-1.5 text-rotulo font-medium text-fg-muted text-center border-l border-line">
                           {u.nome}
                         </th>
                       ))}
-                      <th rowSpan={2} className="px-6 py-4 text-xs font-medium text-fg-subtle w-24 text-center align-bottom">Média</th>
+                      <th rowSpan={2} className="px-3 py-2 text-rotulo font-medium text-fg-muted w-24 text-center align-bottom">Média</th>
                     </tr>
                     <tr>
                       {esquema.unidades.map(u => (
                         <Fragment key={u.id}>
                           {u.atividades.map(a => (
-                            <th key={a.id} className="px-2 py-2 text-xs font-medium text-fg-subtle text-center border-l border-line-subtle w-20">
+                            <th key={a.id} className="px-2 py-1.5 text-rotulo font-medium text-fg-muted text-center border-l border-line-subtle w-12">
                               {a.nome} <span className="text-fg-disabled">({a.notaMaxima})</span>
                             </th>
                           ))}
-                          <th key={`${u.id}-subtotal`} className="px-2 py-2 text-xs font-bold text-fg-subtle text-center bg-subtle/60 w-16">
+                          <th key={`${u.id}-subtotal`} className="px-2 py-1.5 text-xs font-bold text-fg-subtle text-center bg-subtle/60 w-16">
                             Subtotal
                           </th>
                         </Fragment>
@@ -468,22 +483,22 @@ export default function LancarNotasTurmaClient({
                   </>
                 ) : (
                   <tr>
-                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle w-12 text-center">#</th>
-                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle">Estudante</th>
+                    <th className="px-3 py-2 text-rotulo font-medium text-fg-muted w-12 text-center">#</th>
+                    <th className="px-3 py-2 text-rotulo font-medium text-fg-muted">Estudante</th>
                     {(esquema?.unidades ?? []).map(u => (
-                      <th key={u.id} className="px-4 py-4 text-xs font-medium text-fg-subtle w-32 text-center">{u.nome}</th>
+                      <th key={u.id} className="px-2 py-1.5 text-rotulo font-medium text-fg-muted w-32 text-center">{u.nome}</th>
                     ))}
-                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle w-24 text-center">Média</th>
+                    <th className="px-3 py-2 text-rotulo font-medium text-fg-muted w-24 text-center">Média</th>
                   </tr>
                 )}
               </thead>
               <tbody className="divide-y divide-line/80">
                 {loading ? (
                    <tr>
-                     <td colSpan={totalColunas} className="px-6 py-16 text-center">
+                     <td colSpan={totalColunas} className="px-4 py-16 text-center">
                        <div className="flex flex-col items-center gap-2">
                          <Loader2 className="w-8 h-8 text-fg-muted animate-spin" />
-                         <p className="text-fg-subtle text-sm font-medium animate-pulse">Sincronizando...</p>
+                         <p className="text-fg-subtle text-sm font-medium">Sincronizando...</p>
                        </div>
                      </td>
                    </tr>
@@ -507,15 +522,15 @@ export default function LancarNotasTurmaClient({
 
                     return (
                       <tr key={estudante.matricula} className={`hover:bg-canvas transition-colors ${isDesistenteGeral ? 'bg-warning-subtle grayscale-[0.5]' : ''}`}>
-                        <td className="px-6 py-4 text-sm text-fg-subtle font-medium text-center">{index + 1}</td>
-                        <td className="px-6 py-4">
+                        <td className="px-3 py-2 text-sm text-fg-subtle font-medium text-center">{index + 1}</td>
+                        <td className="px-3 py-2">
                           <div className="flex flex-col relative group/name">
                              <div className="flex items-center gap-2">
-                                <span className={`text-base font-medium ${isDesistenteGeral ? 'text-warning-fg' : 'text-fg-muted'}`}>{estudante.nome}</span>
+                                <span className={`text-sm font-medium ${isDesistenteGeral ? 'text-warning-fg' : 'text-fg'}`}>{estudante.nome}</span>
                                 {estudante.aeeProfile && (
                                    <Link
                                      href={`/dashboard/aee/${estudante.matricula}`}
-                                     className={`p-1.5 rounded-full border-2 transition-all flex items-center justify-center hover:scale-110 active:scale-95 ${
+                                     className={`p-1.5 rounded-full border-2 transition-all flex items-center justify-center ${
                                        estudante.aeeProfile.acknowledgements.length > 0
                                        ? 'bg-success-subtle border-success text-success-fg'
                                        : 'bg-warning-subtle border-warning text-warning-fg animate-pulse'
@@ -526,7 +541,7 @@ export default function LancarNotasTurmaClient({
                                    </Link>
                                 )}
                              </div>
-                            <span className="text-xs font-medium text-fg-subtle">Matrícula: {estudante.matricula}</span>
+                            <span className="text-rotulo font-medium text-fg-muted">Matrícula: {estudante.matricula}</span>
                           </div>
                         </td>
                         {(esquema?.unidades ?? []).map((u) => {
@@ -539,13 +554,13 @@ export default function LancarNotasTurmaClient({
                             const isModified = val !== origVal && !saving
 
                             return (
-                              <td key={u.id} className="px-4 py-4 text-center">
+                              <td key={u.id} className="px-2 py-1.5 text-center">
                                 <div className="flex flex-col items-center gap-1.5 group relative">
                                   <input
                                     type="number" step="0.1" inputMode="decimal"
                                     value={val}
                                     onChange={(e) => atividade && handleAtividadeChange(estudante.matricula, u.id, atividade.id, e.target.value, atividade.notaMaxima)}
-                                    className={`w-14 h-9 text-center border-2 rounded-xl text-base font-medium transition-all outline-none ${
+                                    className={`w-10 h-8 text-center border rounded-md text-sm font-medium transition-all outline-none ${
                                       unidadeEstado.isDesistente ? 'bg-warning-subtle border-warning-line text-warning-fg' :
                                       isModified ? 'border-zinc-400 bg-surface ring-4 ring-zinc-500/5' : 'border-line bg-canvas focus:bg-surface focus:border-zinc-400'
                                     }`}
@@ -554,7 +569,7 @@ export default function LancarNotasTurmaClient({
                                   <button
                                       type="button"
                                       onClick={() => handleDesistenteChange(estudante.matricula, u.id, !unidadeEstado.isDesistente)}
-                                      className={`absolute -right-3 -bottom-2 p-1.5 rounded-full transition-all shadow-sm flex items-center justify-center ${
+                                      className={`absolute -right-3 -bottom-2 p-1.5 rounded-full transition-all flex items-center justify-center ${
                                           unidadeEstado.isDesistente
                                           ? 'bg-warning-subtle text-warning-fg scale-100 z-10 ring-2 ring-white'
                                           : 'bg-surface text-fg-disabled hover:text-warning-fg hover:bg-warning-subtle scale-100 opacity-60 hover:opacity-100 group-hover:opacity-100 border border-line-strong z-10'
@@ -584,7 +599,7 @@ export default function LancarNotasTurmaClient({
                                         type="number" step="0.1" inputMode="decimal"
                                         value={val}
                                         onChange={(e) => handleAtividadeChange(estudante.matricula, u.id, a.id, e.target.value, a.notaMaxima)}
-                                        className={`w-14 h-9 text-center border-2 rounded-xl text-sm font-medium transition-all outline-none ${
+                                        className={`w-10 h-9 text-center border-2 rounded-xl text-sm font-medium transition-all outline-none ${
                                           unidadeEstado.isDesistente ? 'bg-warning-subtle border-warning-line text-warning-fg' :
                                           isModified ? 'border-zinc-400 bg-surface ring-4 ring-zinc-500/5' : 'border-line bg-canvas focus:bg-surface focus:border-zinc-400'
                                         }`}
@@ -594,7 +609,7 @@ export default function LancarNotasTurmaClient({
                                         <button
                                             type="button"
                                             onClick={() => handleDesistenteChange(estudante.matricula, u.id, !unidadeEstado.isDesistente)}
-                                            className={`absolute -right-3 -bottom-2 p-1.5 rounded-full transition-all shadow-sm flex items-center justify-center ${
+                                            className={`absolute -right-3 -bottom-2 p-1.5 rounded-full transition-all flex items-center justify-center ${
                                                 unidadeEstado.isDesistente
                                                 ? 'bg-warning-subtle text-warning-fg scale-100 z-10 ring-2 ring-white'
                                                 : 'bg-surface text-fg-disabled hover:text-warning-fg hover:bg-warning-subtle scale-100 opacity-60 hover:opacity-100 group-hover:opacity-100 border border-line-strong z-10'
@@ -616,7 +631,7 @@ export default function LancarNotasTurmaClient({
                             </Fragment>
                           )
                         })}
-                        <td className="px-6 py-4 text-center">
+                        <td className="px-3 py-2 text-center">
                           <span className={`text-base font-medium ${getStatusColor(media)}`}>{media.texto}</span>
                         </td>
                       </tr>
@@ -712,29 +727,24 @@ export default function LancarNotasTurmaClient({
                 })}
               </ul>
             )}
-            {disciplinaSelecionada && filteredEstudantes.length > 0 && (
+            {podeLancar && disciplinaSelecionada && filteredEstudantes.length > 0 && (
               <div className="fixed inset-x-0 bottom-[var(--barra-inferior)] z-30 border-t border-line bg-surface/95 px-4 pt-2 pb-3 backdrop-blur">
-                <p className="mb-2 text-center text-13 text-fg-muted" aria-live="polite">{hasUnsavedChanges() ? 'Há notas alteradas sem salvar' : 'Nenhuma alteração'}</p>
+                <p className="mb-2 text-center text-13 text-fg-muted" aria-live="polite">{hasUnsavedChanges() ? 'Há notas alteradas sem salvar' : salvoEm ? `Salvo às ${horaCurta(salvoEm)}` : 'Nenhuma alteração'}</p>
                 <Button onClick={handleSubmit} loading={saving} disabled={!hasUnsavedChanges()} className="h-12 w-full text-base">
                   {!saving && <Save size={18} strokeWidth={1.75} />} {saving ? 'Salvando…' : 'Salvar notas'}
                 </Button>
               </div>
             )}
           </div>
+          </fieldset>
 
-          {disciplinaSelecionada && filteredEstudantes.length > 0 && (
-            <div className="hidden p-5 bg-canvas border-t border-line md:flex justify-end items-center gap-4">
-              <div className="hidden md:block">
-                 <p className="text-xs font-medium text-fg-subtle">Confira todas as notas antes de salvar o fechamento.</p>
-              </div>
-               <button
-                onClick={handleSubmit}
-                disabled={saving || !hasUnsavedChanges()}
-                className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-8 py-3 rounded-lg font-medium text-sm shadow-card transition-all active:scale-95 disabled:opacity-50"
-              >
-                {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save size={18} />}
-                {saving ? 'SINCRONIZANDO...' : 'SALVAR NOTAS'}
-              </button>
+          {podeLancar && disciplinaSelecionada && filteredEstudantes.length > 0 && (
+            <div className="sticky bottom-0 z-10 hidden items-center justify-end gap-4 border-t border-line bg-surface/95 px-painel py-2.5 backdrop-blur md:flex">
+              <IndicadorGravacao pendente={hasUnsavedChanges()} salvando={saving} salvoEm={salvoEm} className="mr-auto" />
+              <p className="text-13 text-fg-subtle">Confira as notas antes de salvar.</p>
+              <Button onClick={handleSubmit} loading={saving} disabled={!hasUnsavedChanges()}>
+                {!saving && <Save size={16} strokeWidth={1.75} aria-hidden />} {saving ? 'Salvando…' : 'Salvar notas'}
+              </Button>
             </div>
           )}
         </div>
@@ -743,19 +753,19 @@ export default function LancarNotasTurmaClient({
       {showModal && esquema && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
           <div className="bg-surface rounded-xl shadow-overlay w-full max-w-lg overflow-hidden animate-pop-in border border-white">
-            <div className="px-6 py-5 border-b border-line flex justify-between items-center bg-canvas">
+            <div className="px-4 py-2.5 border-b border-line flex justify-between items-center bg-canvas">
               <div className="flex items-center gap-3">
-                 <div className="w-10 h-10 bg-zinc-600 text-white rounded-xl flex items-center justify-center shadow-card"><Save size={20}/></div>
+                 <div className="w-10 h-10 bg-zinc-600 text-white rounded-xl flex items-center justify-center"><Save size={20}/></div>
                   <div>
-                     <h3 className="text-lg font-medium text-fg">Consolidar Dados</h3>
+                     <h3 className="text-lg font-medium text-fg">Consolidar dados</h3>
                     <p className="text-xs font-medium text-fg-subtle">Revise as alterações da turma</p>
                   </div>
               </div>
               <button onClick={() => setShowModal(false)} className="p-2 hover:bg-zinc-300 rounded-xl transition-all"><X size={20}/></button>
             </div>
-            <div className="p-6 max-h-[60vh] overflow-y-auto space-y-3 bg-canvas/20 custom-scrollbar">
+            <div className="p-4 max-h-[60vh] overflow-y-auto space-y-3 bg-canvas/20 custom-scrollbar">
               {estudantes.filter(e => JSON.stringify(notas[e.matricula]) !== JSON.stringify(originalNotas[e.matricula] || {})).map((est, i) => (
-                 <div key={i} className="flex items-center justify-between bg-surface p-3 rounded-2xl border border-line shadow-sm">
+                 <div key={i} className="flex items-center justify-between bg-surface p-3 rounded-2xl border border-line">
                    <span className="text-sm font-medium text-fg-muted truncate pr-4">{est.nome}</span>
                    <div className="flex gap-2 flex-wrap justify-end">
                        {esquema.unidades.map(u => {
@@ -773,9 +783,9 @@ export default function LancarNotasTurmaClient({
                 </div>
               ))}
             </div>
-            <div className="px-6 py-5 bg-canvas border-t border-line flex gap-4">
+            <div className="px-4 py-2.5 bg-canvas border-t border-line flex gap-4">
               <button onClick={() => setShowModal(false)} className="flex-1 py-3 text-sm font-medium text-fg-subtle hover:bg-surface rounded-lg transition-all">Cancelar</button>
-              <button onClick={confirmSave} className="flex-1 py-3 bg-zinc-600 text-white text-sm font-medium rounded-lg shadow-card hover:bg-zinc-700 transition-all active:scale-95">Confirmar e Gravar</button>
+              <button onClick={confirmSave} className="flex-1 py-3 bg-zinc-600 text-white text-sm font-medium rounded-lg hover:bg-zinc-700 transition-all">Confirmar e gravar</button>
             </div>
           </div>
         </div>
@@ -783,14 +793,14 @@ export default function LancarNotasTurmaClient({
 
       {feedbackModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-surface rounded-[32px] shadow-overlay w-full max-w-sm overflow-hidden p-8 flex flex-col items-center text-center animate-pop-in border border-line-subtle">
+          <div className="bg-surface rounded-[32px] shadow-overlay w-full max-w-sm overflow-hidden p-4 flex flex-col items-center text-center animate-pop-in border border-line-subtle">
             {feedbackModal.type === 'success' ? (
               <div className="w-16 h-16 bg-success-subtle text-success-fg rounded-full flex items-center justify-center mb-5 ring-8 ring-success/30">
                 <CheckCircle2 size={36} className="animate-bounce" />
               </div>
             ) : (
               <div className="w-16 h-16 bg-danger-subtle text-danger-fg rounded-full flex items-center justify-center mb-5 ring-8 ring-danger/30">
-                <AlertCircle size={36} className="animate-pulse" />
+                <AlertCircle size={36} className="" />
               </div>
             )}
 
@@ -804,7 +814,7 @@ export default function LancarNotasTurmaClient({
 
             <button
               onClick={() => setFeedbackModal(null)}
-              className={`w-full py-3.5 rounded-lg font-semibold text-sm transition-all active:scale-95 shadow-card ${
+              className={`w-full py-3.5 rounded-lg font-semibold text-sm transition-all ${
                 feedbackModal.type === 'success'
                   ? 'bg-accent text-on-accent hover:bg-accent-hover '
                   : 'bg-danger text-on-accent hover:bg-danger '

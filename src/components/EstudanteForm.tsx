@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Save, Loader2, CheckCheck, X } from "lucide-react"
+import { Save, CheckCheck, X } from "lucide-react"
+import { Alert, Button, CabecalhoPagina, Field, Input, Painel, Select, buttonClasses } from "@/components/ui"
 
 interface Turma {
   id: string
@@ -61,7 +62,7 @@ export default function EstudanteForm({ estudante, isEdit = false }: EstudanteFo
 
       if (response.ok) {
         setResultMsg({ 
-          text: isEdit ? 'Estudante atualizado com sucesso!' : 'Estudante cadastrado com sucesso!', 
+          text: isEdit ? 'Estudante atualizado com sucesso.' : 'Estudante cadastrado com sucesso.', 
           ok: true 
         })
         
@@ -74,12 +75,12 @@ export default function EstudanteForm({ estudante, isEdit = false }: EstudanteFo
           }
         }, 1500)
       } else {
-        setError(data.message || 'Erro ao salvar estudante')
-        setResultMsg({ text: data.message || 'Erro ao salvar estudante', ok: false })
+        setError(data.message || 'Não foi possível salvar o estudante. Tente novamente.')
+        setResultMsg({ text: data.message || 'Não foi possível salvar o estudante. Tente novamente.', ok: false })
       }
     } catch (err) {
-      setError('Erro ao conectar com o servidor')
-      setResultMsg({ text: 'Erro de conexão com o servidor', ok: false })
+      setError('Não foi possível conectar ao servidor. Tente novamente.')
+      setResultMsg({ text: 'Não foi possível conectar ao servidor. Tente novamente.', ok: false })
     } finally {
       setLoading(false)
     }
@@ -100,153 +101,71 @@ export default function EstudanteForm({ estudante, isEdit = false }: EstudanteFo
       const data = await response.json()
 
       if (response.ok) {
-        setResultMsg({ text: 'Estudante excluído com sucesso!', ok: true })
+        setResultMsg({ text: 'Estudante excluído.', ok: true })
         
         setTimeout(() => {
           router.push('/dashboard/estudantes')
           router.refresh()
         }, 1500)
       } else {
-        setError(data.message || 'Erro ao excluir estudante')
-        setResultMsg({ text: data.message || 'Erro ao excluir estudante', ok: false })
+        setError(data.message || 'Não foi possível excluir o estudante. Tente novamente.')
+        setResultMsg({ text: data.message || 'Não foi possível excluir o estudante. Tente novamente.', ok: false })
       }
     } catch (err) {
-      setError('Erro ao conectar com o servidor')
-      setResultMsg({ text: 'Erro de conexão com o servidor', ok: false })
+      setError('Não foi possível conectar ao servidor. Tente novamente.')
+      setResultMsg({ text: 'Não foi possível conectar ao servidor. Tente novamente.', ok: false })
     } finally {
       setLoading(false)
     }
   }
 
+  const voltar = isEdit ? `/dashboard/estudantes/${encodeURIComponent(estudante?.matricula ?? "")}` : "/dashboard/estudantes"
+
   return (
-    <div className="min-h-screen bg-canvas">
-      {/* Header */}
-      <header className="bg-surface shadow-sm border-b border-line">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center space-x-4">
-            <Link
-              href="/dashboard/estudantes"
-              className="p-2 hover:bg-subtle rounded-lg transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-fg-muted" />
-            </Link>
-            <div>
-              <h1 className="text-2xl font-semibold text-fg">
-                {isEdit ? 'Editar Estudante' : 'Novo Estudante'}
-              </h1>
-              <p className="text-sm text-fg-muted">
-                {isEdit ? 'Atualize as informações do estudante' : 'Cadastre um novo estudante'}
-              </p>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div>
+      {!isEdit && <CabecalhoPagina titulo="Novo estudante" descricao="Cadastre o estudante e vincule a uma turma." />}
 
-      {/* Main Content */}
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <form onSubmit={handleSubmit} className="bg-surface rounded-xl shadow-sm border border-line p-6">
-          {error && (
-            <div className="mb-6 p-4 bg-danger-subtle border border-danger-line rounded-lg text-danger-fg">
-              {error}
-            </div>
-          )}
-
-          <div className="space-y-6">
-            <div>
-              <label htmlFor="nome" className="block text-sm font-medium text-fg-muted mb-2">
-                Nome Completo *
-              </label>
-              <input
-                type="text"
-                id="nome"
-                required
-                value={formData.nome}
-                onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                className="w-full px-4 py-3 border border-line-strong rounded-lg focus:ring-2 focus:ring-success/30 focus:border-transparent"
-                placeholder="Ex: João Silva Santos"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="matricula" className="block text-sm font-medium text-fg-muted mb-2">
-                Número de Matrícula *
-              </label>
-              <input
-                type="text"
-                id="matricula"
-                required
-                value={formData.matricula}
-                onChange={(e) => setFormData({ ...formData, matricula: e.target.value })}
-                className="w-full px-4 py-3 border border-line-strong rounded-lg focus:ring-2 focus:ring-success/30 focus:border-transparent"
-                placeholder="Ex: 2024001234"
-              />
-              <p className="mt-1 text-xs text-fg-subtle">
-                A matrícula é o identificador único do aluno e será usada para o acesso ao portal.
-              </p>
-            </div>
-
-            <div>
-              <label htmlFor="turmaId" className="block text-sm font-medium text-fg-muted mb-2">
-                Turma *
-              </label>
-              <select
-                id="turmaId"
-                required
-                value={formData.turmaId}
-                onChange={(e) => setFormData({ ...formData, turmaId: e.target.value })}
-                className="w-full px-4 py-3 border border-line-strong rounded-lg focus:ring-2 focus:ring-success/30 focus:border-transparent"
-              >
-                <option value="">Selecione uma turma...</option>
-                {turmas.map((turma) => (
-                  <option key={turma.id} value={turma.id}>
-                    {turma.nome}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="mt-8 flex items-center justify-between">
-            <div>
-              {isEdit && (
-                <button
-                  type="button"
-                  onClick={handleDelete}
-                  disabled={loading}
-                  className="px-6 py-3 text-danger-fg hover:bg-danger-subtle rounded-lg transition-colors disabled:opacity-50"
-                >
-                  Excluir Estudante
-                </button>
-              )}
-            </div>
-            <div className="flex space-x-4">
-              <Link
-                href="/dashboard/estudantes"
-                className="px-6 py-3 text-fg-muted hover:bg-subtle rounded-lg transition-colors"
-              >
-                Cancelar
-              </Link>
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex items-center space-x-2 bg-accent text-on-accent px-6 py-3 rounded-lg hover:bg-accent-hover transition-all shadow-card disabled:opacity-50"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Salvando...</span>
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-5 h-5" />
-                    <span>{isEdit ? 'Atualizar' : 'Criar'} Estudante</span>
-                  </>
+      <form onSubmit={handleSubmit} className="max-w-formulario">
+        <Painel
+          titulo={isEdit ? "Editar dados do estudante" : "Dados do estudante"}
+          rodape={
+            <>
+              <div>
+                {isEdit && (
+                  <Button variant="ghost" onClick={handleDelete} disabled={loading} className="text-danger-fg hover:bg-danger-subtle hover:text-danger-fg">
+                    Excluir estudante
+                  </Button>
                 )}
-              </button>
-            </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Link href={voltar} className={buttonClasses({ variant: "secondary" })}>Cancelar</Link>
+                <Button type="submit" loading={loading}>
+                  {!loading && <Save size={16} strokeWidth={1.75} aria-hidden />}
+                  {loading ? "Salvando…" : isEdit ? "Salvar alterações" : "Cadastrar estudante"}
+                </Button>
+              </div>
+            </>
+          }
+        >
+          {error && <Alert tone="danger" className="mb-4">{error}</Alert>}
+          <div className="space-y-4">
+            <Field label="Nome completo" obrigatorio>
+              {(p) => <Input {...p} required value={formData.nome} onChange={(e) => setFormData({ ...formData, nome: e.target.value })} placeholder="Ex.: João Silva Santos" />}
+            </Field>
+            <Field label="Matrícula" obrigatorio hint="Identificador único do estudante; também é o usuário de acesso ao portal.">
+              {(p) => <Input {...p} required value={formData.matricula} onChange={(e) => setFormData({ ...formData, matricula: e.target.value })} placeholder="Ex.: 2024001234" className="font-mono" />}
+            </Field>
+            <Field label="Turma" obrigatorio>
+              {(p) => (
+                <Select {...p} required value={formData.turmaId} onChange={(e) => setFormData({ ...formData, turmaId: e.target.value })}>
+                  <option value="">Selecione uma turma</option>
+                  {turmas.map((turma) => <option key={turma.id} value={turma.id}>{turma.nome}</option>)}
+                </Select>
+              )}
+            </Field>
           </div>
-        </form>
-      </main>
+        </Painel>
+      </form>
 
       {/* Toast Notification */}
       {resultMsg && (

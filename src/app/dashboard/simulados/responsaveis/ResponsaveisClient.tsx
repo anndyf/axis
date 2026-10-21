@@ -112,15 +112,15 @@ export default function ResponsaveisClient({
       })
 
       if (res.ok) {
-        setMessage({ type: 'success', text: "Responsável designado com sucesso!" })
+        setMessage({ type: 'success', text: "Responsável designado com sucesso." })
         setFormData({ userId: "", turmaId: "", provaId: "", areaId: "", unidade: "2" })
         loadResponsaveis()
       } else {
         const data = await res.json()
-        setMessage({ type: 'error', text: data.message || "Erro ao salvar" })
+        setMessage({ type: 'error', text: data.message || "Não foi possível salvar. Tente novamente." })
       }
     } catch (err) {
-      setMessage({ type: 'error', text: "Erro de conexão" })
+      setMessage({ type: 'error', text: "Não foi possível conectar ao servidor. Tente novamente." })
     } finally {
       setSaving(false)
     }
@@ -140,9 +140,9 @@ export default function ResponsaveisClient({
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 animate-fade-in">
+    <div className="space-y-5 animate-fade-in">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <Link 
             href="/dashboard/simulados"
@@ -151,21 +151,21 @@ export default function ResponsaveisClient({
             <ArrowLeft className="w-5 h-5 text-fg-muted" />
           </Link>
           <div>
-            <h1 className="text-2xl font-medium text-fg tracking-tight">Responsáveis de Simulado</h1>
+            <h1 className="text-2xl font-medium text-fg tracking-tight">Responsáveis de simulado</h1>
             <p className="text-fg-muted text-sm">Designar professores para lançamento de notas por turma</p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Formulário lateral */}
         <div className="lg:col-span-1">
-          <div className="bg-surface rounded-2xl shadow-sm border border-line-strong p-6 space-y-6 sticky top-24">
+          <div className="bg-surface rounded-2xl border border-line-strong p-4 space-y-4 sticky top-24">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-canvas rounded-lg">
                 <Plus className="w-5 h-5 text-fg-muted" />
               </div>
-              <h3 className="font-medium text-fg">Nova Designação</h3>
+              <h3 className="font-medium text-fg">Nova designação</h3>
             </div>
 
             <form onSubmit={handleAdd} className="space-y-4">
@@ -220,7 +220,7 @@ export default function ResponsaveisClient({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-fg-subtle ml-1">Professor Responsável</label>
+                <label className="text-xs font-medium text-fg-subtle ml-1">Professor responsável</label>
                 <select
                   required
                   value={formData.userId}
@@ -244,7 +244,7 @@ export default function ResponsaveisClient({
               <button
                 type="submit"
                 disabled={saving}
-                className="w-full bg-zinc-600 hover:bg-zinc-700 text-white font-medium py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-card active:scale-95 disabled:opacity-50"
+                className="w-full bg-zinc-600 hover:bg-zinc-700 text-white font-medium py-3 rounded-xl flex items-center justify-center gap-2 transition-all disabled:opacity-50"
               >
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 Designar Professor
@@ -255,9 +255,9 @@ export default function ResponsaveisClient({
 
         {/* Lista de Responsáveis */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="bg-surface rounded-2xl shadow-sm border border-line-strong overflow-hidden">
+          <div className="bg-surface rounded-2xl border border-line-strong overflow-hidden">
             <div className="p-4 border-b border-line bg-canvas flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-               <h3 className="font-medium text-fg">Professores Designados</h3>
+               <h3 className="font-medium text-fg">Professores designados</h3>
                <div className="relative max-w-xs w-full">
                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-subtle" />
                  <input
@@ -265,7 +265,7 @@ export default function ResponsaveisClient({
                    placeholder="Buscar por professor ou turma..."
                    value={searchTerm}
                    onChange={(e) => setSearchTerm(e.target.value)}
-                   className="w-full bg-surface border border-line-strong rounded-xl pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-zinc-500/10 focus:border-zinc-400 transition-all shadow-sm"
+                   className="w-full bg-surface border border-line-strong rounded-xl pl-9 pr-4 py-2 text-sm outline-none focus:ring-2 focus:ring-zinc-500/10 focus:border-zinc-400 transition-all"
                  />
                </div>
             </div>
@@ -273,23 +273,23 @@ export default function ResponsaveisClient({
               <table className="w-full text-left">
                 <thead className="bg-canvas border-b border-line-strong">
                   <tr>
-                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle">Professor / Prova</th>
-                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center">Unidade</th>
-                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center">Turma</th>
-                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-right">Ação</th>
+                    <th className="px-4 py-4 text-xs font-medium text-fg-subtle">Professor / Prova</th>
+                    <th className="px-4 py-4 text-xs font-medium text-fg-subtle text-center">Unidade</th>
+                    <th className="px-4 py-4 text-xs font-medium text-fg-subtle text-center">Turma</th>
+                    <th className="px-4 py-4 text-xs font-medium text-fg-subtle text-right">Ação</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-line">
                   {loading ? (
                     <tr>
-                      <td colSpan={4} className="px-6 py-20 text-center">
+                      <td colSpan={4} className="px-4 py-10 text-center">
                         <Loader2 className="w-8 h-8 text-fg-muted animate-spin mx-auto mb-2" />
                         <span className="text-sm text-fg-muted font-medium tracking-tight">Carregando designações...</span>
                       </td>
                     </tr>
                   ) : responsaveis.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="px-6 py-20 text-center">
+                      <td colSpan={4} className="px-4 py-10 text-center">
                         <div className="flex flex-col items-center gap-3">
                           <Users className="w-10 h-10 text-fg-disabled" />
                           <p className="text-fg-subtle text-sm font-medium">Nenhum professor designado.</p>
@@ -303,9 +303,9 @@ export default function ResponsaveisClient({
                       item.area?.nome.toLowerCase().includes(searchTerm.toLowerCase())
                     ).map((item) => (
                       <tr key={item.id} className="hover:bg-canvas transition-colors group">
-                        <td className="px-6 py-4">
+                        <td className="px-4 py-4">
                           <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-canvas rounded-xl flex items-center justify-center shadow-sm">
+                            <div className="w-10 h-10 bg-canvas rounded-xl flex items-center justify-center">
                               <Award className="w-5 h-5 text-fg-muted" />
                             </div>
                             <div>
@@ -319,17 +319,17 @@ export default function ResponsaveisClient({
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className="px-2.5 py-1 bg-accent-subtle text-accent-fg border border-accent/25 rounded-lg text-xs font-medium tracking-tighter">
+                        <td className="px-4 py-4 text-center">
+                          <span className="px-2.5 py-1 bg-accent-subtle text-accent-fg border border-accent/25 rounded-lg text-xs font-medium tracking-tight">
                             {item.unidade ? `${item.unidade}ª Und` : item.prova?.unidade ? `${item.prova.unidade}ª Und` : 'Ambas'}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className="px-2.5 py-1 bg-subtle border border-line text-fg rounded-lg text-xs font-medium tracking-tighter">
+                        <td className="px-4 py-4 text-center">
+                          <span className="px-2.5 py-1 bg-subtle border border-line text-fg rounded-lg text-xs font-medium tracking-tight">
                             {item.turma.nome}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-right">
+                        <td className="px-4 py-4 text-right">
                           <button
                             onClick={() => handleDelete(item.id)}
                             className="p-2 text-fg-disabled hover:text-danger-fg hover:bg-danger-subtle rounded-xl transition-all"

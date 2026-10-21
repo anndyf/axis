@@ -37,7 +37,7 @@ export default function PortalActionsMenu() {
   }
 
   const handleDeactivate = async () => {
-    if (!confirm("🚨 ATENÇÃO: Isso removerá o acesso de TODOS os alunos ao portal. Eles não conseguirão logar até que o acesso seja reativado individualmente. Deseja continuar?")) {
+    if (!confirm("Atenção: isso removerá o acesso de TODOS os alunos ao portal. Eles não conseguirão logar até que o acesso seja reativado individualmente. Deseja continuar?")) {
       return
     }
 
@@ -63,7 +63,7 @@ export default function PortalActionsMenu() {
       >
         <div className="flex items-center space-x-2">
           <Shield size={16} strokeWidth={1.75} className="text-fg-subtle" />
-          <span>Gestão de Acessos</span>
+          <span>Gestão de acessos</span>
         </div>
         <ChevronDown size={14} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>

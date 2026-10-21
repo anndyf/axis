@@ -5,8 +5,8 @@ import { ChevronRight } from "lucide-react"
 import { cn } from "@/components/ui/cn"
 
 /**
- * Peças do painel inicial por perfil (modelo A "Institucional"): cartões
- * brancos com raio de 16px, indicadores com ícone em círculo suave e número
+ * Peças do painel inicial por perfil (modelo A "Institucional"): painéis
+ * brancos com borda de 1px e raio de 8px, indicadores com ícone em círculo suave e número
  * grande, listas de atividade e cartões com barra de progresso.
  */
 
@@ -30,15 +30,15 @@ export function Cartao({ children, className, as: Tag = "div", id }: { children:
 export function Indicador({ icone: Icone, tom, valor, rotulo, detalhe, href }: { icone: LucideIcon; tom: Tom; valor: ReactNode; rotulo: string; detalhe?: string; href?: string }) {
   const corpo = (
     <>
-      <span className={cn("flex size-10 items-center justify-center rounded-full", TOM[tom])}>
-        <Icone size={18} strokeWidth={1.75} aria-hidden />
+      <span className={cn("flex size-8 items-center justify-center rounded-full", TOM[tom])}>
+        <Icone size={16} strokeWidth={1.75} aria-hidden />
       </span>
-      <p className="mt-4 truncate text-2xl font-semibold tracking-tight text-fg tabular-nums sm:text-3xl">{valor}</p>
+      <p className="mt-3 truncate text-2xl font-semibold tracking-tight text-fg tabular-nums">{valor}</p>
       <p className="mt-0.5 text-sm text-fg-muted">{rotulo}</p>
       {detalhe && <p className="mt-1 truncate text-xs text-fg-subtle">{detalhe}</p>}
     </>
   )
-  const classe = cn(CARTAO, "block min-w-0 p-4 sm:p-5")
+  const classe = cn(CARTAO, "block min-w-0 p-4")
   return href ? (
     <Link href={href} className={cn(classe, "transition-colors duration-150 hover:border-accent")}>{corpo}</Link>
   ) : (
@@ -48,14 +48,14 @@ export function Indicador({ icone: Icone, tom, valor, rotulo, detalhe, href }: {
 
 export function Secao({ titulo, descricao, acao, children, id, className }: { titulo: string; descricao?: string; acao?: { rotulo: string; href: string }; children: ReactNode; id?: string; className?: string }) {
   return (
-    <section id={id} className={cn("min-w-0 scroll-mt-24 space-y-3", className)}>
+    <section id={id} className={cn("min-w-0 scroll-mt-24 space-y-2.5", className)}>
       <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
         <div className="min-w-0">
-          <h2 className="text-lg font-semibold text-fg">{titulo}</h2>
-          {descricao && <p className="text-sm text-fg-subtle">{descricao}</p>}
+          <h2 className="text-[15px] font-semibold text-fg">{titulo}</h2>
+          {descricao && <p className="text-13 text-fg-subtle">{descricao}</p>}
         </div>
         {acao && (
-          <Link href={acao.href} className="shrink-0 rounded-full border border-line bg-surface px-3 py-1 text-13 font-medium text-accent-fg hover:border-accent">
+          <Link href={acao.href} className="shrink-0 rounded-md px-2 py-1 text-13 font-medium text-accent-fg hover:bg-accent-subtle">
             {acao.rotulo}
           </Link>
         )}
@@ -69,7 +69,7 @@ export function Secao({ titulo, descricao, acao, children, id, className }: { ti
 export function Item({ icone: Icone, tom = "neutro", titulo, subtitulo, direita, href, extra }: { icone: LucideIcon; tom?: Tom; titulo: string; subtitulo?: string; direita?: ReactNode; href?: string; extra?: ReactNode }) {
   const corpo = (
     <>
-      <span className={cn("flex size-9 shrink-0 items-center justify-center rounded-full", TOM[tom])}>
+      <span className={cn("flex size-9 shrink-0 items-center justify-center rounded-full md:size-8", TOM[tom])}>
         <Icone size={16} strokeWidth={1.75} aria-hidden />
       </span>
       <span className="min-w-0 flex-1">
@@ -83,9 +83,9 @@ export function Item({ icone: Icone, tom = "neutro", titulo, subtitulo, direita,
   return (
     <li className="border-b border-line-subtle last:border-0">
       {href ? (
-        <Link href={href} className="flex min-w-0 items-center gap-3 px-4 py-3 transition-colors duration-150 hover:bg-subtle sm:px-5">{corpo}</Link>
+        <Link href={href} className="flex min-w-0 items-center gap-3 px-4 py-3 transition-colors duration-150 hover:bg-subtle md:py-2">{corpo}</Link>
       ) : (
-        <div className="flex min-w-0 items-center gap-3 px-4 py-3 sm:px-5">{corpo}</div>
+        <div className="flex min-w-0 items-center gap-3 px-4 py-3 md:py-2">{corpo}</div>
       )}
     </li>
   )
@@ -105,7 +105,7 @@ export function CartaoProgresso({ codigo, detalheCodigo, titulo, rotulo, percent
 }) {
   const p = percentual === null ? null : Math.max(0, Math.min(100, percentual))
   return (
-    <Link href={href} className={cn(CARTAO, "group relative block min-w-0 p-5 transition-colors duration-150 hover:border-accent")}>
+    <Link href={href} className={cn(CARTAO, "group relative block min-w-0 p-4 transition-colors duration-150 hover:border-accent")}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate font-mono text-xs text-fg-subtle">
@@ -136,7 +136,7 @@ export function CartaoProgresso({ codigo, detalheCodigo, titulo, rotulo, percent
 
 /** Grade de cartões que se ajusta à largura (sem largura fixa). */
 export function GradeCartoes({ children }: { children: ReactNode }) {
-  return <div className="grid gap-4 grid-cols-[repeat(auto-fill,minmax(min(100%,18rem),1fr))]">{children}</div>
+  return <div className="grid gap-3 grid-cols-[repeat(auto-fill,minmax(min(100%,17rem),1fr))]">{children}</div>
 }
 
 export function Chip({ children, ativo, href, tom }: { children: ReactNode; ativo?: boolean; href?: string; tom?: Tom }) {

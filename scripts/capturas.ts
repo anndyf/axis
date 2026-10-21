@@ -42,12 +42,15 @@ async function ids() {
   const aula = await prisma.aula.findFirst({ where: { turmaId: turma.id, disciplinaId: disciplina.id }, orderBy: { data: 'desc' } })
   // Conta de portal de teste: libera a troca obrigatória de senha só no banco local
   await prisma.user.updateMany({ where: { escolaId: escola.id, username: '1TIM1-001' }, data: { deveTrocarSenha: false } })
-  const direcao = await prisma.user.findFirst({ where: { escolaId: escola.id, username: 'direcao' } })
+  const direcao = await prisma.user.findFirst({ where: { escolaId: escola.id, username: 'direcao' }, select: { id: true } })
+  const professor = await prisma.user.findFirst({ where: { escolaId: escola.id, username: 'professor' }, select: { id: true } })
   return {
     direcao: direcao?.id ?? '',
+    professor: professor?.id ?? '',
     turma: turma.id,
     disciplina: disciplina.id,
     matricula: turma.estudantes[0].matricula,
+    matriculaAee: turma.estudantes.find((e) => e.matricula.endsWith('-003'))?.matricula ?? turma.estudantes[0].matricula,
     dataAula: aula ? aula.data.toISOString().slice(0, 10) : '',
   }
 }
@@ -103,12 +106,31 @@ async function main() {
         ['dashboard-gestao', '/dashboard'],
         ['turmas', '/dashboard/turmas'],
         ['turma-detalhe', `/dashboard/turmas/${i.turma}/relatorio`],
+        ['turma-ficha', `/dashboard/turmas/${i.turma}`],
+        ['turma-estudantes', `/dashboard/turmas/${i.turma}/estudantes`],
+        ['estudante-dados', `/dashboard/estudantes/${i.matricula}`],
+        ['estudante-aee', `/dashboard/aee/${i.matriculaAee}`],
         ['lancamento-notas', `/dashboard/notas/lancar/${i.turma}`],
         ['frequencia', `/dashboard/frequencia?turma=${i.turma}`],
         ['boletim', `/dashboard/estudantes/${i.matricula}/boletim`],
         ['conselho', `/dashboard/conselho-classe/${i.turma}`],
         ['resultados', '/dashboard/resultados'],
         ['configuracoes', '/dashboard/configuracoes'],
+        ['estudantes', '/dashboard/estudantes'],
+        ['estudante-ficha', `/dashboard/estudantes/${i.matricula}/editar`],
+        ['turma-horario', `/dashboard/turmas/${i.turma}/horario`],
+        ['disciplinas', '/dashboard/disciplinas'],
+        ['mensagens', '/dashboard/mensagens'],
+        ['ocorrencias', '/dashboard/ocorrencias'],
+        ['questoes', '/dashboard/questoes'],
+        ['provas', '/dashboard/provas'],
+        ['simulados', '/dashboard/simulados'],
+        ['conselho-lista', '/dashboard/conselho-classe'],
+        ['notas-recuperacao', `/dashboard/notas/recuperacao/${i.turma}`],
+        ['chamada-direcao', `/dashboard/chamada/fazer?turma=${i.turma}&disciplina=${i.disciplina}&data=${i.dataAula}`],
+        ['diario-direcao', `/dashboard/chamada/diario?turma=${i.turma}&disciplina=${i.disciplina}`],
+        ['auditoria', '/dashboard/auditoria'],
+        ['ui', '/dashboard/ui'],
       ],
     },
     {
@@ -127,8 +149,13 @@ async function main() {
         ['usuarios', '/dashboard/usuarios'],
         ['usuario-novo', '/dashboard/usuarios/novo'],
         ['usuario-editar', `/dashboard/usuarios/${i.direcao}/editar`],
+        ['usuario-ficha', `/dashboard/usuarios/${i.professor}`],
+        ['usuario-disciplinas', `/dashboard/usuarios/${i.professor}/disciplinas`],
+        ['usuario-historico', `/dashboard/usuarios/${i.professor}/historico`],
+        ['estudante-historico', `/dashboard/estudantes/${i.matricula}/historico`],
       ],
     },
+    { usuario: 'aee', senha: 'aee123', telas: [['aee', '/dashboard/aee'], ['aee-ficha', `/dashboard/aee/${i.matriculaAee}`]] },
     { usuario: 'secretaria', senha: 'secretaria123', telas: [['dashboard-secretaria', '/dashboard'], ['estudantes-secretaria', '/dashboard/estudantes']] },
     { usuario: 'coordenacao', senha: 'coordenacao123', telas: [['dashboard-coordenacao', '/dashboard'], ['frequencia-coordenacao', `/dashboard/frequencia?turma=${i.turma}`]] },
     { usuario: '1TIM1-001', senha: '1TIM1-001', telas: [['portal', '/portal'], ['portal-boletim', '/portal?aba=boletim'], ['portal-frequencia', '/portal?aba=frequencia'], ['portal-horario', '/portal?aba=horario']] },

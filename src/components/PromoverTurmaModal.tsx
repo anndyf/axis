@@ -66,7 +66,7 @@ export default function PromoverTurmaModal({
               <ArrowUpCircle className="w-5 h-5 text-accent-fg" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-fg">Promover Turma</h3>
+              <h3 className="text-lg font-semibold text-fg">Promover turma</h3>
               <p className="text-xs text-fg-subtle font-medium">Avançar nível do curso</p>
             </div>
           </div>
@@ -106,7 +106,7 @@ export default function PromoverTurmaModal({
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-fg-subtle ml-1">Ano Letivo</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1">Ano letivo</label>
                 <input
                   type="number"
                   value={anoLetivo}
@@ -117,7 +117,7 @@ export default function PromoverTurmaModal({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-fg-subtle ml-1">Código da Nova Turma</label>
+              <label className="text-xs font-semibold text-fg-subtle ml-1">Código da nova turma</label>
               <input
                 type="text"
                 value={nome}

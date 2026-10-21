@@ -65,7 +65,8 @@ const contarNotas = () => prisma.notaFinal.count({ where: { disciplinaId: D.disc
 
 describe('api/notas/lancar', () => {
   it('lote com 1 nota inválida no meio não salva nada', async () => {
-    sessao.atual = usuario(D.admin, true)
+    // Quem lança é o professor da disciplina (gestão só visualiza)
+    sessao.atual = usuario(D.prof, false)
     const max = D.unidade.atividades[0].notaMaxima
     const r = await lancar([item(`${SUFIXO}-0`, 1), item(`${SUFIXO}-1`, max + 1)])
     expect(r.status).toBe(400)
@@ -99,10 +100,39 @@ describe('api/notas/lancar', () => {
     expect((await lancar([item(`${SUFIXO}-0`, 0)])).status).toBe(403)
   })
 
+  it('direção/administrador não lança em disciplina que não leciona (só visualiza)', async () => {
+    sessao.atual = usuario(D.admin, true)
+    const r = await lancar([item(`${SUFIXO}-0`, 0)])
+    expect(r.status).toBe(403)
+    const nota = await prisma.notaFinal.findFirst({ where: { disciplinaId: D.disciplina, estudante: { matricula: `${SUFIXO}-0` } }, include: { unidades: true } })
+    expect(nota?.unidades.find((u) => u.esquemaUnidadeId === D.unidade.id)?.notaCalculada).toBe(3)
+  })
+
+  it('direção que também leciona a disciplina lança nela', async () => {
+    await prisma.disciplina.update({ where: { id: D.disciplina }, data: { usuariosPermitidos: { connect: { id: D.admin } } } })
+    sessao.atual = usuario(D.admin, true)
+    expect((await lancar([item(`${SUFIXO}-0`, 3)])).status).toBe(200)
+    await prisma.disciplina.update({ where: { id: D.disciplina }, data: { usuariosPermitidos: { disconnect: { id: D.admin } } } })
+  })
+
   it('aluno do portal não lança', async () => {
     sessao.atual = usuario(D.prof, false, { isStaff: false, isPortalUser: true })
     expect((await lancar([item(`${SUFIXO}-0`, 0)])).status).toBe(401)
     const nota = await prisma.notaFinal.findFirst({ where: { disciplinaId: D.disciplina, estudante: { matricula: `${SUFIXO}-0` } }, include: { unidades: true } })
     expect(nota?.unidades.find((u) => u.esquemaUnidadeId === D.unidade.id)?.notaCalculada).toBe(3)
+  })
+
+  it('recuperação final: só o professor da disciplina grava (gestão e outro professor não)', async () => {
+    const { POST } = await import('@/app/api/notas/recuperacao/route')
+    const nota = await prisma.notaFinal.findFirstOrThrow({ where: { disciplinaId: D.disciplina, estudante: { matricula: `${SUFIXO}-0` } } })
+    const gravar = async (valor: number) => (await POST(new NextRequest('http://localhost/api/notas/recuperacao', { method: 'POST', body: JSON.stringify({ notas: [{ notaId: nota.id, notaRecuperacao: valor }] }), headers: { 'Content-Type': 'application/json' } }))).status
+    for (const [quem, gestao] of [[D.outroProf, false], [D.admin, true]] as const) {
+      sessao.atual = usuario(quem, gestao)
+      expect(await gravar(9)).not.toBe(200)
+      expect((await prisma.notaFinal.findUniqueOrThrow({ where: { id: nota.id } })).notaRecuperacao).toBe(nota.notaRecuperacao)
+    }
+    sessao.atual = usuario(D.prof, false)
+    expect(await gravar(7)).toBe(200)
+    expect((await prisma.notaFinal.findUniqueOrThrow({ where: { id: nota.id } })).notaRecuperacao).toBe(7)
   })
 })

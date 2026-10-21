@@ -12,6 +12,7 @@ import { ClipboardCheck, BookOpen, CalendarOff, ChevronRight } from "lucide-reac
 import { Alert, Badge, Card, EmptyState, PageHeader, buttonClasses } from "@/components/ui"
 import { rotuloTempos } from "@/lib/services/inicio-professor"
 import SeletorData from "./SeletorData"
+import { disciplinasLecionadas, lecionaNaTurma } from "@/lib/chamada-acesso"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = { title: 'Áxis - Chamada' }
@@ -30,6 +31,8 @@ interface Item {
   temAula: boolean
   situacao: "PREVISTA" | "REALIZADA" | "CANCELADA" | null
   pendentes: number
+  /** leciona a disciplina (ou, na chamada diária, a turma): só assim faz chamada */
+  podeGravar: boolean
 }
 
 export default async function ChamadaPage({ searchParams }: { searchParams: Promise<{ data?: string }> }) {
@@ -43,6 +46,8 @@ export default async function ChamadaPage({ searchParams }: { searchParams: Prom
   const data = dataValida(dataParam) && dataParam <= hoje ? dataParam : hoje
 
   const disciplinas = await getDisciplinasPermitidas(session)
+  // Gestão vê todas as disciplinas, mas só grava onde leciona
+  const lecionadas = await disciplinasLecionadas(session.user.id, escolaId)
   const config = await getGlobalConfig(escolaId)
   const ano = config?.anoLetivoAtual ?? new Date().getFullYear()
   const calendario = await carregarCalendario(escolaId, ano)
@@ -81,6 +86,7 @@ export default async function ChamadaPage({ searchParams }: { searchParams: Prom
           return { disciplinaId: id, nome: g.nomes.get(id)!, tempos, temAula: tempos.length > 0 }
         })
 
+    const lecionaTurma = porDia ? await lecionaNaTurma(session.user.id, turmaId) : false
     for (const alvo of alvos) {
       const pendentes = diasComAulaAte(hoje, turmaId, calendario, horario, alvo.disciplinaId)
         .filter((d) => !registradas.has(`${d}|${alvo.disciplinaId ?? ""}`) || registradas.get(`${d}|${alvo.disciplinaId ?? ""}`) === "PREVISTA").length
@@ -90,6 +96,7 @@ export default async function ChamadaPage({ searchParams }: { searchParams: Prom
         ...alvo,
         situacao: registradas.get(`${data}|${alvo.disciplinaId ?? ""}`) ?? null,
         pendentes,
+        podeGravar: alvo.disciplinaId ? lecionadas.has(alvo.disciplinaId) : lecionaTurma,
       })
     }
   }
@@ -101,7 +108,7 @@ export default async function ChamadaPage({ searchParams }: { searchParams: Prom
   const dataBR = data.split("-").reverse().join("/")
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="space-y-6">
       <PageHeader
         title="Chamada e diário de classe"
         description="Todos começam presentes: marque só quem faltou."
@@ -114,8 +121,9 @@ export default async function ChamadaPage({ searchParams }: { searchParams: Prom
         </Alert>
       )}
 
+      <div className="grid gap-5 xl:grid-cols-2 xl:items-start">
       <section className="space-y-3">
-        <h2 className="text-base font-semibold text-fg">Aulas de {dataBR}{diaSemana !== null ? ` (${DIAS[diaSemana]})` : ""}</h2>
+        <h2 className="text-sm font-semibold text-fg">Aulas de {dataBR}{diaSemana !== null ? ` (${DIAS[diaSemana]})` : ""}</h2>
         {calendario && !letivo && <Card><EmptyState icon={CalendarOff} title="Dia não letivo" description="Fim de semana, feriado ou recesso. Escolha outra data acima." className="py-8" /></Card>}
         {letivo && doDia.length === 0 && <Card><EmptyState icon={ClipboardCheck} title="Nenhuma aula sua neste dia" description="Só aparecem as disciplinas que estão no horário da turma neste dia da semana." className="py-8" /></Card>}
         {doDia.length > 0 && (
@@ -129,9 +137,13 @@ export default async function ChamadaPage({ searchParams }: { searchParams: Prom
                   </div>
                   <Situacao situacao={i.situacao} />
                 </div>
-                <Link href={link(i)} className={buttonClasses({ variant: i.situacao === "REALIZADA" ? "secondary" : "primary", className: "min-h-11 w-full" })}>
-                  {i.situacao === "REALIZADA" ? "Editar chamada" : "Fazer chamada"}
-                </Link>
+                {i.podeGravar ? (
+                  <Link href={link(i)} className={buttonClasses({ variant: i.situacao === "REALIZADA" ? "secondary" : "primary", className: "min-h-11 w-full" })}>
+                    {i.situacao === "REALIZADA" ? "Editar chamada" : "Fazer chamada"}
+                  </Link>
+                ) : (
+                  <Link href={linkDiario(i)} className={buttonClasses({ variant: "secondary", className: "min-h-11 w-full" })}>Ver diário</Link>
+                )}
               </li>
             ))}
           </ul>
@@ -141,13 +153,13 @@ export default async function ChamadaPage({ searchParams }: { searchParams: Prom
       {itens.length > 0 && (
         <section className="space-y-3">
           <div>
-            <h2 className="text-base font-semibold text-fg">Diários</h2>
+            <h2 className="text-sm font-semibold text-fg">Diários</h2>
             <p className="text-13 text-fg-subtle">Aulas dadas, conteúdo ministrado e dias com aula sem chamada.</p>
           </div>
           <ul className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
             {[...doDia, ...outros].map((i) => (
               <li key={`d-${i.turmaId}-${i.disciplinaId}`} className="border-b border-line-subtle last:border-0">
-                <Link href={linkDiario(i)} className="flex min-h-14 items-center gap-3 px-4 py-3 transition-colors duration-150 hover:bg-subtle/60 sm:px-5">
+                <Link href={linkDiario(i)} className="flex min-h-14 items-center gap-3 px-4 py-3 transition-colors duration-150 hover:bg-subtle/60 sm:px-5 md:min-h-11 md:py-2">
                   <BookOpen size={18} strokeWidth={1.75} className="shrink-0 text-fg-subtle" aria-hidden />
                   <p className="min-w-0 flex-1 break-words text-sm text-fg">{i.nome} <span className="text-fg-subtle">· {i.turmaNome}</span></p>
                   {i.pendentes > 0 && <Badge tone="warning">{i.pendentes} {i.pendentes === 1 ? "pendente" : "pendentes"}</Badge>}
@@ -158,6 +170,7 @@ export default async function ChamadaPage({ searchParams }: { searchParams: Prom
           </ul>
         </section>
       )}
+      </div>
     </div>
   )
 }

@@ -54,21 +54,21 @@ export default function ConfiguracoesPage() {
       })
 
       if (res.ok) {
-        setMessage({ type: 'success', text: 'Configurações atualizadas com sucesso!' })
+        setMessage({ type: 'success', text: 'Configurações atualizadas com sucesso.' })
         // Força atualização da página para refletir no sidebar se necessário
         window.location.reload()
       } else {
         setMessage({ type: 'error', text: 'Erro ao salvar configurações.' })
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Erro de conexão.' })
+      setMessage({ type: 'error', text: 'Não foi possível conectar ao servidor. Tente novamente.' })
     } finally {
       setSaving(false)
     }
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="max-w-leitura space-y-6">
       <PageHeader title="Configurações" description="Funcionalidades globais da escola e acesso dos professores." />
 
       <Card>

@@ -28,7 +28,7 @@ export const GET = rotaDoModulo('NOT', 'leitura', async function GET(
         turma: { escolaId },
         ...(can(session.user, 'escopo.escola') ? {} : { usuariosPermitidos: { some: { id: session.user.id } } }),
       },
-      select: { id: true },
+      select: { id: true, usuariosPermitidos: { where: { id: session.user.id }, select: { id: true } } },
     })
     if (!disciplina) {
       return NextResponse.json({ message: 'Disciplina não encontrada' }, { status: 404 })
@@ -72,6 +72,8 @@ export const GET = rotaDoModulo('NOT', 'leitura', async function GET(
     const atividades = await atividadesDaDisciplina(esquema, disciplinaId)
 
     return NextResponse.json({
+      // Só quem leciona grava; a gestão abre a mesma tela em modo leitura
+      podeLancar: disciplina.usuariosPermitidos.length > 0,
       esquema: {
         id: esquema.id,
         notaMinimaAprovacao: esquema.notaMinimaAprovacao,

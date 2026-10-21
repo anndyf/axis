@@ -110,7 +110,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
         router.refresh()
       }
     } catch (err) {
-      alert('Erro ao salvar')
+      alert('Não foi possível salvar. Tente novamente.')
     } finally {
       setLoading(false)
     }
@@ -120,49 +120,31 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
 
   return (
     <div className="">
-      {/* Header Fixo Premium */}
-      <header className="mb-6">
-        <div className="max-w-5xl mx-auto px-6 py-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex min-w-0 items-center gap-3">
-              <Link 
-                href="/dashboard/usuarios" 
-                className="p-2 hover:bg-subtle-hover rounded-xl transition-colors border border-transparent hover:border-line-strong"
-              >
-                <ArrowLeft className="w-5 h-5 text-fg-muted" />
-              </Link>
-              <div>
-                <h1 className="text-2xl font-semibold tracking-tight text-fg">Vincular Disciplinas</h1>
-                <p className="text-sm text-fg-muted">
-                   Professor: {usuario.name}
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
+      {/* Dentro da ficha do usuário (nome e abas vêm do layout) */}
+      <div className="mb-4 flex max-w-leitura flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-fg-muted">Disciplinas vinculadas ao professor</p>
+        <div className="flex items-center gap-3">
               <Link
                 href={`/dashboard/usuarios/${usuario.id}/importar-horario`}
                 className="flex items-center gap-2 border border-line-strong text-fg-muted px-4 py-2.5 rounded-xl font-medium text-sm hover:bg-canvas transition-all"
               >
                 <ClipboardPaste className="w-4 h-4" />
-                <span>Importar Horário</span>
+                <span>Importar horário</span>
               </Link>
               <button
                 onClick={handleSave} disabled={loading}
                 className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
               >
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                <span>Salvar Alterações</span>
+                <span>Salvar alterações</span>
               </button>
             </div>
-          </div>
-        </div>
-      </header>
+      </div>
 
-      <main className="max-w-4xl mx-auto px-6 py-10">
+      <main className="max-w-leitura">
         
         {/* Barra de Pesquisa e Filtro */}
-        <div className="relative mb-10 group">
+        <div className="relative mb-5 group">
           <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
             <Search className="w-5 h-5 text-fg-subtle group-focus-within:text-fg-muted transition-colors" />
           </div>
@@ -171,7 +153,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
             placeholder="Buscar por turma ou disciplina..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-14 pr-12 py-5 bg-surface border border-line-strong rounded-xl shadow-sm focus:ring-4 focus:ring-zinc-500/10 focus:border-zinc-500 outline-none font-medium text-fg-muted transition-all"
+            className="w-full pl-14 pr-12 py-2.5 bg-surface border border-line-strong rounded-xl focus:ring-4 focus:ring-zinc-500/10 focus:border-zinc-500 outline-none font-medium text-fg-muted transition-all"
           />
           <div className="absolute inset-y-0 right-5 flex items-center gap-2">
             {search && (
@@ -198,10 +180,10 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
         </div>
         
         {/* Banner de Aviso de Regra */}
-        <div className="mb-6 p-4 bg-accent-subtle border border-accent/25 rounded-lg flex items-start gap-3 shadow-sm">
+        <div className="mb-6 p-4 bg-accent-subtle border border-accent/25 rounded-lg flex items-start gap-3">
           <Info className="w-5 h-5 text-accent-fg shrink-0 mt-0.5" />
           <div className="text-sm text-accent-fg">
-            <p className="font-bold mb-1">Regra de Exclusividade Ativa</p>
+            <p className="font-bold mb-1">Regra de exclusividade ativa</p>
             <p className="text-xs font-medium opacity-90 leading-relaxed">
               Cada disciplina pode ter apenas <strong>um professor associado</strong>. 
               Ao selecionar uma matéria que já possui professor (marcada em <span className="text-warning-fg font-bold">amarelo</span>), 
@@ -212,7 +194,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
 
         {/* Disciplinas Vinculadas Atualmente */}
         {disciplinasSelecionadasList.length > 0 && (
-          <div className="mb-10 p-6 bg-surface rounded-xl border border-line shadow-sm">
+          <div className="mb-5 p-4 bg-surface rounded-xl border border-line">
             <h2 className="text-xs font-bold text-fg mb-5 flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-fg-subtle" />
               Disciplinas Já Vinculadas ({disciplinasSelecionadasList.length})
@@ -235,7 +217,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
         )}
 
         {turmaEntries.length === 0 ? (
-          <div className="text-center py-20 bg-surface rounded-xl border border-dashed border-line-strong">
+          <div className="text-center py-10 bg-surface rounded-xl border border-dashed border-line-strong">
             <div className="w-16 h-16 bg-canvas rounded-full flex items-center justify-center mx-auto mb-4">
               <Filter className="w-8 h-8 text-fg-disabled" />
             </div>
@@ -258,7 +240,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
                   {/* Cabeçalho da Turma (Acordeão) */}
                   <button
                     onClick={() => toggleTurma(turmaKey)}
-                    className="w-full px-8 py-6 flex items-center justify-between hover:bg-canvas transition-colors text-left"
+                    className="w-full px-4 py-3 flex items-center justify-between hover:bg-canvas transition-colors text-left"
                   >
                     <div className="flex items-center space-x-4">
                       <div className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all ${
@@ -285,7 +267,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
 
                   {/* Conteúdo das Disciplinas */}
                   {isExpanded && (
-                    <div className="px-8 pb-8 animate-slide-up">
+                    <div className="px-4 pb-8 animate-slide-up">
                       <div className="h-px bg-subtle-hover mb-6" />
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         {disciplinas.map((disc: any) => {
@@ -346,7 +328,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
       </main>
 
       {/* Info Flutuante no Rodapé */}
-      <div className="fixed bottom-[calc(var(--barra-inferior)+2rem)] left-1/2 -translate-x-1/2 bg-zinc-900 text-white px-6 py-3 rounded-full shadow-overlay flex items-center space-x-4 border border-white/10 backdrop-blur-md">
+      <div className="fixed bottom-[calc(var(--barra-inferior)+2rem)] left-1/2 -translate-x-1/2 bg-zinc-900 text-white px-4 py-3 rounded-full shadow-overlay flex items-center space-x-4 border border-white/10 backdrop-blur-md">
          <Info className="w-4 h-4 text-accent" />
          <span className="text-xs font-medium leading-none">
             {selectedIds.length} selecionadas

@@ -77,7 +77,17 @@
   --violet-fg: #6d28d9;
 
   --shadow-overlay: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px -4px rgb(15 23 42 / 0.10);
-  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04);
+  /* Área de trabalho: painéis com borda de 1px e sem sombra; sombra só em
+     camadas flutuantes (menus, modais, avisos) - shadow-overlay */
+  --shadow-card: none;
+
+  /* Densidade equilibrada (layout de sistema) */
+  --pagina-x: 1rem;          /* margem lateral da página: 16px no celular */
+  --pagina-y: 1rem;
+  --painel-x: 1rem;          /* recuo interno do painel: 16px */
+  --painel-y: 0.75rem;       /* 12px */
+  --linha-tabela: 2.5rem;    /* 40px */
+  --barra-superior: 3rem;    /* 48px no desktop */
 
   color-scheme: light;
 }
@@ -122,6 +132,13 @@
   --shadow-overlay: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -4px rgb(0 0 0 / 0.6);
   --shadow-card: none;
   color-scheme: dark;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --pagina-x: 1.5rem;      /* 24px */
+    --pagina-y: 1.25rem;     /* 20px */
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -232,11 +249,40 @@
   /* escala tipográfica curta: 12/13/14/16/20/24/30 */
   --text-13: 0.8125rem;
   --text-13--line-height: 1.125rem;
+  /* rótulos de campo, de coluna e de ficha: 12,5px, peso 400-500, cor secundária */
+  --text-rotulo: 0.78125rem;
+  --text-rotulo--line-height: 1.125rem;
 
-  /* raios: 8px controles (rounded-lg), 16px cartões e modais (rounded-2xl), pílulas (rounded-full) */
-  --radius-control: 8px;
-  --radius-card: 16px;
-  --radius-modal: 16px;
+  /* raios (layout de sistema): controle 6px, painel 8px, modal 12px.
+     A escala do Tailwind é achatada para que as classes já espalhadas pelas
+     telas sigam a mesma regra: rounded-md/lg = controle, rounded-xl/2xl =
+     painel, rounded-3xl = modal. Pílulas continuam rounded-full. */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+  --radius-2xl: 8px;
+  --radius-3xl: 12px;
+  --radius-control: 6px;
+  --radius-painel: 8px;
+  --radius-card: 8px;
+  --radius-modal: 12px;
+
+  /* sombra pequena dos cartões vira borda (só camadas flutuantes têm sombra) */
+  --shadow-xs: 0 0 #0000;
+  --shadow-sm: 0 0 #0000;
+
+  /* espaçamentos de página e painel: px-pagina, py-pagina, px-painel, py-painel */
+  --spacing-pagina: var(--pagina-x);
+  --spacing-pagina-y: var(--pagina-y);
+  --spacing-painel: var(--painel-x);
+  --spacing-painel-y: var(--painel-y);
+  --spacing-linha: var(--linha-tabela);
+  --spacing-barra: var(--barra-superior);
+
+  /* larguras: formulários curtos e leitura longa ficam limitados */
+  --container-formulario: 45rem;   /* 720px */
+  --container-leitura: 55rem;      /* 880px */
 
   /* movimento mínimo: 150ms */
   --animate-skeleton: skeleton 1.4s ease-in-out infinite;
@@ -305,6 +351,9 @@
  * para não ficarem atrás dela. Zero no desktop e em telas sem a barra.
  */
 :root { --barra-inferior: 0px; }
+
+/* Caminho automático do layout: só nas telas sem CabecalhoPagina próprio */
+main:has([data-cabecalho-pagina]) .caminho-layout { display: none; }
 @media (max-width: 767.98px) {
   :root:has([data-barra-inferior]) { --barra-inferior: calc(4rem + env(safe-area-inset-bottom)); }
 }
@@ -333,4 +382,108 @@
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/*
+ * Títulos de página: 20px, peso 600, em toda tela do painel (inclusive as
+ * que ainda montam o próprio cabeçalho). Fora de camada para valer sobre as
+ * classes antigas (text-2xl/3xl); folhas de prova impressas (tamanho em pt)
+ * ficam de fora.
+ */
+main h1:not([class*="pt]"]) {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/*
+ * Formulários (etapa 6): todo campo obrigatório ganha o asterisco no rótulo,
+ * inclusive nos formulários antigos (rótulo logo antes do campo ou do
+ * invólucro dele). O <Label obrigatorio> do design system já marca sozinho.
+ * Campo inválido depois que a pessoa mexeu nele fica com a borda de erro.
+ */
+@layer components {
+  form label:not([data-rotulo-marcado]):has(+ :is(input, select, textarea):required)::after,
+  form label:not([data-rotulo-marcado]):has(+ * :is(input, select, textarea):required)::after {
+    content: " *";
+    color: var(--danger-fg);
+  }
+  form :is(input, select, textarea):user-invalid {
+    border-color: var(--danger);
+  }
+}
+
+/* Impressão do sistema: vale só nas telas com BotaoImprimir
+   (data-folha-impressao). Sem menu, barras e botões; sem fundo de cor;
+   cabeçalho com escola e data/hora; paginação no rodapé da folha. As
+   impressões próprias (provas, conselho de classe) não são afetadas.
+   Paisagem: a folha tem ~1030px de largura e cai no layout de desktop
+   (em retrato seriam ~700px, o layout do celular). */
+@page folha-sistema {
+  size: A4 landscape;
+  margin: 14mm 12mm 16mm;
+  @bottom-right {
+    content: "Página " counter(page) " de " counter(pages);
+    font-size: 8pt;
+    color: #444;
+  }
+}
+@media print {
+  :root:has([data-folha-impressao]) {
+    color-scheme: light;
+  }
+  :root:has([data-folha-impressao]) body {
+    page: folha-sistema;
+    background: #fff !important;
+    font-size: 10pt;
+  }
+  :root:has([data-folha-impressao]) body *,
+  :root:has([data-folha-impressao]) body *::before,
+  :root:has([data-folha-impressao]) body *::after {
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #000 !important;
+    border-color: #bbb !important;
+  }
+  :root:has([data-folha-impressao]) [data-cabecalho-impressao] {
+    display: flex !important;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid #000 !important;
+    padding-bottom: 4px;
+    margin-bottom: 10px;
+    font-size: 9pt;
+  }
+  :root:has([data-folha-impressao]) button:not(th button),
+  :root:has([data-folha-impressao]) th button svg,
+  :root:has([data-folha-impressao]) [role="toolbar"],
+  :root:has([data-folha-impressao]) nav,
+  :root:has([data-folha-impressao]) [data-sem-impressao],
+  :root:has([data-folha-impressao]) select,
+  :root:has([data-folha-impressao]) input[type="search"] {
+    display: none !important;
+  }
+  :root:has([data-folha-impressao]) a {
+    text-decoration: none !important;
+  }
+  :root:has([data-folha-impressao]) [data-cabecalho-pagina] {
+    margin-bottom: 8px;
+  }
+  :root:has([data-folha-impressao]) thead {
+    position: static !important;
+    display: table-header-group;
+  }
+  :root:has([data-folha-impressao]) tr {
+    break-inside: avoid;
+  }
+  :root:has([data-folha-impressao]) .overflow-auto,
+  :root:has([data-folha-impressao]) .overflow-x-auto,
+  :root:has([data-folha-impressao]) .overflow-y-auto {
+    overflow: visible !important;
+    max-height: none !important;
+  }
+  :root:has([data-folha-impressao]) table {
+    min-width: 0 !important;
+  }
 }

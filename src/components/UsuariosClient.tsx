@@ -3,23 +3,25 @@
 import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import {
-  Shield, GraduationCap, PauseCircle, Clock, CheckCircle2,
-  CheckCheck, Loader2, X, Users, Search, Filter, Accessibility, ShieldCheck, ClipboardList, BookOpen
-} from "lucide-react"
-import { Avatar } from "@/components/ui"
+import { Clock, CheckCheck, Loader2, X } from "lucide-react"
+import { Badge, Button, Painel, RodapeTabela, Table, TableContainer, TableEmpty, TBody, TD, TH, THead, TR, type BadgeTone } from "@/components/ui"
+import { BarraFerramentas } from "@/components/ui/BarraFerramentas"
+import { Fichas } from "@/components/ui/Fichas"
+import { baixarCSV } from "@/lib/navegador/csv"
 import UserActions from "./UserActions"
 import { PAPEIS_SISTEMA, type CodigoPapel } from "@/lib/permissoes"
 
 /** Selo de cada papel na lista (Direção, Secretaria e Coordenação ganharam selo na fase 3b). */
-const SELO_PAPEL: Partial<Record<CodigoPapel, { rotulo: string; classe: string; icone: typeof Shield }>> = {
-  ADMINISTRADOR: { rotulo: "Admin", classe: "bg-accent-subtle text-accent-fg border-accent/25", icone: Shield },
-  DIRECAO: { rotulo: "Direção", classe: "bg-accent-subtle text-accent-fg border-accent/25", icone: ShieldCheck },
-  SECRETARIA: { rotulo: "Secretaria", classe: "bg-info-subtle text-info-fg border-info-line", icone: ClipboardList },
-  COORDENACAO: { rotulo: "Coordenação", classe: "bg-info-subtle text-info-fg border-info-line", icone: BookOpen },
-  PROFESSOR: { rotulo: "Professor", classe: "bg-subtle-hover text-fg border-line-strong", icone: GraduationCap },
-  AEE: { rotulo: "AEE", classe: "bg-success-subtle text-success-fg border-success-line", icone: Accessibility },
+const SELO_PAPEL: Partial<Record<CodigoPapel, { rotulo: string; tom: BadgeTone }>> = {
+  ADMINISTRADOR: { rotulo: "Administrador", tom: "accent" },
+  DIRECAO: { rotulo: "Direção", tom: "accent" },
+  SECRETARIA: { rotulo: "Secretaria", tom: "info" },
+  COORDENACAO: { rotulo: "Coordenação", tom: "info" },
+  PROFESSOR: { rotulo: "Professor", tom: "neutral" },
+  AEE: { rotulo: "AEE", tom: "success" },
 }
+
+const situacao = (u: { isApproved: boolean; isActive: boolean }) => (!u.isApproved ? "Aguardando aprovação" : u.isActive ? "Ativo" : "Acesso pausado")
 
 interface Usuario {
   id: string
@@ -117,7 +119,7 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
       setSelectedIds(new Set())
       router.refresh()
     } catch {
-      setResultMsg({ text: 'Erro de conexão com o servidor', ok: false })
+      setResultMsg({ text: 'Não foi possível conectar ao servidor. Tente novamente.', ok: false })
     } finally {
       setAprovando(false)
     }
@@ -125,229 +127,102 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
 
   return (
     <>
-      {/* Cards de contadores */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
-        {/* Total */}
-        <button
-          onClick={() => setFiltroStatus('todos')}
-          className={`p-4 rounded-lg border text-left transition-all ${
-            filtroStatus === 'todos'
-              ? 'bg-accent-subtle border-accent'
-              : 'bg-surface border-line hover:border-line-strong hover:shadow-sm'
-          }`}
-        >
-          <Users className={`w-4 h-4 mb-2 ${filtroStatus === 'todos' ? 'text-fg-muted' : 'text-fg-subtle'}`} />
-          <p className={`text-2xl font-semibold leading-none ${filtroStatus === 'todos' ? 'text-fg' : 'text-fg'}`}>{stats.total}</p>
-          <p className={`text-xs font-bold mt-1 ${filtroStatus === 'todos' ? 'text-fg-muted' : 'text-fg-subtle'}`}>Total</p>
-        </button>
-
-        {/* Ativos */}
-        <button
-          onClick={() => setFiltroStatus('ativos')}
-          className={`p-4 rounded-lg border text-left transition-all ${
-            filtroStatus === 'ativos'
-              ? 'bg-success-subtle border-success'
-              : 'bg-surface border-line hover:border-success-line hover:shadow-sm'
-          }`}
-        >
-          <CheckCircle2 className={`w-4 h-4 mb-2 ${filtroStatus === 'ativos' ? 'text-fg-muted' : 'text-success-fg'}`} />
-          <p className={`text-2xl font-semibold leading-none ${filtroStatus === 'ativos' ? 'text-fg' : 'text-fg'}`}>{stats.ativos}</p>
-          <p className={`text-xs font-bold mt-1 ${filtroStatus === 'ativos' ? 'text-fg-muted' : 'text-fg-subtle'}`}>Ativos</p>
-        </button>
-
-        {/* Pendentes */}
-        <button
-          onClick={() => setFiltroStatus('pendentes')}
-          className={`p-4 rounded-lg border text-left transition-all relative ${
-            filtroStatus === 'pendentes'
-              ? 'bg-warning-subtle border-warning'
-              : 'bg-surface border-line hover:border-warning-line hover:shadow-sm'
-          }`}
-        >
-          {stats.pendentes > 0 && filtroStatus !== 'pendentes' && (
-            <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-warning animate-ping" />
-          )}
-          <Clock className={`w-4 h-4 mb-2 ${filtroStatus === 'pendentes' ? 'text-fg-muted' : 'text-warning-fg'}`} />
-          <p className={`text-2xl font-semibold leading-none ${filtroStatus === 'pendentes' ? 'text-fg' : 'text-fg'}`}>{stats.pendentes}</p>
-          <p className={`text-xs font-bold mt-1 ${filtroStatus === 'pendentes' ? 'text-fg-muted' : 'text-fg-subtle'}`}>Pendentes</p>
-        </button>
-
-        {/* Pausados */}
-        <div className="p-4 rounded-lg border border-line bg-surface text-left">
-          <PauseCircle className="w-4 h-4 mb-2 text-danger" />
-          <p className="text-2xl font-semibold leading-none text-fg">{stats.pausados}</p>
-          <p className="text-xs font-bold mt-1 text-fg-subtle">Pausados</p>
-        </div>
-
-        {/* Professores */}
-        <div className="p-4 rounded-lg border border-line bg-surface text-left">
-          <GraduationCap className="w-4 h-4 mb-2 text-accent-fg" />
-          <p className="text-2xl font-semibold leading-none text-fg">{stats.professores}</p>
-          <p className="text-xs font-bold mt-1 text-fg-subtle">Professores</p>
-        </div>
-
-        {/* Admins */}
-        <div className="p-4 rounded-lg border border-line bg-surface text-left">
-          <Shield className="w-4 h-4 mb-2 text-accent-fg" />
-          <p className="text-2xl font-semibold leading-none text-fg">{stats.admins}</p>
-          <p className="text-xs font-bold mt-1 text-fg-subtle">Admins</p>
-        </div>
-      </div>
-      {/* Barra de ferramentas */}
-      <div className="flex flex-col sm:flex-row items-center gap-3 mb-4">
-        {/* Busca */}
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-subtle" />
-          <input
-            type="text"
-            placeholder="Buscar por nome, e-mail ou @username..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 bg-surface border border-line rounded-xl text-sm focus:ring-2 focus:ring-ring outline-none transition-all"
-          />
-        </div>
-
-        {/* Filtro de status */}
-        <div className="relative shrink-0">
-          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-fg-subtle" />
-          <select
-            value={filtroStatus}
-            onChange={e => setFiltroStatus(e.target.value as any)}
-            className="pl-8 pr-4 py-2.5 bg-surface border border-line rounded-xl text-sm font-semibold text-fg-muted focus:ring-2 focus:ring-ring outline-none appearance-none cursor-pointer transition-all"
-          >
-            <option value="todos">Todos</option>
-            <option value="pendentes">Pendentes ({totalPendentes})</option>
-            <option value="ativos">Ativos</option>
-          </select>
-        </div>
-
-        {/* Botão atalho: selecionar todos pendentes */}
-        {totalPendentes > 0 && (
-          <button
-            onClick={selecionarTodosPendentes}
-            className="shrink-0 flex items-center gap-2 px-4 py-2.5 bg-warning-subtle hover:bg-warning-subtle border border-warning-line text-warning-fg text-xs font-bold rounded-xl transition-all"
-          >
-            <Clock className="w-3.5 h-3.5" />
-            Selecionar {totalPendentes} pendente{totalPendentes !== 1 ? 's' : ''}
-          </button>
-        )}
-      </div>
-
-      {/* Tabela */}
-      <div className="bg-surface rounded-xl shadow-card border border-line-strong overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-canvas border-b border-line-strong">
-              <tr>
-                {/* Checkbox selecionar todos */}
-                <th className="pl-6 pr-2 py-4 w-10">
+      <Painel semRecuo>
+        <BarraFerramentas
+          noPainel
+          busca={{ valor: search, onChange: setSearch, placeholder: "Buscar por nome, e-mail ou usuário" }}
+          filtros={
+            <>
+              <Fichas
+                compactas
+                rotulo="Situação"
+                valor={filtroStatus}
+                onChange={setFiltroStatus}
+                opcoes={[
+                  { valor: "todos", rotulo: "Todos", contagem: stats.total },
+                  { valor: "ativos", rotulo: "Ativos", contagem: stats.ativos },
+                  { valor: "pendentes", rotulo: "Pendentes", contagem: stats.pendentes },
+                ]}
+              />
+              {totalPendentes > 0 && (
+                <Button variant="ghost" size="sm" onClick={selecionarTodosPendentes}>
+                  <Clock size={14} strokeWidth={1.75} aria-hidden /> Selecionar {totalPendentes} pendente{totalPendentes !== 1 ? 's' : ''}
+                </Button>
+              )}
+            </>
+          }
+          onExportar={() => baixarCSV("Usuarios", [
+            { titulo: "Nome", valor: (u: Usuario) => u.name },
+            { titulo: "E-mail", valor: (u: Usuario) => u.email },
+            { titulo: "Usuário", valor: (u: Usuario) => u.username },
+            { titulo: "Papéis", valor: (u: Usuario) => u.papeis.map((c) => PAPEIS_SISTEMA[c]?.nome ?? c).join(", ") },
+            { titulo: "Situação", valor: (u: Usuario) => situacao(u) },
+            { titulo: "Disciplinas", valor: (u: Usuario) => u._count.disciplinasPermitidas },
+          ], usuariosFiltrados)}
+        />
+        <TableContainer semBorda>
+          <Table className="min-w-[44rem]">
+            <THead>
+              <TR>
+                <TH className="w-10 pl-painel pr-0">
                   <input
                     type="checkbox"
+                    aria-label="Selecionar todos da lista"
                     checked={usuariosFiltrados.length > 0 && selectedIds.size === usuariosFiltrados.length}
                     ref={el => {
                       if (el) el.indeterminate =
                         selectedIds.size > 0 && selectedIds.size < usuariosFiltrados.length
                     }}
                     onChange={toggleSelectAll}
-                    className="w-4 h-4 rounded cursor-pointer accent-[var(--accent)]"
+                    className="size-4 cursor-pointer rounded accent-[var(--accent)]"
                   />
-                </th>
-                <th className="px-4 py-4 text-left text-xs font-medium text-fg-muted">Usuário</th>
-                <th className="px-6 py-4 text-center text-xs font-medium text-fg-muted">Função & Status</th>
-                <th className="px-6 py-4 text-center text-xs font-medium text-fg-muted">Permissões</th>
-                <th className="px-6 py-4 text-right text-xs font-medium text-fg-muted">Gerenciamento</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-line">
+                </TH>
+                <TH>Nome</TH>
+                <TH>Usuário</TH>
+                <TH>Papéis</TH>
+                <TH>Situação</TH>
+                <TH numeric>Disciplinas</TH>
+                <TH className="text-right"><span className="sr-only">Ações</span></TH>
+              </TR>
+            </THead>
+            <TBody>
               {usuariosFiltrados.map((usuario) => (
-                <tr
+                <TR
                   key={usuario.id}
                   onClick={() => toggleSelect(usuario.id)}
-                  className={`transition-colors cursor-pointer
-                    ${selectedIds.has(usuario.id) ? 'bg-accent-subtle' : ''}
-                    ${!selectedIds.has(usuario.id) && !usuario.isActive ? 'opacity-60 bg-subtle' : ''}
-                    ${!selectedIds.has(usuario.id) ? 'hover:bg-canvas' : ''}
-                  `}
+                  selecionada={selectedIds.has(usuario.id)}
+                  className={!usuario.isActive && !selectedIds.has(usuario.id) ? "text-fg-muted" : undefined}
                 >
-                  {/* Checkbox */}
-                  <td className="pl-6 pr-2 py-4 w-10" onClick={e => e.stopPropagation()}>
+                  <TD className="w-10 pl-painel pr-0" onClick={e => e.stopPropagation()}>
                     <input
                       type="checkbox"
+                      aria-label={`Selecionar ${usuario.name || usuario.email}`}
                       checked={selectedIds.has(usuario.id)}
                       onChange={() => toggleSelect(usuario.id)}
-                      className="w-4 h-4 rounded cursor-pointer accent-[var(--accent)]"
+                      className="size-4 cursor-pointer rounded accent-[var(--accent)]"
                     />
-                  </td>
-
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <Avatar nome={usuario.name} className={!usuario.isActive ? 'opacity-50' : undefined} />
-                      <div className="ml-3">
-                        <div className="flex items-center gap-2">
-                          <div className={`text-sm font-medium tracking-tight ${!usuario.isActive ? 'text-fg-muted' : 'text-fg'}`}>
-                            {usuario.name || 'Sem nome'}
-                          </div>
-                          {!usuario.isApproved && (
-                            <span className="flex h-2 w-2 rounded-full bg-warning animate-ping" />
-                          )}
-                        </div>
-                        <div className="text-xs text-fg-muted font-medium tracking-tight">{usuario.email}</div>
-                        <div className="text-xs text-fg-subtle font-medium mt-0.5">
-                          @{usuario.username}
-                        </div>
-                      </div>
+                  </TD>
+                  <TD>
+                    <Link href={`/dashboard/usuarios/${usuario.id}`} onClick={e => e.stopPropagation()} className={`font-medium hover:underline ${usuario.isActive ? "text-fg" : "text-fg-muted"}`}>
+                      {usuario.name || "Sem nome"}
+                    </Link>
+                    <span className="block text-xs text-fg-muted">{usuario.email}</span>
+                  </TD>
+                  <TD className="font-mono text-fg-muted">{usuario.username}</TD>
+                  <TD>
+                    <div className="flex flex-wrap gap-1">
+                      {usuario.isApproved ? usuario.papeis.map((c) => SELO_PAPEL[c] ? <Badge key={c} tone={SELO_PAPEL[c]!.tom} title={PAPEIS_SISTEMA[c].nome}>{SELO_PAPEL[c]!.rotulo}</Badge> : null) : <span className="text-fg-subtle">—</span>}
                     </div>
-                  </td>
-
-                  <td className="px-6 py-4 whitespace-nowrap text-center">
-                    <div className="flex flex-col items-center gap-1.5">
-                      <div className="flex flex-wrap items-center justify-center gap-1.5">
-                        {!usuario.isApproved ? (
-                          <span className="px-2.5 py-0.5 inline-flex items-center text-xs font-medium rounded-full bg-warning-subtle text-warning-fg border border-warning-line">
-                            <Clock className="w-3 h-3 mr-1" />
-                            Solicitação
-                          </span>
-                        ) : (
-                          <>
-                            {usuario.papeis.map((c) => {
-                              const selo = SELO_PAPEL[c]
-                              if (!selo) return null
-                              const Icone = selo.icone
-                              return (
-                                <span key={c} title={PAPEIS_SISTEMA[c].nome} className={`px-2.5 py-0.5 inline-flex items-center text-xs font-medium rounded-full border ${selo.classe}`}>
-                                  <Icone className="w-3 h-3 mr-1" />{selo.rotulo}
-                                </span>
-                              )
-                            })}
-                           </>
-                        )}
-                      </div>
-                      {usuario.isApproved && !usuario.isActive && (
-                        <span className="px-2.5 py-0.5 inline-flex items-center text-xs font-medium rounded-full bg-danger-subtle text-danger-fg border border-danger-line animate-pulse">
-                          <PauseCircle className="w-3 h-3 mr-1" />Acesso Pausado
-                        </span>
-                      )}
-                      {usuario.isApproved && usuario.isActive && (
-                        <span className="px-2.5 py-0.5 inline-flex items-center text-xs font-medium rounded-full bg-success-subtle text-success-fg border border-success-line">
-                          <CheckCircle2 className="w-3 h-3 mr-1" />Ativo
-                        </span>
-                      )}
-                    </div>
-                  </td>
-
-                  <td className="px-6 py-4 whitespace-nowrap text-center text-sm">
-                    {usuario.papeis.includes('ADMINISTRADOR') ? (
-                      <span className="text-fg-muted font-medium text-xs bg-canvas px-3 py-1 rounded-lg border border-line">Controle Total</span>
-                    ) : !usuario.isApproved ? (
-                      <span className="text-fg-subtle italic text-xs font-medium">A aguardar</span>
-                    ) : (
-                      <span className="font-medium text-fg-muted text-xs">
-                        {usuario._count.disciplinasPermitidas} <span className="text-xs font-medium text-fg-subtle">Disciplinas</span>
-                      </span>
-                    )}
-                  </td>
-
-                  <td className="px-6 py-4 whitespace-nowrap" onClick={e => e.stopPropagation()}>
+                  </TD>
+                  <TD>
+                    {!usuario.isApproved
+                      ? <Badge tone="warning" dot>Aguardando aprovação</Badge>
+                      : usuario.isActive ? <Badge tone="success" dot>Ativo</Badge> : <Badge tone="danger" dot>Acesso pausado</Badge>}
+                  </TD>
+                  <TD numeric className="text-fg-muted">
+                    {usuario.papeis.includes('ADMINISTRADOR') ? <span className="text-xs">Acesso total</span> : usuario.isApproved ? usuario._count.disciplinasPermitidas : "—"}
+                  </TD>
+                  <TD className="w-0 whitespace-nowrap" onClick={e => e.stopPropagation()}>
                     <UserActions
                       userId={usuario.id}
                       userName={usuario.name || ''}
@@ -356,22 +231,17 @@ export default function UsuariosClient({ usuarios }: UsuariosClientProps) {
                       isSuperuser={usuario.papeis.includes('ADMINISTRADOR')}
                       isStaff={usuario.papeis.includes('PROFESSOR')}
                     />
-                  </td>
-                </tr>
+                  </TD>
+                </TR>
               ))}
-
-              {usuariosFiltrados.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="px-6 py-20 text-center">
-                    <Users className="w-10 h-10 text-fg-disabled mx-auto mb-3" />
-                    <p className="text-sm font-semibold text-fg-subtle">Nenhum usuário encontrado</p>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+              {usuariosFiltrados.length === 0 && <TableEmpty colSpan={7}>Nenhum usuário encontrado com estes filtros.</TableEmpty>}
+            </TBody>
+          </Table>
+        </TableContainer>
+        <RodapeTabela total={usuariosFiltrados.length} singular="usuário" plural="usuários">
+          {selectedIds.size > 0 && <span className="tabular-nums">{selectedIds.size} selecionado{selectedIds.size !== 1 ? "s" : ""}</span>}
+        </RodapeTabela>
+      </Painel>
 
       {/* Barra flutuante de aprovação em massa */}
       {selectedIds.size > 0 && (
