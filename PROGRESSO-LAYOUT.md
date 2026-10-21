@@ -32,8 +32,8 @@ servidor de desenvolvimento recarrega as mudanças em andamento.
 
 ## Próximo passo exato
 
-Abrir o PR para `main` (se ainda não houver) e marcar STATUS no fim deste
-arquivo. Capturas finais já estão em `docs/capturas/layout-sistema/9-final/`.
+Nenhum: todas as etapas concluídas e PR aberto (https://github.com/anndyf/axis/pull/17).
+Aguarda revisão da dona do produto.
 
 ## Etapa 1 — o que foi feito
 
@@ -380,3 +380,5 @@ Componentes novos (`src/components/ui`): `Painel`, `BarraFerramentas`,
 Decisões tomadas sem confirmação: itens 1 a 6 em "Decisões" acima e as das
 etapas 5 a 8 (onde faltaria gravar autor, folha de impressão em paisagem,
 sugestão de versão 0.2.0 sem alterar o package.json).
+
+STATUS: CONCLUÍDO
