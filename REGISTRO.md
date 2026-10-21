@@ -13,13 +13,12 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 ## Agora
 
 **Rodando na nuvem**
-- Nada no momento.
+- Sessão do layout de sistema (8 etapas), iniciada em 20/10 ~22:30: branch `estilo/layout-sistema`. Ela incorpora a branch `regra/so-docente-grava` se esta ainda não estiver na main.
+- Retomadas automáticas agendadas (21/10, horário de Brasília) para o caso de a sessão parar pelo limite: 00:00, 02:00, 04:00 e 06:00. Cada uma confere antes de agir: sem branch = começa; `STATUS: CONCLUÍDO` = não faz nada; commit há menos de 45 min = sai sem mexer; senão continua do PROGRESSO-LAYOUT.md. Rotinas em https://claude.ai/code/routines (trig_01CBgqNsGHTE1jj6rpn8JKv4, trig_018r37jUtcxWMTC3vmpyieSa, trig_01KdzdZWAUzeqVQpjaT5RjZX, trig_01A7DnwtqkwVZ1c4Dvf7HeHf).
 
 **Esperando merge da dona do produto**
 - Branch `regra/so-docente-grava`: só quem leciona grava nota e chamada; Direção e Administrador visualizam. Validada (541 testes, conferida ao vivo). https://github.com/anndyf/axis/compare/main...regra/so-docente-grava
 
-**Pronto para disparar (depois do merge acima)**
-- Sessão do layout de sistema (8 etapas): `sessoes-nuvem/layout-sistema.md`. O PR #15 já entrou na main.
 
 **Pronto para iniciar quando quiser**
 - Layout com cara de sistema no computador + tipografia etapa 2 + rastreabilidade visível, formulários/tabelas com rigor, acabamento de produto e impressão (uma sessão, 8 etapas): instrução em `sessoes-nuvem/layout-sistema.md`, prévia em `sessoes-nuvem/previa-layout.html`. Disparar DEPOIS do merge da fase 3a+3b.
@@ -45,6 +44,7 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 ## Histórico
 
 ### 20/10/2026
+- Sessão do layout de sistema preparada para a noite, com 4 retomadas automáticas agendadas (00:00, 02:00, 04:00, 06:00).
 - Implementada a regra "só quem leciona grava nota e chamada" (branch `regra/so-docente-grava`): vale para qualquer papel; Direção e Administrador visualizam (tela de chamada mostra "Ver diário", diário e calendário sem edição, lançamento de notas e recuperação em modo somente leitura); quem é da direção e dá aula grava só onde leciona. Corrigida também uma brecha antiga: qualquer professor gravava a recuperação final de disciplina de outro. 541 testes passando; conferido ao vivo com direção e professor.
 - Decisões sobre papéis: (1) Direção NÃO lança notas nem faz chamada, apenas visualiza (a implementar); (2) Coordenação decide no conselho de classe: confirmado; (3) Coordenação NÃO faz chamada: confirmado; (4) Secretaria não vê fichas AEE, mas poderá anexar laudo e condição no cadastro do estudante (anotado para as telas de cadastro/secretaria).
 - PR #15 (fases 3a+3b) mergeado na main. Panorama dos papéis: Administrador da escola, Direção, Secretaria, Coordenação, Professor, AEE, Estudante, Responsável (sem portal ainda) e a conta da Plataforma (fora dos papéis até a 3c). Lista de permissões em `src/lib/permissoes.ts`.

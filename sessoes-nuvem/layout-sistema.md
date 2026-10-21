@@ -1,6 +1,6 @@
 Você vai dar ao Áxis (Next.js 16 + Tailwind 4 + Prisma + PostgreSQL, SaaS escolar multi-escola), repositório https://github.com/anndyf/axis, uma CARA DE SISTEMA no computador. Hoje o desktop parece um site comum: conteúdo centralizado numa coluna estreita (max-w-4xl/5xl), cartões flutuantes muito arredondados (428 rounded-xl, 81 rounded-2xl) com muito espaço interno, sem barra de contexto, sem abas nem barra de ferramentas nas listas. O CELULAR já tem cara de app (barra inferior, cartões, bottom sheets): mantenha-o como está, salvo ajustes para continuar coerente.
 
-Parta da `main` e crie a branch `estilo/layout-sistema`; trabalhe só nela. Commits pequenos (mensagens em português, terminando com "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"), push a cada etapa. Ao final, abra um pull request para a `main` (não faça merge).
+Parta da `main` e crie a branch `estilo/layout-sistema`; trabalhe só nela. Logo no início, se `origin/regra/so-docente-grava` não estiver contida na `main`, faça `git merge origin/regra/so-docente-grava` na sua branch: é a regra "só quem leciona grava nota e chamada; Direção e Administrador só visualizam", já validada pela dona do produto. Não altere essa regra; nas telas de notas, recuperação, chamada e diário, mantenha e dê bom acabamento ao modo somente leitura (aviso, campos bloqueados com aparência de leitura, sem botão salvar). Commits pequenos (mensagens em português, terminando com "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"), push a cada etapa. Ao final, abra um pull request para a `main` (não faça merge).
 
 ## Decisões da dona do produto (siga)
 - Densidade EQUILIBRADA: linhas de tabela de ~40px, painéis com borda de 1px, raio 6–8px (12px só em modais), sombra só em camadas flutuantes, espaçamento justo mas confortável. Referência de organização: SIGEduc (Bahia) e SUAP, com acabamento moderno.
@@ -13,7 +13,9 @@ Ninguém vai acompanhar. Não pare para perguntar: na dúvida, escolha a opção
 
 ## Retomada
 - Se a branch `estilo/layout-sistema` já existir no GitHub, faça checkout, leia PROGRESSO-LAYOUT.md e continue do próximo passo pendente.
-- Commite e dê push com frequência. Ao concluir (PR aberto), escreva `STATUS: CONCLUÍDO` no fim de PROGRESSO-LAYOUT.md e dê push.
+- Commite e dê push com frequência: no máximo a cada 20 minutos de trabalho, mesmo que a etapa esteja pela metade (commit "wip: ..." que compila). Uma execução de retomada agendada considera a sessão parada se o último commit tiver mais de 45 minutos.
+- Atualize PROGRESSO-LAYOUT.md a cada commit com o próximo passo exato, para a retomada continuar sem refazer nada.
+- Ao concluir (PR aberto), escreva `STATUS: CONCLUÍDO` no fim de PROGRESSO-LAYOUT.md e dê push.
 
 ## Verificação
 - `npm ci`; suba o PostgreSQL (`sudo apt-get update && sudo apt-get install -y postgresql`, iniciar, senha do postgres). Crie axis_dev e axis_test, .env e .env.test locais (não commitar), `npx prisma migrate deploy` nos dois; no axis_dev rode `npm run db:seed`, `npx tsx prisma/onboard-escola-teste.ts`, `npx tsx prisma/seed-usuarios-teste.ts`, `npx tsx prisma/seed-calendario.ts`, `npx tsx prisma/seed-frequencia.ts`, `npx tsx prisma/backfill/fase-2.ts` e, se existir, `npx tsx prisma/backfill/fase-3a.ts`.
