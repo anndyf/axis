@@ -15,7 +15,10 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 **Rodando na nuvem**
 - Nada no momento.
 
-**Pronto para disparar**
+**Esperando merge da dona do produto**
+- Branch `regra/so-docente-grava`: só quem leciona grava nota e chamada; Direção e Administrador visualizam. Validada (541 testes, conferida ao vivo). https://github.com/anndyf/axis/compare/main...regra/so-docente-grava
+
+**Pronto para disparar (depois do merge acima)**
 - Sessão do layout de sistema (8 etapas): `sessoes-nuvem/layout-sistema.md`. O PR #15 já entrou na main.
 
 **Pronto para iniciar quando quiser**
@@ -42,6 +45,7 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 ## Histórico
 
 ### 20/10/2026
+- Implementada a regra "só quem leciona grava nota e chamada" (branch `regra/so-docente-grava`): vale para qualquer papel; Direção e Administrador visualizam (tela de chamada mostra "Ver diário", diário e calendário sem edição, lançamento de notas e recuperação em modo somente leitura); quem é da direção e dá aula grava só onde leciona. Corrigida também uma brecha antiga: qualquer professor gravava a recuperação final de disciplina de outro. 541 testes passando; conferido ao vivo com direção e professor.
 - Decisões sobre papéis: (1) Direção NÃO lança notas nem faz chamada, apenas visualiza (a implementar); (2) Coordenação decide no conselho de classe: confirmado; (3) Coordenação NÃO faz chamada: confirmado; (4) Secretaria não vê fichas AEE, mas poderá anexar laudo e condição no cadastro do estudante (anotado para as telas de cadastro/secretaria).
 - PR #15 (fases 3a+3b) mergeado na main. Panorama dos papéis: Administrador da escola, Direção, Secretaria, Coordenação, Professor, AEE, Estudante, Responsável (sem portal ainda) e a conta da Plataforma (fora dos papéis até a 3c). Lista de permissões em `src/lib/permissoes.ts`.
 - Fases 3a+3b concluídas na nuvem (PR #15) e validadas localmente: migration `20261021120000_papeis_e_vinculos` só cria tabelas; backfill `fase-3a.ts` com 16 usuários, 94 comparações e 0 diferenças, e a 2ª execução não altera nada; 536 testes passando (eram 437); sem conflito com a main. Conferido ao vivo: menus de direção, professor e AEE idênticos aos da main; novos logins `secretaria` e `coordenacao` com menus próprios. Só o papel Administrador da escola (= superuser) gerencia usuários. A sessão corrigiu dois vazamentos entre escolas ("Desativar todos os portais" e destinatários/e-mail de comunicado geral). Decisões dela a conferir: papel extra "Administrador da escola"; direção recebe também o papel Professor (porque tem isStaff); Coordenação sem chamada; campo "senha inicial" removido do cadastro (o servidor já ignorava).
