@@ -8,14 +8,12 @@ import { prisma } from '@/lib/prisma'
  * AuditLog só entra se o autor for da mesma escola (o AuditLog não grava a
  * escola; é o mesmo filtro da tela de auditoria). Do autor, só o nome.
  *
- * Fuso: o logAudit grava o horário de Brasília "como se fosse UTC" (ver
- * src/lib/audit.ts), então essas entradas são formatadas em UTC; o
- * NotaFinalAudit grava UTC de verdade e é formatado em America/Sao_Paulo.
+ * Fuso: AuditLog e NotaFinalAudit gravam UTC de verdade; tudo é exibido em
+ * America/Sao_Paulo.
  */
 export interface EntradaHistorico {
   id: string
   quando: Date
-  fuso: 'UTC' | 'America/Sao_Paulo'
   autor: string | null
   acao: string
   assunto: string
@@ -47,7 +45,6 @@ function deLog(l: { id: string; createdAt: Date; action: string; entityType: str
   return {
     id: `a-${l.id}`,
     quando: l.createdAt,
-    fuso: 'UTC',
     autor: l.user ? (l.user.name || l.user.username) : null,
     acao: ACAO[l.action] ?? l.action,
     assunto: ASSUNTO[l.entityType] ?? l.entityType,
@@ -91,7 +88,6 @@ export async function historicoDoEstudante(escolaId: string, matricula: string, 
     ...auditNotas.map((a) => ({
       id: `n-${a.id}`,
       quando: a.createdAt,
-      fuso: 'America/Sao_Paulo' as const,
       autor: a.modifiedBy && a.modifiedBy.escolaId === escolaId ? (a.modifiedBy.name || a.modifiedBy.username) : null,
       acao: 'Alteração de nota final',
       assunto: a.notaFinal.disciplina.nome,
@@ -125,13 +121,11 @@ export async function ultimaAlteracao(escolaId: string, entityType: 'ESTUDANTE' 
 }
 
 function ordenar(e: EntradaHistorico[]) {
-  // AuditLog guarda o horário de Brasília como UTC: soma 3h só para ordenar junto com o NotaFinalAudit
-  const real = (x: EntradaHistorico) => x.quando.getTime() + (x.fuso === 'UTC' ? 3 * 3600_000 : 0)
-  return [...e].sort((a, b) => real(b) - real(a))
+  return [...e].sort((a, b) => b.quando.getTime() - a.quando.getTime())
 }
 
-export function formatarQuando(e: { quando: Date; fuso: 'UTC' | 'America/Sao_Paulo' }): string {
-  return e.quando.toLocaleString('pt-BR', { timeZone: e.fuso, day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+export function formatarQuando(e: { quando: Date }): string {
+  return e.quando.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 }
 
 /** Quem vê a aba Histórico: a mesma regra da tela de auditoria. */

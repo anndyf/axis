@@ -119,7 +119,7 @@ export const PUT = rotaDoModulo('NUC', 'escrita', async function PUT(
       if (sqlFields.length > 0) {
         values.push(id)
         await prisma.$executeRawUnsafe(`
-          UPDATE "users" SET ${sqlFields.join(', ')}, updated_at = NOW() WHERE id = $${valIdx}
+          UPDATE "users" SET ${sqlFields.join(', ')}, updated_at = NOW() AT TIME ZONE 'UTC' WHERE id = $${valIdx}
         `, ...values)
       }
 

@@ -17,7 +17,7 @@ export const revalidate = 0
 export default async function AuditoriaPage({ 
   searchParams 
 }: { 
-  searchParams: { q?: string, entity?: string, page?: string, user?: string } 
+  searchParams: Promise<{ q?: string, entity?: string, page?: string, user?: string }>
 }) {
   await paginaDoModulo('NUC')
   const session = await auth()
@@ -28,10 +28,11 @@ export default async function AuditoriaPage({
   }
   const escolaId = session.user.escolaId
 
-  const query = searchParams.q || ""
-  const entityFilter = searchParams.entity || ""
-  const userFilter = searchParams.user || ""
-  const page = parseInt(searchParams.page || "1", 10)
+  const filtros = await searchParams
+  const query = filtros.q || ""
+  const entityFilter = filtros.entity || ""
+  const userFilter = filtros.user || ""
+  const page = parseInt(filtros.page || "1", 10)
   const limit = 50
   const offset = (page - 1) * limit
 
@@ -164,7 +165,7 @@ export default async function AuditoriaPage({
             >
               Todos
             </Link>
-            {['NOTA', 'QUESTAO', 'USUARIO', 'TURMA', 'DISCIPLINA', 'CONSELHO', 'PROVA', 'ESTUDANTE', 'OCORRENCIA'].map(filter => (
+            {['NOTA', 'QUESTAO', 'USUARIO', 'TURMA', 'DISCIPLINA', 'CONSELHO', 'PROVA', 'ESTUDANTE', 'OCORRENCIA', 'UNIDADE'].map(filter => (
               <Link 
                 key={filter} 
                 href={`/dashboard/auditoria?entity=${filter}${query ? `&q=${query}` : ''}${userFilter ? `&user=${userFilter}` : ''}`}
@@ -201,10 +202,10 @@ export default async function AuditoriaPage({
                       </div>
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-fg-muted">
-                          {new Date(log.createdAt).toLocaleDateString('pt-BR')}
+                          {new Date(log.createdAt).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })}
                         </p>
                         <p className="text-xs text-fg-subtle font-medium">
-                          {new Date(log.createdAt).toLocaleTimeString('pt-BR')}
+                          {new Date(log.createdAt).toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' })}
                         </p>
                       </div>
                     </div>

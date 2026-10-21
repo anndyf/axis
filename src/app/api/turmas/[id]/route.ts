@@ -109,7 +109,7 @@ export const PUT = rotaDoModulo('NUC', 'escrita', async function PUT(
       
       await prisma.$executeRawUnsafe(`
         UPDATE "turmas" 
-        SET nome = $1, curso = $2, turno = $3, modalidade = $4, serie = $5, numero = $6, updated_at = NOW()
+        SET nome = $1, curso = $2, turno = $3, modalidade = $4, serie = $5, numero = $6, updated_at = NOW() AT TIME ZONE 'UTC'
         WHERE id = $7
       `, nome.trim(), curso?.trim(), turno?.trim(), modalidade?.trim(), serie?.toString(), numVal, id)
 
