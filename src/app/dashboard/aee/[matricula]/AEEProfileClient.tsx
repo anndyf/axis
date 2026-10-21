@@ -9,6 +9,7 @@ import {
   ChevronDown, Search, X, ClipboardCheck, GraduationCap, Users, Upload
 } from "lucide-react"
 import { CIDS_AEE } from "@/lib/constants-aee"
+import { can } from "@/lib/rbac"
 
 export default function AEEProfileClient({ 
   usuario, 
@@ -23,7 +24,7 @@ export default function AEEProfileClient({
 }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const isDirecao = usuario.isDirecao || usuario.isSuperuser
+  const isDirecao = can(usuario, 'aee.ficha.editar')
   
   // Estados do formulário
   const [formData, setFormData] = useState({

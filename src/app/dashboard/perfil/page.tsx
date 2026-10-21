@@ -4,6 +4,16 @@
 import { useState } from "react"
 import { Lock, Key, CheckCircle2, AlertCircle, Save } from "lucide-react"
 import { useSession } from "next-auth/react"
+import { can, papeisDoUsuario } from "@/lib/rbac"
+
+/** Era isSuperuser ? "Administrador" : "Professor"; Secretaria e Coordenação ganham o próprio nome. */
+function rotuloDoPerfil(user: Parameters<typeof can>[0]) {
+  if (can(user, "escola.administrar")) return "Administrador"
+  const papeis = user ? papeisDoUsuario(user) : []
+  if (papeis.includes("SECRETARIA")) return "Secretaria"
+  if (papeis.includes("COORDENACAO")) return "Coordenação"
+  return "Professor"
+}
 
 export default function ProfilePage() {
   const { data: session } = useSession()
@@ -97,7 +107,7 @@ export default function ProfilePage() {
                 </p>
                 
                 <div className="mt-4 inline-flex items-center px-3 py-1 rounded-full bg-canvas text-fg-muted text-xs font-medium">
-                  {session?.user?.isSuperuser ? "Administrador" : "Professor"}
+                  {rotuloDoPerfil(session?.user)}
                 </div>
              </div>
           </div>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
 import { turmasSaoDaEscola } from '@/lib/data-fetching'
 import { rotaDoModulo } from '@/lib/modulos/guarda'
 
@@ -22,7 +23,7 @@ export const GET = rotaDoModulo('PLA', 'leitura', async function GET(request: Ne
     if (!plano) return NextResponse.json({ message: 'Plano não encontrado' }, { status: 404 })
 
     // Apenas o dono ou admin podem ver os detalhes
-    if (!session.user.isSuperuser && !session.user.isDirecao && plano.professorId !== session.user.id) {
+    if (!can(session.user, 'plano.acompanhar') && plano.professorId !== session.user.id) {
         return NextResponse.json({ message: 'Acesso negado' }, { status: 403 })
     }
 
@@ -49,7 +50,7 @@ export const PUT = rotaDoModulo('PLA', 'escrita', async function PUT(request: Ne
     const existing = await prisma.planoEnsino.findFirst({ where: { id, professor: { escolaId: session.user.escolaId } } })
     if (!existing) return NextResponse.json({ message: 'Plano não encontrado' }, { status: 404 })
 
-    if (!session.user.isSuperuser && !session.user.isDirecao && existing.professorId !== session.user.id) {
+    if (!can(session.user, 'plano.acompanhar') && existing.professorId !== session.user.id) {
         return NextResponse.json({ message: 'Acesso negado' }, { status: 403 })
     }
 
@@ -92,7 +93,7 @@ export const DELETE = rotaDoModulo('PLA', 'escrita', async function DELETE(reque
     const existing = await prisma.planoEnsino.findFirst({ where: { id, professor: { escolaId: session.user.escolaId } } })
     if (!existing) return NextResponse.json({ message: 'Plano não encontrado' }, { status: 404 })
 
-    if (!session.user.isSuperuser && !session.user.isDirecao && existing.professorId !== session.user.id) {
+    if (!can(session.user, 'plano.acompanhar') && existing.professorId !== session.user.id) {
         return NextResponse.json({ message: 'Acesso negado' }, { status: 403 })
     }
 

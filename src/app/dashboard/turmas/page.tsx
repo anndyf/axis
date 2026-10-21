@@ -13,6 +13,7 @@ import { getTurmasPermitidas } from "@/lib/data-fetching"
 import { decodeTurma } from "@/lib/turma-utils"
 import TurmasListClient from "@/components/TurmasListClient"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { can } from '@/lib/rbac'
 
 export const runtime = 'nodejs'
 
@@ -57,7 +58,7 @@ export default async function TurmasPage() {
             </div>
             <Link
               href="/dashboard/turmas/nova"
-              className={`flex items-center space-x-2 bg-accent text-on-accent px-6 py-3 rounded-lg font-medium hover:bg-accent-hover transition-all text-xs active:scale-95 shadow-card ${(!session.user.isSuperuser && !session.user.isDirecao) ? 'hidden' : ''}`}
+              className={`flex items-center space-x-2 bg-accent text-on-accent px-6 py-3 rounded-lg font-medium hover:bg-accent-hover transition-all text-xs active:scale-95 shadow-card ${!can(session.user, 'turma.gerenciar') ? 'hidden' : ''}`}
             >
               <Plus size={16} />
               <span>Nova Turma</span>

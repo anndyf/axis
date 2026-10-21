@@ -10,7 +10,8 @@ import { useSessionTimer } from "@/contexts/SessionTimerContext"
 import { getUnreadCount } from "@/app/dashboard/mensagens/actions"
 import { getPendingUsersCount } from "@/app/dashboard/usuarios/actions"
 import { modulosVisiveis } from "@/lib/modules"
-import { can } from "@/lib/rbac"
+import { rotuloDoPapelPrincipal } from "@/lib/permissoes"
+import { can, restritoADocencia, papeisDoUsuario } from "@/lib/rbac"
 import CommandPalette from "@/components/CommandPalette"
 import { Avatar } from "@/components/ui/Avatar"
 import { Menu } from "@/components/ui/Menu"
@@ -24,6 +25,8 @@ interface User {
   isStaff: boolean
   isAEE?: boolean
   isPlatformAdmin?: boolean
+  papeis?: string[] | null
+  permissoes?: string[] | null
 }
 
 export interface EscolaDoMenu {
@@ -34,7 +37,7 @@ export interface EscolaDoMenu {
 const GRUPOS_ORDENADOS = ["Início", "Gestão Acadêmica", "Diário e Avaliações", "Ferramentas", "Configurações", "Plataforma"]
 
 export function papelDoUsuario(user: User) {
-  return user.isSuperuser ? "Administrador" : user.isAEE ? "Especialista AEE" : user.isDirecao ? "Direção" : user.isStaff ? "Professor" : "Gestão escolar"
+  return rotuloDoPapelPrincipal(papeisDoUsuario(user))
 }
 
 /**
@@ -147,7 +150,7 @@ export default function DashboardSidebar({
   }
 
   const recolhido = isCollapsed && !isMobileOpen
-  const professor = user.isStaff && !user.isSuperuser && !user.isDirecao
+  const professor = restritoADocencia(user)
 
   return (
     <>
@@ -272,7 +275,7 @@ export default function DashboardSidebar({
             items={[
               { label: "Meu perfil", icon: UserRound, href: "/dashboard/perfil" },
               { label: "Trocar senha", icon: KeyRound, href: "/dashboard/perfil#senha" },
-              ...(user.isSuperuser ? [{ label: "Componentes", icon: Blocks, href: "/dashboard/ui" }] : []),
+              ...(can(user, "escola.administrar") ? [{ label: "Componentes", icon: Blocks, href: "/dashboard/ui" }] : []),
               { label: "Tema claro", icon: Sun, marcado: tema === "light", separadorAntes: true, onSelect: () => escolherTema("light") },
               { label: "Tema escuro", icon: Moon, marcado: tema === "dark", onSelect: () => escolherTema("dark") },
               { label: "Tema do sistema", icon: Monitor, marcado: tema === "system", onSelect: () => escolherTema("system") },
@@ -296,7 +299,7 @@ export default function DashboardSidebar({
         aberto={paletaAberta}
         onFechar={() => setPaletaAberta(false)}
         paginas={modulosVisiveis(user, modulosAtivos).map((m) => ({ nome: m.nome, rota: m.rota, grupo: m.grupo, icone: m.icone }))}
-        buscarRegistros={!user.isAEE && can(user, "gestao")}
+        buscarRegistros={!can(user, "aee.atender") && can(user, "estudante.ler")}
       />
     </>
   )

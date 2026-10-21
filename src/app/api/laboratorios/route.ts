@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { can } from "@/lib/rbac"
 import { NextResponse } from "next/server"
 import { rotaDoModulo } from '@/lib/modulos/guarda'
 
@@ -22,7 +23,7 @@ export const GET = rotaDoModulo('REC', 'leitura', async function GET() {
 export const POST = rotaDoModulo('REC', 'escrita', async function POST(request: Request) {
   try {
     const session = await auth()
-    if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
+    if (!session || !can(session.user, 'laboratorio.gerenciar')) {
       return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
     }
 
@@ -40,7 +41,7 @@ export const POST = rotaDoModulo('REC', 'escrita', async function POST(request: 
 export const PATCH = rotaDoModulo('REC', 'escrita', async function PATCH(request: Request) {
   try {
     const session = await auth()
-    if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
+    if (!session || !can(session.user, 'laboratorio.gerenciar')) {
       return NextResponse.json({ message: "Não autorizado" }, { status: 401 })
     }
 

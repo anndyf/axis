@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { can } from "@/lib/rbac"
 import { NextResponse } from "next/server"
 import { rotaDoModulo } from '@/lib/modulos/guarda'
 
@@ -20,7 +21,7 @@ export const DELETE = rotaDoModulo('REC', 'escrita', async function DELETE(
       return NextResponse.json({ message: "Reserva não encontrada" }, { status: 404 })
     }
 
-    const isAdmin = session.user.isSuperuser || session.user.isDirecao
+    const isAdmin = can(session.user, 'laboratorio.gerenciar')
     const isOwner = reserva.userId === session.user.id
 
     if (!isAdmin && !isOwner) {

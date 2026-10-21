@@ -4,6 +4,7 @@ import { redirect, notFound } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import AEEProfileClient from "./AEEProfileClient"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { can } from '@/lib/rbac'
 
 export const runtime = 'nodejs'
 
@@ -40,7 +41,7 @@ export default async function AEEPage({ params }: { params: Promise<{ matricula:
 
   if (!estudante) notFound()
 
-  const isDirecao = session.user.isDirecao || session.user.isSuperuser
+  const isDirecao = can(session.user, 'aee.ficha.editar')
   
   // Verifica se o professor é da turma (via manual ou via disciplina)
   const isProfessorManual = estudante.turma.usuariosPermitidos.some((u: any) => u.id === session.user.id)

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
 import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const runtime = 'nodejs'
@@ -11,7 +12,7 @@ export const GET = rotaDoModulo('PRV', 'leitura', async function GET(request: Ne
     if (!session?.user?.escolaId) return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     const escolaId = session.user.escolaId
 
-    const isAdmin = session.user.isSuperuser || session.user.isDirecao
+    const isAdmin = can(session.user, 'prova.gerenciar')
     const userId = session.user.id
 
     // Para criadores, apenas buscamos usuários que já criaram alguma prova

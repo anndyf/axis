@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import MatrizCurricularClient from "@/components/MatrizCurricularClient"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { can } from '@/lib/rbac'
 
 export const metadata = {
   title: 'Áxis - Matriz'
@@ -11,7 +12,7 @@ export const metadata = {
 export default async function MatrizCurricularPage() {
   await paginaDoModulo('NUC')
   const session = await auth()
-  if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
+  if (!session?.user?.escolaId || !can(session.user, 'matriz.gerenciar')) {
     redirect("/dashboard")
   }
   const escolaId = session.user.escolaId

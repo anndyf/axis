@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
 import { turmasSaoDaEscola } from '@/lib/data-fetching'
 import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const POST = rotaDoModulo('PLA', 'escrita', async function POST(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session?.user?.escolaId || !session.user.isStaff) {
+    if (!session?.user?.escolaId || !can(session.user, 'plano.elaborar')) {
       return NextResponse.json({ message: 'Apenas professores podem criar planos' }, { status: 403 })
     }
 
@@ -69,7 +70,7 @@ export const GET = rotaDoModulo('PLA', 'leitura', async function GET(request: Ne
     const where: any = { professor: { escolaId: session.user.escolaId } }
     
     // Filtros
-    if (!session.user.isSuperuser && !session.user.isDirecao) {
+    if (!can(session.user, 'plano.acompanhar')) {
         // Se não for admin, vê apenas os próprios planos
         where.professorId = session.user.id
     } else if (professorId) {

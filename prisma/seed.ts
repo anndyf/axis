@@ -3,6 +3,7 @@ import * as dotenv from 'dotenv'
 import bcrypt from 'bcryptjs'
 import { vincularCursosSemEsquema } from '../src/lib/services/esquemas-padrao'
 import { calcularMediaFinal, calcularStatus, paraEsquemaConfig } from '../src/lib/services/notas'
+import { sincronizarVinculosDosBooleanos } from '../src/lib/papeis'
 
 dotenv.config()
 
@@ -271,6 +272,11 @@ async function main() {
         })
       }
     }
+  }
+
+  // Fase 3: vínculos de papel a partir dos booleanos (mesma regra do backfill)
+  for (const u of await prisma.user.findMany({ where: {}, select: { id: true } })) {
+    await sincronizarVinculosDosBooleanos(prisma, u.id)
   }
 
   console.log('✨ Banco de dados populado com sucesso!')

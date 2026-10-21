@@ -5,6 +5,7 @@ import { Prisma } from "@prisma/client"
 import { ChevronLeft, Search, Filter, Download, User as UserIcon, Calendar, Activity, Database, Shield, History, Clock, ShieldAlert } from "lucide-react"
 import Link from "next/link"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { can } from '@/lib/rbac'
 
 export const metadata = {
   title: 'Áxis - Auditoria'
@@ -22,7 +23,7 @@ export default async function AuditoriaPage({
   const session = await auth()
 
   // Apenas Superuser pode acessar auditoria
-  if (!session?.user?.escolaId || !session.user.isSuperuser) {
+  if (!session?.user?.escolaId || !can(session.user, 'auditoria.ler')) {
     redirect("/dashboard")
   }
   const escolaId = session.user.escolaId

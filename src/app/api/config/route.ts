@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
 import { revalidatePath } from 'next/cache'
 import { getModulosAtivos } from '@/lib/modules-server'
 import { definirModuloDaAssinatura } from '@/lib/modulos/assinatura-escrita'
@@ -56,7 +57,7 @@ export const GET = rotaDoModulo('NUC', 'leitura', async function GET() {
 export const PUT = rotaDoModulo('NUC', 'escrita', async function PUT(request: NextRequest) {
   try {
     const session = await auth()
-    if (!session || !session.user.isSuperuser) {
+    if (!session || !can(session.user, 'configuracao.editar')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 403 })
     }
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
 import jsPDF from 'jspdf'
 import { rotaDoModulo } from '@/lib/modulos/guarda'
 
@@ -32,7 +33,7 @@ export const GET = rotaDoModulo('PLA', 'leitura', async function GET(
     }
 
     // Mesma regra do GET de detalhe: só o dono ou a gestão
-    if (!session.user.isSuperuser && !session.user.isDirecao && plano.professorId !== session.user.id) {
+    if (!can(session.user, 'plano.acompanhar') && plano.professorId !== session.user.id) {
       return NextResponse.json({ message: 'Acesso negado' }, { status: 403 })
     }
 

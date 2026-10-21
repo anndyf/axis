@@ -12,13 +12,13 @@ export async function acessoChamada(
   turmaId: string,
   disciplinaId: string | null
 ): Promise<{ turma: { id: string; nome: string; cursoId: string | null; esquemaAvaliacaoId: string | null; anoLetivo: number | null }; disciplina: { id: string; nome: string } | null } | null> {
-  if (!can(user, 'staff') || typeof turmaId !== 'string') return null
+  if (!can(user, 'frequencia.lancar') || typeof turmaId !== 'string') return null
   const turma = await prisma.turma.findFirst({
     where: { id: turmaId, escolaId: user.escolaId },
     select: { id: true, nome: true, cursoId: true, esquemaAvaliacaoId: true, anoLetivo: true },
   })
   if (!turma) return null
-  const gestao = can(user, 'gestao')
+  const gestao = can(user, 'escopo.escola')
 
   if (disciplinaId !== null) {
     if (typeof disciplinaId !== 'string') return null

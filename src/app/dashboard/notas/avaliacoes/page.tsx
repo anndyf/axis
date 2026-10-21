@@ -18,7 +18,7 @@ export const dynamic = 'force-dynamic'
 export default async function AvaliacoesPage({ searchParams }: { searchParams: Promise<{ disciplina?: string }> }) {
   await paginaDoModulo('NOT')
   const session = await auth()
-  if (!session?.user?.escolaId || session.user.isPortalUser || !can(session.user, 'staff')) redirect("/dashboard")
+  if (!session?.user?.escolaId || can(session.user, 'portal.acessar') || !can(session.user, 'nota.lancar')) redirect("/dashboard")
   const { disciplina: disciplinaId } = await searchParams
 
   const cabecalho = (titulo: string, sub: string, voltar: string) => (

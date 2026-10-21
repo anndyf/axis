@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { rotaDoModulo } from '@/lib/modulos/guarda'
@@ -24,7 +25,7 @@ export const GET = rotaDoModulo('PLA', 'leitura', async function GET(request: Ne
 
     // PlanoEnsino não tem escolaId próprio - o escopo vem do professor
     const where: any = { professor: { escolaId: session.user.escolaId } }
-    if (!session.user.isSuperuser && !session.user.isDirecao) {
+    if (!can(session.user, 'plano.acompanhar')) {
         where.professorId = session.user.id
     } else if (professorId) {
         where.professorId = professorId

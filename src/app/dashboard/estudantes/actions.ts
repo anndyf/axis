@@ -6,10 +6,12 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import bcrypt from "bcryptjs"
+import { can } from "@/lib/rbac"
+import { criarUsuarioComVinculos } from "@/lib/papeis"
 
 export async function updateMatricula(oldMatricula: string, newMatricula: string) {
   const session = await auth()
-  if (!session?.user?.isSuperuser && !session?.user?.isDirecao) {
+  if (!session?.user?.escolaId || !can(session.user, 'estudante.editar')) {
     return { error: "Sem permissão" }
   }
   if (!session.user.escolaId) {
@@ -33,7 +35,7 @@ export async function updateMatricula(oldMatricula: string, newMatricula: string
 
 export async function createPortalUser(matricula: string) {
   const session = await auth()
-  if (!session?.user?.isSuperuser && !session?.user?.isDirecao) {
+  if (!session?.user?.escolaId || !can(session.user, 'estudante.editar')) {
     return { error: "Sem permissão" }
   }
   if (!session.user.escolaId) {
@@ -52,7 +54,7 @@ export async function createPortalUser(matricula: string) {
     // Criar usuário com a matrícula como username e senha
     const hashedPassword = await bcrypt.hash(estudante.matricula, 10)
     
-    await prisma.user.create({
+    await criarUsuarioComVinculos({
       data: {
         username: estudante.matricula,
         email: `${estudante.matricula}@axis.com`, // Email dummy
@@ -77,13 +79,15 @@ export async function createPortalUser(matricula: string) {
 
 export async function deactivateAllPortals() {
   const session = await auth()
-  if (!session?.user?.isSuperuser && !session?.user?.isDirecao) {
+  if (!session?.user?.escolaId || !can(session.user, 'estudante.editar')) {
     return { error: "Sem permissão" }
   }
 
   try {
+    // Só os acessos ao portal da escola da sessão
     await prisma.user.deleteMany({
       where: {
+        escolaId: session.user.escolaId,
         isPortalUser: true,
         estudanteId: { not: null }
       }
@@ -98,7 +102,7 @@ export async function deactivateAllPortals() {
 
 export async function activateAllPortals() {
     const session = await auth()
-    if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
+    if (!session?.user?.escolaId || !can(session.user, 'estudante.editar')) {
         return { error: "Sem permissão" }
     }
 
@@ -130,7 +134,7 @@ export async function activateAllPortals() {
         for (const estudante of estudantesSemAcesso) {
             const hashedPassword = await bcrypt.hash(estudante.matricula, 10)
             
-            await prisma.user.create({
+            await criarUsuarioComVinculos({
                 data: {
                     username: estudante.matricula,
                     email: `${estudante.matricula}@axis.com`,

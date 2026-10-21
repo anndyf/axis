@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import AEEDashboardClient from "./AEEDashboardClient"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { can } from '@/lib/rbac'
 
 export const runtime = 'nodejs'
 
@@ -13,8 +14,7 @@ export default async function AEEDashboardPage() {
   if (!session?.user?.escolaId) redirect("/login")
   const escolaId = session.user.escolaId
 
-  const isAEE = (session.user as any).isAEE
-  const isDirecao = session.user.isDirecao || session.user.isSuperuser || isAEE
+  const isDirecao = can(session.user, 'aee.gerenciar')
 
   const turmasWhere: any = { escolaId }
   if (!isDirecao) {

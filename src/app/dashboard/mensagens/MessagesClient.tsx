@@ -25,6 +25,7 @@ import RichTextEditor from "@/components/RichTextEditor"
 import MarkdownContent from "@/components/MarkdownContent"
 import { sendMessage, markAsRead, getMessageThread, deleteMessage, markAllAsRead } from "./actions"
 import { useRouter } from "next/navigation"
+import { can, restritoADocencia } from "@/lib/rbac"
 
 /** Formata data/hora sempre no fuso de Brasília */
 const TIMEZONE = 'America/Sao_Paulo'
@@ -65,7 +66,7 @@ export default function MessagesClient({
   const [newMsgSubject, setNewMsgSubject] = useState("")
   const [predefinedSubject, setPredefinedSubject] = useState("")
   const [newMsgContent, setNewMsgContent] = useState("")
-  const isTeacherOnly = currentUserRole.isStaff && !currentUserRole.isSuperuser && !currentUserRole.isDirecao
+  const isTeacherOnly = restritoADocencia(currentUserRole)
   const [newMsgCategory, setNewMsgCategory] = useState(isTeacherOnly ? "SUPORTE" : "GERAL")
   const [newMsgReceiver, setNewMsgReceiver] = useState("")
   const [newMsgPriority, setNewMsgPriority] = useState("MEDIA")
@@ -447,7 +448,7 @@ export default function MessagesClient({
                   >
                     <option value="SUPORTE">Suporte Técnico (Sistema)</option>
                     <option value="DIRECAO">Direção (Pedagógico)</option>
-                    {(currentUserRole.isDirecao || currentUserRole.isSuperuser) && (
+                    {can(currentUserRole, 'mensagem.direcao.atender') && (
                       <>
                         <option value="GERAL">Mensagem Privada</option>
                         <option value="COMUNICADO">Comunicado Oficial</option>
@@ -668,7 +669,7 @@ export default function MessagesClient({
                   </div>
                 )}
                 
-                {(currentUserRole.isSuperuser || currentUserRole.isDirecao) && !selectedMessage.assignedToId && (
+                {can(currentUserRole, 'mensagem.direcao.atender') && !selectedMessage.assignedToId && (
                   <button 
                     onClick={async () => {
                       const { assignTicket } = await import('./actions')
@@ -689,7 +690,7 @@ export default function MessagesClient({
                   </span>
                 )}
                 
-                {(currentUserRole.isSuperuser || currentUserRole.isDirecao || selectedMessage.senderId === currentUserId) && !selectedMessage.isResolved && selectedMessage.category !== 'GERAL' && (
+                {(can(currentUserRole, 'mensagem.direcao.atender') || selectedMessage.senderId === currentUserId) && !selectedMessage.isResolved && selectedMessage.category !== 'GERAL' && (
                   <button
                     onClick={async () => {
                       const { updateTicketStatus } = await import('./actions')

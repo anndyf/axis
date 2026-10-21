@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
 import { logAudit } from '@/lib/audit'
 import { turmasSaoDaEscola } from '@/lib/data-fetching'
 import { rotaDoModulo } from '@/lib/modulos/guarda'
@@ -30,7 +31,7 @@ export const GET = rotaDoModulo('QST', 'leitura', async function GET(request: Ne
     const where: any = {}
  
     // Se não for admin e não estiver buscando do banco de questões aprovadas públicas, só vê as próprias
-    if (!session.user.isSuperuser && !session.user.isDirecao) {
+    if (!can(session.user, 'questao.moderar')) {
       if (status !== 'APROVADA') {
         where.professorId = session.user.id
       }

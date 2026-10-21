@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { can } from '@/lib/rbac'
 import { rotaDoModulo } from '@/lib/modulos/guarda'
+import { criarUsuarioComVinculos } from '@/lib/papeis'
 
 export const runtime = 'nodejs'
 
@@ -11,7 +12,7 @@ export const POST = rotaDoModulo('NUC', 'escrita', async function POST(request: 
   try {
     const session = await auth()
 
-    if (!session?.user?.escolaId || !can(session.user, 'gestao')) {
+    if (!session?.user?.escolaId || !can(session.user, 'estudante.editar')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
     const escolaId = session.user.escolaId
@@ -76,7 +77,7 @@ export const POST = rotaDoModulo('NUC', 'escrita', async function POST(request: 
       const hashedPassword = await bcrypt.hash(matricula, 10)
       
       try {
-        await prisma.user.create({
+        await criarUsuarioComVinculos({
             data: {
               username: matricula,
               email: `${matricula}@axis.com`,
@@ -121,7 +122,7 @@ export const GET = rotaDoModulo('NUC', 'leitura', async function GET(request: Ne
   try {
     const session = await auth()
 
-    if (!session?.user?.escolaId || !can(session.user, 'staff')) {
+    if (!session?.user?.escolaId || !can(session.user, 'estudante.buscar')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 

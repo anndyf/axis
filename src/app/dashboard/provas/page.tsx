@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import GeradorProvasClient from "./GeradorProvasClient"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { can } from '@/lib/rbac'
 
 export const runtime = 'nodejs'
 
@@ -10,7 +11,7 @@ export default async function ProvasPage() {
   await paginaDoModulo('PRV')
   const session = await auth()
   
-  if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
+  if (!session || !can(session.user, 'prova.gerenciar')) {
     redirect("/dashboard")
   }
 

@@ -8,6 +8,7 @@ import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from "@/lib/services/no
 import { etapasDaNota } from "@/lib/services/notas"
 import { carregarFrequenciaDaTurma, resumoFrequenciaParaTela } from "@/lib/services/frequencia-leitura"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { restritoADocencia } from '@/lib/rbac'
 
 export const metadata = {
   title: 'Áxis - Turmas'
@@ -104,7 +105,7 @@ export default async function RelatorioTurmaPage({
     }
   })
 
-  const isProfessorOnly = session.user.isStaff && !session.user.isDirecao && !session.user.isSuperuser
+  const isProfessorOnly = restritoADocencia(session.user)
 
   return (
     <div className="">

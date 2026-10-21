@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import NovaSenhaForm from "@/components/NovaSenhaForm"
+import { can } from "@/lib/rbac"
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -18,7 +19,7 @@ export default async function TrocarSenhaPage() {
   return (
     <NovaSenhaForm
       modo="trocar"
-      destino={session.user.isPortalUser ? "/portal" : "/dashboard"}
+      destino={can(session.user, "portal.acessar") ? "/portal" : "/dashboard"}
       escola={{ nome: escola?.nome ?? 'Áxis', logoUrl: escola?.logoUrl ?? null }}
     />
   )

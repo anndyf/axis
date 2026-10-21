@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import QuestoesClient from "./QuestoesClient"
 import { getTurmasPermitidas } from "@/lib/data-fetching"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { can } from '@/lib/rbac'
 
 export const metadata = {
   title: 'Áxis - Questoes'
@@ -16,7 +17,7 @@ export default async function QuestoesPage() {
   const session = await auth()
   if (!session) redirect("/login")
 
-  const isManagement = session.user.isSuperuser || session.user.isDirecao
+  const isManagement = can(session.user, 'questao.moderar')
   const userId = session.user.id
 
   const escola = await prisma.escola.findUnique({

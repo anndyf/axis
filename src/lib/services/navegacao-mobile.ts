@@ -1,6 +1,6 @@
 import { BookOpen, BookOpenCheck, CalendarDays, ClipboardCheck, FileText, GraduationCap, Home, UserX, type LucideIcon } from 'lucide-react'
 import { modulosVisiveis } from '@/lib/modules'
-import type { RbacUser } from '@/lib/rbac'
+import { can, type RbacUser } from '@/lib/rbac'
 import { visoesDoUsuario } from '@/lib/services/painel-visoes'
 
 /**
@@ -68,8 +68,8 @@ const BARRA_PORTAL: ItemNavegacao[] = [
   { id: 'horario', rotulo: 'Horário', href: '/portal?aba=horario', icone: CalendarDays },
 ]
 
-export function perfilNavegacao(user: RbacUser & { isPortalUser?: boolean }): PerfilNavegacao {
-  if (user.isPortalUser) return 'portal'
+export function perfilNavegacao(user: RbacUser): PerfilNavegacao {
+  if (can(user, 'portal.acessar')) return 'portal'
   const visoes = visoesDoUsuario(user)
   if (visoes.includes('administracao')) return 'gestao'
   if (visoes.includes('professor')) return 'professor'
@@ -77,7 +77,7 @@ export function perfilNavegacao(user: RbacUser & { isPortalUser?: boolean }): Pe
   return 'outro'
 }
 
-export function navegacaoMobile(user: RbacUser & { isPortalUser?: boolean }, modulosAtivos: string[]): NavegacaoMobile {
+export function navegacaoMobile(user: RbacUser, modulosAtivos: string[]): NavegacaoMobile {
   const perfil = perfilNavegacao(user)
   if (perfil === 'portal') return { perfil, barra: BARRA_PORTAL, mais: [] }
 

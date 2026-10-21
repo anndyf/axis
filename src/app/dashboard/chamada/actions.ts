@@ -10,6 +10,7 @@ import { planejarChamada, validarFaltas, hojeNaEscola, dataValida, chaveAula } f
 import { decidirReplicacao, disciplinasParaReplicar, sugerirData, temposNoDia } from "@/lib/services/diario"
 import { chaveData } from "@/lib/services/calendario"
 import { bloqueioDoModulo } from "@/lib/modulos/guarda"
+import { can } from "@/lib/rbac"
 
 // Server actions podem ser chamadas direto pelo navegador: toda ação confere
 // sessão, papel e escola, e todo id recebido é conferido contra a escola.
@@ -31,7 +32,7 @@ type Erro = { erro: string }
 
 async function usuario() {
   const session = await auth()
-  if (!session?.user?.escolaId || session.user.isPortalUser) return null
+  if (!session?.user?.escolaId || can(session.user, 'portal.acessar')) return null
   return session.user
 }
 

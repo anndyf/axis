@@ -6,6 +6,7 @@ import MessageNotification from "@/components/MessageNotification"
 import DashboardLayoutWrapper from "@/components/DashboardLayoutWrapper"
 import { getGlobalConfig, precisaTrocarSenha } from "@/lib/data-fetching"
 import { getModulosAtivos } from "@/lib/modules-server"
+import { can } from "@/lib/rbac"
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -22,7 +23,7 @@ export default async function DashboardLayout({
   }
 
   // Se for usuário do portal, não acessa o dashboard administrativo
-  if (session.user.isPortalUser) {
+  if (can(session.user, 'portal.acessar')) {
     redirect("/portal")
   }
 

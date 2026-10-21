@@ -3,7 +3,7 @@
 
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { can } from "@/lib/rbac"
+import { can, restritoADocencia } from "@/lib/rbac"
 import { anoLetivoAtualDaEscola } from "@/lib/data-fetching"
 import { revalidatePath } from "next/cache"
 import { Resend } from 'resend';
@@ -114,7 +114,7 @@ export async function sendMessage(formData: FormData) {
 
   // Validação de Permissão: Professores (Staff sem ser Admin/Direção)
   const user = session.user as any
-  const isTeacherOnly = user.isStaff && !user.isSuperuser && !user.isDirecao
+  const isTeacherOnly = restritoADocencia(user)
   
   if (isTeacherOnly) {
       if (category === "GERAL" && !parentId) {
@@ -226,6 +226,7 @@ export async function sendMessage(formData: FormData) {
         // Comunicado Geral → todos os usuários ativos (exceto o remetente e bots)
         const todos = await prisma.user.findMany({
           where: {
+            escolaId: user.escolaId,
             isActive: true,
             isApproved: true,
             id: { not: user.id },
@@ -337,12 +338,12 @@ export async function markAllAsRead() {
   const user = session.user as any
 
   const allowedReceiverIds: (string | null)[] = [null];
-  if (user.isStaff) allowedReceiverIds.push('GROUP_TEACHERS');
-  if (user.isStaff || user.isSuperuser) allowedReceiverIds.push('GROUP_STAFF');
-  if (user.isDirecao || user.isSuperuser) allowedReceiverIds.push('GROUP_DIRECAO');
+  if (can(user, 'docencia.exercer')) allowedReceiverIds.push('GROUP_TEACHERS');
+  if (can(user, 'comunicado.receber.equipe')) allowedReceiverIds.push('GROUP_STAFF');
+  if (can(user, 'mensagem.direcao.atender')) allowedReceiverIds.push('GROUP_DIRECAO');
   if (user.estudanteId) allowedReceiverIds.push('GROUP_STUDENTS');
 
-  if (user.isStaff) {
+  if (can(user, 'docencia.exercer')) {
       const teacher = await prisma.user.findUnique({
           where: { id: user.id },
           include: { disciplinasPermitidas: { select: { turmaId: true } } }
@@ -367,7 +368,7 @@ export async function markAllAsRead() {
     { receiverId: user.id }
   ]
 
-  if (!user.isSuperuser) {
+  if (!can(user, 'mensagem.suporte.atender')) {
       whereConditions.push({ 
         AND: [
           { category: "COMUNICADO" },
@@ -380,7 +381,7 @@ export async function markAllAsRead() {
           }
         ]
       })
-      if (user.isDirecao) {
+      if (can(user, 'mensagem.direcao.atender')) {
           whereConditions.push({ category: "DIRECAO" as any, senderId: { not: user.id } })
       }
   } else {
@@ -447,12 +448,12 @@ export async function getMessages(options: { page?: number, limit?: number, type
   if (type === 'all' || type === 'received') {
       const allowedReceiverIds: (string | null)[] = [null];
 
-      if (user.isStaff) allowedReceiverIds.push('GROUP_TEACHERS');
-      if (user.isStaff || user.isSuperuser) allowedReceiverIds.push('GROUP_STAFF');
-      if (user.isDirecao || user.isSuperuser) allowedReceiverIds.push('GROUP_DIRECAO');
+      if (can(user, 'docencia.exercer')) allowedReceiverIds.push('GROUP_TEACHERS');
+      if (can(user, 'comunicado.receber.equipe')) allowedReceiverIds.push('GROUP_STAFF');
+      if (can(user, 'mensagem.direcao.atender')) allowedReceiverIds.push('GROUP_DIRECAO');
       if (user.estudanteId) allowedReceiverIds.push('GROUP_STUDENTS');
 
-      if (user.isStaff) {
+      if (can(user, 'docencia.exercer')) {
           const teacher = await prisma.user.findUnique({
               where: { id: user.id },
               include: { disciplinasPermitidas: { select: { turmaId: true } } }
@@ -488,11 +489,11 @@ export async function getMessages(options: { page?: number, limit?: number, type
                 { receiverId: user.id, senderId: { not: user.id } },
                 { replies: { some: { receiverId: user.id, senderId: { not: user.id } } } },
                 // Categorized
-                ...(user.isSuperuser ? [
+                ...(can(user, 'mensagem.suporte.atender') ? [
                     { category: "SUPORTE" as any, senderId: { not: user.id } },
                     { replies: { some: { category: "SUPORTE" as any, senderId: { not: user.id } } } }
                 ] : []),
-                ...((user.isDirecao || user.isSuperuser) ? [
+                ...(can(user, 'mensagem.direcao.atender') ? [
                     { category: "DIRECAO" as any, senderId: { not: user.id } },
                     { replies: { some: { category: "DIRECAO" as any, senderId: { not: user.id } } } }
                 ] : []),
@@ -625,8 +626,11 @@ export async function getMessages(options: { page?: number, limit?: number, type
 }
 
 export async function getUsersForSelect() {
+    // Só contas da escola da sessão
+    const session = await auth()
+    if (!session?.user?.escolaId) return []
     const users = await prisma.user.findMany({
-        where: { isActive: true },
+        where: { isActive: true, escolaId: session.user.escolaId },
         select: {
             id: true,
             name: true,
@@ -647,7 +651,7 @@ export async function getTurmasForSelect() {
     if (!session?.user?.id) return []
 
     const user = session.user as any
-    const isTeacherOnly = user.isStaff && !user.isSuperuser && !user.isDirecao
+    const isTeacherOnly = restritoADocencia(user)
     if (!user.escolaId) return []
     const where: any = { escolaId: user.escolaId, anoLetivo: await anoLetivoAtualDaEscola(user.escolaId) }
 
@@ -682,12 +686,12 @@ export async function getUnreadCount() {
   
     const allowedReceiverIds: (string | null)[] = [null];
 
-    if (user.isStaff) allowedReceiverIds.push('GROUP_TEACHERS');
-    if (user.isStaff || user.isSuperuser) allowedReceiverIds.push('GROUP_STAFF');
-    if (user.isDirecao || user.isSuperuser) allowedReceiverIds.push('GROUP_DIRECAO');
+    if (can(user, 'docencia.exercer')) allowedReceiverIds.push('GROUP_TEACHERS');
+    if (can(user, 'comunicado.receber.equipe')) allowedReceiverIds.push('GROUP_STAFF');
+    if (can(user, 'mensagem.direcao.atender')) allowedReceiverIds.push('GROUP_DIRECAO');
     if (user.estudanteId) allowedReceiverIds.push('GROUP_STUDENTS');
 
-     if (user.isStaff) {
+     if (can(user, 'docencia.exercer')) {
         const teacher = await prisma.user.findUnique({
             where: { id: user.id },
             include: { disciplinasPermitidas: { select: { turmaId: true } } }
@@ -712,7 +716,7 @@ export async function getUnreadCount() {
       { receiverId: user.id }
     ]
   
-    if (!user.isSuperuser) {
+    if (!can(user, 'mensagem.suporte.atender')) {
         whereConditions.push({ 
           AND: [
             { category: "COMUNICADO" },
@@ -725,7 +729,7 @@ export async function getUnreadCount() {
             }
           ]
         })
-        if (user.isDirecao) {
+        if (can(user, 'mensagem.direcao.atender')) {
             whereConditions.push({ category: "DIRECAO" as any, senderId: { not: user.id } })
         }
     } else {
@@ -765,12 +769,12 @@ export async function getLatestUnreadMessage() {
     const user = session.user as any
     const allowedReceiverIds: (string | null)[] = [null];
 
-    if (user.isStaff) allowedReceiverIds.push('GROUP_TEACHERS');
-    if (user.isStaff || user.isSuperuser) allowedReceiverIds.push('GROUP_STAFF');
-    if (user.isDirecao || user.isSuperuser) allowedReceiverIds.push('GROUP_DIRECAO');
+    if (can(user, 'docencia.exercer')) allowedReceiverIds.push('GROUP_TEACHERS');
+    if (can(user, 'comunicado.receber.equipe')) allowedReceiverIds.push('GROUP_STAFF');
+    if (can(user, 'mensagem.direcao.atender')) allowedReceiverIds.push('GROUP_DIRECAO');
     if (user.estudanteId) allowedReceiverIds.push('GROUP_STUDENTS');
 
-     if (user.isStaff) {
+     if (can(user, 'docencia.exercer')) {
         const teacher = await prisma.user.findUnique({
             where: { id: user.id },
             include: { disciplinasPermitidas: { select: { turmaId: true } } }
@@ -795,7 +799,7 @@ export async function getLatestUnreadMessage() {
       { receiverId: user.id }
     ]
   
-    if (!user.isSuperuser) {
+    if (!can(user, 'mensagem.suporte.atender')) {
         whereConditions.push({ 
           AND: [
             { category: "COMUNICADO" },
@@ -808,7 +812,7 @@ export async function getLatestUnreadMessage() {
             }
           ]
         })
-        if (user.isDirecao) {
+        if (can(user, 'mensagem.direcao.atender')) {
             whereConditions.push({ category: "DIRECAO" as any, senderId: { not: user.id } })
         }
     } else {
@@ -891,7 +895,7 @@ export async function getMessageThread(messageId: string) {
 export async function assignTicket(ticketId: string) {
   const session = await auth()
   // Mesma regra do botão em MessagesClient: só a gestão assume chamados
-  if (!session?.user?.id || !session.user.escolaId || !can(session.user, 'gestao')) return { error: "Não autorizado" }
+  if (!session?.user?.id || !session.user.escolaId || !can(session.user, 'mensagem.direcao.atender')) return { error: "Não autorizado" }
 
   try {
     await prisma.message.update({
@@ -919,7 +923,7 @@ export async function updateTicketStatus(ticketId: string, status: string) {
       where: { id: ticketId, escolaId: session.user.escolaId },
       select: { senderId: true }
     })
-    if (!ticket || (!can(session.user, 'gestao') && ticket.senderId !== session.user.id)) {
+    if (!ticket || (!can(session.user, 'mensagem.direcao.atender') && ticket.senderId !== session.user.id)) {
       return { error: "Não autorizado" }
     }
 

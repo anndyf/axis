@@ -19,6 +19,7 @@ import {
 } from "lucide-react"
 import { format, addDays, subDays, startOfWeek, endOfWeek, isSameDay } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import { can } from "@/lib/rbac"
 
 interface Lab {
   id: string
@@ -70,7 +71,7 @@ export default function LaboratoriosClient({
   const [formDisciplina, setFormDisciplina] = useState("")
   const [formLab, setFormLab] = useState({ nome: '', descricao: '' })
 
-  const isAdmin = currentUser.isSuperuser || currentUser.isDirecao
+  const isAdmin = can(currentUser, 'laboratorio.gerenciar')
 
   const handleSaveLab = async () => {
     if (!formLab.nome || submitting) return

@@ -11,6 +11,7 @@ export const metadata = {
 
 import { Session } from "next-auth"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { can } from '@/lib/rbac'
 
 export const runtime = 'nodejs'
 
@@ -18,7 +19,7 @@ async function getNotasRecuperacao(turmaId: string, session: Session) {
   // 1. Buscar disciplinas permitidas para o usuário nesta turma
   const whereDisciplinas: any = { turmaId }
   
-  if (!session.user.isSuperuser && !session.user.isDirecao) {
+  if (!can(session.user, 'escopo.escola')) {
     whereDisciplinas.usuariosPermitidos = {
       some: { id: session.user.id }
     }

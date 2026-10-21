@@ -18,7 +18,7 @@ type Resultado = { ok: true } | { erro: string }
 
 async function escolaDaGestao(): Promise<string | null> {
   const session = await auth()
-  if (!session?.user?.escolaId || !can(session.user, "gestao")) return null
+  if (!session?.user?.escolaId || !can(session.user, "calendario.gerenciar")) return null
   return session.user.escolaId
 }
 

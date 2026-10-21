@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { can } from "@/lib/rbac"
 import { rotaDoModulo } from '@/lib/modulos/guarda'
 
 export const POST = rotaDoModulo('AEE', 'escrita', async function POST(
@@ -40,7 +41,7 @@ export const POST = rotaDoModulo('AEE', 'escrita', async function POST(
     }
 
     // Verifica se professor tem aula nessa turma (via manual ou disciplina)
-    const isDirecao = session.user.isDirecao || session.user.isSuperuser
+    const isDirecao = can(session.user, 'aee.ficha.editar')
     const isProfessorManual = profile.estudante.turma.usuariosPermitidos.some((u: any) => u.id === session.user.id)
     const isProfessorViaDisciplina = profile.estudante.turma.disciplinas.some((d: any) => 
       d.usuariosPermitidos.some((u: any) => u.id === session.user.id)

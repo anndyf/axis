@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { sincronizarVinculosDosBooleanos } from '@/lib/papeis'
 import bcrypt from 'bcryptjs'
 import { exigirAdminPlataforma, registrarAcaoPlataforma, SELECT_ESCOLA_PLATAFORMA } from '@/lib/plataforma'
 import { garantirEsquemasPadrao } from '@/lib/services/esquemas-padrao'
@@ -74,7 +75,7 @@ export async function POST(request: NextRequest) {
         select: SELECT_ESCOLA_PLATAFORMA,
       })
 
-      await tx.user.create({
+      const primeiroAdmin = await tx.user.create({
         data: {
           escolaId: novaEscola.id,
           name: adminNome,
@@ -90,6 +91,9 @@ export async function POST(request: NextRequest) {
           deveTrocarSenha: true,
         }
       })
+
+      // Fase 3: vínculos de papel coerentes com os booleanos acima
+      await sincronizarVinculosDosBooleanos(tx, primeiroAdmin.id)
 
       // Esquemas de avaliação padrão (anual e semestral), como no onboarding
       await garantirEsquemasPadrao(tx, novaEscola.id)

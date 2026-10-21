@@ -10,7 +10,7 @@ export const runtime = 'nodejs'
 // seu próprio prefixo, sem nenhum modelo de dado financeiro real ainda.
 export const GET = rotaDoModulo('FIN', 'leitura', async function GET() {
   const session = await auth()
-  if (!session?.user?.escolaId || !can(session.user, 'gestao')) {
+  if (!session?.user?.escolaId || !can(session.user, 'financeiro.gerenciar')) {
     return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
   }
 

@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { can } from "@/lib/rbac"
 import { NextResponse } from "next/server"
 import { startOfWeek, endOfWeek, isAfter, startOfMonth, format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -77,7 +78,7 @@ export const POST = rotaDoModulo('REC', 'escrita', async function POST(request: 
       return NextResponse.json({ message: "Turma não encontrada" }, { status: 404 })
     }
 
-    const isAdmin = session.user.isSuperuser || session.user.isDirecao || session.user.name === 'Andressa Mirella'
+    const isAdmin = can(session.user, 'laboratorio.gerenciar') || session.user.name === 'Andressa Mirella'
     const today = new Date()
 
     // Normalize input to array of slots

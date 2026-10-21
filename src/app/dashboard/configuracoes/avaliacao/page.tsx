@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import EsquemaAvaliacaoClient from "./EsquemaAvaliacaoClient"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { can } from '@/lib/rbac'
 
 export const metadata = {
   title: 'Áxis - Esquemas de Avaliação'
@@ -14,7 +15,7 @@ export default async function EsquemasAvaliacaoPage() {
   await paginaDoModulo('NUC')
   const session = await auth()
 
-  if (!session?.user?.escolaId || !session.user.isSuperuser) {
+  if (!session?.user?.escolaId || !can(session.user, 'configuracao.editar')) {
     redirect("/dashboard")
   }
 

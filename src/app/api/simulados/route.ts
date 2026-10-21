@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { can } from "@/lib/rbac"
 import { NextRequest, NextResponse } from "next/server"
 import { logAudit } from "@/lib/audit"
 import { provaDaEscola, anoLetivoAtualDaEscola } from "@/lib/data-fetching"
@@ -133,10 +134,10 @@ export const GET = rotaDoModulo('PRV', 'leitura', async function GET(request: Ne
           })
         })
         
-        canView = professoresDaProva.has(user.id) || user.isSuperuser || user.isDirecao
+        canView = professoresDaProva.has(user.id) || can(user, 'simulado.gerenciar')
       }
     } else {
-      canView = user.isSuperuser || user.isDirecao
+      canView = can(user, 'simulado.gerenciar')
     }
 
     // Professor que leciona disciplina da área correspondente nessa turma também pode visualizar
@@ -154,7 +155,7 @@ export const GET = rotaDoModulo('PRV', 'leitura', async function GET(request: Ne
     }
 
     // Verificar se o usuário TEM PERMISSÃO DE EDIÇÃO para esta consulta
-    let canEdit = user.isSuperuser || user.isDirecao
+    let canEdit = can(user, 'simulado.gerenciar')
     if (!canEdit) {
       // Verifica se o usuário atual é o responsável encontrado acima
       canEdit = responsavelEncontrado && responsavelEncontrado.userId === user.id;
@@ -208,7 +209,7 @@ export const POST = rotaDoModulo('PRV', 'escrita', async function POST(request: 
     const anoLetivo = await anoLetivoAtualDaEscola(user.escolaId)
 
     // Verificação de permissão rigorosa
-    if (!user.isSuperuser && !user.isDirecao) {
+    if (!can(user, 'simulado.gerenciar')) {
       let whereResponsavel: any = { userId: user.id, turmaId, anoLetivo }
       if (provaId) whereResponsavel.provaId = provaId
       else whereResponsavel.areaId = areaId

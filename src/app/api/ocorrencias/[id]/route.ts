@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
 import { logAudit } from '@/lib/audit'
 import { rotaDoModulo } from '@/lib/modulos/guarda'
 
@@ -12,7 +13,7 @@ export const DELETE = rotaDoModulo('SEC', 'escrita', async function DELETE(
 ) {
   try {
     const session = await auth()
-    if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
+    if (!session || !can(session.user, 'ocorrencia.gerenciar')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
     if (!session.user.escolaId) {
@@ -49,7 +50,7 @@ export const PUT = rotaDoModulo('SEC', 'escrita', async function PUT(
 ) {
   try {
     const session = await auth()
-    if (!session || (!session.user.isSuperuser && !session.user.isDirecao)) {
+    if (!session || !can(session.user, 'ocorrencia.gerenciar')) {
       return NextResponse.json({ message: 'Não autorizado' }, { status: 401 })
     }
 

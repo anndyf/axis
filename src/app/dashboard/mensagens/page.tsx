@@ -30,10 +30,13 @@ export default async function MessagesPage() {
     isStudent: !!u.estudanteId || u.isPortalUser
   }))
 
+  // Só o que o cliente precisa para decidir os botões (nunca o registro inteiro)
   const currentUserRole = {
     isSuperuser: session.user.isSuperuser,
     isDirecao: session.user.isDirecao,
-    isStaff: session.user.isStaff
+    isStaff: session.user.isStaff,
+    papeis: session.user.papeis ?? null,
+    permissoes: session.user.permissoes ?? null
   }
 
   return (

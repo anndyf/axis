@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic'
 export default async function CalendarioPage() {
   await paginaDoModulo('NUC')
   const session = await auth()
-  if (!session?.user?.escolaId || !can(session.user, 'gestao')) redirect("/dashboard")
+  if (!session?.user?.escolaId || !can(session.user, 'calendario.gerenciar')) redirect("/dashboard")
   const escolaId = session.user.escolaId
 
   const config = await getGlobalConfig(escolaId)

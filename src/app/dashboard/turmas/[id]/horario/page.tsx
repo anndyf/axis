@@ -6,6 +6,7 @@ import { getSchedule } from "../../schedule-actions"
 import { getGlobalConfig } from "@/lib/data-fetching"
 import { diasLetivos, aulasPrevistasPorDisciplina, normalizarTurno } from "@/lib/services/calendario"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { can } from '@/lib/rbac'
 
 export const metadata = {
   title: 'Áxis - Turmas'
@@ -18,7 +19,7 @@ export default async function SchedulePage(props: { params: Promise<{ id: string
   const params = await props.params
   const session = await auth()
 
-  if (!session?.user?.escolaId || (!session.user.isSuperuser && !session.user.isDirecao)) {
+  if (!session?.user?.escolaId || !can(session.user, 'turma.gerenciar')) {
     redirect("/dashboard")
   }
   const escolaId = session.user.escolaId

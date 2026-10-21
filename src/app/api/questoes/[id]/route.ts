@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { can } from '@/lib/rbac'
 import { logAudit } from '@/lib/audit'
 import { turmasSaoDaEscola } from '@/lib/data-fetching'
 import { rotaDoModulo } from '@/lib/modulos/guarda'
@@ -35,7 +36,7 @@ export const PUT = rotaDoModulo('QST', 'escrita', async function PUT(
     }
 
     // Se nâo for admin, só pode editar se for o dono
-    if (!session.user.isSuperuser && !session.user.isDirecao) {
+    if (!can(session.user, 'questao.moderar')) {
       if (questao.professorId !== session.user.id) {
         return NextResponse.json({ message: 'Acesso negado' }, { status: 403 })
       }
@@ -45,7 +46,7 @@ export const PUT = rotaDoModulo('QST', 'escrita', async function PUT(
     const data: any = {}
     
     // Admin pode mudar status e feedback
-    if (session.user.isSuperuser || session.user.isDirecao) {
+    if (can(session.user, 'questao.moderar')) {
       if (status) data.status = status
       if (feedbackAdmin !== undefined) {
         data.feedbackAdmin = feedbackAdmin
@@ -68,7 +69,7 @@ export const PUT = rotaDoModulo('QST', 'escrita', async function PUT(
     if (tipo !== undefined) data.tipo = tipo
 
     // Se mudou o conteúdo, volta para pendente se for professor
-    if (!session.user.isSuperuser && !session.user.isDirecao && status === undefined) {
+    if (!can(session.user, 'questao.moderar') && status === undefined) {
       data.status = 'PENDENTE'
     }
 
@@ -115,7 +116,7 @@ export const DELETE = rotaDoModulo('QST', 'escrita', async function DELETE(
     if (!questao) return NextResponse.json({ message: 'Questão não encontrada' }, { status: 404 })
 
     // Apenas dono ou admin, e professor não pode deletar se já estiver aprovada
-    if (!session.user.isSuperuser && !session.user.isDirecao) {
+    if (!can(session.user, 'questao.moderar')) {
       if (questao.professorId !== session.user.id) {
         return NextResponse.json({ message: 'Sem permissão' }, { status: 403 })
       }

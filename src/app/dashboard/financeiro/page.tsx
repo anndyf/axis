@@ -16,7 +16,7 @@ export const runtime = 'nodejs'
 export default async function FinanceiroPage() {
   await paginaDoModulo('FIN')
   const session = await auth()
-  if (!session?.user?.escolaId || !can(session.user, 'gestao')) {
+  if (!session?.user?.escolaId || !can(session.user, 'financeiro.gerenciar')) {
     redirect("/dashboard")
   }
 

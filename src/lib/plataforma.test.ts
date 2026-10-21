@@ -166,6 +166,16 @@ describe('a conta de plataforma não pode ser tomada pela escola', () => {
     expect(conta.isActive).toBe(true)
   })
 
+  it('editor de papéis: superuser da mesma escola não tira nem dá papel à conta da plataforma', async () => {
+    sessao.atual = comoSuperuserA()
+    const usuario = await rotas.usuario()
+    expect((await chamar(usuario.PUT as Handler, 'PUT', { id: D.plataforma }, { papeis: ['PROFESSOR'] })).status).toBe(403)
+    expect((await chamar(usuario.PUT as Handler, 'PUT', { id: D.plataforma }, { isSuperuser: false })).status).toBe(403)
+    const conta = await prisma.user.findUniqueOrThrow({ where: { id: D.plataforma }, include: { vinculosPapel: true } })
+    expect([conta.isSuperuser, conta.isDirecao, conta.isStaff]).toEqual([true, true, true])
+    expect(conta.vinculosPapel).toEqual([])
+  })
+
   it('o próprio admin da plataforma continua editando a conta dele', async () => {
     sessao.atual = comoPlataforma()
     const usuario = await rotas.usuario()

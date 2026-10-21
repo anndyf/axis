@@ -7,6 +7,7 @@ import { resetPassword } from "./actions"
 import AcessoLayout, { type EscolaDoAcesso } from "@/components/AcessoLayout"
 import { Alert, Button, Field, Input, PasswordInput } from "@/components/ui"
 import { Dialog } from "@/components/ui/Dialog"
+import { can } from "@/lib/rbac"
 
 // Mensagem para cada código do ErroLogin (src/lib/auth.ts). Usuário inexistente
 // e senha errada caem no mesmo "credenciais" de propósito.
@@ -54,7 +55,7 @@ function LoginContent({ escola }: { escola: EscolaDoAcesso }) {
         setLoading(false)
       } else {
         const session = await getSession()
-        router.push(session?.user?.isPortalUser ? "/portal" : "/dashboard")
+        router.push(can(session?.user, "portal.acessar") ? "/portal" : "/dashboard")
         router.refresh()
       }
     } catch {

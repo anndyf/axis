@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import PendenciasClient from "./PendenciasClient"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { can } from '@/lib/rbac'
 
 export const metadata = {
   title: "Pendências de Cadastro | Sistema de Notas",
@@ -24,7 +25,7 @@ export default async function PendenciasPage({
   }
   
   const user = session.user as any
-  if (!user.isSuperuser && !user.isDirecao) {
+  if (!can(user, 'pendencia.resolver')) {
     redirect("/dashboard")
   }
 

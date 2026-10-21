@@ -25,6 +25,7 @@ import {
 } from "lucide-react"
 
 import { reportarEstudanteFaltante } from "./actions"
+import { can } from "@/lib/rbac"
 
 interface Area {
   id: string
@@ -107,7 +108,7 @@ export default function SimuladosClient({
           setResponsavelName(null)
        }
     } else {
-      setCanLaunch(user.isSuperuser || user.isDirecao)
+      setCanLaunch(can(user, 'simulado.gerenciar'))
     }
   }, [selectedTurma, selectedProva, selectedArea, selectedUnidade])
 
@@ -129,7 +130,7 @@ export default function SimuladosClient({
         setEstudantes(list)
         
         // Liberar digitação na 1ª unidade para Direção e Admin; para outros usuários, manter 1ª unidade fechada
-        const isPrivileged = !!(user?.isSuperuser || user?.isDirecao)
+        const isPrivileged = can(user, 'simulado.gerenciar')
         const canLaunchAllowed = isPrivileged || (canEdit && selectedUnidade !== "1")
         setCanLaunch(canLaunchAllowed)
         setCanView(viewPerm || isPrivileged)
@@ -361,7 +362,7 @@ export default function SimuladosClient({
             </div>
 
             <div className="flex items-center gap-2">
-              {(user.isSuperuser || user.isDirecao) && (
+              {can(user, 'simulado.gerenciar') && (
                 <Link 
                   href="/dashboard/simulados/responsaveis"
                   className="flex items-center gap-2 bg-accent text-on-accent px-6 py-3 rounded-lg font-medium hover:bg-accent-hover transition-all text-xs active:scale-95 shadow-card"
@@ -479,7 +480,7 @@ export default function SimuladosClient({
                       selectedUnidade === "1" ? 'bg-surface text-danger-fg shadow-sm' : 'text-fg-subtle hover:text-fg-muted hover:bg-subtle-hover/50'
                     }`}
                   >
-                    1ª Unidade {user?.isSuperuser || user?.isDirecao ? '' : '(Fechada)'}
+                    1ª Unidade {can(user, 'simulado.gerenciar') ? '' : '(Fechada)'}
                   </button>
                   <button
                     onClick={() => setSelectedUnidade("2")}

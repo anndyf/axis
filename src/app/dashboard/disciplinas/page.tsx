@@ -5,6 +5,7 @@ import { ArrowLeft, Plus, BookOpen } from "lucide-react"
 import { getDisciplinasPermitidas } from "@/lib/data-fetching"
 import DisciplinasList from "./DisciplinasList"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { can } from '@/lib/rbac'
 
 export const metadata = {
   title: 'Áxis - Disciplinas'
@@ -42,7 +43,7 @@ export default async function DisciplinasPage() {
             </div>
             <Link
               href="/dashboard/disciplinas/nova"
-              className={`flex items-center space-x-2 bg-accent text-on-accent px-6 py-3 rounded-lg font-medium hover:bg-accent-hover transition-all text-xs active:scale-95 shadow-card ${!session.user.isSuperuser ? 'hidden' : ''}`}
+              className={`flex items-center space-x-2 bg-accent text-on-accent px-6 py-3 rounded-lg font-medium hover:bg-accent-hover transition-all text-xs active:scale-95 shadow-card ${!can(session.user, 'disciplina.gerenciar') ? 'hidden' : ''}`}
             >
               <Plus size={16} />
               <span>Nova Disciplina</span>
