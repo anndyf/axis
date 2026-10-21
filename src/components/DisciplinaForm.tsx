@@ -94,7 +94,7 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
     setError("")
 
     if (!isEdit && selectedTurmas.length === 0) {
-      setError("Selecione pelo menos uma turma")
+      setError("Selecione pelo menos uma turma.")
       setLoading(false)
       return
     }
@@ -136,7 +136,7 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
         setIsErrorModalOpen(true)
       }
     } catch (err) {
-      setError('Erro ao conectar com o servidor')
+      setError('Não foi possível conectar ao servidor. Tente novamente.')
       setIsErrorModalOpen(true)
     } finally {
       setLoading(false)
@@ -168,7 +168,7 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
       }
     } catch (err) {
       console.error('Erro ao excluir:', err)
-      setError('Erro ao conectar com o servidor')
+      setError('Não foi possível conectar ao servidor. Tente novamente.')
       setIsErrorModalOpen(true)
       setIsConfirmModalOpen(false)
     } finally {
@@ -223,7 +223,7 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
             <div>
               <h3 className="text-lg font-semibold text-fg mb-4 flex items-center">
                 <span className="w-8 h-8 rounded-full bg-accent-subtle text-accent-fg flex items-center justify-center text-sm mr-3">1</span>
-                Informações da Disciplina
+                Informações da disciplina
               </h3>
               
               <div className="pl-11">
@@ -314,9 +314,9 @@ export default function DisciplinaForm({ disciplina, isEdit = false }: Disciplin
                       className="text-sm font-medium text-accent-fg hover:text-accent-fg flex items-center transition-colors"
                     >
                       {selectedTurmas.length === turmas.length ? (
-                        <><CheckSquare className="w-4 h-4 mr-1" /> Desmarcar Todas</>
+                        <><CheckSquare className="w-4 h-4 mr-1" /> Desmarcar todas</>
                       ) : (
-                        <><Square className="w-4 h-4 mr-1" /> Selecionar Todas</>
+                        <><Square className="w-4 h-4 mr-1" /> Selecionar todas</>
                       )}
                     </button>
                   )}

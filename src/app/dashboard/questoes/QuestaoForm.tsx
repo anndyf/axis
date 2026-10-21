@@ -107,7 +107,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
           return
         }
       } catch (err) {
-        console.error('Erro ao verificar duplicata', err)
+        console.error('Não foi possível verificar duplicidade. Tente novamente.', err)
       }
     }
 
@@ -134,7 +134,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
         setError(data.message || 'Erro ao salvar questão')
       }
     } catch (err) {
-      setError('Erro de conexão')
+      setError('Não foi possível conectar ao servidor. Tente novamente.')
     } finally {
       setLoading(false)
     }
@@ -423,7 +423,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
                   }}
                   className="px-4 py-2 bg-surface text-warning-fg border border-warning-line rounded-lg text-sm font-bold hover:bg-warning-subtle transition-colors"
                 >
-                  Cancelar e Revisar
+                  Cancelar e revisar
                 </button>
               </div>
             </div>
@@ -434,7 +434,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
           <div className="space-y-8 animate-slide-up">
           <div className="space-y-3">
             <div className="flex items-center justify-between ml-1">
-              <label className="text-sm font-bold text-fg-muted">Enunciado da Questão</label>
+              <label className="text-sm font-bold text-fg-muted">Enunciado da questão</label>
               <span className="text-xs font-bold text-fg-subtle">Suporte a negrito, itálico e listas</span>
             </div>
             <div className="rich-text-editor">
@@ -573,7 +573,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
               <div className="space-y-2">
                 <label className="text-sm font-bold text-fg flex items-center gap-2">
                   <Info size={16} className="text-fg-muted" />
-                  Alocação da Unidade
+                  Alocação da unidade
                 </label>
                 <select
                   required
@@ -592,7 +592,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
               <div className="flex-1 min-w-[200px]">
                 <label className="flex items-center gap-1.5 text-xs font-semibold text-fg mb-2">
                   <Info size={16} className="text-fg-muted" />
-                  Tipo de Questão
+                  Tipo de questão
                 </label>
                 <select
                   required
@@ -601,7 +601,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
                   className="w-full bg-canvas border border-line rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-ring font-bold text-fg-muted"
                 >
                   <option value="NORMAL">Normal</option>
-                  <option value="RECUPERACAO">Segunda Chamada</option>
+                  <option value="RECUPERACAO">Segunda chamada</option>
                 </select>
               </div>
             </div>
@@ -613,7 +613,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
           <div className="space-y-8 animate-slide-up">
           <div className="space-y-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 ml-1">
-              <h3 className="text-sm font-bold text-fg-muted">Alternativas de Resposta</h3>
+              <h3 className="text-sm font-bold text-fg-muted">Alternativas de resposta</h3>
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   type="button"
@@ -621,7 +621,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
                   className="flex items-center gap-1.5 px-3 py-1 bg-accent-subtle text-accent-fg rounded-full border border-accent/25 hover:bg-accent-subtle transition-all font-bold text-xs hover:scale-105 active:scale-95"
                 >
                   <Plus size={12} />
-                  Colar Bloco
+                  Colar bloco
                 </button>
                 <div className="flex items-center gap-1.5 px-3 py-1 bg-success-subtle text-success-fg rounded-full border border-success-line animate-slide-up shadow-sm">
                   <CheckCircle2 size={14} className="text-success-fg" />
@@ -710,7 +710,7 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
               <label className="text-sm font-bold text-fg-muted">Onde aplicar esta questão?</label>
               <div className="flex items-center gap-2">
                  <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                 <span className="text-xs font-bold text-accent-fg">Vincular a Diários</span>
+                 <span className="text-xs font-bold text-accent-fg">Vincular a diários</span>
               </div>
             </div>
             
@@ -839,8 +839,8 @@ export default function QuestaoForm({ questao, onClose, onSuccess, turmas, disci
                     <Plus className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-fg leading-none">Colar Bloco de Respostas</h3>
-                    <p className="text-xs text-fg-subtle font-bold mt-1">Preenchimento Automático</p>
+                    <h3 className="text-xl font-semibold text-fg leading-none">Colar bloco de respostas</h3>
+                    <p className="text-xs text-fg-subtle font-bold mt-1">Preenchimento automático</p>
                   </div>
                 </div>
                 <button onClick={() => setShowPasteModal(false)} className="p-2 hover:bg-subtle rounded-full transition-colors">

@@ -72,7 +72,7 @@ export default function NovaEscolaModal({ isOpen, onClose, onSuccess }: NovaEsco
         setError(data.message || 'Erro ao criar escola')
       }
     } catch {
-      setError('Erro ao conectar com o servidor')
+      setError('Não foi possível conectar ao servidor. Tente novamente.')
     } finally {
       setLoading(false)
     }
@@ -88,7 +88,7 @@ export default function NovaEscolaModal({ isOpen, onClose, onSuccess }: NovaEsco
               <Building2 className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-slate-800 tracking-tight">Nova Escola</h2>
+              <h2 className="text-xl font-semibold text-slate-800 tracking-tight">Nova escola</h2>
               <p className="text-xs text-slate-400 font-medium">Cria a escola e o administrador inicial</p>
             </div>
           </div>
@@ -105,7 +105,7 @@ export default function NovaEscolaModal({ isOpen, onClose, onSuccess }: NovaEsco
           )}
 
           <div>
-            <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Nome da Escola</label>
+            <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Nome da escola</label>
             <input
               type="text" placeholder="Ex: Colégio Nova Era"
               value={formData.nome}
@@ -149,7 +149,7 @@ export default function NovaEscolaModal({ isOpen, onClose, onSuccess }: NovaEsco
           </div>
 
           <div className="pt-2 border-t border-slate-100">
-            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-3">Administrador Inicial</p>
+            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-3">Administrador inicial</p>
             <div className="space-y-3">
               <input
                 type="text" placeholder="Nome completo"
@@ -193,7 +193,7 @@ export default function NovaEscolaModal({ isOpen, onClose, onSuccess }: NovaEsco
             className="flex-1 bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-2xl font-semibold text-sm flex items-center justify-center space-x-2 transition-all disabled:opacity-50"
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-            <span>Criar Escola</span>
+            <span>Criar escola</span>
           </button>
         </div>
       </div>

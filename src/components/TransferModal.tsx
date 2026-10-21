@@ -72,7 +72,7 @@ export default function TransferModal({ isOpen, onClose, fromUserId, fromUserNam
         alert(data.message || "Erro na transferência")
       }
     } catch (err) {
-      alert("Erro na conexão com o servidor")
+      alert("Não foi possível conectar ao servidor. Tente novamente.")
     } finally {
       setLoading(false)
     }
@@ -89,8 +89,8 @@ export default function TransferModal({ isOpen, onClose, fromUserId, fromUserNam
               <AlertTriangle className="w-5 h-5 text-warning-fg" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-fg tracking-tight">Transferir Posse</h3>
-              <p className="text-xs text-fg-subtle font-semibold">Segurança de Dados</p>
+              <h3 className="text-lg font-semibold text-fg tracking-tight">Transferir posse</h3>
+              <p className="text-xs text-fg-subtle font-semibold">Segurança de dados</p>
             </div>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-subtle-hover rounded-xl transition-colors text-fg-subtle">
@@ -121,7 +121,7 @@ export default function TransferModal({ isOpen, onClose, fromUserId, fromUserNam
 
           <div className="space-y-3">
             <label className="text-xs font-semibold text-fg-subtle flex items-center gap-2">
-              <UserIcon className="w-3 h-3" /> Selecionar Usuário de Destino
+              <UserIcon className="w-3 h-3" /> Selecionar usuário de destino
             </label>
             <select
               value={selectedToUserId}
@@ -141,7 +141,7 @@ export default function TransferModal({ isOpen, onClose, fromUserId, fromUserNam
 
           <div className="bg-warning-subtle rounded-lg p-4 border border-warning-line space-y-2 overflow-hidden">
             <h4 className="text-xs font-semibold text-warning-fg flex items-center gap-2">
-              ⚠️ Observação Crítica
+              <AlertTriangle size={14} strokeWidth={1.75} aria-hidden /> Atenção
             </h4>
             <p className="text-xs text-warning-fg font-medium leading-relaxed whitespace-normal break-words">
               Esta ação transferirá permanentemente a autoria de todas as notas e registros. 

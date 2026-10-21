@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Breadcrumb, type Migalha } from './PageHeader'
 import { cn } from './cn'
 import { CaminhoAutomatico } from './CaminhoAutomatico'
+import { AjudaTela } from './AjudaTela'
 
 export interface DadoChave {
   rotulo: ReactNode
@@ -11,8 +12,8 @@ export interface DadoChave {
 /**
  * Cabeçalho de tela de trabalho: caminho, título, dados-chave em linha
  * ("Turno Matutino · 32 estudantes · Ano letivo 2026") e ações à direita.
- * Sem `caminho`, o caminho vem da rota. `ajuda` recebe o botão "?" da
- * tela. Marca a página com
+ * Sem `caminho`, o caminho vem da rota. O botão "?" de ajuda aparece
+ * sozinho quando a rota tem texto (src/lib/produto/ajuda.ts); `ajuda` troca. Marca a página com
  * data-cabecalho-pagina: o caminho automático do layout se esconde quando a
  * tela traz o próprio cabeçalho.
  */
@@ -34,7 +35,7 @@ export function CabecalhoPagina({ titulo, descricao, caminho, dados, acoes, ajud
         <div className="min-w-0 flex-1">
           <div className="flex min-w-0 items-center gap-1.5">
             <h1 className="min-w-0 break-words text-xl font-semibold tracking-tight text-fg">{titulo}</h1>
-            {ajuda}
+            {ajuda ?? <AjudaTela />}
           </div>
           {descricao && <p className="mt-0.5 max-w-3xl text-sm text-fg-muted">{descricao}</p>}
           {dados && dados.length > 0 && (

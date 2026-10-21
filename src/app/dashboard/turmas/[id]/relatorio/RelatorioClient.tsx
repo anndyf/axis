@@ -144,7 +144,7 @@ export default function RelatorioClient({
                     {!isProfessorOnly && (
                       <div className="flex items-center gap-4 pr-4 hidden md:flex">
                         <div className="text-center">
-                          <p className="text-xs font-bold text-fg-subtle">Média Geral</p>
+                          <p className="text-xs font-bold text-fg-subtle">Média geral</p>
                           <span className="text-sm font-bold text-fg-muted">{media}</span>
                         </div>
                         {frequencia && (() => {
@@ -257,7 +257,7 @@ export default function RelatorioClient({
               <div>
                 <h3 className="text-xl font-bold text-fg flex items-center gap-2">
                   <BookOpen className="w-6 h-6 text-accent-fg" />
-                  Corpo Docente da Turma
+                  Corpo docente da turma
                 </h3>
                 <p className="text-sm text-fg-subtle mt-1">{turma.nome}</p>
               </div>

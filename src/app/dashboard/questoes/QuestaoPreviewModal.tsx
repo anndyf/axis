@@ -17,7 +17,7 @@ export default function QuestaoPreviewModal({ questao, onClose, nomeEscola = 'Á
         {/* Header */}
         <div className="px-6 py-4 border-b border-line-subtle flex items-center justify-between bg-canvas">
           <div>
-            <h2 className="text-lg font-bold text-fg">Visualização da Questão</h2>
+            <h2 className="text-lg font-bold text-fg">Visualização da questão</h2>
             <p className="text-xs text-fg-subtle font-medium">Assim que a questão aparecerá na prova impressa</p>
           </div>
           <button 
@@ -102,7 +102,7 @@ export default function QuestaoPreviewModal({ questao, onClose, nomeEscola = 'Á
             onClick={onClose}
             className="px-6 py-2 bg-surface border border-line text-fg text-sm font-bold rounded-xl hover:bg-subtle transition-colors"
           >
-            Fechar Visualização
+            Fechar visualização
           </button>
         </div>
       </div>

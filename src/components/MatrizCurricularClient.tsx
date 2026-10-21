@@ -160,7 +160,7 @@ export default function MatrizCurricularClient({
       const totalPropagadas = respostas.reduce((acc: number, r: any) => acc + (r.propagadas ?? 0), 0)
       if (totalPropagadas > 0) {
         setPropagacaoMsg(
-          `✅ ${nomes.length} disciplina(s) adicionada(s) à matriz e propagada(s) para ${totalPropagadas} turma(s) existente(s)!`
+          `${nomes.length} disciplina(s) adicionada(s) à matriz e propagada(s) para ${totalPropagadas} turma(s) existente(s)!`
         )
         setTimeout(() => setPropagacaoMsg(null), 5000)
       }
@@ -187,7 +187,7 @@ export default function MatrizCurricularClient({
       const data = await res.json()
       if (res.ok) {
         if (data.propagadas > 0) {
-          setPropagacaoMsg(`✅ Sincronizado: ${data.nome} atualizada em ${data.propagadas} turmas!`)
+          setPropagacaoMsg(`Sincronizado: ${data.nome} atualizada em ${data.propagadas} turmas.`)
           setTimeout(() => setPropagacaoMsg(null), 5000)
         }
         setEditingId(null)
@@ -249,7 +249,7 @@ export default function MatrizCurricularClient({
         alert(data.message || 'Erro ao excluir curso')
       }
     } catch {
-      alert('Erro ao conectar com o servidor')
+      alert('Não foi possível conectar ao servidor. Tente novamente.')
     } finally {
       setDeletingCursoId(null)
     }
@@ -278,7 +278,7 @@ export default function MatrizCurricularClient({
                 <ArrowLeft size={16} strokeWidth={1.75} />
               </Link>
               <div>
-                <h1 className="text-2xl font-semibold tracking-tight text-fg">Matriz Curricular</h1>
+                <h1 className="text-2xl font-semibold tracking-tight text-fg">Matriz curricular</h1>
                 <p className="text-sm text-fg-muted">Definição de disciplinas padrão por curso e série</p>
               </div>
             </div>
@@ -493,13 +493,13 @@ export default function MatrizCurricularClient({
                 />
               </div>
               <div className="md:col-span-4 space-y-1.5">
-                <label className="text-xs font-semibold text-fg-subtle ml-1">Área do Simulado</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1">Área do simulado</label>
                 <select
                   value={novaArea}
                   onChange={(e) => setNovaArea(e.target.value)}
                   className="w-full bg-canvas border-none rounded-xl px-4 py-4 text-base font-semibold text-fg-muted focus:ring-2 focus:ring-ring transition-all outline-none h-[60px] appearance-none cursor-pointer"
                 >
-                  <option value="">Sem Área Vinculada</option>
+                  <option value="">Sem área vinculada</option>
                   {areas.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
                 </select>
               </div>
@@ -522,7 +522,7 @@ export default function MatrizCurricularClient({
           <div className="p-4 border-b border-line-subtle bg-canvas/50 flex flex-col sm:flex-row items-center justify-between gap-4">
             <h2 className="text-lg font-semibold text-fg-muted flex items-center gap-2">
                <BookOpen size={20} className="text-fg-subtle" />
-               Componentes Curriculares Definidos
+               Componentes curriculares definidos
             </h2>
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
               <div className="relative w-full sm:w-64">
@@ -595,7 +595,7 @@ export default function MatrizCurricularClient({
                     {searchTerm && (
                       <th className="px-4 py-4 text-xs font-semibold text-fg-subtle">Curso / Série</th>
                     )}
-                    <th className="px-4 py-4 text-xs font-semibold text-fg-subtle">Área Vinculada</th>
+                    <th className="px-4 py-4 text-xs font-semibold text-fg-subtle">Área vinculada</th>
                     <th className="px-4 py-4 text-xs font-semibold text-fg-subtle text-right">Ação</th>
                   </tr>
                 </thead>

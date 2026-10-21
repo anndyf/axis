@@ -70,7 +70,7 @@ export default function ConselhoClasseList({
           <div className="pb-2.5">
               <div className="flex items-center gap-2 bg-canvas px-4 py-2.5 rounded-lg border border-line">
                   <span className="w-2 h-2 rounded-full bg-zinc-500"></span>
-                  <span className="text-xs font-semibold text-fg-muted">Sincronização Ativa</span>
+                  <span className="text-xs font-semibold text-fg-muted">Sincronização ativa</span>
               </div>
           </div>
       </div>
@@ -82,7 +82,7 @@ export default function ConselhoClasseList({
              <div className="w-8 h-8 rounded-lg bg-canvas text-fg-muted flex items-center justify-center">
                <Users size={16} />
              </div>
-             Turmas em Deliberação de Conselho
+             Turmas em deliberação de conselho
            </h2>
         </div>
 

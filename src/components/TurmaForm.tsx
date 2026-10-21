@@ -212,7 +212,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
       }
     } catch (err) {
       console.error('Erro de conexão:', err)
-      setError('Erro ao conectar com o servidor')
+      setError('Não foi possível conectar ao servidor. Tente novamente.')
     } finally {
       setLoading(false)
     }
@@ -242,7 +242,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
       }
     } catch (err) {
       console.error('Erro na requisição:', err)
-      setError('Erro de conexão com o servidor')
+      setError('Não foi possível conectar ao servidor. Tente novamente.')
       setIsConfirmModalOpen(false)
       setIsErrorModalOpen(true)
     } finally {
@@ -258,7 +258,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
             <ArrowLeft className="w-4 h-4" />
             <span>Voltar</span>
           </Link>
-          <span className="text-xs font-semibold text-fg">Áxis Control</span>
+          <span className="text-xs font-semibold text-fg">Áxis control</span>
         </div>
       </nav>
 
@@ -292,7 +292,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                 <Save className="w-3.5 h-3.5 text-white" />
               </div>
               <div>
-                <h4 className="text-xs font-semibold text-success-fg mb-1">Código Automático</h4>
+                <h4 className="text-xs font-semibold text-success-fg mb-1">Código automático</h4>
                 <p className="text-xs text-success-fg font-medium leading-tight">
                   O nome da turma (ex: <b>1TIM1</b>) é criado conforme você seleciona as opções.
                 </p>
@@ -474,7 +474,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                         <Layers className={`w-5 h-5 ${importarMatriz ? 'text-white' : 'text-fg-subtle'}`} />
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-fg">Importar Matriz Curricular</p>
+                        <p className="text-xs font-bold text-fg">Importar matriz curricular</p>
                         <p className="text-xs text-fg-subtle font-medium leading-none">Cadastrar disciplinas padrão automaticamente</p>
                       </div>
                     </div>
@@ -523,7 +523,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                       className="flex items-center space-x-1.5 font-semibold text-xs text-danger hover:text-danger-fg hover:bg-danger-subtle px-3 py-1.5 rounded-lg transition-all"
                     >
                       <Trash2 className="w-3 h-3" />
-                      <span>Excluir Turma</span>
+                      <span>Excluir turma</span>
                     </button>
                   )}
                 </div>

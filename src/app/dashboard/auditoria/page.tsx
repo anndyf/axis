@@ -103,7 +103,7 @@ export default async function AuditoriaPage({
             </Link>
             <h1 className="text-xl font-medium text-fg tracking-tight flex items-center gap-3">
               <History className="w-8 h-8 text-fg-muted" />
-              Central de Auditoria
+              Central de auditoria
             </h1>
             <p className="text-sm text-fg-muted font-medium">Monitoramento em tempo real de todas as ações críticas do sistema.</p>
           </div>
@@ -113,8 +113,8 @@ export default async function AuditoriaPage({
               <ShieldAlert size={20} />
             </div>
             <div>
-              <p className="text-xs font-medium text-fg-subtle leading-none mb-1">Status de Segurança</p>
-              <p className="text-sm font-medium text-fg">Monitoramento Ativo</p>
+              <p className="text-xs font-medium text-fg-subtle leading-none mb-1">Status de segurança</p>
+              <p className="text-sm font-medium text-fg">Monitoramento ativo</p>
             </div>
           </div>
         </div>

@@ -226,7 +226,7 @@ export default function LancarNotasTurmaClient({
   }
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); if (!disciplinaSelecionada) { setMessage({ type: 'error', text: 'Selecione uma disciplina' }); return; }
+    e.preventDefault(); if (!disciplinaSelecionada) { setMessage({ type: 'error', text: 'Selecione uma disciplina.' }); return; }
     setShowModal(true);
   }
 
@@ -263,7 +263,7 @@ export default function LancarNotasTurmaClient({
     } catch (error) {
       setFeedbackModal({
         type: 'error',
-        text: 'Erro de conexão com o servidor. Verifique sua conexão com a internet.'
+        text: 'Não foi possível conectar ao servidor. Verifique a internet e tente novamente.'
       });
     } finally { setSaving(false) }
   }
@@ -309,7 +309,7 @@ export default function LancarNotasTurmaClient({
     },
     {
       title: "Status de Aluno",
-      description: "Marque como infrequente aquele aluno que não frequenta ou só apareceu para fazer a prova, clicando no ícone lateral (👥).",
+      description: "Marque como infrequente aquele aluno que não frequenta ou só apareceu para fazer a prova, clicando no ícone ao lado da nota.",
       icon: <UserMinus className="w-5 h-5 text-fg-muted" />,
       color: "blue"
     },
@@ -409,7 +409,7 @@ export default function LancarNotasTurmaClient({
           <div className="p-4 border-b border-line bg-canvas/10 flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-medium text-fg flex items-center gap-2">
               <Users size={20} className="text-fg-subtle" />
-              <span className="hidden md:inline">Matriz de Rendimento Acadêmico</span><span className="md:hidden">Alunos</span>
+              <span className="hidden md:inline">Matriz de rendimento acadêmico</span><span className="md:hidden">Alunos</span>
             </h2>
             <div className="relative w-full md:max-w-xs">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-subtle" />
@@ -757,7 +757,7 @@ export default function LancarNotasTurmaClient({
               <div className="flex items-center gap-3">
                  <div className="w-10 h-10 bg-zinc-600 text-white rounded-xl flex items-center justify-center"><Save size={20}/></div>
                   <div>
-                     <h3 className="text-lg font-medium text-fg">Consolidar Dados</h3>
+                     <h3 className="text-lg font-medium text-fg">Consolidar dados</h3>
                     <p className="text-xs font-medium text-fg-subtle">Revise as alterações da turma</p>
                   </div>
               </div>
@@ -785,7 +785,7 @@ export default function LancarNotasTurmaClient({
             </div>
             <div className="px-4 py-2.5 bg-canvas border-t border-line flex gap-4">
               <button onClick={() => setShowModal(false)} className="flex-1 py-3 text-sm font-medium text-fg-subtle hover:bg-surface rounded-lg transition-all">Cancelar</button>
-              <button onClick={confirmSave} className="flex-1 py-3 bg-zinc-600 text-white text-sm font-medium rounded-lg hover:bg-zinc-700 transition-all">Confirmar e Gravar</button>
+              <button onClick={confirmSave} className="flex-1 py-3 bg-zinc-600 text-white text-sm font-medium rounded-lg hover:bg-zinc-700 transition-all">Confirmar e gravar</button>
             </div>
           </div>
         </div>

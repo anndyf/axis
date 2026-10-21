@@ -70,7 +70,7 @@ export default function PlanoForm({ plano, onSuccess, onClose }: PlanoFormProps)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.disciplinaNome) { setError("Selecione uma disciplina"); return; }
-    if (formData.turmasIds.length === 0) { setError("Selecione pelo menos uma turma"); return; }
+    if (formData.turmasIds.length === 0) { setError("Selecione pelo menos uma turma."); return; }
 
     setLoading(true); setError("");
 
@@ -83,8 +83,8 @@ export default function PlanoForm({ plano, onSuccess, onClose }: PlanoFormProps)
         body: JSON.stringify(formData)
       })
       if (response.ok) onSuccess()
-      else { const result = await response.json(); setError(result.message || "Erro ao salvar"); }
-    } catch (err) { setError("Erro de conexão") } finally { setLoading(false) }
+      else { const result = await response.json(); setError(result.message || "Não foi possível salvar. Tente novamente."); }
+    } catch (err) { setError("Não foi possível conectar ao servidor. Tente novamente.") } finally { setLoading(false) }
   }
 
   const toggleTurma = (id: string) => {
@@ -112,7 +112,7 @@ export default function PlanoForm({ plano, onSuccess, onClose }: PlanoFormProps)
               <h2 className="text-xl font-bold text-fg tracking-tight leading-tight">
                 {plano ? 'Editar Plano' : 'Novo Plano'}
               </h2>
-              <p className="text-fg-subtle text-xs font-medium">Gestão Pedagógica</p>
+              <p className="text-fg-subtle text-xs font-medium">Gestão pedagógica</p>
             </div>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-canvas rounded-lg transition-all text-fg-disabled hover:text-fg-muted border border-transparent hover:border-line-subtle"><X size={20} /></button>
@@ -127,7 +127,7 @@ export default function PlanoForm({ plano, onSuccess, onClose }: PlanoFormProps)
 
           <div className="space-y-4">
             <h3 className="text-xs font-bold text-fg-subtle flex items-center gap-2 px-1">
-               <Users size={12} /> Turmas e Período
+               <Users size={12} /> Turmas e período
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-surface p-4 rounded-2xl border border-line-subtle">
@@ -167,7 +167,7 @@ export default function PlanoForm({ plano, onSuccess, onClose }: PlanoFormProps)
               </div>
 
               <div className="space-y-1.5 md:col-span-2">
-                 <label className="text-xs font-bold text-fg-subtle ml-1">Categoria de Turmas</label>
+                 <label className="text-xs font-bold text-fg-subtle ml-1">Categoria de turmas</label>
                  <select 
                    value={selectedClusterKey}
                    disabled={!selectedDisc}

@@ -65,9 +65,9 @@ export default function UsuarioForm({ usuario, isEdit = false }: { usuario?: Usu
         return
       }
       const data = await res.json().catch(() => ({}))
-      setErro(`${data.message || "Erro ao salvar"}${data.detail ? `: ${data.detail}` : ""}`)
+      setErro(`${data.message || "Não foi possível salvar. Tente novamente."}${data.detail ? `: ${data.detail}` : ""}`)
     } catch {
-      setErro("Erro ao conectar com o servidor")
+      setErro("Não foi possível conectar ao servidor. Tente novamente.")
     } finally {
       setSalvando(false)
       setConfirmar(false)

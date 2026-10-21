@@ -68,7 +68,7 @@ export default function ProfilePage() {
         setError(data.message || "Erro ao alterar senha")
       }
     } catch (err) {
-      setError("Erro na conexão com o servidor")
+      setError("Não foi possível conectar ao servidor. Tente novamente.")
     } finally {
       setLoading(false)
     }
@@ -81,7 +81,7 @@ export default function ProfilePage() {
           <div className="w-10 h-10 bg-subtle-hover rounded-xl flex items-center justify-center">
             <Lock className="w-6 h-6 text-fg-muted" />
           </div>
-          Meu Perfil
+          Meu perfil
         </h1>
         <p className="text-fg-muted font-medium ml-14">Gerencie suas informações de acesso.</p>
       </div>
@@ -118,13 +118,13 @@ export default function ProfilePage() {
           <div className="bg-surface rounded-xl p-4 border border-line">
             <h2 className="text-xl font-medium text-fg mb-6 flex items-center gap-2">
               <Key className="w-5 h-5 text-fg-muted" />
-              Alterar Senha
+              Alterar senha
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
                 <label className="text-xs font-medium text-fg-subtle ml-1">
-                  Senha Atual
+                  Senha atual
                 </label>
                 <input
                   type="password"
@@ -138,7 +138,7 @@ export default function ProfilePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-2">
                   <label className="text-xs font-medium text-fg-subtle ml-1">
-                    Nova Senha
+                    Nova senha
                   </label>
                   <input
                     type="password"
@@ -151,7 +151,7 @@ export default function ProfilePage() {
 
                 <div className="space-y-2">
                   <label className="text-xs font-medium text-fg-subtle ml-1">
-                    Confirmar Nova Senha
+                    Confirmar nova senha
                   </label>
                   <input
                     type="password"
@@ -189,7 +189,7 @@ export default function ProfilePage() {
                   ) : (
                     <>
                       <Save className="w-4 h-4 group- transition-transform" />
-                      Salvar Alterações
+                      Salvar alterações
                     </>
                   )}
                 </button>

@@ -210,7 +210,7 @@ export default function ConselhoClasseClient({
       })
 
       if (response.ok) {
-        setMessage({ type: 'success', text: 'Decisões do conselho salvas com sucesso!' })
+        setMessage({ type: 'success', text: 'Decisões do conselho salvas com sucesso.' })
         router.refresh()
         setTimeout(() => setMessage(null), 5000)
       } else {
@@ -218,7 +218,7 @@ export default function ConselhoClasseClient({
         setMessage({ type: 'error', text: error.message || 'Erro ao salvar decisões' })
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Erro ao conectar com o servidor' })
+      setMessage({ type: 'error', text: 'Não foi possível conectar ao servidor. Tente novamente.' })
     } finally {
       setLoading(false)
     }
@@ -365,12 +365,12 @@ export default function ConselhoClasseClient({
           {/* Identificação - Esquerda */}
           <div className="flex-1">
             <p className="text-xs font-medium text-fg-muted mb-1 leading-tight">
-              Centro Territorial de Educação Profissional do Litoral Norte e Agreste Baiano
+              Centro territorial de educação profissional do litoral norte e agreste baiano
             </p>
             <div className="flex items-center gap-2 mb-1">
               <div className="text-fg font-medium text-lg">Áxis</div>
               <div className="text-fg-disabled">|</div>
-              <h1 className="text-xl font-medium text-fg">Conselho de Classe Final</h1>
+              <h1 className="text-xl font-medium text-fg">Conselho de classe final</h1>
             </div>
             <h2 className="text-lg font-medium text-fg mb-0.5">{turmaNome}</h2>
             {turmaCurso && <p className="text-sm font-medium text-fg-muted">{turmaCurso} {turmaTurno && `- ${turmaTurno}`}</p>}
@@ -626,7 +626,7 @@ export default function ConselhoClasseClient({
                       <Gavel className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-base font-medium text-fg tracking-tight">Guia Rápido do Conselho</h3>
+                      <h3 className="text-base font-medium text-fg tracking-tight">Guia rápido do conselho</h3>
                       <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
                           <span className="text-xs font-medium text-accent-fg">Passo 01</span>
@@ -638,7 +638,7 @@ export default function ConselhoClasseClient({
                         </div>
                         <div className="space-y-2">
                           <span className="text-xs font-medium text-accent-fg">Passo 03</span>
-                          <p className="text-xs text-fg-subtle leading-relaxed font-medium">Defina a <b>Decisão Final</b> e use o botão <b>Gravar</b> no rodapé fixo.</p>
+                          <p className="text-xs text-fg-subtle leading-relaxed font-medium">Defina a <b>Decisão final</b> e use o botão <b>Gravar</b> no rodapé fixo.</p>
                         </div>
                       </div>
                     </div>
@@ -781,7 +781,7 @@ export default function ConselhoClasseClient({
                             <tr className="border-b border-line">
                                <th className="px-4 py-3 text-left text-sm font-medium text-fg-subtle w-10">#</th>
                               <th className="px-4 py-3 text-left text-sm font-medium text-fg-subtle text-nowrap">Disciplina</th>
-                              <th className="px-4 py-3 text-center text-sm font-medium text-fg-subtle">Média Anual</th>
+                              <th className="px-4 py-3 text-center text-sm font-medium text-fg-subtle">Média anual</th>
                               <th className="px-4 py-3 text-center text-sm font-medium text-fg-subtle text-nowrap">Nota Rec.</th>
                               <th className="px-4 py-3 text-left text-sm font-medium text-accent-fg">Decisão</th>
                             </tr>
@@ -934,7 +934,7 @@ export default function ConselhoClasseClient({
             <div className="bg-surface rounded-xl shadow-overlay max-w-2xl w-full flex flex-col max-h-[90vh] animate-pop-in">
               <div className="p-4 border-b border-line-subtle flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-medium text-fg">Revisar Decisões</h3>
+                  <h3 className="text-xl font-medium text-fg">Revisar decisões</h3>
                   <p className="text-xs font-medium text-fg-subtle mt-1">Confira os dados antes de consolidar no sistema</p>
                 </div>
                 <button 
@@ -998,7 +998,7 @@ export default function ConselhoClasseClient({
                   className="px-4 py-3 rounded-lg bg-accent text-on-accent font-medium hover:bg-accent-hover transition-all flex items-center space-x-3 text-xs"
                 >
                   <Save className="w-4 h-4" />
-                  <span>Gravar Permanentemente</span>
+                  <span>Gravar permanentemente</span>
                 </button>
               </div>
             </div>

@@ -97,7 +97,7 @@ export default function OcorrenciaForm({
         onSuccess()
       } else {
         const err = await res.json()
-        alert(err.message || "Erro ao salvar")
+        alert(err.message || "Não foi possível salvar. Tente novamente.")
       }
     } catch (error) {
       console.error("Erro ao salvar ocorrência:", error)
@@ -135,7 +135,7 @@ export default function OcorrenciaForm({
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-xs font-bold text-fg-subtle ml-1">Título da Ocorrência</label>
+              <label className="text-xs font-bold text-fg-subtle ml-1">Título da ocorrência</label>
               <input
                 required
                 type="text"
@@ -147,7 +147,7 @@ export default function OcorrenciaForm({
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold text-fg-subtle ml-1">Tipo de Evento</label>
+              <label className="text-xs font-bold text-fg-subtle ml-1">Tipo de evento</label>
               <select
                 value={formData.tipo}
                 onChange={e => setFormData({ ...formData, tipo: e.target.value })}
@@ -163,7 +163,7 @@ export default function OcorrenciaForm({
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold text-fg-subtle ml-1">Data do Evento</label>
+              <label className="text-xs font-bold text-fg-subtle ml-1">Data do evento</label>
               <input
                 type="date"
                 value={formData.data}
@@ -174,7 +174,7 @@ export default function OcorrenciaForm({
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-bold text-fg-subtle ml-1">Estudantes Envolvidos</label>
+            <label className="text-xs font-bold text-fg-subtle ml-1">Estudantes envolvidos</label>
             
             {/* Multi-select students */}
             <div className="space-y-4">
@@ -240,7 +240,7 @@ export default function OcorrenciaForm({
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-bold text-fg-subtle ml-1">Descrição Detalhada</label>
+            <label className="text-xs font-bold text-fg-subtle ml-1">Descrição detalhada</label>
             <textarea
               required
               rows={12}

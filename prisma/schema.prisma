@@ -213,6 +213,9 @@ model User {
   createdAt             DateTime                @default(now()) @map("created_at")
   updatedAt             DateTime                @updatedAt @map("updated_at")
   lastLogin             DateTime?               @map("last_login")
+  // Acesso anterior ao atual (o login copia last_login para cá antes de
+  // atualizar): aviso "Seu último acesso foi em ..." depois de entrar
+  acessoAnterior        DateTime?               @map("acesso_anterior")
   isDirecao             Boolean                 @default(false) @map("is_direcao")
   isPortalUser          Boolean                 @default(false) @map("is_portal_user")
   estudanteId           String?                 @map("estudante_id")

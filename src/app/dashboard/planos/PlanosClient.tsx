@@ -171,7 +171,7 @@ export default function PlanosClient() {
                 <ArrowLeft size={16} strokeWidth={1.75} />
               </Link>
               <div>
-                <h1 className="text-2xl font-semibold tracking-tight text-fg">Planos de Ensino</h1>
+                <h1 className="text-2xl font-semibold tracking-tight text-fg">Planos de ensino</h1>
                 <p className="text-sm text-fg-muted">Gestão de cronogramas e conteúdos programáticos</p>
               </div>
             </div>
@@ -182,7 +182,7 @@ export default function PlanosClient() {
                   onClick={() => { setShowForm(true); setSelectedPlano(null); }}
                   className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
                 >
-                  <Plus size={16} strokeWidth={1.75} /> Novo Plano
+                  <Plus size={16} strokeWidth={1.75} /> Novo plano
                 </button>
               )}
             </div>
@@ -212,7 +212,7 @@ export default function PlanosClient() {
         <div className="bg-surface p-4 rounded-xl border border-line flex flex-wrap gap-4 items-end relative overflow-hidden">
             
             <div className="flex-1 min-w-[200px] space-y-2">
-                <label className="text-xs font-medium text-fg-subtle ml-2">Filtrar por Turma</label>
+                <label className="text-xs font-medium text-fg-subtle ml-2">Filtrar por turma</label>
                 <div className="relative group">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-canvas rounded-lg text-fg-subtle group-focus-within:text-fg-muted group-focus-within:bg-canvas transition-all">
                     <Users size={16} />
@@ -271,7 +271,7 @@ export default function PlanosClient() {
               <div className="w-8 h-8 rounded-lg bg-canvas text-fg-muted flex items-center justify-center">
                 <Users size={16} />
               </div>
-              Matriz de Planos Quinzenais
+              Matriz de planos quinzenais
             </h2>
             <div className="hidden md:flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-success"></span>
@@ -330,7 +330,7 @@ export default function PlanosClient() {
                                                     <thead>
                                                         <tr className="bg-surface">
                                                             <th className="px-4 py-4 text-xs font-medium text-fg-subtle border-b border-line-subtle">Disciplina / Matéria</th>
-                                                            <th className="px-4 py-4 text-xs font-medium text-fg-subtle text-center border-b border-line-subtle">Período de Vigência</th>
+                                                            <th className="px-4 py-4 text-xs font-medium text-fg-subtle text-center border-b border-line-subtle">Período de vigência</th>
                                                             <th className="px-4 py-4 text-xs font-medium text-fg-subtle text-center border-b border-line-subtle">Ações</th>
                                                         </tr>
                                                     </thead>

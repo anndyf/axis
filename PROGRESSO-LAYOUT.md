@@ -27,15 +27,16 @@ servidor de desenvolvimento recarrega as mudanças em andamento.
 - [x] 4. Listas e telas de trabalho
 - [x] 5. Rastreabilidade visível
 - [x] 6. Formulários e tabelas com rigor
-- [ ] 7. Acabamento de produto maduro
+- [x] 7. Acabamento de produto maduro
 - [ ] 8. Impressão
 
 ## Próximo passo exato
 
-Etapa 7 (acabamento): trocar emojis por ícones lucide; linguagem formal nas
-mensagens; rodapé do sistema com versão (package.json), Suporte, Termos,
-Privacidade e Novidades; último acesso após o login (coluna nova
-`User.acessoAnterior`? ver decisão); botão "?" de ajuda nas telas principais.
+Etapa 8 (impressão): botão "Imprimir" com folha própria (sem menu, sem
+fundo, cabeçalho com escola, data/hora e paginação) em: estudantes da turma
+(aba Estudantes), ficha do estudante, ficha AEE, diário da disciplina,
+resultados da turma e frequência/infrequência. Depois: capturas finais,
+"Para validar localmente", PR e STATUS.
 
 ## Etapa 1 — o que foi feito
 
@@ -267,3 +268,35 @@ Correção feita no caminho: a passada de densidade da etapa 4 tinha tirado o
 espaço entre classes e interpolações `${...}` em alguns arquivos (classes
 coladas); voltou com base nas versões anteriores (nenhum desses arquivos
 tinha classe colada a interpolação antes).
+
+## Etapa 7 — o que foi feito
+
+- Emojis das telas trocados por ícones lucide (mensagens: categorias com
+  Megaphone, Wrench, Landmark e MessageCircle; aviso de transferência,
+  símbolos, cursos, matriz, portal e dica do lançamento de notas). Ficaram
+  os emojis do assunto de e-mail (`mensagens/actions.ts`, não é tela) e de
+  logs/comentários do servidor.
+- Linguagem: mensagens de erro e sucesso padronizadas ("Não foi possível
+  salvar. Tente novamente.", "Não foi possível conectar ao servidor. Tente
+  novamente.", sucesso sem exclamação) em 31 arquivos; rótulos e títulos
+  em Maiúsculas Em Cada Palavra passados para frase normal (48 arquivos,
+  só texto de tela, nomes próprios preservados).
+- Rodapé do sistema (`components/RodapeSistema.tsx`): versão lida do
+  package.json (0.1.0), Novidades, Suporte, Termos de uso e Privacidade.
+  Páginas: `/dashboard/novidades` (lista por versão em
+  `src/lib/produto/novidades.ts`), `/dashboard/suporte`, `/termos` e
+  `/privacidade` (públicas, texto provisório marcado como tal).
+- Último acesso: coluna nova `User.acessoAnterior` (migration aditiva
+  `20261022120000_acesso_anterior`, gerada com `prisma migrate diff`). O
+  login copia `last_login` para `acesso_anterior` e grava o atual numa só
+  instrução (`src/lib/ultimo-acesso.ts`, com teste). Depois do login, um
+  aviso discreto: "Seu último acesso foi em 19/10/2026 às 21:14" (uma vez
+  por login, sem IP). Só no painel da equipe (o portal do aluno ficou de
+  fora).
+- Ajuda contextual: botão "?" ao lado do título (`AjudaTela`), com textos
+  em `src/lib/produto/ajuda.ts` (31 telas). Aparece sozinho no
+  `CabecalhoPagina` e, nas telas com cabeçalho antigo, ao lado do caminho.
+
+Sugestão de versão (não alterei; decisão da dona do produto): esta entrega
+muda a cara do sistema e acrescenta uma coluna; sugiro 0.2.0 (ou 1.0.0 se
+for a versão de lançamento para as escolas).

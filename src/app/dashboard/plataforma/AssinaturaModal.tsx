@@ -68,7 +68,7 @@ export default function AssinaturaModal({ escolaId, onClose, onAtualizada }: Ass
   const enviar = async (url: string, metodo: string, corpo: unknown) => {
     const res = await fetch(url, { method: metodo, headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo) })
     const data = await res.json()
-    if (!res.ok) throw new Error(data.message || "Erro ao salvar")
+    if (!res.ok) throw new Error(data.message || "Não foi possível salvar. Tente novamente.")
     aplicar(data)
   }
 

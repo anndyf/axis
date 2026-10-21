@@ -182,7 +182,7 @@ export default function RecuperacaoTurmaClient({
         {/* Filtros Estilo Simulados */}
         <div className="bg-surface p-5 rounded-2xl border border-line flex flex-wrap gap-5 items-end">
             <div className="flex-1 min-w-[300px] space-y-1.5">
-                <label className="text-sm font-medium text-fg-subtle ml-1">Disciplina Alvo</label>
+                <label className="text-sm font-medium text-fg-subtle ml-1">Disciplina alvo</label>
                 <div className="relative">
                   <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-subtle" size={16} />
                   <select
@@ -213,7 +213,7 @@ export default function RecuperacaoTurmaClient({
           <div className="p-4 border-b border-line bg-canvas/10 flex items-center justify-between">
             <h2 className="text-lg font-medium text-fg flex items-center gap-2">
                <Users size={20} className="text-fg-subtle" />
-               Painel de Recuperação Final
+               Painel de recuperação final
             </h2>
             {disciplinaSelecionada && !podeLancar && (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-info-subtle px-2.5 py-0.5 text-13 text-info-fg" role="status">
@@ -245,7 +245,7 @@ export default function RecuperacaoTurmaClient({
                 <tr>
                   <th className="px-4 py-4 text-xs font-medium text-fg-subtle w-12 text-center">#</th>
                   <th className="px-4 py-4 text-xs font-medium text-fg-subtle">Estudante</th>
-                  <th className="px-4 py-4 text-xs font-medium text-fg-subtle w-32 text-center">Média Anual</th>
+                  <th className="px-4 py-4 text-xs font-medium text-fg-subtle w-32 text-center">Média anual</th>
                   <th className="px-4 py-4 text-xs font-medium text-fg-subtle w-32 text-center">Recuperação</th>
                   <th className="px-4 py-4 text-xs font-medium text-fg-subtle w-16 text-center">Faltou</th>
                   <th className="px-4 py-4 text-xs font-medium text-fg-subtle w-32 text-center">Resultado</th>
@@ -358,7 +358,7 @@ export default function RecuperacaoTurmaClient({
               <div className="flex items-center gap-3">
                  <div className="w-10 h-10 bg-danger text-white rounded-xl flex items-center justify-center"><TrendingUp size={20}/></div>
                   <div>
-                    <h3 className="text-lg font-medium text-fg">Consolidar Recuperação Final</h3>
+                    <h3 className="text-lg font-medium text-fg">Consolidar recuperação final</h3>
                     <p className="text-xs font-medium text-fg-subtle">Ação permanente no boletim anual</p>
                   </div>
               </div>
@@ -374,7 +374,7 @@ export default function RecuperacaoTurmaClient({
             </div>
              <div className="px-4 py-2.5 bg-canvas border-t border-line flex gap-4">
               <button onClick={() => setShowConfirmModal(false)} className="flex-1 py-3 text-sm font-medium text-fg-subtle hover:bg-surface rounded-lg transition-all">Cancelar</button>
-              <button onClick={handleConfirmSave} className="flex-1 py-3 bg-danger text-white text-sm font-medium rounded-lg hover:bg-danger transition-all">Finalizar Envio</button>
+              <button onClick={handleConfirmSave} className="flex-1 py-3 bg-danger text-white text-sm font-medium rounded-lg hover:bg-danger transition-all">Finalizar envio</button>
             </div>
           </div>
         </div>

@@ -65,13 +65,13 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
         })
       const r = await saveSchedule(turma.id, items)
       if ("error" in r) {
-        setAviso({ tipo: "erro", texto: r.error ?? "Erro ao salvar" })
+        setAviso({ tipo: "erro", texto: r.error ?? "Não foi possível salvar. Tente novamente." })
       } else {
         setAviso({ tipo: "ok", texto: "Horário salvo." })
         router.refresh()
       }
     } catch {
-      setAviso({ tipo: "erro", texto: "Erro ao salvar" })
+      setAviso({ tipo: "erro", texto: "Não foi possível salvar. Tente novamente." })
     } finally {
       setSaving(false)
     }

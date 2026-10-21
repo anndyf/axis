@@ -101,7 +101,7 @@ export default function AEEDashboardClient({
         setActivePanel(null)
         router.refresh()
       } else {
-        alert('Erro ao salvar ficha')
+        alert('Não foi possível salvar a ficha. Tente novamente.')
       }
     } finally {
       setSaving(false)
@@ -123,7 +123,7 @@ export default function AEEDashboardClient({
         alert('Erro ao excluir ficha')
       }
     } catch {
-      alert('Erro de conexão')
+      alert('Não foi possível conectar ao servidor. Tente novamente.')
     } finally {
       setSaving(false)
     }
@@ -193,7 +193,7 @@ export default function AEEDashboardClient({
                    className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
                  >
                    <PlusCircle size={16} strokeWidth={1.75} />
-                   <span className="whitespace-nowrap">Nova Ficha</span>
+                   <span className="whitespace-nowrap">Nova ficha</span>
                  </button>
                )}
 
@@ -202,7 +202,7 @@ export default function AEEDashboardClient({
                     onClick={() => setIsEditing(true)}
                     className="flex items-center gap-2 bg-surface border border-line-strong px-4 py-2 rounded-lg text-xs font-semibold hover:bg-canvas transition-all"
                  >
-                    <Edit3 size={14} /> Editar Ficha
+                    <Edit3 size={14} /> Editar ficha
                  </button>
                )}
 
@@ -399,7 +399,7 @@ export default function AEEDashboardClient({
              {activePanel === 'create' && !selectedStudent ? (
                 <div className="max-w-2xl mx-auto space-y-5 py-2.5">
                    <div className="text-center space-y-2">
-                      <h3 className="text-xl font-semibold">Vincular Estudante</h3>
+                      <h3 className="text-xl font-semibold">Vincular estudante</h3>
                       <p className="text-sm text-fg">Pesquise abaixo para carregar os dados base do estudante.</p>
                    </div>
                    <div className="relative">
@@ -455,7 +455,7 @@ export default function AEEDashboardClient({
                             {activePanel === 'edit' && !isEditing && (
                                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-accent-subtle text-accent-fg rounded-full border border-accent/25 self-center md:self-auto">
                                   <Accessibility size={10} />
-                                  <span className="text-xs font-semibold">Ficha Ativa</span>
+                                  <span className="text-xs font-semibold">Ficha ativa</span>
                                </div>
                             )}
                          </div>
@@ -475,7 +475,7 @@ export default function AEEDashboardClient({
                       {activePanel === 'edit' && !isEditing && (
                          <div className="shrink-0 flex items-center gap-4 bg-canvas px-4 py-2 rounded-xl border border-line-subtle">
                             <div>
-                               <p className="text-xs text-fg-subtle font-semibold mb-1">Status de Ciência</p>
+                               <p className="text-xs text-fg-subtle font-semibold mb-1">Status de ciência</p>
                                {selectedProfile.acknowledgements.length === 0 ? (
                                   <div className="flex items-center gap-1.5 text-warning-fg">
                                      <Clock size={12} className="" />
@@ -558,7 +558,7 @@ export default function AEEDashboardClient({
                             <div className="p-2 bg-accent-subtle text-accent-fg rounded-xl border border-accent/25">
                                <ClipboardCheck size={16} />
                             </div>
-                            Necessidades Avaliativas
+                            Necessidades avaliativas
                          </label>
                          
                          <div className="grid grid-cols-1 gap-4">
@@ -625,7 +625,7 @@ export default function AEEDashboardClient({
                                <div className="p-1.5 bg-surface text-fg-subtle rounded-md border border-line">
                                   <Lock size={18} />
                                 </div>
-                               Observações Administrativas Internas
+                               Observações administrativas internas
                             </label>
                             <textarea 
                                rows={4} readOnly={!isEditing} value={formData.notasDirecao}
@@ -646,11 +646,11 @@ export default function AEEDashboardClient({
                             <div className="p-2 bg-danger-subtle text-danger-fg rounded-xl">
                                <Phone size={16} />
                             </div>
-                            <p className="text-xs font-semibold text-fg-subtle">Contatos de Emergência do Estudante</p>
+                            <p className="text-xs font-semibold text-fg-subtle">Contatos de emergência do estudante</p>
                          </div>
                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                               <label className="text-xs font-semibold text-fg-subtle px-1">Nome do Responsável</label>
+                               <label className="text-xs font-semibold text-fg-subtle px-1">Nome do responsável</label>
                                <input 
                                   type="text" readOnly={!isEditing} value={formData.contatoNome}
                                   onChange={e => setFormData(f => ({ ...f, contatoNome: e.target.value }))}
@@ -686,7 +686,7 @@ export default function AEEDashboardClient({
                                      <div className="p-2 bg-success-subtle text-success-fg rounded-xl">
                                         <CheckCircle2 size={16} />
                                      </div>
-                                     <label className="text-xs font-semibold text-fg-subtle">Controle Docente</label>
+                                     <label className="text-xs font-semibold text-fg-subtle">Controle docente</label>
                                   </div>
                                   <div className="px-3 py-1 bg-subtle border border-line text-fg rounded-lg text-xs font-semibold">
                                      {lidosCont} / {totalCont}
@@ -700,7 +700,7 @@ export default function AEEDashboardClient({
                                      onClick={() => document.getElementById('relatorio-leituras')?.scrollIntoView({ behavior: 'smooth' })}
                                      className="w-full py-3.5 text-xs text-fg font-semibold border-2 border-line-subtle rounded-lg hover:bg-canvas hover:border-line transition-all active:scale-[0.98]"
                                   >
-                                     Auditoria Nominal de Leituras
+                                     Auditoria nominal de leituras
                                   </button>
                                </div>
                             </div>
@@ -714,7 +714,7 @@ export default function AEEDashboardClient({
                          <div className="flex items-center justify-between">
                             <h3 className="text-base font-bold text-fg flex items-center gap-3">
                                <div className="w-1.5 h-6 bg-accent rounded-full" />
-                               Relatório Nominal de Ciência
+                               Relatório nominal de ciência
                             </h3>
                             <div className="flex gap-4">
                                <div className="flex items-center gap-2 text-xs text-fg-subtle font-semibold"><div className="w-2.5 h-2.5 rounded-full bg-success shadow-[0_0_8px_rgba(16,185,129,0.5)]" /> Concluído</div>

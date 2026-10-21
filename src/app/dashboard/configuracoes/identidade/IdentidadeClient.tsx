@@ -166,7 +166,7 @@ export default function IdentidadeClient({ nomeEscola, corInicial, logoInicial, 
             </div>
             <div className="hidden flex-col justify-end bg-accent p-4 text-on-accent sm:flex">
               <p className="text-sm font-semibold">{nomeEscola}</p>
-              <p className="text-xs opacity-80">Sistema de Gestão Escolar</p>
+              <p className="text-xs opacity-80">Sistema de gestão escolar</p>
             </div>
           </div>
         </CardBody>

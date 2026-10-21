@@ -119,7 +119,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
         const text = await selectedFile.text()
         const lines = text.split('\n').filter(line => line.trim())
         if (lines.length <= 1) {
-            setMessage({ type: 'error', text: 'O arquivo CSV está vazio' })
+            setMessage({ type: 'error', text: 'O arquivo CSV está vazio.' })
             return
         }
         const data: PreviewData[] = []
@@ -165,7 +165,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
     if (!file || preview.length === 0) return
 
     if (syncMode && !manualTurma) {
-      setMessage({ type: 'error', text: 'Para Sincronizar, você precisa selecionar a Turma alvo manualmente primeiro!' })
+      setMessage({ type: 'error', text: 'Para sincronizar, selecione antes a turma de destino.' })
       return
     }
 
@@ -231,7 +231,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
         })
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Erro ao conectar com o servidor' })
+      setMessage({ type: 'error', text: 'Não foi possível conectar ao servidor. Tente novamente.' })
     } finally {
       setLoading(false)
     }
@@ -246,7 +246,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
               <ArrowLeft className="w-5 h-5 text-fg-muted" />
             </Link>
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight text-fg">Importar Estudantes</h1>
+              <h1 className="text-2xl font-semibold tracking-tight text-fg">Importar estudantes</h1>
               <p className="text-sm text-fg-muted">Importe via CSV ou PDF (Relação de Alunos)</p>
             </div>
           </div>
@@ -260,7 +260,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
               <FileType className="w-6 h-6 text-fg" />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-medium text-fg mb-2">Instruções de Importação</h3>
+              <h3 className="text-lg font-medium text-fg mb-2">Instruções de importação</h3>
               <div className="space-y-4 text-accent-fg text-sm">
                 <p>
                   Para importar vários alunos de uma vez, utilize o arquivo PDF <strong>"Relação de Estudantes na Turma"</strong> baixado diretamente do <strong>SIGEDUC</strong>.
@@ -268,7 +268,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
                 <ul className="list-disc list-inside space-y-1 ml-2">
                    <li>O sistema extrairá os <strong>nomes</strong> e <strong>números de matrícula</strong> automaticamente.</li>
                    <li>A matrícula será usada para identificar o aluno e o acesso ao portal virá desativado por padrão.</li>
-                   <li>É necessário selecionar a <strong>Turma de Destino</strong> abaixo para vincular os alunos.</li>
+                   <li>É necessário selecionar a <strong>Turma de destino</strong> abaixo para vincular os alunos.</li>
                 </ul>
                 
                 <div className="mt-4">
@@ -331,13 +331,13 @@ export default function UploadForm({ turmas }: UploadFormProps) {
                     }}
                     className="w-full sm:w-auto px-4 py-4 bg-accent text-on-accent rounded-lg font-bold hover:bg-accent-hover transition-all"
                   >
-                    Nova Importação
+                    Nova importação
                   </button>
                   <Link
                     href="/dashboard/estudantes"
                     className="w-full sm:w-auto px-4 py-4 bg-surface text-fg-muted border border-line-strong rounded-lg font-bold hover:bg-canvas transition-all"
                   >
-                    Voltar para Estudantes
+                    Voltar para estudantes
                   </Link>
                </div>
             </div>
@@ -377,7 +377,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
                 />
             </div>
             <div ref={dropdownRef}>
-                <label className="block text-sm font-medium text-fg mb-2">Turma de Destino <span className="text-danger-fg">*</span></label>
+                <label className="block text-sm font-medium text-fg mb-2">Turma de destino <span className="text-danger-fg">*</span></label>
                 <div className="relative">
                     <div className="relative group">
                         <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${showTurmaDropdown ? 'text-fg' : 'text-fg-subtle'}`} />
@@ -461,7 +461,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
                       <th className="px-4 py-3 text-left text-xs font-medium text-fg-muted">#</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-fg-muted">Matrícula</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-fg-muted">Nome</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-fg-muted">Turma de Destino</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-fg-muted">Turma de destino</th>
                     </tr>
                   </thead>
                   <tbody className="bg-surface divide-y divide-line-strong">

@@ -96,7 +96,7 @@ export default function LaboratoriosClient({
       }
     } catch (err) {
       console.error(err)
-      setMessage({ type: 'error', text: "Erro de conexão" })
+      setMessage({ type: 'error', text: "Não foi possível conectar ao servidor. Tente novamente." })
     } finally {
       setSubmitting(false)
     }
@@ -178,7 +178,7 @@ export default function LaboratoriosClient({
         setMessage({ type: 'error', text: data.message || "Erro ao reservar" })
       }
     } catch (err) {
-      setMessage({ type: 'error', text: "Erro de conexão" })
+      setMessage({ type: 'error', text: "Não foi possível conectar ao servidor. Tente novamente." })
     } finally {
       setSubmitting(false)
     }
@@ -194,10 +194,10 @@ export default function LaboratoriosClient({
         fetchReservas()
       } else {
         const data = await res.json()
-        setMessage({ type: 'error', text: data.message || "Erro ao cancelar" })
+        setMessage({ type: 'error', text: data.message || "Não foi possível cancelar. Tente novamente." })
       }
     } catch (err) {
-      setMessage({ type: 'error', text: "Erro ao cancelar" })
+      setMessage({ type: 'error', text: "Não foi possível cancelar. Tente novamente." })
     }
   }
 
@@ -226,7 +226,7 @@ export default function LaboratoriosClient({
         <div className="absolute top-0 right-0 w-64 h-64 bg-zinc-500/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
-            <h1 className="text-xl font-bold text-fg tracking-tight">Reserva de Laboratórios</h1>
+            <h1 className="text-xl font-bold text-fg tracking-tight">Reserva de laboratórios</h1>
             <p className="text-fg-subtle font-medium">Gerencie o uso compartilhado dos espaços tecnológicos.</p>
           </div>
 
@@ -483,7 +483,7 @@ export default function LaboratoriosClient({
                  <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-subtle text-fg rounded-xl flex items-center justify-center"><Clock size={20}/></div>
                     <div>
-                        <h3 className="text-lg font-bold text-fg tracking-tight">Nova Reserva</h3>
+                        <h3 className="text-lg font-bold text-fg tracking-tight">Nova reserva</h3>
                         <p className="text-xs font-medium text-fg-subtle">
                           {selectedSlots.length > 0 
                             ? `${selectedSlots.length} Horário(s) Selecionado(s)` 
@@ -517,7 +517,7 @@ export default function LaboratoriosClient({
                          }}
                          className="w-full bg-canvas border-none rounded-lg px-4 py-4 text-sm font-medium focus:ring-2 focus:ring-zinc-900 transition-all outline-none"
                        >
-                         <option value="">Selecione a Turma</option>
+                         <option value="">Selecione a turma</option>
                          {myTurmas.map(t => (
                            <option key={t.id} value={t.id}>{t.nome}</option>
                          ))}
@@ -533,7 +533,7 @@ export default function LaboratoriosClient({
                           onChange={(e) => setSelectedDisciplinaId(e.target.value)}
                           className="w-full bg-canvas border-none rounded-lg px-4 py-4 text-sm font-medium focus:ring-2 focus:ring-zinc-900 transition-all outline-none"
                         >
-                          <option value="">Selecione a Disciplina</option>
+                          <option value="">Selecione a disciplina</option>
                           {selectedTurma?.disciplinas.map((d: any) => (
                             <option key={d.id} value={d.id}>{d.nome}</option>
                           ))}
@@ -601,7 +601,7 @@ export default function LaboratoriosClient({
                     <div className="w-10 h-10 bg-subtle border border-line text-fg rounded-xl flex items-center justify-center"><Monitor size={20}/></div>
                     <div>
                         <h3 className="text-lg font-bold text-fg tracking-tight">{editingLabId ? 'Editar Laboratório' : 'Novo Laboratório'}</h3>
-                        <p className="text-xs font-medium text-fg-subtle">Acesso Administrativo</p>
+                        <p className="text-xs font-medium text-fg-subtle">Acesso administrativo</p>
                     </div>
                  </div>
                  <button onClick={() => { setShowLabModal(false); setEditingLabId(null); }} className="p-2 hover:bg-subtle-hover rounded-xl transition-all text-fg-subtle"><X size={20}/></button>
@@ -610,7 +610,7 @@ export default function LaboratoriosClient({
               <div className="p-4 space-y-4">
                  <div className="space-y-4">
                     <div className="space-y-2">
-                       <label className="text-xs font-bold text-fg-subtle ml-1">Nome do Espaço</label>
+                       <label className="text-xs font-bold text-fg-subtle ml-1">Nome do espaço</label>
                        <input 
                          type="text" 
                          value={formLab.nome}

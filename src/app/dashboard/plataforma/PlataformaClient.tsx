@@ -77,7 +77,7 @@ export default function PlataformaClient({ escolasIniciais }: { escolasIniciais:
           className="flex items-center space-x-2 bg-slate-900 text-white px-5 py-3 rounded-2xl font-medium hover:bg-slate-800 transition-all text-xs shadow-lg"
         >
           <Plus size={16} />
-          <span>Nova Escola</span>
+          <span>Nova escola</span>
         </button>
       </div>
 

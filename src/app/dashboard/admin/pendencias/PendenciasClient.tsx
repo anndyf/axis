@@ -173,7 +173,7 @@ export default function PendenciasClient({
               <div className="p-3 bg-accent-subtle text-accent-fg rounded-lg">
                 <UserPlus size={24} />
               </div>
-              Solicitações de Cadastro
+              Solicitações de cadastro
             </h1>
             <p className="text-fg-subtle font-medium mt-1 ml-1">
               Alunos não localizados pelos professores nas turmas.
@@ -364,7 +364,7 @@ export default function PendenciasClient({
                                 className="w-full md:w-64 flex items-center justify-center gap-2 bg-surface hover:bg-canvas text-fg-muted border border-line px-4 py-3.5 rounded-lg font-bold text-sm transition-all"
                               >
                                 <MessageSquare className="w-5 h-5 text-accent-fg" />
-                                Responder Professor
+                                Responder professor
                               </button>
                               
                               {/* Advanced Controls Dropdown */}
@@ -378,7 +378,7 @@ export default function PendenciasClient({
                                         onChange={(e) => handleStatusUpdate(item.id, e.target.value || null)}
                                         className="w-full bg-subtle border-none rounded-xl px-3 py-2 text-xs font-bold text-fg-muted outline-none focus:ring-2 focus:ring-ring"
                                       >
-                                        <option value="">Sem Status</option>
+                                        <option value="">Sem status</option>
                                         {statusOptions.map(opt => (
                                           <option key={opt.label} value={opt.label}>{opt.label}</option>
                                         ))}
@@ -397,7 +397,7 @@ export default function PendenciasClient({
                             {/* Original Observation */}
                             {item.observacao && (
                               <div className="space-y-2">
-                                <h4 className="text-xs font-semibold text-fg-subtle">Solicitação Original</h4>
+                                <h4 className="text-xs font-semibold text-fg-subtle">Solicitação original</h4>
                                 <div className="bg-surface p-4 rounded-2xl border border-line text-sm text-fg-muted">
                                   {item.observacao}
                                 </div>
@@ -450,7 +450,7 @@ export default function PendenciasClient({
                   <MessageSquare size={20} />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-fg tracking-tight">Responder Chamado</h2>
+                  <h2 className="text-xl font-bold text-fg tracking-tight">Responder chamado</h2>
                   <p className="text-xs font-semibold text-fg-subtle mt-0.5">Chamado #{replyingTo.id.slice(-6).toUpperCase()} - {replyingTo.estudante}</p>
                 </div>
               </div>
@@ -480,7 +480,7 @@ export default function PendenciasClient({
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-fg-subtle ml-1 mb-2 block">Sua Resposta</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1 mb-2 block">Sua resposta</label>
                 <textarea
                   autoFocus
                   placeholder="Escreva aqui sua resposta para o professor..."

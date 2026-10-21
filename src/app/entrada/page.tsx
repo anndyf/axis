@@ -28,7 +28,7 @@ export default async function EntradaPage() {
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center px-5 py-12 sm:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
           <div className="space-y-5">
-            <p className="text-13 font-medium text-fg-subtle">Sistema de Gestão Escolar</p>
+            <p className="text-13 font-medium text-fg-subtle">Sistema de gestão escolar</p>
             <h1 className="max-w-xl text-3xl font-semibold leading-tight tracking-tight text-fg sm:text-[2.5rem]">
               Notas, chamada e frequência da sua escola, com clareza.
             </h1>

@@ -84,7 +84,7 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
         <div className="bg-surface p-4 rounded-xl border border-line flex flex-wrap gap-4 items-end relative overflow-hidden">
             
             <div className="flex-1 min-w-[250px] space-y-2">
-                <label className="text-xs font-medium text-fg-subtle ml-2">Pesquisar Turma</label>
+                <label className="text-xs font-medium text-fg-subtle ml-2">Pesquisar turma</label>
                 <div className="relative group">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-canvas rounded-lg text-fg-subtle group-focus-within:text-success-fg group-focus-within:bg-success-subtle transition-all">
                         <Search size={18} />
@@ -131,11 +131,11 @@ export default function NotasClient({ turmas }: { turmas: any[] }) {
                <div className="w-8 h-8 rounded-lg bg-success-subtle text-success-fg flex items-center justify-center">
                  <Users size={16} />
                </div>
-               Listagem de Turmas para Lançamento
+               Listagem de turmas para lançamento
             </h2>
             <div className="hidden md:block">
               <span className="px-3 py-1 bg-canvas text-fg-subtle text-xs font-semibold rounded-full border border-line">
-                Acesso Rápido Habilitado
+                Acesso rápido habilitado
               </span>
             </div>
           </div>

@@ -210,7 +210,7 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
         {/* Header with Inline Metrics */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-4">
-            <h1 className="text-xl font-bold text-fg">Banco de Questões</h1>
+            <h1 className="text-xl font-bold text-fg">Banco de questões</h1>
             <div className="hidden lg:flex items-center gap-4 bg-surface px-4 py-2 rounded-lg border border-line">
               <div className="flex items-center gap-2">
                 <span className="text-xs text-fg-subtle font-semibold">Total:</span>
@@ -234,7 +234,7 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
             className="flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-5 py-2.5 rounded-lg font-semibold transition-all"
           >
             <Plus size={18} />
-            Nova Questão
+            Nova questão
           </button>
         </div>
 
@@ -242,7 +242,7 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
         <div className="bg-surface p-5 md:p-4 rounded-2xl border border-line/60 mb-5">
           <div className="flex items-center gap-2 mb-5">
             <Filter className="w-5 h-5 text-fg-subtle" />
-            <h2 className="text-base font-bold text-fg">Filtros e Ações</h2>
+            <h2 className="text-base font-bold text-fg">Filtros e ações</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-5">
             <div>
@@ -260,7 +260,7 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-fg mb-1.5">Área de Conhecimento</label>
+              <label className="block text-sm font-semibold text-fg mb-1.5">Área de conhecimento</label>
               <div className="relative">
                 <select 
                   value={filters.areaId}
@@ -379,7 +379,7 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
                 >
                   <option value="">Todos os Tipos</option>
                   <option value="NORMAL">Normal</option>
-                  <option value="RECUPERACAO">Segunda Chamada</option>
+                  <option value="RECUPERACAO">Segunda chamada</option>
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-fg-subtle w-4 h-4 pointer-events-none" />
               </div>
@@ -391,7 +391,7 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
                   onClick={() => setFilters({ turmaId: '', disciplinaId: '', areaId: '', status: '', unidade: '', tipo: '', search: '', professorId: '' })}
                   className="w-full px-3 py-2 text-fg-muted bg-subtle hover:bg-subtle-hover font-bold rounded-lg transition-all text-xs flex items-center justify-center gap-1.5"
                 >
-                  <X size={14} /> Limpar Filtros
+                  <X size={14} /> Limpar filtros
                 </button>
               )}
               {isAdmin && (
@@ -407,7 +407,7 @@ export default function QuestoesClient({ user, turmas, disciplinas, metrics, que
                   }}
                   className="w-full h-8 px-3 text-fg bg-surface border border-line hover:bg-subtle font-medium rounded-md transition-colors duration-150 text-13 flex items-center justify-center gap-1.5"
                 >
-                  <CheckCircle2 size={14} /> Selecionar Pendentes
+                  <CheckCircle2 size={14} /> Selecionar pendentes
                 </button>
               )}
             </div>

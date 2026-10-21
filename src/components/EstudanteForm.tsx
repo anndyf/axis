@@ -62,7 +62,7 @@ export default function EstudanteForm({ estudante, isEdit = false }: EstudanteFo
 
       if (response.ok) {
         setResultMsg({ 
-          text: isEdit ? 'Estudante atualizado com sucesso!' : 'Estudante cadastrado com sucesso!', 
+          text: isEdit ? 'Estudante atualizado com sucesso.' : 'Estudante cadastrado com sucesso.', 
           ok: true 
         })
         
@@ -75,12 +75,12 @@ export default function EstudanteForm({ estudante, isEdit = false }: EstudanteFo
           }
         }, 1500)
       } else {
-        setError(data.message || 'Erro ao salvar estudante')
-        setResultMsg({ text: data.message || 'Erro ao salvar estudante', ok: false })
+        setError(data.message || 'Não foi possível salvar o estudante. Tente novamente.')
+        setResultMsg({ text: data.message || 'Não foi possível salvar o estudante. Tente novamente.', ok: false })
       }
     } catch (err) {
-      setError('Erro ao conectar com o servidor')
-      setResultMsg({ text: 'Erro de conexão com o servidor', ok: false })
+      setError('Não foi possível conectar ao servidor. Tente novamente.')
+      setResultMsg({ text: 'Não foi possível conectar ao servidor. Tente novamente.', ok: false })
     } finally {
       setLoading(false)
     }
@@ -101,19 +101,19 @@ export default function EstudanteForm({ estudante, isEdit = false }: EstudanteFo
       const data = await response.json()
 
       if (response.ok) {
-        setResultMsg({ text: 'Estudante excluído com sucesso!', ok: true })
+        setResultMsg({ text: 'Estudante excluído.', ok: true })
         
         setTimeout(() => {
           router.push('/dashboard/estudantes')
           router.refresh()
         }, 1500)
       } else {
-        setError(data.message || 'Erro ao excluir estudante')
-        setResultMsg({ text: data.message || 'Erro ao excluir estudante', ok: false })
+        setError(data.message || 'Não foi possível excluir o estudante. Tente novamente.')
+        setResultMsg({ text: data.message || 'Não foi possível excluir o estudante. Tente novamente.', ok: false })
       }
     } catch (err) {
-      setError('Erro ao conectar com o servidor')
-      setResultMsg({ text: 'Erro de conexão com o servidor', ok: false })
+      setError('Não foi possível conectar ao servidor. Tente novamente.')
+      setResultMsg({ text: 'Não foi possível conectar ao servidor. Tente novamente.', ok: false })
     } finally {
       setLoading(false)
     }

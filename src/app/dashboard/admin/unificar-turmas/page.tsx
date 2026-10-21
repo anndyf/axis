@@ -44,7 +44,7 @@ export default function MigracaoPage() {
       const refresh = await fetch('/api/admin/merge-turmas')
       setData(await refresh.json())
     } catch (error) {
-      alert('Erro na migração')
+      alert('Não foi possível concluir a migração. Tente novamente.')
     } finally {
       setMerging(false)
     }
@@ -55,7 +55,7 @@ export default function MigracaoPage() {
   return (
     <div className="max-w-formulario">
       <h1 className="text-2xl font-bold mb-2 flex items-center gap-2">
-        <Trash2 className="text-danger-fg" /> Assistente de Unificação de Turmas
+        <Trash2 className="text-danger-fg" /> Assistente de unificação de turmas
       </h1>
       <p className="text-fg-muted mb-4">Utilize esta ferramenta para mover questões e alunos entre turmas duplicadas.</p>
 

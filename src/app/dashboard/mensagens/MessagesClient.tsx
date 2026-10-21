@@ -1,26 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo, useTransition } from "react"
-import { 
-  MessageSquare, 
-  Send, 
-  Inbox, 
-  User, 
-  Search, 
-  CheckCheck, 
-  AlertCircle,
-  Megaphone,
-  LifeBuoy,
-  Plus,
-  ArrowLeft,
-  Clock,
-  MoreVertical,
-  X,
-  Tag,
-  Check,
-  Loader2,
-  ChevronRight
-} from "lucide-react"
+import { MessageSquare, Send, Inbox, User, Search, CheckCheck, AlertCircle, Megaphone, LifeBuoy, Plus, ArrowLeft, Clock, MoreVertical, X, Tag, Check, Loader2, ChevronRight, Wrench, Landmark, MessageCircle } from "lucide-react"
 import RichTextEditor from "@/components/RichTextEditor"
 import MarkdownContent from "@/components/MarkdownContent"
 import { sendMessage, markAsRead, getMessageThread, deleteMessage, markAllAsRead } from "./actions"
@@ -248,10 +229,10 @@ export default function MessagesClient({
 
   const getCatStyles = (cat: string) => {
     switch(cat) {
-      case "COMUNICADO": return { bg: "bg-warning-subtle", text: "text-warning-fg", dot: "bg-warning", border: "border-warning-line", label: "📢 Comunicado" }
-      case "SUPORTE": return { bg: "bg-accent-subtle", text: "text-accent-fg", dot: "bg-accent", border: "border-accent/25", label: "🛠️ Chamado Técnico" }
-      case "DIRECAO": return { bg: "bg-accent-subtle", text: "text-accent-fg", dot: "bg-accent", border: "border-accent/25", label: "🏛️ Chamado Direção" }
-      default: return { bg: "bg-success-subtle", text: "text-success-fg", dot: "bg-success", border: "border-success-line", label: "💬 Mensagem Geral" }
+      case "COMUNICADO": return { bg: "bg-warning-subtle", text: "text-warning-fg", dot: "bg-warning", border: "border-warning-line", label: "Comunicado", Icone: Megaphone }
+      case "SUPORTE": return { bg: "bg-accent-subtle", text: "text-accent-fg", dot: "bg-accent", border: "border-accent/25", label: "Chamado técnico", Icone: Wrench }
+      case "DIRECAO": return { bg: "bg-accent-subtle", text: "text-accent-fg", dot: "bg-accent", border: "border-accent/25", label: "Chamado à direção", Icone: Landmark }
+      default: return { bg: "bg-success-subtle", text: "text-success-fg", dot: "bg-success", border: "border-success-line", label: "Mensagem geral", Icone: MessageCircle }
     }
   }
 
@@ -277,7 +258,7 @@ export default function MessagesClient({
         <div className="flex flex-col h-full bg-canvas/20">
           <div className="p-4 md:px-4 border-b border-line-subtle flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h2 className="text-xl font-semibold text-fg tracking-tight">Painel de Chamados</h2>
+              <h2 className="text-xl font-semibold text-fg tracking-tight">Painel de chamados</h2>
               <button 
                 onClick={async () => {
                   startTransition(async () => {
@@ -299,20 +280,20 @@ export default function MessagesClient({
                   onClick={() => setActiveTab("inbox")}
                   className={`px-4 py-3 text-xs font-bold rounded-xl transition-all ${activeTab === 'inbox' ? 'bg-surface text-accent-fg shadow-sm' : 'text-fg-subtle hover:text-fg-muted'}`}
                 >
-                  Fila de Chamados
+                  Fila de chamados
                 </button>
                 <button
                   onClick={() => setActiveTab("sent")}
                   className={`px-4 py-3 text-xs font-bold rounded-xl transition-all ${activeTab === 'sent' ? 'bg-surface text-accent-fg shadow-sm' : 'text-fg-subtle hover:text-fg-muted'}`}
                 >
-                  Meus Chamados
+                  Meus chamados
                 </button>
               </div>
               <button
                 onClick={() => { setActiveTab("new"); setSelectedMessage(null); }}
                 className="w-full sm:w-auto px-4 py-3 bg-accent text-on-accent rounded-lg hover:bg-accent-hover transition-all flex items-center justify-center gap-2 font-bold text-sm"
               >
-                <Plus size={18} /> Novo Chamado
+                <Plus size={18} /> Novo chamado
               </button>
             </div>
           </div>
@@ -350,7 +331,7 @@ export default function MessagesClient({
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className={`px-2 py-1 rounded-lg text-xs font-semibold border ${style.bg} ${style.text} ${style.border}`}>
-                            {style.label}
+                            <style.Icone size={12} strokeWidth={1.75} aria-hidden className="mr-1 inline" />{style.label}
                           </span>
                           {!msg.isResolved && msg.category !== 'GERAL' && (
                             <span className={`px-2 py-1 rounded-lg text-xs font-semibold ${statusData.color} border border-current opacity-80`}>
@@ -431,7 +412,7 @@ export default function MessagesClient({
               <ArrowLeft size={20} className="text-fg-muted" />
             </button>
             <div>
-              <h2 className="text-2xl font-semibold text-fg tracking-tight leading-none">Abrir Novo Chamado</h2>
+              <h2 className="text-2xl font-semibold text-fg tracking-tight leading-none">Abrir novo chamado</h2>
               <p className="text-xs font-bold text-fg-subtle mt-1.5">Preencha os detalhes do seu ticket</p>
             </div>
           </div>
@@ -450,16 +431,16 @@ export default function MessagesClient({
                     <option value="DIRECAO">Direção (Pedagógico)</option>
                     {can(currentUserRole, 'mensagem.direcao.atender') && (
                       <>
-                        <option value="GERAL">Mensagem Privada</option>
-                        <option value="COMUNICADO">Comunicado Oficial</option>
-                        <option value="COMUNICADO_TURMA">Aviso para Turma</option>
+                        <option value="GERAL">Mensagem privada</option>
+                        <option value="COMUNICADO">Comunicado oficial</option>
+                        <option value="COMUNICADO_TURMA">Aviso para turma</option>
                       </>
                     )}
                   </select>
                 </div>
 
                 <div className="space-y-3">
-                  <label className="text-xs font-semibold text-fg-subtle ml-1">Nível de Urgência</label>
+                  <label className="text-xs font-semibold text-fg-subtle ml-1">Nível de urgência</label>
                   <select 
                     value={newMsgPriority} 
                     onChange={e => setNewMsgPriority(e.target.value)}
@@ -601,7 +582,7 @@ export default function MessagesClient({
               </div>
 
               <div className="space-y-3">
-                <label className="text-xs font-semibold text-fg-subtle ml-1">Descrição Completa da Ocorrência</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1">Descrição completa da ocorrência</label>
                 <div className="rounded-lg overflow-hidden border border-line">
                   <RichTextEditor
                     value={newMsgContent}
@@ -643,7 +624,7 @@ export default function MessagesClient({
                       CHAMADO #{selectedMessage.ticketNumber || selectedMessage.id.substring(selectedMessage.id.length - 6).toUpperCase()}
                     </span>
                     <span className={`px-2 py-0.5 rounded-md text-xs font-semibold border ${getCatStyles(selectedMessage.category).bg} ${getCatStyles(selectedMessage.category).text} ${getCatStyles(selectedMessage.category).border}`}>
-                      {getCatStyles(selectedMessage.category).label}
+                      {(() => { const C = getCatStyles(selectedMessage.category); return <><C.Icone size={12} strokeWidth={1.75} aria-hidden className="mr-1 inline" />{C.label}</> })()}
                     </span>
                   </div>
                   <h3 className="text-2xl font-semibold text-fg tracking-tight leading-none">
@@ -680,13 +661,13 @@ export default function MessagesClient({
                     }}
                     className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-accent-subtle hover:bg-accent-subtle text-accent-fg border border-accent/25 transition-colors cursor-pointer flex items-center gap-1"
                   >
-                    <User size={12} /> Assumir Chamado
+                    <User size={12} /> Assumir chamado
                   </button>
                 )}
 
                 {!selectedMessage.isResolved && selectedMessage.category !== 'GERAL' && (
                   <span className={`px-4 py-2.5 rounded-xl text-xs font-semibold bg-warning-subtle text-warning-fg border border-warning-line`}>
-                    Em Aberto
+                    Em aberto
                   </span>
                 )}
                 
@@ -699,7 +680,7 @@ export default function MessagesClient({
                     }}
                     className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-accent hover:bg-accent-hover text-on-accent transition-colors cursor-pointer flex items-center gap-1"
                   >
-                    <Check size={12} /> Marcar Resolvido
+                    <Check size={12} /> Marcar resolvido
                   </button>
                 )}
               </div>

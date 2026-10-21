@@ -103,7 +103,7 @@ export default function PlanoView({ planoId, onClose }: PlanoViewProps) {
         <div className="flex-1 overflow-y-auto p-4 space-y-5 bg-canvas/20 custom-scrollbar">
           <div className="space-y-3 px-1">
             <h3 className="text-xs font-bold text-fg-subtle flex items-center gap-2">
-               <Users className="w-3.5 h-3.5" /> Turmas Atendidas
+               <Users className="w-3.5 h-3.5" /> Turmas atendidas
             </h3>
             <div className="flex flex-wrap gap-1.5">
                 {plano.turmas.map(t => <span key={t.id} className="px-3 py-1.5 bg-surface border border-line-subtle rounded-lg font-bold text-fg-muted text-xs">{t.nome}</span>)}

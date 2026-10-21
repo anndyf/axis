@@ -8,6 +8,7 @@ const SEGMENTOS: Record<string, string> = {
   calendario: "Calendário letivo", avaliacao: "Esquemas de avaliação", identidade: "Identidade visual", status: "Situação",
   ui: "Componentes", perfil: "Meu perfil", importar: "Importar", recuperacao: "Recuperação final", pendencias: "Pendências",
   "unificar-turmas": "Unificar turmas", responsaveis: "Responsáveis",
+  novidades: "Novidades", suporte: "Suporte", historico: "Histórico",
 }
 
 /** Migalhas a partir da rota: Início › módulo › subpágina. */

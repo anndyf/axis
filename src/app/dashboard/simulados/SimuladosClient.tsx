@@ -179,7 +179,7 @@ export default function SimuladosClient({
         setMessage({ type: 'error', text: data.message || 'Erro ao carregar estudantes' })
       }
     } catch (err) {
-      setMessage({ type: 'error', text: 'Erro de conexão' })
+      setMessage({ type: 'error', text: 'Não foi possível conectar ao servidor. Tente novamente.' })
     } finally {
       setLoading(false)
     }
@@ -256,7 +256,7 @@ export default function SimuladosClient({
       })
 
       if (res.ok) {
-        setMessage({ type: 'success', text: 'Notas salvas com sucesso!' })
+        setMessage({ type: 'success', text: 'Notas salvas.' })
         setShowModal(false)
         setOriginalNotas({...notasTemp})
         setOriginalAusentes({...ausentesTemp})
@@ -269,7 +269,7 @@ export default function SimuladosClient({
         setMessage({ type: 'error', text: data.message || 'Erro ao salvar notas' })
       }
     } catch (err) {
-      setMessage({ type: 'error', text: 'Erro de conexão ao salvar' })
+      setMessage({ type: 'error', text: 'Não foi possível salvar: falha de conexão. Tente novamente.' })
     } finally {
       setSaving(false)
     }
@@ -367,7 +367,7 @@ export default function SimuladosClient({
                   href="/dashboard/simulados/responsaveis"
                   className="flex items-center gap-2 bg-accent text-on-accent px-4 py-3 rounded-lg font-medium hover:bg-accent-hover transition-all text-xs"
                 >
-                  <Users size={16} /> Designar Responsáveis
+                  <Users size={16} /> Designar responsáveis
                 </Link>
               )}
             </div>
@@ -382,7 +382,7 @@ export default function SimuladosClient({
         <div className="hidden print:block border-b-2 border-zinc-800 pb-4 mb-6">
            <div className="flex justify-between items-end">
               <div>
-                 <h1 className="text-2xl font-bold text-fg">Lista de Lançamento de Simulado</h1>
+                 <h1 className="text-2xl font-bold text-fg">Lista de lançamento de simulado</h1>
                  <p className="text-sm font-medium text-fg-muted mt-1">
                     Turma: {turmas.find(t => t.id === selectedTurma)?.nome || 'Não selecionada'} • 
                     Prova: {provas.find((p: any) => p.id === selectedProva)?.titulo || 'Não selecionada'} • 
@@ -418,7 +418,7 @@ export default function SimuladosClient({
         <div className="bg-surface p-4 rounded-xl border border-line flex flex-wrap gap-4 items-end relative overflow-hidden print:hidden">
             
             <div className="flex-1 min-w-[200px] space-y-2">
-                <label className="text-xs font-medium text-fg-subtle ml-2">Filtrar por Turma</label>
+                <label className="text-xs font-medium text-fg-subtle ml-2">Filtrar por turma</label>
                 <div className="relative group">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-canvas rounded-lg text-fg-subtle group-focus-within:text-danger-fg group-focus-within:bg-danger-subtle transition-all">
                     <Users size={16} />
@@ -512,7 +512,7 @@ export default function SimuladosClient({
             <div>
                <h2 className="text-lg font-medium text-fg flex items-center gap-2">
                  <Users size={20} className="text-fg-subtle" />
-                 Matriz de Avaliação Somativa
+                 Matriz de avaliação somativa
                </h2>
                <div className="mt-2">
                  {responsavelName && (
@@ -586,7 +586,7 @@ export default function SimuladosClient({
                 className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-4 py-2 rounded-xl text-xs font-semibold transition-all shrink-0"
               >
                 <UserPlus size={14} />
-                Reportar Ausência
+                Reportar ausência
               </button>
             </div>
           )}
@@ -705,7 +705,7 @@ export default function SimuladosClient({
                               {isFalta && nota2 < 0 ? 'Faltou' : isAltaPerformance ? 'Alta Performance' : isNaMedia ? 'Na Média' : 'Abaixo da Média'}
                             </span>
                           ) : (
-                            <span className="text-fg-disabled text-xs font-medium italic opacity-50">Não Lançado</span>
+                            <span className="text-fg-disabled text-xs font-medium italic opacity-50">Não lançado</span>
                           )}
                         </td>
                       </tr>
@@ -741,7 +741,7 @@ export default function SimuladosClient({
               <div className="flex items-center gap-3">
                  <div className="w-10 h-10 bg-zinc-600 text-white rounded-xl flex items-center justify-center"><Save size={20}/></div>
                   <div>
-                     <h3 className="text-lg font-medium text-fg">Consolidar Dados</h3>
+                     <h3 className="text-lg font-medium text-fg">Consolidar dados</h3>
                     <p className="text-xs font-medium text-fg-subtle">Revise as alterações do Simulado</p>
                   </div>
               </div>
@@ -766,7 +766,7 @@ export default function SimuladosClient({
                   onClick={() => setShowModal(false)}
                   className="px-4 py-3 rounded-xl font-medium text-fg-muted hover:bg-subtle-hover transition-all text-xs flex-1 md:flex-none text-center"
                 >
-                  Continuar Editando
+                  Continuar editando
                 </button>
                 <button
                   type="button"
@@ -793,7 +793,7 @@ export default function SimuladosClient({
               <div className="w-12 h-12 bg-accent-subtle text-accent-fg rounded-full flex items-center justify-center mx-auto mb-6 border border-accent/25">
                  <CheckCircle2 size={40} />
               </div>
-              <h3 className="text-2xl font-medium text-fg tracking-tight mb-2">Área de Lançamento</h3>
+              <h3 className="text-2xl font-medium text-fg tracking-tight mb-2">Área de lançamento</h3>
               <p className="text-sm text-fg-subtle leading-relaxed">
                 Você foi designado(a) como <strong>Responsável</strong> pela correção e lançamento das notas do Simulado desta turma na {selectedUnidade}ª Unidade.
               </p>
@@ -838,7 +838,7 @@ export default function SimuladosClient({
             <div className="px-4 py-2.5 border-b border-line flex justify-between items-center bg-canvas">
               <h3 className="text-lg font-medium text-fg flex items-center gap-2">
                 <Target size={20} className="text-accent-fg"/>
-                Gabarito da Prova
+                Gabarito da prova
               </h3>
               <button onClick={() => setShowGabaritoModal(false)} className="p-2 hover:bg-subtle-hover rounded-xl transition-all"><X size={20}/></button>
             </div>
@@ -873,7 +873,7 @@ export default function SimuladosClient({
             <div className="p-4 border-b border-line-subtle flex justify-between items-center bg-canvas">
               <h3 className="text-xl font-bold text-fg flex items-center gap-2">
                 <UserPlus className="w-5 h-5 text-accent-fg" />
-                Reportar Ausência
+                Reportar ausência
               </h3>
               <button onClick={() => setShowMissingStudentModal(false)} className="p-2 text-fg-subtle hover:text-fg-muted hover:bg-subtle-hover rounded-full transition-all">
                 <X size={20} />
@@ -941,7 +941,7 @@ export default function SimuladosClient({
                     "Aluno novo na turma",
                     "Transferência interna",
                     "Remanejamento",
-                    "Erro no cadastro",
+                    "Não foi possível concluir o cadastro. Tente novamente.",
                     "Matrícula recente"
                   ].map((motivo) => (
                     <button

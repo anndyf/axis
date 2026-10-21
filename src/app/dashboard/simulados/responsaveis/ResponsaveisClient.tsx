@@ -112,15 +112,15 @@ export default function ResponsaveisClient({
       })
 
       if (res.ok) {
-        setMessage({ type: 'success', text: "Responsável designado com sucesso!" })
+        setMessage({ type: 'success', text: "Responsável designado com sucesso." })
         setFormData({ userId: "", turmaId: "", provaId: "", areaId: "", unidade: "2" })
         loadResponsaveis()
       } else {
         const data = await res.json()
-        setMessage({ type: 'error', text: data.message || "Erro ao salvar" })
+        setMessage({ type: 'error', text: data.message || "Não foi possível salvar. Tente novamente." })
       }
     } catch (err) {
-      setMessage({ type: 'error', text: "Erro de conexão" })
+      setMessage({ type: 'error', text: "Não foi possível conectar ao servidor. Tente novamente." })
     } finally {
       setSaving(false)
     }
@@ -151,7 +151,7 @@ export default function ResponsaveisClient({
             <ArrowLeft className="w-5 h-5 text-fg-muted" />
           </Link>
           <div>
-            <h1 className="text-2xl font-medium text-fg tracking-tight">Responsáveis de Simulado</h1>
+            <h1 className="text-2xl font-medium text-fg tracking-tight">Responsáveis de simulado</h1>
             <p className="text-fg-muted text-sm">Designar professores para lançamento de notas por turma</p>
           </div>
         </div>
@@ -165,7 +165,7 @@ export default function ResponsaveisClient({
               <div className="p-2 bg-canvas rounded-lg">
                 <Plus className="w-5 h-5 text-fg-muted" />
               </div>
-              <h3 className="font-medium text-fg">Nova Designação</h3>
+              <h3 className="font-medium text-fg">Nova designação</h3>
             </div>
 
             <form onSubmit={handleAdd} className="space-y-4">
@@ -220,7 +220,7 @@ export default function ResponsaveisClient({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-fg-subtle ml-1">Professor Responsável</label>
+                <label className="text-xs font-medium text-fg-subtle ml-1">Professor responsável</label>
                 <select
                   required
                   value={formData.userId}
@@ -257,7 +257,7 @@ export default function ResponsaveisClient({
         <div className="lg:col-span-2 space-y-4">
           <div className="bg-surface rounded-2xl border border-line-strong overflow-hidden">
             <div className="p-4 border-b border-line bg-canvas flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-               <h3 className="font-medium text-fg">Professores Designados</h3>
+               <h3 className="font-medium text-fg">Professores designados</h3>
                <div className="relative max-w-xs w-full">
                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-subtle" />
                  <input

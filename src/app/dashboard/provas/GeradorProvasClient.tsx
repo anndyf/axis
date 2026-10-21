@@ -250,7 +250,7 @@ const ManualSelectorModal = ({ isOpen, onClose, onSelect, questions, selectedIds
       <div className="bg-surface w-full max-w-4xl max-h-[90vh] rounded-xl relative z-10 flex flex-col overflow-hidden animate-pop-in">
         <div className="p-4 border-b border-line-subtle flex items-center justify-between bg-surface">
           <div>
-            <h2 className="text-xl font-bold text-fg">Selecionar Questões</h2>
+            <h2 className="text-xl font-bold text-fg">Selecionar questões</h2>
             <div className="flex items-center gap-2">
               <p className="text-sm text-fg-subtle">{disciplinaNome}</p>
               <span className="text-fg-disabled">•</span>
@@ -343,7 +343,7 @@ const ManualSelectorModal = ({ isOpen, onClose, onSelect, questions, selectedIds
             onClick={onClose}
             className="bg-accent text-on-accent px-4 py-3 rounded-lg font-bold transition-all"
           >
-            Concluir Seleção
+            Concluir seleção
           </button>
         </div>
       </div>
@@ -792,7 +792,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
         throw new Error(data.message || "Erro ao excluir prova")
       }
       
-      alert("Prova excluída com sucesso!")
+      alert("Prova excluída com sucesso.")
       fetchProvas()
       if (viewingProva?.id === id) setViewingProva(null)
       if (lastSavedProva?.id === id) setLastSavedProva(null)
@@ -879,7 +879,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
         <div>
           <h1 className="text-2xl sm:text-xl font-bold text-fg flex items-center gap-3">
             <Scissors className="text-accent-fg" />
-            Gerador de Provas
+            Gerador de provas
           </h1>
           <p className="text-fg-subtle mt-2 text-sm">Crie ou gerencie suas avaliações profissionais.</p>
         </div>
@@ -917,7 +917,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
         <div className="xl:col-span-5 space-y-4">
           <div className="bg-surface p-4 rounded-xl border border-line-subtle space-y-4">
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-fg-subtle ml-1">Título da Prova</label>
+              <label className="text-xs font-semibold text-fg-subtle ml-1">Título da prova</label>
               <input 
                 value={titulo}
                 onChange={(e) => setTitulo(e.target.value)}
@@ -928,7 +928,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-fg-subtle ml-1">Tipo de Prova</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1">Tipo de prova</label>
                 <select 
                   value={tipoProva}
                   onChange={(e) => setTipoProva(e.target.value)}
@@ -949,19 +949,19 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                   className="w-full bg-canvas border-none rounded-xl px-4 py-3 font-bold text-fg focus:ring-2 focus:ring-ring transition-all"
                 >
                   <option value="">Livre (Todas)</option>
-                  <option value="CIÊNCIAS DA NATUREZA">Ciências da Natureza</option>
-                  <option value="CIÊNCIAS HUMANAS">Ciências Humanas</option>
+                  <option value="CIÊNCIAS DA NATUREZA">Ciências da natureza</option>
+                  <option value="CIÊNCIAS HUMANAS">Ciências humanas</option>
                   <option value="LINGUAGENS">Linguagens</option>
                   <option value="MATEMÁTICA">Matemática</option>
-                  <option value="DISCIPLINAS TÉCNICAS">Disciplinas Técnicas</option>
-                  <option value="DISCIPLINAS ARTICULADORAS">Disciplinas Articuladoras</option>
+                  <option value="DISCIPLINAS TÉCNICAS">Disciplinas técnicas</option>
+                  <option value="DISCIPLINAS ARTICULADORAS">Disciplinas articuladoras</option>
                 </select>
               </div>
             </div>
 
             {/* Filtros de Turma */}
             <div className="bg-canvas/50 p-4 rounded-xl border border-line-subtle space-y-3">
-              <label className="text-xs font-semibold text-fg-subtle ml-1">Filtrar Turmas</label>
+              <label className="text-xs font-semibold text-fg-subtle ml-1">Filtrar turmas</label>
               <div className="grid grid-cols-2 gap-3">
                 <select 
                   value={filterCurso}
@@ -1047,13 +1047,13 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                 className="w-full bg-canvas border-none rounded-xl px-4 py-3 font-bold text-fg focus:ring-2 focus:ring-ring transition-all"
               >
                 <option value="TODAS">Todas as Questões (Misto)</option>
-                <option value="NORMAL">Somente Prova Normal</option>
-                <option value="RECUPERACAO">Somente Segunda Chamada</option>
+                <option value="NORMAL">Somente prova normal</option>
+                <option value="RECUPERACAO">Somente segunda chamada</option>
               </select>
             </div>
 
             <div className="space-y-3">
-              <label className="text-xs font-semibold text-fg-subtle ml-1">Formato e Acessibilidade</label>
+              <label className="text-xs font-semibold text-fg-subtle ml-1">Formato e acessibilidade</label>
               <div className="flex flex-wrap items-center gap-3">
                 <div className="flex bg-subtle p-1 rounded-xl">
                   <button 
@@ -1091,7 +1091,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                   <div className="flex items-center gap-2 text-left">
                     <Eye size={16} className={isAmpliada ? 'text-warning-fg' : 'text-fg-subtle group-hover:text-warning-fg'} />
                     <div>
-                      <p className="text-xs font-bold leading-tight">Prova Ampliada</p>
+                      <p className="text-xs font-bold leading-tight">Prova ampliada</p>
                       <p className="text-xs font-medium opacity-70 leading-tight">Acessibilidade</p>
                     </div>
                   </div>
@@ -1118,7 +1118,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
           {selectedTurma && (
             <div className="bg-surface p-4 rounded-xl border border-line-subtle space-y-4">
               <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-semibold text-fg-subtle ml-1">Questões por Disciplina</label>
+                <label className="text-xs font-semibold text-fg-subtle ml-1">Questões por disciplina</label>
                 <button 
                   onClick={() => {
                     const qtd = prompt("Quantidade de questões para cada disciplina:")
@@ -1172,7 +1172,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                         }}
                         className="text-xs font-bold text-accent-fg hover:text-accent-fg flex items-center gap-1 mt-1"
                       >
-                        <Search size={10} /> Selecionar Manuais
+                        <Search size={10} /> Selecionar manuais
                       </button>
                     </div>
                     <div className="flex items-center gap-2 bg-surface border border-line rounded-lg p-1 shrink-0">
@@ -1234,7 +1234,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                     {draftQuestions.length}
                   </div>
                   <div>
-                    <h3 className="font-bold text-fg leading-tight text-sm">Rascunho Gerado</h3>
+                    <h3 className="font-bold text-fg leading-tight text-sm">Rascunho gerado</h3>
                     <p className="text-accent-fg text-xs">Você pode trocar questões individuais ou baixar o PDF.</p>
                   </div>
                 </div>
@@ -1242,7 +1242,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                   <button
                     onClick={async () => {
                       const saved = await saveProva()
-                      if (saved) alert("Prova salva no histórico com sucesso!")
+                      if (saved) alert("Prova salva no histórico com sucesso.")
                     }}
                     disabled={loading || !!lastSavedProva}
                     className={`px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all disabled:opacity-50 ${
@@ -1356,7 +1356,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
               </div>
               <h3 className="text-2xl font-semibold text-fg tracking-tight relative z-10">Sua prova está vazia</h3>
               <p className="text-fg-subtle mt-3 max-w-md leading-relaxed relative z-10 text-sm">
-                Siga os passos na barra lateral: escolha uma turma, defina a quantidade de questões por disciplina e clique em <b className="text-fg-muted">Gerar Rascunho</b> para visualizar e editar sua avaliação.
+                Siga os passos na barra lateral: escolha uma turma, defina a quantidade de questões por disciplina e clique em <b className="text-fg-muted">Gerar rascunho</b> para visualizar e editar sua avaliação.
               </p>
             </div>
             )}
@@ -1373,7 +1373,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
               </div>
               <div>
                 <div className="flex items-center gap-3">
-                  <h2 className="text-2xl font-bold text-fg leading-tight">Avaliações Recentes</h2>
+                  <h2 className="text-2xl font-bold text-fg leading-tight">Avaliações recentes</h2>
                   {!loadingHistory && Array.isArray(displayedProvas) && (
                     <span className="bg-warning-subtle text-warning-fg text-xs font-semibold px-2.5 py-1 rounded-full hidden sm:block border border-warning-line">
                       {displayedProvas.length} {displayedProvas.length === 1 ? 'Prova' : 'Provas'}
@@ -1597,7 +1597,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
               return Array.from(map.values())
             })
             
-            alert(`${data.length} questões de outras turmas foram adicionadas à lista!`)
+            alert(`${data.length} questões de outras turmas foram adicionadas à lista.`)
           } catch (error) {
             console.error(error)
             alert("Erro ao buscar questões de outras turmas.")
@@ -1745,7 +1745,7 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
               <div className="flex items-center gap-2 text-left">
                 <Eye size={16} className={localAmpliada ? 'text-warning-fg' : 'text-fg-subtle group-hover:text-warning-fg'} />
                 <div>
-                  <p className="text-xs font-bold leading-tight">Prova Ampliada</p>
+                  <p className="text-xs font-bold leading-tight">Prova ampliada</p>
                   <p className="text-xs font-medium opacity-70 leading-tight">Acessibilidade</p>
                 </div>
               </div>
@@ -1785,7 +1785,7 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
                 title="Gerar apenas o Gabarito do Professor"
               >
                 <ClipboardCheck size={16} />
-                Gerar Gabarito
+                Gerar gabarito
               </button>
               
             </div>

@@ -51,7 +51,7 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
         setErroExclusao(data.message || 'Erro ao excluir esquema')
       }
     } catch {
-      setErroExclusao('Erro ao conectar com o servidor')
+      setErroExclusao('Não foi possível conectar ao servidor. Tente novamente.')
     } finally {
       setExcluindo(false)
     }
@@ -66,7 +66,7 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
               <ArrowLeft size={16} strokeWidth={1.75} />
             </Link>
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight text-fg">Esquemas de Avaliação</h1>
+              <h1 className="text-2xl font-semibold tracking-tight text-fg">Esquemas de avaliação</h1>
               <p className="text-sm text-fg-muted">Unidades, atividades e regras de recuperação por escola</p>
             </div>
           </div>
@@ -75,7 +75,7 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
             className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
           >
             <Plus size={16} strokeWidth={1.75} />
-            <span>Novo Esquema</span>
+            <span>Novo esquema</span>
           </button>
         </div>
       </header>
@@ -95,7 +95,7 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
               className="inline-flex items-center space-x-2 bg-accent text-on-accent px-4 py-4 rounded-lg hover:bg-accent-hover transition-all font-medium text-xs"
             >
               <Plus size={16} />
-              <span>Criar Esquema</span>
+              <span>Criar esquema</span>
             </button>
           </div>
         ) : (

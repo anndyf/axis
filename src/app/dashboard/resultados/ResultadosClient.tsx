@@ -53,7 +53,7 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
             <Info className="w-6 h-6" />
           </div>
           <div className="flex-1">
-            <h3 className="text-sm font-bold text-fg mb-1">Dica de Monitoramento</h3>
+            <h3 className="text-sm font-bold text-fg mb-1">Dica de monitoramento</h3>
             <p className="text-sm text-fg-muted font-medium leading-relaxed">
               Acesse aqui a visão consolidada de todas as turmas. Esta seção é responsável por gerar os mapas de desempenho, detalhando as notas por unidades e o status acadêmico completo das turmas. Utilize os filtros para localizar a turma desejada e acesse o cartão correspondente para explorar os dados ou gerar relatórios em PDF.
             </p>
@@ -88,7 +88,7 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
             </div>
 
             <div className="flex-[2] min-w-[min(100%,250px)] space-y-2">
-                <label className="text-xs font-medium text-fg-subtle ml-2">Pesquisar Turma</label>
+                <label className="text-xs font-medium text-fg-subtle ml-2">Pesquisar turma</label>
                 <div className="relative group">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-canvas rounded-lg text-fg-subtle group-focus-within:text-fg-muted group-focus-within:bg-subtle transition-all">
                         <Search size={18} />

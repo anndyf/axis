@@ -110,7 +110,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
         router.refresh()
       }
     } catch (err) {
-      alert('Erro ao salvar')
+      alert('Não foi possível salvar. Tente novamente.')
     } finally {
       setLoading(false)
     }
@@ -129,14 +129,14 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
                 className="flex items-center gap-2 border border-line-strong text-fg-muted px-4 py-2.5 rounded-xl font-medium text-sm hover:bg-canvas transition-all"
               >
                 <ClipboardPaste className="w-4 h-4" />
-                <span>Importar Horário</span>
+                <span>Importar horário</span>
               </Link>
               <button
                 onClick={handleSave} disabled={loading}
                 className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
               >
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                <span>Salvar Alterações</span>
+                <span>Salvar alterações</span>
               </button>
             </div>
       </div>
@@ -183,7 +183,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
         <div className="mb-6 p-4 bg-accent-subtle border border-accent/25 rounded-lg flex items-start gap-3">
           <Info className="w-5 h-5 text-accent-fg shrink-0 mt-0.5" />
           <div className="text-sm text-accent-fg">
-            <p className="font-bold mb-1">Regra de Exclusividade Ativa</p>
+            <p className="font-bold mb-1">Regra de exclusividade ativa</p>
             <p className="text-xs font-medium opacity-90 leading-relaxed">
               Cada disciplina pode ter apenas <strong>um professor associado</strong>. 
               Ao selecionar uma matéria que já possui professor (marcada em <span className="text-warning-fg font-bold">amarelo</span>), 

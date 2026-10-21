@@ -501,7 +501,7 @@ export default function TurmasListClient({
 
                       {turma.minhasDisciplinas && turma.minhasDisciplinas.length > 0 && (
                         <div className="mt-4 pt-4 border-t border-line-subtle">
-                          <p className="text-xs font-bold text-fg-subtle mb-2">Suas Disciplinas</p>
+                          <p className="text-xs font-bold text-fg-subtle mb-2">Suas disciplinas</p>
                           <div className="flex flex-wrap gap-1.5">
                             {turma.minhasDisciplinas.map((d: any) => (
                               <span key={d.id} className="inline-flex items-center px-2 py-0.5 bg-subtle text-fg-muted text-xs font-medium rounded-md border border-line">

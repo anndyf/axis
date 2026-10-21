@@ -57,7 +57,7 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
               }}
               className="px-4 py-3 bg-subtle text-fg-muted font-medium rounded-xl hover:bg-subtle-hover transition-all"
             >
-              Reportar Outro Aluno
+              Reportar outro aluno
             </button>
             <Link 
               href="/dashboard"
@@ -158,7 +158,7 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
                     "Aluno novo na turma",
                     "Transferência interna",
                     "Remanejamento",
-                    "Erro no cadastro",
+                    "Não foi possível concluir o cadastro. Tente novamente.",
                     "Matrícula recente"
                   ].map((motivo) => (
                     <button

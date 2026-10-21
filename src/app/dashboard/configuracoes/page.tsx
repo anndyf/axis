@@ -54,14 +54,14 @@ export default function ConfiguracoesPage() {
       })
 
       if (res.ok) {
-        setMessage({ type: 'success', text: 'Configurações atualizadas com sucesso!' })
+        setMessage({ type: 'success', text: 'Configurações atualizadas com sucesso.' })
         // Força atualização da página para refletir no sidebar se necessário
         window.location.reload()
       } else {
         setMessage({ type: 'error', text: 'Erro ao salvar configurações.' })
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Erro de conexão.' })
+      setMessage({ type: 'error', text: 'Não foi possível conectar ao servidor. Tente novamente.' })
     } finally {
       setSaving(false)
     }

@@ -82,7 +82,7 @@ export default function AEEProfileClient({
         router.refresh()
       }
     } catch {
-      alert('Erro ao processar aceite')
+      alert('Não foi possível registrar a confirmação de leitura. Tente novamente.')
     } finally {
       setLoading(false)
     }

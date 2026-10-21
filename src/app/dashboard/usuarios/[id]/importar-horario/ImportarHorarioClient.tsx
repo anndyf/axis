@@ -68,7 +68,7 @@ export default function ImportarHorarioClient({
           .map((e: Encontrado) => e.discId)
       ))
     } catch {
-      setErro("Erro de conexão com o servidor")
+      setErro("Não foi possível conectar ao servidor. Tente novamente.")
     } finally {
       setVerificando(false)
     }
@@ -91,7 +91,7 @@ export default function ImportarHorarioClient({
       setSucesso(true)
       setTimeout(() => router.push(`/dashboard/usuarios/${usuario.id}/disciplinas`), 1500)
     } catch {
-      setErro("Erro de conexão com o servidor")
+      setErro("Não foi possível conectar ao servidor. Tente novamente.")
     } finally {
       setImportando(false)
     }
