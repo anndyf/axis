@@ -9,11 +9,12 @@ import { ICONE } from './cn'
  * Botão "Imprimir" das telas com folha de impressão própria. Marca a página
  * com data-folha-impressao: só nessas telas a folha do sistema vale
  * (globals.css: sem menu, sem fundo, cabeçalho com escola e data/hora e
- * paginação). Ctrl+P na mesma tela dá o mesmo resultado.
+ * paginação). Ctrl+P na mesma tela dá o mesmo resultado. Some no celular
+ * (o app não imprime; a folha continua valendo se imprimir pelo navegador).
  */
 export function BotaoImprimir({ rotulo = 'Imprimir' }: { rotulo?: string }) {
   return (
-    <Button type="button" variant="secondary" size="sm" data-folha-impressao onClick={() => window.print()} className="print:hidden">
+    <Button type="button" variant="secondary" size="sm" data-folha-impressao onClick={() => window.print()} className="max-md:hidden print:hidden">
       <Printer {...ICONE} aria-hidden /> {rotulo}
     </Button>
   )

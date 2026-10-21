@@ -32,9 +32,8 @@ servidor de desenvolvimento recarrega as mudanças em andamento.
 
 ## Próximo passo exato
 
-Encerramento: rodada final de capturas (1440, 1280 e 375px, claro e escuro)
-em `docs/capturas/layout-sistema/9-final/`, conferir celular, escrever "Para
-validar localmente", abrir o PR para `main` e marcar STATUS.
+Abrir o PR para `main` (se ainda não houver) e marcar STATUS no fim deste
+arquivo. Capturas finais já estão em `docs/capturas/layout-sistema/9-final/`.
 
 ## Etapa 1 — o que foi feito
 
@@ -321,6 +320,12 @@ for a versão de lançamento para as escolas).
   turma (ao lado do PDF que já existia) e frequência/infrequência (tela
   Frequência e aba da turma; o cadastro de atestados fica fora do papel).
 - Vitrine `/dashboard/ui`: seção "Impressão".
+- O botão some no celular (o app não imprime); a folha continua valendo se
+  imprimir pelo navegador.
+- Conferência final: sem rolagem horizontal da página em 375 e 1280px nas
+  telas principais (painel, turmas, ficha e estudantes da turma, ficha do
+  estudante, diário, resultados, frequência, estudantes, ocorrências,
+  vitrine); tabelas largas rolam dentro do próprio painel.
 - Prévias (PDF gerado pelo Chromium, página 1) em
   `docs/capturas/layout-sistema/8-impressao/`.
 
