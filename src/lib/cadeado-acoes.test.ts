@@ -259,7 +259,7 @@ describe('chamada e diário', () => {
   it('data dentro da unidade encerrada bloqueia; fora de qualquer unidade não', async () => {
     const c = await chamada()
     como(A, 'prof')
-    expect(await c.abrirChamada(A.turma, A.mat, '2026-03-09')).toEqual({ erro: MSG_U1 }) // não cria aula
+    expect(await c.abrirChamada(A.turma, A.mat, '2026-03-09')).toEqual({ erro: MSG_U1, trancada: true }) // não cria aula
     expect(await prisma.aula.count({ where: { turmaId: A.turma, data: new Date('2026-03-09') } })).toBe(0)
     const fora = await c.abrirChamada(A.turma, A.mat, '2026-02-02')
     if ('erro' in fora) throw new Error(fora.erro)
@@ -284,7 +284,7 @@ describe('chamada e diário', () => {
     como(A, 'prof')
     expect(await c.salvarChamada(A.aulaU1, [], 'Frações')).toEqual({ ok: true })
     como(A, 'outroProf')
-    expect(await c.abrirChamada(A.turma, A.por, '2026-03-16')).toEqual({ erro: MSG_U1 })
+    expect(await c.abrirChamada(A.turma, A.por, '2026-03-16')).toEqual({ erro: MSG_U1, trancada: true })
     const r = await prisma.reaberturaUnidade.findFirstOrThrow({ where: { escolaId: A.escola, revogadaEm: null } })
     como(A, 'direcao')
     expect(await g.revogarReabertura(r.id)).toEqual({ ok: true })

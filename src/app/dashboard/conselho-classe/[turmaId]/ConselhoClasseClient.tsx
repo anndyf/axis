@@ -545,10 +545,14 @@ export default function ConselhoClasseClient({
       <main className="pt-4 pb-32 space-y-5 no-print">
         {Object.keys(cadeado).length > 0 && (
           <ul className="space-y-1.5" aria-label="Unidades encerradas">
-            {Object.entries(cadeado).map(([id, c]) => (
-              <li key={id} className={`flex items-start gap-2 rounded-painel border px-3.5 py-2 text-13 ${c.trancada ? 'border-line bg-subtle text-fg-muted' : 'border-warning-line bg-warning-subtle text-warning-fg'}`} role="status">
+            {/* Um aviso por situação, com as disciplinas a que se aplica */}
+            {Object.values(Object.values(cadeado).reduce<Record<string, { trancada: boolean; aviso: string; disciplinas: string[] }>>((acc, c) => {
+              (acc[c.aviso] ??= { trancada: c.trancada, aviso: c.aviso, disciplinas: [] }).disciplinas.push(c.disciplina)
+              return acc
+            }, {})).map((c) => (
+              <li key={c.aviso} className={`flex items-start gap-2 rounded-painel border px-3.5 py-2 text-13 ${c.trancada ? 'border-line bg-subtle text-fg-muted' : 'border-warning-line bg-warning-subtle text-warning-fg'}`} role="status">
                 {c.trancada ? <Lock size={15} strokeWidth={1.75} className="mt-px shrink-0" aria-hidden /> : <LockOpen size={15} strokeWidth={1.75} className="mt-px shrink-0" aria-hidden />}
-                <span><strong className="font-medium">{c.disciplina}:</strong> {c.aviso}</span>
+                <span><strong className="font-medium">{c.disciplinas.join(', ')}:</strong> {c.aviso}</span>
               </li>
             ))}
           </ul>

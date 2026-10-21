@@ -138,7 +138,7 @@ export default function EncerramentoClient(props: {
               <THead>
                 <tr>
                   <TH>Unidade</TH>
-                  <TH>Período</TH>
+                  <TH className="max-md:hidden">Período</TH>
                   <TH>Situação</TH>
                   {props.podeGerir && <TH className="text-right">Ação</TH>}
                 </tr>
@@ -146,8 +146,11 @@ export default function EncerramentoClient(props: {
               <TBody>
                 {esq.unidades.map((u) => (
                   <TR key={u.id}>
-                    <TD className="font-medium text-fg whitespace-nowrap">{u.nome}</TD>
-                    <TD className="whitespace-nowrap tabular-nums text-fg-muted">{u.inicio && u.fim ? `${dataBR(u.inicio)} a ${dataBR(u.fim)}` : "—"}</TD>
+                    <TD className="font-medium text-fg whitespace-nowrap">
+                      {u.nome}
+                      {u.inicio && u.fim && <span className="block text-xs font-normal tabular-nums text-fg-subtle md:hidden">{dataBR(u.inicio)} a {dataBR(u.fim)}</span>}
+                    </TD>
+                    <TD className="whitespace-nowrap tabular-nums text-fg-muted max-md:hidden">{u.inicio && u.fim ? `${dataBR(u.inicio)} a ${dataBR(u.fim)}` : "—"}</TD>
                     <TD><Situacao u={u} /></TD>
                     {props.podeGerir && (
                       <TD className="text-right whitespace-nowrap">

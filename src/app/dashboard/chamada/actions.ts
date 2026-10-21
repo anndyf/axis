@@ -31,7 +31,7 @@ export interface ChamadaAberta {
   trancada: string | null
 }
 
-type Erro = { erro: string }
+type Erro = { erro: string; trancada?: true }
 
 async function usuario() {
   const session = await auth()
@@ -72,7 +72,7 @@ export async function abrirChamada(turmaId: string, disciplinaId: string | null,
   const cadeado = await podeGravarAula(user.escolaId, turmaBase.id, acesso.disciplina?.id ?? null, data)
   const trancada = cadeado.ok ? null : cadeado.mensagem
   let aula = existente
-  if (!aula && trancada) return { erro: trancada }
+  if (!aula && trancada) return { erro: trancada, trancada: true }
   if (!aula) {
     const plano = planejarChamada({ registro, data, hoje: hojeNaEscola(), turmaId: turmaBase.id, disciplinaId: acesso.disciplina?.id ?? null, calendario, horario })
     if (!plano.ok) return { erro: plano.erro }

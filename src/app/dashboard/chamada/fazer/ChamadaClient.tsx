@@ -37,6 +37,8 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
   const [pendente, startTransition] = useTransition()
   const [chamada, setChamada] = useState<ChamadaAberta | null>(null)
   const [erroAbertura, setErroAbertura] = useState<string | null>(null)
+  // Dia de unidade encerrada sem chamada registrada: aviso de cadeado, não de erro
+  const [aberturaTrancada, setAberturaTrancada] = useState(false)
   const [faltas, setFaltas] = useState<Record<string, Falta>>({})
   const [observacoes, setObservacoes] = useState<Record<string, string>>({})
   const [conteudo, setConteudo] = useState("")
@@ -55,7 +57,7 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
     let ativo = true
     abrirChamada(turmaId, disciplinaId, data).then((r) => {
       if (!ativo) return
-      if ("erro" in r) { setErroAbertura(r.erro); return }
+      if ("erro" in r) { setErroAbertura(r.erro); setAberturaTrancada(!!r.trancada); return }
       setChamada(r)
       setFaltas(r.faltas)
       setObservacoes(r.observacoes)
@@ -186,11 +188,17 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
               <CalendarRange size={16} strokeWidth={1.75} aria-hidden /> Calendário
             </button>
           )}
-          {!chamada?.trancada && <p className="w-full text-13 text-fg-subtle">Todos começam presentes; toque em quem faltou.</p>}
+          {!chamada?.trancada && !aberturaTrancada && <p className="w-full text-13 text-fg-subtle">Todos começam presentes; toque em quem faltou.</p>}
         </div>
       </section>
 
-      {erroAbertura && <Alert tone="danger" title="Não foi possível abrir a chamada">{erroAbertura}</Alert>}
+      {erroAbertura && !aberturaTrancada && <Alert tone="danger" title="Não foi possível abrir a chamada">{erroAbertura}</Alert>}
+      {erroAbertura && aberturaTrancada && (
+        <div className="flex items-start gap-2.5 rounded-painel border border-line bg-subtle px-3.5 py-2.5 text-13 text-fg-muted" role="status">
+          <Lock size={16} strokeWidth={1.75} className="mt-px shrink-0" aria-hidden />
+          <span><strong className="font-medium text-fg">Unidade encerrada.</strong> {erroAbertura}</span>
+        </div>
+      )}
       {aviso && <Alert tone={aviso.tipo === "ok" ? "success" : "danger"}>{aviso.texto}</Alert>}
       {chamada?.trancada && (
         <div className="flex items-start gap-2.5 rounded-painel border border-line bg-subtle px-3.5 py-2.5 text-13 text-fg-muted" role="status">
