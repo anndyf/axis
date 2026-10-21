@@ -112,7 +112,7 @@ export default function ImportarHorarioClient({
     <div className="">
       {/* Header */}
       <header className="mb-6">
-        <div className="max-w-4xl mx-auto px-6 flex flex-wrap items-center justify-between gap-3">
+        <div className="mx-auto max-w-leitura flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-4">
             <Link
               href={`/dashboard/usuarios/${usuario.id}/disciplinas`}
@@ -143,7 +143,7 @@ export default function ImportarHorarioClient({
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-8 space-y-6">
+      <main className="mx-auto max-w-leitura py-8 space-y-6">
 
         {/* Sucesso */}
         {sucesso && (

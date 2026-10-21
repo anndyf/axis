@@ -22,7 +22,7 @@ servidor de desenvolvimento recarrega as mudanças em andamento.
 ## Etapas
 
 - [x] 1. Fundação de área de trabalho (tokens e componentes)
-- [ ] 2. Casca (largura, barra superior de contexto, menu lateral compacto)
+- [x] 2. Casca (largura, barra superior de contexto, menu lateral compacto)
 - [ ] 3. Fichas com abas (turma, estudante, usuário, AEE)
 - [ ] 4. Listas e telas de trabalho
 - [ ] 5. Rastreabilidade visível
@@ -32,13 +32,9 @@ servidor de desenvolvimento recarrega as mudanças em andamento.
 
 ## Próximo passo exato
 
-Etapa 2: em `src/app/dashboard/layout.tsx` tirar o `max-w-[1400px]` e usar
-`px-pagina py-pagina-y`; nova barra superior de 48px em
-`src/components/DashboardTopbar.tsx` (escola, "Ano letivo 2026" só exibido,
-perfil/visão, busca Ctrl+K, notificações, usuário); caminho automático acima
-do conteúdo, escondido quando a tela usa `CabecalhoPagina`; menu lateral
-compacto (`DashboardSidebar.tsx`); remover `max-w-*` estreitos das páginas de
-trabalho.
+Etapa 3 (fichas com abas): turma em `src/app/dashboard/turmas/[id]/` com
+layout de ficha (CabecalhoPagina + Abas) e rotas filhas que reaproveitam as
+páginas existentes; depois estudante, usuário e ficha AEE.
 
 ## Etapa 1 — o que foi feito
 
@@ -84,3 +80,37 @@ Componentes novos (`src/components/ui`), todos na vitrine `/dashboard/ui`:
    celular usam `rounded-modal` (12px) explicitamente.
 2. Capturas: rodada completa (todas as telas) em "0-antes" e no final; nas
    etapas intermediárias só as telas afetadas, para não inchar o repositório.
+
+## Etapa 2 — o que foi feito
+
+- `src/app/dashboard/layout.tsx`: a área de trabalho ocupa a largura toda
+  (`px-pagina py-pagina-y`, sem o `max-w-[1400px]`). Acima do conteúdo, o
+  caminho automático (`CaminhoAutomatico`), que some quando a tela traz
+  `CabecalhoPagina` (regra em `globals.css`).
+- Barra superior nova (`DashboardTopbar.tsx`, 48px no desktop): escola, "Ano
+  letivo 2026" só exibido (sem seletor), perfil com o seletor de visão do
+  painel (as mesmas visões de antes, agora calculadas em
+  `src/lib/services/painel-visoes-servidor.ts` e usadas também pelo painel),
+  busca (abre a mesma busca do Ctrl+K), notificações com contagem de não
+  lidas e menu do usuário (perfil, senha, componentes, tema, sair). No
+  celular a barra continua como era.
+- Menu lateral mais compacto: itens de 32px, rótulos de grupo em frase
+  normal (sem caixa alta), mesma cor e mesmos itens. Busca e menu do usuário
+  saíram do menu lateral (estão na barra superior); a consulta de não lidas
+  e pendentes passou para o `DashboardLayoutWrapper` (uma só, para o menu e
+  o sino).
+- Nomes dos módulos em frase normal (`src/lib/modules.ts`): "Lançar notas",
+  "Chamada e diário", "Gestão acadêmica"... O item "Dashboard" virou
+  "Painel".
+- `max-w` estreitos removidos das telas de trabalho (33 arquivos, junto com
+  o recuo lateral duplicado `px-4 sm:px-6 lg:px-8`). Ficam limitados só
+  formulários curtos (`max-w-formulario`: reportar estudante, unificar
+  turmas, nova mensagem) e telas de leitura (`max-w-leitura`: configurações,
+  perfil, calendário, vincular disciplinas, importar horário, minhas
+  avaliações, leitura de mensagem).
+
+Decisões:
+3. O caminho (migalhas) saiu da barra superior para o cabeçalho de cada tela;
+   a barra superior ficou com o contexto de trabalho (como SIGEduc/SUAP).
+4. O seletor de visão do painel fica na barra superior (menu do perfil); no
+   celular continua nas fichas dentro do painel.

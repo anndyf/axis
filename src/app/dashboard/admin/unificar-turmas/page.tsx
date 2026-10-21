@@ -53,7 +53,7 @@ export default function MigracaoPage() {
   if (loading) return <div className="p-8 flex justify-center"><Loader2 className="animate-spin" /></div>
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
+    <div className="mx-auto max-w-formulario">
       <h1 className="text-2xl font-bold mb-2 flex items-center gap-2">
         <Trash2 className="text-danger-fg" /> Assistente de Unificação de Turmas
       </h1>

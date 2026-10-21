@@ -10,6 +10,9 @@ import MenuMais from "./MenuMais"
 import { itemAtivo, navegacaoMobile } from "@/lib/services/navegacao-mobile"
 import { cn } from "@/components/ui/cn"
 import { can } from "@/lib/rbac"
+import { getUnreadCount } from "@/app/dashboard/mensagens/actions"
+import { getPendingUsersCount } from "@/app/dashboard/usuarios/actions"
+import type { VisaoPainel } from "@/lib/services/painel-visoes"
 
 export default function DashboardLayoutWrapper({
   children,
@@ -17,12 +20,15 @@ export default function DashboardLayoutWrapper({
   escola,
   modulosAtivos,
   anoLetivo,
+  visoes = [],
 }: {
   children: ReactNode
   user: any
   escola: EscolaDoMenu
   modulosAtivos: string[]
   anoLetivo?: number
+  /** visões do painel inicial do usuário (seletor na barra superior) */
+  visoes?: VisaoPainel[]
 }) {
   // Padrão expandido; a preferência fica no navegador
   const [isCollapsed, setIsCollapsed] = useState(false)
@@ -44,6 +50,19 @@ export default function DashboardLayoutWrapper({
   }
   const closeMobile = useCallback(() => setIsMobileOpen(false), [])
 
+  // Mensagens não lidas (sino e menu) e cadastros pendentes (menu)
+  const [contagens, setContagens] = useState<{ mensagens: number; usuarios: number }>({ mensagens: 0, usuarios: 0 })
+  useEffect(() => {
+    // Consulta interrompida (troca de página, rede) não é erro: tenta na próxima rodada
+    const atualizar = () => {
+      getUnreadCount().then((mensagens) => setContagens((c) => ({ ...c, mensagens }))).catch(() => {})
+      getPendingUsersCount().then((usuarios) => setContagens((c) => ({ ...c, usuarios }))).catch(() => {})
+    }
+    atualizar()
+    const interval = setInterval(atualizar, 30000)
+    return () => clearInterval(interval)
+  }, [])
+
   // Celular: barra inferior por perfil + painel "Mais" (o menu lateral fica para md+)
   const pathname = usePathname()
   const [maisAberto, setMaisAberto] = useState(false)
@@ -62,6 +81,7 @@ export default function DashboardLayoutWrapper({
         toggleCollapse={toggleCollapse}
         isMobileOpen={isMobileOpen}
         closeMobile={closeMobile}
+        contagens={contagens}
       />
       {/* --barra-inferior (globals.css): espaço da barra do celular */}
       <div className={cn(
@@ -69,7 +89,11 @@ export default function DashboardLayoutWrapper({
         "pb-[var(--barra-inferior)] print:pb-0",
         isCollapsed ? "md:ml-16" : "md:ml-64"
       )}>
-        <DashboardTopbar escola={escola} nome={user?.name} raizes={[...nav.barra, ...nav.mais].map((i) => i.href)} />
+        <DashboardTopbar
+          nome={user?.name}
+          raizes={[...nav.barra, ...nav.mais].map((i) => i.href)}
+          contexto={{ escola, anoLetivo, papel: papelDoUsuario(user), visoes, naoLidas: contagens.mensagens, podeVerComponentes: can(user, "escola.administrar") }}
+        />
         <main className="flex min-w-0 flex-1 flex-col print:block">{children}</main>
       </div>
       <BarraInferior itens={nav.barra} ativo={ativo} maisAberto={maisAberto} onMais={() => setMaisAberto(true)} />

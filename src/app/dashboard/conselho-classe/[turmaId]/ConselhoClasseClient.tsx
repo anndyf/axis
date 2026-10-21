@@ -512,7 +512,7 @@ export default function ConselhoClasseClient({
     <div className="no-print">
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
       <header className="mb-6 border-b border-line pb-4 no-print">
-        <div className="max-w-7xl mx-auto py-4">
+        <div className="py-4">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="flex items-center space-x-5">
               <Link
@@ -538,7 +538,7 @@ export default function ConselhoClasseClient({
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-32 space-y-8 no-print">
+      <main className="pt-4 pb-32 space-y-8 no-print">
         <form onSubmit={handleSubmit}>
           {/* Mensagem */}
           {message && (

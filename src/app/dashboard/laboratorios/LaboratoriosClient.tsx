@@ -220,7 +220,7 @@ export default function LaboratoriosClient({
   const selectedTurma = myTurmas.find(t => t.id === selectedTurmaId)
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 animate-fade-in pb-20">
+    <div className="space-y-8 animate-fade-in pb-20">
       {/* Header Centralizado */}
       <section className="bg-surface border border-line rounded-xl p-8 shadow-sm relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-zinc-500/5 rounded-full blur-3xl -mr-32 -mt-32"></div>

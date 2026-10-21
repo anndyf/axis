@@ -351,6 +351,9 @@
  * para não ficarem atrás dela. Zero no desktop e em telas sem a barra.
  */
 :root { --barra-inferior: 0px; }
+
+/* Caminho automático do layout: só nas telas sem CabecalhoPagina próprio */
+main:has([data-cabecalho-pagina]) .caminho-layout { display: none; }
 @media (max-width: 767.98px) {
   :root:has([data-barra-inferior]) { --barra-inferior: calc(4rem + env(safe-area-inset-bottom)); }
 }

@@ -32,7 +32,7 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
 
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
       <header className="mb-6">
-        <div className="max-w-7xl mx-auto">
+        <div className="">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="flex min-w-0 items-center gap-3">
               <Link
@@ -51,7 +51,7 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 pt-2 pb-8 space-y-6 md:pt-4 md:pb-32 md:space-y-8">
+      <main className="pt-2 pb-8 space-y-6 md:pt-4 md:pb-32 md:space-y-8">
         
         {/* Dica de Uso */}
         <div className="hidden bg-subtle border border-line rounded-lg p-5 items-start gap-4 md:flex">

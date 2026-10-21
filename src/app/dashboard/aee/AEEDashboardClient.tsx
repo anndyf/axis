@@ -167,7 +167,7 @@ export default function AEEDashboardClient({
     <div className="pb-10 text-fg antialiased">
       {/* Header Dinâmico */}
       <header className="mb-6">
-        <div className="max-w-7xl mx-auto">
+        <div className="">
           <div className="flex flex-wrap items-center justify-between gap-3">
              <div className="flex min-w-0 items-center gap-3">
                <button
@@ -239,7 +239,7 @@ export default function AEEDashboardClient({
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-32 space-y-8">
+      <main className="pt-4 pb-32 space-y-8">
         {!activePanel ? (
           <>
             {/* Stats Row */}

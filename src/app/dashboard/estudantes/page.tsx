@@ -186,7 +186,7 @@ export default async function EstudantesPage({
   const acaoIcone = "p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg"
 
   return (
-    <div className="mx-auto max-w-7xl space-y-4 pb-16">
+    <div className="space-y-4 pb-16">
       <PageHeader
         title="Estudantes"
         description="Cadastro de alunos, acesso ao portal e boletins."

@@ -41,33 +41,33 @@ export type Modulo = {
 }
 
 export const MODULOS: Modulo[] = [
-  { id: 'dashboard', nome: 'Dashboard', grupo: 'Início', icone: LayoutDashboard, rota: '/dashboard', moduloId: 'NUC', permissao: () => true },
+  { id: 'dashboard', nome: 'Painel', grupo: 'Início', icone: LayoutDashboard, rota: '/dashboard', moduloId: 'NUC', permissao: () => true },
   { id: 'mensagens', nome: 'Mensagens', grupo: 'Início', icone: MessageSquare, rota: '/dashboard/mensagens', moduloId: 'NUC', permissao: () => true },
-  { id: 'laboratorios', nome: 'Reserva de Laboratórios', grupo: 'Início', icone: FlaskConical, rota: '/dashboard/laboratorios', moduloId: 'REC', permissao: (u) => !can(u, 'aee.atender') },
+  { id: 'laboratorios', nome: 'Reserva de laboratórios', grupo: 'Início', icone: FlaskConical, rota: '/dashboard/laboratorios', moduloId: 'REC', permissao: (u) => !can(u, 'aee.atender') },
 
-  { id: 'turmas', nome: 'Turmas', grupo: 'Gestão Acadêmica', icone: Users, rota: '/dashboard/turmas', moduloId: 'NUC', permissao: (u) => !can(u, 'aee.atender') && can(u, 'turma.ler') },
-  { id: 'disciplinas', nome: 'Disciplinas', grupo: 'Gestão Acadêmica', icone: BookOpen, rota: '/dashboard/disciplinas', moduloId: 'NUC', permissao: (u) => !can(u, 'aee.atender') && can(u, 'disciplina.gerenciar') },
-  { id: 'estudantes', nome: 'Estudantes', grupo: 'Gestão Acadêmica', icone: GraduationCap, rota: '/dashboard/estudantes', moduloId: 'NUC', permissao: (u) => !can(u, 'aee.atender') && can(u, 'estudante.ler') },
-  { id: 'ocorrencias', nome: 'Ocorrências', grupo: 'Gestão Acadêmica', icone: FileWarning, rota: '/dashboard/ocorrencias', moduloId: 'SEC', permissao: (u) => !can(u, 'aee.atender') && can(u, 'ocorrencia.gerenciar') },
-  { id: 'aee', nome: 'Atendimento AEE', grupo: 'Gestão Acadêmica', icone: Accessibility, rota: '/dashboard/aee', moduloId: 'AEE', permissao: (u) => can(u, 'aee.ler') },
+  { id: 'turmas', nome: 'Turmas', grupo: 'Gestão acadêmica', icone: Users, rota: '/dashboard/turmas', moduloId: 'NUC', permissao: (u) => !can(u, 'aee.atender') && can(u, 'turma.ler') },
+  { id: 'disciplinas', nome: 'Disciplinas', grupo: 'Gestão acadêmica', icone: BookOpen, rota: '/dashboard/disciplinas', moduloId: 'NUC', permissao: (u) => !can(u, 'aee.atender') && can(u, 'disciplina.gerenciar') },
+  { id: 'estudantes', nome: 'Estudantes', grupo: 'Gestão acadêmica', icone: GraduationCap, rota: '/dashboard/estudantes', moduloId: 'NUC', permissao: (u) => !can(u, 'aee.atender') && can(u, 'estudante.ler') },
+  { id: 'ocorrencias', nome: 'Ocorrências', grupo: 'Gestão acadêmica', icone: FileWarning, rota: '/dashboard/ocorrencias', moduloId: 'SEC', permissao: (u) => !can(u, 'aee.atender') && can(u, 'ocorrencia.gerenciar') },
+  { id: 'aee', nome: 'Atendimento AEE', grupo: 'Gestão acadêmica', icone: Accessibility, rota: '/dashboard/aee', moduloId: 'AEE', permissao: (u) => can(u, 'aee.ler') },
 
-  { id: 'simulados', nome: 'Simulados', grupo: 'Diário e Avaliações', icone: Target, rota: '/dashboard/simulados', moduloId: 'PRV', permissao: (u) => !can(u, 'aee.atender') && can(u, 'simulado.ler'), planoMinimo: 'PRO' },
-  { id: 'chamada', nome: 'Chamada e Diário', grupo: 'Diário e Avaliações', icone: ClipboardCheck, rota: '/dashboard/chamada', moduloId: 'DIA', permissao: (u) => !can(u, 'aee.atender') && can(u, 'frequencia.lancar') },
-  { id: 'notas', nome: 'Lançar Notas', grupo: 'Diário e Avaliações', icone: FileText, rota: '/dashboard/notas', moduloId: 'NOT', permissao: (u) => !can(u, 'aee.atender') && can(u, 'nota.tela') },
-  { id: 'notas-recuperacao', nome: 'Recuperação Final', grupo: 'Diário e Avaliações', icone: TrendingUp, rota: '/dashboard/notas/recuperacao', moduloId: 'NOT', permissao: (u) => !can(u, 'aee.atender') && can(u, 'nota.tela') },
-  { id: 'planos-ensino', nome: 'Planos de Ensino', grupo: 'Diário e Avaliações', icone: ClipboardList, rota: '/dashboard/planos', moduloId: 'PLA', permissao: (u) => !can(u, 'aee.atender') && can(u, 'plano.ler') },
-  { id: 'resultados', nome: 'Resultados', grupo: 'Diário e Avaliações', icone: Award, rota: '/dashboard/resultados', moduloId: 'RES', permissao: (u) => !can(u, 'aee.atender') && can(u, 'resultado.ler') },
-  { id: 'frequencia', nome: 'Frequência', grupo: 'Diário e Avaliações', icone: UserX, rota: '/dashboard/frequencia', moduloId: 'DIA', permissao: (u) => !can(u, 'aee.atender') && can(u, 'frequencia.acompanhar') },
-  { id: 'conselho-classe', nome: 'Conselho de Classe', grupo: 'Diário e Avaliações', icone: Users, rota: '/dashboard/conselho-classe', moduloId: 'RES', permissao: (u) => !can(u, 'aee.atender') && can(u, 'conselho.decidir') },
+  { id: 'simulados', nome: 'Simulados', grupo: 'Diário e avaliações', icone: Target, rota: '/dashboard/simulados', moduloId: 'PRV', permissao: (u) => !can(u, 'aee.atender') && can(u, 'simulado.ler'), planoMinimo: 'PRO' },
+  { id: 'chamada', nome: 'Chamada e diário', grupo: 'Diário e avaliações', icone: ClipboardCheck, rota: '/dashboard/chamada', moduloId: 'DIA', permissao: (u) => !can(u, 'aee.atender') && can(u, 'frequencia.lancar') },
+  { id: 'notas', nome: 'Lançar notas', grupo: 'Diário e avaliações', icone: FileText, rota: '/dashboard/notas', moduloId: 'NOT', permissao: (u) => !can(u, 'aee.atender') && can(u, 'nota.tela') },
+  { id: 'notas-recuperacao', nome: 'Recuperação final', grupo: 'Diário e avaliações', icone: TrendingUp, rota: '/dashboard/notas/recuperacao', moduloId: 'NOT', permissao: (u) => !can(u, 'aee.atender') && can(u, 'nota.tela') },
+  { id: 'planos-ensino', nome: 'Planos de ensino', grupo: 'Diário e avaliações', icone: ClipboardList, rota: '/dashboard/planos', moduloId: 'PLA', permissao: (u) => !can(u, 'aee.atender') && can(u, 'plano.ler') },
+  { id: 'resultados', nome: 'Resultados', grupo: 'Diário e avaliações', icone: Award, rota: '/dashboard/resultados', moduloId: 'RES', permissao: (u) => !can(u, 'aee.atender') && can(u, 'resultado.ler') },
+  { id: 'frequencia', nome: 'Frequência', grupo: 'Diário e avaliações', icone: UserX, rota: '/dashboard/frequencia', moduloId: 'DIA', permissao: (u) => !can(u, 'aee.atender') && can(u, 'frequencia.acompanhar') },
+  { id: 'conselho-classe', nome: 'Conselho de classe', grupo: 'Diário e avaliações', icone: Users, rota: '/dashboard/conselho-classe', moduloId: 'RES', permissao: (u) => !can(u, 'aee.atender') && can(u, 'conselho.decidir') },
 
-  { id: 'banco-questoes', nome: 'Banco de Questões', grupo: 'Ferramentas', icone: Database, rota: '/dashboard/questoes', moduloId: 'QST', permissao: (u) => !can(u, 'aee.atender') && can(u, 'questao.usar'), planoMinimo: 'PRO' },
-  { id: 'provas', nome: 'Gerador de Provas', grupo: 'Ferramentas', icone: Scissors, rota: '/dashboard/provas', moduloId: 'PRV', permissao: (u) => !can(u, 'aee.atender') && can(u, 'prova.gerenciar'), planoMinimo: 'PRO' },
+  { id: 'banco-questoes', nome: 'Banco de questões', grupo: 'Ferramentas', icone: Database, rota: '/dashboard/questoes', moduloId: 'QST', permissao: (u) => !can(u, 'aee.atender') && can(u, 'questao.usar'), planoMinimo: 'PRO' },
+  { id: 'provas', nome: 'Gerador de provas', grupo: 'Ferramentas', icone: Scissors, rota: '/dashboard/provas', moduloId: 'PRV', permissao: (u) => !can(u, 'aee.atender') && can(u, 'prova.gerenciar'), planoMinimo: 'PRO' },
   // grupo "Módulos Futuros" fica de fora da navegação (DashboardSidebar só
   // renderiza os grupos em GRUPOS_ORDENADOS) - acessível só por URL direta
   // até haver requisito de produto real para o financeiro (Fase 11).
-  { id: 'financeiro', nome: 'Financeiro', grupo: 'Módulos Futuros', icone: DollarSign, rota: '/dashboard/financeiro', moduloId: 'FIN', permissao: (u) => can(u, 'financeiro.gerenciar'), planoMinimo: 'PRO' },
+  { id: 'financeiro', nome: 'Financeiro', grupo: 'Módulos futuros', icone: DollarSign, rota: '/dashboard/financeiro', moduloId: 'FIN', permissao: (u) => can(u, 'financeiro.gerenciar'), planoMinimo: 'PRO' },
 
-  { id: 'matriz', nome: 'Matriz Curricular', grupo: 'Configurações', icone: LayoutGrid, rota: '/dashboard/matriz', moduloId: 'NUC', permissao: (u) => !can(u, 'aee.atender') && can(u, 'matriz.gerenciar') },
+  { id: 'matriz', nome: 'Matriz curricular', grupo: 'Configurações', icone: LayoutGrid, rota: '/dashboard/matriz', moduloId: 'NUC', permissao: (u) => !can(u, 'aee.atender') && can(u, 'matriz.gerenciar') },
   { id: 'usuarios', nome: 'Usuários', grupo: 'Configurações', icone: Shield, rota: '/dashboard/usuarios', moduloId: 'NUC', permissao: (u) => !can(u, 'aee.atender') && can(u, 'usuario.gerenciar') },
   { id: 'configuracoes', nome: 'Configurações', grupo: 'Configurações', icone: Settings, rota: '/dashboard/configuracoes', moduloId: 'NUC', permissao: (u) => !can(u, 'aee.atender') && can(u, 'configuracao.editar') },
 

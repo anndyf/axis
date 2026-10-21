@@ -122,7 +122,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
     <div className="">
       {/* Header Fixo Premium */}
       <header className="mb-6">
-        <div className="max-w-5xl mx-auto px-6 py-4">
+        <div className="py-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
               <Link 
@@ -159,7 +159,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-10">
+      <main className="mx-auto max-w-leitura py-6">
         
         {/* Barra de Pesquisa e Filtro */}
         <div className="relative mb-10 group">

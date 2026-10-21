@@ -126,7 +126,7 @@ export default function AEEProfileClient({
     <div className="pb-24">
       {/* Header Premium */}
       <div className="mb-6 border-b border-line pb-4">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button onClick={() => router.back()} className="p-2 hover:bg-subtle rounded-xl transition-colors">
               <ArrowLeft className="w-5 h-5 text-fg-muted" />
@@ -153,7 +153,7 @@ export default function AEEProfileClient({
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-6 mt-8 space-y-6">
+      <main className="mt-8 space-y-6">
         
         {/* Banner de Status para o Professor */}
         {!isDirecao && (

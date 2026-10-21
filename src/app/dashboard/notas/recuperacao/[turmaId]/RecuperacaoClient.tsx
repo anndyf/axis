@@ -133,7 +133,7 @@ export default function RecuperacaoTurmaClient({
     <div className="">
       {/* Header Estilo Simulados */}
       <header className="mb-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="py-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
               <Link href="/dashboard/notas/recuperacao" aria-label="Voltar" className="hidden sm:inline-flex p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg">
@@ -161,7 +161,7 @@ export default function RecuperacaoTurmaClient({
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <main className="py-8 space-y-8">
         
         {/* Dicas Estilo Simulados */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

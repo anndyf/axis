@@ -18,7 +18,8 @@ import {
 import { cartoesDoProfessor, destaqueDoDia, horaNaEscola, rotuloTempos, turmasDosCartoes } from "@/lib/services/inicio-professor"
 import CartoesTurmas from "@/components/painel/CartoesTurmas"
 import { Avatar } from "@/components/ui/Avatar"
-import { ROTULO_VISAO, visaoEfetiva, visoesDoUsuario, type VisaoPainel } from "@/lib/services/painel-visoes"
+import { ROTULO_VISAO, visaoEfetiva, type VisaoPainel } from "@/lib/services/painel-visoes"
+import { visoesDisponiveis } from "@/lib/services/painel-visoes-servidor"
 import { cn } from "@/components/ui/cn"
 import TeacherTipsModal from "@/components/TeacherTipsModal"
 import { Atalhos, Aviso, Cartao, CartaoProgresso, Chip, dataCurta, GradeCartoes, Indicador, Item, Lista, Secao, TOM } from "@/components/painel/ui"
@@ -65,11 +66,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const visiveis = new Set(modulosVisiveis(user, modulosAtivos).map((m) => m.id))
 
   // A visão de professor só entra no seletor de quem tem disciplinas
-  let visoes = visoesDoUsuario(user)
-  if (visoes.length > 1 && visoes.includes("professor")) {
-    const temDisciplinas = await prisma.disciplina.count({ where: { usuariosPermitidos: { some: { id: user.id } }, turma: { escolaId, anoLetivo } } })
-    if (!temDisciplinas) visoes = visoes.filter((v) => v !== "professor")
-  }
+  const visoes = await visoesDisponiveis(user, escolaId, anoLetivo)
   const efetiva = visaoEfetiva(user, pedida)
   const visao: VisaoPainel | null = efetiva && visoes.includes(efetiva) ? efetiva : (visoes[0] ?? null)
 
@@ -115,7 +112,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           </div>
         </div>
         {visoes.length > 1 && visao && (
-          <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Visão do painel">
+          <div className="flex flex-wrap items-center gap-2 md:hidden" role="group" aria-label="Visão do painel">
             <span className="text-13 text-fg-subtle">Visão</span>
             {visoes.map((v) => (
               <Chip key={v} ativo={v === visao} href={`/dashboard?visao=${v}`}>{ROTULO_VISAO[v]}</Chip>

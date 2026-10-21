@@ -27,7 +27,7 @@ export default async function DisciplinasPage() {
     <div className="">
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
       <header className="mb-6">
-        <div className="max-w-7xl mx-auto">
+        <div className="">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
               <Link
@@ -53,7 +53,7 @@ export default async function DisciplinasPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-32">
+      <main className="pt-4 pb-32">
         {disciplinas.length === 0 ? (
           <div className="bg-surface rounded-xl shadow-card border border-line p-20 text-center">
             <div className="w-20 h-20 bg-canvas flex items-center justify-center rounded-xl mx-auto mb-6">

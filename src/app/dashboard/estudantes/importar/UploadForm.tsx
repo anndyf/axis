@@ -240,7 +240,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
   return (
     <div className="">
       <header className="mb-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="py-4">
           <div className="flex min-w-0 items-center gap-3">
             <Link href="/dashboard/estudantes" aria-label="Voltar" className="hidden sm:inline-flex p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg">
               <ArrowLeft className="w-5 h-5 text-fg-muted" />
@@ -253,7 +253,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="py-8">
         <div className="bg-subtle border border-line-strong rounded-xl p-6 mb-8">
           <div className="flex items-start space-x-4">
             <div className="bg-subtle-hover rounded-lg p-3">

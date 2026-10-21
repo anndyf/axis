@@ -42,7 +42,7 @@ export default async function TurmasPage() {
     <div className="">
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
       <header className="mb-6">
-        <div className="max-w-7xl mx-auto">
+        <div className="">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
               <Link
@@ -68,7 +68,7 @@ export default async function TurmasPage() {
       </header>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-7xl">
+      <main className="">
 
         {turmas.length === 0 ? (
           <div className="bg-surface rounded-xl shadow-card border border-line p-20 text-center">

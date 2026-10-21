@@ -59,7 +59,7 @@ export default async function UsuariosPage() {
     <div className="pb-20">
       {/* Header */}
       <header className="mb-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="py-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
               <Link href="/dashboard" aria-label="Voltar" className="hidden sm:inline-flex p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg">
@@ -89,7 +89,7 @@ export default async function UsuariosPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="py-8">
         <UsuariosClient usuarios={usuarios} />
       </main>
     </div>

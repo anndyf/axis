@@ -116,10 +116,10 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 pb-32 animate-fade-in">
+    <div className="space-y-8 pb-32 animate-fade-in">
       {/* Header Premium */}
       <header className="mb-6">
-        <div className="max-w-7xl mx-auto py-6">
+        <div className="py-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex min-w-0 items-center gap-4">
               <Link

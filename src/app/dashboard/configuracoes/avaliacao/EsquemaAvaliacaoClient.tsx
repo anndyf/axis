@@ -60,7 +60,7 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
   return (
     <div className="">
       <header className="mb-6">
-        <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
             <Link href="/dashboard/configuracoes" aria-label="Voltar" className="hidden sm:inline-flex p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg">
               <ArrowLeft size={16} strokeWidth={1.75} />
@@ -80,7 +80,7 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="py-8">
         {esquemas.length === 0 ? (
           <div className="bg-surface rounded-xl shadow-card border border-line p-20 text-center">
             <div className="w-20 h-20 bg-canvas rounded-xl flex items-center justify-center mx-auto mb-6">

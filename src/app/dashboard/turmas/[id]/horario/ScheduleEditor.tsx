@@ -80,7 +80,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
   return (
     <div className="">
       <header className="mb-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="py-4">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <Link href="/dashboard/turmas" aria-label="Voltar" className="hidden sm:inline-flex p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg">
@@ -108,7 +108,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <main className="py-8 space-y-6">
         {aviso && (
           <div className={`p-4 rounded-xl border text-sm flex items-center gap-2 ${aviso.tipo === "ok" ? "bg-success-subtle border-success-line text-success-fg" : "bg-danger-subtle border-danger-line text-danger-fg"}`}>
             {aviso.tipo === "ok" ? <CheckCircle2 className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}

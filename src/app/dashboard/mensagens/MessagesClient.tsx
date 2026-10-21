@@ -437,7 +437,7 @@ export default function MessagesClient({
           </div>
 
           <div className="flex-1 p-8 md:p-12">
-            <div className="max-w-3xl mx-auto space-y-8 bg-surface p-8 md:p-10 rounded-xl shadow-sm border border-line-subtle">
+            <div className="mx-auto max-w-formulario space-y-8 bg-surface p-8 md:p-10 rounded-xl shadow-sm border border-line-subtle">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-3">
                   <label className="text-xs font-semibold text-fg-subtle ml-1">Categoria / Departamento</label>
@@ -707,7 +707,7 @@ export default function MessagesClient({
           </div>
 
           <div className="flex-1 overflow-y-auto p-8 md:p-12 space-y-6 custom-scrollbar bg-canvas/50">
-            <div className="max-w-4xl mx-auto space-y-6">
+            <div className="mx-auto max-w-leitura space-y-6">
               {threadMessages.map((m, idx) => {
                 const isMe = m.senderId === currentUserId
                 return (
@@ -747,7 +747,7 @@ export default function MessagesClient({
           </div>
 
           <div className="p-8 md:px-12 bg-surface border-t border-line-subtle shrink-0">
-            <div className="max-w-4xl mx-auto">
+            <div className="mx-auto max-w-leitura">
               <form onSubmit={handleQuickReply} className="flex flex-col md:flex-row gap-4">
                 <input 
                   type="text"

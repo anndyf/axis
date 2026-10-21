@@ -161,7 +161,7 @@ export default function PlanosClient() {
       
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
       <header className="mb-6">
-        <div className="max-w-7xl mx-auto">
+        <div className="">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="flex min-w-0 items-center gap-3">
               <Link
@@ -191,7 +191,7 @@ export default function PlanosClient() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-32 space-y-8">
+      <main className="pt-4 pb-32 space-y-8">
         
         {/* Dicas Fixas - Estilo Resultados */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

@@ -108,7 +108,7 @@ export default async function ChamadaPage({ searchParams }: { searchParams: Prom
   const dataBR = data.split("-").reverse().join("/")
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="space-y-6">
       <PageHeader
         title="Chamada e diário de classe"
         description="Todos começam presentes: marque só quem faltou."

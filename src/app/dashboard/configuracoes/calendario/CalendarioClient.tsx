@@ -76,7 +76,7 @@ export default function CalendarioClient(props: Props) {
     setTempos((prev) => ({ ...prev, [turno]: prev[turno].map((t, idx) => (idx === i ? { ...t, [campo]: valor } : t)) }))
 
   return (
-    <div className="max-w-4xl mx-auto space-y-4 pb-16">
+    <div className="mx-auto max-w-leitura space-y-4 pb-16">
       <PageHeader
         title={`Calendário letivo ${props.anoLetivo}`}
         description="Base das aulas previstas e da frequência: dias letivos × horário das turmas."

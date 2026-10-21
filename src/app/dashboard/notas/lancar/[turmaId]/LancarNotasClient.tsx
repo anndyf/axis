@@ -329,7 +329,7 @@ export default function LancarNotasTurmaClient({
     : 6
 
   return (
-    <div className="mx-auto max-w-7xl">
+    <div className="">
       <PageHeader
         title={disciplinaSelecionada ? selectedDiscName : "Lançar notas"}
         description={`Turma ${turmaNome}`}

@@ -20,7 +20,7 @@ export default async function IdentidadePage() {
   })
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="">
       <PageHeader
         title="Identidade visual"
         description="Logo e cor da escola. O logo aparece no menu, no cabeçalho, no portal e nos PDFs; a cor, só como detalhe. Botões, links e menu usam sempre o azul Áxis."

@@ -56,7 +56,7 @@ export default function RelatorioClient({
   }
 
   return (
-    <main className="mx-auto max-w-7xl">
+    <main className="">
 
       {/* Botão para Modal de Professores */}
       <div className="mb-4 flex justify-end">

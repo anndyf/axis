@@ -164,7 +164,7 @@ export default function PendenciasClient({
 
   return (
     <div className="p-4 sm:p-8">
-      <div className="max-w-6xl mx-auto space-y-8">
+      <div className="space-y-8">
         
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">

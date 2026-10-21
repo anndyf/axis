@@ -111,7 +111,7 @@ export default async function RelatorioTurmaPage({
     <div className="">
       {/* Header */}
       <header className="mb-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="py-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
               <Link

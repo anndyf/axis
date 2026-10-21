@@ -75,7 +75,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="mx-auto max-w-leitura space-y-8">
       <div>
         <h1 className="text-3xl font-medium text-fg tracking-tight flex items-center gap-3">
           <div className="w-10 h-10 bg-subtle-hover rounded-xl flex items-center justify-center">

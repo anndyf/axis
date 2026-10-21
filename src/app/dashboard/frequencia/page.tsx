@@ -150,7 +150,7 @@ export default async function FrequenciaPage({ searchParams }: { searchParams: P
   }
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
+    <div className="space-y-6">
       <PageHeader
         title="Frequência"
         description="Infrequência por turma e cadastro de atestados e justificativas."

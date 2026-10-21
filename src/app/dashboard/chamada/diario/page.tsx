@@ -81,7 +81,7 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
   const linkBase = podeGravar ? linkChamada("") : null
   const diasCalendario = calendario ? calendarioDaDisciplina({ calendario, turmaId: turma.id, disciplinaId, horario, aulas, hoje }) : null
   return (
-    <div className={diasCalendario ? "mx-auto max-w-6xl md:grid md:grid-cols-[15rem_minmax(0,1fr)] md:items-start md:gap-6" : "mx-auto max-w-4xl"}>
+    <div className={diasCalendario ? "md:grid md:grid-cols-[15rem_minmax(0,1fr)] md:items-start md:gap-6" : ""}>
       {diasCalendario && (
         <aside aria-label="Calendário da disciplina" className="sticky top-20 hidden max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-2xl border border-line bg-surface p-3 shadow-card md:block">
           <CalendarioDisciplina dias={diasCalendario} linkBase={linkBase} hoje={hoje} modo="coluna" />
@@ -208,7 +208,7 @@ async function IndiceDiarios() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="space-y-6">
       <PageHeader title="Diário de classe" description="Aulas dadas, conteúdo ministrado e faltas por disciplina." />
       {grupos.length === 0 ? (
         <Card><EmptyState icon={BookOpen} title="Nenhuma disciplina vinculada" description="Peça à gestão para vincular suas disciplinas." /></Card>

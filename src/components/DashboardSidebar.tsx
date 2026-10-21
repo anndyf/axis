@@ -3,18 +3,12 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
-import { signOut } from "next-auth/react"
-import { KeyRound, LogOut, PanelLeftClose, PanelLeftOpen, UserRound, X, ChevronsUpDown, Clock, Blocks, Sun, Moon, Monitor, Search } from "lucide-react"
-import { definirTema, temaValido, type Tema } from "@/lib/tema"
+import { PanelLeftClose, PanelLeftOpen, X, Clock } from "lucide-react"
 import { useSessionTimer } from "@/contexts/SessionTimerContext"
-import { getUnreadCount } from "@/app/dashboard/mensagens/actions"
-import { getPendingUsersCount } from "@/app/dashboard/usuarios/actions"
 import { modulosVisiveis } from "@/lib/modules"
 import { rotuloDoPapelPrincipal } from "@/lib/permissoes"
 import { can, restritoADocencia, papeisDoUsuario } from "@/lib/rbac"
 import CommandPalette from "@/components/CommandPalette"
-import { Avatar } from "@/components/ui/Avatar"
-import { Menu } from "@/components/ui/Menu"
 import { cn } from "@/components/ui/cn"
 
 interface User {
@@ -34,7 +28,7 @@ export interface EscolaDoMenu {
   logoUrl?: string | null
 }
 
-const GRUPOS_ORDENADOS = ["Início", "Gestão Acadêmica", "Diário e Avaliações", "Ferramentas", "Configurações", "Plataforma"]
+const GRUPOS_ORDENADOS = ["Início", "Gestão acadêmica", "Diário e avaliações", "Ferramentas", "Configurações", "Plataforma"]
 
 export function papelDoUsuario(user: User) {
   return rotuloDoPapelPrincipal(papeisDoUsuario(user))
@@ -80,6 +74,7 @@ export default function DashboardSidebar({
   toggleCollapse,
   isMobileOpen,
   closeMobile,
+  contagens = {},
 }: {
   user: User
   escola: EscolaDoMenu
@@ -89,14 +84,11 @@ export default function DashboardSidebar({
   toggleCollapse: () => void
   isMobileOpen: boolean
   closeMobile: () => void
+  /** mensagens não lidas e cadastros pendentes (o layout consulta) */
+  contagens?: { mensagens?: number; usuarios?: number }
 }) {
   const pathname = usePathname()
-  const [unreadCount, setUnreadCount] = useState(0)
-  const [pendingUsersCount, setPendingUsersCount] = useState(0)
   const { timeLeft } = useSessionTimer()
-  const [tema, setTema] = useState<Tema>("light")
-  useEffect(() => { setTema(temaValido(document.documentElement.dataset.theme)) }, [])
-  const escolherTema = (t: Tema) => { definirTema(t); setTema(t) }
   const [paletaAberta, setPaletaAberta] = useState(false)
 
   // Ctrl+K / ⌘K abre a busca rápida de qualquer tela do painel
@@ -111,17 +103,6 @@ export default function DashboardSidebar({
     return () => window.removeEventListener("keydown", atalho)
   }, [])
 
-  useEffect(() => {
-    // Consulta interrompida (troca de página, rede) não é erro: tenta na próxima rodada
-    const atualizar = () => {
-      getUnreadCount().then(setUnreadCount).catch(() => {})
-      getPendingUsersCount().then(setPendingUsersCount).catch(() => {})
-    }
-    atualizar()
-    const interval = setInterval(atualizar, 30000)
-    return () => clearInterval(interval)
-  }, [])
-
   // Gaveta do celular fecha ao trocar de página
   useEffect(() => { closeMobile() }, [pathname]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -132,7 +113,7 @@ export default function DashboardSidebar({
   }
 
   // Itens: permissão do papel E (sem exigência de plano OU módulo ativo na escola)
-  const badgesPorModulo: Record<string, number> = { mensagens: unreadCount, usuarios: pendingUsersCount }
+  const badgesPorModulo: Record<string, number> = { mensagens: contagens.mensagens ?? 0, usuarios: contagens.usuarios ?? 0 }
   const menuGroups = GRUPOS_ORDENADOS.map((title) => ({
     title,
     links: modulosVisiveis(user, modulosAtivos)
@@ -169,38 +150,21 @@ export default function DashboardSidebar({
         )}
       >
         {/* Escola */}
-        <div className={cn("flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-line", recolhido ? "justify-center px-2" : "px-4")}>
+        <div className={cn("flex h-barra shrink-0 items-center gap-2 border-b border-sidebar-line", recolhido ? "justify-center px-2" : "px-3")}>
           <Link href="/dashboard" className="min-w-0 flex-1 rounded-md" title={recolhido ? escola.nome : undefined}>
-            <MarcaEscola escola={escola} compacta={recolhido} escura subtitulo={anoLetivo ? `Ano letivo ${anoLetivo}` : "Gestão escolar"} />
+            <MarcaEscola escola={escola} compacta={recolhido} escura subtitulo="Gestão escolar" />
           </Link>
           <button type="button" onClick={closeMobile} aria-label="Fechar menu" className="rounded-full p-1.5 text-sidebar-fg-muted hover:bg-sidebar-hover hover:text-sidebar-fg md:hidden">
             <X size={16} strokeWidth={1.75} />
           </button>
         </div>
 
-        {/* Busca rápida */}
-        <div className={cn("shrink-0 px-3 pt-4", recolhido && "flex justify-center")}>
-          <button
-            type="button"
-            onClick={() => setPaletaAberta(true)}
-            aria-label="Busca rápida (Ctrl+K)"
-            title={recolhido ? "Busca rápida (Ctrl+K)" : undefined}
-            className={cn(
-              "flex h-9 items-center gap-2 rounded-full bg-sidebar-hover text-13 text-sidebar-fg-muted transition-colors duration-150 hover:bg-sidebar-active hover:text-sidebar-fg",
-              recolhido ? "w-9 justify-center" : "w-full px-3"
-            )}
-          >
-            <Search size={14} strokeWidth={1.75} aria-hidden />
-            {!recolhido && <><span>Buscar...</span><kbd className="ml-auto font-mono text-xs text-sidebar-fg-subtle">Ctrl K</kbd></>}
-          </button>
-        </div>
-
         {/* Navegação */}
-        <nav className="flex-1 space-y-5 overflow-y-auto px-3 py-4">
+        <nav className="flex-1 space-y-4 overflow-y-auto px-2.5 py-3">
           {menuGroups.map((group) => (
             <div key={group.title}>
               {!recolhido ? (
-                <p className="mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-wider text-sidebar-fg-subtle">{group.title}</p>
+                <p className="mb-1 px-2.5 text-xs font-medium text-sidebar-fg-subtle">{group.title}</p>
               ) : (
                 <div className="mx-2 mb-2 h-px bg-sidebar-line first:hidden" aria-hidden />
               )}
@@ -215,8 +179,8 @@ export default function DashboardSidebar({
                         title={recolhido ? link.name : undefined}
                         aria-current={active ? "page" : undefined}
                         className={cn(
-                          "group relative flex h-10 items-center gap-3 rounded-full text-sm transition-colors duration-150",
-                          recolhido ? "justify-center px-0" : "px-3",
+                          "group relative flex h-8 items-center gap-2.5 rounded-md text-13 transition-colors duration-150",
+                          recolhido ? "justify-center px-0" : "px-2.5",
                           active ? "bg-sidebar-active font-medium text-sidebar-fg" : "text-sidebar-fg-muted hover:bg-sidebar-hover hover:text-sidebar-fg"
                         )}
                       >
@@ -242,52 +206,18 @@ export default function DashboardSidebar({
         </nav>
 
         {/* Usuário */}
-        <div className="shrink-0 space-y-1 border-t border-sidebar-line p-3">
+        <div className="shrink-0 space-y-1 border-t border-sidebar-line p-2.5">
           {professor && !recolhido && (
             <p className={cn("flex items-center gap-1.5 px-2 text-[11px] tabular-nums", timeLeft < 300 ? "font-medium text-sidebar-fg" : "text-sidebar-fg-subtle")}>
               <Clock size={12} strokeWidth={1.75} aria-hidden /> Sessão expira em {formatTime(timeLeft)}
             </p>
           )}
-          <Menu
-            align="start"
-            side="top"
-            className="w-full"
-            trigger={(p) => (
-              <button
-                {...p}
-                type="button"
-                title={recolhido ? user.name ?? undefined : undefined}
-                className={cn("flex w-full items-center gap-2.5 rounded-xl p-2 text-left transition-colors duration-150 hover:bg-sidebar-hover", recolhido && "justify-center p-1.5")}
-              >
-                <Avatar nome={user.name} tom="menu" />
-                {!recolhido && (
-                  <>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-13 font-medium text-sidebar-fg">{user.name}</span>
-                      <span className="block truncate text-xs text-sidebar-fg-subtle">{papelDoUsuario(user)}</span>
-                    </span>
-                    <ChevronsUpDown size={14} strokeWidth={1.75} className="shrink-0 text-sidebar-fg-subtle" aria-hidden />
-                  </>
-                )}
-                {recolhido && <span className="sr-only">Menu do usuário</span>}
-              </button>
-            )}
-            items={[
-              { label: "Meu perfil", icon: UserRound, href: "/dashboard/perfil" },
-              { label: "Trocar senha", icon: KeyRound, href: "/dashboard/perfil#senha" },
-              ...(can(user, "escola.administrar") ? [{ label: "Componentes", icon: Blocks, href: "/dashboard/ui" }] : []),
-              { label: "Tema claro", icon: Sun, marcado: tema === "light", separadorAntes: true, onSelect: () => escolherTema("light") },
-              { label: "Tema escuro", icon: Moon, marcado: tema === "dark", onSelect: () => escolherTema("dark") },
-              { label: "Tema do sistema", icon: Monitor, marcado: tema === "system", onSelect: () => escolherTema("system") },
-              { label: "Sair", icon: LogOut, perigo: true, separadorAntes: true, onSelect: () => signOut({ redirectTo: "/login" }) },
-            ]}
-          />
           <button
             type="button"
             onClick={toggleCollapse}
             aria-label={isCollapsed ? "Expandir menu" : "Recolher menu"}
             title={isCollapsed ? "Expandir menu" : "Recolher menu"}
-            className={cn("hidden h-9 w-full items-center gap-3 rounded-full px-3 text-13 text-sidebar-fg-subtle transition-colors duration-150 hover:bg-sidebar-hover hover:text-sidebar-fg md:flex", recolhido && "justify-center px-0")}
+            className={cn("hidden h-8 w-full items-center gap-2.5 rounded-md px-2.5 text-13 text-sidebar-fg-subtle transition-colors duration-150 hover:bg-sidebar-hover hover:text-sidebar-fg md:flex", recolhido && "justify-center px-0")}
           >
             {isCollapsed ? <PanelLeftOpen size={16} strokeWidth={1.75} /> : <PanelLeftClose size={16} strokeWidth={1.75} />}
             {!recolhido && "Recolher"}

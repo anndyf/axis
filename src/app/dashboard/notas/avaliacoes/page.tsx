@@ -37,7 +37,7 @@ export default async function AvaliacoesPage({ searchParams }: { searchParams: P
   if (!disciplinaId) {
     const disciplinas = await getDisciplinasPermitidas(session)
     return (
-      <div className="max-w-3xl mx-auto space-y-6 pb-16">
+      <div className="mx-auto max-w-leitura space-y-6 pb-16">
         {cabecalho("Minhas avaliações", "Provas, trabalhos e atividades de cada unidade, quando o esquema da turma deixa o professor definir.", "/dashboard/notas")}
         <section className="bg-surface rounded-2xl shadow-sm border border-line p-6 divide-y divide-line-subtle">
           {disciplinas.length === 0 && <p className="text-sm text-fg-subtle">Nenhuma disciplina.</p>}
@@ -66,7 +66,7 @@ export default async function AvaliacoesPage({ searchParams }: { searchParams: P
     : []
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 pb-16">
+    <div className="mx-auto max-w-leitura space-y-6 pb-16">
       {cabecalho(`Avaliações — ${disciplina.nome}`, `${disciplina.turma.nome}${esquema ? ` · ${esquema.nome}` : ""}`, "/dashboard/notas/avaliacoes")}
       {!porProfessor ? (
         <p className="text-sm text-fg-muted bg-surface rounded-2xl border border-line p-6">

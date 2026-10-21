@@ -68,7 +68,7 @@ export default function ConfiguracoesPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="mx-auto max-w-leitura space-y-6">
       <PageHeader title="Configurações" description="Funcionalidades globais da escola e acesso dos professores." />
 
       <Card>

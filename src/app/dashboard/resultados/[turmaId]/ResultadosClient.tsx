@@ -233,7 +233,7 @@ export default function ResultadosTurmaClient({
       
       {/* Header Premium */}
       <header className="mb-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="py-4">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="flex min-w-0 items-center gap-3">
               <Link
@@ -294,7 +294,7 @@ export default function ResultadosTurmaClient({
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="py-8">
         {/* Compact Summary & Legend Row */}
         <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 mb-6 bg-surface p-4 rounded-2xl border border-line-strong shadow-sm">
           {/* Metrics */}

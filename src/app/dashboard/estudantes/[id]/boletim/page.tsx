@@ -136,7 +136,7 @@ export default async function BoletimPage({
   const fmt = (n: number | null | undefined) => (n === null || n === undefined ? '—' : n.toFixed(1).replace('.', ','))
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
+    <div className="space-y-6">
       <PageHeader
         title={estudante.nome}
         description={<>Boletim · {estudante.turma.nome} · <span className="font-mono">{estudante.matricula}</span></>}
