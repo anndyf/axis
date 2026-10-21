@@ -41,6 +41,7 @@ model Escola {
   tempoAulas        TempoAula[]
   aulas             Aula[]
   justificativas    Justificativa[]
+  reaberturas       ReaberturaUnidade[]
 
   @@map("escolas")
 }
@@ -251,6 +252,9 @@ model User {
   justificativas        Justificativa[]         @relation("JustificativaAutor")
   avaliacoesCriadas     AvaliacaoDisciplina[]   @relation("AvaliacaoCriador")
   vinculosPapel         VinculoPapel[]
+  unidadesEncerradas    EtapaCalendario[]       @relation("EtapaEncerradaPor")
+  reaberturasCriadas    ReaberturaUnidade[]     @relation("ReaberturaCriador")
+  reaberturasRevogadas  ReaberturaUnidade[]     @relation("ReaberturaRevogador")
 
   @@unique([escolaId, email])
   @@unique([escolaId, username])
@@ -504,6 +508,7 @@ model Turma {
   usuariosPermitidos   User[]                @relation("TurmaUsuarios")
   diaNaoLetivos        DiaNaoLetivo[]
   aulas                Aula[]
+  reaberturas          ReaberturaUnidade[]
 
   @@index([anoLetivo])
   @@index([escolaId])
@@ -642,6 +647,7 @@ model Disciplina {
   questoes           Questao[]             @relation("QuestaoDisciplinas")
   aulas              Aula[]
   avaliacoes         AvaliacaoDisciplina[]
+  reaberturas        ReaberturaUnidade[]
 
   @@index([turmaId])
   @@map("disciplinas")
@@ -1065,17 +1071,52 @@ model PeriodoLetivo {
 
 // Datas de cada etapa (unidade/bimestre) de um esquema naquele ano.
 model EtapaCalendario {
-  id               String         @id @default(cuid())
-  periodoLetivoId  String         @map("periodo_letivo_id")
-  periodoLetivo    PeriodoLetivo  @relation(fields: [periodoLetivoId], references: [id], onDelete: Cascade)
-  esquemaUnidadeId String         @map("esquema_unidade_id")
-  esquemaUnidade   EsquemaUnidade @relation(fields: [esquemaUnidadeId], references: [id], onDelete: Cascade)
-  inicio           DateTime       @db.Date
-  fim              DateTime       @db.Date
-  prazoLancamento  DateTime?      @map("prazo_lancamento") @db.Date
+  id               String              @id @default(cuid())
+  periodoLetivoId  String              @map("periodo_letivo_id")
+  periodoLetivo    PeriodoLetivo       @relation(fields: [periodoLetivoId], references: [id], onDelete: Cascade)
+  esquemaUnidadeId String              @map("esquema_unidade_id")
+  esquemaUnidade   EsquemaUnidade      @relation(fields: [esquemaUnidadeId], references: [id], onDelete: Cascade)
+  inicio           DateTime            @db.Date
+  fim              DateTime            @db.Date
+  prazoLancamento  DateTime?           @map("prazo_lancamento") @db.Date
+  // Cadeado (src/lib/cadeado-unidade.ts): a etapa tranca sozinha no dia
+  // seguinte ao prazoLancamento, ou antes, quando a gestão encerra
+  // (encerradaEm/encerradaPor). Instante em UTC.
+  encerradaEm      DateTime?           @map("encerrada_em")
+  encerradaPorId   String?             @map("encerrada_por_id")
+  encerradaPor     User?               @relation("EtapaEncerradaPor", fields: [encerradaPorId], references: [id], onDelete: SetNull)
+  reaberturas      ReaberturaUnidade[]
 
   @@unique([periodoLetivoId, esquemaUnidadeId])
   @@map("etapas_calendario")
+}
+
+// Reabertura pontual de uma etapa encerrada, só para uma turma + disciplina
+// (disciplinaId nulo = chamada diária da turma POR_DIA), até a data `ate`
+// (inclusive, no calendário da escola). Revogada = tranca de novo.
+model ReaberturaUnidade {
+  id                String          @id @default(cuid())
+  escolaId          String          @map("escola_id")
+  escola            Escola          @relation(fields: [escolaId], references: [id])
+  etapaCalendarioId String          @map("etapa_calendario_id")
+  etapaCalendario   EtapaCalendario @relation(fields: [etapaCalendarioId], references: [id], onDelete: Cascade)
+  turmaId           String          @map("turma_id")
+  turma             Turma           @relation(fields: [turmaId], references: [id], onDelete: Cascade)
+  disciplinaId      String?         @map("disciplina_id")
+  disciplina        Disciplina?     @relation(fields: [disciplinaId], references: [id], onDelete: Cascade)
+  ate               DateTime        @db.Date
+  motivo            String
+  criadoPorId       String?         @map("criado_por_id")
+  criadoPor         User?           @relation("ReaberturaCriador", fields: [criadoPorId], references: [id], onDelete: SetNull)
+  criadoEm          DateTime        @default(now()) @map("criado_em")
+  revogadaEm        DateTime?       @map("revogada_em")
+  revogadaPorId     String?         @map("revogada_por_id")
+  revogadaPor       User?           @relation("ReaberturaRevogador", fields: [revogadaPorId], references: [id], onDelete: SetNull)
+
+  @@index([escolaId])
+  @@index([etapaCalendarioId, turmaId])
+  @@index([turmaId])
+  @@map("reaberturas_unidade")
 }
 
 enum TipoDiaNaoLetivo {

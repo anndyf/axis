@@ -122,3 +122,16 @@ describe('papéis novos (Secretaria e Coordenação) — tabela 2.5.1', () => {
     for (const p of ['frequencia.lancar', 'estudante.editar', 'turma.gerenciar', 'nota.lancar', 'nota.tela', 'usuario.gerenciar', 'configuracao.editar'] as const) expect(can(coord, p), p).toBe(false)
   })
 })
+
+describe('cadeado de unidade: unidade.encerrar', () => {
+  it('só Direção e Coordenação encerram e reabrem unidades', () => {
+    const com = (Object.keys(PAPEIS_SISTEMA) as (keyof typeof PAPEIS_SISTEMA)[]).filter((c) => PAPEIS_SISTEMA[c].permissoes.includes('unidade.encerrar'))
+    expect(com.sort()).toEqual(['COORDENACAO', 'DIRECAO'])
+    // Administrador da escola NÃO recebe (decisão da dona do produto)
+    expect(can({ papeis: ['ADMINISTRADOR'] }, 'unidade.encerrar')).toBe(false)
+    for (const c of ['PROFESSOR', 'SECRETARIA', 'AEE', 'ESTUDANTE']) expect(can({ papeis: [c] }, 'unidade.encerrar'), c).toBe(false)
+    // sessão antiga só com booleanos: direção sim, superuser e staff não
+    expect(can({ isDirecao: true }, 'unidade.encerrar')).toBe(true)
+    expect(can({ isSuperuser: true, isStaff: true }, 'unidade.encerrar')).toBe(false)
+  })
+})

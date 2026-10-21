@@ -12,7 +12,7 @@ Ambiente: PostgreSQL 16 local, `axis_dev` e `axis_test` com `timezone = America/
 - [ ] Etapa 5 — telas
 - [ ] Encerramento (PR)
 
-**Próximo passo:** Etapa 3 — modelo do cadeado (schema + migration + permissão `unidade.encerrar` + backfill).
+**Próximo passo:** Etapa 3 (resto) / Etapa 4 — escrever `src/lib/cadeado-unidade.ts` (situação das unidades + podeGravarNotaUnidade/podeGravarAula/podeGravarRecuperacaoOuConselho) e as actions de encerrar/desfazer/reabrir/revogar.
 
 ## Etapa 1 — fuso
 - `logAudit` (src/lib/audit.ts) grava UTC verdadeiro (`@default(now())` do Prisma). O caminho alternativo em SQL bruto foi retirado (morto: o modelo `auditLog` sempre existe; e um `Date` do JS passado como parâmetro de SQL bruto é convertido para a hora local do banco — conferido).
@@ -30,3 +30,11 @@ Ambiente: PostgreSQL 16 local, `axis_dev` e `axis_test` com `timezone = America/
 - **Correção:** removidos os dois `loading.tsx` (raiz e painel). O `redirect()` volta a responder 307 antes de qualquer HTML (conferido com curl: 307 → /dashboard) e a navegação sem permissão termina na tela de destino sem erro (0 de 8; script abaixo).
   - **[decisão]** Efeito colateral: na troca de tela dentro do painel não aparece mais o esqueleto de carregamento; a tela anterior fica até a nova chegar, com a barra de progresso do topo (NextTopLoader, já existente). Alternativas (replicar as regras de cada página no layout/proxy) duplicariam as checagens de permissão. `src/app/portal/loading.tsx` foi mantido (fora do painel, não faz parte do defeito relatado).
 - Testes: `src/lib/redirecionamento-sem-streaming.test.ts` (falha se voltar a existir loading.tsx na raiz ou dentro de /dashboard) e conferência ao vivo `npx tsx scripts/verificar-redirecionamento.ts` (Playwright; professor em /dashboard/usuarios e /dashboard/auditoria → /dashboard; AEE em /dashboard/turmas/<id> → /dashboard/turmas; sem `pageerror`; 4 repetições cada — 12/12 ok no build de produção).
+
+## Etapa 3 — modelo
+- Migration `20261023130000_cadeado_unidade` (só aditiva, gerada com `migrate diff` e revisada; `--from-migrations` × schema sem diferença):
+  - `etapas_calendario`: `encerrada_em` (instante UTC) e `encerrada_por_id` (→ users, SET NULL).
+  - `reaberturas_unidade`: escola, etapa do calendário (CASCADE), turma (CASCADE), disciplina opcional (CASCADE; nula = chamada diária POR_DIA), `ate` (DATE, inclusive), motivo, `criado_por_id`/`criado_em`, `revogada_em`/`revogada_por_id`. Índices por escola, (etapa, turma) e turma.
+- Permissão `unidade.encerrar` (lista fechada em src/lib/permissoes.ts) para DIRECAO e COORDENACAO.
+  - **[decisão]** Administrador da escola NÃO recebe (pedido da dona do produto). Quem é Administrador + Direção (como o admin do seed da CETEP) recebe pela Direção.
+  - Entre os booleanos antigos, equivale a `isDirecao` (checagens-papeis.test.ts). O backfill da fase 3a grava a permissão em `papeis_permissoes` (garantirPapeisSistema já é idempotente); teste novo em equivalencia-papeis.test.ts: banco sem a permissão → 1ª execução grava só `+unidade.encerrar` em Direção e Coordenação; 2ª execução não altera nada. Rodado no axis_dev.

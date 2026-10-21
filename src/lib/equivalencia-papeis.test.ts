@@ -87,6 +87,21 @@ describe('fase 3a - backfill e equivalência', () => {
     expect(await prisma.vinculoPapel.findMany({ where: { escolaId }, orderBy: { id: 'asc' } })).toEqual(antes)
   })
 
+  it('permissão nova unidade.encerrar: o backfill grava em Direção e Coordenação e a 2ª execução não altera nada', async () => {
+    // Estado de um banco anterior ao cadeado: sem a permissão nos papéis
+    const papeis = await prisma.papel.findMany({ where: { escolaId: null, codigo: { in: ['DIRECAO', 'COORDENACAO'] } }, select: { id: true } })
+    await prisma.papelPermissao.deleteMany({ where: { permissao: 'unidade.encerrar', papelId: { in: papeis.map((p) => p.id) } } })
+    const r1 = await backfillFase3a({ escolaIds: [escolaId] })
+    expect(r1.papeis.sort()).toEqual(['papel COORDENACAO: +unidade.encerrar', 'papel DIRECAO: +unidade.encerrar'])
+    const comPermissao = await prisma.papelPermissao.findMany({ where: { permissao: 'unidade.encerrar', papel: { escolaId: null } }, select: { papel: { select: { codigo: true } } } })
+    expect(comPermissao.map((p) => p.papel.codigo).sort()).toEqual(['COORDENACAO', 'DIRECAO'])
+    const antes = await prisma.papelPermissao.findMany({ where: { papel: { escolaId: null } }, orderBy: [{ papelId: 'asc' }, { permissao: 'asc' }] })
+    const r2 = await backfillFase3a({ escolaIds: [escolaId] })
+    expect([r2.papeis, r2.vinculosCriados, r2.vinculosRemovidos]).toEqual([[], 0, 0])
+    expect(await prisma.papelPermissao.findMany({ where: { papel: { escolaId: null } }, orderBy: [{ papelId: 'asc' }, { permissao: 'asc' }] })).toEqual(antes)
+    expect(await conferirPapeisSistema()).toEqual([])
+  })
+
   it('backfill não mexe em Secretaria/Coordenação dadas pela tela e acompanha booleano alterado', async () => {
     const c = contas[4] // só professor
     await prisma.$transaction((tx) => gravarPapeis(tx, { id: c.id, escolaId }, ['PROFESSOR', 'SECRETARIA']))

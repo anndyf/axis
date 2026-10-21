@@ -65,6 +65,7 @@ export const PERMISSOES = [
   'indicador.ler', // professores com lançamentos pendentes
   'conselho.decidir',
   'relatorio.turma', // PDFs de relatório da turma
+  'unidade.encerrar', // encerrar/desfazer encerramento de unidade e reabrir por turma+disciplina (cadeado)
 
   // Planos de ensino
   'plano.ler', // tela de planos de ensino
@@ -162,7 +163,8 @@ export const PAPEIS_SISTEMA: Record<CodigoPapel, DefinicaoPapel> = {
     descricao: 'Gestão da escola: estudantes, turmas, resultados, conselho, AEE e identidade visual.',
     escopo: 'ESCOLA',
     atribuivel: true,
-    permissoes: [...GESTAO, ...EQUIPE, 'aee.ler', 'aee.gerenciar'],
+    // unidade.encerrar fora do GESTAO: o Administrador da escola não recebe
+    permissoes: [...GESTAO, ...EQUIPE, 'aee.ler', 'aee.gerenciar', 'unidade.encerrar'],
   },
   SECRETARIA: {
     nome: 'Secretaria escolar',
@@ -185,7 +187,7 @@ export const PAPEIS_SISTEMA: Record<CodigoPapel, DefinicaoPapel> = {
       'turma.ler', 'frequencia.acompanhar', 'resultado.ler', 'indicador.ler',
       'conselho.decidir', 'relatorio.turma', 'plano.ler',
       'plano.acompanhar', 'questao.usar', 'questao.moderar', 'prova.gerenciar', 'simulado.ler',
-      'simulado.gerenciar', 'comunicado.receber.equipe',
+      'simulado.gerenciar', 'comunicado.receber.equipe', 'unidade.encerrar',
     ],
   },
   PROFESSOR: {
