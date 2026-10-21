@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth"
 import { redirect, notFound } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import AEEProfileClient from "./AEEProfileClient"
+import CabecalhoFichaEstudante from "@/components/fichas/CabecalhoFichaEstudante"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
 import { can } from '@/lib/rbac'
 
@@ -59,12 +60,19 @@ export default async function AEEPage({ params }: { params: Promise<{ matricula:
   // Verifica se este professor específico já atestou a leitura
   const jaAtestado = estudante.aeeProfile?.acknowledgements.some(ack => ack.user.id === session.user.id) || false
 
+  // Quem pode ver a ficha do estudante vê também as abas dela (Dados, Notas, AEE)
+  const cabecalho = await CabecalhoFichaEstudante({ session, matricula })
+
   return (
-    <AEEProfileClient 
-      usuario={session.user}
-      estudante={estudante}
-      perfilExistente={estudante.aeeProfile}
-      jaAtestado={jaAtestado}
-    />
+    <>
+      {cabecalho}
+      <AEEProfileClient 
+        usuario={session.user}
+        estudante={estudante}
+        perfilExistente={estudante.aeeProfile}
+        jaAtestado={jaAtestado}
+        comCabecalhoDaFicha={!!cabecalho}
+      />
+    </>
   )
 }

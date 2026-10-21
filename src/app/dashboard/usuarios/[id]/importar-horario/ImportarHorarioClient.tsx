@@ -110,40 +110,29 @@ export default function ImportarHorarioClient({
 
   return (
     <div className="">
-      {/* Header */}
-      <header className="mb-6">
-        <div className="mx-auto max-w-leitura flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-4">
-            <Link
-              href={`/dashboard/usuarios/${usuario.id}/disciplinas`}
-              className="p-2 hover:bg-subtle rounded-xl transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-fg-muted" />
-            </Link>
-            <div>
-              <h1 className="text-2xl font-semibold tracking-tight text-fg">Importar Horário</h1>
-              <p className="text-sm text-fg-muted">
-                Professor: {usuario.name}
-              </p>
-            </div>
-          </div>
-
-          {resultado && confirmados.size > 0 && !sucesso && (
-            <button
-              onClick={handleImportar}
-              disabled={importando}
-              className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
-            >
-              {importando
-                ? <Loader2 size={16} className="animate-spin" />
-                : <CheckCheck size={16} />}
-              Vincular {confirmados.size} disciplina{confirmados.size !== 1 ? 's' : ''}
-            </button>
-          )}
+      {/* Dentro da ficha do usuário (nome e abas vêm do layout) */}
+      <div className="mb-4 flex max-w-leitura flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Link href={`/dashboard/usuarios/${usuario.id}/disciplinas`} aria-label="Voltar para disciplinas e turmas" className="rounded-md p-1 text-fg-subtle hover:bg-subtle hover:text-fg">
+            <ArrowLeft size={16} strokeWidth={1.75} />
+          </Link>
+          <p className="text-sm text-fg-muted">Importar horário do professor</p>
         </div>
-      </header>
+        {resultado && confirmados.size > 0 && !sucesso && (
+          <button
+            onClick={handleImportar}
+            disabled={importando}
+            className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
+          >
+            {importando
+              ? <Loader2 size={16} className="animate-spin" />
+              : <CheckCheck size={16} />}
+            Vincular {confirmados.size} disciplina{confirmados.size !== 1 ? 's' : ''}
+          </button>
+        )}
+      </div>
 
-      <main className="mx-auto max-w-leitura py-8 space-y-6">
+      <main className="max-w-leitura space-y-6">
 
         {/* Sucesso */}
         {sucesso && (

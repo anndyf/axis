@@ -22,14 +22,10 @@ export async function permissoesFichaTurma(user: RbacUser, escolaId: string): Pr
 }
 
 export async function permissoesFichaEstudante(user: RbacUser, escolaId: string, temFichaAee: boolean): Promise<PermissoesFichaEstudante> {
-  const [not, dia, sec, aee] = await Promise.all([
-    moduloLivre(escolaId, 'NOT', user), moduloLivre(escolaId, 'DIA', user), moduloLivre(escolaId, 'SEC', user), moduloLivre(escolaId, 'AEE', user),
-  ])
+  const [not, aee] = await Promise.all([moduloLivre(escolaId, 'NOT', user), moduloLivre(escolaId, 'AEE', user)])
   return {
     editar: can(user, 'estudante.editar'),
     boletim: not,
-    frequencia: dia && can(user, 'frequencia.acompanhar'),
-    ocorrencias: sec && can(user, 'ocorrencia.gerenciar'),
     aee: aee && temFichaAee && can(user, 'aee.ler'),
     historico: false, // etapa 5: aba Histórico (auditoria.ler)
   }

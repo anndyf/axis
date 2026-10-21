@@ -23,7 +23,7 @@ servidor de desenvolvimento recarrega as mudanças em andamento.
 
 - [x] 1. Fundação de área de trabalho (tokens e componentes)
 - [x] 2. Casca (largura, barra superior de contexto, menu lateral compacto)
-- [ ] 3. Fichas com abas (turma, estudante, usuário, AEE)
+- [x] 3. Fichas com abas (turma, estudante, usuário, AEE)
 - [ ] 4. Listas e telas de trabalho
 - [ ] 5. Rastreabilidade visível
 - [ ] 6. Formulários e tabelas com rigor
@@ -32,9 +32,13 @@ servidor de desenvolvimento recarrega as mudanças em andamento.
 
 ## Próximo passo exato
 
-Etapa 3 (fichas com abas): turma em `src/app/dashboard/turmas/[id]/` com
-layout de ficha (CabecalhoPagina + Abas) e rotas filhas que reaproveitam as
-páginas existentes; depois estudante, usuário e ficha AEE.
+Etapa 4 (listas e telas de trabalho), na ordem: turmas (`TurmasListClient`
+vira Painel + BarraFerramentas + Tabela), estudantes (usar
+`components/estudantes/TabelaEstudantes`), usuários (`UsuariosClient`),
+disciplinas, resultados, frequência/infrequência (`ConteudoFrequencia`),
+conselho, lançamento de notas, chamada e diário (desktop), mensagens,
+ocorrências, AEE, provas/questões/simulados, configurações; dashboard em
+grade.
 
 ## Etapa 1 — o que foi feito
 
@@ -114,3 +118,48 @@ Decisões:
    a barra superior ficou com o contexto de trabalho (como SIGEduc/SUAP).
 4. O seletor de visão do painel fica na barra superior (menu do perfil); no
    celular continua nas fichas dentro do painel.
+
+## Etapa 3 — o que foi feito
+
+Abas = links para telas que já existiam ou rotas filhas que reaproveitam os
+mesmos componentes e consultas. A aba só aparece se o usuário puder abrir a
+tela de destino (mesma guarda de módulo + `can()`), em
+`src/lib/fichas/abas.ts` (puro, com teste) e `src/lib/fichas/permissoes.ts`.
+
+- Turma (`src/app/dashboard/turmas/[id]/layout.tsx`): cabeçalho com curso,
+  turno, ano letivo e contagens; abas Visão geral (nova, `page.tsx`: dados
+  em `ListaDescritiva` + atalhos de trabalho) · Estudantes (nova rota filha,
+  mesma consulta da tela Estudantes, extraída para
+  `src/lib/services/estudantes-lista.ts`) · Disciplinas (nova rota filha:
+  disciplina, área, professor e carga horária — dados que relatório e
+  horário já mostravam) · Horário · Notas (relatório da turma) · Resultados
+  (situação) · Frequência (rota filha que usa `ConteudoFrequencia`, extraído
+  da tela Frequência) · Ocorrências (rota filha com o livro filtrado pela
+  turma). Rotas filhas novas entraram no mapa de módulos (DIA, SEC).
+  Os cabeçalhos repetidos de horário, relatório e situação viraram uma linha
+  de ações.
+- Estudante (`src/app/dashboard/estudantes/[id]/layout.tsx` +
+  `components/fichas/CabecalhoFichaEstudante.tsx`): abas Dados (nova,
+  leitura em `ListaDescritiva`, botão "Editar" abre o formulário de sempre)
+  · Notas e frequência (boletim, que já traz a frequência por disciplina) ·
+  AEE (só com ficha AEE, módulo ativo e `aee.ler`). O formulário de
+  estudante passou para o design system (Painel, Field com obrigatórios).
+- Usuário (`src/app/dashboard/usuarios/[id]/layout.tsx`): abas Dados e
+  papéis (nova, leitura; "Editar" abre o formulário com o editor de papéis
+  da fase 3b) · Disciplinas e turmas (professor; inclui importar horário).
+- Ficha AEE (`AEEProfileClient`): modo leitura em painéis e
+  `ListaDescritiva`; "Editar ficha" (só `aee.ficha.editar`) abre os mesmos
+  campos; professor continua confirmando a leitura (mesma ação). Quem pode
+  ver a ficha do estudante vê também as abas dele; o especialista AEE vê o
+  cabeçalho próprio. Mensagens de salvar viraram avisos (toast) formais.
+
+Correção de segurança encontrada no caminho: a tela "Vincular disciplinas"
+mandava o registro inteiro de `User` (com o hash da senha) ao navegador;
+agora seleciona só `id`, `name` e as disciplinas.
+
+Ficaram fora (não existe tela para isso hoje):
+- Aba "Ocorrências" do estudante: a tela de ocorrências só filtra por nome do
+  estudante, não por estudante; seria preciso um filtro novo na API.
+- Aba "Documentos" do estudante: não há documentos anexados no sistema.
+- Aba "Papéis" separada no usuário: o editor de papéis faz parte do
+  formulário de usuário; a ficha mostra os papéis na aba "Dados e papéis".

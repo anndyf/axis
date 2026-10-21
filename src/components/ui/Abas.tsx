@@ -11,11 +11,14 @@ export interface AbaLink {
   contador?: number
   /** ativa só no endereço exato (padrão: também nas subpáginas) */
   exato?: boolean
+  /** outros endereços em que a aba também fica ativa (ex.: "Dados" no formulário de edição) */
+  ativaEm?: string[]
 }
 
 /** Aba ativa: endereço exato, ou subpágina quando a aba não é `exato`. */
-export function abaAtiva(pathname: string, aba: Pick<AbaLink, 'href' | 'exato'>): boolean {
+export function abaAtiva(pathname: string, aba: Pick<AbaLink, 'href' | 'exato' | 'ativaEm'>): boolean {
   const alvo = aba.href.split('?')[0]
+  if (aba.ativaEm?.some((outro) => pathname === outro || pathname.startsWith(`${outro}/`))) return true
   return pathname === alvo || (!aba.exato && pathname.startsWith(`${alvo}/`))
 }
 

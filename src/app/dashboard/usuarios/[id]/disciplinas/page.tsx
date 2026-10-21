@@ -13,11 +13,10 @@ export const metadata = {
 export const runtime = 'nodejs'
 
 async function getUsuarioEDisciplinas(id: string, escolaId: string) {
+  // Só o necessário vai para o navegador (nunca o registro inteiro de User)
   const usuario = await prisma.user.findUnique({
     where: { id, escolaId },
-    include: {
-      disciplinasPermitidas: { select: { id: true } }
-    }
+    select: { id: true, name: true, disciplinasPermitidas: { select: { id: true } } }
   })
 
   if (!usuario) return null

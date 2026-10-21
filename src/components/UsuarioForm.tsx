@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Accessibility, BookOpen, Check, ClipboardList, Fingerprint, GraduationCap, Mail, ShieldCheck, type LucideIcon } from "lucide-react"
-import { Alert, Button, Card, CardBody, CardFooter, CardHeader, Field, Input, PageHeader, PasswordInput, cn } from "@/components/ui"
+import { Alert, Button, Card, CardBody, CardFooter, CardHeader, Field, Input, CabecalhoPagina, PasswordInput, cn } from "@/components/ui"
 import { Dialog } from "@/components/ui/Dialog"
 import { PAPEIS_ATRIBUIVEIS, PAPEIS_SISTEMA, type CodigoPapel } from "@/lib/permissoes"
 
@@ -74,12 +74,9 @@ export default function UsuarioForm({ usuario, isEdit = false }: { usuario?: Usu
   const papeisExtras = (usuario?.papeis ?? []).filter((p) => !PAPEIS_ATRIBUIVEIS.includes(p))
 
   return (
-    <div className="mx-auto max-w-3xl space-y-4 pb-24">
-      <PageHeader
-        title={isEdit ? "Editar usuário" : "Novo usuário"}
-        description={isEdit ? "Dados de acesso e papéis da conta" : "A senha provisória é enviada por e-mail"}
-        breadcrumb={[{ label: "Usuários", href: "/dashboard/usuarios" }, { label: isEdit ? (usuario?.name || usuario?.email || "Editar") : "Novo" }]}
-      />
+    <div className="max-w-leitura space-y-4 pb-24">
+      {/* Na edição, nome e abas vêm da ficha do usuário (layout) */}
+      {!isEdit && <CabecalhoPagina titulo="Novo usuário" descricao="A senha provisória é enviada por e-mail." />}
 
       {protegida && (
         <Alert tone="warning" title="Conta da plataforma">

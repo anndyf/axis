@@ -42,7 +42,7 @@ export default async function TurmaVisaoGeralPage({ params }: { params: Promise<
   ]
 
   return (
-    <div className="grid gap-4 lg:grid-cols-3">
+    <div className="grid gap-4 lg:grid-cols-3 lg:items-start">
       <Painel titulo="Dados da turma" className="lg:col-span-2">
         <ListaDescritiva itens={[
           { rotulo: "Nome", valor: turma.nome },

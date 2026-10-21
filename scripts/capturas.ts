@@ -42,9 +42,11 @@ async function ids() {
   const aula = await prisma.aula.findFirst({ where: { turmaId: turma.id, disciplinaId: disciplina.id }, orderBy: { data: 'desc' } })
   // Conta de portal de teste: libera a troca obrigatória de senha só no banco local
   await prisma.user.updateMany({ where: { escolaId: escola.id, username: '1TIM1-001' }, data: { deveTrocarSenha: false } })
-  const direcao = await prisma.user.findFirst({ where: { escolaId: escola.id, username: 'direcao' } })
+  const direcao = await prisma.user.findFirst({ where: { escolaId: escola.id, username: 'direcao' }, select: { id: true } })
+  const professor = await prisma.user.findFirst({ where: { escolaId: escola.id, username: 'professor' }, select: { id: true } })
   return {
     direcao: direcao?.id ?? '',
+    professor: professor?.id ?? '',
     turma: turma.id,
     disciplina: disciplina.id,
     matricula: turma.estudantes[0].matricula,
@@ -104,6 +106,10 @@ async function main() {
         ['dashboard-gestao', '/dashboard'],
         ['turmas', '/dashboard/turmas'],
         ['turma-detalhe', `/dashboard/turmas/${i.turma}/relatorio`],
+        ['turma-ficha', `/dashboard/turmas/${i.turma}`],
+        ['turma-estudantes', `/dashboard/turmas/${i.turma}/estudantes`],
+        ['estudante-dados', `/dashboard/estudantes/${i.matricula}`],
+        ['estudante-aee', `/dashboard/aee/${i.matriculaAee}`],
         ['lancamento-notas', `/dashboard/notas/lancar/${i.turma}`],
         ['frequencia', `/dashboard/frequencia?turma=${i.turma}`],
         ['boletim', `/dashboard/estudantes/${i.matricula}/boletim`],
@@ -143,6 +149,8 @@ async function main() {
         ['usuarios', '/dashboard/usuarios'],
         ['usuario-novo', '/dashboard/usuarios/novo'],
         ['usuario-editar', `/dashboard/usuarios/${i.direcao}/editar`],
+        ['usuario-ficha', `/dashboard/usuarios/${i.professor}`],
+        ['usuario-disciplinas', `/dashboard/usuarios/${i.professor}/disciplinas`],
       ],
     },
     { usuario: 'aee', senha: 'aee123', telas: [['aee', '/dashboard/aee'], ['aee-ficha', `/dashboard/aee/${i.matriculaAee}`]] },

@@ -120,26 +120,10 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
 
   return (
     <div className="">
-      {/* Header Fixo Premium */}
-      <header className="mb-6">
-        <div className="py-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex min-w-0 items-center gap-3">
-              <Link 
-                href="/dashboard/usuarios" 
-                className="p-2 hover:bg-subtle-hover rounded-xl transition-colors border border-transparent hover:border-line-strong"
-              >
-                <ArrowLeft className="w-5 h-5 text-fg-muted" />
-              </Link>
-              <div>
-                <h1 className="text-2xl font-semibold tracking-tight text-fg">Vincular Disciplinas</h1>
-                <p className="text-sm text-fg-muted">
-                   Professor: {usuario.name}
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
+      {/* Dentro da ficha do usuário (nome e abas vêm do layout) */}
+      <div className="mb-4 flex max-w-leitura flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-fg-muted">Disciplinas vinculadas ao professor</p>
+        <div className="flex items-center gap-3">
               <Link
                 href={`/dashboard/usuarios/${usuario.id}/importar-horario`}
                 className="flex items-center gap-2 border border-line-strong text-fg-muted px-4 py-2.5 rounded-xl font-medium text-sm hover:bg-canvas transition-all"
@@ -155,11 +139,9 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
                 <span>Salvar Alterações</span>
               </button>
             </div>
-          </div>
-        </div>
-      </header>
+      </div>
 
-      <main className="mx-auto max-w-leitura py-6">
+      <main className="max-w-leitura">
         
         {/* Barra de Pesquisa e Filtro */}
         <div className="relative mb-10 group">

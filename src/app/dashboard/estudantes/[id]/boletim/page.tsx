@@ -1,9 +1,8 @@
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
-import Link from "next/link"
-import { ArrowLeft, Download, FileText } from "lucide-react"
-import { Badge, Card, CardHeader, EmptyState, PageHeader, Stat, buttonClasses, type BadgeTone } from "@/components/ui"
+import { Download, FileText } from "lucide-react"
+import { Badge, Card, CardHeader, EmptyState, Stat, buttonClasses, type BadgeTone } from "@/components/ui"
 import { calcularMediaFinal, unidadesDeNotasSalvas, etapasDaNota } from "@/lib/services/notas"
 import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from "@/lib/services/notas-leitura"
 import { carregarFrequenciaDaTurma } from "@/lib/services/frequencia-leitura"
@@ -137,18 +136,13 @@ export default async function BoletimPage({
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={estudante.nome}
-        description={<>Boletim · {estudante.turma.nome} · <span className="font-mono">{estudante.matricula}</span></>}
-        actions={
-          <>
-            <Link href="/dashboard/estudantes" className={buttonClasses({ variant: 'ghost' })}><ArrowLeft size={16} strokeWidth={1.75} /> Estudantes</Link>
-            <a href={`/api/boletim/${estudante.matricula}/pdf`} target="_blank" rel="noopener noreferrer" className={buttonClasses({ variant: 'secondary' })}>
-              <Download size={16} strokeWidth={1.75} /> Baixar PDF
-            </a>
-          </>
-        }
-      />
+      {/* Dentro da ficha do estudante (nome, matrícula e turma vêm do layout) */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-fg-muted">Boletim de {estudante.turma.nome}: notas, recuperação e frequência por disciplina</p>
+        <a href={`/api/boletim/${estudante.matricula}/pdf`} target="_blank" rel="noopener noreferrer" className={buttonClasses({ variant: 'secondary', size: 'sm' })}>
+          <Download size={14} strokeWidth={1.75} aria-hidden /> Baixar PDF
+        </a>
+      </div>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat label="Média geral" value={mediaGeral.replace('.', ',')} hint={`${estudante.notas.length} disciplinas`} />
