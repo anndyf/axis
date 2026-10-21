@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Accessibility, CheckCircle2, Pencil, Save, Trash2, Upload, Users } from "lucide-react"
-import { Alert, Button, CabecalhoPagina, IndicadorGravacao, RodapeRastreio, Checkbox, Field, Input, ListaDescritiva, Painel, Textarea, buttonClasses } from "@/components/ui"
+import { Alert, BarraSalvar, Button, CabecalhoPagina, IndicadorGravacao, RodapeRastreio, Checkbox, Field, Input, ListaDescritiva, Painel, Textarea, buttonClasses } from "@/components/ui"
 import { useToast } from "@/components/ui/Toast"
 import { mascaraTelefone, telefoneValido } from "@/lib/navegador/mascaras"
 import { CIDS_AEE } from "@/lib/constants-aee"
@@ -138,6 +138,8 @@ export default function AEEProfileClient({
     if (!telefoneValido(formData.contatoTelefone)) { toast('Confira o telefone do contato de emergência.', 'error'); return }
     if (await handleSave()) setEditando(false)
   }
+  /** No modo de edição as seções ficam numeradas (formulário longo) */
+  const secao = (n: number, nome: string) => (editando ? `${n}. ${nome}` : nome)
   const nomeCid = (code: string) => CIDS_AEE.find((c: any) => c.code === code)?.label || 'CID específico'
   const minhaLeitura = perfilExistente?.acknowledgements?.find((ack: any) => ack.user.id === usuario.id)?.readAt
 
@@ -161,13 +163,7 @@ export default function AEEProfileClient({
           {editando ? 'Editando a ficha AEE' : 'Ficha AEE em modo leitura'}
         </p>
         {isDirecao && (
-          editando ? (
-            <div className="flex items-center gap-3">
-              <IndicadorGravacao pendente={alteracoesPendentes} salvando={loading} salvoEm={salvoEm} />
-              {perfilExistente && <Button variant="secondary" onClick={() => setEditando(false)} disabled={loading}>Cancelar</Button>}
-              <Button onClick={salvarESair} loading={loading}>{!loading && <Save size={16} strokeWidth={1.75} aria-hidden />} Salvar ficha</Button>
-            </div>
-          ) : (
+          editando ? null : (
             <Button variant="secondary" onClick={() => setEditando(true)}><Pencil size={14} strokeWidth={1.75} aria-hidden /> Editar ficha</Button>
           )
         )}
@@ -192,7 +188,7 @@ export default function AEEProfileClient({
 
       <div className="grid gap-4 lg:grid-cols-12">
         <div className="space-y-4 lg:col-span-4">
-          <Painel titulo="Identificação">
+          <Painel titulo={secao(1, "Identificação")}>
             <div className="flex items-center gap-3">
               <div className="relative size-16 shrink-0 overflow-hidden rounded-painel border border-line bg-subtle">
                 {formData.fotoUrl ? (
@@ -221,7 +217,7 @@ export default function AEEProfileClient({
             )}
           </Painel>
 
-          <Painel titulo="Necessidades na avaliação">
+          <Painel titulo={secao(2, "Necessidades na avaliação")}>
             {editando ? (
               <div className="space-y-2.5">
                 <Checkbox label="Prova adaptada" checked={formData.precisaProvaAdaptada} onChange={(e) => setFormData({ ...formData, precisaProvaAdaptada: e.target.checked })} />
@@ -235,7 +231,7 @@ export default function AEEProfileClient({
             )}
           </Painel>
 
-          <Painel titulo="Diagnóstico (CID)" semRecuo={editando}>
+          <Painel titulo={secao(3, "Diagnóstico (CID)")} semRecuo={editando}>
             {editando ? (
               <div>
                 <div className="border-b border-line-subtle px-painel py-2.5">
@@ -265,7 +261,7 @@ export default function AEEProfileClient({
             ) : <p className="text-sm text-fg-disabled">Nenhum CID informado.</p>}
           </Painel>
 
-          <Painel titulo="Contato de emergência">
+          <Painel titulo={secao(4, "Contato de emergência")}>
             {editando ? (
               <div className="space-y-3">
                 <Field label="Nome do contato">{(p) => <Input {...p} value={formData.contatoNome} onChange={(e) => setFormData({ ...formData, contatoNome: e.target.value })} placeholder="Ex.: Maria (mãe)" />}</Field>
@@ -281,19 +277,19 @@ export default function AEEProfileClient({
         </div>
 
         <div className="space-y-4 lg:col-span-8">
-          <Painel titulo="Contexto e condição do estudante">
+          <Painel titulo={secao(5, "Contexto e condição do estudante")}>
             {editando
               ? <Textarea rows={5} value={formData.condicao} onChange={(e) => setFormData({ ...formData, condicao: e.target.value })} placeholder="Descreva a condição pedagógica e médica do estudante" aria-label="Contexto e condição do estudante" />
               : textoLeitura(formData.condicao, 'Sem descrição.')}
           </Painel>
 
-          <Painel titulo="Orientações para o professor" className="border-success-line">
+          <Painel titulo={secao(6, "Orientações para o professor")} className="border-success-line">
             {editando
               ? <Textarea rows={8} value={formData.recomendacoes} onChange={(e) => setFormData({ ...formData, recomendacoes: e.target.value })} placeholder="Avaliações, tempo adicional, fonte ampliada, apoio em sala" aria-label="Orientações para o professor" />
               : textoLeitura(formData.recomendacoes, 'Sem orientações cadastradas.')}
           </Painel>
 
-          <Painel titulo="Observações internas" rodape={perfilExistente ? <RodapeRastreio criadoEm={new Date(perfilExistente.createdAt)} alteradoEm={new Date(perfilExistente.updatedAt)} /> : undefined}>
+          <Painel titulo={secao(7, "Observações internas")} rodape={perfilExistente ? <RodapeRastreio criadoEm={new Date(perfilExistente.createdAt)} alteradoEm={new Date(perfilExistente.updatedAt)} /> : undefined}>
             {editando
               ? <Textarea rows={3} value={formData.notasDirecao} onChange={(e) => setFormData({ ...formData, notasDirecao: e.target.value })} placeholder="Informações administrativas adicionais" aria-label="Observações internas" />
               : textoLeitura(formData.notasDirecao, 'Sem observações.')}
@@ -314,6 +310,13 @@ export default function AEEProfileClient({
           )}
         </div>
       </div>
+
+      {editando && isDirecao && (
+        <BarraSalvar estado={<IndicadorGravacao pendente={alteracoesPendentes} salvando={loading} salvoEm={salvoEm} />}>
+          {perfilExistente && <Button variant="secondary" onClick={() => setEditando(false)} disabled={loading}>Cancelar</Button>}
+          <Button onClick={salvarESair} loading={loading}>{!loading && <Save size={16} strokeWidth={1.75} aria-hidden />} Salvar ficha</Button>
+        </BarraSalvar>
+      )}
     </div>
   )
 }

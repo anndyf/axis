@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useMemo, useState, type ReactNode } from "react"
 import { useRouter } from "next/navigation"
 import { ChevronRight } from "lucide-react"
-import { Painel, RodapeTabela, Table, TableContainer, TableEmpty, TBody, TD, TH, THead, TR, type DirecaoOrdem } from "@/components/ui"
+import { Painel, RodapeTabela, SeletorColunas, useColunasVisiveis, Table, TableContainer, TableEmpty, TBody, TD, TH, THead, TR, type DirecaoOrdem } from "@/components/ui"
 import { BarraFerramentas } from "@/components/ui/BarraFerramentas"
 import { Fichas } from "@/components/ui/Fichas"
 import { baixarCSV } from "@/lib/navegador/csv"
@@ -62,7 +62,15 @@ export default function ListaDeTurmas<T extends TurmaDaLista>({ turmas, href, ex
   }, [turmas, busca, turno, ordem])
   const ordenar = (coluna: typeof ordem.coluna) => setOrdem((o) => ({ coluna, direcao: o.coluna === coluna && o.direcao === "asc" ? "desc" : "asc" }))
   const seta = (c: typeof ordem.coluna) => (ordem.coluna === c ? ordem.direcao : null)
-  const colunas = 3 + (temEstudantes ? 1 : 0) + extras.length + 1
+  const sel = useColunasVisiveis(`turmas-${nomeExportacao}`, [
+    { id: "curso", rotulo: "Curso" },
+    { id: "turno", rotulo: "Turno" },
+    ...(temEstudantes ? [{ id: "estudantes", rotulo: "Estudantes" }] : []),
+    ...extras.map((e) => ({ id: e.titulo, rotulo: e.titulo })),
+  ])
+  const ver = sel.visivel
+  const extrasVisiveis = extras.filter((e) => ver(e.titulo))
+  const colunas = 2 + (ver("curso") ? 1 : 0) + (ver("turno") ? 1 : 0) + (temEstudantes && ver("estudantes") ? 1 : 0) + extrasVisiveis.length
 
   return (
     <Painel titulo={titulo} semRecuo className={className ?? "hidden md:block"}>
@@ -75,12 +83,13 @@ export default function ListaDeTurmas<T extends TurmaDaLista>({ turmas, href, ex
             ...turnos.map((t) => ({ valor: t, rotulo: t, contagem: turmas.filter((x) => rotuloTurno(x.turno) === t).length })),
           ]} />
         ) : undefined}
+        acoes={<SeletorColunas {...sel} />}
         onExportar={() => baixarCSV(nomeExportacao, [
           { titulo: "Turma", valor: (t: T) => t.nome },
-          { titulo: "Curso", valor: (t: T) => t.curso },
-          { titulo: "Turno", valor: (t: T) => rotuloTurno(t.turno) },
-          ...(temEstudantes ? [{ titulo: "Estudantes", valor: (t: T) => t.estudantes }] : []),
-          ...extras.map((e) => ({ titulo: e.titulo, valor: (t: T) => (e.csv ? e.csv(t) : (() => { const v = e.valor(t); return typeof v === "string" || typeof v === "number" ? v : "" })()) })),
+          ...(ver("curso") ? [{ titulo: "Curso", valor: (t: T) => t.curso }] : []),
+          ...(ver("turno") ? [{ titulo: "Turno", valor: (t: T) => rotuloTurno(t.turno) }] : []),
+          ...(temEstudantes && ver("estudantes") ? [{ titulo: "Estudantes", valor: (t: T) => t.estudantes }] : []),
+          ...extrasVisiveis.map((e) => ({ titulo: e.titulo, valor: (t: T) => (e.csv ? e.csv(t) : (() => { const v = e.valor(t); return typeof v === "string" || typeof v === "number" ? v : "" })()) })),
         ], linhas)}
       />
       <TableContainer semBorda>
@@ -88,10 +97,10 @@ export default function ListaDeTurmas<T extends TurmaDaLista>({ turmas, href, ex
           <THead>
             <TR>
               <TH ordem={seta("nome")} onOrdenar={() => ordenar("nome")}>Turma</TH>
-              <TH ordem={seta("curso")} onOrdenar={() => ordenar("curso")}>Curso</TH>
-              <TH>Turno</TH>
-              {temEstudantes && <TH numeric ordem={seta("estudantes")} onOrdenar={() => ordenar("estudantes")}>Estudantes</TH>}
-              {extras.map((e) => <TH key={e.titulo} numeric={e.numeric}>{e.titulo}</TH>)}
+              {ver("curso") && <TH ordem={seta("curso")} onOrdenar={() => ordenar("curso")}>Curso</TH>}
+              {ver("turno") && <TH>Turno</TH>}
+              {temEstudantes && ver("estudantes") && <TH numeric ordem={seta("estudantes")} onOrdenar={() => ordenar("estudantes")}>Estudantes</TH>}
+              {extrasVisiveis.map((e) => <TH key={e.titulo} numeric={e.numeric}>{e.titulo}</TH>)}
               <TH className="text-right"><span className="sr-only">{acaoLinha}</span></TH>
             </TR>
           </THead>
@@ -99,10 +108,10 @@ export default function ListaDeTurmas<T extends TurmaDaLista>({ turmas, href, ex
             {linhas.map((t) => (
               <TR key={t.id} onClick={() => router.push(href(t))}>
                 <TD><Link href={href(t)} onClick={(ev) => ev.stopPropagation()} className="font-medium text-fg hover:underline">{t.nome}</Link></TD>
-                <TD className="text-fg-muted">{t.curso || "—"}</TD>
-                <TD className="text-fg-muted">{rotuloTurno(t.turno) || "—"}</TD>
-                {temEstudantes && <TD numeric>{t.estudantes ?? "—"}</TD>}
-                {extras.map((e) => <TD key={e.titulo} numeric={e.numeric}>{e.valor(t)}</TD>)}
+                {ver("curso") && <TD className="text-fg-muted">{t.curso || "—"}</TD>}
+                {ver("turno") && <TD className="text-fg-muted">{rotuloTurno(t.turno) || "—"}</TD>}
+                {temEstudantes && ver("estudantes") && <TD numeric>{t.estudantes ?? "—"}</TD>}
+                {extrasVisiveis.map((e) => <TD key={e.titulo} numeric={e.numeric}>{e.valor(t)}</TD>)}
                 <TD className="w-0 whitespace-nowrap text-right text-13 text-fg-subtle">
                   <span className="inline-flex items-center gap-1">{acaoLinha}<ChevronRight size={14} strokeWidth={1.75} aria-hidden /></span>
                 </TD>

@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Accessibility, FileText, Pencil } from "lucide-react"
-import { Badge, Painel, RodapeTabela, Table, TableContainer, TableEmpty, TBody, TD, TH, THead, TR, type DirecaoOrdem } from "@/components/ui"
+import { Badge, Painel, SeletorColunas, useColunasVisiveis, RodapeTabela, Table, TableContainer, TableEmpty, TBody, TD, TH, THead, TR, type DirecaoOrdem } from "@/components/ui"
 import { BarraFerramentas } from "@/components/ui/BarraFerramentas"
 import { baixarCSV } from "@/lib/navegador/csv"
 import PortalActivationAction from "@/app/dashboard/estudantes/PortalActivationAction"
@@ -57,6 +57,13 @@ export default function TabelaEstudantes({ estudantes, portalUserIds, mostrarTur
   const ordenar = (coluna: typeof ordem.coluna) => setOrdem((o) => ({ coluna, direcao: o.coluna === coluna && o.direcao === "asc" ? "desc" : "asc" }))
   const seta = (coluna: typeof ordem.coluna) => (ordem.coluna === coluna ? ordem.direcao : null)
   const ficha = (e: LinhaEstudante) => `/dashboard/estudantes/${encodeURIComponent(e.matricula)}`
+  const colunas = useColunasVisiveis("estudantes", [
+    { id: "matricula", rotulo: "Matrícula" },
+    ...(mostrarTurma ? [{ id: "turma", rotulo: "Turma" }] : []),
+    { id: "notas", rotulo: "Notas lançadas" },
+  ])
+  const ver = colunas.visivel
+  const totalColunas = 2 + (ver("matricula") ? 1 : 0) + (mostrarTurma && ver("turma") ? 1 : 0) + (ver("notas") ? 1 : 0)
 
   return (
     <Painel titulo={titulo} semRecuo acoes={titulo ? acoes : undefined}>
@@ -66,13 +73,13 @@ export default function TabelaEstudantes({ estudantes, portalUserIds, mostrarTur
         noPainel
         resumo={semBusca ? `${linhas.length} ${linhas.length === 1 ? "estudante" : "estudantes"}` : undefined}
         busca={semBusca ? undefined : { valor: busca, onChange: setBusca, placeholder: "Buscar por nome ou matrícula" }}
-        acoes={titulo ? undefined : acoes}
+        acoes={<><SeletorColunas {...colunas} />{titulo ? undefined : acoes}</>}
         onExportar={() => baixarCSV(nomeExportacao, [
-          { titulo: "Matrícula", valor: (e: LinhaEstudante) => e.matricula },
           { titulo: "Nome", valor: (e: LinhaEstudante) => e.nome },
-          { titulo: "Turma", valor: (e: LinhaEstudante) => e.turma.nome },
+          ...(ver("matricula") ? [{ titulo: "Matrícula", valor: (e: LinhaEstudante) => e.matricula }] : []),
+          ...(mostrarTurma && ver("turma") ? [{ titulo: "Turma", valor: (e: LinhaEstudante) => e.turma.nome }] : []),
           { titulo: "AEE", valor: (e: LinhaEstudante) => (e.aeeProfile ? "Sim" : "Não") },
-          { titulo: "Notas lançadas", valor: (e: LinhaEstudante) => e._count.notas },
+          ...(ver("notas") ? [{ titulo: "Notas lançadas", valor: (e: LinhaEstudante) => e._count.notas }] : []),
         ], linhas)}
       />
       <TableContainer semBorda>
@@ -80,9 +87,9 @@ export default function TabelaEstudantes({ estudantes, portalUserIds, mostrarTur
           <THead>
             <TR>
               <TH ordem={seta("nome")} onOrdenar={() => ordenar("nome")}>Estudante</TH>
-              <TH ordem={seta("matricula")} onOrdenar={() => ordenar("matricula")}>Matrícula</TH>
-              {mostrarTurma && <TH ordem={seta("turma")} onOrdenar={() => ordenar("turma")}>Turma</TH>}
-              <TH numeric ordem={seta("notas")} onOrdenar={() => ordenar("notas")}>Notas lançadas</TH>
+              {ver("matricula") && <TH ordem={seta("matricula")} onOrdenar={() => ordenar("matricula")}>Matrícula</TH>}
+              {mostrarTurma && ver("turma") && <TH ordem={seta("turma")} onOrdenar={() => ordenar("turma")}>Turma</TH>}
+              {ver("notas") && <TH numeric ordem={seta("notas")} onOrdenar={() => ordenar("notas")}>Notas lançadas</TH>}
               <TH className="text-right"><span className="sr-only">Ações</span></TH>
             </TR>
           </THead>
@@ -95,9 +102,9 @@ export default function TabelaEstudantes({ estudantes, portalUserIds, mostrarTur
                     {e.aeeProfile && <Badge tone="accent">AEE</Badge>}
                   </span>
                 </TD>
-                <TD className="font-mono text-fg-muted">{e.matricula}</TD>
-                {mostrarTurma && <TD className="text-fg-muted">{e.turma.nome}</TD>}
-                <TD numeric className="text-fg-muted">{e._count.notas}</TD>
+                {ver("matricula") && <TD className="font-mono text-fg-muted">{e.matricula}</TD>}
+                {mostrarTurma && ver("turma") && <TD className="text-fg-muted">{e.turma.nome}</TD>}
+                {ver("notas") && <TD numeric className="text-fg-muted">{e._count.notas}</TD>}
                 <TD className="w-0" onClick={(ev) => ev.stopPropagation()}>
                   <div className="flex items-center justify-end gap-0.5">
                     <PortalActivationAction estudanteId={e.matricula} initialMatricula={e.matricula} hasUser={comPortal.has(e.matricula)} />
@@ -116,7 +123,7 @@ export default function TabelaEstudantes({ estudantes, portalUserIds, mostrarTur
                 </TD>
               </TR>
             ))}
-            {linhas.length === 0 && <TableEmpty colSpan={mostrarTurma ? 5 : 4}>{busca ? "Nenhum estudante encontrado com esta busca." : "Nenhum estudante nesta lista."}</TableEmpty>}
+            {linhas.length === 0 && <TableEmpty colSpan={totalColunas}>{busca ? "Nenhum estudante encontrado com esta busca." : "Nenhum estudante nesta lista."}</TableEmpty>}
           </TBody>
         </Table>
       </TableContainer>

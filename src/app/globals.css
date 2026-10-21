@@ -396,3 +396,20 @@ main h1:not([class*="pt]"]) {
   font-weight: 600;
   letter-spacing: -0.02em;
 }
+
+/*
+ * Formulários (etapa 6): todo campo obrigatório ganha o asterisco no rótulo,
+ * inclusive nos formulários antigos (rótulo logo antes do campo ou do
+ * invólucro dele). O <Label obrigatorio> do design system já marca sozinho.
+ * Campo inválido depois que a pessoa mexeu nele fica com a borda de erro.
+ */
+@layer components {
+  form label:not([data-rotulo-marcado]):has(+ :is(input, select, textarea):required)::after,
+  form label:not([data-rotulo-marcado]):has(+ * :is(input, select, textarea):required)::after {
+    content: " *";
+    color: var(--danger-fg);
+  }
+  form :is(input, select, textarea):user-invalid {
+    border-color: var(--danger);
+  }
+}

@@ -26,17 +26,16 @@ servidor de desenvolvimento recarrega as mudanças em andamento.
 - [x] 3. Fichas com abas (turma, estudante, usuário, AEE)
 - [x] 4. Listas e telas de trabalho
 - [x] 5. Rastreabilidade visível
-- [ ] 6. Formulários e tabelas com rigor
+- [x] 6. Formulários e tabelas com rigor
 - [ ] 7. Acabamento de produto maduro
 - [ ] 8. Impressão
 
 ## Próximo passo exato
 
-Etapa 6 (formulários e tabelas com rigor): máscaras e validação no
-navegador (CPF com dígito, telefone, CEP, datas) onde existirem; obrigatórios
-marcados; formulários longos em seções numeradas com salvar fixo; tabelas
-com ordenação (já em turmas, estudantes, disciplinas, listas de turma),
-escolha de colunas visíveis (guardada no navegador) e exportar.
+Etapa 7 (acabamento): trocar emojis por ícones lucide; linguagem formal nas
+mensagens; rodapé do sistema com versão (package.json), Suporte, Termos,
+Privacidade e Novidades; último acesso após o login (coluna nova
+`User.acessoAnterior`? ver decisão); botão "?" de ajuda nas telas principais.
 
 ## Etapa 1 — o que foi feito
 
@@ -239,3 +238,32 @@ Onde faltaria gravar autor (não inventei):
 - Fuso: o `logAudit` grava o horário de Brasília "como se fosse UTC"
   (src/lib/audit.ts); o histórico formata essas entradas em UTC para mostrar
   a hora certa. Vale corrigir a gravação numa fase própria.
+
+## Etapa 6 — o que foi feito
+
+- `src/lib/navegador/mascaras.ts` (+ teste): telefone (máscara e DDD), CPF
+  (máscara e dígitos verificadores), CEP e datas (existência e intervalo).
+  O sistema hoje só tem telefone (contato de emergência da ficha AEE) e
+  datas; não há campo de CPF nem de CEP (utilitários prontos para quando
+  existirem). Telefone com máscara e erro na linha do campo na ficha AEE;
+  plano de ensino não aceita fim antes do início (erro na linha do campo,
+  `min` no campo). A validação do servidor não mudou.
+- Obrigatórios: `Field`/`Label` com `obrigatorio`, e uma regra em
+  globals.css marca com asterisco o rótulo de qualquer campo `required`
+  nos formulários antigos (sem editar arquivo por arquivo). Campo inválido
+  depois de tocado ganha a borda de erro (`:user-invalid`).
+- Formulários longos em seções numeradas com `BarraSalvar` fixa (estado +
+  ações): usuário (1. Dados de acesso, 2. Papéis, com "Alterações não
+  salvas") e ficha AEE em edição (1 a 7).
+- Tabelas: ordenação por coluna (turmas, estudantes, disciplinas, listas de
+  turma, demonstração na vitrine); seleção em lote onde já havia ação em
+  lote (usuários: aprovação em massa); escolha de colunas visíveis
+  (`SeletorColunas` + `useColunasVisiveis`, guardada no navegador por tela)
+  em turmas, estudantes e listas de turma; exportar CSV do que está na tela
+  (respeita as colunas visíveis) em turmas, estudantes, usuários,
+  disciplinas, ocorrências e listas de turma.
+
+Correção feita no caminho: a passada de densidade da etapa 4 tinha tirado o
+espaço entre classes e interpolações `${...}` em alguns arquivos (classes
+coladas); voltou com base nas versões anteriores (nenhum desses arquivos
+tinha classe colada a interpolação antes).

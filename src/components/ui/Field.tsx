@@ -17,7 +17,7 @@ const CONTROLE = cn(
 
 export function Label({ className, children, opcional, obrigatorio, ...props }: LabelHTMLAttributes<HTMLLabelElement> & { opcional?: boolean; obrigatorio?: boolean }) {
   return (
-    <label className={cn('block text-13 font-medium text-fg', className)} {...props}>
+    <label data-rotulo-marcado={obrigatorio || opcional ? '' : undefined} className={cn('block text-13 font-medium text-fg', className)} {...props}>
       {children}
       {obrigatorio && <span aria-hidden className="ml-0.5 text-danger-fg">*</span>}
       {obrigatorio && <span className="sr-only"> (obrigatório)</span>}

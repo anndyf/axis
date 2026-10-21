@@ -12,7 +12,7 @@ import CloneTurmaModal from "./CloneTurmaModal"
 import PromoverTurmaModal from "./PromoverTurmaModal"
 import { ArrowUpCircle } from "lucide-react"
 import { can } from "@/lib/rbac"
-import { Button, Painel, RodapeTabela, Table, TableContainer, TableEmpty, TBody, TD, TH, THead, TR, type DirecaoOrdem } from "@/components/ui"
+import { Button, Painel, SeletorColunas, useColunasVisiveis, RodapeTabela, Table, TableContainer, TableEmpty, TBody, TD, TH, THead, TR, type DirecaoOrdem } from "@/components/ui"
 import { BarraFerramentas } from "@/components/ui/BarraFerramentas"
 import { Fichas } from "@/components/ui/Fichas"
 import { baixarCSV } from "@/lib/navegador/csv"
@@ -215,6 +215,12 @@ export default function TurmasListClient({
     return ordem.direcao === "asc" ? s : s.reverse()
   }, [filteredTurmas, ordem]) // eslint-disable-line react-hooks/exhaustive-deps
   const temMinhas = turmas.some((t) => t.minhasDisciplinas && t.minhasDisciplinas.length > 0)
+  const sel = useColunasVisiveis("turmas", [
+    { id: "curso", rotulo: "Curso" }, { id: "turno", rotulo: "Turno" }, { id: "modalidade", rotulo: "Modalidade" },
+    { id: "estudantes", rotulo: "Estudantes" }, { id: "disciplinas", rotulo: "Disciplinas" },
+  ])
+  const ver = sel.visivel
+  const totalColunas = 2 + ["curso", "turno", "modalidade", "estudantes", "disciplinas"].filter(ver).length + (temMinhas ? 1 : 0)
 
   return (
     <div className="space-y-4">
@@ -251,6 +257,7 @@ export default function TurmasListClient({
               )}
             </>
           }
+          acoes={<SeletorColunas {...sel} />}
           onExportar={() => baixarCSV("Turmas", [
             { titulo: "Turma", valor: (t: Turma) => t.nome },
             { titulo: "Curso", valor: (t: Turma) => t.curso || decodeTurma(t.nome).curso || "" },
@@ -266,11 +273,11 @@ export default function TurmasListClient({
             <THead>
               <TR>
                 <TH ordem={ordem.coluna === "nome" ? ordem.direcao : null} onOrdenar={() => ordenar("nome")}>Turma</TH>
-                <TH ordem={ordem.coluna === "curso" ? ordem.direcao : null} onOrdenar={() => ordenar("curso")}>Curso</TH>
-                <TH ordem={ordem.coluna === "turno" ? ordem.direcao : null} onOrdenar={() => ordenar("turno")}>Turno</TH>
-                <TH>Modalidade</TH>
-                <TH numeric ordem={ordem.coluna === "estudantes" ? ordem.direcao : null} onOrdenar={() => ordenar("estudantes")}>Estudantes</TH>
-                <TH numeric>Disciplinas</TH>
+                {ver("curso") && <TH ordem={ordem.coluna === "curso" ? ordem.direcao : null} onOrdenar={() => ordenar("curso")}>Curso</TH>}
+                {ver("turno") && <TH ordem={ordem.coluna === "turno" ? ordem.direcao : null} onOrdenar={() => ordenar("turno")}>Turno</TH>}
+                {ver("modalidade") && <TH>Modalidade</TH>}
+                {ver("estudantes") && <TH numeric ordem={ordem.coluna === "estudantes" ? ordem.direcao : null} onOrdenar={() => ordenar("estudantes")}>Estudantes</TH>}
+                {ver("disciplinas") && <TH numeric>Disciplinas</TH>}
                 {temMinhas && <TH>Suas disciplinas</TH>}
                 <TH className="text-right"><span className="sr-only">Ações</span></TH>
               </TR>
@@ -282,11 +289,11 @@ export default function TurmasListClient({
                 return (
                   <TR key={turma.id} onClick={() => router.push(`/dashboard/turmas/${turma.id}`)}>
                     <TD><Link href={`/dashboard/turmas/${turma.id}`} onClick={(e) => e.stopPropagation()} className="font-medium text-fg hover:underline">{turma.nome}</Link></TD>
-                    <TD className="text-fg-muted">{turma.curso || decoded.curso || "—"}</TD>
-                    <TD className="text-fg-muted">{rotuloTurno(turma.turno || decoded.turno)}</TD>
-                    <TD className="text-fg-muted">{turma.modalidade || "—"}</TD>
-                    <TD numeric>{turma._count.estudantes}</TD>
-                    <TD numeric className="text-fg-muted">{turma._count.disciplinas}</TD>
+                    {ver("curso") && <TD className="text-fg-muted">{turma.curso || decoded.curso || "—"}</TD>}
+                    {ver("turno") && <TD className="text-fg-muted">{rotuloTurno(turma.turno || decoded.turno)}</TD>}
+                    {ver("modalidade") && <TD className="text-fg-muted">{turma.modalidade || "—"}</TD>}
+                    {ver("estudantes") && <TD numeric>{turma._count.estudantes}</TD>}
+                    {ver("disciplinas") && <TD numeric className="text-fg-muted">{turma._count.disciplinas}</TD>}
                     {temMinhas && <TD className="max-w-64 truncate text-fg-muted" title={turma.minhasDisciplinas?.map((d) => d.nome).join(", ")}>{turma.minhasDisciplinas?.map((d) => d.nome).join(", ") || "—"}</TD>}
                     <TD className="w-0" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-0.5">
@@ -308,7 +315,7 @@ export default function TurmasListClient({
                   </TR>
                 )
               })}
-              {ordenadas.length === 0 && <TableEmpty colSpan={temMinhas ? 8 : 7}>Nenhuma turma encontrada com estes filtros.</TableEmpty>}
+              {ordenadas.length === 0 && <TableEmpty colSpan={totalColunas}>Nenhuma turma encontrada com estes filtros.</TableEmpty>}
             </TBody>
           </Table>
         </TableContainer>
