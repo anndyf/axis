@@ -5,6 +5,7 @@ import { hojeNaEscola, dataValida } from "@/lib/services/chamada"
 import ChamadaClient from "./ChamadaClient"
 import { calendarioDaChamada } from "@/lib/calendario-disciplina-leitura"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { acessoChamada } from "@/lib/chamada-acesso"
 
 export const metadata = { title: 'Áxis - Fazer chamada' }
 export const runtime = 'nodejs'
@@ -18,6 +19,10 @@ export default async function FazerChamadaPage({ searchParams }: { searchParams:
   if (!session?.user?.escolaId || can(session.user, 'portal.acessar') || !can(session.user, 'frequencia.lancar')) redirect("/dashboard")
   const { turma, disciplina, data } = await searchParams
   if (!turma) redirect("/dashboard/chamada")
+  // Só quem leciona faz chamada; gestão (Direção/Administrador) visualiza pelo diário
+  if (!(await acessoChamada(session.user, turma, disciplina ?? null, "escrita"))) {
+    redirect(`/dashboard/chamada/diario?turma=${encodeURIComponent(turma)}${disciplina ? `&disciplina=${encodeURIComponent(disciplina)}` : ""}`)
+  }
   const hoje = hojeNaEscola()
   const dia = dataValida(data) ? data : hoje
   // Calendário da disciplina (só leitura, mesmo acesso da chamada); null = sem acesso/calendário

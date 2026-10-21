@@ -33,8 +33,10 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
   const { turma: turmaId, disciplina } = await searchParams
   if (!turmaId) return <IndiceDiarios />
 
-  const acesso = await acessoChamada(session.user, turmaId, disciplina ?? null)
+  const acesso = await acessoChamada(session.user, turmaId, disciplina ?? null, "leitura")
   if (!acesso) redirect("/dashboard/chamada")
+  // Gravar (fazer/editar chamada) é só de quem leciona; gestão aqui só visualiza
+  const podeGravar = !!(await acessoChamada(session.user, turmaId, disciplina ?? null, "escrita"))
   const { turma } = acesso
   const disciplinaId = acesso.disciplina?.id ?? null
 
@@ -76,7 +78,7 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
     : null
 
   const linkChamada = (d: string) => `/dashboard/chamada/fazer?turma=${turma.id}${disciplinaId ? `&disciplina=${disciplinaId}` : ""}&data=${d}`
-  const linkBase = linkChamada("")
+  const linkBase = podeGravar ? linkChamada("") : null
   const diasCalendario = calendario ? calendarioDaDisciplina({ calendario, turmaId: turma.id, disciplinaId, horario, aulas, hoje }) : null
   return (
     <div className={diasCalendario ? "mx-auto max-w-6xl md:grid md:grid-cols-[15rem_minmax(0,1fr)] md:items-start md:gap-6" : "mx-auto max-w-4xl"}>
@@ -111,7 +113,9 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
           <CardHeader title="Dias com aula sem chamada" description="Toque no dia para fazer a chamada." />
           <CardBody className="flex flex-wrap gap-1.5">
             {pendentes.slice(0, 60).map((d) => (
-              <Link key={d} href={linkChamada(d)} className="rounded-md border border-line bg-surface px-2 py-1 text-xs tabular-nums text-fg-muted transition-colors duration-150 hover:border-line-strong hover:text-fg">{dataBR(d)}</Link>
+              podeGravar
+                ? <Link key={d} href={linkChamada(d)} className="rounded-md border border-line bg-surface px-2 py-1 text-xs tabular-nums text-fg-muted transition-colors duration-150 hover:border-line-strong hover:text-fg">{dataBR(d)}</Link>
+                : <span key={d} className="rounded-md border border-line bg-surface px-2 py-1 text-xs tabular-nums text-fg-muted">{dataBR(d)}</span>
             ))}
             {pendentes.length > 60 && <span className="px-2 py-1 text-xs text-fg-subtle">e mais {pendentes.length - 60}</span>}
           </CardBody>
@@ -153,7 +157,7 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
                               {a.professor && <span>· {a.professor.name || a.professor.username}</span>}
                             </p>
                           </div>
-                          <Link href={linkChamada(a.data)} className={buttonClasses({ size: "sm", variant: "secondary", className: "min-h-9" })} aria-label={`Editar a chamada de ${dataBR(a.data)}`}>Editar</Link>
+                          {podeGravar && <Link href={linkChamada(a.data)} className={buttonClasses({ size: "sm", variant: "secondary", className: "min-h-9" })} aria-label={`Editar a chamada de ${dataBR(a.data)}`}>Editar</Link>}
                         </div>
                         <p className="mt-2 whitespace-pre-line break-words text-13 text-fg">{a.conteudo || <span className="text-fg-subtle">Sem conteúdo registrado</span>}</p>
                         {a.situacao === "REALIZADA" && (

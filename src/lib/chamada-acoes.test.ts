@@ -133,17 +133,46 @@ describe('chamada - fluxo do professor', () => {
     expect((await prisma.aula.findUniqueOrThrow({ where: { id: aula.id } })).situacao).toBe('CANCELADA')
   })
 
-  it('chamada diária (POR_DIA) não tem disciplina', async () => {
-    sessao.atual = sessaoDe(B, 'admin')
+  it('chamada diária (POR_DIA) não tem disciplina; só quem leciona na turma faz', async () => {
     const turma = await prisma.turma.findUniqueOrThrow({ where: { id: B.turma }, select: { cursoId: true } })
     const curso = await prisma.curso.findUniqueOrThrow({ where: { id: turma.cursoId! } })
     await prisma.esquemaAvaliacao.update({ where: { id: curso.esquemaAvaliacaoId! }, data: { registroFrequencia: 'POR_DIA' } })
+    try {
+      const a = await acoes()
+      // Direção/Administrador só visualizam: não abrem a chamada diária
+      sessao.atual = sessaoDe(B, 'admin')
+      expect(await a.abrirChamada(B.turma, B.outraDisciplina, '2026-03-03')).toHaveProperty('erro')
+      sessao.atual = sessaoDe(B, 'prof')
+      const aberta = await a.abrirChamada(B.turma, B.outraDisciplina, '2026-03-03')
+      if ('erro' in aberta) throw new Error(aberta.erro)
+      expect(aberta.disciplina).toBeNull()
+      expect(aberta.aula.quantidade).toBe(1)
+    } finally {
+      await prisma.esquemaAvaliacao.update({ where: { id: curso.esquemaAvaliacaoId! }, data: { registroFrequencia: 'POR_AULA' } })
+    }
+  })
+})
+
+describe('chamada - só quem leciona grava; gestão só visualiza', () => {
+  it('gestão lê o diário de qualquer disciplina da escola, mas não grava; professor lê e grava a dele', async () => {
+    const { acessoChamada } = await import('@/lib/chamada-acesso')
+    const gestao = sessaoDe(B, 'admin').user as any
+    const prof = sessaoDe(B, 'prof').user as any
+    expect(await acessoChamada(gestao, B.turma, B.disciplina, 'leitura')).not.toBeNull()
+    expect(await acessoChamada(gestao, B.turma, B.disciplina, 'escrita')).toBeNull()
+    expect(await acessoChamada(prof, B.turma, B.disciplina, 'leitura')).not.toBeNull()
+    expect(await acessoChamada(prof, B.turma, B.disciplina, 'escrita')).not.toBeNull()
+    expect(await acessoChamada(prof, B.turma, B.outraDisciplina, 'leitura')).toBeNull()
+    expect(await acessoChamada(gestao, A.turma, A.disciplina, 'leitura')).toBeNull()
+  })
+
+  it('gestão não abre nem salva chamada', async () => {
+    sessao.atual = sessaoDe(B, 'admin')
     const a = await acoes()
-    const aberta = await a.abrirChamada(B.turma, B.outraDisciplina, '2026-03-03')
-    if ('erro' in aberta) throw new Error(aberta.erro)
-    expect(aberta.disciplina).toBeNull()
-    expect(aberta.aula.quantidade).toBe(1)
-    await prisma.esquemaAvaliacao.update({ where: { id: curso.esquemaAvaliacaoId! }, data: { registroFrequencia: 'POR_AULA' } })
+    expect(await a.abrirChamada(B.turma, B.disciplina, SEGUNDA)).toHaveProperty('erro')
+    const aula = await prisma.aula.findFirstOrThrow({ where: { turmaId: B.turma, disciplinaId: B.disciplina } })
+    expect(await a.salvarChamada(aula.id, [], 'conteúdo da gestão')).toHaveProperty('erro')
+    expect((await prisma.aula.findUniqueOrThrow({ where: { id: aula.id } })).conteudo).not.toBe('conteúdo da gestão')
   })
 })
 
@@ -204,9 +233,10 @@ describe('chamada - falta por tempo e observação', () => {
     const aberta = await a.abrirChamada(B.turma, B.disciplina, DIA)
     if ('erro' in aberta) throw new Error(aberta.erro)
     expect(aberta.observacoes).toEqual({ [B.aluno2]: 'chegou no 2º tempo' })
-    // a gestão vê e edita
+    // a gestão só visualiza (pelo diário): não edita a observação
     sessao.atual = sessaoDe(B, 'admin')
-    expect(await a.salvarObservacao(aulaId, B.aluno2, 'OBS SECRETA B')).toEqual({ ok: true })
+    expect(await a.salvarObservacao(aulaId, B.aluno2, 'OBS DA GESTAO')).toEqual({ erro: 'Aula não encontrada' })
+    expect((await prisma.observacaoChamada.findFirstOrThrow({ where: { aulaId, estudanteId: B.aluno2 } })).texto).toBe('chegou no 2º tempo')
     sessao.atual = sessaoDe(B, 'prof')
     expect(await a.salvarObservacao(aulaId, B.aluno1, 'temporária')).toEqual({ ok: true })
     expect(await a.salvarObservacao(aulaId, B.aluno1, '   ')).toEqual({ ok: true })
@@ -222,7 +252,7 @@ describe('chamada - falta por tempo e observação', () => {
   })
 
   it('escola B não grava observação em aula de A, nem para aluno de A numa aula de B', async () => {
-    sessao.atual = sessaoDe(B, 'admin')
+    sessao.atual = sessaoDe(B, 'prof')
     const a = await acoes()
     expect(await a.salvarObservacao(A.aula, A.aluno1, 'HACK')).toEqual({ erro: 'Aula não encontrada' })
     expect(await a.salvarObservacao(aulaId, A.aluno1, 'HACK')).toEqual({ erro: 'Aluno não pertence a esta turma.' })

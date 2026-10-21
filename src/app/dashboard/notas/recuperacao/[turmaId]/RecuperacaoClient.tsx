@@ -37,13 +37,16 @@ export default function RecuperacaoTurmaClient({
   turmaNome,
   notasRecuperacao,
   disciplinas,
-  notaMaxima
+  notaMaxima,
+  disciplinasLecionadas
 }: {
   turmaId: string
   turmaNome: string
   notasRecuperacao: NotaRecuperacao[]
   disciplinas: { id: string; nome: string }[]
   notaMaxima: number
+  /** ids das disciplinas que o usuário leciona: só nelas grava (gestão só visualiza) */
+  disciplinasLecionadas: string[]
 }) {
   // Prévia: a situação final é recalculada no servidor ao salvar
   const aprova = (n: NotaRecuperacao, valor: string) =>
@@ -51,6 +54,7 @@ export default function RecuperacaoTurmaClient({
 
   const router = useRouter()
   const [disciplinaSelecionada, setDisciplinaSelecionada] = useState("")
+  const podeLancar = disciplinasLecionadas.includes(disciplinaSelecionada)
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
@@ -143,7 +147,7 @@ export default function RecuperacaoTurmaClient({
               </div>
             </div>
 
-            {hasUnsavedChanges() && (
+            {podeLancar && hasUnsavedChanges() && (
               <button
                 onClick={handleSubmit}
                 disabled={saving}
@@ -210,6 +214,7 @@ export default function RecuperacaoTurmaClient({
                <Users size={20} className="text-fg-subtle" />
                Painel de Recuperação Final
             </h2>
+            {disciplinaSelecionada && !podeLancar && <span className="text-13 text-fg-muted" role="status">Somente leitura: só o professor da disciplina grava</span>}
             <div className="relative max-w-xs w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-subtle" />
               <input
@@ -291,7 +296,7 @@ export default function RecuperacaoTurmaClient({
                             type="number" step="0.1" min={0} max={notaMaxima} inputMode="decimal"
                             aria-label={`Nota de recuperação de ${nota.estudanteNome}`}
                             value={isFaltou || nota.status === 'DESISTENTE' ? '' : currentVal} 
-                            disabled={isFaltou || nota.status === 'DESISTENTE'}
+                            disabled={!podeLancar || isFaltou || nota.status === 'DESISTENTE'}
                             onChange={(e) => handleNotaChange(nota.id, e.target.value)}
                              className={`w-16 h-9 text-center border-2 rounded-xl text-base font-medium transition-all outline-none ${
                                  isFaltou || nota.status === 'DESISTENTE' ? 'bg-subtle-hover border-line text-fg-disabled pointer-events-none' : 
@@ -304,7 +309,7 @@ export default function RecuperacaoTurmaClient({
                           )}
                         </td>
                         <td className="px-4 py-4 text-center">
-                           <input type="checkbox" checked={isFaltou} onChange={(e) => toggleNaoRealizou(nota.id, e.target.checked)} className="w-5 h-5 text-danger-fg border-line-strong rounded-lg cursor-pointer transition-all active:scale-90" />
+                           <input type="checkbox" checked={isFaltou} disabled={!podeLancar} onChange={(e) => toggleNaoRealizou(nota.id, e.target.checked)} className="w-5 h-5 text-danger-fg border-line-strong rounded-lg cursor-pointer transition-all active:scale-90" />
                         </td>
                         <td className="px-6 py-4 text-center">
                             <span className={`inline-block whitespace-nowrap px-3 py-1 rounded-full text-xs font-medium border ${
@@ -328,7 +333,7 @@ export default function RecuperacaoTurmaClient({
               </div>
                <button
                 onClick={handleSubmit}
-                disabled={saving || !hasUnsavedChanges()}
+                disabled={!podeLancar || saving || !hasUnsavedChanges()}
                 className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-8 py-3 rounded-lg font-medium text-sm shadow-card transition-all active:scale-95 disabled:opacity-50"
               >
                 {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save size={18} />}

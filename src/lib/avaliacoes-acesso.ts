@@ -16,7 +16,8 @@ export async function contextoDaDisciplina(disciplinaId: string) {
     where: {
       id: disciplinaId,
       turma: { escolaId: user.escolaId },
-      ...(can(user, "escopo.escola") ? {} : { usuariosPermitidos: { some: { id: user.id } } }),
+      // Avaliações são do professor da disciplina: só quem leciona cria e edita
+      usuariosPermitidos: { some: { id: user.id } },
     },
     select: { id: true, nome: true, turma: { select: { id: true, nome: true, cursoId: true, esquemaAvaliacaoId: true } } },
   })

@@ -21,7 +21,7 @@ export async function calendarioDaChamada(
   const turma = await prisma.turma.findFirst({ where: { id: turmaId, escolaId: user.escolaId }, select: { id: true, cursoId: true, esquemaAvaliacaoId: true, anoLetivo: true } })
   if (!turma) return null
   const esquema = await carregarEsquemaDaTurma(turma)
-  const acesso = await acessoChamada(user, turma.id, esquema?.registroFrequencia === 'POR_DIA' ? null : disciplinaId)
+  const acesso = await acessoChamada(user, turma.id, esquema?.registroFrequencia === 'POR_DIA' ? null : disciplinaId, 'leitura')
   if (!acesso) return null
   const alvo = acesso.disciplina?.id ?? null
 

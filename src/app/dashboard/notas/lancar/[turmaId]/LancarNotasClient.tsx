@@ -110,6 +110,8 @@ export default function LancarNotasTurmaClient({
   const [notas, setNotas] = useState<Record<string, NotaState>>({})
   const [originalNotas, setOriginalNotas] = useState<Record<string, NotaState>>({})
   const [loading, setLoading] = useState(false)
+  // Só quem leciona a disciplina lança; Direção/Administrador só visualizam
+  const [podeLancar, setPodeLancar] = useState(true)
   const [saving, setSaving] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
@@ -270,7 +272,8 @@ export default function LancarNotasTurmaClient({
       setLoading(true)
       fetch(`/api/notas/turma/${turmaId}/disciplina/${disciplinaSelecionada}`)
         .then(res => res.json())
-        .then((data: { esquema: EsquemaInfo, notas: any[] }) => {
+        .then((data: { esquema: EsquemaInfo, notas: any[], podeLancar?: boolean }) => {
+          setPodeLancar(data.podeLancar !== false)
           setEsquema(data.esquema)
           const dict: Record<string, NotaState> = {}
           const status: Record<string, string> = {}
@@ -344,7 +347,7 @@ export default function LancarNotasTurmaClient({
                 <Printer size={16} strokeWidth={1.75} /> <span className="hidden md:inline">Imprimir mapa</span>
               </a>
             )}
-            {hasUnsavedChanges() && (
+            {podeLancar && hasUnsavedChanges() && (
               <Button onClick={handleSubmit} loading={saving} className="hidden md:inline-flex">
                 {!saving && <Save size={16} strokeWidth={1.75} />} {saving ? "Salvando…" : "Salvar notas"}
               </Button>
@@ -432,10 +435,19 @@ export default function LancarNotasTurmaClient({
                 Nesta turma o professor define as avaliações de cada unidade.
                 {esquema.unidades.some(u => u.atividades.length === 0) && ' Unidades sem avaliação ainda não recebem nota.'}
               </span>
-              <Link href={`/dashboard/notas/avaliacoes?disciplina=${disciplinaSelecionada}`} className="font-medium underline">Minhas avaliações</Link>
+              {podeLancar && <Link href={`/dashboard/notas/avaliacoes?disciplina=${disciplinaSelecionada}`} className="font-medium underline">Minhas avaliações</Link>}
             </div>
           )}
 
+          {disciplinaSelecionada && !podeLancar && (
+            <div className="p-3 flex items-center gap-2 border-b bg-canvas text-fg-muted border-line text-sm" role="status">
+              <AlertCircle size={16} />
+              <span>Somente leitura: apenas o professor da disciplina lança e altera notas.</span>
+            </div>
+          )}
+
+          {/* disabled no fieldset bloqueia todos os campos quando é só leitura */}
+          <fieldset disabled={!podeLancar} className="contents">
           <div className="hidden overflow-x-auto md:block">
             <table className="w-full text-left">
               <thead className="bg-canvas border-b border-line-strong">
@@ -712,7 +724,7 @@ export default function LancarNotasTurmaClient({
                 })}
               </ul>
             )}
-            {disciplinaSelecionada && filteredEstudantes.length > 0 && (
+            {podeLancar && disciplinaSelecionada && filteredEstudantes.length > 0 && (
               <div className="fixed inset-x-0 bottom-[var(--barra-inferior)] z-30 border-t border-line bg-surface/95 px-4 pt-2 pb-3 backdrop-blur">
                 <p className="mb-2 text-center text-13 text-fg-muted" aria-live="polite">{hasUnsavedChanges() ? 'Há notas alteradas sem salvar' : 'Nenhuma alteração'}</p>
                 <Button onClick={handleSubmit} loading={saving} disabled={!hasUnsavedChanges()} className="h-12 w-full text-base">
@@ -721,8 +733,9 @@ export default function LancarNotasTurmaClient({
               </div>
             )}
           </div>
+          </fieldset>
 
-          {disciplinaSelecionada && filteredEstudantes.length > 0 && (
+          {podeLancar && disciplinaSelecionada && filteredEstudantes.length > 0 && (
             <div className="hidden p-5 bg-canvas border-t border-line md:flex justify-end items-center gap-4">
               <div className="hidden md:block">
                  <p className="text-xs font-medium text-fg-subtle">Confira todas as notas antes de salvar o fechamento.</p>

@@ -59,8 +59,9 @@ export const POST = rotaDoModulo('NOT', 'escrita', async function POST(request: 
     if (!disciplina) {
       return NextResponse.json({ message: 'Disciplina não encontrada' }, { status: 404 })
     }
-    // Professor só lança nas disciplinas dele; gestão lança em qualquer uma da escola
-    if (!can(session.user, 'escopo.escola') && disciplina.usuariosPermitidos.length === 0) {
+    // Só quem leciona a disciplina lança notas, em qualquer papel: Direção e
+    // Administrador só visualizam (decisão da dona do produto, 20/10/2026)
+    if (disciplina.usuariosPermitidos.length === 0) {
       return NextResponse.json({ message: 'Você não leciona esta disciplina' }, { status: 403 })
     }
 

@@ -12,6 +12,7 @@ import { ClipboardCheck, BookOpen, CalendarOff, ChevronRight } from "lucide-reac
 import { Alert, Badge, Card, EmptyState, PageHeader, buttonClasses } from "@/components/ui"
 import { rotuloTempos } from "@/lib/services/inicio-professor"
 import SeletorData from "./SeletorData"
+import { disciplinasLecionadas, lecionaNaTurma } from "@/lib/chamada-acesso"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = { title: 'Áxis - Chamada' }
@@ -30,6 +31,8 @@ interface Item {
   temAula: boolean
   situacao: "PREVISTA" | "REALIZADA" | "CANCELADA" | null
   pendentes: number
+  /** leciona a disciplina (ou, na chamada diária, a turma): só assim faz chamada */
+  podeGravar: boolean
 }
 
 export default async function ChamadaPage({ searchParams }: { searchParams: Promise<{ data?: string }> }) {
@@ -43,6 +46,8 @@ export default async function ChamadaPage({ searchParams }: { searchParams: Prom
   const data = dataValida(dataParam) && dataParam <= hoje ? dataParam : hoje
 
   const disciplinas = await getDisciplinasPermitidas(session)
+  // Gestão vê todas as disciplinas, mas só grava onde leciona
+  const lecionadas = await disciplinasLecionadas(session.user.id, escolaId)
   const config = await getGlobalConfig(escolaId)
   const ano = config?.anoLetivoAtual ?? new Date().getFullYear()
   const calendario = await carregarCalendario(escolaId, ano)
@@ -81,6 +86,7 @@ export default async function ChamadaPage({ searchParams }: { searchParams: Prom
           return { disciplinaId: id, nome: g.nomes.get(id)!, tempos, temAula: tempos.length > 0 }
         })
 
+    const lecionaTurma = porDia ? await lecionaNaTurma(session.user.id, turmaId) : false
     for (const alvo of alvos) {
       const pendentes = diasComAulaAte(hoje, turmaId, calendario, horario, alvo.disciplinaId)
         .filter((d) => !registradas.has(`${d}|${alvo.disciplinaId ?? ""}`) || registradas.get(`${d}|${alvo.disciplinaId ?? ""}`) === "PREVISTA").length
@@ -90,6 +96,7 @@ export default async function ChamadaPage({ searchParams }: { searchParams: Prom
         ...alvo,
         situacao: registradas.get(`${data}|${alvo.disciplinaId ?? ""}`) ?? null,
         pendentes,
+        podeGravar: alvo.disciplinaId ? lecionadas.has(alvo.disciplinaId) : lecionaTurma,
       })
     }
   }
@@ -129,9 +136,13 @@ export default async function ChamadaPage({ searchParams }: { searchParams: Prom
                   </div>
                   <Situacao situacao={i.situacao} />
                 </div>
-                <Link href={link(i)} className={buttonClasses({ variant: i.situacao === "REALIZADA" ? "secondary" : "primary", className: "min-h-11 w-full" })}>
-                  {i.situacao === "REALIZADA" ? "Editar chamada" : "Fazer chamada"}
-                </Link>
+                {i.podeGravar ? (
+                  <Link href={link(i)} className={buttonClasses({ variant: i.situacao === "REALIZADA" ? "secondary" : "primary", className: "min-h-11 w-full" })}>
+                    {i.situacao === "REALIZADA" ? "Editar chamada" : "Fazer chamada"}
+                  </Link>
+                ) : (
+                  <Link href={linkDiario(i)} className={buttonClasses({ variant: "secondary", className: "min-h-11 w-full" })}>Ver diário</Link>
+                )}
               </li>
             ))}
           </ul>

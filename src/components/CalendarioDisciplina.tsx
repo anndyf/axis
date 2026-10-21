@@ -35,7 +35,7 @@ const descreverDia = (d: DiaDoCalendario) => {
   return `${semana}, ${dia} de ${MESES[mes - 1]}: ${ROTULO_ESTADO[d.estado]}${d.extra ? " (dia letivo extra)" : ""}${d.descricao ? ` — ${d.descricao}` : ""}`
 }
 
-function Mes({ mes, linkBase, selecionada, hoje, compacto }: { mes: ReturnType<typeof mesesDoCalendario>[number]; linkBase: string; selecionada?: string; hoje: string; compacto?: boolean }) {
+function Mes({ mes, linkBase, selecionada, hoje, compacto }: { mes: ReturnType<typeof mesesDoCalendario>[number]; linkBase: string | null; selecionada?: string; hoje: string; compacto?: boolean }) {
   return (
     <table className="w-full table-fixed border-separate border-spacing-1 text-center">
       <caption className="sr-only">{MESES[mes.mes - 1]} de {mes.ano}</caption>
@@ -59,7 +59,7 @@ function Mes({ mes, linkBase, selecionada, hoje, compacto }: { mes: ReturnType<t
               const conteudo = <>{numero}{!sel && <Marca estado={d.estado} extra={d.extra} />}</>
               return (
                 <td key={j} className="p-0">
-                  {ESTADOS_COM_CHAMADA.includes(d.estado) ? (
+                  {linkBase !== null && ESTADOS_COM_CHAMADA.includes(d.estado) ? (
                     <Link href={`${linkBase}${d.data}`} aria-label={descreverDia(d)} title={descreverDia(d)} aria-current={sel ? "date" : undefined} className={cn(classe, "transition-opacity duration-150 hover:opacity-80")}>{conteudo}</Link>
                   ) : (
                     <span aria-label={descreverDia(d)} title={descreverDia(d)} className={classe}>{conteudo}</span>
@@ -99,8 +99,8 @@ export function LegendaCalendario({ className }: { className?: string }) {
  */
 export default function CalendarioDisciplina({ dias, linkBase, selecionada, hoje, modo, className }: {
   dias: DiaDoCalendario[]
-  /** link da chamada sem a data: "...&data=" (o dia é somado no fim) */
-  linkBase: string
+  /** link da chamada sem a data: "...&data=" (o dia é somado no fim); null = só leitura, sem links */
+  linkBase: string | null
   selecionada?: string
   hoje: string
   modo: "coluna" | "mes"

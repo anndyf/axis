@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import RecuperacaoClient from "./RecuperacaoClient"
 import { calcularMediaFinal, notaNecessariaNaRecuperacao, unidadesDeNotasSalvas } from "@/lib/services/notas"
 import { carregarEsquemaDaTurma } from "@/lib/services/notas-leitura"
+import { disciplinasLecionadas } from "@/lib/chamada-acesso"
 
 export const metadata = {
   title: 'Áxis - Notas'
@@ -97,7 +98,9 @@ async function getNotasRecuperacao(turmaId: string, session: Session) {
     turma,
     notasRecuperacao,
     disciplinas,
-    notaMaxima: esquema?.notaMaxima ?? 10
+    notaMaxima: esquema?.notaMaxima ?? 10,
+    // Só grava quem leciona; gestão vê todas as disciplinas em modo leitura
+    lecionadas: [...await disciplinasLecionadas(session.user.id, session.user.escolaId)],
   }
 }
 
@@ -127,6 +130,7 @@ export default async function RecuperacaoTurmaPage({
       notasRecuperacao={data.notasRecuperacao}
       disciplinas={data.disciplinas}
       notaMaxima={data.notaMaxima}
+      disciplinasLecionadas={data.lecionadas}
     />
   )
 }
