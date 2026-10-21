@@ -23,6 +23,8 @@ export function buttonClasses({ variant = 'primary', size = 'md', className }: {
     'inline-flex items-center justify-center shrink-0 whitespace-nowrap rounded-control font-medium select-none',
     'transition-colors duration-150 disabled:pointer-events-none disabled:opacity-50',
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
+    // ação de tela não vai para o papel
+    'print:hidden',
     VARIANTES[variant],
     TAMANHOS[size],
     className

@@ -14,7 +14,7 @@ import { agruparPorUnidade, unidadeAtual } from "@/lib/services/diario"
 import { rotuloTempos } from "@/lib/services/inicio-professor"
 import { calendarioDaDisciplina } from "@/lib/services/calendario-disciplina"
 import CalendarioDisciplina from "@/components/CalendarioDisciplina"
-import { Badge, Card, CardBody, CardHeader, EmptyState, PageHeader, Stat, buttonClasses } from "@/components/ui"
+import { Badge, BotaoImprimir, Card, CardBody, CardHeader, EmptyState, PageHeader, Stat, buttonClasses } from "@/components/ui"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = { title: 'Áxis - Diário de classe' }
@@ -81,9 +81,9 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
   const linkBase = podeGravar ? linkChamada("") : null
   const diasCalendario = calendario ? calendarioDaDisciplina({ calendario, turmaId: turma.id, disciplinaId, horario, aulas, hoje }) : null
   return (
-    <div className={diasCalendario ? "md:grid md:grid-cols-[15rem_minmax(0,1fr)] md:items-start md:gap-6" : ""}>
+    <div className={diasCalendario ? "md:grid md:grid-cols-[15rem_minmax(0,1fr)] md:items-start md:gap-6 print:block" : ""}>
       {diasCalendario && (
-        <aside aria-label="Calendário da disciplina" className="sticky top-20 hidden max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-2xl border border-line bg-surface p-3 shadow-card md:block">
+        <aside aria-label="Calendário da disciplina" data-sem-impressao className="sticky top-20 hidden max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-2xl border border-line bg-surface p-3 shadow-card md:block">
           <CalendarioDisciplina dias={diasCalendario} linkBase={linkBase} hoje={hoje} modo="coluna" />
         </aside>
       )}
@@ -91,7 +91,7 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
       <PageHeader
         title={`Diário de classe — ${acesso.disciplina?.nome ?? "Chamada diária"}`}
         description={`${turma.nome} · ${ano}`}
-        actions={<Link href="/dashboard/chamada" className={buttonClasses({ variant: "ghost", className: "max-md:hidden" })}><ArrowLeft size={16} strokeWidth={1.75} /> Chamada</Link>}
+        actions={<><BotaoImprimir /><Link href="/dashboard/chamada" className={buttonClasses({ variant: "ghost", className: "max-md:hidden" })}><ArrowLeft size={16} strokeWidth={1.75} /> Chamada</Link></>}
       />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

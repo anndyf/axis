@@ -90,7 +90,7 @@ export default function TabelaEstudantes({ estudantes, portalUserIds, mostrarTur
               {ver("matricula") && <TH ordem={seta("matricula")} onOrdenar={() => ordenar("matricula")}>Matrícula</TH>}
               {mostrarTurma && ver("turma") && <TH ordem={seta("turma")} onOrdenar={() => ordenar("turma")}>Turma</TH>}
               {ver("notas") && <TH numeric ordem={seta("notas")} onOrdenar={() => ordenar("notas")}>Notas lançadas</TH>}
-              <TH className="text-right"><span className="sr-only">Ações</span></TH>
+              <TH className="text-right" data-sem-impressao><span className="sr-only">Ações</span></TH>
             </TR>
           </THead>
           <TBody>
@@ -105,7 +105,7 @@ export default function TabelaEstudantes({ estudantes, portalUserIds, mostrarTur
                 {ver("matricula") && <TD className="font-mono text-fg-muted">{e.matricula}</TD>}
                 {mostrarTurma && ver("turma") && <TD className="text-fg-muted">{e.turma.nome}</TD>}
                 {ver("notas") && <TD numeric className="text-fg-muted">{e._count.notas}</TD>}
-                <TD className="w-0" onClick={(ev) => ev.stopPropagation()}>
+                <TD className="w-0" data-sem-impressao onClick={(ev) => ev.stopPropagation()}>
                   <div className="flex items-center justify-end gap-0.5">
                     <PortalActivationAction estudanteId={e.matricula} initialMatricula={e.matricula} hasUser={comPortal.has(e.matricula)} />
                     <Link href={`/dashboard/estudantes/${encodeURIComponent(e.matricula)}/editar`} className={acaoIcone} title="Editar dados" aria-label={`Editar dados de ${e.nome}`}>

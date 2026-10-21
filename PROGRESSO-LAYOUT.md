@@ -28,15 +28,13 @@ servidor de desenvolvimento recarrega as mudanças em andamento.
 - [x] 5. Rastreabilidade visível
 - [x] 6. Formulários e tabelas com rigor
 - [x] 7. Acabamento de produto maduro
-- [ ] 8. Impressão
+- [x] 8. Impressão
 
 ## Próximo passo exato
 
-Etapa 8 (impressão): botão "Imprimir" com folha própria (sem menu, sem
-fundo, cabeçalho com escola, data/hora e paginação) em: estudantes da turma
-(aba Estudantes), ficha do estudante, ficha AEE, diário da disciplina,
-resultados da turma e frequência/infrequência. Depois: capturas finais,
-"Para validar localmente", PR e STATUS.
+Encerramento: rodada final de capturas (1440, 1280 e 375px, claro e escuro)
+em `docs/capturas/layout-sistema/9-final/`, conferir celular, escrever "Para
+validar localmente", abrir o PR para `main` e marcar STATUS.
 
 ## Etapa 1 — o que foi feito
 
@@ -300,3 +298,32 @@ tinha classe colada a interpolação antes).
 Sugestão de versão (não alterei; decisão da dona do produto): esta entrega
 muda a cara do sistema e acrescenta uma coluna; sugiro 0.2.0 (ou 1.0.0 se
 for a versão de lançamento para as escolas).
+
+## Etapa 8 — o que foi feito
+
+- Folha de impressão do sistema (`globals.css`, página nomeada
+  `folha-sistema`): A4 em paisagem, sem menu, barras, abas, botões, busca e
+  seletores; sem fundo de cor (texto preto, bordas cinza); cabeçalho só no
+  papel com o nome da escola e "Impresso em 21/10/2026 às 14:32"
+  (`CabecalhoImpressao`, no layout do painel, atualizado no `beforeprint`);
+  "Página X de Y" no rodapé da folha; cabeçalho de tabela repetido em cada
+  folha e linha sem quebra no meio; rolagens internas abertas; seções
+  recolhidas (`<details>`) abertas para o papel e fechadas de novo depois.
+- Vale só nas telas com o botão `BotaoImprimir` (marca
+  `data-folha-impressao`; Ctrl+P na mesma tela dá o mesmo resultado). As
+  impressões próprias que já existiam (provas, conselho de classe) não
+  mudam. `data-sem-impressao` tira um bloco do papel; links com cara de
+  botão (`buttonClasses`) ganharam `print:hidden`.
+- Botão "Imprimir" em: estudantes da turma (aba Estudantes), ficha do
+  estudante (cabeçalho da ficha, em todas as abas), ficha AEE (mesmo
+  cabeçalho; a página continua com a permissão e a auditoria de leitura de
+  antes), diário da disciplina (sem o calendário lateral), resultados da
+  turma (ao lado do PDF que já existia) e frequência/infrequência (tela
+  Frequência e aba da turma; o cadastro de atestados fica fora do papel).
+- Vitrine `/dashboard/ui`: seção "Impressão".
+- Prévias (PDF gerado pelo Chromium, página 1) em
+  `docs/capturas/layout-sistema/8-impressao/`.
+
+Decisão sem confirmação: folha em paisagem. Em retrato a largura útil da A4
+(~700px) cai no layout do celular (cartões em vez de tabela); em paisagem
+(~1030px) sai a tabela do desktop, que é o que se espera no papel.

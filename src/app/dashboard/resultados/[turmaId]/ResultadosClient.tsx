@@ -2,9 +2,9 @@
 
 import { useState, useMemo } from "react"
 import Link from "next/link"
-import { ArrowLeft, Download, CheckCircle2, FileText, GraduationCap, AlertTriangle, TrendingDown, Info, Printer } from "lucide-react"
+import { ArrowLeft, Download, CheckCircle2, FileText, GraduationCap, AlertTriangle, TrendingDown, Info } from "lucide-react"
 import TeacherTipsModal from "@/components/TeacherTipsModal"
-import { buttonClasses } from "@/components/ui"
+import { BotaoImprimir, buttonClasses } from "@/components/ui"
 import { analyzeRisk } from "@/lib/risk-analysis"
 import type { EtapaDaNota } from "@/lib/services/notas"
 
@@ -238,6 +238,7 @@ export default function ResultadosTurmaClient({
             <div className="flex min-w-0 items-center gap-3">
               <Link
                 href="/dashboard/resultados"
+                data-sem-impressao
                 className="w-10 h-10 bg-surface border border-line-strong rounded-xl flex items-center justify-center text-fg-muted hover:bg-canvas transition-all hover:translate-x-[-2px]"
               >
                 <ArrowLeft className="w-5 h-5" />
@@ -254,7 +255,7 @@ export default function ResultadosTurmaClient({
             </div>
             
             <div className="flex flex-wrap items-center gap-3">
-              <div role="group" aria-label="Visualização" className="flex items-center gap-0.5 rounded-lg border border-line bg-subtle p-0.5">
+              <div role="group" aria-label="Visualização" data-sem-impressao className="flex items-center gap-0.5 rounded-lg border border-line bg-subtle p-0.5">
                 {[
                   { id: 'FINAL', label: 'Status', icon: CheckCircle2 },
                   ...nomesEtapas.map((_, i) => ({ id: `UNIDADE_${i + 1}`, label: `Und ${i + 1}`, icon: FileText }))
@@ -288,6 +289,7 @@ export default function ResultadosTurmaClient({
                 <Download size={16} strokeWidth={1.75} />
                 <span>PDF</span>
               </a>
+              <BotaoImprimir />
             </div>
           </div>
         </div>

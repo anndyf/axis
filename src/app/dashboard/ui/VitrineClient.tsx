@@ -5,7 +5,7 @@ import { Plus, Download, MoreHorizontal, Pencil, Trash2, Users, Search, Settings
 import {
   Button, Field, Input, Textarea, Select, Checkbox, Switch, Badge, Card, CardHeader, CardBody, CardFooter,
   PageHeader, TableContainer, Table, THead, TBody, TR, TH, TD, TableEmpty, EmptyState, Skeleton, SkeletonRows,
-  Avatar, Stat, Alert, Tooltip, Painel, ListaDescritiva, CabecalhoPagina, RodapeTabela, type DirecaoOrdem,
+  Avatar, Stat, Alert, Tooltip, Painel, ListaDescritiva, CabecalhoPagina, RodapeTabela, BotaoImprimir, type DirecaoOrdem,
 } from "@/components/ui"
 import { Abas } from "@/components/ui/Abas"
 import { BarraFerramentas } from "@/components/ui/BarraFerramentas"
@@ -234,6 +234,14 @@ export default function VitrineClient() {
         <EmptyState icon={Users} title="Nenhuma turma neste ano letivo" description="Crie a primeira turma ou importe a matriz curricular para começar." action={<Button size="sm"><Plus size={16} strokeWidth={1.75} /> Nova turma</Button>} />
         <CardFooter><Button variant="secondary" size="sm">Cancelar</Button><Button size="sm">Salvar</Button></CardFooter>
       </Card>
+
+      <Secao titulo="Impressão">
+        <p className="text-13 text-fg-muted">
+          BotaoImprimir liga a folha de impressão do sistema na tela: A4 em paisagem, sem menu, barras e botões, sem fundo de cor,
+          cabeçalho com a escola e a data/hora da impressão e &ldquo;Página X de Y&rdquo; no rodapé. Use data-sem-impressao no que não deve ir para o papel.
+        </p>
+        <BotaoImprimir />
+      </Secao>
 
       <Secao titulo="Tipografia">
         <div className="space-y-1">

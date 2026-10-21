@@ -413,3 +413,77 @@ main h1:not([class*="pt]"]) {
     border-color: var(--danger);
   }
 }
+
+/* Impressão do sistema: vale só nas telas com BotaoImprimir
+   (data-folha-impressao). Sem menu, barras e botões; sem fundo de cor;
+   cabeçalho com escola e data/hora; paginação no rodapé da folha. As
+   impressões próprias (provas, conselho de classe) não são afetadas.
+   Paisagem: a folha tem ~1030px de largura e cai no layout de desktop
+   (em retrato seriam ~700px, o layout do celular). */
+@page folha-sistema {
+  size: A4 landscape;
+  margin: 14mm 12mm 16mm;
+  @bottom-right {
+    content: "Página " counter(page) " de " counter(pages);
+    font-size: 8pt;
+    color: #444;
+  }
+}
+@media print {
+  :root:has([data-folha-impressao]) {
+    color-scheme: light;
+  }
+  :root:has([data-folha-impressao]) body {
+    page: folha-sistema;
+    background: #fff !important;
+    font-size: 10pt;
+  }
+  :root:has([data-folha-impressao]) body *,
+  :root:has([data-folha-impressao]) body *::before,
+  :root:has([data-folha-impressao]) body *::after {
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #000 !important;
+    border-color: #bbb !important;
+  }
+  :root:has([data-folha-impressao]) [data-cabecalho-impressao] {
+    display: flex !important;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid #000 !important;
+    padding-bottom: 4px;
+    margin-bottom: 10px;
+    font-size: 9pt;
+  }
+  :root:has([data-folha-impressao]) button:not(th button),
+  :root:has([data-folha-impressao]) th button svg,
+  :root:has([data-folha-impressao]) [role="toolbar"],
+  :root:has([data-folha-impressao]) nav,
+  :root:has([data-folha-impressao]) [data-sem-impressao],
+  :root:has([data-folha-impressao]) select,
+  :root:has([data-folha-impressao]) input[type="search"] {
+    display: none !important;
+  }
+  :root:has([data-folha-impressao]) a {
+    text-decoration: none !important;
+  }
+  :root:has([data-folha-impressao]) [data-cabecalho-pagina] {
+    margin-bottom: 8px;
+  }
+  :root:has([data-folha-impressao]) thead {
+    position: static !important;
+    display: table-header-group;
+  }
+  :root:has([data-folha-impressao]) tr {
+    break-inside: avoid;
+  }
+  :root:has([data-folha-impressao]) .overflow-auto,
+  :root:has([data-folha-impressao]) .overflow-x-auto,
+  :root:has([data-folha-impressao]) .overflow-y-auto {
+    overflow: visible !important;
+    max-height: none !important;
+  }
+  :root:has([data-folha-impressao]) table {
+    min-width: 0 !important;
+  }
+}

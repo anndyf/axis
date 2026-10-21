@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth"
 import { can } from "@/lib/rbac"
 import { turmaPermitida } from "@/lib/fichas/turma"
 import { getEstudantes } from "@/lib/services/estudantes-lista"
-import { buttonClasses } from "@/components/ui"
+import { BotaoImprimir, buttonClasses } from "@/components/ui"
 import TabelaEstudantes from "@/components/estudantes/TabelaEstudantes"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
 
@@ -32,9 +32,12 @@ export default async function TurmaEstudantesPage({ params }: { params: Promise<
       estudantes={estudantes}
       portalUserIds={[...portalUserIds]}
       nomeExportacao={`Estudantes ${turma.nome}`}
-      acoes={can(session.user, 'estudante.editar') ? (
-        <Link href="/dashboard/estudantes/novo" className={buttonClasses({ size: "sm" })}><Plus size={14} strokeWidth={1.75} aria-hidden /> Novo estudante</Link>
-      ) : undefined}
+      acoes={<>
+        <BotaoImprimir />
+        {can(session.user, 'estudante.editar') && (
+          <Link href="/dashboard/estudantes/novo" className={buttonClasses({ size: "sm" })}><Plus size={14} strokeWidth={1.75} aria-hidden /> Novo estudante</Link>
+        )}
+      </>}
     />
   )
 }

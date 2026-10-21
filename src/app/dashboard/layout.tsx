@@ -13,6 +13,7 @@ import { can } from "@/lib/rbac"
 import { visoesDisponiveis } from "@/lib/services/painel-visoes-servidor"
 import { CaminhoAutomatico } from "@/components/ui/CaminhoAutomatico"
 import { AjudaTela } from "@/components/ui/AjudaTela"
+import { CabecalhoImpressao } from "@/components/ui/Impressao"
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -82,6 +83,7 @@ export default async function DashboardLayout({
             <CaminhoAutomatico />
             <AjudaTela />
           </div>
+          <CabecalhoImpressao escola={escola?.nome || "Áxis"} />
           {children}
         </div>
 

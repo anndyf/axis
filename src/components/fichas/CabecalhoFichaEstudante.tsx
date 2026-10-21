@@ -1,7 +1,7 @@
 import type { Session } from "next-auth"
 import { prisma } from "@/lib/prisma"
 import { can } from "@/lib/rbac"
-import { CabecalhoPagina, Badge } from "@/components/ui"
+import { CabecalhoPagina, Badge, BotaoImprimir } from "@/components/ui"
 import { Abas } from "@/components/ui/Abas"
 import { abasDoEstudante } from "@/lib/fichas/abas"
 import { permissoesFichaEstudante } from "@/lib/fichas/permissoes"
@@ -30,6 +30,7 @@ export default async function CabecalhoFichaEstudante({ session, matricula }: { 
         { rotulo: "Turma", valor: estudante.turma.nome },
         ...(estudante.status && estudante.status !== "ATIVO" ? [{ rotulo: "Situação", valor: estudante.status.charAt(0) + estudante.status.slice(1).toLowerCase() }] : []),
       ]}
+      acoes={<BotaoImprimir />}
       abas={<Abas rotulo={`Seções da ficha de ${estudante.nome}`} itens={abasDoEstudante(estudante.matricula, permissoes)} />}
     />
   )

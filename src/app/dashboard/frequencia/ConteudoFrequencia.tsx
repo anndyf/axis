@@ -4,7 +4,7 @@ import { carregarFrequenciaDaTurma } from "@/lib/services/frequencia-leitura"
 import { linhasInfrequencia, formatarFrequencia } from "@/lib/services/frequencia"
 import { chaveData } from "@/lib/services/calendario"
 import { ClipboardCheck, CheckCircle2 } from "lucide-react"
-import { Alert, Badge, Card, CardHeader, EmptyState, buttonClasses, type BadgeTone } from "@/components/ui"
+import { Alert, Badge, BotaoImprimir, Card, CardHeader, EmptyState, buttonClasses, type BadgeTone } from "@/components/ui"
 import JustificativasClient from "./JustificativasClient"
 
 const TOM_RISCO: Record<string, BadgeTone> = { CRITICAL: "danger", HIGH: "danger", MEDIUM: "warning", LOW: "success", NONE: "neutral" }
@@ -42,11 +42,12 @@ export default async function ConteudoFrequencia({ escolaId, turma, todos, base 
           <CardHeader
             title={`Infrequência — ${turma.nome}`}
             description={frequencia ? `Mínimo de ${frequencia.regra.minimo}% ${frequencia.regra.apuracao === "GERAL" ? "do total de aulas" : "em cada disciplina"} · ${frequencia.aulasRestantes.total} ${frequencia.registro === "POR_DIA" ? "dias letivos" : "aulas"} ainda previstas até o fim do ano letivo` : undefined}
-            actions={
+            actions={<>
+              <BotaoImprimir />
               <Link href={`${base}${todos === "1" ? "" : `${base.includes("?") ? "&" : "?"}todos=1`}`} className={buttonClasses({ variant: "secondary", size: "sm" })}>
                 {todos === "1" ? "Só abaixo ou perto do mínimo" : "Mostrar a turma toda"}
               </Link>
-            }
+            </>}
           />
           {!frequencia?.temChamada && <EmptyState icon={ClipboardCheck} title="Nenhuma chamada salva nesta turma ainda" description="A frequência aparece depois que os professores salvarem as primeiras chamadas." />}
           {frequencia?.temChamada && linhas.length === 0 && <EmptyState icon={CheckCircle2} title="Ninguém abaixo ou perto da frequência mínima" description="Use “Mostrar a turma toda” para ver todos os alunos." />}
@@ -119,6 +120,8 @@ export default async function ConteudoFrequencia({ escolaId, turma, todos, base 
           )}
         </Card>
 
+        {/* Cadastro de atestados: fica fora da folha impressa da infrequência */}
+        <div data-sem-impressao>
         <JustificativasClient
           alunos={alunos.map((a) => ({ id: a.id, nome: a.nome, matricula: a.matricula }))}
           justificativas={justificativas.map((j) => ({
@@ -132,6 +135,7 @@ export default async function ConteudoFrequencia({ escolaId, turma, todos, base 
             registradoPor: j.registradoPor ? (j.registradoPor.name || j.registradoPor.username) : "",
           }))}
         />
+        </div>
       </>
     )
   }
