@@ -10,9 +10,9 @@ Ambiente: PostgreSQL 16 local, `axis_dev` e `axis_test` com `timezone = America/
 - [ ] Etapa 3 — modelo do cadeado
 - [x] Etapa 4 — regra única no servidor e cobertura
 - [x] Etapa 5 — telas
-- [ ] Encerramento (PR)
+- [x] Encerramento (PR https://github.com/anndyf/axis/pull/19)
 
-**Próximo passo:** abrir o PR para `main` e marcar STATUS: CONCLUÍDO.
+**Próximo passo:** nenhum — PR aberto: https://github.com/anndyf/axis/pull/19
 
 ## Etapa 1 — fuso
 - `logAudit` (src/lib/audit.ts) grava UTC verdadeiro (`@default(now())` do Prisma). O caminho alternativo em SQL bruto foi retirado (morto: o modelo `auditLog` sempre existe; e um `Date` do JS passado como parâmetro de SQL bruto é convertido para a hora local do banco — conferido).
@@ -79,7 +79,7 @@ Ambiente: PostgreSQL 16 local, `axis_dev` e `axis_test` com `timezone = America/
 1. `npm ci`; PostgreSQL com `axis_dev` e `axis_test` em `ALTER DATABASE … SET timezone TO 'America/Sao_Paulo'`; `.env`/`.env.test` locais; `npx prisma migrate deploy` nos dois.
 2. No axis_dev: `npm run db:seed`, `npx tsx prisma/onboard-escola-teste.ts`, `npx tsx prisma/seed-usuarios-teste.ts`, `npx tsx prisma/seed-calendario.ts`, `npx tsx prisma/seed-frequencia.ts`, `npx tsx prisma/backfill/fase-2.ts`, `npx tsx prisma/backfill/fase-3a.ts` (grava `unidade.encerrar` em Direção e Coordenação) e **`npx tsx prisma/seed-cadeado.ts`** (novo).
    - **Como forçar unidade encerrada**: o seed-cadeado define `prazoLancamento = fim da etapa + 7 dias` onde não há prazo. Com o calendário do seed (3 unidades: 02/02–15/05, 18/05–28/08, 31/08–18/12) a 1ª e a 2ª Unidade ficam encerradas pelo prazo a partir de 23/05 e 05/09/2026; a 3ª segue aberta (prazo 25/12). Também cria uma reabertura de 1TIM1 · Português · 2ª Unidade por 4 dias. Para outros cenários, edite o prazo em Calendário letivo (prazo no passado = encerrada desde o dia seguinte) ou use "Encerrar agora".
-3. `npx tsc --noEmit` e `npx vitest run` (59 arquivos, 597 testes, todos passando nesta sessão).
+3. `npx tsc --noEmit` e `npx vitest run` (57 arquivos, 597 testes, todos passando nesta sessão).
 4. `npm run build && npm start` e:
    - `direcao`/direcao123 ou `coordenacao`/coordenacao123: Painel (seção Encerramento de unidades), Configurações → Encerramento de unidades (encerrar a 3ª, desfazer com motivo, reabrir para turma e disciplina, revogar); Auditoria → filtro UNIDADE.
    - `secretaria`/secretaria123: mesma tela, só leitura. `aee`/aee123 e `professor`/professor123 não têm o item no menu (endereço direto → /dashboard).
@@ -90,3 +90,5 @@ Ambiente: PostgreSQL 16 local, `axis_dev` e `axis_test` com `timezone = America/
 - Migrations: `20261023120000_audit_logs_utc` (correção de dados do AuditLog, +3h exceto PLATAFORMA_ESCOLA) e `20261023130000_cadeado_unidade` (só aditiva).
 - Permissão nova: `unidade.encerrar` (Direção, Coordenação; Administrador não).
 - Pontos de gravação cobertos, exceções e decisões: ver Etapa 4. Causa do redirecionamento: ver Etapa 2.
+
+STATUS: CONCLUÍDO
