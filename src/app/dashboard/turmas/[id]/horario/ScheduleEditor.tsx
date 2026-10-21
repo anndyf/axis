@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowLeft, Save, Loader2, Calendar, Info, AlertTriangle, CheckCircle2 } from "lucide-react"
+import { Save, Loader2, Calendar, Info, AlertTriangle, CheckCircle2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { saveSchedule } from "../../schedule-actions"
@@ -79,36 +79,23 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
 
   return (
     <div className="">
-      <header className="mb-6">
-        <div className="py-4">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <Link href="/dashboard/turmas" aria-label="Voltar" className="hidden sm:inline-flex p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg">
-                <ArrowLeft className="w-5 h-5 text-fg-muted" />
-              </Link>
-              <div>
-                <h1 className="text-2xl font-semibold tracking-tight text-fg">
-                  <Calendar className="w-6 h-6 text-fg-muted" />
-                  Horário: {turma.nome}
-                </h1>
-                <p className="text-sm text-fg-muted">
-                  {turma.curso} • {turma.anoLetivo}
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
-            >
-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              <span className="text-xs font-medium">Salvar Alterações</span>
-            </button>
-          </div>
+      {/* Dentro da ficha da turma (o cabeçalho com o nome vem do layout) */}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2 text-sm text-fg-muted">
+          <Calendar size={16} strokeWidth={1.75} aria-hidden className="text-fg-subtle" />
+          Horário semanal da turma
         </div>
-      </header>
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
+        >
+          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          Salvar horário
+        </button>
+      </div>
 
-      <main className="py-8 space-y-6">
+      <main className="space-y-6">
         {aviso && (
           <div className={`p-4 rounded-xl border text-sm flex items-center gap-2 ${aviso.tipo === "ok" ? "bg-success-subtle border-success-line text-success-fg" : "bg-danger-subtle border-danger-line text-danger-fg"}`}>
             {aviso.tipo === "ok" ? <CheckCircle2 className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}

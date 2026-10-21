@@ -287,7 +287,7 @@ export default function TurmasListClient({
                           </div>
                           <div className="min-w-0 flex-1">
                             <h3 className="text-base font-semibold text-fg leading-none whitespace-nowrap truncate">
-                              {turma.nome}
+                              <Link href={`/dashboard/turmas/${turma.id}`} className="hover:underline">{turma.nome}</Link>
                             </h3>
                             <p className="text-xs text-fg-subtle mt-1 whitespace-nowrap truncate">
                               {cursoExibicao}

@@ -46,9 +46,11 @@ interface Ocorrencia {
 
 interface OcorrenciasClientProps {
   turmas: { id: string; nome: string }[]
+  /** aba Ocorrências da ficha da turma: lista só desta turma, sem o cabeçalho da tela */
+  turmaFixa?: string
 }
 
-export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
+export default function OcorrenciasClient({ turmas, turmaFixa }: OcorrenciasClientProps) {
   const { data: session } = useSession()
   const [ocorrencias, setOcorrencias] = useState<Ocorrencia[]>([])
   const [loading, setLoading] = useState(true)
@@ -59,7 +61,7 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
     startDate: "",
     endDate: "",
     studentName: "",
-    turmaId: "",
+    turmaId: turmaFixa ?? "",
     type: ""
   })
 
@@ -118,7 +120,7 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
   return (
     <div className="space-y-8 pb-32 animate-fade-in">
       {/* Header Premium */}
-      <header className="mb-6">
+      <header className={turmaFixa ? "hidden" : "mb-6"}>
         <div className="py-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex min-w-0 items-center gap-4">
@@ -197,7 +199,7 @@ export default function OcorrenciasClient({ turmas }: OcorrenciasClientProps) {
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className={turmaFixa ? "hidden" : "space-y-2"}>
             <label className="text-xs font-bold text-fg-subtle ml-1">Turma</label>
             <div className="relative group">
               <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-disabled group-focus-within:text-fg transition-colors" size={18} />

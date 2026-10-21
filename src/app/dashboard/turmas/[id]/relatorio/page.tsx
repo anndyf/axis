@@ -1,8 +1,8 @@
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
-import Link from "next/link"
-import { ArrowLeft, Download, FileText } from "lucide-react"
+import { Download } from "lucide-react"
+import { buttonClasses } from "@/components/ui"
 import RelatorioClient from "./RelatorioClient"
 import { carregarEsquemaDaTurma, SELECT_ETAPAS_DA_NOTA } from "@/lib/services/notas-leitura"
 import { etapasDaNota } from "@/lib/services/notas"
@@ -109,40 +109,20 @@ export default async function RelatorioTurmaPage({
 
   return (
     <div className="">
-      {/* Header */}
-      <header className="mb-6">
-        <div className="py-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex min-w-0 items-center gap-3">
-              <Link
-                href="/dashboard/turmas"
-                aria-label="Voltar" className="hidden sm:inline-flex p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg"
-                title="Voltar para Turmas"
-              >
-                <ArrowLeft className="w-5 h-5 text-fg-muted" />
-              </Link>
-              <div>
-                <h1 className="text-2xl font-semibold tracking-tight text-fg">
-                  {isProfessorOnly ? 'Relação de Estudantes' : 'Relatório da Turma'}
-                </h1>
-                <p className="text-sm text-fg-muted">{turma.nome}</p>
-              </div>
-            </div>
-            
-            {!isProfessorOnly && (
-              <a
-                href={`/api/relatorio/turma/${turma.id}/pdf`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-2 bg-surface border border-line text-fg px-4 py-2 rounded-lg hover:bg-subtle transition-all shadow-card"
-              >
-                <Download className="w-5 h-5" />
-                <span>Baixar PDF Global</span>
-              </a>
-            )}
-          </div>
-        </div>
-      </header>
+      {/* Dentro da ficha da turma (o cabeçalho com o nome vem do layout) */}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-fg-muted">{isProfessorOnly ? 'Relação de estudantes e notas' : 'Notas e frequência por estudante'}</p>
+        {!isProfessorOnly && (
+          <a
+            href={`/api/relatorio/turma/${turma.id}/pdf`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={buttonClasses({ variant: "secondary", size: "sm" })}
+          >
+            <Download size={14} strokeWidth={1.75} aria-hidden /> Baixar PDF da turma
+          </a>
+        )}
+      </div>
 
       {/* Main Content */}
       <RelatorioClient
