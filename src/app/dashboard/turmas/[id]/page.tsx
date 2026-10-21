@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma"
 import { can } from "@/lib/rbac"
 import { decodeTurma } from "@/lib/turma-utils"
 import { turmaPermitida } from "@/lib/fichas/turma"
-import { ListaDescritiva, Painel } from "@/components/ui"
+import { ListaDescritiva, Painel, RodapeRastreio } from "@/components/ui"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = { title: 'Áxis - Turma' }
@@ -24,7 +24,7 @@ export default async function TurmaVisaoGeralPage({ params }: { params: Promise<
   const turma = await prisma.turma.findFirst({
     where: { id, escolaId: session.user.escolaId },
     select: {
-      nome: true, curso: true, turno: true, modalidade: true, serie: true, numero: true, anoLetivo: true,
+      nome: true, curso: true, turno: true, modalidade: true, serie: true, numero: true, anoLetivo: true, createdAt: true, updatedAt: true,
       esquemaAvaliacao: { select: { nome: true } },
       _count: { select: { estudantes: true, disciplinas: true } },
     },
@@ -43,7 +43,7 @@ export default async function TurmaVisaoGeralPage({ params }: { params: Promise<
 
   return (
     <div className="grid gap-4 lg:grid-cols-3 lg:items-start">
-      <Painel titulo="Dados da turma" className="lg:col-span-2">
+      <Painel titulo="Dados da turma" className="lg:col-span-2" rodape={<RodapeRastreio criadoEm={turma.createdAt} alteradoEm={turma.updatedAt} />}>
         <ListaDescritiva itens={[
           { rotulo: "Nome", valor: turma.nome },
           { rotulo: "Curso", valor: turma.curso || d.curso },

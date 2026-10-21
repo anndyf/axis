@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Accessibility, CheckCircle2, Pencil, Save, Trash2, Upload, Users } from "lucide-react"
-import { Alert, Button, CabecalhoPagina, IndicadorGravacao, Checkbox, Field, Input, ListaDescritiva, Painel, Textarea, buttonClasses } from "@/components/ui"
+import { Alert, Button, CabecalhoPagina, IndicadorGravacao, RodapeRastreio, Checkbox, Field, Input, ListaDescritiva, Painel, Textarea, buttonClasses } from "@/components/ui"
 import { useToast } from "@/components/ui/Toast"
 import { CIDS_AEE } from "@/lib/constants-aee"
 import { can } from "@/lib/rbac"
@@ -289,7 +289,7 @@ export default function AEEProfileClient({
               : textoLeitura(formData.recomendacoes, 'Sem orientações cadastradas.')}
           </Painel>
 
-          <Painel titulo="Observações internas">
+          <Painel titulo="Observações internas" rodape={perfilExistente ? <RodapeRastreio criadoEm={new Date(perfilExistente.createdAt)} alteradoEm={new Date(perfilExistente.updatedAt)} /> : undefined}>
             {editando
               ? <Textarea rows={3} value={formData.notasDirecao} onChange={(e) => setFormData({ ...formData, notasDirecao: e.target.value })} placeholder="Informações administrativas adicionais" aria-label="Observações internas" />
               : textoLeitura(formData.notasDirecao, 'Sem observações.')}

@@ -25,19 +25,18 @@ servidor de desenvolvimento recarrega as mudanças em andamento.
 - [x] 2. Casca (largura, barra superior de contexto, menu lateral compacto)
 - [x] 3. Fichas com abas (turma, estudante, usuário, AEE)
 - [x] 4. Listas e telas de trabalho
-- [ ] 5. Rastreabilidade visível
+- [x] 5. Rastreabilidade visível
 - [ ] 6. Formulários e tabelas com rigor
 - [ ] 7. Acabamento de produto maduro
 - [ ] 8. Impressão
 
 ## Próximo passo exato
 
-Etapa 5 (rastreabilidade): rodapé "Criado por … · Última alteração por …"
-nas fichas e registros (componente `RodapeRastreio` em src/components/ui),
-aba "Histórico" (AuditLog/NotaFinalAudit da entidade, só com
-`auditoria.ler`, sempre filtrando pela escola) nas fichas de turma,
-estudante e usuário, com teste de isolamento A × B e aluno do portal; o
-indicador de gravação já está pronto (falta formulário de usuário).
+Etapa 6 (formulários e tabelas com rigor): máscaras e validação no
+navegador (CPF com dígito, telefone, CEP, datas) onde existirem; obrigatórios
+marcados; formulários longos em seções numeradas com salvar fixo; tabelas
+com ordenação (já em turmas, estudantes, disciplinas, listas de turma),
+escolha de colunas visíveis (guardada no navegador) e exportar.
 
 ## Etapa 1 — o que foi feito
 
@@ -208,3 +207,35 @@ Decisões:
    regredir o app.
 6. Dicas fixas no topo de notas, recuperação, resultados e conselho ficam só
    no celular; no desktop a ajuda vai para o botão "?" (etapa 7).
+
+## Etapa 5 — o que foi feito
+
+- `RodapeRastreio` (src/components/ui): "Criado por … em … · Última
+  alteração por … em …". Usado em: ficha da turma (só datas: a turma não
+  grava autor), ficha do estudante e do usuário (datas; autor da última
+  alteração vem do AuditLog e só aparece para quem já vê a auditoria),
+  ficha AEE (só datas), plano de ensino (autor = professor do plano, datas).
+  Ocorrência: a linha aberta mostra "Registrado em … por …" (autor gravado).
+- Aba "Histórico" nas fichas do estudante (cadastro + notas: AuditLog
+  ESTUDANTE/NOTA e NotaFinalAudit) e do usuário (AuditLog USUARIO), em
+  `src/lib/services/historico-leitura.ts`. Só com `auditoria.ler` (mesma
+  regra da tela de auditoria) e nunca para conta do portal; sempre na escola
+  da sessão: a entidade é buscada pela escola e o AuditLog só entra se o
+  autor for da mesma escola (o AuditLog não grava a escola).
+  Teste: `src/lib/historico-leitura.test.ts` (mesma matrícula nas escolas A e
+  B, registro da escola B apontando para a nota da A, conta da escola B,
+  aluno do portal e professor sem acesso).
+- Indicador de gravação ("Alterações não salvas" / "Salvando…" / "Salvo às
+  14:32"): lançamento de notas, recuperação final, chamada e ficha AEE.
+
+Onde faltaria gravar autor (não inventei):
+- Turma: nenhuma ação grava AuditLog de TURMA (criar, editar, horário,
+  promover, clonar). Por isso a turma não tem aba Histórico.
+- Estudante: o cadastro (POST /api/estudantes) não grava AuditLog de
+  criação; só alteração e exclusão.
+- Ficha AEE: não grava quem criou nem quem alterou (só datas).
+- Avaliações do professor (AvaliacaoDisciplina): tem `criadoPorId`, mas a
+  tela "Minhas avaliações" é do próprio professor; o rodapé ficou de fora.
+- Fuso: o `logAudit` grava o horário de Brasília "como se fosse UTC"
+  (src/lib/audit.ts); o histórico formata essas entradas em UTC para mostrar
+  a hora certa. Vale corrigir a gravação numa fase própria.

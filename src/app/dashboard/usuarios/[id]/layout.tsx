@@ -6,6 +6,7 @@ import { papeisDosBooleanos, rotuloDoPapelPrincipal } from "@/lib/permissoes"
 import { CabecalhoPagina, Badge } from "@/components/ui"
 import { Abas } from "@/components/ui/Abas"
 import { abasDoUsuario } from "@/lib/fichas/abas"
+import { podeVerHistorico } from "@/lib/services/historico-regra"
 
 /**
  * Ficha do usuário (equipe): cabeçalho e abas sobre as telas do usuário.
@@ -34,7 +35,7 @@ export default async function FichaUsuarioLayout({ children, params }: { childre
           { rotulo: "Papel", valor: rotuloDoPapelPrincipal(papeis) },
           { rotulo: "Usuário", valor: <span className="font-mono">{usuario.username}</span> },
         ]}
-        abas={<Abas rotulo={`Seções da ficha de ${usuario.name || usuario.username}`} itens={abasDoUsuario(usuario.id, { disciplinas: papeis.includes("PROFESSOR"), historico: false })} />}
+        abas={<Abas rotulo={`Seções da ficha de ${usuario.name || usuario.username}`} itens={abasDoUsuario(usuario.id, { disciplinas: papeis.includes("PROFESSOR"), historico: podeVerHistorico(session.user) })} />}
       />
       {children}
     </div>

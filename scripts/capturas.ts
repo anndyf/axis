@@ -151,6 +151,8 @@ async function main() {
         ['usuario-editar', `/dashboard/usuarios/${i.direcao}/editar`],
         ['usuario-ficha', `/dashboard/usuarios/${i.professor}`],
         ['usuario-disciplinas', `/dashboard/usuarios/${i.professor}/disciplinas`],
+        ['usuario-historico', `/dashboard/usuarios/${i.professor}/historico`],
+        ['estudante-historico', `/dashboard/estudantes/${i.matricula}/historico`],
       ],
     },
     { usuario: 'aee', senha: 'aee123', telas: [['aee', '/dashboard/aee'], ['aee-ficha', `/dashboard/aee/${i.matriculaAee}`]] },

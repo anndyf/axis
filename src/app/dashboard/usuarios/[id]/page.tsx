@@ -7,7 +7,8 @@ import { can } from "@/lib/rbac"
 import { papeisDoUsuarioNoBanco } from "@/lib/papeis"
 import { PAPEIS_SISTEMA, papeisDosBooleanos } from "@/lib/permissoes"
 import { contaProtegidaDaPlataforma } from "@/lib/plataforma"
-import { Badge, ListaDescritiva, Painel, buttonClasses } from "@/components/ui"
+import { Badge, ListaDescritiva, Painel, RodapeRastreio, buttonClasses } from "@/components/ui"
+import { podeVerHistorico, ultimaAlteracao } from "@/lib/services/historico-leitura"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
 
 export const metadata = { title: 'Áxis - Usuário' }
@@ -26,7 +27,7 @@ export default async function UsuarioDadosPage({ params }: { params: Promise<{ i
   const usuario = await prisma.user.findFirst({
     where: { id, escolaId: session.user.escolaId },
     select: {
-      id: true, name: true, username: true, email: true, isActive: true, isApproved: true, createdAt: true, lastLogin: true,
+      id: true, name: true, username: true, email: true, isActive: true, isApproved: true, createdAt: true, updatedAt: true, lastLogin: true,
       isSuperuser: true, isDirecao: true, isStaff: true, isAEE: true, isPortalUser: true, isPlatformAdmin: true,
       _count: { select: { disciplinasPermitidas: true } },
     },
@@ -35,12 +36,14 @@ export default async function UsuarioDadosPage({ params }: { params: Promise<{ i
   const noBanco = await papeisDoUsuarioNoBanco(prisma, usuario.id, session.user.escolaId)
   const papeis = noBanco.length ? noBanco : papeisDosBooleanos(usuario)
   const protegida = contaProtegidaDaPlataforma(usuario, session.user)
+  const ultima = podeVerHistorico(session.user) ? await ultimaAlteracao(session.user.escolaId, "USUARIO", usuario.id) : null
 
   return (
     <div className="grid gap-4 lg:grid-cols-3 lg:items-start">
       <Painel
         titulo="Dados de acesso"
         className="lg:col-span-2"
+        rodape={<RodapeRastreio criadoEm={usuario.createdAt} {...(ultima ? { alteradoEm: ultima.quando, alteradoPor: ultima.autor, fusoAlteracao: "UTC" as const } : { alteradoEm: usuario.updatedAt })} />}
         acoes={!protegida ? (
           <Link href={`/dashboard/usuarios/${usuario.id}/editar`} className={buttonClasses({ variant: "secondary", size: "sm" })}>
             <Pencil size={14} strokeWidth={1.75} aria-hidden /> Editar

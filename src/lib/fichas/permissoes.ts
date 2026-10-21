@@ -2,6 +2,7 @@ import { can, type RbacUser } from '@/lib/rbac'
 import { estadoModulo } from '@/lib/modulos/guarda'
 import { estadoPermite } from '@/lib/services/modulos'
 import type { ModuloId } from '@/lib/modulos/tipos'
+import { podeVerHistorico } from '@/lib/services/historico-regra'
 import type { PermissoesFichaEstudante, PermissoesFichaTurma } from './abas'
 
 async function moduloLivre(escolaId: string, modulo: ModuloId, user: RbacUser) {
@@ -17,7 +18,7 @@ export async function permissoesFichaTurma(user: RbacUser, escolaId: string): Pr
     resultados: res && can(user, 'resultado.ler'),
     frequencia: dia && can(user, 'frequencia.acompanhar'),
     ocorrencias: sec && can(user, 'ocorrencia.gerenciar'),
-    historico: false, // etapa 5: aba Histórico (auditoria.ler)
+    historico: false, // a turma não grava auditoria hoje (nenhum logAudit de TURMA)
   }
 }
 
@@ -27,6 +28,6 @@ export async function permissoesFichaEstudante(user: RbacUser, escolaId: string,
     editar: can(user, 'estudante.editar'),
     boletim: not,
     aee: aee && temFichaAee && can(user, 'aee.ler'),
-    historico: false, // etapa 5: aba Histórico (auditoria.ler)
+    historico: podeVerHistorico(user),
   }
 }

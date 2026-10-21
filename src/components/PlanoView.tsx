@@ -1,5 +1,6 @@
 "use client"
 
+import { RodapeRastreio } from "@/components/ui"
 import { useState, useEffect } from "react"
 import { 
   X, 
@@ -33,6 +34,8 @@ interface Plano {
   observacoes?: string
   professor: { name: string }
   turmas: Turma[]
+  createdAt?: string
+  updatedAt?: string
 }
 
 interface PlanoViewProps {
@@ -114,6 +117,9 @@ export default function PlanoView({ planoId, onClose }: PlanoViewProps) {
               <ViewSection icon={<Wrench size={14} className="text-accent-fg" />} title="Recursos" content={plano.recursos} />
               <ViewSection full icon={<GraduationCap size={14} className="text-danger-fg" />} title="Avaliação" content={plano.avaliacao} />
               {plano.observacoes && <ViewSection full icon={<FileText size={14} className="text-fg-subtle" />} title="Observações" content={plano.observacoes} />}
+              {plano.createdAt && (
+                <RodapeRastreio className="md:col-span-2" criadoEm={new Date(plano.createdAt)} criadoPor={plano.professor.name} alteradoEm={plano.updatedAt ? new Date(plano.updatedAt) : null} />
+              )}
           </div>
         </div>
 
