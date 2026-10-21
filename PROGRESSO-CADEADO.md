@@ -8,11 +8,11 @@ Ambiente: PostgreSQL 16 local, `axis_dev` e `axis_test` com `timezone = America/
 - [x] Etapa 1 — defeitos de fuso
 - [x] Etapa 2 — defeito do redirecionamento
 - [ ] Etapa 3 — modelo do cadeado
-- [ ] Etapa 4 — regra única no servidor e cobertura
+- [x] Etapa 4 — regra única no servidor e cobertura
 - [ ] Etapa 5 — telas
 - [ ] Encerramento (PR)
 
-**Próximo passo:** Etapa 4 — testes puros (src/lib/cadeado-unidade.test.ts) e de integração (src/lib/cadeado-acoes.test.ts) do cadeado.
+**Próximo passo:** Etapa 5 — tela /dashboard/configuracoes/encerramento (gestão), avisos com cadeado no lançamento de notas, chamada/diário, recuperação e conselho; painel inicial; ajuda e novidades.
 
 ## Etapa 1 — fuso
 - `logAudit` (src/lib/audit.ts) grava UTC verdadeiro (`@default(now())` do Prisma). O caminho alternativo em SQL bruto foi retirado (morto: o modelo `auditLog` sempre existe; e um `Date` do JS passado como parâmetro de SQL bruto é convertido para a hora local do banco — conferido).
@@ -38,3 +38,28 @@ Ambiente: PostgreSQL 16 local, `axis_dev` e `axis_test` com `timezone = America/
 - Permissão `unidade.encerrar` (lista fechada em src/lib/permissoes.ts) para DIRECAO e COORDENACAO.
   - **[decisão]** Administrador da escola NÃO recebe (pedido da dona do produto). Quem é Administrador + Direção (como o admin do seed da CETEP) recebe pela Direção.
   - Entre os booleanos antigos, equivale a `isDirecao` (checagens-papeis.test.ts). O backfill da fase 3a grava a permissão em `papeis_permissoes` (garantirPapeisSistema já é idempotente); teste novo em equivalencia-papeis.test.ts: banco sem a permissão → 1ª execução grava só `+unidade.encerrar` em Direção e Coordenação; 2ª execução não altera nada. Rodado no axis_dev.
+
+## Etapa 4 — regra no servidor
+- Módulo único `src/lib/cadeado-unidade.ts`: parte pura (`encerramentoDaEtapa`, `podeDesfazerEncerramento`, `reaberturaVigente`, `estadoDaEtapa`, `verificarNotaUnidade`, `verificarAula`, `verificarRecuperacaoOuConselho`, mensagens) + leitura do banco (`contextoCadeado(escolaId, turmaId)`, uma leitura por turma) + as três funções pedidas `podeGravarNotaUnidade`, `podeGravarAula`, `podeGravarRecuperacaoOuConselho` (retornam `{ ok: true } | { ok: false, mensagem }`). Esquema resolvido pela turma (turma ?? curso); ano pelo `anoLetivoDaTurma`; "hoje" por `hojeNaEscola()` (America/Sao_Paulo).
+- Recusa: rotas respondem **423** com `{ message }`; actions devolvem `{ erro }` com a mesma mensagem ("A 1ª Unidade foi encerrada em 18/10/2026. Para alterar, solicite a reabertura à coordenação."; "O 2º Bimestre foi encerrado…" para nomes masculinos).
+- Ações da gestão em `src/app/dashboard/configuracoes/encerramento/actions.ts` (Núcleo, marcador `@modulo NUC`): `encerrarUnidade`, `desfazerEncerramento` (motivo ≥ 5 caracteres), `reabrirUnidade` (turma + disciplina, até, motivo), `revogarReabertura`. Todas exigem `unidade.encerrar`, escopo na escola da sessão, e gravam no AuditLog com entityType `UNIDADE` (detalhes: operação, unidade, turma, disciplina, até, motivo).
+
+### Pontos de gravação cobertos
+| Arquivo | O que tranca |
+|---|---|
+| `api/notas/lancar` | NotaUnidade, NotaAtividade, NotaAvaliacao e infrequente (isDesistente) de etapa encerrada. O lote é recusado (423) só se mudar algo numa etapa encerrada; sem mudança, a etapa encerrada não é regravada. |
+| `api/notas/recuperacao` | recuperação final (última unidade) — conferido para o lote inteiro antes de gravar |
+| `api/conselho-classe` | decisões do conselho (última unidade), na validação do lote |
+| `dashboard/notas/avaliacoes/actions.ts` | criar, editar e remover AvaliacaoDisciplina da etapa |
+| `dashboard/chamada/actions.ts` | abrir (não cria aula em dia trancado; aula existente abre só para leitura, campo `trancada`), salvar chamada (Aula + Falta), cancelar, observação, replicar conteúdo (por destino) |
+
+- `src/lib/services/chamada.ts` é só lógica pura (não grava); a checagem fica nas actions que a usam.
+- Teste de cobertura `src/lib/cadeado-cobertura.test.ts`: falha se algum arquivo de src/ gravar em notas_finais/notas_unidades/notas_atividades/notas_avaliacoes/avaliacoes_disciplina/aulas/faltas/observacoes_chamada (Prisma, gravação aninhada ou SQL bruto) sem importar o cadeado e chamar uma checagem.
+- **Exceções (não bloqueadas, decisão da dona do produto)**: `api/usuarios/transferir` (transfere a autoria `modifiedById` das notas), `api/usuarios/[id]` (exclusão de conta: `modifiedById` → null), `api/turmas/[id]` (exclusão da turma com as notas). Falsos positivos do detector: `lib/services/esquemas-padrao.ts` e `lib/services/esquemas-avaliacao.ts` (criam atividades do TEMPLATE do esquema). Exclusões em cascata (turma/disciplina/estudante apagados) também não passam pelo cadeado.
+- **[decisão]** Não trancam: justificativas/atestados (`dashboard/frequencia/actions.ts`; não fazem parte da lista), planos de ensino, horário da turma.
+- **[decisão]** Sem calendário cadastrado para o ano, turma sem esquema, etapa sem datas no calendário, ou data de aula fora de qualquer etapa: não tranca.
+- **[decisão]** Desfazer encerramento de unidade SEM prazo cadastrado: permitido a qualquer momento (o prazo nunca "passa").
+- **[decisão]** Reabertura: só de unidade efetivamente encerrada; `ate` entre hoje e hoje + 30 dias (inclusive); a turma precisa seguir o esquema da unidade no mesmo ano letivo; disciplina nula só em turma POR_DIA; uma reabertura ativa por (unidade, turma, disciplina) — para mudar a data, revogar e criar outra. Revogar não pede motivo (a tarefa pede motivo só para reabrir e desfazer).
+- **[decisão]** Conselho de classe e recuperação final trancam quando a última unidade está encerrada, como pedido. Consequência prática: se o conselho acontece depois do prazo da última unidade, a gestão precisa reabrir a última unidade para a turma + disciplina (ou cadastrar o prazo depois da data do conselho).
+- **[decisão]** "Encerrar agora" não pede motivo (a tarefa não pede); fica no AuditLog com quem e quando.
+- Testes: `src/lib/cadeado-unidade.test.ts` (puro) e `src/lib/cadeado-acoes.test.ts` (integração, "hoje" = 21/10/2026): encerrada pelo prazo bloqueia (423 + mensagem); sem prazo não encerra; infrequente tranca; manual antes do prazo bloqueia (com auditoria); desfazer exige motivo e libera, e não vale depois do prazo; reabertura libera só turma + disciplina e só até a data (tranca de novo no dia seguinte); revogada volta a bloquear; escola A × B; chamada dentro da unidade encerrada bloqueia (abrir, salvar, cancelar, observação) e fora não; reabertura libera a chamada da disciplina; recuperação e conselho seguem a última unidade (reabrir a última libera só a turma + disciplina); avaliações do professor; professor sem docência e Direção continuam 403 mesmo com reabertura; professor, secretaria, AEE e Administrador recebem "Não autorizado" nas ações da gestão.
