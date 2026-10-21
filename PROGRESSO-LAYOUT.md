@@ -32,13 +32,11 @@ servidor de desenvolvimento recarrega as mudanças em andamento.
 
 ## Próximo passo exato
 
-Etapa 4 (listas e telas de trabalho), na ordem: turmas (`TurmasListClient`
-vira Painel + BarraFerramentas + Tabela), estudantes (usar
-`components/estudantes/TabelaEstudantes`), usuários (`UsuariosClient`),
-disciplinas, resultados, frequência/infrequência (`ConteudoFrequencia`),
-conselho, lançamento de notas, chamada e diário (desktop), mensagens,
-ocorrências, AEE, provas/questões/simulados, configurações; dashboard em
-grade.
+Etapa 4 em andamento. Feitas: turmas, estudantes, usuários. Próxima:
+disciplinas (`src/app/dashboard/disciplinas/page.tsx`), depois resultados,
+frequência/infrequência, conselho, lançamento de notas, chamada e diário
+(desktop), mensagens, ocorrências, AEE, provas/questões/simulados,
+configurações e dashboard em grade.
 
 ## Etapa 1 — o que foi feito
 

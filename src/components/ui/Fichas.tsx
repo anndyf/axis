@@ -34,8 +34,8 @@ export function Fichas<T extends string>({ opcoes, valor, onChange, rotulo, comp
             aria-pressed={ativa}
             onClick={() => onChange(o.valor)}
             className={cn(
-              'inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full px-4 text-sm font-medium transition-colors duration-150 md:h-9 md:text-13',
-              compactas && 'md:h-8 md:px-3',
+              'inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full px-4 text-sm font-medium transition-colors duration-150 md:text-13',
+              compactas ? 'md:h-8 md:px-3' : 'md:h-9',
               ativa ? 'bg-accent text-on-accent' : 'border border-line bg-surface text-fg-muted hover:border-line-strong hover:text-fg'
             )}
           >

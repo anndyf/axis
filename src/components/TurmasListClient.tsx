@@ -12,6 +12,10 @@ import CloneTurmaModal from "./CloneTurmaModal"
 import PromoverTurmaModal from "./PromoverTurmaModal"
 import { ArrowUpCircle } from "lucide-react"
 import { can } from "@/lib/rbac"
+import { Button, Painel, RodapeTabela, Table, TableContainer, TableEmpty, TBody, TD, TH, THead, TR, type DirecaoOrdem } from "@/components/ui"
+import { BarraFerramentas } from "@/components/ui/BarraFerramentas"
+import { Fichas } from "@/components/ui/Fichas"
+import { baixarCSV } from "@/lib/navegador/csv"
 
 interface Turma {
   id: string
@@ -194,8 +198,125 @@ export default function TurmasListClient({
 
   const turnosOrdenados = ["Matutino", "Vespertino", "Noturno", "Integral", "Outros"].filter(t => turmasAgrupadas[t])
 
+  // Desktop: ordenação da tabela
+  const [ordem, setOrdem] = useState<{ coluna: "nome" | "curso" | "turno" | "estudantes"; direcao: DirecaoOrdem }>({ coluna: "nome", direcao: "asc" })
+  const ordenar = (coluna: typeof ordem.coluna) => setOrdem((o) => ({ coluna, direcao: o.coluna === coluna && o.direcao === "asc" ? "desc" : "asc" }))
+  const ordenadas = useMemo(() => {
+    const valor = (t: Turma): string | number => {
+      if (ordem.coluna === "estudantes") return t._count.estudantes
+      if (ordem.coluna === "curso") return t.curso || decodeTurma(t.nome).curso || ""
+      if (ordem.coluna === "turno") return ["Matutino", "Vespertino", "Noturno", "Integral", "Outros"].indexOf(rotuloTurno(t.turno || decodeTurma(t.nome).turno))
+      return t.nome
+    }
+    const s = [...filteredTurmas].sort((a, b) => {
+      const va = valor(a), vb = valor(b)
+      return typeof va === "number" && typeof vb === "number" ? va - vb : String(va).localeCompare(String(vb), "pt-BR", { numeric: true })
+    })
+    return ordem.direcao === "asc" ? s : s.reverse()
+  }, [filteredTurmas, ordem]) // eslint-disable-line react-hooks/exhaustive-deps
+  const temMinhas = turmas.some((t) => t.minhasDisciplinas && t.minhasDisciplinas.length > 0)
+
   return (
     <div className="space-y-4">
+      {/* Desktop: lista de trabalho (painel + barra de ferramentas + tabela) */}
+      <Painel semRecuo className="hidden md:block">
+        <BarraFerramentas
+          noPainel
+          busca={{ valor: searchTerm, onChange: setSearchTerm, placeholder: "Buscar por nome ou curso" }}
+          filtros={
+            <>
+              <Fichas
+                compactas
+                rotulo="Turno"
+                valor={selectedTurno ?? ""}
+                onChange={(v) => setSelectedTurno(v || null)}
+                opcoes={[
+                  { valor: "", rotulo: "Todos os turnos", contagem: turmas.length },
+                  ...turnosOptions
+                    .map((t) => ({ valor: t, rotulo: t, contagem: turmas.filter((x) => rotuloTurno(x.turno || decodeTurma(x.nome).turno) === t).length }))
+                    .filter((o) => o.contagem > 0),
+                ]}
+              />
+              <select
+                value={selectedSerie || ""}
+                onChange={(e) => setSelectedSerie(e.target.value || null)}
+                aria-label="Série"
+                className="h-8 rounded-md border border-line bg-surface px-2 text-13 text-fg-muted hover:border-line-strong focus:border-accent focus:outline-none"
+              >
+                <option value="">Todas as séries</option>
+                {seriesOptions.map((s) => <option key={s} value={s}>{s}ª série</option>)}
+              </select>
+              {(searchTerm || selectedTurno || selectedSerie || selectedCurso) && (
+                <Button variant="ghost" size="sm" onClick={clearFilters}><X size={14} strokeWidth={1.75} aria-hidden /> Limpar filtros</Button>
+              )}
+            </>
+          }
+          onExportar={() => baixarCSV("Turmas", [
+            { titulo: "Turma", valor: (t: Turma) => t.nome },
+            { titulo: "Curso", valor: (t: Turma) => t.curso || decodeTurma(t.nome).curso || "" },
+            { titulo: "Turno", valor: (t: Turma) => rotuloTurno(t.turno || decodeTurma(t.nome).turno) },
+            { titulo: "Modalidade", valor: (t: Turma) => t.modalidade },
+            { titulo: "Ano letivo", valor: (t: Turma) => t.anoLetivo },
+            { titulo: "Estudantes", valor: (t: Turma) => t._count.estudantes },
+            { titulo: "Disciplinas", valor: (t: Turma) => t._count.disciplinas },
+          ], ordenadas)}
+        />
+        <TableContainer semBorda>
+          <Table>
+            <THead>
+              <TR>
+                <TH ordem={ordem.coluna === "nome" ? ordem.direcao : null} onOrdenar={() => ordenar("nome")}>Turma</TH>
+                <TH ordem={ordem.coluna === "curso" ? ordem.direcao : null} onOrdenar={() => ordenar("curso")}>Curso</TH>
+                <TH ordem={ordem.coluna === "turno" ? ordem.direcao : null} onOrdenar={() => ordenar("turno")}>Turno</TH>
+                <TH>Modalidade</TH>
+                <TH numeric ordem={ordem.coluna === "estudantes" ? ordem.direcao : null} onOrdenar={() => ordenar("estudantes")}>Estudantes</TH>
+                <TH numeric>Disciplinas</TH>
+                {temMinhas && <TH>Suas disciplinas</TH>}
+                <TH className="text-right"><span className="sr-only">Ações</span></TH>
+              </TR>
+            </THead>
+            <TBody>
+              {ordenadas.map((turma) => {
+                const decoded = decodeTurma(turma.nome)
+                const acao = "flex size-8 items-center justify-center rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg disabled:opacity-30"
+                return (
+                  <TR key={turma.id} onClick={() => router.push(`/dashboard/turmas/${turma.id}`)}>
+                    <TD><Link href={`/dashboard/turmas/${turma.id}`} onClick={(e) => e.stopPropagation()} className="font-medium text-fg hover:underline">{turma.nome}</Link></TD>
+                    <TD className="text-fg-muted">{turma.curso || decoded.curso || "—"}</TD>
+                    <TD className="text-fg-muted">{rotuloTurno(turma.turno || decoded.turno)}</TD>
+                    <TD className="text-fg-muted">{turma.modalidade || "—"}</TD>
+                    <TD numeric>{turma._count.estudantes}</TD>
+                    <TD numeric className="text-fg-muted">{turma._count.disciplinas}</TD>
+                    {temMinhas && <TD className="max-w-64 truncate text-fg-muted" title={turma.minhasDisciplinas?.map((d) => d.nome).join(", ")}>{turma.minhasDisciplinas?.map((d) => d.nome).join(", ") || "—"}</TD>}
+                    <TD className="w-0" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center justify-end gap-0.5">
+                        <Link href={`/dashboard/turmas/${turma.id}/relatorio`} title="Notas da turma" aria-label={`Notas da turma ${turma.nome}`} className={acao}><FileText size={16} strokeWidth={1.75} /></Link>
+                        {isManagement && <Link href={`/dashboard/turmas/${turma.id}/horario`} title="Horário" aria-label={`Horário da turma ${turma.nome}`} className={acao}><Calendar size={16} strokeWidth={1.75} /></Link>}
+                        {can(session?.user, 'turma.promover') && (
+                          <>
+                            <button type="button" onClick={() => handlePromoteClick(turma)} disabled={!!promotingId || !!cloningId} title="Promover para a próxima etapa (move os estudantes)" aria-label={`Promover a turma ${turma.nome}`} className={acao}>
+                              {promotingId === turma.id ? <Loader2 size={16} className="animate-spin" /> : <ArrowUpCircle size={16} strokeWidth={1.75} />}
+                            </button>
+                            <button type="button" onClick={() => handleCloneClick(turma)} disabled={!!cloningId || !!promotingId} title="Clonar estrutura (sem estudantes)" aria-label={`Clonar a turma ${turma.nome}`} className={acao}>
+                              {cloningId === turma.id ? <Loader2 size={16} className="animate-spin" /> : <Copy size={16} strokeWidth={1.75} />}
+                            </button>
+                          </>
+                        )}
+                        {isManagement && <Link href={`/dashboard/turmas/${turma.id}/editar`} title="Editar turma" aria-label={`Editar a turma ${turma.nome}`} className={acao}><Pencil size={16} strokeWidth={1.75} /></Link>}
+                      </div>
+                    </TD>
+                  </TR>
+                )
+              })}
+              {ordenadas.length === 0 && <TableEmpty colSpan={temMinhas ? 8 : 7}>Nenhuma turma encontrada com estes filtros.</TableEmpty>}
+            </TBody>
+          </Table>
+        </TableContainer>
+        <RodapeTabela total={ordenadas.length} singular="turma" plural="turmas" />
+      </Painel>
+
+      {/* Celular: cartões por turno (como antes) */}
+      <div className="space-y-4 md:hidden">
       {/* Top Row */}
       <div className="flex flex-col items-center gap-2 rounded-2xl border border-line bg-surface p-1.5 shadow-card md:flex-row">
         {/* Total Badge */}
@@ -391,6 +512,8 @@ export default function TurmasListClient({
           ))}
         </div>
       )}
+
+      </div>
 
       <CloneTurmaModal 
         isOpen={isCloneModalOpen}

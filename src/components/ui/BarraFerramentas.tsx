@@ -32,7 +32,7 @@ export function BarraFerramentas({ busca, filtros, acoes, onExportar, resumo, no
       )}
     >
       {busca && (
-        <div className="relative min-w-0 md:w-72 lg:w-80">
+        <div className="relative min-w-0 md:w-60 xl:w-72">
           <Search {...ICONE} aria-hidden className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-fg-subtle" />
           <input
             type="search"
@@ -54,9 +54,9 @@ export function BarraFerramentas({ busca, filtros, acoes, onExportar, resumo, no
         </div>
       )}
       {resumo && <span className="hidden text-13 text-fg-muted md:inline">{resumo}</span>}
-      {filtros && <div className="flex min-w-0 flex-wrap items-center gap-2">{filtros}</div>}
+      {filtros && <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">{filtros}</div>}
       {(acoes || onExportar) && (
-        <div className="flex flex-wrap items-center gap-2 md:ml-auto">
+        <div className="flex shrink-0 flex-wrap items-center gap-2 md:ml-auto">
           {onExportar && (
             <Button variant="secondary" size="sm" onClick={onExportar} className="max-md:hidden">
               <Download size={14} strokeWidth={1.75} aria-hidden /> Exportar

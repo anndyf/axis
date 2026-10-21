@@ -24,8 +24,14 @@ const acaoIcone = "flex size-8 items-center justify-center rounded-md text-fg-su
  * busca e ordenação no que já foi carregado, linha abre a ficha do
  * estudante, ações por linha (portal, editar, AEE, boletim) e exportar CSV.
  */
-export default function TabelaEstudantes({ estudantes, portalUserIds, mostrarTurma, titulo, nomeExportacao, acoes }: {
+export default function TabelaEstudantes({ estudantes, portalUserIds, mostrarTurma, titulo, nomeExportacao, acoes, topo, semBusca, vazio }: {
   estudantes: LinhaEstudante[]
+  /** conteúdo acima da barra (ex.: filtros da tela Estudantes) */
+  topo?: React.ReactNode
+  /** a tela já busca no servidor: só ordena e exporta aqui */
+  semBusca?: boolean
+  /** estado vazio próprio (substitui a tabela quando não há estudantes) */
+  vazio?: React.ReactNode
   portalUserIds: string[]
   mostrarTurma?: boolean
   titulo?: string
@@ -54,9 +60,12 @@ export default function TabelaEstudantes({ estudantes, portalUserIds, mostrarTur
 
   return (
     <Painel titulo={titulo} semRecuo acoes={titulo ? acoes : undefined}>
+      {topo}
+      {estudantes.length === 0 && vazio ? vazio : (<>
       <BarraFerramentas
         noPainel
-        busca={{ valor: busca, onChange: setBusca, placeholder: "Buscar por nome ou matrícula" }}
+        resumo={semBusca ? `${linhas.length} ${linhas.length === 1 ? "estudante" : "estudantes"}` : undefined}
+        busca={semBusca ? undefined : { valor: busca, onChange: setBusca, placeholder: "Buscar por nome ou matrícula" }}
         acoes={titulo ? undefined : acoes}
         onExportar={() => baixarCSV(nomeExportacao, [
           { titulo: "Matrícula", valor: (e: LinhaEstudante) => e.matricula },
@@ -112,6 +121,7 @@ export default function TabelaEstudantes({ estudantes, portalUserIds, mostrarTur
         </Table>
       </TableContainer>
       <RodapeTabela total={linhas.length} singular="estudante" plural="estudantes" />
+      </>)}
     </Painel>
   )
 }
