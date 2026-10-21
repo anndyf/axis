@@ -32,7 +32,13 @@ const erros: string[] = []
 async function salvar(page: Page, nome: string, largura: number) {
   await page.waitForLoadState('networkidle').catch(() => {})
   await page.waitForTimeout(800)
+  // Viewport do tamanho da página: barras fixas aparecem no fim, não no meio (como em capturas.ts)
+  const viewport = page.viewportSize()!
+  const altura = await page.evaluate(() => document.documentElement.scrollHeight)
+  await page.setViewportSize({ width: viewport.width, height: Math.max(viewport.height, Math.min(altura, 12000)) })
+  await page.waitForTimeout(300)
   const bruto = await page.screenshot({ fullPage: true })
+  await page.setViewportSize(viewport)
   const arquivo = path.join(saida, `${nome}-${largura}.png`)
   await sharp(bruto).png({ palette: true, quality: 80, compressionLevel: 9 }).toFile(arquivo)
   console.log('  ', arquivo)

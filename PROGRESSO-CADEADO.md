@@ -9,10 +9,10 @@ Ambiente: PostgreSQL 16 local, `axis_dev` e `axis_test` com `timezone = America/
 - [x] Etapa 2 — defeito do redirecionamento
 - [ ] Etapa 3 — modelo do cadeado
 - [x] Etapa 4 — regra única no servidor e cobertura
-- [ ] Etapa 5 — telas
+- [x] Etapa 5 — telas
 - [ ] Encerramento (PR)
 
-**Próximo passo:** Etapa 5 — refazer build e capturas (`npx tsx scripts/capturas-cadeado.ts`) depois dos ajustes; depois Encerramento (roteiro de validação, PR).
+**Próximo passo:** abrir o PR para `main` e marcar STATUS: CONCLUÍDO.
 
 ## Etapa 1 — fuso
 - `logAudit` (src/lib/audit.ts) grava UTC verdadeiro (`@default(now())` do Prisma). O caminho alternativo em SQL bruto foi retirado (morto: o modelo `auditLog` sempre existe; e um `Date` do JS passado como parâmetro de SQL bruto é convertido para a hora local do banco — conferido).
@@ -63,3 +63,30 @@ Ambiente: PostgreSQL 16 local, `axis_dev` e `axis_test` com `timezone = America/
 - **[decisão]** Conselho de classe e recuperação final trancam quando a última unidade está encerrada, como pedido. Consequência prática: se o conselho acontece depois do prazo da última unidade, a gestão precisa reabrir a última unidade para a turma + disciplina (ou cadastrar o prazo depois da data do conselho).
 - **[decisão]** "Encerrar agora" não pede motivo (a tarefa não pede); fica no AuditLog com quem e quando.
 - Testes: `src/lib/cadeado-unidade.test.ts` (puro) e `src/lib/cadeado-acoes.test.ts` (integração, "hoje" = 21/10/2026): encerrada pelo prazo bloqueia (423 + mensagem); sem prazo não encerra; infrequente tranca; manual antes do prazo bloqueia (com auditoria); desfazer exige motivo e libera, e não vale depois do prazo; reabertura libera só turma + disciplina e só até a data (tranca de novo no dia seguinte); revogada volta a bloquear; escola A × B; chamada dentro da unidade encerrada bloqueia (abrir, salvar, cancelar, observação) e fora não; reabertura libera a chamada da disciplina; recuperação e conselho seguem a última unidade (reabrir a última libera só a turma + disciplina); avaliações do professor; professor sem docência e Direção continuam 403 mesmo com reabertura; professor, secretaria, AEE e Administrador recebem "Não autorizado" nas ações da gestão.
+
+## Etapa 5 — telas
+- **Encerramento de unidades** (`/dashboard/configuracoes/encerramento`, Núcleo): por esquema, cada unidade com período, situação (aberta · prazo em dd/mm / encerrada em dd/mm por X ou "(prazo)") e ação "Encerrar agora" / "Desfazer encerramento" / "Reabrir". Painel "Reaberturas" (ativas; "Mostrar encerradas" lista vencidas e revogadas) com turma, disciplina, unidade, até, motivo, quem, situação e "Revogar"; botão "Reabrir para turma e disciplina" (unidade encerrada, turma do esquema, disciplina ou "Chamada diária" em turma POR_DIA, até — padrão +7, máx. +30 —, motivo).
+  - Acesso: `unidade.encerrar` (Direção, Coordenação) age; `calendario.gerenciar` (Secretaria, Administrador) só vê, sem botões. Item novo no menu (grupo Configurações), atalho em Configurações e botão no Calendário letivo.
+  - Ao navegador vão só nomes de unidade/esquema/turma/disciplina, datas, motivo e o nome de quem fez (nada de registro de User).
+- **Lançamento de notas**: a API de leitura (`api/notas/turma/.../disciplina/...`) devolve `cadeado` por unidade; colunas de unidade encerrada com `Lock` e campos em modo leitura (mesmo visual do "somente leitura"), aviso "1ª Unidade encerrada em …" e, com reabertura, "Reaberta para você até …".
+- **Chamada**: dia de unidade encerrada abre só para leitura (aula existente) ou mostra o aviso com cadeado (sem aula); sem salvar, "aula não dada" nem replicar. **Diário**: dias encerrados sem "Editar", com cadeado (também nos dias pendentes).
+- **Recuperação final e conselho**: aviso com cadeado por disciplina e campos/decisões desabilitados; o conselho não envia decisões de disciplina trancada.
+- **Painel da gestão**: seção "Encerramento de unidades" junto do Calendário — unidades que encerram sozinhas nos próximos 7 dias e reaberturas ativas (`avisosDoCadeado` em `painel-leitura.ts`, testado).
+- Ajuda "?" (`ajuda.ts`: tela nova + passos em notas, chamada, diário, recuperação e conselho) e Novidades 0.1.0 ("Cadeado de unidade encerrada").
+- Capturas (build de produção, 1440 e 375px, sem `pageerror`): `docs/capturas/cadeado/` — painel-gestao, encerramento-direcao, encerramento-reabrir, encerramento-coordenacao, encerramento-secretaria-leitura, notas-encerradas, notas-reaberta, chamada-dia-encerrado, diario-encerrado, recuperacao-encerrada, conselho-encerrado.
+
+## Para validar localmente
+1. `npm ci`; PostgreSQL com `axis_dev` e `axis_test` em `ALTER DATABASE … SET timezone TO 'America/Sao_Paulo'`; `.env`/`.env.test` locais; `npx prisma migrate deploy` nos dois.
+2. No axis_dev: `npm run db:seed`, `npx tsx prisma/onboard-escola-teste.ts`, `npx tsx prisma/seed-usuarios-teste.ts`, `npx tsx prisma/seed-calendario.ts`, `npx tsx prisma/seed-frequencia.ts`, `npx tsx prisma/backfill/fase-2.ts`, `npx tsx prisma/backfill/fase-3a.ts` (grava `unidade.encerrar` em Direção e Coordenação) e **`npx tsx prisma/seed-cadeado.ts`** (novo).
+   - **Como forçar unidade encerrada**: o seed-cadeado define `prazoLancamento = fim da etapa + 7 dias` onde não há prazo. Com o calendário do seed (3 unidades: 02/02–15/05, 18/05–28/08, 31/08–18/12) a 1ª e a 2ª Unidade ficam encerradas pelo prazo a partir de 23/05 e 05/09/2026; a 3ª segue aberta (prazo 25/12). Também cria uma reabertura de 1TIM1 · Português · 2ª Unidade por 4 dias. Para outros cenários, edite o prazo em Calendário letivo (prazo no passado = encerrada desde o dia seguinte) ou use "Encerrar agora".
+3. `npx tsc --noEmit` e `npx vitest run` (59 arquivos, 597 testes, todos passando nesta sessão).
+4. `npm run build && npm start` e:
+   - `direcao`/direcao123 ou `coordenacao`/coordenacao123: Painel (seção Encerramento de unidades), Configurações → Encerramento de unidades (encerrar a 3ª, desfazer com motivo, reabrir para turma e disciplina, revogar); Auditoria → filtro UNIDADE.
+   - `secretaria`/secretaria123: mesma tela, só leitura. `aee`/aee123 e `professor`/professor123 não têm o item no menu (endereço direto → /dashboard).
+   - `professor`/professor123: Lançar notas → 1TIM1 → História (1ª e 2ª com cadeado) e Português (2ª reaberta); Chamada de 24/08/2026 em História (aviso de cadeado); Diário de História (dias com cadeado); Recuperação final (encerre a 3ª antes).
+   - `npx tsx scripts/capturas-cadeado.ts` refaz as capturas; `npx tsx scripts/verificar-redirecionamento.ts` confere o defeito da Etapa 2.
+
+## Resumo
+- Migrations: `20261023120000_audit_logs_utc` (correção de dados do AuditLog, +3h exceto PLATAFORMA_ESCOLA) e `20261023130000_cadeado_unidade` (só aditiva).
+- Permissão nova: `unidade.encerrar` (Direção, Coordenação; Administrador não).
+- Pontos de gravação cobertos, exceções e decisões: ver Etapa 4. Causa do redirecionamento: ver Etapa 2.
