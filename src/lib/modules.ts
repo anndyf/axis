@@ -22,6 +22,7 @@ import {
   UserX,
   Building2,
   type LucideIcon,
+  Lock,
 } from 'lucide-react'
 import { PlanoTipo } from '@prisma/client'
 import { can, type RbacUser } from '@/lib/rbac'
@@ -69,6 +70,8 @@ export const MODULOS: Modulo[] = [
 
   { id: 'matriz', nome: 'Matriz curricular', grupo: 'Configurações', icone: LayoutGrid, rota: '/dashboard/matriz', moduloId: 'NUC', permissao: (u) => !can(u, 'aee.atender') && can(u, 'matriz.gerenciar') },
   { id: 'usuarios', nome: 'Usuários', grupo: 'Configurações', icone: Shield, rota: '/dashboard/usuarios', moduloId: 'NUC', permissao: (u) => !can(u, 'aee.atender') && can(u, 'usuario.gerenciar') },
+  // Cadeado de unidade: Direção e Coordenação encerram/reabrem; quem já vê o calendário só acompanha
+  { id: 'encerramento', nome: 'Encerramento de unidades', grupo: 'Configurações', icone: Lock, rota: '/dashboard/configuracoes/encerramento', moduloId: 'NUC', permissao: (u) => !can(u, 'aee.atender') && !can(u, 'portal.acessar') && (can(u, 'unidade.encerrar') || can(u, 'calendario.gerenciar')) },
   { id: 'configuracoes', nome: 'Configurações', grupo: 'Configurações', icone: Settings, rota: '/dashboard/configuracoes', moduloId: 'NUC', permissao: (u) => !can(u, 'aee.atender') && can(u, 'configuracao.editar') },
 
   // Ferramenta da dona da plataforma (gestão cross-tenant de escolas), não é

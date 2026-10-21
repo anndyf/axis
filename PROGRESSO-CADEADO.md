@@ -12,7 +12,7 @@ Ambiente: PostgreSQL 16 local, `axis_dev` e `axis_test` com `timezone = America/
 - [ ] Etapa 5 — telas
 - [ ] Encerramento (PR)
 
-**Próximo passo:** Etapa 5 — tela /dashboard/configuracoes/encerramento (gestão), avisos com cadeado no lançamento de notas, chamada/diário, recuperação e conselho; painel inicial; ajuda e novidades.
+**Próximo passo:** Etapa 5 — (feito: tela de gestão /dashboard/configuracoes/encerramento + menu) avisos com cadeado no lançamento de notas, chamada/diário, recuperação e conselho; painel inicial; ajuda e novidades; capturas.
 
 ## Etapa 1 — fuso
 - `logAudit` (src/lib/audit.ts) grava UTC verdadeiro (`@default(now())` do Prisma). O caminho alternativo em SQL bruto foi retirado (morto: o modelo `auditLog` sempre existe; e um `Date` do JS passado como parâmetro de SQL bruto é convertido para a hora local do banco — conferido).
