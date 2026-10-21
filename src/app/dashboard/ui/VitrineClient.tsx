@@ -1,24 +1,23 @@
 "use client"
 
-import { useState, type ReactNode } from "react"
+import { useMemo, useState, type ReactNode } from "react"
 import { Plus, Download, MoreHorizontal, Pencil, Trash2, Users, Search, Settings } from "lucide-react"
 import {
   Button, Field, Input, Textarea, Select, Checkbox, Switch, Badge, Card, CardHeader, CardBody, CardFooter,
   PageHeader, TableContainer, Table, THead, TBody, TR, TH, TD, TableEmpty, EmptyState, Skeleton, SkeletonRows,
-  Avatar, Stat, Alert, Tooltip,
+  Avatar, Stat, Alert, Tooltip, Painel, ListaDescritiva, CabecalhoPagina, RodapeTabela, type DirecaoOrdem,
 } from "@/components/ui"
+import { Abas } from "@/components/ui/Abas"
+import { BarraFerramentas } from "@/components/ui/BarraFerramentas"
+import { Fichas } from "@/components/ui/Fichas"
+import { baixarCSV } from "@/lib/navegador/csv"
 import { Dialog } from "@/components/ui/Dialog"
 import { Tabs } from "@/components/ui/Tabs"
 import { Menu } from "@/components/ui/Menu"
 import { useToast } from "@/components/ui/Toast"
 
 function Secao({ titulo, children }: { titulo: string; children: ReactNode }) {
-  return (
-    <Card>
-      <CardHeader title={titulo} />
-      <CardBody className="space-y-4">{children}</CardBody>
-    </Card>
-  )
+  return <Painel titulo={titulo} corpoClassName="space-y-4">{children}</Painel>
 }
 
 const ALUNOS = [
@@ -31,14 +30,87 @@ export default function VitrineClient() {
   const [dialogo, setDialogo] = useState(false)
   const [ligado, setLigado] = useState(true)
   const toast = useToast()
+  const [busca, setBusca] = useState("")
+  const [situacao, setSituacao] = useState<"todos" | "success" | "warning" | "danger">("todos")
+  const [ordem, setOrdem] = useState<{ coluna: "nome" | "media"; direcao: DirecaoOrdem }>({ coluna: "nome", direcao: "asc" })
+  const linhas = useMemo(() => {
+    const f = ALUNOS.filter((a) => (situacao === "todos" || a.status === situacao) && a.nome.toLowerCase().includes(busca.toLowerCase()))
+    const s = [...f].sort((a, b) => ordem.coluna === "nome" ? a.nome.localeCompare(b.nome) : a.media - b.media)
+    return ordem.direcao === "asc" ? s : s.reverse()
+  }, [busca, situacao, ordem])
+  const ordenar = (coluna: "nome" | "media") => setOrdem((o) => ({ coluna, direcao: o.coluna === coluna && o.direcao === "asc" ? "desc" : "asc" }))
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
-      <PageHeader
-        title="Componentes"
-        description="Design system do Áxis (src/components/ui): tokens, controles e estados para revisão."
-        actions={<><Button variant="secondary"><Download size={16} strokeWidth={1.75} /> Exportar</Button><Button><Plus size={16} strokeWidth={1.75} /> Novo</Button></>}
+    <div className="space-y-5">
+      <CabecalhoPagina
+        titulo="Componentes"
+        descricao="Design system do Áxis (src/components/ui): tokens, controles e estados para revisão."
+        dados={[{ rotulo: "Raio do painel", valor: "8px" }, { rotulo: "Linha de tabela", valor: "40px" }, { rotulo: "Modal", valor: "12px" }]}
+        acoes={<><Button variant="secondary"><Download size={16} strokeWidth={1.75} /> Exportar</Button><Button><Plus size={16} strokeWidth={1.75} /> Novo</Button></>}
+        abas={<Abas rotulo="Exemplo de abas de ficha" itens={[{ href: "/dashboard/ui", rotulo: "Visão geral", exato: true }, { href: "/dashboard/turmas", rotulo: "Turmas" }, { href: "/dashboard/estudantes", rotulo: "Estudantes", contador: 90 }]} />}
       />
+
+      <div className="grid gap-4 xl:grid-cols-3">
+        <Painel
+          className="xl:col-span-2"
+          titulo="Lista de trabalho"
+          descricao="Painel + BarraFerramentas + Tabela (ordenação e rodapé com contagem)"
+          semRecuo
+        >
+          <BarraFerramentas
+            noPainel
+            busca={{ valor: busca, onChange: setBusca, placeholder: "Buscar estudante" }}
+            filtros={<Fichas compactas rotulo="Situação" valor={situacao} onChange={setSituacao} opcoes={[
+              { valor: "todos", rotulo: "Todos", contagem: ALUNOS.length },
+              { valor: "success", rotulo: "Aprovados", contagem: ALUNOS.filter((a) => a.status === "success").length },
+              { valor: "warning", rotulo: "Atenção", contagem: ALUNOS.filter((a) => a.status === "warning").length },
+              { valor: "danger", rotulo: "Reprovados", contagem: ALUNOS.filter((a) => a.status === "danger").length },
+            ]} />}
+            onExportar={() => baixarCSV("Estudantes exemplo", [
+              { titulo: "Nome", valor: (a: typeof ALUNOS[number]) => a.nome },
+              { titulo: "Matrícula", valor: (a: typeof ALUNOS[number]) => a.matricula },
+              { titulo: "Média", valor: (a: typeof ALUNOS[number]) => a.media },
+            ], linhas)}
+          />
+          <TableContainer semBorda>
+            <Table>
+              <THead>
+                <TR>
+                  <TH ordem={ordem.coluna === "nome" ? ordem.direcao : null} onOrdenar={() => ordenar("nome")}>Estudante</TH>
+                  <TH>Matrícula</TH>
+                  <TH numeric ordem={ordem.coluna === "media" ? ordem.direcao : null} onOrdenar={() => ordenar("media")}>Média</TH>
+                  <TH numeric>Frequência</TH>
+                  <TH>Situação</TH>
+                </TR>
+              </THead>
+              <TBody>
+                {linhas.map((a) => (
+                  <TR key={a.matricula} onClick={() => toast(`Abrir ${a.nome}`)}>
+                    <TD>{a.nome}</TD>
+                    <TD className="font-mono text-fg-muted">{a.matricula}</TD>
+                    <TD numeric>{a.media.toFixed(1).replace(".", ",")}</TD>
+                    <TD numeric>{a.freq.toFixed(1).replace(".", ",")}%</TD>
+                    <TD><Badge tone={a.status} dot>{a.rotulo}</Badge></TD>
+                  </TR>
+                ))}
+                {linhas.length === 0 && <TableEmpty colSpan={5}>Nenhum estudante encontrado com estes filtros.</TableEmpty>}
+              </TBody>
+            </Table>
+          </TableContainer>
+          <RodapeTabela total={linhas.length} singular="estudante" plural="estudantes" />
+        </Painel>
+
+        <Painel titulo="Ficha em modo leitura" acoes={<Button size="sm" variant="secondary"><Pencil size={14} strokeWidth={1.75} /> Editar</Button>}>
+          <ListaDescritiva colunas={2} itens={[
+            { rotulo: "Nome", valor: "Ana Beatriz Souza", largo: true },
+            { rotulo: "Matrícula", valor: <span className="font-mono">1TIM1-001</span> },
+            { rotulo: "Turma", valor: "1TIM1" },
+            { rotulo: "Data de nascimento", valor: "12/03/2010" },
+            { rotulo: "Telefone", valor: "" },
+            { rotulo: "Observações", valor: "Sem observações registradas.", largo: true },
+          ]} />
+        </Painel>
+      </div>
 
       <Secao titulo="Botões">
         <div className="flex flex-wrap items-center gap-2">
@@ -165,13 +237,13 @@ export default function VitrineClient() {
 
       <Secao titulo="Tipografia">
         <div className="space-y-1">
-          <p className="text-3xl font-semibold tracking-tight">30 · Título de página grande</p>
-          <p className="text-2xl font-semibold tracking-tight">24 · Título de página</p>
-          <p className="text-xl font-semibold tracking-tight">20 · Seção</p>
-          <p className="text-base font-medium">16 · Destaque</p>
+          <p className="text-2xl font-semibold tracking-tight">24 · Número de destaque (indicadores)</p>
+          <p className="text-xl font-semibold tracking-tight">20 · Título de página</p>
+          <p className="text-sm font-semibold">14 · Título de painel e de seção (peso 600)</p>
           <p className="text-sm">14 · Texto padrão da interface</p>
           <p className="text-13 text-fg-muted">13 · Texto secundário e tabelas</p>
-          <p className="text-xs text-fg-subtle">12 · Rótulos e legendas</p>
+          <p className="text-rotulo text-fg-muted">12,5 · Rótulos de campo e de coluna (peso 400–500, cor secundária)</p>
+          <p className="text-xs text-fg-subtle">12 · Legendas</p>
           <p className="font-mono text-13">Geist Mono · 1TIM1-001 · 2026 (texto: Inter)</p>
         </div>
       </Secao>

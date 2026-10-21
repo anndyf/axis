@@ -63,7 +63,7 @@ export function BottomSheet({ open, onClose, title, description, children, foote
         tabIndex={-1}
         style={deslocamento ? { transform: `translateY(${deslocamento}px)` } : undefined}
         className={cn(
-          'relative flex max-h-[88dvh] w-full flex-col rounded-t-2xl border border-b-0 border-line bg-elevated shadow-overlay outline-none sm:max-w-lg',
+          'relative flex max-h-[88dvh] w-full flex-col rounded-t-modal border border-b-0 border-line bg-elevated shadow-overlay outline-none sm:max-w-lg',
           deslocamento ? '' : 'animate-sheet-up transition-transform duration-150 ease-out',
           className
         )}

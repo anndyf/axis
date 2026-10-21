@@ -77,7 +77,17 @@
   --violet-fg: #6d28d9;
 
   --shadow-overlay: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px -4px rgb(15 23 42 / 0.10);
-  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04);
+  /* Área de trabalho: painéis com borda de 1px e sem sombra; sombra só em
+     camadas flutuantes (menus, modais, avisos) - shadow-overlay */
+  --shadow-card: none;
+
+  /* Densidade equilibrada (layout de sistema) */
+  --pagina-x: 1rem;          /* margem lateral da página: 16px no celular */
+  --pagina-y: 1rem;
+  --painel-x: 1rem;          /* recuo interno do painel: 16px */
+  --painel-y: 0.75rem;       /* 12px */
+  --linha-tabela: 2.5rem;    /* 40px */
+  --barra-superior: 3rem;    /* 48px no desktop */
 
   color-scheme: light;
 }
@@ -122,6 +132,13 @@
   --shadow-overlay: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -4px rgb(0 0 0 / 0.6);
   --shadow-card: none;
   color-scheme: dark;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --pagina-x: 1.5rem;      /* 24px */
+    --pagina-y: 1.25rem;     /* 20px */
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -232,11 +249,40 @@
   /* escala tipográfica curta: 12/13/14/16/20/24/30 */
   --text-13: 0.8125rem;
   --text-13--line-height: 1.125rem;
+  /* rótulos de campo, de coluna e de ficha: 12,5px, peso 400-500, cor secundária */
+  --text-rotulo: 0.78125rem;
+  --text-rotulo--line-height: 1.125rem;
 
-  /* raios: 8px controles (rounded-lg), 16px cartões e modais (rounded-2xl), pílulas (rounded-full) */
-  --radius-control: 8px;
-  --radius-card: 16px;
-  --radius-modal: 16px;
+  /* raios (layout de sistema): controle 6px, painel 8px, modal 12px.
+     A escala do Tailwind é achatada para que as classes já espalhadas pelas
+     telas sigam a mesma regra: rounded-md/lg = controle, rounded-xl/2xl =
+     painel, rounded-3xl = modal. Pílulas continuam rounded-full. */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+  --radius-2xl: 8px;
+  --radius-3xl: 12px;
+  --radius-control: 6px;
+  --radius-painel: 8px;
+  --radius-card: 8px;
+  --radius-modal: 12px;
+
+  /* sombra pequena dos cartões vira borda (só camadas flutuantes têm sombra) */
+  --shadow-xs: 0 0 #0000;
+  --shadow-sm: 0 0 #0000;
+
+  /* espaçamentos de página e painel: px-pagina, py-pagina, px-painel, py-painel */
+  --spacing-pagina: var(--pagina-x);
+  --spacing-pagina-y: var(--pagina-y);
+  --spacing-painel: var(--painel-x);
+  --spacing-painel-y: var(--painel-y);
+  --spacing-linha: var(--linha-tabela);
+  --spacing-barra: var(--barra-superior);
+
+  /* larguras: formulários curtos e leitura longa ficam limitados */
+  --container-formulario: 45rem;   /* 720px */
+  --container-leitura: 55rem;      /* 880px */
 
   /* movimento mínimo: 150ms */
   --animate-skeleton: skeleton 1.4s ease-in-out infinite;

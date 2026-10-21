@@ -3,20 +3,24 @@ import { ChevronDown } from 'lucide-react'
 import { cn } from './cn'
 
 const CONTROLE = cn(
-  'w-full rounded-lg border border-line bg-surface px-3 text-sm text-fg shadow-card',
+  'w-full rounded-control border border-line bg-surface px-3 text-sm text-fg',
   'placeholder:text-fg-subtle transition-[border-color,box-shadow] duration-150',
   'hover:border-line-strong focus:outline-none focus:border-accent focus:ring-3 focus:ring-ring/40',
   'disabled:cursor-not-allowed disabled:bg-subtle disabled:text-fg-disabled',
+  // Somente leitura (ex.: gestão vendo notas): parece texto, não campo
+  'read-only:border-line-subtle read-only:bg-subtle read-only:hover:border-line-subtle read-only:focus:border-line read-only:focus:ring-0',
   'aria-[invalid=true]:border-danger aria-[invalid=true]:focus:ring-danger/25',
   // Celular: campo preenchido em cinza claro (padrão de app) e texto de 16px,
   // que evita o zoom automático do iOS ao focar
   'max-md:border-transparent max-md:bg-subtle max-md:shadow-none max-md:text-base max-md:focus:bg-surface'
 )
 
-export function Label({ className, children, opcional, ...props }: LabelHTMLAttributes<HTMLLabelElement> & { opcional?: boolean }) {
+export function Label({ className, children, opcional, obrigatorio, ...props }: LabelHTMLAttributes<HTMLLabelElement> & { opcional?: boolean; obrigatorio?: boolean }) {
   return (
     <label className={cn('block text-13 font-medium text-fg', className)} {...props}>
       {children}
+      {obrigatorio && <span aria-hidden className="ml-0.5 text-danger-fg">*</span>}
+      {obrigatorio && <span className="sr-only"> (obrigatório)</span>}
       {opcional && <span className="ml-1 font-normal text-fg-subtle">(opcional)</span>}
     </label>
   )
@@ -36,11 +40,12 @@ export function FieldHint({ id, children }: { id?: string; children?: ReactNode 
  * Rótulo + controle + ajuda + erro, com ids ligados (aria-describedby).
  * O filho recebe id/aria via render prop.
  */
-export function Field({ label, hint, error, opcional, className, children }: {
+export function Field({ label, hint, error, opcional, obrigatorio, className, children }: {
   label: ReactNode
   hint?: ReactNode
   error?: ReactNode
   opcional?: boolean
+  obrigatorio?: boolean
   className?: string
   children: (props: { id: string; 'aria-describedby'?: string; 'aria-invalid'?: boolean }) => ReactNode
 }) {
@@ -48,7 +53,7 @@ export function Field({ label, hint, error, opcional, className, children }: {
   const descricao = [hint ? `${id}-ajuda` : '', error ? `${id}-erro` : ''].filter(Boolean).join(' ') || undefined
   return (
     <div className={cn('space-y-1.5', className)}>
-      <Label htmlFor={id} opcional={opcional}>{label}</Label>
+      <Label htmlFor={id} opcional={opcional} obrigatorio={obrigatorio}>{label}</Label>
       {children({ id, 'aria-describedby': descricao, 'aria-invalid': error ? true : undefined })}
       <FieldHint id={`${id}-ajuda`}>{hint}</FieldHint>
       <FieldError id={`${id}-erro`}>{error}</FieldError>
