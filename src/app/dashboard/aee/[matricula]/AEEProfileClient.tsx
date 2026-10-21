@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Accessibility, CheckCircle2, Pencil, Save, Trash2, Upload, Users } from "lucide-react"
-import { Alert, Button, CabecalhoPagina, Checkbox, Field, Input, ListaDescritiva, Painel, Textarea, buttonClasses } from "@/components/ui"
+import { Alert, Button, CabecalhoPagina, IndicadorGravacao, Checkbox, Field, Input, ListaDescritiva, Painel, Textarea, buttonClasses } from "@/components/ui"
 import { useToast } from "@/components/ui/Toast"
 import { CIDS_AEE } from "@/lib/constants-aee"
 import { can } from "@/lib/rbac"
@@ -54,6 +54,8 @@ export default function AEEProfileClient({
       })
       if (res.ok) {
         router.refresh()
+        setGravado(JSON.stringify(formData))
+        setSalvoEm(new Date())
         toast('Ficha AEE salva.')
         return true
       }
@@ -128,6 +130,9 @@ export default function AEEProfileClient({
   )
 
   const [editando, setEditando] = useState(isDirecao && !perfilExistente)
+  const [gravado, setGravado] = useState(() => JSON.stringify(formData))
+  const [salvoEm, setSalvoEm] = useState<Date | null>(null)
+  const alteracoesPendentes = editando && JSON.stringify(formData) !== gravado
   const salvarESair = async () => { if (await handleSave()) setEditando(false) }
   const nomeCid = (code: string) => CIDS_AEE.find((c: any) => c.code === code)?.label || 'CID específico'
   const minhaLeitura = perfilExistente?.acknowledgements?.find((ack: any) => ack.user.id === usuario.id)?.readAt
@@ -153,7 +158,8 @@ export default function AEEProfileClient({
         </p>
         {isDirecao && (
           editando ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
+              <IndicadorGravacao pendente={alteracoesPendentes} salvando={loading} salvoEm={salvoEm} />
               {perfilExistente && <Button variant="secondary" onClick={() => setEditando(false)} disabled={loading}>Cancelar</Button>}
               <Button onClick={salvarESair} loading={loading}>{!loading && <Save size={16} strokeWidth={1.75} aria-hidden />} Salvar ficha</Button>
             </div>

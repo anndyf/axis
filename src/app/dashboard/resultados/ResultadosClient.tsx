@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from "react"
 import Link from "next/link"
-import { ArrowLeft, Users, Search, Filter, Info, ListFilter, CheckCircle2 } from "lucide-react"
-import TeacherTipsModal from "@/components/TeacherTipsModal"
+import { Users, Search, Info } from "lucide-react"
+import { CabecalhoPagina } from "@/components/ui"
+import ListaDeTurmas from "@/components/listas/ListaDeTurmas"
 
 export default function ResultadosClient({ turmas }: { turmas: any[] }) {
 
@@ -30,28 +31,21 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
     <div className="">
 
 
-      {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
-      <header className="mb-6">
-        <div className="">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="flex min-w-0 items-center gap-3">
-              <Link
-                href="/dashboard"
-                aria-label="Voltar" className="hidden sm:inline-flex p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg"
-              >
-                <ArrowLeft size={16} strokeWidth={1.75} />
-              </Link>
-              <div>
-                <h1 className="text-2xl font-semibold tracking-tight text-fg">Resultados da Turma</h1>
-                <p className="text-sm text-fg-muted">Visualizar desempenho por unidade e resultados finais</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <CabecalhoPagina
+        titulo="Resultados"
+        descricao="Desempenho por unidade e resultado final de cada turma."
+        dados={[{ rotulo: "Turmas", valor: turmas.length }]}
+      />
+
+      <ListaDeTurmas
+        turmas={turmas.map((t) => ({ id: t.id, nome: t.nome, curso: t.curso || "Ensino médio", turno: t.turno, estudantes: t._count?.estudantes }))}
+        href={(t) => `/dashboard/resultados/${t.id}`}
+        nomeExportacao="Resultados - turmas"
+        acaoLinha="Ver resultados"
+      />
 
       {/* Main Content */}
-      <main className="pt-2 pb-8 space-y-6 md:pt-4 md:pb-32 md:space-y-8">
+      <main className="space-y-6 pt-2 pb-8 md:hidden">
         
         {/* Dica de Uso */}
         <div className="hidden bg-subtle border border-line rounded-lg p-5 items-start gap-4 md:flex">

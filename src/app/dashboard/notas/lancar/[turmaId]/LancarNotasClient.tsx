@@ -3,7 +3,7 @@
 import { useState, useEffect, Fragment } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Button, EmptyState, PageHeader, buttonClasses } from "@/components/ui"
+import { Button, EmptyState, IndicadorGravacao, PageHeader, buttonClasses, horaCurta } from "@/components/ui"
 import {
   ArrowLeft,
   Save,
@@ -21,8 +21,7 @@ import {
   Accessibility,
   Printer,
   Info,
-  ChevronDown
-} from "lucide-react"
+  ChevronDown, Eye } from "lucide-react"
 import { calcularNotaUnidade, calcularMediaFinal, paraEsquemaConfig, type EsquemaConfig, type UnidadeInput, type FormaCalculo } from "@/lib/services/notas"
 
 interface Estudante {
@@ -113,6 +112,7 @@ export default function LancarNotasTurmaClient({
   // Só quem leciona a disciplina lança; Direção/Administrador só visualizam
   const [podeLancar, setPodeLancar] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [salvoEm, setSalvoEm] = useState<Date | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
   const [feedbackModal, setFeedbackModal] = useState<{ type: 'success' | 'error', text: string } | null>(null)
@@ -246,9 +246,10 @@ export default function LancarNotasTurmaClient({
       const response = await fetch('/api/notas/lancar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ notas: notasArray }) });
       if (response.ok) {
         setOriginalNotas(JSON.parse(JSON.stringify(notas)));
+        setSalvoEm(new Date());
         setFeedbackModal({
           type: 'success',
-          text: `As notas de ${selectedDiscName || 'disciplina'} da turma ${turmaNome} foram salvas com sucesso no banco de dados!`
+          text: `As notas de ${selectedDiscName || 'disciplina'} da turma ${turmaNome} foram salvas.`
         });
         router.refresh();
       }
@@ -256,7 +257,7 @@ export default function LancarNotasTurmaClient({
         const error = await response.json();
         setFeedbackModal({
           type: 'error',
-          text: error.message || 'Ocorreu um erro ao tentar salvar as notas. Verifique as informações.'
+          text: error.message || 'Não foi possível salvar as notas. Confira os valores e tente novamente.'
         });
       }
     } catch (error) {
@@ -347,6 +348,7 @@ export default function LancarNotasTurmaClient({
                 <Printer size={16} strokeWidth={1.75} /> <span className="hidden md:inline">Imprimir mapa</span>
               </a>
             )}
+            {podeLancar && disciplinaSelecionada && <IndicadorGravacao pendente={hasUnsavedChanges()} salvando={saving} salvoEm={salvoEm} className="hidden md:inline-flex" />}
             {podeLancar && hasUnsavedChanges() && (
               <Button onClick={handleSubmit} loading={saving} className="hidden md:inline-flex">
                 {!saving && <Save size={16} strokeWidth={1.75} />} {saving ? "Salvando…" : "Salvar notas"}
@@ -440,38 +442,39 @@ export default function LancarNotasTurmaClient({
           )}
 
           {disciplinaSelecionada && !podeLancar && (
-            <div className="p-3 flex items-center gap-2 border-b bg-canvas text-fg-muted border-line text-sm" role="status">
-              <AlertCircle size={16} />
-              <span>Somente leitura: apenas o professor da disciplina lança e altera notas.</span>
+            <div className="flex items-center gap-2 border-b border-line bg-info-subtle px-painel py-2.5 text-13 text-info-fg" role="status">
+              <Eye size={16} strokeWidth={1.75} aria-hidden />
+              <span><strong className="font-medium">Somente leitura.</strong> Apenas o professor da disciplina lança e altera notas; a direção e a administração visualizam.</span>
             </div>
           )}
 
           {/* disabled no fieldset bloqueia todos os campos quando é só leitura */}
-          <fieldset disabled={!podeLancar} className="contents">
+          {/* Só leitura: campos bloqueados com aparência de texto, sem os botões de marcar infrequente */}
+          <fieldset disabled={!podeLancar} className="contents [&_input:disabled]:cursor-default [&_input:disabled]:border-transparent [&_input:disabled]:bg-transparent [&_input:disabled]:text-fg [&_input:disabled]:opacity-100 [&_input:disabled]:shadow-none [&_button:disabled]:hidden">
           <div className="hidden overflow-x-auto md:block">
             <table className="w-full text-left">
               <thead className="bg-canvas border-b border-line-strong">
                 {esquema && !isSimples ? (
                   <>
                     <tr>
-                      <th rowSpan={2} className="px-6 py-4 text-xs font-medium text-fg-subtle w-12 text-center align-bottom">#</th>
-                      <th rowSpan={2} className="px-6 py-4 text-xs font-medium text-fg-subtle align-bottom">Estudante</th>
+                      <th rowSpan={2} className="px-3 py-2 text-rotulo font-medium text-fg-muted w-12 text-center align-bottom">#</th>
+                      <th rowSpan={2} className="px-3 py-2 text-rotulo font-medium text-fg-muted align-bottom">Estudante</th>
                       {esquema.unidades.map(u => (
-                        <th key={u.id} colSpan={u.atividades.length + 1} className="px-4 py-2 text-xs font-medium text-fg-subtle text-center border-l border-line">
+                        <th key={u.id} colSpan={u.atividades.length + 1} className="px-2 py-1.5 text-rotulo font-medium text-fg-muted text-center border-l border-line">
                           {u.nome}
                         </th>
                       ))}
-                      <th rowSpan={2} className="px-6 py-4 text-xs font-medium text-fg-subtle w-24 text-center align-bottom">Média</th>
+                      <th rowSpan={2} className="px-3 py-2 text-rotulo font-medium text-fg-muted w-24 text-center align-bottom">Média</th>
                     </tr>
                     <tr>
                       {esquema.unidades.map(u => (
                         <Fragment key={u.id}>
                           {u.atividades.map(a => (
-                            <th key={a.id} className="px-2 py-2 text-xs font-medium text-fg-subtle text-center border-l border-line-subtle w-20">
+                            <th key={a.id} className="px-2 py-1.5 text-rotulo font-medium text-fg-muted text-center border-l border-line-subtle w-20">
                               {a.nome} <span className="text-fg-disabled">({a.notaMaxima})</span>
                             </th>
                           ))}
-                          <th key={`${u.id}-subtotal`} className="px-2 py-2 text-xs font-bold text-fg-subtle text-center bg-subtle/60 w-16">
+                          <th key={`${u.id}-subtotal`} className="px-2 py-1.5 text-xs font-bold text-fg-subtle text-center bg-subtle/60 w-16">
                             Subtotal
                           </th>
                         </Fragment>
@@ -480,12 +483,12 @@ export default function LancarNotasTurmaClient({
                   </>
                 ) : (
                   <tr>
-                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle w-12 text-center">#</th>
-                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle">Estudante</th>
+                    <th className="px-3 py-2 text-rotulo font-medium text-fg-muted w-12 text-center">#</th>
+                    <th className="px-3 py-2 text-rotulo font-medium text-fg-muted">Estudante</th>
                     {(esquema?.unidades ?? []).map(u => (
-                      <th key={u.id} className="px-4 py-4 text-xs font-medium text-fg-subtle w-32 text-center">{u.nome}</th>
+                      <th key={u.id} className="px-2 py-1.5 text-rotulo font-medium text-fg-muted w-32 text-center">{u.nome}</th>
                     ))}
-                    <th className="px-6 py-4 text-xs font-medium text-fg-subtle w-24 text-center">Média</th>
+                    <th className="px-3 py-2 text-rotulo font-medium text-fg-muted w-24 text-center">Média</th>
                   </tr>
                 )}
               </thead>
@@ -519,11 +522,11 @@ export default function LancarNotasTurmaClient({
 
                     return (
                       <tr key={estudante.matricula} className={`hover:bg-canvas transition-colors ${isDesistenteGeral ? 'bg-warning-subtle grayscale-[0.5]' : ''}`}>
-                        <td className="px-6 py-4 text-sm text-fg-subtle font-medium text-center">{index + 1}</td>
-                        <td className="px-6 py-4">
+                        <td className="px-3 py-2 text-sm text-fg-subtle font-medium text-center">{index + 1}</td>
+                        <td className="px-3 py-2">
                           <div className="flex flex-col relative group/name">
                              <div className="flex items-center gap-2">
-                                <span className={`text-base font-medium ${isDesistenteGeral ? 'text-warning-fg' : 'text-fg-muted'}`}>{estudante.nome}</span>
+                                <span className={`text-sm font-medium ${isDesistenteGeral ? 'text-warning-fg' : 'text-fg'}`}>{estudante.nome}</span>
                                 {estudante.aeeProfile && (
                                    <Link
                                      href={`/dashboard/aee/${estudante.matricula}`}
@@ -538,7 +541,7 @@ export default function LancarNotasTurmaClient({
                                    </Link>
                                 )}
                              </div>
-                            <span className="text-xs font-medium text-fg-subtle">Matrícula: {estudante.matricula}</span>
+                            <span className="text-rotulo font-medium text-fg-muted">Matrícula: {estudante.matricula}</span>
                           </div>
                         </td>
                         {(esquema?.unidades ?? []).map((u) => {
@@ -551,13 +554,13 @@ export default function LancarNotasTurmaClient({
                             const isModified = val !== origVal && !saving
 
                             return (
-                              <td key={u.id} className="px-4 py-4 text-center">
+                              <td key={u.id} className="px-2 py-1.5 text-center">
                                 <div className="flex flex-col items-center gap-1.5 group relative">
                                   <input
                                     type="number" step="0.1" inputMode="decimal"
                                     value={val}
                                     onChange={(e) => atividade && handleAtividadeChange(estudante.matricula, u.id, atividade.id, e.target.value, atividade.notaMaxima)}
-                                    className={`w-14 h-9 text-center border-2 rounded-xl text-base font-medium transition-all outline-none ${
+                                    className={`w-14 h-8 text-center border rounded-md text-sm font-medium transition-all outline-none ${
                                       unidadeEstado.isDesistente ? 'bg-warning-subtle border-warning-line text-warning-fg' :
                                       isModified ? 'border-zinc-400 bg-surface ring-4 ring-zinc-500/5' : 'border-line bg-canvas focus:bg-surface focus:border-zinc-400'
                                     }`}
@@ -628,7 +631,7 @@ export default function LancarNotasTurmaClient({
                             </Fragment>
                           )
                         })}
-                        <td className="px-6 py-4 text-center">
+                        <td className="px-3 py-2 text-center">
                           <span className={`text-base font-medium ${getStatusColor(media)}`}>{media.texto}</span>
                         </td>
                       </tr>
@@ -726,7 +729,7 @@ export default function LancarNotasTurmaClient({
             )}
             {podeLancar && disciplinaSelecionada && filteredEstudantes.length > 0 && (
               <div className="fixed inset-x-0 bottom-[var(--barra-inferior)] z-30 border-t border-line bg-surface/95 px-4 pt-2 pb-3 backdrop-blur">
-                <p className="mb-2 text-center text-13 text-fg-muted" aria-live="polite">{hasUnsavedChanges() ? 'Há notas alteradas sem salvar' : 'Nenhuma alteração'}</p>
+                <p className="mb-2 text-center text-13 text-fg-muted" aria-live="polite">{hasUnsavedChanges() ? 'Há notas alteradas sem salvar' : salvoEm ? `Salvo às ${horaCurta(salvoEm)}` : 'Nenhuma alteração'}</p>
                 <Button onClick={handleSubmit} loading={saving} disabled={!hasUnsavedChanges()} className="h-12 w-full text-base">
                   {!saving && <Save size={18} strokeWidth={1.75} />} {saving ? 'Salvando…' : 'Salvar notas'}
                 </Button>
@@ -736,18 +739,12 @@ export default function LancarNotasTurmaClient({
           </fieldset>
 
           {podeLancar && disciplinaSelecionada && filteredEstudantes.length > 0 && (
-            <div className="hidden p-5 bg-canvas border-t border-line md:flex justify-end items-center gap-4">
-              <div className="hidden md:block">
-                 <p className="text-xs font-medium text-fg-subtle">Confira todas as notas antes de salvar o fechamento.</p>
-              </div>
-               <button
-                onClick={handleSubmit}
-                disabled={saving || !hasUnsavedChanges()}
-                className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-8 py-3 rounded-lg font-medium text-sm shadow-card transition-all active:scale-95 disabled:opacity-50"
-              >
-                {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save size={18} />}
-                {saving ? 'SINCRONIZANDO...' : 'SALVAR NOTAS'}
-              </button>
+            <div className="sticky bottom-0 z-10 hidden items-center justify-end gap-4 border-t border-line bg-surface/95 px-painel py-2.5 backdrop-blur md:flex">
+              <IndicadorGravacao pendente={hasUnsavedChanges()} salvando={saving} salvoEm={salvoEm} className="mr-auto" />
+              <p className="text-13 text-fg-subtle">Confira as notas antes de salvar.</p>
+              <Button onClick={handleSubmit} loading={saving} disabled={!hasUnsavedChanges()}>
+                {!saving && <Save size={16} strokeWidth={1.75} aria-hidden />} {saving ? 'Salvando…' : 'Salvar notas'}
+              </Button>
             </div>
           )}
         </div>

@@ -3,7 +3,7 @@
 import { useEffect, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { Ban, CalendarDays, CalendarRange, Check, Copy, MessageSquareText, MoreVertical, Save, Users } from "lucide-react"
-import { Alert, Avatar, BottomSheet, Button, Card, EmptyState, Label, SkeletonRows, Textarea, cn } from "@/components/ui"
+import { Alert, Avatar, BottomSheet, Button, Card, EmptyState, IndicadorGravacao, Label, SkeletonRows, Textarea, cn } from "@/components/ui"
 import { Menu } from "@/components/ui/Menu"
 import { rotuloTempos } from "@/lib/services/inicio-professor"
 import type { DiaDoCalendario } from "@/lib/services/calendario-disciplina"
@@ -47,6 +47,9 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
   // Destinos possíveis do "Salvar e replicar" (mesma disciplina do professor em outras turmas)
   const [podeReplicar, setPodeReplicar] = useState(false)
   const [replicar, setReplicar] = useState<AlvoReplicacao[] | null>(null)
+  // Indicador de gravação: retrato do que está salvo (faltas + conteúdo)
+  const [gravado, setGravado] = useState<string | null>(null)
+  const [salvoEm, setSalvoEm] = useState<Date | null>(null)
 
   useEffect(() => {
     let ativo = true
@@ -57,6 +60,7 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
       setFaltas(r.faltas)
       setObservacoes(r.observacoes)
       setConteudo(r.aula.conteudo)
+      setGravado(JSON.stringify([r.faltas, r.aula.conteudo]))
       if (r.disciplina) opcoesReplicacao(r.aula.id).then((o) => { if (ativo && !("erro" in o)) setPodeReplicar(o.alvos.length > 0) })
     })
     return () => { ativo = false }
@@ -66,6 +70,7 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
   const porTempo = temposDaAula.length >= 2
   const totalFaltas = Object.keys(faltas).length
   const totalPresentes = (chamada?.alunos.length ?? 0) - totalFaltas
+  const alteracoesPendentes = gravado !== null && JSON.stringify([faltas, conteudo]) !== gravado
 
   /** Toque no cartão: presente <-> faltou (em todos os tempos). */
   const alternar = (id: string) => setFaltas((prev) => {
@@ -91,6 +96,8 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
     const r = await salvarChamada(chamada.aula.id, lista, conteudo)
     if ("erro" in r) { setAviso({ tipo: "erro", texto: r.erro }); return false }
     setChamada({ ...chamada, aula: { ...chamada.aula, situacao: "REALIZADA", conteudo: conteudo.trim() } })
+    setGravado(JSON.stringify([faltas, conteudo]))
+    setSalvoEm(new Date())
     setAviso({ tipo: "ok", texto: `Chamada salva: ${lista.length === 0 ? "todos presentes" : `${lista.length} ${lista.length === 1 ? "falta" : "faltas"}`}.` })
     router.refresh()
     return true
@@ -136,19 +143,19 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
   }
 
   return (
-    <div className={cn("mx-auto", calendario ? "max-w-5xl md:grid md:grid-cols-[15rem_minmax(0,1fr)] md:items-start md:gap-6" : "max-w-3xl")}>
+    <div className={cn(calendario ? "md:grid md:grid-cols-[15rem_minmax(0,1fr)] md:items-start md:gap-5 xl:grid-cols-[16rem_minmax(0,1fr)]" : "mx-auto max-w-3xl md:mx-0 md:max-w-none")}>
       {/* Desktop: meses empilhados numa coluna à esquerda (como no SIGEduc) */}
       {calendario && (
-        <aside aria-label="Calendário da disciplina" className="sticky top-20 hidden max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-2xl border border-line bg-surface p-3 shadow-card md:block">
+        <aside aria-label="Calendário da disciplina" className="sticky top-16 hidden max-h-[calc(100dvh-5rem)] overflow-y-auto rounded-2xl border border-line bg-surface p-3 shadow-card md:block">
           <CalendarioDisciplina dias={calendario.dias} linkBase={calendario.linkBase} selecionada={data} hoje={hoje} modo="coluna" />
         </aside>
       )}
-    <div className="min-w-0 space-y-4 pb-32 md:space-y-5 md:pb-6">
+    <div className="min-w-0 space-y-4 pb-32 md:pb-6">
       {/* Dados da turma */}
-      <section aria-label="Dados da aula" className="rounded-2xl border border-line bg-surface p-4 shadow-card md:p-5">
+      <section aria-label="Dados da aula" className="rounded-2xl border border-line bg-surface p-4 shadow-card md:px-painel md:py-3">
         <div className="flex items-start gap-3">
           <div className="min-w-0 flex-1">
-            <h1 className="break-words text-xl font-semibold leading-snug text-fg md:text-2xl">
+            <h1 className="break-words text-xl font-semibold leading-snug text-fg">
               {chamada ? (chamada.disciplina?.nome ?? "Chamada diária") : "Chamada"}
             </h1>
             <p className="mt-1 text-sm text-fg-muted">
@@ -194,21 +201,21 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
           {chamada.alunos.length === 0 ? (
             <Card><EmptyState icon={Users} title="Nenhum aluno nesta turma" description="Cadastre os estudantes da turma para fazer a chamada." /></Card>
           ) : (
-            <ul className="space-y-2" aria-label="Alunos">
+            <ul className="space-y-2 md:space-y-0 md:divide-y md:divide-line-subtle md:overflow-hidden md:rounded-painel md:border md:border-line md:bg-surface" aria-label="Alunos">
               {chamada.alunos.map((a) => {
                 const falta = faltas[a.id]
                 const just = chamada.justificados[a.id]
                 const obs = observacoes[a.id]
                 return (
-                  <li key={a.id} className={cn("rounded-2xl border transition-colors duration-150", falta ? "border-danger-line bg-danger-subtle" : "border-line bg-surface")}>
+                  <li key={a.id} className={cn("rounded-2xl border transition-colors duration-150 md:rounded-none md:border-0", falta ? "border-danger-line bg-danger-subtle" : "border-line bg-surface")}>
                     <div className="flex items-stretch">
                       <button
                         type="button"
                         onClick={() => alternar(a.id)}
                         aria-pressed={!!falta}
-                        className="flex min-h-16 min-w-0 flex-1 items-center gap-3 rounded-l-2xl py-3 pl-4 pr-2 text-left"
+                        className="flex min-h-16 min-w-0 flex-1 items-center gap-3 rounded-l-2xl py-3 pl-4 pr-2 text-left md:min-h-11 md:rounded-none md:py-1.5 md:pl-painel"
                       >
-                        <Avatar nome={a.nome} size="md" />
+                        <Avatar nome={a.nome} size="md" className="md:size-7 md:text-[11px]" />
                         <span className="min-w-0 flex-1">
                           <span className={cn("block break-words text-sm font-medium", falta ? "text-danger-fg" : "text-fg")}>{a.nome}</span>
                           <span className="flex flex-wrap items-center gap-x-1.5 text-xs text-fg-subtle">
@@ -225,13 +232,13 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
                         type="button"
                         onClick={() => setObsAberta({ id: a.id, nome: a.nome, texto: obs ?? "" })}
                         aria-label={obs ? `Observação de ${a.nome} (preenchida)` : `Adicionar observação para ${a.nome}`}
-                        className={cn("flex w-12 shrink-0 items-center justify-center rounded-r-2xl transition-colors duration-150", obs ? "text-accent-fg" : "text-fg-subtle hover:text-fg")}
+                        className={cn("flex w-12 shrink-0 items-center justify-center rounded-r-2xl transition-colors duration-150 md:rounded-none", obs ? "text-accent-fg" : "text-fg-subtle hover:text-fg")}
                       >
                         <MessageSquareText size={18} strokeWidth={obs ? 2.25 : 1.75} aria-hidden />
                       </button>
                     </div>
                     {falta && porTempo && (
-                      <div role="group" aria-label={`Tempos em que ${a.nome} faltou`} className="flex flex-wrap items-center gap-2 px-4 pb-3">
+                      <div role="group" aria-label={`Tempos em que ${a.nome} faltou`} className="flex flex-wrap items-center gap-2 px-4 pb-3 md:pb-2 md:pl-[3.75rem]">
                         <span className="text-xs text-danger-fg">Faltou em:</span>
                         {temposDaAula.map((t) => {
                           const marcado = falta.tempos.includes(t)
@@ -242,7 +249,7 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
                               aria-pressed={marcado}
                               aria-label={`${t}º tempo: ${marcado ? "faltou" : "presente"}`}
                               onClick={() => alternarTempo(a.id, t)}
-                              className={cn("flex h-9 min-w-12 items-center justify-center gap-1 rounded-full border px-3 text-13 font-medium transition-colors duration-150", marcado ? "border-danger-line bg-surface text-danger-fg" : "border-line bg-transparent text-fg-subtle line-through")}
+                              className={cn("flex h-9 min-w-12 items-center justify-center gap-1 rounded-full border px-3 text-13 font-medium transition-colors duration-150 md:h-7 md:min-w-10", marcado ? "border-danger-line bg-surface text-danger-fg" : "border-line bg-transparent text-fg-subtle line-through")}
                             >
                               {t}º
                             </button>
@@ -250,14 +257,14 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
                         })}
                       </div>
                     )}
-                    {obs && <p className="break-words px-4 pb-3 text-13 text-fg-muted"><span className="sr-only">Observação: </span>{obs}</p>}
+                    {obs && <p className="break-words px-4 pb-3 text-13 text-fg-muted md:pb-2 md:pl-[3.75rem]"><span className="sr-only">Observação: </span>{obs}</p>}
                   </li>
                 )
               })}
             </ul>
           )}
 
-          <section className="rounded-2xl border border-line bg-surface p-4 shadow-card md:p-5">
+          <section className="rounded-2xl border border-line bg-surface p-4 shadow-card md:px-painel md:py-3">
             <Label htmlFor="conteudo">Conteúdo ministrado</Label>
             <Textarea id="conteudo" className="mt-2" value={conteudo} onChange={(e) => setConteudo(e.target.value)} rows={3} maxLength={5000} placeholder="Ex.: Equações do 1º grau — resolução de exercícios" />
             {podeReplicar && (
@@ -272,7 +279,8 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
 
           {/* Rodapé fixo acima da barra inferior (a lista tem padding equivalente); no desktop gruda no fim da área */}
           <div className="fixed inset-x-0 bottom-[var(--barra-inferior)] z-30 border-t border-line bg-surface/95 px-4 pt-2 pb-3 backdrop-blur md:sticky md:bottom-4 md:rounded-2xl md:border md:px-4 md:py-3 md:shadow-overlay">
-            <div className="mx-auto flex max-w-3xl flex-col gap-2 md:flex-row md:items-center">
+            <div className="mx-auto flex max-w-3xl flex-col gap-2 md:max-w-none md:flex-row md:items-center">
+              <IndicadorGravacao pendente={alteracoesPendentes} salvando={pendente} salvoEm={salvoEm} className="hidden md:inline-flex" />
               <p className="text-center text-13 text-fg-muted tabular-nums md:flex-1 md:text-left" aria-live="polite">
                 <span className="font-semibold text-fg">{totalPresentes}</span> {totalPresentes === 1 ? "presente" : "presentes"} · <span className={cn("font-semibold", totalFaltas ? "text-danger-fg" : "text-fg")}>{totalFaltas}</span> {totalFaltas === 1 ? "falta" : "faltas"}
               </p>

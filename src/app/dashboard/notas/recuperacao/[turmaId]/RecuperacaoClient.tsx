@@ -1,5 +1,6 @@
 "use client"
 
+import { IndicadorGravacao } from "@/components/ui"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -16,8 +17,7 @@ import {
   Search,
   Loader2,
   TrendingDown,
-  AlertTriangle
-} from "lucide-react"
+  AlertTriangle, Eye } from "lucide-react"
 
 interface NotaRecuperacao {
   id: string
@@ -57,6 +57,7 @@ export default function RecuperacaoTurmaClient({
   const podeLancar = disciplinasLecionadas.includes(disciplinaSelecionada)
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [salvoEm, setSalvoEm] = useState<Date | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   
   const [notas, setNotas] = useState<Record<string, string>>(() => {
@@ -91,9 +92,9 @@ export default function RecuperacaoTurmaClient({
       const relevantNotaIds = new Set(notasRecuperacao.filter(n => n.disciplinaId === disciplinaSelecionada).map(n => n.id))
       const notasArray = Object.entries(notas).filter(([id]) => relevantNotaIds.has(id)).map(([notaId, val]) => ({ notaId, notaRecuperacao: parseFloat(val) })).filter(n => !isNaN(n.notaRecuperacao))
       const response = await fetch('/api/notas/recuperacao', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ notas: notasArray }) })
-      if (response.ok) { setMessage({ type: 'success', text: 'Notas salvas!' }); setOriginalNotas(JSON.parse(JSON.stringify(notas))); router.refresh(); }
-      else { const error = await response.json(); setMessage({ type: 'error', text: error.message || 'Erro ao salvar' }); }
-    } catch (error) { setMessage({ type: 'error', text: 'Erro de conexão' }) } finally { setSaving(false) }
+      if (response.ok) { setMessage({ type: 'success', text: 'Notas de recuperação salvas.' }); setOriginalNotas(JSON.parse(JSON.stringify(notas))); setSalvoEm(new Date()); router.refresh(); }
+      else { const error = await response.json(); setMessage({ type: 'error', text: error.message || 'Não foi possível salvar. Tente novamente.' }); }
+    } catch (error) { setMessage({ type: 'error', text: 'Não foi possível conectar ao servidor. Tente novamente.' }) } finally { setSaving(false) }
   }
 
   const disciplineObj = disciplinas.find(d => d.id === disciplinaSelecionada)
@@ -214,7 +215,11 @@ export default function RecuperacaoTurmaClient({
                <Users size={20} className="text-fg-subtle" />
                Painel de Recuperação Final
             </h2>
-            {disciplinaSelecionada && !podeLancar && <span className="text-13 text-fg-muted" role="status">Somente leitura: só o professor da disciplina grava</span>}
+            {disciplinaSelecionada && !podeLancar && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-info-subtle px-2.5 py-0.5 text-13 text-info-fg" role="status">
+                <Eye size={14} strokeWidth={1.75} aria-hidden /> Somente leitura: apenas o professor da disciplina grava
+              </span>
+            )}
             <div className="relative max-w-xs w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-subtle" />
               <input
@@ -299,6 +304,7 @@ export default function RecuperacaoTurmaClient({
                             disabled={!podeLancar || isFaltou || nota.status === 'DESISTENTE'}
                             onChange={(e) => handleNotaChange(nota.id, e.target.value)}
                              className={`w-16 h-9 text-center border-2 rounded-xl text-base font-medium transition-all outline-none ${
+                                 !podeLancar ? 'cursor-default border-transparent bg-transparent text-fg' :
                                  isFaltou || nota.status === 'DESISTENTE' ? 'bg-subtle-hover border-line text-fg-disabled pointer-events-none' : 
                                  isModified ? 'border-danger bg-surface ring-4 ring-danger/30 shadow-sm' : 'border-line bg-canvas focus:bg-surface focus:border-danger'
                              }`}
@@ -326,18 +332,19 @@ export default function RecuperacaoTurmaClient({
             </table>
           </div>
 
-          {disciplinaSelecionada && filteredNotas.length > 0 && (
-            <div className="p-5 bg-canvas border-t border-line flex justify-end items-center gap-4">
+          {podeLancar && disciplinaSelecionada && filteredNotas.length > 0 && (
+            <div className="flex items-center justify-end gap-4 border-t border-line bg-canvas px-painel py-3">
+              <IndicadorGravacao pendente={hasUnsavedChanges()} salvando={saving} salvoEm={salvoEm} className="mr-auto" />
               <div className="hidden md:block">
                  <p className="text-xs font-medium text-fg-subtle">Confirme o lançamento para substituir a média anual automática.</p>
               </div>
                <button
                 onClick={handleSubmit}
                 disabled={!podeLancar || saving || !hasUnsavedChanges()}
-                className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-8 py-3 rounded-lg font-medium text-sm shadow-card transition-all active:scale-95 disabled:opacity-50"
+                className="flex h-9 items-center gap-2 rounded-md bg-accent px-3.5 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover disabled:opacity-50"
               >
-                {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save size={18} />}
-                {saving ? 'SINCRONIZANDO...' : 'SALVAR RECUPERAÇÃO FINAL'}
+                {saving ? <Loader2 className="size-4 animate-spin" /> : <Save size={16} strokeWidth={1.75} />}
+                {saving ? 'Salvando…' : 'Salvar recuperação final'}
               </button>
             </div>
           )}

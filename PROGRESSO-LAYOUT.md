@@ -32,10 +32,12 @@ servidor de desenvolvimento recarrega as mudanças em andamento.
 
 ## Próximo passo exato
 
-Etapa 4 em andamento. Feitas: turmas, estudantes, usuários. Próxima:
-disciplinas (`src/app/dashboard/disciplinas/page.tsx`), depois resultados,
-frequência/infrequência, conselho, lançamento de notas, chamada e diário
-(desktop), mensagens, ocorrências, AEE, provas/questões/simulados,
+Etapa 4 em andamento. Feitas: turmas, estudantes, usuários, disciplinas,
+resultados, conselho (lista), frequência (via PageHeader → CabecalhoPagina),
+lançamento de notas, recuperação (modo leitura), chamada (desktop). O
+indicador de gravação (etapa 5) já está em notas, recuperação, chamada e
+ficha AEE. Próximas: listas de notas/recuperação/chamada (escolha de turma),
+mensagens, ocorrências, AEE (painel), provas/questões/simulados,
 configurações e dashboard em grade.
 
 ## Etapa 1 — o que foi feito
