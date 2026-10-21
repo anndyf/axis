@@ -327,3 +327,51 @@ for a versão de lançamento para as escolas).
 Decisão sem confirmação: folha em paisagem. Em retrato a largura útil da A4
 (~700px) cai no layout do celular (cartões em vez de tabela); em paisagem
 (~1030px) sai a tabela do desktop, que é o que se espera no papel.
+
+## Para validar localmente
+
+Ambiente: `npm ci`, PostgreSQL local com `axis_dev`, `.env` local,
+`npx prisma migrate deploy` (há uma migration nova, aditiva:
+`20261022120000_acesso_anterior`), seeds de `LOGINS_TESTE.md`, `npm run dev`.
+Entre como `direcao` / `direcao123` e como `professor` / `professor123`.
+
+Capturas: antes em `docs/capturas/layout-sistema/0-antes/`, depois em
+`docs/capturas/layout-sistema/9-final/` (mesmos nomes; 1440, 1280 e 375px;
+sufixo `-escuro` no tema escuro). Intermediárias em `2-3-casca-e-fichas/`;
+folhas de impressão em `8-impressao/`.
+
+Telas para conferir (desktop claro e escuro, e celular):
+1. Casca: barra superior (escola, "Ano letivo 2026" só exibido, perfil com
+   o seletor de visão, busca/Ctrl+K, notificações, usuário), menu lateral
+   compacto, conteúdo na largura toda, rodapé com versão e links.
+2. Turmas → uma turma: ficha com abas (Visão geral, Estudantes, Disciplinas,
+   Horário, Notas, Resultados, Frequência, Ocorrências) e rodapé de criação.
+3. Estudantes → um estudante: Dados em modo leitura com "Editar", Notas e
+   frequência, AEE (estudante com ficha), Histórico (direção), Imprimir.
+4. Usuários → um usuário: Dados e papéis, Disciplinas e turmas, Histórico.
+5. Ficha AEE: leitura em painéis, "Editar ficha" em seções numeradas com
+   barra de salvar fixa e telefone com máscara.
+6. Listas: turmas, estudantes, usuários (seleção em lote), disciplinas,
+   ocorrências — busca, fichas de filtro, ordenação por coluna, colunas
+   visíveis (lembradas no navegador), exportar CSV.
+7. Lançamento de notas, recuperação e chamada: como professor (grava, com
+   "Alterações não salvas" / "Salvo às …") e como direção (somente
+   leitura: aviso, campos com aparência de leitura, sem salvar).
+8. Diário, resultados da turma e frequência: botão Imprimir (A4 paisagem,
+   cabeçalho com escola e data/hora, "Página X de Y").
+9. Depois de sair e entrar de novo: aviso "Seu último acesso foi em …".
+10. Botão "?" ao lado do título das telas principais; páginas Novidades,
+    Suporte, Termos de uso e Privacidade (texto provisório marcado).
+11. Vitrine `/dashboard/ui` com os componentes novos.
+
+Componentes novos (`src/components/ui`): `Painel`, `BarraFerramentas`,
+`Abas`, `CabecalhoPagina`, `ListaDescritiva`, `Tabela` revisada
+(`TH` ordenável, `RodapeTabela`), `IndicadorGravacao`, `RodapeRastreio`,
+`BarraSalvar`, `SeletorColunas` + `useColunasVisiveis`, `AjudaTela`,
+`CaminhoAutomatico`, `BotaoImprimir` + `CabecalhoImpressao`. Fora de `ui`:
+`DashboardTopbar` (barra de contexto), `RodapeSistema`, `AvisoUltimoAcesso`,
+`TabelaEstudantes`, `ListaDeTurmas`.
+
+Decisões tomadas sem confirmação: itens 1 a 6 em "Decisões" acima e as das
+etapas 5 a 8 (onde faltaria gravar autor, folha de impressão em paisagem,
+sugestão de versão 0.2.0 sem alterar o package.json).
