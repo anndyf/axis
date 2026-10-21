@@ -16,7 +16,7 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 - Nada no momento. As retomadas agendadas de 21/10 já dispararam (a das 00:00–06:00 concluiu a etapa 8 e abriu o PR #17).
 
 **Esperando merge da dona do produto**
-- **PR #17 — layout de sistema** (já inclui a regra "só quem leciona grava"; mergear o #17 basta, a branch `regra/so-docente-grava` entra junto): https://github.com/anndyf/axis/pull/17. Validado localmente em 21/10. Merge recomendado logo: corrige um vazamento de hash de senha que existe hoje na main (tela "Vincular disciplinas").
+- Branch `versao/0.2.0`: número da versão 0.1.0 → 0.2.0 (rodapé e tela Novidades). https://github.com/anndyf/axis/pull/new/versao/0.2.0
 
 **Pronto para iniciar quando quiser**
 - Sessão de lógica (depois do layout): fechamento de unidade com cadeado em notas e chamadas, reabertura pela direção auditada. Instrução ainda a escrever.
@@ -27,14 +27,13 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 **Esperando decisão da dona do produto**
 - As 20 decisões de `docs/arquitetura/decisoes.md`. As 5 mais urgentes: D-03 (público-alvo), D-01 (núcleo e módulos), D-14 (quando a CETEP migra para matrícula por ano), D-06 (etapas de ensino no lançamento), D-04 (redes agora ou depois).
 - Preços dos planos (a fase 2 criou os planos com preço zerado).
-- Número da versão do sistema que aparece no rodapé (hoje 0.1.0; a sessão do layout sugere 0.2.0).
 
 **Defeitos conhecidos (a corrigir em sessão própria)**
 - Abrir pelo endereço uma tela sem permissão mostra "Application error" em vez de voltar ao início (React: "Rendered more hooks than during the previous render" no Router do Next ao redirecionar). Já existe na main; visto no modo desenvolvimento, falta conferir no build de produção.
 - Fuso de horário em gravações feitas direto em SQL: o `logAudit` grava o horário de Brasília como se fosse UTC (o Histórico compensa na tela) e `updated_at = NOW()` em `api/turmas/[id]` e `api/usuarios/[id]` grava a hora local do banco. O último acesso já foi corrigido no PR #17.
 
 **Próximos passos**
-1. Merge do PR #17.
+1. Merge da branch `versao/0.2.0`.
 2. Sessão de lógica: cadeado de unidade encerrada (instrução a escrever) + os defeitos conhecidos acima.
 3. Fase 3c depois: remover os booleanos de User, tirar a conta da plataforma da escola, trocar as consultas que ainda filtram por booleano (ex.: destinatários de comunicados).
 4. Fases seguintes do roteiro conforme as decisões.
@@ -45,6 +44,8 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 ## Histórico
 
 ### 21/10/2026
+- PR #17 (layout de sistema + regra "só quem leciona grava") mergeado na main.
+- Versão decidida: 0.2.0 (branch `versao/0.2.0`, esperando merge; tsc 0 erros, 562 testes).
 - Sessão do layout de sistema concluída na nuvem (PR #17); a retomada agendada terminou a etapa 8 (impressão) depois que a sessão principal parou pelo limite. Inclui a regra "só quem leciona grava".
 - Validação local do PR #17: migration `20261022120000_acesso_anterior` só acrescenta uma coluna; tsc 0 erros; 562 testes passando; lógica de acesso e rotas de API idênticas à regra já validada; varredura com direção, professor e AEE em 26 telas, a 1440px e 375px (156 aberturas): todas 200, sem erro de JavaScript, sem rolagem horizontal; celular continua com cara de app. Aba Histórico restrita à escola e à permissão da auditoria; aba AEE só com módulo, ficha e permissão.
 - Duas correções feitas na validação e enviadas ao PR #17: (1) o último acesso gravava a hora com 3h de diferença quando o banco não está em UTC (`NOW()` numa coluna sem fuso) — teste agora confere os dois sentidos; (2) a aba Ocorrências da turma e o livro de ocorrências quebravam ("ocorrencias.map is not a function") quando abertos pelo endereço por quem não tem a permissão (ex.: AEE) — agora redirecionam.
