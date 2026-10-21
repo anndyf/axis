@@ -16,7 +16,7 @@ export interface VersaoNovidades {
 
 export const NOVIDADES: VersaoNovidades[] = [
   {
-    versao: '0.1.0',
+    versao: '0.2.0',
     rotulo: 'Versão atual',
     entregas: [
       {
