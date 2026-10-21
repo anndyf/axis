@@ -403,3 +403,51 @@ export async function numerosDaEscola(escolaId: string, anoLetivo: number) {
   ])
   return { turmas, estudantes, professores, disciplinas }
 }
+
+export interface AvisoCadeado {
+  chave: string
+  tipo: 'encerra' | 'reaberta'
+  titulo: string
+  subtitulo: string
+  /** YYYY-MM-DD: dia em que encerra / último dia da reabertura */
+  data: string
+}
+
+/**
+ * Cadeado no painel da gestão: unidades que encerram sozinhas nos próximos
+ * 7 dias (dia seguinte ao prazo, ainda não encerradas à mão) e reaberturas
+ * ativas. Só nomes de unidade, turma e disciplina.
+ */
+export async function avisosDoCadeado(escolaId: string, anoLetivo: number, limite = 8): Promise<AvisoCadeado[]> {
+  const hojeTexto = hojeNaEscola()
+  const hoje = new Date(`${hojeTexto}T00:00:00Z`)
+  // encerra em prazo + 1 ≤ hoje + 7  ⇔  hoje ≤ prazo ≤ hoje + 6
+  const ate = new Date(hoje.getTime() + 6 * 86_400_000)
+  const [etapas, reaberturas] = await Promise.all([
+    prisma.etapaCalendario.findMany({
+      where: { periodoLetivo: { escolaId, anoLetivo }, encerradaEm: null, prazoLancamento: { gte: hoje, lte: ate } },
+      orderBy: { prazoLancamento: 'asc' },
+      take: limite,
+      select: { id: true, prazoLancamento: true, esquemaUnidade: { select: { nome: true, esquema: { select: { nome: true } } } } },
+    }),
+    prisma.reaberturaUnidade.findMany({
+      where: { escolaId, revogadaEm: null, ate: { gte: hoje }, etapaCalendario: { periodoLetivo: { escolaId, anoLetivo } } },
+      orderBy: { ate: 'asc' },
+      take: limite,
+      select: { id: true, ate: true, turma: { select: { nome: true } }, disciplina: { select: { nome: true } }, etapaCalendario: { select: { esquemaUnidade: { select: { nome: true } } } } },
+    }),
+  ])
+  const avisos: AvisoCadeado[] = [
+    ...etapas.map((e) => {
+      const encerra = chaveData(new Date(e.prazoLancamento!.getTime() + 86_400_000))
+      return { chave: `e-${e.id}`, tipo: 'encerra' as const, titulo: `${e.esquemaUnidade.nome} encerra (${e.esquemaUnidade.esquema.nome})`, subtitulo: 'Encerramento automático pelo prazo', data: encerra }
+    }),
+    ...reaberturas.map((r) => ({
+      chave: `r-${r.id}`, tipo: 'reaberta' as const,
+      titulo: `${r.turma.nome} · ${r.disciplina?.nome ?? 'Chamada diária'}`,
+      subtitulo: `${r.etapaCalendario.esquemaUnidade.nome} reaberta`,
+      data: chaveData(r.ate),
+    })),
+  ]
+  return avisos.sort((a, b) => a.data.localeCompare(b.data)).slice(0, limite)
+}

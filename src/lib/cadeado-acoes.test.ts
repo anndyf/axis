@@ -363,3 +363,21 @@ describe('avaliações do professor (esquema com atividades definidas pelo profe
     await prisma.etapaCalendario.deleteMany({ where: { esquemaUnidade: { esquemaId: esquema.id } } })
   })
 })
+
+describe('painel da gestão', () => {
+  it('lista as unidades que encerram em até 7 dias e as reaberturas ativas, só da escola', async () => {
+    const { avisosDoCadeado } = await import('@/lib/services/painel-leitura')
+    await prisma.etapaCalendario.update({ where: { id: B.etapas[1] }, data: { prazoLancamento: new Date('2026-10-25') } })
+    const g = await gestao()
+    como(B, 'coord')
+    expect(await g.reabrirUnidade({ etapaId: B.etapas[0], turmaId: B.turma, disciplinaId: B.mat, ate: '2026-10-23', motivo: 'ajuste de notas' })).toEqual({ ok: true })
+    const avisos = await avisosDoCadeado(B.escola, 2026)
+    expect(avisos.map((a) => [a.tipo, a.titulo, a.data])).toEqual([
+      ['reaberta', 'TB · Mat B', '2026-10-23'],
+      ['encerra', '2ª Unidade encerra (3 Unidades (Legado))', '2026-10-26'],
+    ])
+    // A 3ª de B encerra em 21/12: fora da janela; nada de A aparece
+    expect(avisos.some((a) => a.titulo.includes(' A'))).toBe(false)
+    await prisma.etapaCalendario.update({ where: { id: B.etapas[1] }, data: { prazoLancamento: new Date('2026-10-30') } })
+  })
+})
