@@ -13,16 +13,12 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 ## Agora
 
 **Rodando na nuvem**
-- Sessão do layout de sistema (8 etapas), iniciada em 20/10 ~22:30: branch `estilo/layout-sistema`. Ela incorpora a branch `regra/so-docente-grava` se esta ainda não estiver na main.
-- Retomadas automáticas agendadas (21/10, horário de Brasília) para o caso de a sessão parar pelo limite: 00:00, 02:00, 04:00 e 06:00. Cada uma confere antes de agir: sem branch = começa; `STATUS: CONCLUÍDO` = não faz nada; commit há menos de 45 min = sai sem mexer; senão continua do PROGRESSO-LAYOUT.md. Rotinas em https://claude.ai/code/routines (trig_01CBgqNsGHTE1jj6rpn8JKv4, trig_018r37jUtcxWMTC3vmpyieSa, trig_01KdzdZWAUzeqVQpjaT5RjZX, trig_01A7DnwtqkwVZ1c4Dvf7HeHf).
+- Nada no momento. As retomadas agendadas de 21/10 já dispararam (a das 00:00–06:00 concluiu a etapa 8 e abriu o PR #17).
 
 **Esperando merge da dona do produto**
-- Branch `regra/so-docente-grava`: só quem leciona grava nota e chamada; Direção e Administrador visualizam. Validada (541 testes, conferida ao vivo). https://github.com/anndyf/axis/compare/main...regra/so-docente-grava
-
+- **PR #17 — layout de sistema** (já inclui a regra "só quem leciona grava"; mergear o #17 basta, a branch `regra/so-docente-grava` entra junto): https://github.com/anndyf/axis/pull/17. Validado localmente em 21/10. Merge recomendado logo: corrige um vazamento de hash de senha que existe hoje na main (tela "Vincular disciplinas").
 
 **Pronto para iniciar quando quiser**
-- Layout com cara de sistema no computador + tipografia etapa 2 + rastreabilidade visível, formulários/tabelas com rigor, acabamento de produto e impressão (uma sessão, 8 etapas): instrução em `sessoes-nuvem/layout-sistema.md`, prévia em `sessoes-nuvem/previa-layout.html`. Disparar DEPOIS do merge da fase 3a+3b.
-
 - Sessão de lógica (depois do layout): fechamento de unidade com cadeado em notas e chamadas, reabertura pela direção auditada. Instrução ainda a escrever.
 
 **Para elaborar no futuro (pedido da dona do produto)**
@@ -31,10 +27,15 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 **Esperando decisão da dona do produto**
 - As 20 decisões de `docs/arquitetura/decisoes.md`. As 5 mais urgentes: D-03 (público-alvo), D-01 (núcleo e módulos), D-14 (quando a CETEP migra para matrícula por ano), D-06 (etapas de ensino no lançamento), D-04 (redes agora ou depois).
 - Preços dos planos (a fase 2 criou os planos com preço zerado).
-- Número da versão do sistema que aparecerá no rodapé (hoje 0.1.0).
+- Número da versão do sistema que aparece no rodapé (hoje 0.1.0; a sessão do layout sugere 0.2.0).
+
+**Defeitos conhecidos (a corrigir em sessão própria)**
+- Abrir pelo endereço uma tela sem permissão mostra "Application error" em vez de voltar ao início (React: "Rendered more hooks than during the previous render" no Router do Next ao redirecionar). Já existe na main; visto no modo desenvolvimento, falta conferir no build de produção.
+- Fuso de horário em gravações feitas direto em SQL: o `logAudit` grava o horário de Brasília como se fosse UTC (o Histórico compensa na tela) e `updated_at = NOW()` em `api/turmas/[id]` e `api/usuarios/[id]` grava a hora local do banco. O último acesso já foi corrigido no PR #17.
 
 **Próximos passos**
-1. Disparar a sessão do layout de sistema (8 etapas, instrução em `sessoes-nuvem/layout-sistema.md`).
+1. Merge do PR #17.
+2. Sessão de lógica: cadeado de unidade encerrada (instrução a escrever) + os defeitos conhecidos acima.
 3. Fase 3c depois: remover os booleanos de User, tirar a conta da plataforma da escola, trocar as consultas que ainda filtram por booleano (ex.: destinatários de comunicados).
 4. Fases seguintes do roteiro conforme as decisões.
 5. Em produção (quando houver): `prisma migrate deploy`, depois `npx tsx prisma/backfill/fase-2.ts` e `npx tsx prisma/backfill/fase-3a.ts`, com backup verificado.
@@ -42,6 +43,13 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 ---
 
 ## Histórico
+
+### 21/10/2026
+- Sessão do layout de sistema concluída na nuvem (PR #17); a retomada agendada terminou a etapa 8 (impressão) depois que a sessão principal parou pelo limite. Inclui a regra "só quem leciona grava".
+- Validação local do PR #17: migration `20261022120000_acesso_anterior` só acrescenta uma coluna; tsc 0 erros; 562 testes passando; lógica de acesso e rotas de API idênticas à regra já validada; varredura com direção, professor e AEE em 26 telas, a 1440px e 375px (156 aberturas): todas 200, sem erro de JavaScript, sem rolagem horizontal; celular continua com cara de app. Aba Histórico restrita à escola e à permissão da auditoria; aba AEE só com módulo, ficha e permissão.
+- Duas correções feitas na validação e enviadas ao PR #17: (1) o último acesso gravava a hora com 3h de diferença quando o banco não está em UTC (`NOW()` numa coluna sem fuso) — teste agora confere os dois sentidos; (2) a aba Ocorrências da turma e o livro de ocorrências quebravam ("ocorrencias.map is not a function") quando abertos pelo endereço por quem não tem a permissão (ex.: AEE) — agora redirecionam.
+- Confirmado que o PR #17 fecha um vazamento existente na main: a tela "Vincular disciplinas" enviava ao navegador o registro inteiro do usuário, com o hash da senha.
+- Encontrado defeito antigo (também na main): tela sem permissão aberta pelo endereço mostra "Application error" em vez de redirecionar. Anotado em "Defeitos conhecidos".
 
 ### 20/10/2026
 - Sessão do layout de sistema preparada para a noite, com 4 retomadas automáticas agendadas (00:00, 02:00, 04:00, 06:00).
