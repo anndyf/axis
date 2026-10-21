@@ -73,7 +73,7 @@ export default function OcorrenciasClient({ turmas, turmaFixa }: OcorrenciasClie
       const query = new URLSearchParams(filters).toString()
       const res = await fetch(`/api/ocorrencias?${query}`)
       const data = await res.json()
-      setOcorrencias(data)
+      setOcorrencias(res.ok && Array.isArray(data) ? data : [])
     } catch (error) {
       console.error("Erro ao carregar ocorrências:", error)
     } finally {

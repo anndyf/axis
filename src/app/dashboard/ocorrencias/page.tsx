@@ -9,6 +9,7 @@ export const metadata: Metadata = {
 import { prisma } from "@/lib/prisma"
 import { getGlobalConfig } from "@/lib/data-fetching"
 import { auth } from "@/lib/auth"
+import { can } from "@/lib/rbac"
 import { redirect } from "next/navigation"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
 
@@ -16,6 +17,7 @@ export default async function OcorrenciasPage() {
   await paginaDoModulo('SEC')
   const session = await auth()
   if (!session?.user?.escolaId) redirect("/login")
+  if (!can(session.user, "ocorrencia.gerenciar")) redirect("/dashboard")
 
   const config = await getGlobalConfig(session.user.escolaId)
   const currentYear = config?.anoLetivoAtual || new Date().getFullYear()
