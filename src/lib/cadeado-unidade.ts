@@ -257,3 +257,13 @@ export function situacoesParaTela(ctx: ContextoCadeado, disciplinaId: string | n
     }
   })
 }
+
+/** Para as telas de recuperação final e conselho: a situação da última etapa (null = sem cadeado). */
+export function situacaoRecuperacaoOuConselho(ctx: ContextoCadeado, disciplinaId: string, hoje = hojeNaEscola()): { trancada: boolean; aviso: string } | null {
+  const ultima = ctx.ultimaOrdem === null ? undefined : ctx.etapas.find((e) => e.ordem === ctx.ultimaOrdem)
+  if (!ultima) return null
+  const e = estadoDaEtapa(ultima, ctx.reaberturas, disciplinaId, hoje)
+  if (e.estado === 'ENCERRADA') return { trancada: true, aviso: avisoEncerrada(ultima.nome, e.encerramento.data) }
+  if (e.estado === 'REABERTA') return { trancada: false, aviso: avisoReaberta(e.ate) }
+  return null
+}

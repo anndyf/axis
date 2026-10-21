@@ -4,7 +4,7 @@ import { useState } from "react"
 import { buttonClasses } from "@/components/ui"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Save, AlertCircle, Gavel, Loader2, ChevronDown, ChevronUp, CheckCircle2, Printer, X } from "lucide-react"
+import { ArrowLeft, Save, AlertCircle, Gavel, Loader2, ChevronDown, ChevronUp, CheckCircle2, Printer, X, Lock, LockOpen } from "lucide-react"
 import { calcularMediaFinal, type EsquemaConfig, type EtapaDaNota, type UnidadeInput } from "@/lib/services/notas"
 import { formatarFrequencia } from "@/lib/services/frequencia"
 
@@ -38,7 +38,8 @@ export default function ConselhoClasseClient({
   notasConselho,
   esquemaConfig,
   pesosEtapas,
-  frequenciaMinima = 75
+  frequenciaMinima = 75,
+  cadeado = {},
 }: {
   turmaId: string
   turmaNome: string
@@ -48,6 +49,8 @@ export default function ConselhoClasseClient({
   esquemaConfig: EsquemaConfig
   pesosEtapas: number[]
   frequenciaMinima?: number
+  /** cadeado por disciplina: última unidade encerrada (trancada) ou reaberta */
+  cadeado?: Record<string, { trancada: boolean; aviso: string; disciplina: string }>
 }) {
   const notaMinima = esquemaConfig.notaMinimaAprovacao
   const router = useRouter()
@@ -196,8 +199,9 @@ export default function ConselhoClasseClient({
           novaNotaRec: notaRecValue
         }
       }).filter(item => {
-        // Enviar apenas o que mudou
+        // Enviar apenas o que mudou (e nada de disciplina trancada pelo cadeado)
         const original = notasConselho.find(n => n.id === item.notaId)
+        if (original && cadeado[original.disciplinaId]?.trancada) return false
         return item.novoStatus !== original?.status || item.novaNotaRec !== original?.notaRecuperacao
       })
 
@@ -539,6 +543,16 @@ export default function ConselhoClasseClient({
 
       {/* Main Content */}
       <main className="pt-4 pb-32 space-y-5 no-print">
+        {Object.keys(cadeado).length > 0 && (
+          <ul className="space-y-1.5" aria-label="Unidades encerradas">
+            {Object.entries(cadeado).map(([id, c]) => (
+              <li key={id} className={`flex items-start gap-2 rounded-painel border px-3.5 py-2 text-13 ${c.trancada ? 'border-line bg-subtle text-fg-muted' : 'border-warning-line bg-warning-subtle text-warning-fg'}`} role="status">
+                {c.trancada ? <Lock size={15} strokeWidth={1.75} className="mt-px shrink-0" aria-hidden /> : <LockOpen size={15} strokeWidth={1.75} className="mt-px shrink-0" aria-hidden />}
+                <span><strong className="font-medium">{c.disciplina}:</strong> {c.aviso}</span>
+              </li>
+            ))}
+          </ul>
+        )}
         <form onSubmit={handleSubmit}>
           {/* Mensagem */}
           {message && (
@@ -801,6 +815,8 @@ export default function ConselhoClasseClient({
                                 const notaRecVal = notasRec[nota.id] !== undefined ? (notasRec[nota.id] || null) : (nota.notaRecuperacao || null)
                                 const mediaCalculada = calcularMediaReal(nota)
                                 const isApproved = ((notaRecVal !== null && notaRecVal >= notaMinima) || mediaCalculada >= notaMinima) && !nota.abaixoMinimoFrequencia
+                                // Cadeado: última unidade encerrada para a disciplina (o servidor também recusa)
+                                const trancadaNota = !!cadeado[nota.disciplinaId]?.trancada
                                 const isResolvida = isApproved || ['APROVADO_CONSELHO', 'DEPENDENCIA', 'CONSERVADO'].includes(statusValue || nota.status)
                                 
                                 // Definir cores dinâmicas para o select
@@ -858,7 +874,7 @@ export default function ConselhoClasseClient({
                                          defaultValue={notaRecVal !== null ? notaRecVal.toFixed(1) : ''}
                                          key={`${nota.id}-${notaRecVal}`}
                                          onBlur={(e) => handleNotaRecChange(nota.id, e.target.value)}
-                                         disabled={isApproved}
+                                         disabled={isApproved || trancadaNota}
                                          className={`w-16 h-9 text-center rounded-md text-base font-medium border outline-none transition-all ${
                                            isApproved 
                                            ? 'bg-success-subtle text-success-fg border-success-line cursor-not-allowed font-medium' 
@@ -872,7 +888,7 @@ export default function ConselhoClasseClient({
                                          <select
                                            value={isApproved ? 'APROVADO_RECUPERACAO' : statusValue}
                                            onChange={(e) => handleDecisaoChange(nota.id, e.target.value)}
-                                           disabled={isApproved}
+                                           disabled={isApproved || trancadaNota}
                                            className={`w-[212px] h-10 px-4 pr-8 rounded-lg outline-none font-medium text-xs uppercase tracking-wider transition-all appearance-none border ${
                                              isApproved 
                                              ? 'bg-success-subtle border-success-line text-success-fg cursor-not-allowed' 
