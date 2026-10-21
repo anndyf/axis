@@ -3,10 +3,13 @@ import { prisma } from '@/lib/prisma'
 /**
  * Registra o login: o acesso atual vira o "anterior" e last_login passa a
  * ser agora, numa só instrução (o lado direito do SET lê os valores antigos).
+ * A coluna é sem fuso e o Prisma a lê como UTC: NOW() puro gravaria a hora
+ * local do servidor do banco (3h de diferença num banco em horário de
+ * Brasília), por isso o AT TIME ZONE 'UTC'.
  * Falha aqui nunca impede o login (quem chama trata o erro).
  */
 export async function registrarAcesso(userId: string): Promise<void> {
-  await prisma.$executeRaw`UPDATE "users" SET acesso_anterior = last_login, last_login = NOW() WHERE id = ${userId}`
+  await prisma.$executeRaw`UPDATE "users" SET acesso_anterior = last_login, last_login = NOW() AT TIME ZONE 'UTC' WHERE id = ${userId}`
 }
 
 /** "Seu último acesso foi em 19/10/2026 às 21:14" (horário de Brasília). Sem IP. */

@@ -27,7 +27,9 @@ describe('último acesso', () => {
     await registrarAcesso(usuario)
     const u = await prisma.user.findUniqueOrThrow({ where: { id: usuario }, select: { lastLogin: true, acessoAnterior: true } })
     expect(u.acessoAnterior?.toISOString()).toBe('2026-10-20T00:14:00.000Z')
+    // Nos dois sentidos: banco fora de UTC deslocaria a hora em horas
     expect(u.lastLogin!.getTime()).toBeGreaterThanOrEqual(antes - 60_000)
+    expect(u.lastLogin!.getTime()).toBeLessThanOrEqual(Date.now() + 60_000)
 
     // Segundo login: o anterior passa a ser o login de agora há pouco
     const primeiro = u.lastLogin!.toISOString()
