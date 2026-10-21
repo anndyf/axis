@@ -34,7 +34,7 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 
 **Próximos passos**
 1. Merge da branch `versao/0.2.0`.
-2. Sessão de lógica: cadeado de unidade encerrada (instrução a escrever) + os defeitos conhecidos acima.
+2. Iniciar na nuvem a sessão do cadeado (`sessoes-nuvem/cadeado-unidade.md`), que também corrige os defeitos conhecidos acima.
 3. Fase 3c depois: remover os booleanos de User, tirar a conta da plataforma da escola, trocar as consultas que ainda filtram por booleano (ex.: destinatários de comunicados).
 4. Fases seguintes do roteiro conforme as decisões.
 5. Em produção (quando houver): `prisma migrate deploy`, depois `npx tsx prisma/backfill/fase-2.ts` e `npx tsx prisma/backfill/fase-3a.ts`, com backup verificado.
@@ -44,6 +44,7 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 ## Histórico
 
 ### 21/10/2026
+- Decisões do cadeado de unidade: encerra automaticamente no dia seguinte ao prazo de lançamento do calendário e a gestão pode encerrar antes; Direção e Coordenação encerram e reabrem (nova permissão `unidade.encerrar`; Administrador não), com motivo e auditoria; reabertura por turma + disciplina com prazo (padrão 7 dias, máx. 30), que tranca de novo sozinha; tranca notas da unidade, chamadas/diário do período, e recuperação/conselho quando a última unidade encerra; planos de ensino não trancam. Instrução da sessão escrita (`sessoes-nuvem/cadeado-unidade.md`).
 - PR #17 (layout de sistema + regra "só quem leciona grava") mergeado na main.
 - Versão decidida: 0.2.0 (branch `versao/0.2.0`, esperando merge; tsc 0 erros, 562 testes).
 - Sessão do layout de sistema concluída na nuvem (PR #17); a retomada agendada terminou a etapa 8 (impressão) depois que a sessão principal parou pelo limite. Inclui a regra "só quem leciona grava".
