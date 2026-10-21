@@ -95,15 +95,15 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
         </button>
       </div>
 
-      <main className="space-y-6">
+      <main className="space-y-4">
         {aviso && (
-          <div className={`p-4 rounded-xl border text-sm flex items-center gap-2 ${aviso.tipo === "ok" ? "bg-success-subtle border-success-line text-success-fg" : "bg-danger-subtle border-danger-line text-danger-fg"}`}>
+          <div className={`p-4 rounded-xl border text-sm flex items-center gap-2${aviso.tipo === "ok" ? "bg-success-subtle border-success-line text-success-fg" : "bg-danger-subtle border-danger-line text-danger-fg"}`}>
             {aviso.tipo === "ok" ? <CheckCircle2 className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}
             {aviso.texto}
           </div>
         )}
 
-        <div className="bg-subtle border border-line rounded-xl p-6 flex items-start gap-4">
+        <div className="bg-subtle border border-line rounded-xl p-4 flex items-start gap-4">
           <div className="w-10 h-10 bg-subtle-hover rounded-lg flex items-center justify-center shrink-0">
             <Info className="w-5 h-5 text-fg-muted" />
           </div>
@@ -136,7 +136,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
           </div>
         )}
 
-        <div className="bg-surface rounded-xl shadow-card border border-line-strong overflow-hidden">
+        <div className="bg-surface rounded-xl border border-line-strong overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1000px]">
               <thead>
@@ -167,7 +167,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
                         const disciplinaId = schedule[key] ?? ""
                         const professor = disciplinaPorId.get(disciplinaId)?.professor
                         return (
-                          <td key={day.id} className="p-2 border-r border-line last:border-0 h-20">
+                          <td key={day.id} className="p-2 border-r border-line last:border-0 h-12">
                             <div className="h-full flex flex-col items-center justify-center text-center">
                               <select
                                 aria-label={`${day.label}, ${period}º horário`}
@@ -181,7 +181,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
                                 ))}
                               </select>
                               {disciplinaId && (
-                                <span className={`text-xs font-medium mt-0.5 truncate w-full px-1 ${professor ? "text-fg-subtle" : "text-warning-fg"}`}>
+                                <span className={`text-xs font-medium mt-0.5 truncate w-full px-1${professor ? "text-fg-subtle" : "text-warning-fg"}`}>
                                   {professor ?? "sem professor vinculado"}
                                 </span>
                               )}
@@ -198,7 +198,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
         </div>
 
         {/* Carga horária */}
-        <div className="bg-surface rounded-2xl shadow-sm border border-line overflow-hidden">
+        <div className="bg-surface rounded-2xl border border-line overflow-hidden">
           <div className="p-4 border-b border-line">
             <h2 className="font-medium text-fg">Aulas por disciplina</h2>
             <p className="text-xs text-fg-subtle">
@@ -225,7 +225,7 @@ export default function ScheduleEditor({ turma, initialSchedule, tempos, previst
                     <tr key={d.id}>
                       <td className="px-4 py-2 text-fg">{d.nome}</td>
                       <td className="px-4 py-2 text-center">{temposSemana.get(d.id) ?? 0}</td>
-                      <td className={`px-4 py-2 text-center ${abaixo ? "text-danger-fg font-medium" : ""}`}>{previstas ? prev : "—"}</td>
+                      <td className={`px-4 py-2 text-center${abaixo ? "text-danger-fg font-medium" : ""}`}>{previstas ? prev : "—"}</td>
                       <td className="px-4 py-2 text-center text-fg-subtle">{d.cargaHoraria ?? "—"}</td>
                     </tr>
                   )

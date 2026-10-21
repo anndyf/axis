@@ -144,7 +144,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
       <main className="max-w-leitura">
         
         {/* Barra de Pesquisa e Filtro */}
-        <div className="relative mb-10 group">
+        <div className="relative mb-5 group">
           <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
             <Search className="w-5 h-5 text-fg-subtle group-focus-within:text-fg-muted transition-colors" />
           </div>
@@ -153,7 +153,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
             placeholder="Buscar por turma ou disciplina..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-14 pr-12 py-5 bg-surface border border-line-strong rounded-xl shadow-sm focus:ring-4 focus:ring-zinc-500/10 focus:border-zinc-500 outline-none font-medium text-fg-muted transition-all"
+            className="w-full pl-14 pr-12 py-2.5 bg-surface border border-line-strong rounded-xl focus:ring-4 focus:ring-zinc-500/10 focus:border-zinc-500 outline-none font-medium text-fg-muted transition-all"
           />
           <div className="absolute inset-y-0 right-5 flex items-center gap-2">
             {search && (
@@ -167,7 +167,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
             )}
             <button
                onClick={() => setShowOnlySelected(!showOnlySelected)}
-               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border${
                  showOnlySelected 
                  ? 'bg-accent-subtle text-accent-fg border-accent shadow-card' 
                  : 'bg-surface text-fg-subtle border-line hover:border-line-strong'
@@ -180,7 +180,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
         </div>
         
         {/* Banner de Aviso de Regra */}
-        <div className="mb-6 p-4 bg-accent-subtle border border-accent/25 rounded-lg flex items-start gap-3 shadow-sm">
+        <div className="mb-6 p-4 bg-accent-subtle border border-accent/25 rounded-lg flex items-start gap-3">
           <Info className="w-5 h-5 text-accent-fg shrink-0 mt-0.5" />
           <div className="text-sm text-accent-fg">
             <p className="font-bold mb-1">Regra de Exclusividade Ativa</p>
@@ -194,7 +194,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
 
         {/* Disciplinas Vinculadas Atualmente */}
         {disciplinasSelecionadasList.length > 0 && (
-          <div className="mb-10 p-6 bg-surface rounded-xl border border-line shadow-sm">
+          <div className="mb-5 p-4 bg-surface rounded-xl border border-line">
             <h2 className="text-xs font-bold text-fg mb-5 flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-fg-subtle" />
               Disciplinas Já Vinculadas ({disciplinasSelecionadasList.length})
@@ -217,7 +217,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
         )}
 
         {turmaEntries.length === 0 ? (
-          <div className="text-center py-20 bg-surface rounded-xl border border-dashed border-line-strong">
+          <div className="text-center py-10 bg-surface rounded-xl border border-dashed border-line-strong">
             <div className="w-16 h-16 bg-canvas rounded-full flex items-center justify-center mx-auto mb-4">
               <Filter className="w-8 h-8 text-fg-disabled" />
             </div>
@@ -233,17 +233,17 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
               return (
                 <div 
                   key={turmaKey} 
-                  className={`bg-surface rounded-xl border transition-all overflow-hidden ${
+                  className={`bg-surface rounded-xl border transition-all overflow-hidden${
                     isExpanded ? 'ring-2 ring-zinc-900 border-transparent shadow-card' : 'border-line-strong hover:border-zinc-400'
                   }`}
                 >
                   {/* Cabeçalho da Turma (Acordeão) */}
                   <button
                     onClick={() => toggleTurma(turmaKey)}
-                    className="w-full px-8 py-6 flex items-center justify-between hover:bg-canvas transition-colors text-left"
+                    className="w-full px-4 py-3 flex items-center justify-between hover:bg-canvas transition-colors text-left"
                   >
                     <div className="flex items-center space-x-4">
-                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all ${
+                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all${
                         isExpanded ? 'bg-subtle border border-line text-fg' : 'bg-subtle-hover text-fg-muted'
                       }`}>
                         <School className="w-6 h-6" />
@@ -267,7 +267,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
 
                   {/* Conteúdo das Disciplinas */}
                   {isExpanded && (
-                    <div className="px-8 pb-8 animate-slide-up">
+                    <div className="px-4 pb-8 animate-slide-up">
                       <div className="h-px bg-subtle-hover mb-6" />
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         {disciplinas.map((disc: any) => {
@@ -278,17 +278,17 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
                           return (
                             <label 
                               key={disc.id} 
-                              className={`group flex flex-col p-4 rounded-lg border-2 transition-all cursor-pointer relative ${
+                              className={`group flex flex-col p-4 rounded-lg border-2 transition-all cursor-pointer relative${
                                 isSelected 
                                   ? 'bg-subtle border-zinc-700 shadow-sm' 
                                   : 'bg-surface border-line hover:border-line-strong'
-                              } ${outroProfessor && !isSelected ? 'border-warning-line bg-warning-subtle' : ''}`}
+                              }${outroProfessor && !isSelected ? 'border-warning-line bg-warning-subtle' : ''}`}
                             >
                               <div className="flex items-center justify-between w-full">
-                                <span className={`text-sm font-semibold flex-grow ${isSelected ? 'text-accent-fg' : 'text-fg-muted'}`}>
+                                <span className={`text-sm font-semibold flex-grow${isSelected ? 'text-accent-fg' : 'text-fg-muted'}`}>
                                   {disc.nome}
                                 </span>
-                                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
+                                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all${
                                   isSelected ? 'border-zinc-700 bg-zinc-700' : 'border-line-strong group-hover:border-line-strong'
                                 }`}>
                                   <input
@@ -328,7 +328,7 @@ export default function VincularDisciplinasClient({ usuario, todasDisciplinas }:
       </main>
 
       {/* Info Flutuante no Rodapé */}
-      <div className="fixed bottom-[calc(var(--barra-inferior)+2rem)] left-1/2 -translate-x-1/2 bg-zinc-900 text-white px-6 py-3 rounded-full shadow-overlay flex items-center space-x-4 border border-white/10 backdrop-blur-md">
+      <div className="fixed bottom-[calc(var(--barra-inferior)+2rem)] left-1/2 -translate-x-1/2 bg-zinc-900 text-white px-4 py-3 rounded-full shadow-overlay flex items-center space-x-4 border border-white/10 backdrop-blur-md">
          <Info className="w-4 h-4 text-accent" />
          <span className="text-xs font-medium leading-none">
             {selectedIds.length} selecionadas

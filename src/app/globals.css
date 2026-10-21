@@ -383,3 +383,16 @@ main:has([data-cabecalho-pagina]) .caminho-layout { display: none; }
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/*
+ * Títulos de página: 20px, peso 600, em toda tela do painel (inclusive as
+ * que ainda montam o próprio cabeçalho). Fora de camada para valer sobre as
+ * classes antigas (text-2xl/3xl); folhas de prova impressas (tamanho em pt)
+ * ficam de fora.
+ */
+main h1:not([class*="pt]"]) {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}

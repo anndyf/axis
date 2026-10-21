@@ -45,11 +45,11 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
       />
 
       {/* Main Content */}
-      <main className="space-y-6 pt-2 pb-8 md:hidden">
+      <main className="space-y-4 pt-2 pb-8 md:hidden">
         
         {/* Dica de Uso */}
         <div className="hidden bg-subtle border border-line rounded-lg p-5 items-start gap-4 md:flex">
-          <div className="bg-surface p-2 rounded-xl shadow-sm border border-line flex-shrink-0 text-fg-subtle">
+          <div className="bg-surface p-2 rounded-xl border border-line flex-shrink-0 text-fg-subtle">
             <Info className="w-6 h-6" />
           </div>
           <div className="flex-1">
@@ -61,14 +61,14 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
         </div>
 
         {/* Filtros Premium */}
-        <div className="bg-surface p-4 rounded-2xl shadow-card border border-line flex flex-wrap gap-4 items-end relative overflow-hidden md:p-6 md:gap-6">
+        <div className="bg-surface p-4 rounded-2xl border border-line flex flex-wrap gap-4 items-end relative overflow-hidden md:p-4 md:gap-4">
             
             <div className="flex-1 min-w-[min(100%,200px)] space-y-2">
                 <label className="text-xs font-medium text-fg-subtle ml-2">Curso</label>
                 <select 
                     value={filterCurso}
                     onChange={(e) => setFilterCurso(e.target.value)}
-                    className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg px-4 py-3 text-base md:px-6 md:py-4 md:text-sm focus:ring-2 focus:ring-zinc-500 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
+                    className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg px-4 py-3 text-base md:px-4 md:py-4 md:text-sm focus:ring-2 focus:ring-zinc-500 transition-all appearance-none cursor-pointer font-medium text-fg-muted"
                 >
                     <option value="">Todos os Cursos</option>
                     {uniqueCursos.map((c: any) => <option key={c} value={c}>{c}</option>)}
@@ -80,7 +80,7 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
                 <select 
                     value={filterTurno}
                     onChange={(e) => setFilterTurno(e.target.value)}
-                    className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg px-4 py-3 text-base md:px-6 md:py-4 md:text-sm focus:ring-2 focus:ring-zinc-500 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
+                    className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg px-4 py-3 text-base md:px-4 md:py-4 md:text-sm focus:ring-2 focus:ring-zinc-500 transition-all appearance-none cursor-pointer font-medium text-fg-muted"
                 >
                     <option value="">Todos os Turnos</option>
                     {uniqueTurnos.map((t: any) => <option key={t} value={t}>{t}</option>)}
@@ -98,24 +98,24 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
                         value={filterNome}
                         onChange={(e) => setFilterNome(e.target.value)}
                         placeholder="Ex: 1º Ano, Técnico em Enfermagem..."
-                        className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-4 py-3 text-base md:pr-6 md:py-4 md:text-sm focus:ring-2 focus:ring-zinc-500 transition-all font-medium text-fg-muted shadow-card placeholder:text-fg-disabled"
+                        className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-4 py-3 text-base md:pr-6 md:py-4 md:text-sm focus:ring-2 focus:ring-zinc-500 transition-all font-medium text-fg-muted placeholder:text-fg-disabled"
                     />
                 </div>
             </div>
 
             <div className="pb-2.5">
-                <div className="flex items-center gap-2 bg-subtle px-4 py-2.5 rounded-lg border border-line shadow-sm">
-                    <span className="w-2 h-2 rounded-full bg-zinc-500 animate-pulse"></span>
+                <div className="flex items-center gap-2 bg-subtle px-4 py-2.5 rounded-lg border border-line">
+                    <span className="w-2 h-2 rounded-full bg-zinc-500"></span>
                     <span className="text-xs font-semibold text-fg">{filteredTurmas.length} turmas mapeadas</span>
                 </div>
             </div>
         </div>
 
         {/* Turmas Grid Style Premium */}
-        <div className="md:bg-surface md:rounded-xl md:shadow-card md:border md:border-line md:p-8">
-          <div className="flex items-center justify-between mb-3 md:mb-8">
+        <div className="md:bg-surface md:rounded-xl md: md:border md:border-line md:p-4">
+          <div className="flex items-center justify-between mb-3 md:mb-4">
             <h2 className="text-xs font-semibold text-fg-subtle flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-subtle text-fg-muted flex items-center justify-center shadow-card">
+              <div className="w-8 h-8 rounded-lg bg-subtle text-fg-muted flex items-center justify-center">
                 <Users size={16} />
               </div>
               Selecione uma Turma para Detalhes
@@ -136,7 +136,7 @@ export default function ResultadosClient({ turmas }: { turmas: any[] }) {
                 <Link
                   key={turma.id}
                   href={`/dashboard/resultados/${turma.id}`}
-                  className="min-h-11 border border-line-strong rounded-2xl p-4 hover:border-zinc-500 hover:bg-subtle transition-all group bg-surface shadow-sm hover:shadow-card h-full flex flex-col justify-between"
+                  className="min-h-11 border border-line-strong rounded-2xl p-4 hover:border-zinc-500 hover:bg-subtle transition-all group bg-surface hover: h-full flex flex-col justify-between"
                 >
                   <div>
                     <h3 className="font-semibold text-fg mb-2 break-words text-base tracking-tight">

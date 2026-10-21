@@ -50,17 +50,17 @@ export default function MigracaoPage() {
     }
   }
 
-  if (loading) return <div className="p-8 flex justify-center"><Loader2 className="animate-spin" /></div>
+  if (loading) return <div className="p-4 flex justify-center"><Loader2 className="animate-spin" /></div>
 
   return (
-    <div className="mx-auto max-w-formulario">
+    <div className="max-w-formulario">
       <h1 className="text-2xl font-bold mb-2 flex items-center gap-2">
         <Trash2 className="text-danger-fg" /> Assistente de Unificação de Turmas
       </h1>
-      <p className="text-fg-muted mb-8">Utilize esta ferramenta para mover questões e alunos entre turmas duplicadas.</p>
+      <p className="text-fg-muted mb-4">Utilize esta ferramenta para mover questões e alunos entre turmas duplicadas.</p>
 
       {result && (
-        <div className="bg-success-subtle border border-success-line text-success-fg p-4 rounded-lg mb-8 flex items-center gap-3">
+        <div className="bg-success-subtle border border-success-line text-success-fg p-4 rounded-lg mb-4 flex items-center gap-3">
           <CheckCircle2 />
           <div>
             <p className="font-bold">Migração concluída!</p>
@@ -69,8 +69,8 @@ export default function MigracaoPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        <div className="bg-surface p-6 rounded-xl border border-line shadow-sm">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div className="bg-surface p-4 rounded-xl border border-line">
           <label className="block text-sm font-bold text-fg-muted mb-4">
             1. Turma de Origem (A que será esvaziada)
           </label>
@@ -89,7 +89,7 @@ export default function MigracaoPage() {
           <p className="text-xs text-fg-subtle mt-2 italic">Dica: Escolha a turma que tem o ID que você deseja descartar.</p>
         </div>
 
-        <div className="bg-surface p-6 rounded-xl border border-line shadow-sm">
+        <div className="bg-surface p-4 rounded-xl border border-line">
           <label className="block text-sm font-bold text-fg-muted mb-4">
             2. Turma de Destino (A que será mantida)
           </label>
@@ -112,13 +112,13 @@ export default function MigracaoPage() {
       <button
         onClick={handleMerge}
         disabled={merging || !selection.from || !selection.to}
-        className="w-full bg-accent hover:bg-accent-hover disabled:bg-zinc-400 text-on-accent font-bold py-4 rounded-xl shadow-card transition-all flex items-center justify-center gap-3"
+        className="w-full bg-accent hover:bg-accent-hover disabled:bg-zinc-400 text-on-accent font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-3"
       >
         {merging ? <Loader2 className="animate-spin" /> : <ArrowRight />}
         {merging ? 'Processando Migração...' : 'Unificar Turmas Agora'}
       </button>
 
-      <div className="mt-12 bg-warning-subtle border border-warning-line p-6 rounded-xl">
+      <div className="mt-12 bg-warning-subtle border border-warning-line p-4 rounded-xl">
         <h3 className="text-warning-fg font-bold flex items-center gap-2 mb-2">
           <AlertCircle size={18} /> Importante
         </h3>

@@ -24,7 +24,7 @@ servidor de desenvolvimento recarrega as mudanças em andamento.
 - [x] 1. Fundação de área de trabalho (tokens e componentes)
 - [x] 2. Casca (largura, barra superior de contexto, menu lateral compacto)
 - [x] 3. Fichas com abas (turma, estudante, usuário, AEE)
-- [ ] 4. Listas e telas de trabalho
+- [x] 4. Listas e telas de trabalho
 - [ ] 5. Rastreabilidade visível
 - [ ] 6. Formulários e tabelas com rigor
 - [ ] 7. Acabamento de produto maduro
@@ -32,13 +32,12 @@ servidor de desenvolvimento recarrega as mudanças em andamento.
 
 ## Próximo passo exato
 
-Etapa 4 em andamento. Feitas: turmas, estudantes, usuários, disciplinas,
-resultados, conselho (lista), frequência (via PageHeader → CabecalhoPagina),
-lançamento de notas, recuperação (modo leitura), chamada (desktop). O
-indicador de gravação (etapa 5) já está em notas, recuperação, chamada e
-ficha AEE. Próximas: listas de notas/recuperação/chamada (escolha de turma),
-mensagens, ocorrências, AEE (painel), provas/questões/simulados,
-configurações e dashboard em grade.
+Etapa 5 (rastreabilidade): rodapé "Criado por … · Última alteração por …"
+nas fichas e registros (componente `RodapeRastreio` em src/components/ui),
+aba "Histórico" (AuditLog/NotaFinalAudit da entidade, só com
+`auditoria.ler`, sempre filtrando pela escola) nas fichas de turma,
+estudante e usuário, com teste de isolamento A × B e aluno do portal; o
+indicador de gravação já está pronto (falta formulário de usuário).
 
 ## Etapa 1 — o que foi feito
 
@@ -163,3 +162,49 @@ Ficaram fora (não existe tela para isso hoje):
 - Aba "Documentos" do estudante: não há documentos anexados no sistema.
 - Aba "Papéis" separada no usuário: o editor de papéis faz parte do
   formulário de usuário; a ficha mostra os papéis na aba "Dados e papéis".
+
+## Etapa 4 — o que foi feito
+
+- Componentes de lista: `components/estudantes/TabelaEstudantes` (tela
+  Estudantes e aba da turma) e `components/listas/ListaDeTurmas` (telas de
+  "escolha a turma": resultados, conselho, lançar notas, recuperação), com
+  busca, fichas de turno com contagem, ordenação, linha clicável, rodapé com
+  contagem e exportar CSV do que está na tela.
+- Turmas, estudantes, usuários (seleção em lote e aprovação em massa
+  mantidas), disciplinas e ocorrências: `CabecalhoPagina` + `Painel` +
+  `BarraFerramentas` + `Tabela` no desktop. No celular, turmas, disciplinas,
+  resultados, conselho, notas e recuperação mantêm os cartões de antes (o
+  bloco antigo ficou em `md:hidden`); ocorrências ganhou cartões compactos.
+- `PageHeader` antigo agora delega para `CabecalhoPagina` (frequência,
+  chamada, diário, configurações, calendário, identidade e lançamento de
+  notas ganharam o cabeçalho novo sem reescrever cada tela).
+- Lançamento de notas: linhas de ~44px, rótulos de coluna discretos,
+  matrícula em mono; barra de salvar fixa no pé do painel com o indicador
+  de gravação. Somente leitura (gestão): faixa informativa, campos com
+  aparência de texto, sem botões de infrequente e sem salvar.
+- Recuperação final: mesmo tratamento de somente leitura (antes o botão
+  salvar aparecia desabilitado; agora some) e indicador de gravação.
+- Chamada (desktop): alunos numa lista única em painel com linhas de ~44px,
+  calendário à esquerda, barra de salvar com indicador; celular igual.
+- Chamada e diário (lista): aulas do dia e diários lado a lado no desktop
+  largo.
+- Painel inicial: indicadores mais compactos; na visão de administração,
+  "Turmas com pendências" ocupa 2/3 e comunicados/calendário a lateral;
+  professores atrasados e atalhos na linha de baixo.
+- Telas grandes ainda não reescritas (mensagens, AEE, questões, provas,
+  simulados, laboratórios, planos, conselho da turma, resultados da turma,
+  auditoria, perfil, pendências, matriz, formulários de turma/disciplina):
+  passada de densidade com regra fixa (espaçamentos p-8/p-10 → p-4/p-5,
+  títulos 3xl/4xl → xl, sem caixa alta forçada, sem sombras de cartão, sem
+  animações de pulsar/escala) e título de página normalizado em 20px peso
+  600 por CSS (`main h1` em globals.css). Mensagens ganhou cabeçalho novo e
+  aviso de suporte em `Alert`.
+- Formulários curtos e telas de leitura ficam alinhados à esquerda (sem
+  centralizar) com `max-w-formulario`/`max-w-leitura`.
+
+Decisões:
+5. Celular: onde a tela tinha cartões próprios, o desktop ganhou a tabela e
+   o celular manteve os cartões (bloco antigo em `md:hidden`), para não
+   regredir o app.
+6. Dicas fixas no topo de notas, recuperação, resultados e conselho ficam só
+   no celular; no desktop a ajuda vai para o botão "?" (etapa 7).

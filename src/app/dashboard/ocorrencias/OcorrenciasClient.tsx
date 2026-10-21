@@ -1,6 +1,8 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { Fragment, useState, useEffect, useRef } from "react"
+import { Badge, Button, CabecalhoPagina, EmptyState, Painel, RodapeTabela, SkeletonRows, Table, TableContainer, TBody, TD, TH, THead, TR, type BadgeTone } from "@/components/ui"
+import { baixarCSV } from "@/lib/navegador/csv"
 import { 
   Plus, 
   Search, 
@@ -84,7 +86,7 @@ export default function OcorrenciasClient({ turmas, turmaFixa }: OcorrenciasClie
   }, [filters])
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Tem certeza que deseja excluir este registro?")) return
+    if (!confirm("Excluir este registro de ocorrência? Esta ação não pode ser desfeita.")) return
     
     try {
       const res = await fetch(`/api/ocorrencias/${id}`, { method: 'DELETE' })
@@ -117,231 +119,155 @@ export default function OcorrenciasClient({ turmas, turmaFixa }: OcorrenciasClie
     }
   }
 
+  const [aberta, setAberta] = useState<string | null>(null)
+  const ctrl = "h-9 w-full rounded-md border border-line bg-surface px-2.5 text-sm text-fg hover:border-line-strong focus:border-accent focus:outline-none md:h-8 md:text-13"
+  const tomTipo = (tipo: string): BadgeTone => {
+    switch (tipo.toLowerCase()) {
+      case 'comportamental': return 'danger'
+      case 'pedagógica': return 'accent'
+      case 'médica': return 'success'
+      case 'elogio': return 'warning'
+      default: return 'neutral'
+    }
+  }
+  const dataCurta = (d: string) => format(new Date(d), "dd/MM/yyyy", { locale: ptBR })
+  const acoesTela = (
+    <>
+      <Button variant="secondary" onClick={handlePrint}><Printer size={16} strokeWidth={1.75} aria-hidden /> <span className="hidden sm:inline">Imprimir</span></Button>
+      <Button onClick={() => { setShowForm(true); setSelectedOcorrencia(null) }}><Plus size={16} strokeWidth={1.75} aria-hidden /> Novo registro</Button>
+    </>
+  )
+
   return (
-    <div className="space-y-8 pb-32 animate-fade-in">
-      {/* Header Premium */}
-      <header className={turmaFixa ? "hidden" : "mb-6"}>
-        <div className="py-6">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex min-w-0 items-center gap-4">
-              <Link
-                href="/dashboard"
-                className="p-3 hover:bg-subtle rounded-lg transition-all text-fg-subtle hover:text-fg border border-transparent hover:border-line shadow-sm"
-              >
-                <ArrowLeft size={16} strokeWidth={1.75} />
-              </Link>
-              <div className="min-w-0">
-                <h1 className="break-words text-2xl font-semibold tracking-tight text-fg">Livro de Ocorrências</h1>
-                <p className="text-sm text-fg-muted">Registro histórico e acompanhamento escolar</p>
-              </div>
-            </div>
+    <div className="space-y-4 pb-32 md:pb-0">
+      {!turmaFixa && (
+        <CabecalhoPagina
+          titulo="Livro de ocorrências"
+          descricao="Registro e acompanhamento das ocorrências escolares."
+          acoes={acoesTela}
+        />
+      )}
 
-            <div className="flex flex-wrap items-center gap-3">
-              <button 
-                onClick={handlePrint}
-                className="flex items-center gap-2 bg-surface border border-line text-fg-muted px-6 py-3 rounded-lg font-semibold hover:bg-canvas transition-all shadow-sm active:scale-95"
-              >
-                <Printer size={18} />
-                <span className="hidden sm:inline">Imprimir Tudo</span>
-              </button>
-              <button 
-                onClick={() => { setShowForm(true); setSelectedOcorrencia(null); }}
-                className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-accent px-3 text-sm font-medium text-on-accent transition-colors duration-150 hover:bg-accent-hover disabled:opacity-50"
-              >
-                <Plus size={16} strokeWidth={1.75} />
-                <span>Novo Registro</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Seção de Filtros */}
-      <section className="bg-surface p-6 md:p-8 rounded-xl shadow-card border border-line-subtle">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-fg-subtle ml-1">Estudante</label>
-            <div className="relative group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-disabled group-focus-within:text-fg transition-colors" size={18} />
-              <input 
-                type="text" 
-                placeholder="Buscar por nome..."
-                value={filters.studentName}
-                onChange={e => setFilters({...filters, studentName: e.target.value})}
-                className="w-full bg-canvas border-transparent rounded-lg pl-12 pr-6 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium placeholder:text-fg-disabled shadow-card"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-fg-subtle ml-1">Período Inicial</label>
-            <div className="relative group">
-              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-disabled group-focus-within:text-fg transition-colors" size={18} />
-              <input 
-                type="date"
-                value={filters.startDate}
-                onChange={e => setFilters({...filters, startDate: e.target.value})}
-                className="w-full bg-canvas border-transparent rounded-lg pl-12 pr-6 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium shadow-card cursor-pointer"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-fg-subtle ml-1">Período Final</label>
-            <div className="relative group">
-              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-disabled group-focus-within:text-fg transition-colors" size={18} />
-              <input 
-                type="date"
-                value={filters.endDate}
-                onChange={e => setFilters({...filters, endDate: e.target.value})}
-                className="w-full bg-canvas border-transparent rounded-lg pl-12 pr-6 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium shadow-card cursor-pointer"
-              />
-            </div>
-          </div>
-
-          <div className={turmaFixa ? "hidden" : "space-y-2"}>
-            <label className="text-xs font-bold text-fg-subtle ml-1">Turma</label>
-            <div className="relative group">
-              <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-disabled group-focus-within:text-fg transition-colors" size={18} />
-              <select 
-                value={filters.turmaId}
-                onChange={e => setFilters({...filters, turmaId: e.target.value})}
-                className="w-full bg-canvas border-transparent rounded-lg pl-12 pr-10 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium shadow-card cursor-pointer appearance-none"
-              >
+      <Painel semRecuo>
+        <div role="toolbar" aria-label="Filtros das ocorrências" className="grid gap-2 border-b border-line-subtle px-painel py-2.5 sm:grid-cols-2 md:flex md:flex-wrap md:items-end md:gap-3 print:hidden">
+          <label className="block md:w-64">
+            <span className="mb-1 block text-rotulo text-fg-muted">Estudante</span>
+            <span className="relative block">
+              <Search size={14} strokeWidth={1.75} aria-hidden className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-fg-subtle" />
+              <input type="search" placeholder="Nome do estudante" value={filters.studentName} onChange={e => setFilters({ ...filters, studentName: e.target.value })} className={`${ctrl} pl-8`} />
+            </span>
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-rotulo text-fg-muted">De</span>
+            <input type="date" value={filters.startDate} onChange={e => setFilters({ ...filters, startDate: e.target.value })} className={ctrl} />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-rotulo text-fg-muted">Até</span>
+            <input type="date" value={filters.endDate} onChange={e => setFilters({ ...filters, endDate: e.target.value })} className={ctrl} />
+          </label>
+          {!turmaFixa && (
+            <label className="block md:w-44">
+              <span className="mb-1 block text-rotulo text-fg-muted">Turma</span>
+              <select value={filters.turmaId} onChange={e => setFilters({ ...filters, turmaId: e.target.value })} className={ctrl}>
                 <option value="">Todas as turmas</option>
-                {turmas.map(t => (
-                  <option key={t.id} value={t.id}>{t.nome}</option>
-                ))}
+                {turmas.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
               </select>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-fg-subtle ml-1">Tipo de Ocorrência</label>
-            <div className="relative group">
-              <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-disabled group-focus-within:text-fg transition-colors" size={18} />
-              <select 
-                value={filters.type}
-                onChange={e => setFilters({...filters, type: e.target.value})}
-                className="w-full bg-canvas border-transparent rounded-lg pl-12 pr-10 py-4 text-sm focus:ring-4 focus:ring-zinc-900/5 focus:bg-surface focus:border-line transition-all font-medium shadow-card cursor-pointer appearance-none"
-              >
-                <option value="">Todos os tipos</option>
-                <option value="Comportamental">Comportamental</option>
-                <option value="Pedagógica">Pedagógica</option>
-                <option value="Médica">Médica</option>
-                <option value="Elogio">Elogio</option>
-              </select>
-            </div>
+            </label>
+          )}
+          <label className="block md:w-44">
+            <span className="mb-1 block text-rotulo text-fg-muted">Tipo</span>
+            <select value={filters.type} onChange={e => setFilters({ ...filters, type: e.target.value })} className={ctrl}>
+              <option value="">Todos os tipos</option>
+              <option value="Comportamental">Comportamental</option>
+              <option value="Pedagógica">Pedagógica</option>
+              <option value="Médica">Médica</option>
+              <option value="Elogio">Elogio</option>
+            </select>
+          </label>
+          <div className="flex items-center gap-2 md:ml-auto">
+            {turmaFixa && acoesTela}
+            <Button variant="secondary" size="sm" className="max-md:hidden" onClick={() => baixarCSV("Ocorrencias", [
+              { titulo: "Data", valor: (o: Ocorrencia) => dataCurta(o.data) },
+              { titulo: "Tipo", valor: (o: Ocorrencia) => o.tipo },
+              { titulo: "Título", valor: (o: Ocorrencia) => o.titulo },
+              { titulo: "Estudantes", valor: (o: Ocorrencia) => o.estudantes.map((e) => `${e.nome} (${e.turma.nome})`).join(", ") },
+              { titulo: "Registrado por", valor: (o: Ocorrencia) => o.autor.name || "Sistema" },
+              { titulo: "Descrição", valor: (o: Ocorrencia) => o.descricao },
+            ], ocorrencias)}>
+              <Download size={14} strokeWidth={1.75} aria-hidden /> Exportar
+            </Button>
           </div>
         </div>
-      </section>
 
-      {/* Lista de Registros */}
-      <section className="space-y-6 print:space-y-8">
         {loading ? (
-          <div className="py-32 text-center">
-            <div className="w-12 h-12 border-4 border-line border-t-zinc-900 rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-fg-subtle font-bold animate-pulse">Consultando Registros...</p>
-          </div>
+          <SkeletonRows linhas={6} colunas={4} />
         ) : ocorrencias.length === 0 ? (
-          <div className="py-32 text-center bg-surface border border-dashed border-line rounded-xl">
-            <div className="w-20 h-20 bg-canvas rounded-full flex items-center justify-center mx-auto mb-6 text-fg-disabled">
-              <FileWarning size={40} />
-            </div>
-            <h3 className="text-xl font-bold text-fg mb-2">Nenhum registro localizado</h3>
-            <p className="text-fg-subtle max-w-xs mx-auto">Tente ajustar seus filtros ou verifique se há registros cadastrados no período.</p>
-          </div>
+          <EmptyState icon={FileWarning} title="Nenhum registro encontrado" description="Ajuste os filtros ou confira se há registros no período." />
         ) : (
-          ocorrencias.map((item) => (
-            <div 
-              key={item.id} 
-              className="group bg-surface border border-line-subtle rounded-xl p-8 md:p-10 shadow-card hover:shadow-card transition-all duration-500 relative overflow-hidden print:shadow-none print:border-line print:mb-8"
-            >
-              <div className="absolute top-0 right-0 w-64 h-64 bg-canvas rounded-full -mr-32 -mt-32 opacity-0 group-hover:opacity-100 blur-3xl transition-opacity duration-1000 print:hidden"></div>
-              
-              <div className="relative z-10 space-y-8">
-                {/* Header do Registro */}
-                <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-                  <div className="space-y-4">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span className={`px-4 py-1.5 rounded-full border text-xs font-semibold shadow-sm flex items-center gap-2 ${getTipoColor(item.tipo)}`}>
-                        {getTipoIcon(item.tipo)}
-                        {item.tipo}
-                      </span>
-                      <span className="px-4 py-1.5 bg-subtle border border-line text-fg rounded-full text-xs font-semibold shadow-card">
-                        {format(new Date(item.data), "dd 'de' MMM, yyyy", { locale: ptBR })}
-                      </span>
-                    </div>
-                    <h2 className="text-2xl md:text-3xl font-semibold text-fg tracking-tight leading-tight group-hover:text-accent-fg transition-colors">
-                      {item.titulo}
-                    </h2>
-                  </div>
+          <>
+            {/* Desktop: tabela; a linha abre a descrição completa */}
+            <TableContainer semBorda className="hidden md:block print:block">
+              <Table>
+                <THead>
+                  <TR><TH className="w-28">Data</TH><TH className="w-36">Tipo</TH><TH>Registro</TH><TH>Estudantes</TH><TH>Registrado por</TH><TH className="print:hidden"><span className="sr-only">Ações</span></TH></TR>
+                </THead>
+                <TBody>
+                  {ocorrencias.map((item) => (
+                    <Fragment key={item.id}>
+                      <TR onClick={() => setAberta(aberta === item.id ? null : item.id)} aria-expanded={aberta === item.id}>
+                        <TD className="tabular-nums text-fg-muted">{dataCurta(item.data)}</TD>
+                        <TD><Badge tone={tomTipo(item.tipo)}>{item.tipo}</Badge></TD>
+                        <TD className="max-w-md">
+                          <span className="font-medium text-fg">{item.titulo}</span>
+                          {aberta !== item.id && <span className="block truncate text-xs text-fg-muted print:hidden">{item.descricao}</span>}
+                        </TD>
+                        <TD className="text-fg-muted">{item.estudantes.map((e) => `${e.nome} (${e.turma.nome})`).join(", ")}</TD>
+                        <TD className="text-fg-muted">{item.autor.name || "Sistema"}</TD>
+                        <TD className="w-0 print:hidden" onClick={(e) => e.stopPropagation()}>
+                          <div className="flex items-center justify-end gap-0.5">
+                            <button type="button" onClick={() => { setSelectedOcorrencia(item); setShowForm(true) }} aria-label={`Editar ${item.titulo}`} title="Editar" className="flex size-8 items-center justify-center rounded-md text-fg-subtle hover:bg-subtle hover:text-fg"><Edit3 size={16} strokeWidth={1.75} /></button>
+                            <button type="button" onClick={() => handleDelete(item.id)} aria-label={`Excluir ${item.titulo}`} title="Excluir" className="flex size-8 items-center justify-center rounded-md text-fg-subtle hover:bg-danger-subtle hover:text-danger-fg"><Trash2 size={16} strokeWidth={1.75} /></button>
+                          </div>
+                        </TD>
+                      </TR>
+                      {aberta === item.id && (
+                        <tr className="bg-subtle/40">
+                          <td colSpan={6} className="border-b border-line-subtle px-3 pb-3 pt-1">
+                            <p className="max-w-leitura whitespace-pre-wrap text-sm leading-relaxed text-fg">{item.descricao}</p>
+                            <p className="mt-2 text-xs text-fg-subtle">Registrado em {format(new Date(item.createdAt), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })} por {item.autor.name || "Sistema"}</p>
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
+                  ))}
+                </TBody>
+              </Table>
+            </TableContainer>
 
-                  <div className="flex items-center gap-2 print:hidden">
-                    <button 
-                      onClick={() => { setSelectedOcorrencia(item); setShowForm(true); }}
-                      className="p-3 bg-canvas text-fg-subtle hover:text-fg hover:bg-subtle rounded-lg transition-all border border-transparent hover:border-line"
-                    >
-                      <Edit3 size={18} />
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(item.id)}
-                      className="p-3 bg-canvas text-fg-subtle hover:text-danger-fg hover:bg-danger-subtle rounded-lg transition-all border border-transparent hover:border-danger-line"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Conteúdo */}
-                <div className="bg-canvas/50 p-8 rounded-xl border border-line-subtle group-hover:bg-surface group-hover:shadow-card transition-all duration-500 print:bg-surface print:border-line">
-                  <p className="text-fg-muted text-lg leading-relaxed font-medium whitespace-pre-wrap">
-                    {item.descricao}
-                  </p>
-                </div>
-
-                {/* Rodapé - Estudantes e Autor */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pt-4">
-                  <div className="flex flex-wrap gap-4">
-                    {item.estudantes.map(est => (
-                      <div key={est.matricula} className="flex items-center gap-3 bg-surface border border-line pl-2 pr-5 py-2 rounded-lg shadow-sm hover:border-zinc-900 transition-colors cursor-default">
-                        <div className="w-9 h-9 bg-subtle border border-line text-fg rounded-xl flex items-center justify-center font-bold text-xs ring-4 ring-zinc-50">
-                          {est.nome.charAt(0)}
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-fg leading-none mb-1">{est.nome}</p>
-                          <p className="text-xs font-semibold text-fg-subtle">Turma: {est.turma.nome}</p>
-                        </div>
+            {/* Celular: cartões compactos */}
+            <ul className="divide-y divide-line-subtle md:hidden print:hidden">
+              {ocorrencias.map((item) => (
+                <li key={item.id} className="space-y-2 px-4 py-3">
+                  <div className="flex items-start gap-2">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge tone={tomTipo(item.tipo)}>{item.tipo}</Badge>
+                        <span className="text-xs tabular-nums text-fg-subtle">{dataCurta(item.data)}</span>
                       </div>
-                    ))}
-                  </div>
-
-                  <div className="flex items-center gap-4 border-l border-line-subtle pl-8 md:pl-10 print:border-line">
-                    <div className="text-right">
-                      <p className="text-xs font-semibold text-fg-subtle leading-none mb-2">Registrado por</p>
-                      <p className="font-bold text-fg text-sm whitespace-nowrap">{item.autor.name || "Sistema"}</p>
+                      <p className="mt-1 break-words text-sm font-medium text-fg">{item.titulo}</p>
                     </div>
-                    <div className="w-12 h-12 bg-subtle rounded-lg flex items-center justify-center text-fg-subtle border border-line">
-                      <User size={20} />
-                    </div>
+                    <button type="button" onClick={() => { setSelectedOcorrencia(item); setShowForm(true) }} aria-label={`Editar ${item.titulo}`} className="flex size-11 items-center justify-center rounded-md text-fg-subtle hover:bg-subtle"><Edit3 size={18} strokeWidth={1.75} /></button>
+                    <button type="button" onClick={() => handleDelete(item.id)} aria-label={`Excluir ${item.titulo}`} className="flex size-11 items-center justify-center rounded-md text-fg-subtle hover:bg-danger-subtle hover:text-danger-fg"><Trash2 size={18} strokeWidth={1.75} /></button>
                   </div>
-                </div>
-              </div>
-            </div>
-          ))
+                  <p className="whitespace-pre-wrap text-13 text-fg-muted">{item.descricao}</p>
+                  <p className="text-xs text-fg-subtle">{item.estudantes.map((e) => `${e.nome} (${e.turma.nome})`).join(", ")} · por {item.autor.name || "Sistema"}</p>
+                </li>
+              ))}
+            </ul>
+            <RodapeTabela total={ocorrencias.length} singular="registro" plural="registros" className="print:hidden" />
+          </>
         )}
-      </section>
-
-      {/* Footer Info */}
-      <section className="py-12 border-t border-line print:hidden">
-        <div className="flex flex-col items-center text-center space-y-4">
-          <div className="w-14 h-14 bg-canvas rounded-xl flex items-center justify-center text-fg-disabled">
-            <Printer size={24} />
-          </div>
-          <h4 className="text-fg font-bold">Configuração de Impressão</h4>
-          <p className="text-fg-subtle text-sm max-w-sm">Use os filtros acima para definir o conteúdo do relatório mensal desejado antes de imprimir.</p>
-        </div>
-      </section>
+      </Painel>
 
       {/* Modais */}
       {showForm && (

@@ -169,7 +169,7 @@ export default function DisciplinasList({ disciplinas }: DisciplinasListProps) {
     </Painel>
 
     {/* Celular: por turno e turma (como antes) */}
-    <div className="space-y-6 md:hidden">
+    <div className="space-y-4 md:hidden">
       {/* Filtros */}
       <div className="bg-surface p-4 rounded-2xl border border-line flex flex-col md:flex-row gap-3 md:items-end">
         <div className="flex-1 w-full space-y-1.5">
@@ -182,7 +182,7 @@ export default function DisciplinasList({ disciplinas }: DisciplinasListProps) {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Nome da disciplina ou turma..."
-                    className={`${CONTROLE} pl-9`}
+                    className={`${CONTROLE}pl-9`}
                 />
             </div>
         </div>
@@ -207,7 +207,7 @@ export default function DisciplinasList({ disciplinas }: DisciplinasListProps) {
       {sortedTurnos.length === 0 ? (
         <EmptyState icon={Search} title="Nenhuma disciplina encontrada" description="Tente ajustar os filtros de busca." className="rounded-lg border border-dashed border-line bg-surface" />
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-5">
       {sortedTurnos.map(turno => (
         <section key={turno} className="space-y-3" aria-label={rotulo(turno)}>
           <div className="flex items-center gap-2">
@@ -230,7 +230,7 @@ export default function DisciplinasList({ disciplinas }: DisciplinasListProps) {
                     aria-expanded={isOpen}
                     className="w-full flex items-center gap-3 px-4 py-3 text-left transition-colors duration-150 hover:bg-subtle/60"
                   >
-                    <ChevronRight size={16} strokeWidth={1.75} className={`shrink-0 text-fg-subtle transition-transform duration-150 ${isOpen ? 'rotate-90' : ''}`} aria-hidden />
+                    <ChevronRight size={16} strokeWidth={1.75} className={`shrink-0 text-fg-subtle transition-transform duration-150${isOpen ? 'rotate-90' : ''}`} aria-hidden />
                     <span className="text-sm font-medium text-fg">{turma.nome}</span>
                     <span className="ml-auto text-xs tabular-nums text-fg-subtle">{discs.length} {discs.length === 1 ? 'disciplina' : 'disciplinas'}</span>
                   </button>

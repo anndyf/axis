@@ -80,19 +80,19 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
         </div>
       </header>
 
-      <main className="py-8">
+      <main className="py-4">
         {esquemas.length === 0 ? (
-          <div className="bg-surface rounded-xl shadow-card border border-line p-20 text-center">
-            <div className="w-20 h-20 bg-canvas rounded-xl flex items-center justify-center mx-auto mb-6">
+          <div className="bg-surface rounded-xl border border-line p-8 text-center">
+            <div className="w-12 h-12 bg-canvas rounded-xl flex items-center justify-center mx-auto mb-6">
               <ClipboardList className="w-10 h-10 text-fg-disabled" />
             </div>
             <h3 className="text-2xl font-medium text-fg mb-2">Nenhum esquema cadastrado</h3>
-            <p className="text-fg-muted font-medium mb-8 max-w-xs mx-auto text-sm">
+            <p className="text-fg-muted font-medium mb-4 max-w-xs mx-auto text-sm">
               Crie o primeiro esquema de avaliação da escola.
             </p>
             <button
               onClick={abrirNovo}
-              className="inline-flex items-center space-x-2 bg-accent text-on-accent px-8 py-4 rounded-lg hover:bg-accent-hover transition-all font-medium text-xs shadow-card active:scale-95"
+              className="inline-flex items-center space-x-2 bg-accent text-on-accent px-4 py-4 rounded-lg hover:bg-accent-hover transition-all font-medium text-xs"
             >
               <Plus size={16} />
               <span>Criar Esquema</span>
@@ -101,7 +101,7 @@ export default function EsquemaAvaliacaoClient({ esquemasIniciais }: { esquemasI
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {esquemas.map(esquema => (
-              <div key={esquema.id} className="bg-surface border border-line rounded-xl p-6 shadow-sm hover:shadow-card transition-all">
+              <div key={esquema.id} className="bg-surface border border-line rounded-xl p-4 hover: transition-all">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2.5 rounded-lg bg-subtle text-fg-muted">

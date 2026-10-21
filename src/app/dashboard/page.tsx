@@ -90,7 +90,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const nome = user.name ?? "Usuário"
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <TeacherTipsModal
         storageKey="seen_support_popup_v1"
         title="Dica de Suporte"
@@ -127,7 +127,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 }
 
 function GradeIndicadores({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">{children}</div>
+  return <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">{children}</div>
 }
 
 type Atalho = (id: string, rotulo?: string, href?: string) => { rotulo: string; href: string; icone: LucideIcon }[]
@@ -201,7 +201,7 @@ async function PainelProfessor({ escolaId, userId, anoLetivo, atalho }: { escola
         )}
       </Secao>
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid gap-5 lg:grid-cols-2">
         <Secao id="chamadas" titulo="Chamadas pendentes" className="hidden md:block">
           <Lista vazio="Nenhuma chamada pendente.">
             {chamadas.map((p) => (
@@ -218,7 +218,7 @@ async function PainelProfessor({ escolaId, userId, anoLetivo, atalho }: { escola
         </Secao>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
         <Secao id="comunicados" titulo="Comunicados" acao={{ rotulo: "Ver todos", href: "/dashboard/mensagens" }}>
           <ListaComunicados comunicados={comunicados} />
         </Secao>
@@ -328,7 +328,7 @@ async function PainelPedagogia({ escolaId, anoLetivo, atalho, visiveis }: { esco
         </Secao>
       )}
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid gap-5 lg:grid-cols-2">
         {resumo && (
           <Secao id="atrasadas" titulo="Turmas com chamada atrasada">
             <Lista vazio="Todas as chamadas em dia.">
@@ -397,7 +397,8 @@ async function PainelAdministracao({ escolaId, anoLetivo, atalho }: { escolaId: 
         <Indicador icone={AlertTriangle} tom="danger" valor={risco.total} rotulo="Estudantes em risco" detalhe="Frequência ou notas" href="/dashboard/conselho-classe" />
       </GradeIndicadores>
 
-      <Secao id="turmas" titulo="Turmas com pendências" descricao={`Chamadas, frequência e notas de ${anoLetivo}`} acao={{ rotulo: "Ver turmas", href: "/dashboard/turmas" }}>
+      <div className="grid gap-5 xl:grid-cols-3 xl:items-start">
+      <Secao id="turmas" className="xl:col-span-2" titulo="Turmas com pendências" descricao={`Chamadas, frequência e notas de ${anoLetivo}`} acao={{ rotulo: "Ver turmas", href: "/dashboard/turmas" }}>
         {turmas.length === 0 ? <Aviso>Nenhuma turma com pendência.</Aviso> : (
           <>
             {/* Celular: cartões. Telas maiores: tabela com rolagem própria */}
@@ -422,22 +423,22 @@ async function PainelAdministracao({ escolaId, anoLetivo, atalho }: { escolaId: 
               <div className="relative overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-line text-left text-xs text-fg-subtle">
-                      <th scope="col" className="px-5 py-3 font-medium">Turma</th>
-                      <th scope="col" className="px-3 py-3 text-right font-medium">Freq. média</th>
-                      <th scope="col" className="px-3 py-3 text-right font-medium">Chamadas pendentes</th>
-                      <th scope="col" className="px-3 py-3 text-right font-medium">Abaixo do mínimo</th>
-                      <th scope="col" className="px-5 py-3 text-right font-medium">Alunos sem nota</th>
+                    <tr className="border-b border-line bg-canvas text-left text-rotulo text-fg-muted">
+                      <th scope="col" className="h-9 px-4 font-medium">Turma</th>
+                      <th scope="col" className="h-9 px-3 text-right font-medium">Freq. média</th>
+                      <th scope="col" className="h-9 px-3 text-right font-medium">Chamadas pendentes</th>
+                      <th scope="col" className="h-9 px-3 text-right font-medium">Abaixo do mínimo</th>
+                      <th scope="col" className="h-9 px-4 text-right font-medium">Alunos sem nota</th>
                     </tr>
                   </thead>
                   <tbody>
                     {turmas.map((t) => (
                       <tr key={t.turmaId} className="border-b border-line-subtle last:border-0">
-                        <td className="px-5 py-3"><Link href={`/dashboard/frequencia?turma=${t.turmaId}`} className="font-mono font-medium text-fg hover:text-accent-fg hover:underline">{t.nome}</Link></td>
-                        <td className="px-3 py-3 text-right text-fg-muted tabular-nums">{formatarFrequencia(t.frequenciaMedia)}</td>
-                        <td className="px-3 py-3 text-right">{contagem(t.chamadasPendentes, "danger")}</td>
-                        <td className="px-3 py-3 text-right">{contagem(t.abaixoDoMinimo, "danger")}</td>
-                        <td className="px-5 py-3 text-right">{contagem(t.semNota, "warning")}</td>
+                        <td className="h-linha px-4"><Link href={`/dashboard/frequencia?turma=${t.turmaId}`} className="font-mono font-medium text-fg hover:text-accent-fg hover:underline">{t.nome}</Link></td>
+                        <td className="h-linha px-3 text-right text-fg-muted tabular-nums">{formatarFrequencia(t.frequenciaMedia)}</td>
+                        <td className="h-linha px-3 text-right">{contagem(t.chamadasPendentes, "danger")}</td>
+                        <td className="h-linha px-3 text-right">{contagem(t.abaixoDoMinimo, "danger")}</td>
+                        <td className="h-linha px-4 text-right">{contagem(t.semNota, "warning")}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -448,15 +449,7 @@ async function PainelAdministracao({ escolaId, anoLetivo, atalho }: { escolaId: 
         )}
       </Secao>
 
-      <div className="grid gap-8 lg:grid-cols-2">
-        <Secao id="professores" titulo="Professores com lançamentos atrasados" descricao="Chamadas não feitas e alunos sem nota">
-          <Lista vazio="Nenhum professor com lançamento atrasado.">
-            {atrasados.slice(0, 8).map((p) => (
-              <Item key={p.id} icone={UserRound} tom="warning" titulo={p.nome} subtitulo={`${p.disciplinas} ${p.disciplinas === 1 ? "disciplina" : "disciplinas"}`} href={atalho("usuarios").length ? `/dashboard/usuarios/${p.id}/disciplinas` : undefined} direita={<>{p.chamadasPendentes} chamadas<br />{p.semNota} sem nota</>} />
-            ))}
-          </Lista>
-        </Secao>
-        <div className="min-w-0 space-y-8">
+        <div className="min-w-0 space-y-5">
           <Secao id="comunicados" titulo="Comunicados" acao={{ rotulo: "Ver todos", href: "/dashboard/mensagens" }}>
             <ListaComunicados comunicados={comunicados} />
           </Secao>
@@ -470,9 +463,18 @@ async function PainelAdministracao({ escolaId, anoLetivo, atalho }: { escolaId: 
         </div>
       </div>
 
+      <div className="grid gap-5 xl:grid-cols-3 xl:items-start">
+        <Secao id="professores" className="xl:col-span-2" titulo="Professores com lançamentos atrasados" descricao="Chamadas não feitas e alunos sem nota">
+          <Lista vazio="Nenhum professor com lançamento atrasado.">
+            {atrasados.slice(0, 8).map((p) => (
+              <Item key={p.id} icone={UserRound} tom="warning" titulo={p.nome} subtitulo={`${p.disciplinas} ${p.disciplinas === 1 ? "disciplina" : "disciplinas"}`} href={atalho("usuarios").length ? `/dashboard/usuarios/${p.id}/disciplinas` : undefined} direita={<>{p.chamadasPendentes} chamadas<br />{p.semNota} sem nota</>} />
+            ))}
+          </Lista>
+        </Secao>
       <Secao titulo="Atalhos" className="hidden md:block">
         <Atalhos itens={[...atalho("usuarios"), ...atalho("resultados", "Relatórios e resultados"), ...atalho("configuracoes"), ...(atalho("usuarios").length ? [] : atalho("turmas"))]} />
       </Secao>
+      </div>
     </>
   )
 }

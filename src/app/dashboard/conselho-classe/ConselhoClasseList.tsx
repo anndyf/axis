@@ -46,10 +46,10 @@ export default function ConselhoClasseList({
   ]
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
 
       {/* Filtros Premium */}
-      <div className="bg-surface p-6 rounded-xl shadow-card border border-line flex flex-wrap gap-6 items-end relative overflow-hidden">
+      <div className="bg-surface p-4 rounded-xl border border-line flex flex-wrap gap-4 items-end relative overflow-hidden">
           
           <div className="flex-1 min-w-[300px] space-y-2">
               <label className="text-xs font-medium text-fg-subtle ml-2">Turma ou Curso</label>
@@ -62,24 +62,24 @@ export default function ConselhoClasseList({
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
                       placeholder="Busque por nome ou curso..."
-                      className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-zinc-500 transition-all font-medium text-fg-muted shadow-card placeholder:text-fg-disabled"
+                      className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-zinc-500 transition-all font-medium text-fg-muted placeholder:text-fg-disabled"
                   />
               </div>
           </div>
 
           <div className="pb-2.5">
-              <div className="flex items-center gap-2 bg-canvas px-4 py-2.5 rounded-lg border border-line shadow-sm">
-                  <span className="w-2 h-2 rounded-full bg-zinc-500 animate-pulse"></span>
+              <div className="flex items-center gap-2 bg-canvas px-4 py-2.5 rounded-lg border border-line">
+                  <span className="w-2 h-2 rounded-full bg-zinc-500"></span>
                   <span className="text-xs font-semibold text-fg-muted">Sincronização Ativa</span>
               </div>
           </div>
       </div>
 
       {/* Listagem Estilo Premium */}
-      <div className="bg-surface rounded-xl shadow-card border border-line overflow-hidden">
-        <div className="p-8 border-b border-line bg-canvas/10 flex items-center justify-between">
+      <div className="bg-surface rounded-xl border border-line overflow-hidden">
+        <div className="p-4 border-b border-line bg-canvas/10 flex items-center justify-between">
            <h2 className="text-xs font-semibold text-fg-subtle flex items-center gap-3">
-             <div className="w-8 h-8 rounded-lg bg-canvas text-fg-muted flex items-center justify-center shadow-card">
+             <div className="w-8 h-8 rounded-lg bg-canvas text-fg-muted flex items-center justify-center">
                <Users size={16} />
              </div>
              Turmas em Deliberação de Conselho
@@ -88,7 +88,7 @@ export default function ConselhoClasseList({
 
         <div className="overflow-x-auto">
           {turnos.length === 0 ? (
-            <div className="text-center py-20 text-fg-disabled">
+            <div className="text-center py-10 text-fg-disabled">
               <BarChart3 className="w-12 h-12 opacity-20 mx-auto mb-3" />
               <p className="text-xs font-medium">Nenhuma turma para deliberar</p>
             </div>

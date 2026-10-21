@@ -163,13 +163,13 @@ export default function PendenciasClient({
   ]
 
   return (
-    <div className="p-4 sm:p-8">
-      <div className="space-y-8">
+    <div className="p-4 sm:p-4">
+      <div className="space-y-5">
         
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-fg tracking-tight flex items-center gap-3">
+            <h1 className="text-xl font-bold text-fg tracking-tight flex items-center gap-3">
               <div className="p-3 bg-accent-subtle text-accent-fg rounded-lg">
                 <UserPlus size={24} />
               </div>
@@ -182,7 +182,7 @@ export default function PendenciasClient({
           <div className="flex items-center gap-3 w-full md:w-auto">
             <Link 
               href="/dashboard/estudantes/novo"
-              className="flex-1 md:flex-none text-center bg-accent text-on-accent px-6 py-3 rounded-xl font-bold hover:bg-accent-hover transition-all shadow-card active:scale-95"
+              className="flex-1 md:flex-none text-center bg-accent text-on-accent px-4 py-3 rounded-xl font-bold hover:bg-accent-hover transition-all"
             >
               + Cadastrar Aluno
             </Link>
@@ -190,50 +190,50 @@ export default function PendenciasClient({
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-surface p-6 rounded-xl border border-line shadow-sm flex items-center gap-5">
-            <div className="w-14 h-14 bg-accent-subtle text-accent-fg rounded-lg flex items-center justify-center shrink-0">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-surface p-4 rounded-xl border border-line flex items-center gap-5">
+            <div className="w-10 h-10 bg-accent-subtle text-accent-fg rounded-lg flex items-center justify-center shrink-0">
               <FileText size={28} />
             </div>
             <div>
               <p className="text-sm font-bold text-fg-subtle">Total</p>
-              <h2 className="text-3xl font-semibold text-fg">{stats.total}</h2>
+              <h2 className="text-xl font-semibold text-fg">{stats.total}</h2>
             </div>
           </div>
 
-          <div className="bg-surface p-6 rounded-xl border border-line shadow-sm flex items-center gap-5">
-            <div className="w-14 h-14 bg-danger-subtle text-danger-fg rounded-lg flex items-center justify-center shrink-0">
+          <div className="bg-surface p-4 rounded-xl border border-line flex items-center gap-5">
+            <div className="w-10 h-10 bg-danger-subtle text-danger-fg rounded-lg flex items-center justify-center shrink-0">
               <Clock size={28} />
             </div>
             <div>
               <p className="text-sm font-bold text-fg-subtle">Pendentes</p>
-              <h2 className="text-3xl font-semibold text-danger-fg">{stats.pendentes}</h2>
+              <h2 className="text-xl font-semibold text-danger-fg">{stats.pendentes}</h2>
             </div>
           </div>
 
-          <div className="bg-surface p-6 rounded-xl border border-line shadow-sm flex items-center gap-5">
-            <div className="w-14 h-14 bg-success-subtle text-success-fg rounded-lg flex items-center justify-center shrink-0">
+          <div className="bg-surface p-4 rounded-xl border border-line flex items-center gap-5">
+            <div className="w-10 h-10 bg-success-subtle text-success-fg rounded-lg flex items-center justify-center shrink-0">
               <CheckCircle2 size={28} />
             </div>
             <div>
               <p className="text-sm font-bold text-fg-subtle">Resolvidas</p>
-              <h2 className="text-3xl font-semibold text-success-fg">{stats.resolvidos}</h2>
+              <h2 className="text-xl font-semibold text-success-fg">{stats.resolvidos}</h2>
             </div>
           </div>
         </div>
 
         {/* Filters and Search */}
         <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
-          <div className="flex bg-surface p-1 rounded-lg border border-line shadow-sm">
+          <div className="flex bg-surface p-1 rounded-lg border border-line">
             <button 
               onClick={() => updateFilters({ status: 'pendente' })}
-              className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${!serverFilters.showResolved ? 'bg-accent text-on-accent shadow-card' : 'text-fg-subtle hover:bg-canvas'}`}
+              className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all${!serverFilters.showResolved ? 'bg-accent text-on-accent shadow-card' : 'text-fg-subtle hover:bg-canvas'}`}
             >
               Pendências
             </button>
             <button 
               onClick={() => updateFilters({ status: 'resolvido' })}
-              className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${serverFilters.showResolved ? 'bg-accent text-on-accent shadow-card' : 'text-fg-subtle hover:bg-canvas'}`}
+              className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all${serverFilters.showResolved ? 'bg-accent text-on-accent shadow-card' : 'text-fg-subtle hover:bg-canvas'}`}
             >
               Histórico / Resolvidos
             </button>
@@ -250,7 +250,7 @@ export default function PendenciasClient({
                 if (e.key === 'Enter') updateFilters({ q: searchTerm })
               }}
               onBlur={() => updateFilters({ q: searchTerm })}
-              className="w-full bg-surface border border-line rounded-lg pl-12 pr-4 py-3.5 text-sm focus:ring-2 focus:ring-ring outline-none text-fg-muted font-medium transition-all shadow-sm"
+              className="w-full bg-surface border border-line rounded-lg pl-12 pr-4 py-3.5 text-sm focus:ring-2 focus:ring-ring outline-none text-fg-muted font-medium transition-all"
             />
             {isPending && (
               <div className="absolute right-4 top-1/2 -translate-y-1/2">
@@ -261,10 +261,10 @@ export default function PendenciasClient({
         </div>
 
         {/* Grouped List */}
-        <div className="space-y-8">
+        <div className="space-y-5">
           {finalGroupedArray.length === 0 ? (
             <div className="bg-surface rounded-xl p-16 text-center border border-line border-dashed">
-              <div className="w-20 h-20 bg-canvas rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-12 h-12 bg-canvas rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckCircle2 className="w-10 h-10 text-fg-disabled" />
               </div>
               <h3 className="text-xl font-bold text-fg-muted">Nenhum chamado encontrado</h3>
@@ -300,15 +300,15 @@ export default function PendenciasClient({
                   {group.items.map((item) => {
                     const isExpanded = expandedPendencies.has(item.id)
                     return (
-                      <div key={item.id} className={`bg-surface rounded-xl shadow-sm border border-line overflow-hidden hover:shadow-card transition-all ${item.isResolved ? 'opacity-75 grayscale-[0.3]' : ''}`}>
-                        <div className="p-6 flex flex-col md:flex-row gap-6 items-start md:items-center">
+                      <div key={item.id} className={`bg-surface rounded-xl border border-line overflow-hidden hover: transition-all${item.isResolved ? 'opacity-75 grayscale-[0.3]' : ''}`}>
+                        <div className="p-4 flex flex-col md:flex-row gap-4 items-start md:items-center">
                           <div className="flex-1 space-y-4">
                             <div className="flex flex-wrap items-center gap-3">
                               <span className="text-xs font-medium text-fg-subtle flex items-center gap-1.5">
                                 <Clock size={14} /> {item.date}
                               </span>
                               {item.internalStatus && (
-                                <span className={`px-3 py-1 text-xs font-semibold rounded-lg border flex items-center gap-1.5 ${statusOptions.find(s => s.label === item.internalStatus)?.color || 'bg-subtle text-fg-muted border-line'}`}>
+                                <span className={`px-3 py-1 text-xs font-semibold rounded-lg border flex items-center gap-1.5${statusOptions.find(s => s.label === item.internalStatus)?.color || 'bg-subtle text-fg-muted border-line'}`}>
                                   <Tag size={10} /> {item.internalStatus}
                                 </span>
                               )}
@@ -317,7 +317,7 @@ export default function PendenciasClient({
                             <div>
                               <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm font-semibold text-fg-subtle">
                                 <span className="flex items-center gap-2">
-                                  <div className="w-2 h-2 bg-accent rounded-full shadow-sm"></div>
+                                  <div className="w-2 h-2 bg-accent rounded-full"></div>
                                   Turma: <strong className="text-fg-muted">{item.turma}</strong>
                                 </span>
                                 <span className="flex items-center gap-2">
@@ -354,14 +354,14 @@ export default function PendenciasClient({
                               <button
                                 onClick={() => handleResolve(item.id)}
                                 disabled={resolvingId === item.id}
-                                className="w-full md:w-64 flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-6 py-3.5 rounded-lg font-bold text-sm transition-all shadow-card active:scale-95 disabled:opacity-50"
+                                className="w-full md:w-64 flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-on-accent px-4 py-3.5 rounded-lg font-bold text-sm transition-all disabled:opacity-50"
                               >
                                 {resolvingId === item.id ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
                                 Resolver Chamado
                               </button>
                               <button
                                 onClick={() => setReplyingTo(item)}
-                                className="w-full md:w-64 flex items-center justify-center gap-2 bg-surface hover:bg-canvas text-fg-muted border border-line px-6 py-3.5 rounded-lg font-bold text-sm transition-all shadow-sm active:scale-95"
+                                className="w-full md:w-64 flex items-center justify-center gap-2 bg-surface hover:bg-canvas text-fg-muted border border-line px-4 py-3.5 rounded-lg font-bold text-sm transition-all"
                               >
                                 <MessageSquare className="w-5 h-5 text-accent-fg" />
                                 Responder Professor
@@ -393,7 +393,7 @@ export default function PendenciasClient({
 
                         {/* Details and Conversation History */}
                         {isExpanded && (
-                          <div className="bg-canvas border-t border-line-subtle p-6 space-y-6 animate-slide-up">
+                          <div className="bg-canvas border-t border-line-subtle p-4 space-y-4 animate-slide-up">
                             {/* Original Observation */}
                             {item.observacao && (
                               <div className="space-y-2">
@@ -415,7 +415,7 @@ export default function PendenciasClient({
                                       <div className="w-8 h-8 rounded-xl bg-surface border border-line flex items-center justify-center text-xs font-bold text-fg-subtle shrink-0">
                                         {reply.sender.name?.charAt(0) || reply.sender.username.charAt(0)}
                                       </div>
-                                      <div className="bg-surface p-4 rounded-2xl border border-line shadow-sm flex-1">
+                                      <div className="bg-surface p-4 rounded-2xl border border-line flex-1">
                                         <div className="flex justify-between items-center mb-2">
                                           <span className="text-xs font-bold text-fg-muted">{reply.sender.name || reply.sender.username}</span>
                                           <span className="text-xs text-fg-subtle font-medium">{new Date(reply.createdAt).toLocaleString('pt-BR')}</span>
@@ -444,7 +444,7 @@ export default function PendenciasClient({
       {replyingTo && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-fade-in">
           <div className="bg-surface rounded-[32px] w-full max-w-2xl shadow-overlay border border-line-subtle overflow-hidden animate-pop-in">
-            <div className="px-8 py-6 flex items-center justify-between border-b bg-canvas/50 border-line-subtle">
+            <div className="px-4 py-3 flex items-center justify-between border-b bg-canvas/50 border-line-subtle">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 bg-accent-subtle text-accent-fg rounded-xl">
                   <MessageSquare size={20} />
@@ -462,7 +462,7 @@ export default function PendenciasClient({
               </button>
             </div>
 
-            <div className="p-8 space-y-6">
+            <div className="p-4 space-y-4">
               {/* Templates Section */}
               <div>
                 <label className="text-xs font-semibold text-fg-subtle ml-1 mb-3 block">Mensagens Rápidas (Templates)</label>
@@ -471,7 +471,7 @@ export default function PendenciasClient({
                     <button
                       key={template.label}
                       onClick={() => setReplyContent(template.text)}
-                      className="px-4 py-2 bg-accent-subtle text-accent-fg text-xs font-bold rounded-xl border border-accent/25 hover:bg-accent-hover hover:text-white transition-all active:scale-95"
+                      className="px-4 py-2 bg-accent-subtle text-accent-fg text-xs font-bold rounded-xl border border-accent/25 hover:bg-accent-hover hover:text-white transition-all"
                     >
                       {template.label}
                     </button>
@@ -493,14 +493,14 @@ export default function PendenciasClient({
               <div className="flex gap-3 pt-2">
                 <button
                   onClick={() => setReplyingTo(null)}
-                  className="flex-1 px-6 py-4 bg-subtle text-fg-muted rounded-lg font-bold text-sm hover:bg-subtle-hover transition-all active:scale-95"
+                  className="flex-1 px-4 py-4 bg-subtle text-fg-muted rounded-lg font-bold text-sm hover:bg-subtle-hover transition-all"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={handleSendReply}
                   disabled={isSendingReply || !replyContent.trim()}
-                  className="flex-1 px-6 py-4 bg-accent text-on-accent rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:bg-accent-hover transition-all shadow-card active:scale-95 disabled:opacity-50"
+                  className="flex-1 px-4 py-4 bg-accent text-on-accent rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:bg-accent-hover transition-all disabled:opacity-50"
                 >
                   {isSendingReply ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                   Enviar Mensagem

@@ -253,18 +253,18 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
   return (
     <div className="pb-20">
       <nav className="mb-6 border-b border-line pb-4">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/dashboard/turmas" className="flex items-center space-x-2 text-fg hover:opacity-70 font-semibold transition-all text-xs">
             <ArrowLeft className="w-4 h-4" />
             <span>Voltar</span>
           </Link>
-          <span className="text-xs font-semibold text-fg tracking-widest">Áxis Control</span>
+          <span className="text-xs font-semibold text-fg">Áxis Control</span>
         </div>
       </nav>
 
-      <main className="max-w-4xl mx-auto px-6 mt-12">
-        <div className="mb-10 text-center">
-           <h1 className="text-5xl font-semibold text-fg tracking-tight mb-3">
+      <main className="max-w-4xl mx-auto px-4 mt-12">
+        <div className="mb-5 text-center">
+           <h1 className="text-xl font-semibold text-fg tracking-tight mb-3">
              {isEdit ? 'Editar Turma' : 'Lançar Turma'}
            </h1>
            <p className="text-fg font-medium text-lg max-w-xl mx-auto leading-relaxed">
@@ -274,7 +274,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
 
         {/* Seção de Dicas Rápidas */}
         {!isEdit && (
-          <div className="max-w-2xl mx-auto mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="max-w-2xl mx-auto mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-accent-subtle border border-accent/25 p-4 rounded-lg flex items-start space-x-3">
               <div className="bg-accent p-1.5 rounded-lg shrink-0">
                 <Layers className="w-3.5 h-3.5 text-white" />
@@ -301,16 +301,16 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-6">
-          <div className="space-y-6">
+        <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-4">
+          <div className="space-y-4">
             {error && (
-              <div className="p-4 bg-danger-subtle border border-danger-line rounded-lg text-danger-fg flex items-center shadow-sm">
+              <div className="p-4 bg-danger-subtle border border-danger-line rounded-lg text-danger-fg flex items-center">
                 <AlertCircle className="w-5 h-5 mr-3 shrink-0" />
                 <span className="text-sm font-semibold">{error}</span>
               </div>
             )}
 
-            <div className="bg-surface rounded-xl p-8 shadow-card border border-line-subtle space-y-8">
+            <div className="bg-surface rounded-xl p-4 border border-line-subtle space-y-5">
               {/* 1. Modalidade */}
               <div className="space-y-3">
                 <div className="ml-1">
@@ -326,7 +326,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                       key={mod}
                       type="button"
                       onClick={() => setFormData(prev => ({ ...prev, modalidade: mod, curso: "", turno: "" }))}
-                      className={`py-2.5 rounded-xl font-semibold text-xs transition-all border-2 ${
+                      className={`py-2.5 rounded-xl font-semibold text-xs transition-all border-2${
                         formData.modalidade === mod 
                         ? 'bg-accent-subtle border-accent text-accent-fg shadow-card' 
                         : 'bg-canvas border-line-subtle text-fg hover:border-line hover:bg-surface'
@@ -339,7 +339,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
               </div>
 
               {/* Grid 2 & 3 */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between ml-1">
                     <div className="flex flex-col ml-1">
@@ -407,7 +407,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                       <button
                         key={s} type="button"
                         onClick={() => setFormData(p => ({ ...p, serie: s }))}
-                        className={`flex-1 py-2.5 rounded-lg font-semibold text-sm transition-all border ${
+                        className={`flex-1 py-2.5 rounded-lg font-semibold text-sm transition-all border${
                           formData.serie === s 
                           ? 'bg-success-subtle border-success-line text-success-fg shadow-card' 
                           : 'bg-canvas border-transparent text-fg hover:bg-subtle'
@@ -433,7 +433,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                       <button
                         key={n} type="button"
                         onClick={() => setFormData(p => ({ ...p, numero: n }))}
-                        className={`flex-1 py-2.5 rounded-lg font-semibold text-sm transition-all border ${
+                        className={`flex-1 py-2.5 rounded-lg font-semibold text-sm transition-all border${
                           formData.numero === n
                           ? 'bg-accent border-accent text-on-accent shadow-card' 
                           : 'bg-canvas border-transparent text-fg hover:bg-subtle'
@@ -470,15 +470,15 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                 {!isEdit && (
                   <div className="md:col-span-2 bg-canvas p-4 rounded-lg flex items-center justify-between group cursor-pointer" onClick={() => setImportarMatriz(!importarMatriz)}>
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${importarMatriz ? 'bg-accent shadow-card ' : 'bg-subtle-hover'}`}>
-                        <Layers className={`w-5 h-5 ${importarMatriz ? 'text-white' : 'text-fg-subtle'}`} />
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all${importarMatriz ? 'bg-accent shadow-card ' : 'bg-subtle-hover'}`}>
+                        <Layers className={`w-5 h-5${importarMatriz ? 'text-white' : 'text-fg-subtle'}`} />
                       </div>
                       <div>
                         <p className="text-xs font-bold text-fg">Importar Matriz Curricular</p>
                         <p className="text-xs text-fg-subtle font-medium leading-none">Cadastrar disciplinas padrão automaticamente</p>
                       </div>
                     </div>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${importarMatriz ? 'bg-accent border-accent' : 'border-line-strong'}`}>
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all${importarMatriz ? 'bg-accent border-accent' : 'border-line-strong'}`}>
                       {importarMatriz && <div className="w-2 h-2 bg-surface rounded-full" />}
                     </div>
                   </div>
@@ -490,14 +490,14 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                 <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
                   <div className="flex-1 flex flex-col items-center md:items-start justify-center p-4 bg-canvas rounded-lg border border-line-subtle">
                     <span className="text-xs font-semibold text-fg">Código</span>
-                    <div className="text-xl font-semibold tracking-tighter text-fg font-mono">
+                    <div className="text-xl font-semibold tracking-tight text-fg font-mono">
                       {formData.nome || "---"}
                     </div>
                   </div>
 
                   <button
                     type="submit" disabled={loading}
-                    className="flex-[1.5] flex items-center justify-center space-x-2 bg-accent text-on-accent py-4 px-6 rounded-lg font-semibold hover:bg-accent-hover transition-all shadow-card active:scale-[0.98] disabled:opacity-50"
+                    className="flex-[1.5] flex items-center justify-center space-x-2 bg-accent text-on-accent py-4 px-4 rounded-lg font-semibold hover:bg-accent-hover transition-all active:scale-[0.98] disabled:opacity-50"
                   >
                     {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
                     <span className="text-sm">
@@ -506,7 +506,7 @@ export default function TurmaForm({ turma, isEdit = false, dbCursos = [] }: Turm
                   </button>
                 </div>
 
-                <div className="flex items-center justify-center gap-6">
+                <div className="flex items-center justify-center gap-4">
                   <button
                     type="button"
                     onClick={() => router.push('/dashboard/turmas')}

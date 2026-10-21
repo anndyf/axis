@@ -269,7 +269,7 @@ export default function MatrizCurricularClient({
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
       <header className="mb-6">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div className="flex min-w-0 items-center gap-3">
               <Link
                 href="/dashboard"
@@ -287,10 +287,10 @@ export default function MatrizCurricularClient({
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-32 space-y-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-4 lg:px-4 pt-4 pb-32 space-y-5">
         
         {/* Filtros Premium */}
-        <div className="bg-surface p-5 rounded-xl shadow-card border border-line-subtle flex flex-wrap gap-4 items-end relative overflow-visible">
+        <div className="bg-surface p-5 rounded-xl border border-line-subtle flex flex-wrap gap-4 items-end relative overflow-visible">
 
             {/* Modalidade */}
             <div className="flex-1 min-w-[130px] max-w-[180px] space-y-1.5">
@@ -353,7 +353,7 @@ export default function MatrizCurricularClient({
                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-subtle">
                       <GraduationCap size={15} />
                     </div>
-                    <span className={`truncate ${selectedCurso ? 'text-fg' : 'text-fg-subtle font-normal'}`}>
+                    <span className={`truncate${selectedCurso ? 'text-fg' : 'text-fg-subtle font-normal'}`}>
                       {selectedCurso
                         ? (() => {
                             const c = cursosLocais.find(curr => curr.id === selectedCurso);
@@ -361,7 +361,7 @@ export default function MatrizCurricularClient({
                           })()
                         : 'Selecione o Curso...'}
                     </span>
-                    <ChevronDown size={14} className={`ml-auto shrink-0 text-fg-subtle transition-transform ${showCursoDropdown ? 'rotate-180' : ''}`} />
+                    <ChevronDown size={14} className={`ml-auto shrink-0 text-fg-subtle transition-transform${showCursoDropdown ? 'rotate-180' : ''}`} />
                   </button>
 
                   {showCursoDropdown && (
@@ -378,13 +378,13 @@ export default function MatrizCurricularClient({
                           <p className="px-4 py-4 text-xs text-fg-subtle text-center">Nenhum curso encontrado</p>
                         )}
                         {cursosFiltrados.map((c) => (
-                          <div key={c.id} className={`flex items-center group transition-colors ${selectedCurso === c.id ? 'bg-accent-subtle' : 'hover:bg-canvas'}`}>
+                          <div key={c.id} className={`flex items-center group transition-colors${selectedCurso === c.id ? 'bg-accent-subtle' : 'hover:bg-canvas'}`}>
                             <button
                               type="button"
                               onClick={() => { setSelectedCurso(c.id); setShowCursoDropdown(false) }}
                               className="flex-1 text-left px-4 py-2.5 min-w-0"
                             >
-                              <span className={`block text-sm font-semibold truncate ${selectedCurso === c.id ? 'text-accent-fg' : 'text-fg-muted'}`}>{c.nome}</span>
+                              <span className={`block text-sm font-semibold truncate${selectedCurso === c.id ? 'text-accent-fg' : 'text-fg-muted'}`}>{c.nome}</span>
                               <span className="text-xs font-bold text-fg-subtle">{c.modalidade} · {c.turnos?.join(', ') || '—'}</span>
                             </button>
                             {/* Ações: editar e excluir */}
@@ -467,8 +467,8 @@ export default function MatrizCurricularClient({
 
             {/* Badge de disciplinas */}
             <div className="shrink-0 pb-0.5">
-                <div className="flex items-center gap-1.5 bg-accent text-on-accent px-3 py-2.5 rounded-xl shadow-card">
-                    <span className="w-1.5 h-1.5 rounded-full bg-surface/70 animate-pulse" />
+                <div className="flex items-center gap-1.5 bg-accent text-on-accent px-3 py-2.5 rounded-xl">
+                    <span className="w-1.5 h-1.5 rounded-full bg-surface/70" />
                     <span className="text-xs font-semibold whitespace-nowrap">{itemsFiltradosNaLista.length} disciplinas</span>
                 </div>
             </div>
@@ -476,7 +476,7 @@ export default function MatrizCurricularClient({
 
         {/* Formulário de Lançamento em Lote */}
         {selectedCurso && (
-          <div className="bg-surface p-6 rounded-2xl shadow-sm border border-line">
+          <div className="bg-surface p-4 rounded-2xl border border-line">
             <h2 className="text-base font-semibold text-fg mb-4 flex items-center gap-2">
                <Plus size={20} className="text-accent-fg" />
                Adicionar Disciplinas à Matriz
@@ -507,7 +507,7 @@ export default function MatrizCurricularClient({
                 <button
                   type="submit"
                   disabled={saving || !novoNome}
-                  className="w-full bg-accent border border-accent text-on-accent font-semibold h-[60px] rounded-xl shadow-card transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95 text-sm"
+                  className="w-full bg-accent border border-accent text-on-accent font-semibold h-[60px] rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50 text-sm"
                 >
                   {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                   Lançar na Matriz
@@ -518,7 +518,7 @@ export default function MatrizCurricularClient({
         )}
 
         {/* Listagem da Matriz */}
-        <div className="bg-surface rounded-2xl shadow-sm border border-line overflow-hidden">
+        <div className="bg-surface rounded-2xl border border-line overflow-hidden">
           <div className="p-4 border-b border-line-subtle bg-canvas/50 flex flex-col sm:flex-row items-center justify-between gap-4">
             <h2 className="text-lg font-semibold text-fg-muted flex items-center gap-2">
                <BookOpen size={20} className="text-fg-subtle" />
@@ -557,17 +557,17 @@ export default function MatrizCurricularClient({
 
           <div className="overflow-x-auto">
             {!selectedCurso && !searchTerm ? (
-              <div className="p-20 text-center space-y-4">
+              <div className="p-8 text-center space-y-4">
                 <Search className="w-12 h-12 text-fg-disabled mx-auto" />
                 <p className="text-sm font-semibold text-fg-subtle">Selecione um curso para ver a matriz</p>
               </div>
             ) : loading ? (
-              <div className="p-20 text-center flex flex-col items-center gap-3">
+              <div className="p-8 text-center flex flex-col items-center gap-3">
                 <Loader2 className="w-8 h-8 text-accent-fg animate-spin" />
                 <p className="text-sm font-semibold text-fg-subtle">Sincronizando dados...</p>
               </div>
             ) : items.length === 0 ? (
-              <div className="p-20 text-center space-y-3">
+              <div className="p-8 text-center space-y-3">
                  <AlertCircle className="w-10 h-10 text-fg-disabled mx-auto" />
                  <p className="text-sm font-semibold text-fg-subtle">Matriz vazia para esta configuração</p>
               </div>
@@ -595,15 +595,15 @@ export default function MatrizCurricularClient({
                     {searchTerm && (
                       <th className="px-4 py-4 text-xs font-semibold text-fg-subtle">Curso / Série</th>
                     )}
-                    <th className="px-6 py-4 text-xs font-semibold text-fg-subtle">Área Vinculada</th>
-                    <th className="px-6 py-4 text-xs font-semibold text-fg-subtle text-right">Ação</th>
+                    <th className="px-4 py-4 text-xs font-semibold text-fg-subtle">Área Vinculada</th>
+                    <th className="px-4 py-4 text-xs font-semibold text-fg-subtle text-right">Ação</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-line-subtle/80">
                   {itemsFiltradosNaLista.map((item) => (
                     <tr
                       key={item.id}
-                      className={`transition-colors group cursor-pointer ${
+                      className={`transition-colors group cursor-pointer${
                         selectedIds.has(item.id)
                           ? 'bg-accent-subtle'
                           : 'hover:bg-canvas/50'
@@ -633,7 +633,7 @@ export default function MatrizCurricularClient({
                       </td>
                       <td className="px-4 py-4">
                         <div className="flex items-center gap-3">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors${
                             selectedIds.has(item.id)
                               ? 'bg-accent-subtle text-accent-fg'
                               : 'bg-subtle text-fg-subtle group-hover:bg-accent-subtle group-hover:text-accent-fg'
@@ -671,7 +671,7 @@ export default function MatrizCurricularClient({
                           </div>
                         </td>
                       )}
-                      <td className="px-6 py-4" onClick={e => e.stopPropagation()}>
+                      <td className="px-4 py-4" onClick={e => e.stopPropagation()}>
                         {editingId === item.id ? (
                           <select
                             value={editArea}
@@ -689,7 +689,7 @@ export default function MatrizCurricularClient({
                           <span className="text-fg-disabled text-xs font-medium italic">Não vinculada</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-right" onClick={e => e.stopPropagation()}>
+                      <td className="px-4 py-4 text-right" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-end gap-1">
                           {editingId === item.id ? (
                             <>

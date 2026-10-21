@@ -247,8 +247,8 @@ const ManualSelectorModal = ({ isOpen, onClose, onSelect, questions, selectedIds
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-zinc-900/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="bg-surface w-full max-w-4xl max-h-[90vh] rounded-xl shadow-card relative z-10 flex flex-col overflow-hidden animate-pop-in">
-        <div className="p-6 border-b border-line-subtle flex items-center justify-between bg-surface">
+      <div className="bg-surface w-full max-w-4xl max-h-[90vh] rounded-xl relative z-10 flex flex-col overflow-hidden animate-pop-in">
+        <div className="p-4 border-b border-line-subtle flex items-center justify-between bg-surface">
           <div>
             <h2 className="text-xl font-bold text-fg">Selecionar Questões</h2>
             <div className="flex items-center gap-2">
@@ -285,9 +285,9 @@ const ManualSelectorModal = ({ isOpen, onClose, onSelect, questions, selectedIds
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {filtered.length === 0 ? (
-            <div className="py-20 text-center text-fg-subtle">
+            <div className="py-10 text-center text-fg-subtle">
               <Search size={48} className="mx-auto mb-4 opacity-20" />
               <p>Nenhuma questão encontrada para os critérios.</p>
             </div>
@@ -295,7 +295,7 @@ const ManualSelectorModal = ({ isOpen, onClose, onSelect, questions, selectedIds
             filtered.map((q: any) => (
               <div 
                 key={q.id} 
-                className={`p-4 rounded-lg border transition-all cursor-pointer group ${
+                className={`p-4 rounded-lg border transition-all cursor-pointer group${
                   selectedIds.includes(q.id) 
                   ? 'border-accent bg-accent-subtle' 
                   : 'border-line-subtle hover:border-accent/25 hover:shadow-card'
@@ -304,7 +304,7 @@ const ManualSelectorModal = ({ isOpen, onClose, onSelect, questions, selectedIds
               >
                 <div className="flex justify-between gap-4 mb-2">
                   <div className="text-sm text-fg font-medium line-clamp-3 leading-relaxed" dangerouslySetInnerHTML={{ __html: q.enunciado }} />
-                  <div className={`mt-1 shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                  <div className={`mt-1 shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all${
                     selectedIds.includes(q.id) 
                     ? 'bg-accent border-accent' 
                     : 'border-line bg-surface'
@@ -319,7 +319,7 @@ const ManualSelectorModal = ({ isOpen, onClose, onSelect, questions, selectedIds
                     </span>
                   )}
                   <div 
-                    className={`w-2 h-2 rounded-full shrink-0 ${q.tipo === 'RECUPERACAO' ? 'bg-warning' : 'bg-accent'}`} 
+                    className={`w-2 h-2 rounded-full shrink-0${q.tipo === 'RECUPERACAO' ? 'bg-warning' : 'bg-accent'}`} 
                     title={q.tipo === 'RECUPERACAO' ? 'Questão de Segunda Chamada' : 'Questão Normal'}
                   />
                   <span className="text-xs font-bold px-2 py-0.5 rounded bg-surface border border-line-subtle text-fg-subtle">{q.dificuldade}</span>
@@ -335,13 +335,13 @@ const ManualSelectorModal = ({ isOpen, onClose, onSelect, questions, selectedIds
           )}
         </div>
 
-        <div className="p-6 border-t border-line-subtle bg-canvas flex items-center justify-between">
+        <div className="p-4 border-t border-line-subtle bg-canvas flex items-center justify-between">
           <p className="text-sm font-medium text-fg-subtle">
             <span className="text-accent-fg font-bold">{selectedIds.length}</span> questões selecionadas
           </p>
           <button 
             onClick={onClose}
-            className="bg-accent text-on-accent px-8 py-3 rounded-lg font-bold shadow-card active:scale-95 transition-all"
+            className="bg-accent text-on-accent px-4 py-3 rounded-lg font-bold transition-all"
           >
             Concluir Seleção
           </button>
@@ -874,20 +874,20 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
       {isPrinting && (
         <ProvaPrintView prova={printingProva} options={printingOptions} nomeEscola={nomeEscola} logoUrl={logoUrl} />
       )}
-      <div className="space-y-8 px-4 sm:px-0">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+      <div className="space-y-5 px-4 sm:px-0">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-fg flex items-center gap-3">
+          <h1 className="text-2xl sm:text-xl font-bold text-fg flex items-center gap-3">
             <Scissors className="text-accent-fg" />
             Gerador de Provas
           </h1>
           <p className="text-fg-subtle mt-2 text-sm">Crie ou gerencie suas avaliações profissionais.</p>
         </div>
 
-        <div className="flex flex-wrap bg-subtle p-1.5 rounded-lg shadow-card gap-1 w-full sm:w-auto overflow-x-auto no-scrollbar">
+        <div className="flex flex-wrap bg-subtle p-1.5 rounded-lg gap-1 w-full sm:w-auto overflow-x-auto no-scrollbar">
           <button
             onClick={() => setActiveTab('gerador')}
-            className={`flex-1 sm:flex-none px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 whitespace-nowrap ${
+            className={`flex-1 sm:flex-none px-4 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 whitespace-nowrap${
               activeTab === 'gerador'
               ? 'bg-surface text-accent-fg shadow-sm'
               : 'text-fg-subtle hover:text-fg-muted'
@@ -898,7 +898,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
           </button>
           <button
             onClick={() => setActiveTab('historico')}
-            className={`flex-1 sm:flex-none px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 whitespace-nowrap ${
+            className={`flex-1 sm:flex-none px-4 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 whitespace-nowrap${
               activeTab === 'historico'
               ? 'bg-surface text-accent-fg shadow-sm'
               : 'text-fg-subtle hover:text-fg-muted'
@@ -912,10 +912,10 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
       </div>
 
       {activeTab === 'gerador' && (
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 xl:gap-8 animate-slide-up items-start">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 xl:gap-4 animate-slide-up items-start">
         {/* Lado Esquerdo: Configurações + Disciplinas */}
-        <div className="xl:col-span-5 space-y-6">
-          <div className="bg-surface p-6 rounded-xl shadow-sm border border-line-subtle space-y-6">
+        <div className="xl:col-span-5 space-y-4">
+          <div className="bg-surface p-4 rounded-xl border border-line-subtle space-y-4">
             <div className="space-y-2">
               <label className="text-xs font-semibold text-fg-subtle ml-1">Título da Prova</label>
               <input 
@@ -1059,22 +1059,22 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                   <button 
                     onClick={() => setLayoutColunas(1)}
                     disabled={isAmpliada}
-                    className={`py-1.5 px-3 rounded-lg text-xs font-bold transition-all ${
+                    className={`py-1.5 px-3 rounded-lg text-xs font-bold transition-all${
                       layoutColunas === 1 && !isAmpliada
                       ? 'bg-surface text-accent-fg shadow-sm' 
                       : 'text-fg-subtle hover:text-fg-muted'
-                    } disabled:opacity-30`}
+                    }disabled:opacity-30`}
                   >
                     1 Coluna
                   </button>
                   <button 
                     onClick={() => setLayoutColunas(2)}
                     disabled={isAmpliada}
-                    className={`py-1.5 px-3 rounded-lg text-xs font-bold transition-all ${
+                    className={`py-1.5 px-3 rounded-lg text-xs font-bold transition-all${
                       layoutColunas === 2 && !isAmpliada
                       ? 'bg-surface text-accent-fg shadow-sm' 
                       : 'text-fg-subtle hover:text-fg-muted'
-                    } disabled:opacity-30`}
+                    }disabled:opacity-30`}
                   >
                     2 Colunas
                   </button>
@@ -1082,7 +1082,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
 
                 <button 
                   onClick={() => setIsAmpliada(!isAmpliada)}
-                  className={`flex-1 flex items-center justify-between gap-3 px-4 py-2 rounded-xl border-2 transition-all group ${
+                  className={`flex-1 flex items-center justify-between gap-3 px-4 py-2 rounded-xl border-2 transition-all group${
                     isAmpliada 
                     ? 'bg-warning-subtle border-warning text-warning-fg shadow-sm' 
                     : 'bg-canvas border-line-subtle text-fg-subtle hover:border-warning-line hover:text-warning-fg'
@@ -1095,8 +1095,8 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                       <p className="text-xs font-medium opacity-70 leading-tight">Acessibilidade</p>
                     </div>
                   </div>
-                  <div className={`w-8 h-4 rounded-full relative transition-colors ${isAmpliada ? 'bg-warning' : 'bg-subtle-hover'}`}>
-                    <div className={`absolute top-0.5 w-3 h-3 bg-surface rounded-full transition-all ${isAmpliada ? 'right-0.5' : 'left-0.5'}`} />
+                  <div className={`w-8 h-4 rounded-full relative transition-colors${isAmpliada ? 'bg-warning' : 'bg-subtle-hover'}`}>
+                    <div className={`absolute top-0.5 w-3 h-3 bg-surface rounded-full transition-all${isAmpliada ? 'right-0.5' : 'left-0.5'}`} />
                   </div>
                 </button>
               </div>
@@ -1116,7 +1116,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
 
           {/* Configuração de Disciplinas (Agora logo abaixo dos filtros na mesma coluna) */}
           {selectedTurma && (
-            <div className="bg-surface p-6 rounded-xl shadow-sm border border-line-subtle space-y-4">
+            <div className="bg-surface p-4 rounded-xl border border-line-subtle space-y-4">
               <div className="flex items-center justify-between mb-2">
                 <label className="text-xs font-semibold text-fg-subtle ml-1">Questões por Disciplina</label>
                 <button 
@@ -1142,13 +1142,13 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                 {config.map((c, idx) => {
                   const isHighlighted = isDisciplinaInArea(c.nome, areaConhecimento);
                   return (
-                  <div key={idx} className={`flex items-center justify-between p-3 rounded-xl border transition-colors ${
+                  <div key={idx} className={`flex items-center justify-between p-3 rounded-xl border transition-colors${
                     isHighlighted ? 'bg-success-subtle border-success-line hover:border-success-line' : 'bg-canvas/50 border-line-subtle hover:border-accent/25'
                   }`}>
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
-                         <span className={`text-sm font-medium truncate max-w-[200px] ${isHighlighted ? 'text-success-fg' : 'text-fg-muted'}`}>{c.nome}</span>
-                         <span className={`text-xs font-bold bg-surface px-1.5 py-0.5 rounded border ${isHighlighted ? 'text-success-fg border-success-line' : 'text-fg-subtle border-line'}`} title="Questões disponíveis nesta turma">
+                         <span className={`text-sm font-medium truncate max-w-[200px]${isHighlighted ? 'text-success-fg' : 'text-fg-muted'}`}>{c.nome}</span>
+                         <span className={`text-xs font-bold bg-surface px-1.5 py-0.5 rounded border${isHighlighted ? 'text-success-fg border-success-line' : 'text-fg-subtle border-line'}`} title="Questões disponíveis nesta turma">
                            {filteredAvailableQuestions.filter((q: any) => 
                              q.disciplinas?.some((d: any) => normalizeText(d.nome || "") === normalizeText(c.nome || ""))
                            ).length}
@@ -1175,7 +1175,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                         <Search size={10} /> Selecionar Manuais
                       </button>
                     </div>
-                    <div className="flex items-center gap-2 bg-surface border border-line rounded-lg p-1 shadow-sm shrink-0">
+                    <div className="flex items-center gap-2 bg-surface border border-line rounded-lg p-1 shrink-0">
                       <button 
                         onClick={() => {
                           const newConfig = [...config]
@@ -1214,7 +1214,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                 <button
                   onClick={handleGenerateDraft}
                   disabled={loading || config.reduce((acc, c) => acc + c.qtd, 0) === 0}
-                  className="w-full bg-accent hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed text-on-accent py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-card active:scale-95"
+                  className="w-full bg-accent hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed text-on-accent py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all"
                 >
                   {loading ? <RefreshCw className="animate-spin" size={20} /> : <FileText size={20} />}
                   {config.reduce((acc, c) => acc + c.qtd, 0) === 0 ? "Adicione questões acima" : "Gerar Rascunho"}
@@ -1225,12 +1225,12 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
         </div>
 
         {/* Lado Direito: Preview (Com Sticky Scroll para acompanhar a rolagem) */}
-        <div className="xl:col-span-7 space-y-6 xl:sticky xl:top-6 self-start">
+        <div className="xl:col-span-7 space-y-4 xl:sticky xl:top-6 self-start">
           {draftQuestions.length > 0 ? (
             <>
               <div className="flex items-center justify-between bg-accent-subtle p-4 rounded-lg border border-accent/25">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-accent text-on-accent rounded-full flex items-center justify-center font-bold shadow-card">
+                  <div className="w-10 h-10 bg-accent text-on-accent rounded-full flex items-center justify-center font-bold">
                     {draftQuestions.length}
                   </div>
                   <div>
@@ -1245,7 +1245,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                       if (saved) alert("Prova salva no histórico com sucesso!")
                     }}
                     disabled={loading || !!lastSavedProva}
-                    className={`px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-sm active:scale-95 disabled:opacity-50 ${
+                    className={`px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all disabled:opacity-50${
                         lastSavedProva 
                         ? "bg-success-subtle text-success-fg border border-success-line cursor-not-allowed" 
                         : "bg-surface hover:bg-canvas text-accent-fg border border-accent/25"
@@ -1263,7 +1263,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                         generatePDF(null)
                     }}
                     disabled={loading}
-                    className={`px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-card active:scale-95 disabled:opacity-50 ${
+                    className={`px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all disabled:opacity-50${
                         !lastSavedProva ? 'bg-zinc-300 text-fg-subtle cursor-not-allowed' : 'bg-accent hover:bg-accent-hover text-on-accent'
                     }`}
                   >
@@ -1276,12 +1276,12 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
 
               <div className="space-y-4">
                 {draftQuestions.map((q, idx) => (
-                  <div key={`${q.id}-${idx}`} className="bg-surface border border-line-subtle rounded-2xl p-6 shadow-sm group hover:border-accent/25 transition-all">
+                  <div key={`${q.id}-${idx}`} className="bg-surface border border-line-subtle rounded-2xl p-4 group hover:border-accent/25 transition-all">
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-semibold text-accent-fg">Questão {idx + 1} • {q.disciplinas[0]?.nome}</span>
                         <div 
-                          className={`w-2 h-2 rounded-full ${q.tipo === 'RECUPERACAO' ? 'bg-warning' : 'bg-accent'}`} 
+                          className={`w-2 h-2 rounded-full${q.tipo === 'RECUPERACAO' ? 'bg-warning' : 'bg-accent'}`} 
                           title={q.tipo === 'RECUPERACAO' ? 'Questão de Segunda Chamada' : 'Questão Normal'}
                         />
                       </div>
@@ -1344,11 +1344,11 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
               </div>
             </>
           ) : (
-            <div className="bg-accent-subtle via-white rounded-xl border border-accent/25 p-12 lg:p-20 text-center flex flex-col items-center justify-center min-h-[500px] shadow-sm relative overflow-hidden">
+            <div className="bg-accent-subtle via-white rounded-xl border border-accent/25 p-12 lg:p-8 text-center flex flex-col items-center justify-center min-h-[500px] relative overflow-hidden">
               <div className="absolute top-0 right-0 w-72 h-72 bg-accent-subtle rounded-full mix-blend-multiply filter blur-3xl opacity-20 transform translate-x-1/2 -translate-y-1/2"></div>
               <div className="absolute bottom-0 left-0 w-72 h-72 bg-accent-subtle rounded-full mix-blend-multiply filter blur-3xl opacity-20 transform -translate-x-1/2 translate-y-1/2"></div>
               
-              <div className="relative z-10 w-24 h-24 bg-surface shadow-card rounded-xl flex items-center justify-center mb-8 rotate-3 hover:rotate-0 transition-transform duration-300 border border-accent/25">
+              <div className="relative z-10 w-24 h-24 bg-surface rounded-xl flex items-center justify-center mb-4 rotate-3 hover:rotate-0 transition-transform duration-300 border border-accent/25">
                 <Layout size={40} className="text-accent-fg" />
                 <div className="absolute -bottom-3 -right-3 bg-warning text-white p-2.5 rounded-xl shadow-overlay rotate-12 border-2 border-white">
                   <FileText size={18} />
@@ -1365,10 +1365,10 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
       )}
 
       {activeTab === 'historico' && (
-        <div className="space-y-8 animate-slide-up">
-          <div className="flex flex-col gap-6 mb-8">
+        <div className="space-y-5 animate-slide-up">
+          <div className="flex flex-col gap-4 mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-warning-subtle text-warning-fg rounded-lg flex items-center justify-center shadow-sm">
+              <div className="w-12 h-12 bg-warning-subtle text-warning-fg rounded-lg flex items-center justify-center">
                 <HistoryIcon size={24} />
               </div>
               <div>
@@ -1388,7 +1388,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
               <select
                 value={historyFilterTurmaId}
                 onChange={(e) => setHistoryFilterTurmaId(e.target.value)}
-                className="bg-surface border border-line text-fg-muted rounded-lg px-4 py-2.5 text-sm outline-none shadow-sm focus:ring-2 focus:ring-ring w-full md:w-auto flex-1 appearance-none"
+                className="bg-surface border border-line text-fg-muted rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring w-full md:w-auto flex-1 appearance-none"
               >
                 <option value="">Todas as Turmas</option>
                 {turmas?.map((t: any) => (
@@ -1399,7 +1399,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
               <select
                 value={historyFilterTipo}
                 onChange={(e) => setHistoryFilterTipo(e.target.value)}
-                className="bg-surface border border-line text-fg-muted rounded-lg px-4 py-2.5 text-sm outline-none shadow-sm focus:ring-2 focus:ring-ring w-full md:w-auto flex-1 appearance-none"
+                className="bg-surface border border-line text-fg-muted rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring w-full md:w-auto flex-1 appearance-none"
               >
                 <option value="">Todos os Tipos</option>
                 <option value="SIMULADO">Simulado</option>
@@ -1411,7 +1411,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
               <select
                 value={historyFilterAreaId}
                 onChange={(e) => setHistoryFilterAreaId(e.target.value)}
-                className="bg-surface border border-line text-fg-muted rounded-lg px-4 py-2.5 text-sm outline-none shadow-sm focus:ring-2 focus:ring-ring w-full md:w-auto flex-1 appearance-none"
+                className="bg-surface border border-line text-fg-muted rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring w-full md:w-auto flex-1 appearance-none"
               >
                 <option value="">Todas as Áreas</option>
                 {globalAreas.map((a) => (
@@ -1422,7 +1422,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
               <select
                 value={historyFilterCriadorId}
                 onChange={(e) => setHistoryFilterCriadorId(e.target.value)}
-                className="bg-surface border border-line text-fg-muted rounded-lg px-4 py-2.5 text-sm outline-none shadow-sm focus:ring-2 focus:ring-ring w-full md:w-auto flex-1 appearance-none"
+                className="bg-surface border border-line text-fg-muted rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring w-full md:w-auto flex-1 appearance-none"
               >
                 <option value="">Todos os Criadores</option>
                 {globalCriadores.map((c) => (
@@ -1437,7 +1437,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
                   placeholder="Buscar por título ou turma..."
                   value={searchHistory}
                   onChange={(e) => setSearchHistory(e.target.value)}
-                  className="w-full bg-surface border border-line rounded-lg pl-12 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-ring outline-none transition-all shadow-sm"
+                  className="w-full bg-surface border border-line rounded-lg pl-12 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-ring outline-none transition-all"
                 />
               </div>
             </div>
@@ -1453,9 +1453,9 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
               <p className="text-fg-subtle font-medium">Nenhuma avaliação encontrada.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-20">
               {displayedProvas.map((p: any) => (
-                <div key={p.id} className="bg-surface p-6 rounded-xl border border-line-subtle shadow-sm hover:shadow-card transition-all group">
+                <div key={p.id} className="bg-surface p-4 rounded-xl border border-line-subtle hover: transition-all group">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex flex-wrap gap-2">
                       <span className="bg-success-subtle text-success-fg text-xs font-semibold px-2 py-1 rounded border border-success-line">
@@ -1546,7 +1546,7 @@ export default function GeradorProvasClient({ user, turmas, nomeEscola = 'Áxis'
 
           {/* Paginação */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-4 mt-8 pb-8">
+            <div className="flex items-center justify-center gap-4 mt-4 pb-8">
               <button 
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                 disabled={currentPage === 1 || loadingHistory}
@@ -1648,8 +1648,8 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-zinc-900/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="bg-surface w-full max-w-5xl max-h-[90vh] rounded-xl shadow-card relative z-10 flex flex-col overflow-hidden animate-pop-in">
-        <div className="p-6 border-b border-line-subtle flex items-center justify-between bg-surface text-fg">
+      <div className="bg-surface w-full max-w-5xl max-h-[90vh] rounded-xl relative z-10 flex flex-col overflow-hidden animate-pop-in">
+        <div className="p-4 border-b border-line-subtle flex items-center justify-between bg-surface text-fg">
           <div>
             <h2 className="text-xl font-bold">{prova.titulo}</h2>
             <p className="text-sm text-fg-subtle">{prova.turma?.nome} • {questoes.length} Questões</p>
@@ -1661,14 +1661,14 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-8 space-y-8 bg-canvas/30">
+        <div className="flex-1 overflow-y-auto p-4 space-y-5 bg-canvas/30">
           {questoes.length === 0 ? (
-            <div className="py-20 text-center text-fg-subtle">
+            <div className="py-10 text-center text-fg-subtle">
               <p>Carregando detalhes das questões...</p>
             </div>
           ) : (
             questoes.map((q: any, idx: number) => (
-              <div key={q.id} className="bg-surface p-6 rounded-2xl border border-line-subtle shadow-sm">
+              <div key={q.id} className="bg-surface p-4 rounded-2xl border border-line-subtle">
                 <span className="text-xs font-semibold text-accent-fg mb-2 block">Questão {idx + 1}</span>
                 <div className="text-fg font-medium mb-4 leading-relaxed overflow-hidden break-words w-full" dangerouslySetInnerHTML={{ __html: q.enunciado }} />
                 {q.imagemUrl && (
@@ -1683,12 +1683,12 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                   {['A', 'B', 'C', 'D', 'E'].map(letter => (
-                    <div key={letter} className={`p-3 rounded-xl border flex gap-3 ${
+                    <div key={letter} className={`p-3 rounded-xl border flex gap-3${
                       q.correta === letter 
                       ? 'bg-success-subtle border-success-line text-success-fg font-bold' 
                       : 'bg-canvas border-line-subtle text-fg-subtle'
                     }`}>
-                      <span className={`w-5 h-5 rounded-full shrink-0 flex items-center justify-center text-xs ${
+                      <span className={`w-5 h-5 rounded-full shrink-0 flex items-center justify-center text-xs${
                         q.correta === letter ? 'bg-success text-white' : 'bg-subtle-hover text-fg-subtle'
                       }`}>
                         {letter}
@@ -1704,7 +1704,7 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
           )}
         </div>
 
-        <div className="p-6 border-t border-line-subtle bg-surface flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="p-4 border-t border-line-subtle bg-surface flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex flex-wrap items-end gap-3">
             <div className="space-y-2">
               <label className="text-xs font-semibold text-fg-subtle">Formato</label>
@@ -1712,22 +1712,22 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
                 <button 
                   onClick={() => setLocalLayout(1)}
                   disabled={localAmpliada}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all${
                     localLayout === 1 && !localAmpliada
                     ? 'bg-surface text-accent-fg shadow-sm' 
                     : 'text-fg-subtle hover:text-fg-muted'
-                  } disabled:opacity-30`}
+                  }disabled:opacity-30`}
                 >
                   1 Coluna
                 </button>
                 <button 
                   onClick={() => setLocalLayout(2)}
                   disabled={localAmpliada}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all${
                     localLayout === 2 && !localAmpliada
                     ? 'bg-surface text-accent-fg shadow-sm' 
                     : 'text-fg-subtle hover:text-fg-muted'
-                  } disabled:opacity-30`}
+                  }disabled:opacity-30`}
                 >
                   2 Colunas
                 </button>
@@ -1736,7 +1736,7 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
 
             <button 
               onClick={() => setLocalAmpliada(!localAmpliada)}
-              className={`flex items-center gap-3 px-4 py-1.5 rounded-xl border-2 transition-all group ${
+              className={`flex items-center gap-3 px-4 py-1.5 rounded-xl border-2 transition-all group${
                 localAmpliada 
                 ? 'bg-warning-subtle border-warning text-warning-fg' 
                 : 'bg-canvas border-line-subtle text-fg-subtle hover:border-warning-line'
@@ -1749,8 +1749,8 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
                   <p className="text-xs font-medium opacity-70 leading-tight">Acessibilidade</p>
                 </div>
               </div>
-              <div className={`w-8 h-4 rounded-full relative transition-colors ${localAmpliada ? 'bg-warning' : 'bg-subtle-hover'}`}>
-                <div className={`absolute top-0.5 w-3 h-3 bg-surface rounded-full transition-all ${localAmpliada ? 'right-0.5' : 'left-0.5'}`} />
+              <div className={`w-8 h-4 rounded-full relative transition-colors${localAmpliada ? 'bg-warning' : 'bg-subtle-hover'}`}>
+                <div className={`absolute top-0.5 w-3 h-3 bg-surface rounded-full transition-all${localAmpliada ? 'right-0.5' : 'left-0.5'}`} />
               </div>
             </button>
           </div>
@@ -1773,7 +1773,7 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
             <div className="flex flex-wrap gap-2">
               <button 
                 onClick={() => onDownload({ layout: localLayout, ampliada: localAmpliada })}
-                className="bg-accent hover:bg-accent-hover text-on-accent px-4 py-2.5 rounded-xl text-xs font-bold shadow-card active:scale-95 transition-all flex items-center justify-center gap-2"
+                className="bg-accent hover:bg-accent-hover text-on-accent px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
               >
                 <FileDown size={16} />
                 Gerar PDF
@@ -1781,7 +1781,7 @@ const PreviewProvaModalWithConfig = ({ isOpen, onClose, prova, onDownload, onDel
               
               <button 
                 onClick={() => onDownload({ layout: localLayout, ampliada: localAmpliada, apenasGabarito: true })}
-                className="bg-accent hover:bg-accent-hover text-on-accent px-4 py-2.5 rounded-xl text-xs font-bold shadow-card active:scale-95 transition-all flex items-center justify-center gap-2"
+                className="bg-accent hover:bg-accent-hover text-on-accent px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2"
                 title="Gerar apenas o Gabarito do Professor"
               >
                 <ClipboardCheck size={16} />

@@ -92,8 +92,8 @@ export default async function AuditoriaPage({
   }
 
   return (
-    <div className="p-8">
-      <div className="space-y-8">
+    <div className="p-4">
+      <div className="space-y-5">
         
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -101,14 +101,14 @@ export default async function AuditoriaPage({
             <Link href="/dashboard" className="text-xs font-medium text-fg-subtle hover:text-fg-muted flex items-center gap-1 mb-2 transition-colors">
               <ChevronLeft size={14} /> Voltar ao Dashboard
             </Link>
-            <h1 className="text-3xl font-medium text-fg tracking-tight flex items-center gap-3">
+            <h1 className="text-xl font-medium text-fg tracking-tight flex items-center gap-3">
               <History className="w-8 h-8 text-fg-muted" />
               Central de Auditoria
             </h1>
             <p className="text-sm text-fg-muted font-medium">Monitoramento em tempo real de todas as ações críticas do sistema.</p>
           </div>
           
-          <div className="bg-surface p-4 rounded-xl border border-line-strong shadow-sm flex items-center gap-4">
+          <div className="bg-surface p-4 rounded-xl border border-line-strong flex items-center gap-4">
             <div className="w-10 h-10 rounded-lg bg-warning-subtle flex items-center justify-center text-warning-fg">
               <ShieldAlert size={20} />
             </div>
@@ -120,7 +120,7 @@ export default async function AuditoriaPage({
         </div>
 
         {/* Filters Placeholder */}
-        <div className="bg-surface border border-line-strong rounded-xl p-6 shadow-sm flex flex-col md:flex-row items-center gap-6">
+        <div className="bg-surface border border-line-strong rounded-xl p-4 flex flex-col md:flex-row items-center gap-4">
           <form className="flex-1 relative flex flex-col md:flex-row w-full items-center gap-3">
             <div className="relative flex-1 w-full">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-subtle" size={18} />
@@ -147,7 +147,7 @@ export default async function AuditoriaPage({
               </select>
             </div>
             
-            <button type="submit" className="w-full md:w-auto px-6 py-4 bg-surface border border-line text-fg rounded-lg text-sm font-medium hover:bg-subtle transition-colors">
+            <button type="submit" className="w-full md:w-auto px-4 py-4 bg-surface border border-line text-fg rounded-lg text-sm font-medium hover:bg-subtle transition-colors">
               Filtrar
             </button>
             {entityFilter && <input type="hidden" name="entity" value={entityFilter} />}
@@ -158,7 +158,7 @@ export default async function AuditoriaPage({
           <div className="flex flex-wrap gap-2 w-full md:w-auto">
             <Link 
               href={`/dashboard/auditoria?${userFilter ? `user=${userFilter}&` : ''}${query ? `q=${query}` : ''}`} 
-              className={`px-4 py-2 rounded-xl text-xs font-medium border transition-all ${
+              className={`px-4 py-2 rounded-xl text-xs font-medium border transition-all${
                 !entityFilter ? 'bg-surface border border-line border-zinc-700 text-fg' : 'border-line-strong text-fg-muted hover:bg-canvas'
               }`}
             >
@@ -168,7 +168,7 @@ export default async function AuditoriaPage({
               <Link 
                 key={filter} 
                 href={`/dashboard/auditoria?entity=${filter}${query ? `&q=${query}` : ''}${userFilter ? `&user=${userFilter}` : ''}`}
-                className={`px-4 py-2 rounded-xl text-xs font-medium border transition-all ${
+                className={`px-4 py-2 rounded-xl text-xs font-medium border transition-all${
                   entityFilter === filter ? 'bg-surface border border-line border-zinc-700 text-fg' : 'border-line-strong text-fg-muted hover:bg-canvas'
                 }`}
               >
@@ -179,22 +179,22 @@ export default async function AuditoriaPage({
         </div>
 
         {/* Logs Table */}
-        <div className="bg-surface border border-line-strong rounded-xl overflow-hidden shadow-card">
+        <div className="bg-surface border border-line-strong rounded-xl overflow-hidden">
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-canvas border-b border-line text-left">
-                <th className="px-8 py-5 text-xs font-medium text-fg-subtle">Data / Hora</th>
-                <th className="px-8 py-5 text-xs font-medium text-fg-subtle">Autor</th>
-                <th className="px-8 py-5 text-xs font-medium text-fg-subtle">Ação</th>
-                <th className="px-8 py-5 text-xs font-medium text-fg-subtle">Alvo / Impacto</th>
-                <th className="px-8 py-5 text-xs font-medium text-fg-subtle">Entidade</th>
-                <th className="px-8 py-5 text-xs font-medium text-fg-subtle">Alterações</th>
+                <th className="px-4 py-2.5 text-xs font-medium text-fg-subtle">Data / Hora</th>
+                <th className="px-4 py-2.5 text-xs font-medium text-fg-subtle">Autor</th>
+                <th className="px-4 py-2.5 text-xs font-medium text-fg-subtle">Ação</th>
+                <th className="px-4 py-2.5 text-xs font-medium text-fg-subtle">Alvo / Impacto</th>
+                <th className="px-4 py-2.5 text-xs font-medium text-fg-subtle">Entidade</th>
+                <th className="px-4 py-2.5 text-xs font-medium text-fg-subtle">Alterações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-line-subtle">
               {logs.length > 0 ? logs.map((log) => (
                 <tr key={log.id} className="hover:bg-canvas/30 transition-colors group">
-                  <td className="px-8 py-5">
+                  <td className="px-4 py-2.5">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-lg bg-subtle-hover flex items-center justify-center text-fg-subtle">
                         <Clock size={14} />
@@ -209,7 +209,7 @@ export default async function AuditoriaPage({
                       </div>
                     </div>
                   </td>
-                  <td className="px-8 py-5">
+                  <td className="px-4 py-2.5">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-subtle-hover flex items-center justify-center text-fg-muted font-medium text-xs">
                         {log.user?.name?.charAt(0) || '?'}
@@ -220,8 +220,8 @@ export default async function AuditoriaPage({
                       </div>
                     </div>
                   </td>
-                  <td className="px-8 py-5">
-                    <span className={`px-3 py-1 rounded-lg text-xs font-medium ${
+                  <td className="px-4 py-2.5">
+                    <span className={`px-3 py-1 rounded-lg text-xs font-medium${
                       log.action === 'INSERT' ? 'bg-success-subtle text-success-fg' :
                       log.action === 'UPDATE' ? 'bg-subtle text-fg-muted' :
                       'bg-danger-subtle text-danger-fg'
@@ -229,7 +229,7 @@ export default async function AuditoriaPage({
                       {log.action}
                     </span>
                   </td>
-                  <td className="px-8 py-5">
+                  <td className="px-4 py-2.5">
                     {(() => {
                       try {
                         const d = log.details ? JSON.parse(log.details) : {}
@@ -244,13 +244,13 @@ export default async function AuditoriaPage({
                       }
                     })()}
                   </td>
-                  <td className="px-8 py-5">
+                  <td className="px-4 py-2.5">
                     <div className="flex items-center gap-2">
                        <Database size={14} className="text-fg-disabled" />
                        <span className="text-xs font-medium text-fg-muted">{log.entityType}</span>
                     </div>
                   </td>
-                  <td className="px-8 py-5">
+                  <td className="px-4 py-2.5">
                     <div className="max-w-xs">
                       {(() => {
                         try {
@@ -306,7 +306,7 @@ export default async function AuditoriaPage({
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan={6} className="px-8 py-20 text-center">
+                  <td colSpan={6} className="px-4 py-10 text-center">
                     <div className="max-w-xs mx-auto space-y-4">
                       <div className="w-16 h-16 rounded-xl bg-canvas flex items-center justify-center text-fg-disabled mx-auto">
                         <ShieldAlert size={32} />
@@ -322,10 +322,10 @@ export default async function AuditoriaPage({
           </table>
           
           {/* Paginação */}
-          <div className="bg-canvas border-t border-line px-8 py-4 flex items-center justify-between">
+          <div className="bg-canvas border-t border-line px-4 py-4 flex items-center justify-between">
             <Link 
               href={page > 1 ? `/dashboard/auditoria?page=${page - 1}${entityFilter ? `&entity=${entityFilter}` : ''}${query ? `&q=${query}` : ''}${userFilter ? `&user=${userFilter}` : ''}` : '#'} 
-              className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${
+              className={`px-4 py-2 rounded-lg text-xs font-medium transition-all${
                 page > 1 ? 'bg-surface border border-line-strong text-fg-muted hover:bg-subtle' : 'opacity-50 cursor-not-allowed bg-subtle text-fg-subtle border border-line'
               }`}
             >
@@ -336,7 +336,7 @@ export default async function AuditoriaPage({
             </span>
             <Link 
               href={logs.length === limit ? `/dashboard/auditoria?page=${page + 1}${entityFilter ? `&entity=${entityFilter}` : ''}${query ? `&q=${query}` : ''}${userFilter ? `&user=${userFilter}` : ''}` : '#'} 
-              className={`px-4 py-2 rounded-lg text-xs font-medium transition-all ${
+              className={`px-4 py-2 rounded-lg text-xs font-medium transition-all${
                 logs.length === limit ? 'bg-surface border border-line-strong text-fg-muted hover:bg-subtle' : 'opacity-50 cursor-not-allowed bg-subtle text-fg-subtle border border-line'
               }`}
             >

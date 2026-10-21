@@ -2,7 +2,9 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Search, ChevronRight, Users, Filter, ArrowLeft, TrendingUp, AlertTriangle, FileText, CheckCircle2, BarChart3 } from "lucide-react"
+import { Search, ChevronRight, Users, Filter, TrendingUp, AlertTriangle, FileText, CheckCircle2, BarChart3 } from "lucide-react"
+import { CabecalhoPagina } from "@/components/ui"
+import ListaDeTurmas from "@/components/listas/ListaDeTurmas"
 
 interface RecuperacaoPageClientProps {
   turmas: any[]
@@ -44,32 +46,28 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
 
   return (
     <div className="">
-      {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
-      <header className="mb-6">
-        <div className="">
-          <div className="flex min-w-0 items-center gap-3">
-            <Link
-              href="/dashboard/notas"
-              aria-label="Voltar" className="hidden sm:inline-flex p-1.5 rounded-md text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg"
-            >
-              <ArrowLeft size={16} strokeWidth={1.75} />
-            </Link>
-            <div>
-              <h1 className="text-2xl font-semibold tracking-tight text-fg">Lançar Recuperação Final</h1>
-              <p className="text-sm text-fg-muted">Registro de notas substitutivas por turma</p>
-            </div>
-          </div>
-        </div>
-      </header>
+      <CabecalhoPagina
+        titulo="Recuperação final"
+        descricao="Notas substitutivas por turma, para estudantes que ficaram em recuperação."
+        dados={[{ rotulo: "Turmas", valor: turmas.length }, { rotulo: "Estudantes em recuperação", valor: totalAlunosEmRecuperacao }]}
+      />
+
+      <ListaDeTurmas
+        turmas={turmas.map((t) => ({ id: t.id, nome: t.nome, curso: t.curso, turno: t.turno, estudantes: t._count?.estudantes, emRecuperacao: t.totalRecuperacao as number }))}
+        href={(t) => `/dashboard/notas/recuperacao/${t.id}`}
+        nomeExportacao="Recuperação final - turmas"
+        acaoLinha="Abrir recuperação"
+        extras={[{ titulo: "Em recuperação", numeric: true, valor: (t: { emRecuperacao?: number }) => <span className={t.emRecuperacao ? "font-medium text-danger-fg" : "text-fg-muted"}>{t.emRecuperacao ?? 0}</span>, csv: (t: { emRecuperacao?: number }) => t.emRecuperacao ?? 0 }]}
+      />
 
       {/* Main Content */}
-      <main className="pt-4 pb-32 space-y-8">
+      <main className="space-y-5 pt-4 pb-32 md:hidden">
         
         {/* Dicas Fixas - Estilo Resultados */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {recuperacaoTips.map((tip, index) => (
              <div key={index} className="bg-surface border border-line p-4 rounded-2xl flex items-start gap-3">
-                <div className={`p-3 rounded-lg bg-subtle text-fg-muted transition-all shadow-card`}>
+                <div className={`p-3 rounded-lg bg-subtle text-fg-muted transition-all`}>
                    {tip.icon}
                 </div>
                 <div>
@@ -81,7 +79,7 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
         </div>
 
         {/* Filtros Estilo Simulados */}
-        <div className="bg-surface p-5 rounded-2xl shadow-sm border border-line flex flex-wrap gap-5 items-end">
+        <div className="bg-surface p-5 rounded-2xl border border-line flex flex-wrap gap-5 items-end">
             <div className="flex-1 min-w-[250px] space-y-1.5">
                 <label className="text-sm font-medium text-fg-subtle ml-1">Turma</label>
                 <div className="relative">
@@ -120,7 +118,7 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
         </div>
 
         {/* Listagem Estilo Simulados (Table) */}
-        <div className="bg-surface rounded-2xl shadow-sm border border-line-strong overflow-hidden">
+        <div className="bg-surface rounded-2xl border border-line-strong overflow-hidden">
           <div className="p-4 border-b border-line bg-canvas/10 flex items-center justify-between">
             <h2 className="text-lg font-medium text-fg flex items-center gap-2">
                <TrendingUp size={20} className="text-fg-subtle" />
@@ -132,16 +130,16 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
             <table className="w-full text-left">
               <thead className="bg-canvas border-b border-line-strong">
                 <tr>
-                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle">Turma / Pendência</th>
-                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center">Turno</th>
-                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center">Estudantes</th>
-                  <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center w-24">Ação</th>
+                  <th className="px-4 py-4 text-xs font-medium text-fg-subtle">Turma / Pendência</th>
+                  <th className="px-4 py-4 text-xs font-medium text-fg-subtle text-center">Turno</th>
+                  <th className="px-4 py-4 text-xs font-medium text-fg-subtle text-center">Estudantes</th>
+                  <th className="px-4 py-4 text-xs font-medium text-fg-subtle text-center w-24">Ação</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
                 {filteredTurmas.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="px-6 py-16 text-center text-fg-disabled">
+                    <td colSpan={4} className="px-4 py-16 text-center text-fg-disabled">
                       <BarChart3 className="w-12 h-12 opacity-20 mx-auto mb-3" />
                        <p className="text-sm font-medium">Nenhuma turma com pendências encontrada</p>
                     </td>
@@ -153,21 +151,21 @@ export default function RecuperacaoPageClient({ turmas, totalAlunosEmRecuperacao
                       className="group hover:bg-danger-subtle transition-colors cursor-pointer"
                       onClick={() => window.location.href = `/dashboard/notas/recuperacao/${turma.id}`}
                     >
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-4">
                         <div className="flex flex-col">
                            <span className="text-base font-medium text-fg-muted group-hover:text-danger-fg transition-colors">{turma.nome}</span>
-                           <span className="text-xs font-medium text-danger-fg">{turma.totalRecuperacao} ALUNOS PARA RECUPERAÇÃO FINAL</span>
+                           <span className="text-xs font-medium text-danger-fg">{turma.totalRecuperacao} estudantes em recuperação final</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-4 py-4 text-center">
                         <span className="px-3 py-1 bg-subtle-hover text-fg-muted text-xs font-medium rounded-lg border border-line-strong">
                           {turma.turno || 'N/A'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-4 py-4 text-center">
                           <span className="text-sm font-medium text-fg-muted flex items-center justify-center gap-1.5"><Users size={14} className="text-fg-disabled" /> {turma._count.estudantes}</span>
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-4 py-4 text-center">
                          <div className="flex justify-center">
                             <div className="w-8 h-8 rounded-full bg-canvas group-hover:bg-danger group-hover:text-white flex items-center justify-center transition-all">
                                <ChevronRight size={16} />

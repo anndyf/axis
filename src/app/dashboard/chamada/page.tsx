@@ -121,8 +121,9 @@ export default async function ChamadaPage({ searchParams }: { searchParams: Prom
         </Alert>
       )}
 
+      <div className="grid gap-5 xl:grid-cols-2 xl:items-start">
       <section className="space-y-3">
-        <h2 className="text-base font-semibold text-fg">Aulas de {dataBR}{diaSemana !== null ? ` (${DIAS[diaSemana]})` : ""}</h2>
+        <h2 className="text-sm font-semibold text-fg">Aulas de {dataBR}{diaSemana !== null ? ` (${DIAS[diaSemana]})` : ""}</h2>
         {calendario && !letivo && <Card><EmptyState icon={CalendarOff} title="Dia não letivo" description="Fim de semana, feriado ou recesso. Escolha outra data acima." className="py-8" /></Card>}
         {letivo && doDia.length === 0 && <Card><EmptyState icon={ClipboardCheck} title="Nenhuma aula sua neste dia" description="Só aparecem as disciplinas que estão no horário da turma neste dia da semana." className="py-8" /></Card>}
         {doDia.length > 0 && (
@@ -152,13 +153,13 @@ export default async function ChamadaPage({ searchParams }: { searchParams: Prom
       {itens.length > 0 && (
         <section className="space-y-3">
           <div>
-            <h2 className="text-base font-semibold text-fg">Diários</h2>
+            <h2 className="text-sm font-semibold text-fg">Diários</h2>
             <p className="text-13 text-fg-subtle">Aulas dadas, conteúdo ministrado e dias com aula sem chamada.</p>
           </div>
           <ul className="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
             {[...doDia, ...outros].map((i) => (
               <li key={`d-${i.turmaId}-${i.disciplinaId}`} className="border-b border-line-subtle last:border-0">
-                <Link href={linkDiario(i)} className="flex min-h-14 items-center gap-3 px-4 py-3 transition-colors duration-150 hover:bg-subtle/60 sm:px-5">
+                <Link href={linkDiario(i)} className="flex min-h-14 items-center gap-3 px-4 py-3 transition-colors duration-150 hover:bg-subtle/60 sm:px-5 md:min-h-11 md:py-2">
                   <BookOpen size={18} strokeWidth={1.75} className="shrink-0 text-fg-subtle" aria-hidden />
                   <p className="min-w-0 flex-1 break-words text-sm text-fg">{i.nome} <span className="text-fg-subtle">· {i.turmaNome}</span></p>
                   {i.pendentes > 0 && <Badge tone="warning">{i.pendentes} {i.pendentes === 1 ? "pendente" : "pendentes"}</Badge>}
@@ -169,6 +170,7 @@ export default async function ChamadaPage({ searchParams }: { searchParams: Prom
           </ul>
         </section>
       )}
+      </div>
     </div>
   )
 }

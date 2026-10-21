@@ -270,14 +270,14 @@ export default function MessagesClient({
   ]
 
   return (
-    <div className="flex flex-col bg-surface rounded-xl shadow-card border border-line min-h-[calc(100vh-180px)] overflow-hidden animate-fade-in">
+    <div className="flex flex-col bg-surface rounded-xl border border-line min-h-[calc(100vh-180px)] overflow-hidden animate-fade-in">
       
       {/* View 1: Listagem de Chamados (Full Width) */}
       {!selectedMessage && activeTab !== 'new' && (
         <div className="flex flex-col h-full bg-canvas/20">
-          <div className="p-8 md:px-12 border-b border-line-subtle flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="p-4 md:px-4 border-b border-line-subtle flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h2 className="text-3xl font-semibold text-fg tracking-tight">Painel de Chamados</h2>
+              <h2 className="text-xl font-semibold text-fg tracking-tight">Painel de Chamados</h2>
               <button 
                 onClick={async () => {
                   startTransition(async () => {
@@ -297,39 +297,39 @@ export default function MessagesClient({
               <div className="flex bg-subtle p-1.5 rounded-lg w-full sm:w-auto">
                 <button
                   onClick={() => setActiveTab("inbox")}
-                  className={`px-8 py-3 text-xs font-bold rounded-xl transition-all ${activeTab === 'inbox' ? 'bg-surface text-accent-fg shadow-sm' : 'text-fg-subtle hover:text-fg-muted'}`}
+                  className={`px-4 py-3 text-xs font-bold rounded-xl transition-all${activeTab === 'inbox' ? 'bg-surface text-accent-fg shadow-sm' : 'text-fg-subtle hover:text-fg-muted'}`}
                 >
                   Fila de Chamados
                 </button>
                 <button
                   onClick={() => setActiveTab("sent")}
-                  className={`px-8 py-3 text-xs font-bold rounded-xl transition-all ${activeTab === 'sent' ? 'bg-surface text-accent-fg shadow-sm' : 'text-fg-subtle hover:text-fg-muted'}`}
+                  className={`px-4 py-3 text-xs font-bold rounded-xl transition-all${activeTab === 'sent' ? 'bg-surface text-accent-fg shadow-sm' : 'text-fg-subtle hover:text-fg-muted'}`}
                 >
                   Meus Chamados
                 </button>
               </div>
               <button
                 onClick={() => { setActiveTab("new"); setSelectedMessage(null); }}
-                className="w-full sm:w-auto px-6 py-3 bg-accent text-on-accent rounded-lg hover:bg-accent-hover transition-all shadow-card active:scale-95 flex items-center justify-center gap-2 font-bold text-sm"
+                className="w-full sm:w-auto px-4 py-3 bg-accent text-on-accent rounded-lg hover:bg-accent-hover transition-all flex items-center justify-center gap-2 font-bold text-sm"
               >
                 <Plus size={18} /> Novo Chamado
               </button>
             </div>
           </div>
 
-          <div className="p-8 md:px-12">
-            <div className="relative max-w-md mb-8">
+          <div className="p-4 md:px-4">
+            <div className="relative max-w-md mb-4">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-subtle w-5 h-5" />
               <input 
                 type="text" 
                 placeholder="Buscar ticket por assunto ou remetente..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 bg-surface border border-line rounded-lg text-sm font-medium focus:ring-2 focus:ring-ring outline-none transition-all shadow-sm"
+                className="w-full pl-12 pr-4 py-4 bg-surface border border-line rounded-lg text-sm font-medium focus:ring-2 focus:ring-ring outline-none transition-all"
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredBySearchAndCategory.map((msg: any) => {
                 const style = getCatStyles(msg.category)
                 const isUnread = !msg.isRead && activeTab === 'inbox'
@@ -340,7 +340,7 @@ export default function MessagesClient({
                   <div 
                     key={msg.id}
                     onClick={() => handleSelectMessage(msg)}
-                    className={`group p-6 rounded-xl cursor-pointer transition-all border flex flex-col justify-between min-h-[160px] ${
+                    className={`group p-4 rounded-xl cursor-pointer transition-all border flex flex-col justify-between min-h-[160px]${
                       isUnread 
                         ? 'bg-accent-subtle border-accent/25 shadow-card ' 
                         : 'bg-surface border-line hover:border-accent/25 hover:shadow-card '
@@ -349,24 +349,24 @@ export default function MessagesClient({
                     <div>
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className={`px-2 py-1 rounded-lg text-xs font-semibold border ${style.bg} ${style.text} ${style.border}`}>
+                          <span className={`px-2 py-1 rounded-lg text-xs font-semibold border${style.bg}${style.text}${style.border}`}>
                             {style.label}
                           </span>
                           {!msg.isResolved && msg.category !== 'GERAL' && (
-                            <span className={`px-2 py-1 rounded-lg text-xs font-semibold ${statusData.color} border border-current opacity-80`}>
+                            <span className={`px-2 py-1 rounded-lg text-xs font-semibold${statusData.color}border border-current opacity-80`}>
                               {statusData.label}
                             </span>
                           )}
                         </div>
                         {isUnread && (
                           <div className="flex items-center gap-1.5 shrink-0">
-                            <div className="w-2 h-2 bg-accent rounded-full animate-pulse"></div>
+                            <div className="w-2 h-2 bg-accent rounded-full"></div>
                             <span className="text-xs font-semibold text-accent-fg">Novo</span>
                           </div>
                         )}
                       </div>
                       
-                      <h4 className={`text-base leading-tight mb-2 ${isUnread ? 'font-semibold text-fg' : 'font-bold text-fg'}`}>
+                      <h4 className={`text-base leading-tight mb-2${isUnread ? 'font-semibold text-fg' : 'font-bold text-fg'}`}>
                         {msg.ticketNumber ? <span className="text-accent-fg mr-2">#{msg.ticketNumber}</span> : ''}
                         {msg.subject.replace(/\[Ticket\]|\[Cadastro Pendente\]/gi, '').trim() || 'Sem Assunto'}
                       </h4>
@@ -382,7 +382,7 @@ export default function MessagesClient({
                     </div>
 
                     <div className="flex items-center justify-between mt-auto pt-4 border-t border-line-subtle/80">
-                      <span className={`text-xs font-semibold ${priorityData.color}`}>
+                      <span className={`text-xs font-semibold${priorityData.color}`}>
                         Prio: {priorityData.label}
                       </span>
                       <span className="text-xs font-bold text-fg-subtle">
@@ -394,7 +394,7 @@ export default function MessagesClient({
               })}
               
               {filteredBySearchAndCategory.length === 0 && (
-                <div className="col-span-full py-20 flex flex-col items-center justify-center text-center bg-surface rounded-xl border border-dashed border-line">
+                <div className="col-span-full py-10 flex flex-col items-center justify-center text-center bg-surface rounded-xl border border-dashed border-line">
                   <div className="w-24 h-24 bg-canvas rounded-xl flex items-center justify-center mb-6">
                     <Inbox className="w-10 h-10 text-fg-disabled" />
                   </div>
@@ -409,7 +409,7 @@ export default function MessagesClient({
                 <button
                   onClick={loadMore}
                   disabled={loadingMore}
-                  className="px-8 py-3 bg-surface border border-line text-fg-muted rounded-xl text-sm font-bold shadow-sm hover:bg-canvas hover:text-accent-fg transition-colors flex items-center gap-2 disabled:opacity-50"
+                  className="px-4 py-3 bg-surface border border-line text-fg-muted rounded-xl text-sm font-bold hover:bg-canvas hover:text-accent-fg transition-colors flex items-center gap-2 disabled:opacity-50"
                 >
                   {loadingMore ? (
                     <><Loader2 size={16} className="animate-spin" /> Carregando...</>
@@ -426,7 +426,7 @@ export default function MessagesClient({
       {/* View 2: Criação de Novo Chamado (Full Width) */}
       {activeTab === "new" && (
         <div className="flex-1 flex flex-col bg-canvas/30 overflow-y-auto">
-          <div className="px-8 py-6 bg-surface border-b border-line-subtle flex items-center gap-4 sticky top-0 z-10">
+          <div className="px-4 py-3 bg-surface border-b border-line-subtle flex items-center gap-4 sticky top-0 z-10">
             <button onClick={() => setActiveTab("inbox")} className="p-3 bg-canvas hover:bg-subtle rounded-lg transition-all">
               <ArrowLeft size={20} className="text-fg-muted" />
             </button>
@@ -436,9 +436,9 @@ export default function MessagesClient({
             </div>
           </div>
 
-          <div className="flex-1 p-8 md:p-12">
-            <div className="mx-auto max-w-formulario space-y-8 bg-surface p-8 md:p-10 rounded-xl shadow-sm border border-line-subtle">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="flex-1 p-4 md:p-12">
+            <div className="max-w-formulario space-y-5 bg-surface p-4 md:p-5 rounded-xl border border-line-subtle">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-3">
                   <label className="text-xs font-semibold text-fg-subtle ml-1">Categoria / Departamento</label>
                   <select 
@@ -489,7 +489,7 @@ export default function MessagesClient({
                 )}
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <div className="space-y-3">
                   <label className="text-xs font-semibold text-fg-subtle ml-1">Assunto / Tópico</label>
                   {newMsgCategory === 'SUPORTE' ? (
@@ -615,7 +615,7 @@ export default function MessagesClient({
                 <button 
                   onClick={() => handleSendMessage()}
                   disabled={sending}
-                  className="w-full md:w-auto px-12 bg-accent text-on-accent py-5 rounded-lg font-semibold text-sm hover:bg-accent-hover transition-all shadow-card disabled:opacity-50 active:scale-95 flex items-center justify-center gap-3"
+                  className="w-full md:w-auto px-4 bg-accent text-on-accent py-2.5 rounded-lg font-semibold text-sm hover:bg-accent-hover transition-all disabled:opacity-50 flex items-center justify-center gap-3"
                 >
                   {sending ? <Loader2 className="animate-spin w-5 h-5" /> : <Send size={20} />}
                   {sending ? "Enviando..." : "Registrar Chamado"}
@@ -629,7 +629,7 @@ export default function MessagesClient({
       {/* View 3: Detalhes do Chamado (Full Width) */}
       {selectedMessage && (
         <div className="flex-1 flex flex-col h-full bg-canvas/30 overflow-hidden">
-          <div className="px-8 py-6 bg-surface border-b border-line-subtle flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm z-10 shrink-0">
+          <div className="px-4 py-3 bg-surface border-b border-line-subtle flex flex-col md:flex-row md:items-center justify-between gap-4 z-10 shrink-0">
             <div className="flex items-center gap-5">
                <button 
                  onClick={() => { setSelectedMessage(null); setThreadMessages([]); }} 
@@ -642,7 +642,7 @@ export default function MessagesClient({
                     <span className="text-xs font-semibold text-fg-subtle">
                       CHAMADO #{selectedMessage.ticketNumber || selectedMessage.id.substring(selectedMessage.id.length - 6).toUpperCase()}
                     </span>
-                    <span className={`px-2 py-0.5 rounded-md text-xs font-semibold border ${getCatStyles(selectedMessage.category).bg} ${getCatStyles(selectedMessage.category).text} ${getCatStyles(selectedMessage.category).border}`}>
+                    <span className={`px-2 py-0.5 rounded-md text-xs font-semibold border${getCatStyles(selectedMessage.category).bg}${getCatStyles(selectedMessage.category).text}${getCatStyles(selectedMessage.category).border}`}>
                       {getCatStyles(selectedMessage.category).label}
                     </span>
                   </div>
@@ -697,7 +697,7 @@ export default function MessagesClient({
                       await updateTicketStatus(selectedMessage.id, 'RESOLVIDO')
                       setSelectedMessage({...selectedMessage, isResolved: true, status: 'RESOLVIDO'})
                     }}
-                    className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-accent hover:bg-accent-hover text-on-accent transition-colors shadow-sm cursor-pointer flex items-center gap-1"
+                    className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-accent hover:bg-accent-hover text-on-accent transition-colors cursor-pointer flex items-center gap-1"
                   >
                     <Check size={12} /> Marcar Resolvido
                   </button>
@@ -706,18 +706,18 @@ export default function MessagesClient({
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-8 md:p-12 space-y-6 custom-scrollbar bg-canvas/50">
-            <div className="mx-auto max-w-leitura space-y-6">
+          <div className="flex-1 overflow-y-auto p-4 md:p-12 space-y-4 custom-scrollbar bg-canvas/50">
+            <div className="max-w-leitura space-y-4">
               {threadMessages.map((m, idx) => {
                 const isMe = m.senderId === currentUserId
                 return (
                   <div key={m.id} className="animate-slide-up">
-                    <div className={`w-full p-8 rounded-xl shadow-sm border ${
+                    <div className={`w-full p-4 rounded-xl border${
                       isMe ? 'bg-surface border-accent/25' : 'bg-surface border-line'
                     }`}>
                       <div className="flex items-center justify-between mb-6 pb-5 border-b border-line-subtle">
                         <div className="flex items-center gap-4">
-                           <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-semibold text-lg ${
+                           <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-semibold text-lg${
                              isMe ? 'bg-accent text-on-accent shadow-card ' : 'bg-subtle text-fg-muted'
                            }`}>
                              {m.sender?.name?.charAt(0) || m.sender?.username?.charAt(0) || '?'}
@@ -746,20 +746,20 @@ export default function MessagesClient({
             </div>
           </div>
 
-          <div className="p-8 md:px-12 bg-surface border-t border-line-subtle shrink-0">
-            <div className="mx-auto max-w-leitura">
+          <div className="p-4 md:px-4 bg-surface border-t border-line-subtle shrink-0">
+            <div className="max-w-leitura">
               <form onSubmit={handleQuickReply} className="flex flex-col md:flex-row gap-4">
                 <input 
                   type="text"
                   value={replyContent}
                   onChange={e => setReplyContent(e.target.value)}
                   placeholder="Escreva sua interação ou resposta para este chamado..."
-                  className="flex-1 px-8 py-5 bg-canvas border-2 border-transparent rounded-xl font-bold text-fg-muted focus:bg-surface focus:border-accent transition-all outline-none"
+                  className="flex-1 px-4 py-2.5 bg-canvas border-2 border-transparent rounded-xl font-bold text-fg-muted focus:bg-surface focus:border-accent transition-all outline-none"
                 />
                 <button 
                   type="submit"
                   disabled={!replyContent.trim() || replying}
-                  className="px-10 py-5 bg-accent text-on-accent rounded-xl font-semibold text-xs hover:bg-accent-hover transition-all shadow-card active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3"
+                  className="px-4 py-2.5 bg-accent text-on-accent rounded-xl font-semibold text-xs hover:bg-accent-hover transition-all disabled:opacity-50 flex items-center justify-center gap-3"
                 >
                   {replying ? <Loader2 size={20} className="animate-spin" /> : <Send size={20} />}
                   {replying ? 'Enviando...' : 'Responder'}

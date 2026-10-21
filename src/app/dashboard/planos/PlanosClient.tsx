@@ -162,7 +162,7 @@ export default function PlanosClient() {
       {/* Header Premium Estilo Resultados - Ajustado para ser Flush com o Layout */}
       <header className="mb-6">
         <div className="">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div className="flex min-w-0 items-center gap-3">
               <Link
                 href="/dashboard"
@@ -191,13 +191,13 @@ export default function PlanosClient() {
       </header>
 
       {/* Main Content */}
-      <main className="pt-4 pb-32 space-y-8">
+      <main className="pt-4 pb-32 space-y-5">
         
         {/* Dicas Fixas - Estilo Resultados */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {planoTips.map((tip, index) => (
              <div key={index} className="bg-surface border border-line p-4 rounded-2xl flex items-start gap-3">
-                <div className={`p-3 rounded-lg bg-subtle text-fg-muted transition-all shadow-card`}>
+                <div className={`p-3 rounded-lg bg-subtle text-fg-muted transition-all`}>
                    {tip.icon}
                 </div>
                 <div>
@@ -209,7 +209,7 @@ export default function PlanosClient() {
         </div>
 
         {/* Filtros Premium */}
-        <div className="bg-surface p-6 rounded-xl shadow-card border border-line flex flex-wrap gap-6 items-end relative overflow-hidden">
+        <div className="bg-surface p-4 rounded-xl border border-line flex flex-wrap gap-4 items-end relative overflow-hidden">
             
             <div className="flex-1 min-w-[200px] space-y-2">
                 <label className="text-xs font-medium text-fg-subtle ml-2">Filtrar por Turma</label>
@@ -220,7 +220,7 @@ export default function PlanosClient() {
                   <select 
                       value={filters.turmaId} 
                       onChange={e => setFilters({...filters, turmaId: e.target.value})}
-                      className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-zinc-500 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
+                      className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-zinc-500 transition-all appearance-none cursor-pointer font-medium text-fg-muted"
                   >
                       <option value="">Selecione a Turma...</option>
                       {turmas.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
@@ -239,7 +239,7 @@ export default function PlanosClient() {
                         placeholder="Buscar matéria..." 
                         value={filters.disciplinaNome} 
                         onChange={e => setFilters({...filters, disciplinaNome: e.target.value})} 
-                        className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-zinc-500 transition-all font-medium text-fg-muted shadow-card placeholder:text-fg-disabled" 
+                        className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-zinc-500 transition-all font-medium text-fg-muted placeholder:text-fg-disabled" 
                     />
                 </div>
             </div>
@@ -254,7 +254,7 @@ export default function PlanosClient() {
                       <select 
                         value={filters.professorId} 
                         onChange={e => setFilters({...filters, professorId: e.target.value})}
-                        className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-zinc-500 transition-all appearance-none cursor-pointer font-medium text-fg-muted shadow-card"
+                        className="w-full bg-canvas hover:bg-subtle-hover border-none rounded-lg pl-14 pr-6 py-4 text-sm focus:ring-2 focus:ring-zinc-500 transition-all appearance-none cursor-pointer font-medium text-fg-muted"
                       >
                           <option value="">Todos os Professores</option>
                           {professores.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -265,27 +265,27 @@ export default function PlanosClient() {
         </div>
 
         {/* Matriz de Planos Estilo Resultados (Cards Table) */}
-        <div className="bg-surface rounded-xl shadow-card border border-line overflow-hidden relative">
-          <div className="p-6 border-b border-line-subtle bg-canvas/10 flex items-center justify-between">
+        <div className="bg-surface rounded-xl border border-line overflow-hidden relative">
+          <div className="p-4 border-b border-line-subtle bg-canvas/10 flex items-center justify-between">
             <h2 className="text-sm font-medium text-fg-subtle flex items-center gap-3 ml-2">
-              <div className="w-8 h-8 rounded-lg bg-canvas text-fg-muted flex items-center justify-center shadow-card">
+              <div className="w-8 h-8 rounded-lg bg-canvas text-fg-muted flex items-center justify-center">
                 <Users size={16} />
               </div>
               Matriz de Planos Quinzenais
             </h2>
             <div className="hidden md:flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-success animate-pulse shadow-card"></span>
+                <span className="w-2 h-2 rounded-full bg-success"></span>
                 <p className="text-xs font-medium text-fg-subtle leading-none">Acesso em tempo real</p>
             </div>
           </div>
 
           <div className="overflow-x-auto">
             {loading ? (
-              <div className="p-20 text-center">
+              <div className="p-8 text-center">
                  <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-success mx-auto"></div>
               </div>
             ) : turmasNomes.length === 0 ? (
-              <div className="text-center py-20 text-fg-disabled">
+              <div className="text-center py-10 text-fg-disabled">
                   <BarChart3 className="w-12 h-12 opacity-20 mx-auto mb-3" />
                   <p className="text-sm font-medium">Nenhum plano localizado</p>
               </div>
@@ -299,10 +299,10 @@ export default function PlanosClient() {
                             <div key={turmaNome} className="bg-surface">
                                 <button 
                                     onClick={() => toggleTurmaExpansion(turmaNome)}
-                                    className={`w-full px-8 py-5 flex items-center justify-between transition-all hover:bg-canvas/80 group ${isExpanded ? 'bg-canvas border-b border-line' : ''}`}
+                                    className={`w-full px-4 py-2.5 flex items-center justify-between transition-all hover:bg-canvas/80 group${isExpanded ? 'bg-canvas border-b border-line' : ''}`}
                                 >
                                     <div className="flex items-center gap-5">
-                                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-500 ${isExpanded ? 'bg-zinc-600 text-white shadow-card rotate-6' : 'bg-subtle-hover text-fg-subtle group-hover:bg-surface group-hover:shadow-card'}`}>
+                                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-500${isExpanded ? 'bg-zinc-600 text-white shadow-card rotate-6' : 'bg-subtle-hover text-fg-subtle group-hover:bg-surface group-hover:shadow-card'}`}>
                                             <Users size={20} />
                                         </div>
                                         <div className="text-left">
@@ -313,7 +313,7 @@ export default function PlanosClient() {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all duration-300 ${isExpanded ? 'bg-canvas border-line-strong text-fg-muted rotate-90' : 'bg-surface border-line text-fg-disabled group-hover:border-line-strong'}`}>
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all duration-300${isExpanded ? 'bg-canvas border-line-strong text-fg-muted rotate-90' : 'bg-surface border-line text-fg-disabled group-hover:border-line-strong'}`}>
                                         <ChevronRight size={16} />
                                     </div>
                                 </button>
@@ -322,16 +322,16 @@ export default function PlanosClient() {
                                     <div className="bg-canvas/20 border-t border-line/50 animate-slide-up pb-2">
                                         {Object.keys(groupedData[turmaNome]).map(month => (
                                             <div key={month} className="space-y-0">
-                                                <div className="px-8 py-3 bg-canvas border-b border-line flex items-center gap-3">
+                                                <div className="px-4 py-3 bg-canvas border-b border-line flex items-center gap-3">
                                                    <div className="w-1 h-3 bg-zinc-500 rounded-full"></div>
                                                    <span className="text-xs font-medium text-fg-muted">{month}</span>
                                                 </div>
                                                 <table className="w-full text-left border-collapse">
                                                     <thead>
                                                         <tr className="bg-surface">
-                                                            <th className="px-8 py-4 text-xs font-medium text-fg-subtle border-b border-line-subtle">Disciplina / Matéria</th>
-                                                            <th className="px-6 py-4 text-xs font-medium text-fg-subtle text-center border-b border-line-subtle">Período de Vigência</th>
-                                                            <th className="px-8 py-4 text-xs font-medium text-fg-subtle text-center border-b border-line-subtle">Ações</th>
+                                                            <th className="px-4 py-4 text-xs font-medium text-fg-subtle border-b border-line-subtle">Disciplina / Matéria</th>
+                                                            <th className="px-4 py-4 text-xs font-medium text-fg-subtle text-center border-b border-line-subtle">Período de Vigência</th>
+                                                            <th className="px-4 py-4 text-xs font-medium text-fg-subtle text-center border-b border-line-subtle">Ações</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody className="divide-y divide-line-subtle">
@@ -339,9 +339,9 @@ export default function PlanosClient() {
                                                             const current = isCurrentFortnight(plano.periodoInicio, plano.periodoFim)
                                                             return (
                                                                 <tr key={plano.id} className="group hover:bg-canvas/30 transition-all">
-                                                                    <td className="px-8 py-5">
+                                                                    <td className="px-4 py-2.5">
                                                                         <div className="flex items-center gap-4">
-                                                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${current ? 'bg-success-subtle text-success-fg shadow-sm border border-success-line' : 'bg-canvas text-fg-subtle border border-line group-hover:bg-surface'}`}>
+                                                                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all${current ? 'bg-success-subtle text-success-fg shadow-sm border border-success-line' : 'bg-canvas text-fg-subtle border border-line group-hover:bg-surface'}`}>
                                                                                 <FileText size={18} />
                                                                             </div>
                                                                             <div className="flex flex-col">
@@ -352,19 +352,19 @@ export default function PlanosClient() {
                                                                              </div>
                                                                         </div>
                                                                     </td>
-                                                                    <td className="px-6 py-5 text-center">
-                                                                        <div className="inline-flex items-center gap-2 bg-canvas px-4 py-2 rounded-xl border border-line shadow-sm group-hover:bg-surface transition-all">
+                                                                    <td className="px-4 py-2.5 text-center">
+                                                                        <div className="inline-flex items-center gap-2 bg-canvas px-4 py-2 rounded-xl border border-line group-hover:bg-surface transition-all">
                                                                             <Calendar size={14} className="text-fg-subtle" />
                                                                             <span className="text-xs font-medium text-fg-muted">
                                                                                 {new Date(plano.periodoInicio).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', timeZone: 'UTC'})} — {new Date(plano.periodoFim).toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', timeZone: 'UTC'})}
                                                                             </span>
                                                                         </div>
                                                                     </td>
-                                                                    <td className="px-8 py-5 text-center">
+                                                                    <td className="px-4 py-2.5 text-center">
                                                                         <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all -translate-y-1 group-hover:translate-y-0">
-                                                                            <button onClick={() => { setViewPlanoId(plano.id); setShowView(true); }} className="w-9 h-9 flex items-center justify-center bg-surface border border-line-strong text-fg-subtle rounded-xl hover:bg-canvas hover:text-fg-muted hover:border-line-strong transition-all shadow-sm" title="Ver Detalhes"><Eye size={16} /></button>
-                                                                            <button onClick={() => { setSelectedPlano(plano); setShowForm(true); }} className="w-9 h-9 flex items-center justify-center bg-surface border border-line-strong text-fg-subtle rounded-xl hover:bg-zinc-900 hover:text-white hover:border-zinc-900 transition-all shadow-sm" title="Editar"><Edit3 size={16} /></button>
-                                                                            <button onClick={() => handleDelete(plano.id)} className="w-9 h-9 flex items-center justify-center bg-surface border border-line-strong text-fg-subtle rounded-xl hover:bg-danger-subtle hover:text-danger-fg hover:border-danger-line transition-all shadow-sm" title="Remover"><Trash2 size={16} /></button>
+                                                                            <button onClick={() => { setViewPlanoId(plano.id); setShowView(true); }} className="w-9 h-9 flex items-center justify-center bg-surface border border-line-strong text-fg-subtle rounded-xl hover:bg-canvas hover:text-fg-muted hover:border-line-strong transition-all" title="Ver Detalhes"><Eye size={16} /></button>
+                                                                            <button onClick={() => { setSelectedPlano(plano); setShowForm(true); }} className="w-9 h-9 flex items-center justify-center bg-surface border border-line-strong text-fg-subtle rounded-xl hover:bg-zinc-900 hover:text-white hover:border-zinc-900 transition-all" title="Editar"><Edit3 size={16} /></button>
+                                                                            <button onClick={() => handleDelete(plano.id)} className="w-9 h-9 flex items-center justify-center bg-surface border border-line-strong text-fg-subtle rounded-xl hover:bg-danger-subtle hover:text-danger-fg hover:border-danger-line transition-all" title="Remover"><Trash2 size={16} /></button>
                                                                         </div>
                                                                     </td>
                                                                 </tr>

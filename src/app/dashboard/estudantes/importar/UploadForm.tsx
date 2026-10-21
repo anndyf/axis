@@ -253,8 +253,8 @@ export default function UploadForm({ turmas }: UploadFormProps) {
         </div>
       </header>
 
-      <main className="py-8">
-        <div className="bg-subtle border border-line-strong rounded-xl p-6 mb-8">
+      <main className="py-4">
+        <div className="bg-subtle border border-line-strong rounded-xl p-4 mb-4">
           <div className="flex items-start space-x-4">
             <div className="bg-subtle-hover rounded-lg p-3">
               <FileType className="w-6 h-6 text-fg" />
@@ -273,7 +273,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
                 
                 <div className="mt-4">
                     <p className="font-medium mb-2 text-accent-fg">Exemplo de arquivo aceito:</p>
-                    <div className="border-2 border-line-strong rounded-lg overflow-hidden shadow-sm max-w-2xl">
+                    <div className="border-2 border-line-strong rounded-lg overflow-hidden max-w-2xl">
                         <img 
                             src="/assets/exemplo-pdf.png" 
                             alt="Exemplo de Relação de Estudantes do SIGEDUC" 
@@ -286,24 +286,24 @@ export default function UploadForm({ turmas }: UploadFormProps) {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-surface rounded-xl shadow-sm border border-line-strong p-6">
+        <form onSubmit={handleSubmit} className="bg-surface rounded-xl border border-line-strong p-4">
           {isFinished ? (
-            <div className="py-10 text-center animate-pop-in">
+            <div className="py-2.5 text-center animate-pop-in">
                {message?.type === 'success' ? (
-                 <div className="w-20 h-20 bg-success-subtle text-success-fg rounded-full flex items-center justify-center mx-auto mb-6">
+                 <div className="w-12 h-12 bg-success-subtle text-success-fg rounded-full flex items-center justify-center mx-auto mb-6">
                    <CheckCircle className="w-10 h-10" />
                  </div>
                ) : (
-                 <div className="w-20 h-20 bg-subtle text-fg-subtle rounded-full flex items-center justify-center mx-auto mb-6">
+                 <div className="w-12 h-12 bg-subtle text-fg-subtle rounded-full flex items-center justify-center mx-auto mb-6">
                    <FileType className="w-10 h-10" />
                  </div>
                )}
                
                <h3 className="text-2xl font-bold text-fg mb-2">{message?.text}</h3>
-               <p className="text-fg-muted mb-8 font-medium">O processo de importação foi finalizado com base nos dados fornecidos.</p>
+               <p className="text-fg-muted mb-4 font-medium">O processo de importação foi finalizado com base nos dados fornecidos.</p>
 
                {skippedList.length > 0 && (
-                <div className="max-w-md mx-auto mb-10 p-6 bg-canvas rounded-lg border border-line text-left">
+                <div className="max-w-md mx-auto mb-5 p-4 bg-canvas rounded-lg border border-line text-left">
                     <div className="flex items-center gap-2 mb-4 text-warning-fg">
                        <AlertCircle className="w-5 h-5" />
                        <span className="font-bold text-sm">Registros ignorados ({skippedList.length})</span>
@@ -329,13 +329,13 @@ export default function UploadForm({ turmas }: UploadFormProps) {
                         setTurmaSearch("")
                         setManualTurma("")
                     }}
-                    className="w-full sm:w-auto px-8 py-4 bg-accent text-on-accent rounded-lg font-bold hover:bg-accent-hover transition-all shadow-card active:scale-95"
+                    className="w-full sm:w-auto px-4 py-4 bg-accent text-on-accent rounded-lg font-bold hover:bg-accent-hover transition-all"
                   >
                     Nova Importação
                   </button>
                   <Link
                     href="/dashboard/estudantes"
-                    className="w-full sm:w-auto px-8 py-4 bg-surface text-fg-muted border border-line-strong rounded-lg font-bold hover:bg-canvas transition-all active:scale-95"
+                    className="w-full sm:w-auto px-4 py-4 bg-surface text-fg-muted border border-line-strong rounded-lg font-bold hover:bg-canvas transition-all"
                   >
                     Voltar para Estudantes
                   </Link>
@@ -344,7 +344,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
           ) : (
             <>
           {message && (
-            <div className={`mb-6 p-4 rounded-lg ${
+            <div className={`mb-6 p-4 rounded-lg${
               message.type === 'success' ? 'bg-success-subtle border border-success-line text-success-fg' : 
               message.type === 'error' ? 'bg-danger-subtle border border-danger-line text-danger-fg' : 
               'bg-subtle border border-line-strong text-accent-fg'
@@ -367,7 +367,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
                 <label className="block text-sm font-medium text-fg mb-2">Arquivo (PDF da Relação de Alunos)</label>
                 <input 
@@ -380,7 +380,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
                 <label className="block text-sm font-medium text-fg mb-2">Turma de Destino <span className="text-danger-fg">*</span></label>
                 <div className="relative">
                     <div className="relative group">
-                        <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${showTurmaDropdown ? 'text-fg' : 'text-fg-subtle'}`} />
+                        <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors${showTurmaDropdown ? 'text-fg' : 'text-fg-subtle'}`} />
                         <input 
                             type="text"
                             placeholder="Digite o nome da turma para buscar..."
@@ -391,7 +391,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
                                 if (manualTurma) setManualTurma("")
                             }}
                             onFocus={() => setShowTurmaDropdown(true)}
-                            className={`w-full pl-11 pr-10 py-3 border rounded-lg focus:ring-2 focus:ring-zinc-500 transition-all bg-surface font-medium text-fg-muted outline-none ${!manualTurma && preview.length > 0 ? 'border-danger-line ring-2 ring-danger/30' : 'border-accent/25 hover:border-accent'}`}
+                            className={`w-full pl-11 pr-10 py-3 border rounded-lg focus:ring-2 focus:ring-zinc-500 transition-all bg-surface font-medium text-fg-muted outline-none${!manualTurma && preview.length > 0 ? 'border-danger-line ring-2 ring-danger/30' : 'border-accent/25 hover:border-accent'}`}
                         />
                         {(turmaSearch || manualTurma) && (
                             <button 
@@ -411,7 +411,7 @@ export default function UploadForm({ turmas }: UploadFormProps) {
                     {showTurmaDropdown && (
                         <div className="absolute z-50 mt-2 w-full bg-surface border border-line rounded-xl shadow-overlay max-h-72 overflow-y-auto animate-slide-up py-2">
                              {filteredTurmas.length === 0 ? (
-                                <div className="px-4 py-6 text-center text-sm text-fg-subtle font-medium">
+                                <div className="px-4 py-3 text-center text-sm text-fg-subtle font-medium">
                                     Nenhuma turma encontrada para "{turmaSearch}"
                                 </div>
                              ) : (
@@ -424,18 +424,18 @@ export default function UploadForm({ turmas }: UploadFormProps) {
                                             setTurmaSearch(t.nome)
                                             setShowTurmaDropdown(false)
                                         }}
-                                        className={`w-full text-left px-4 py-3 text-sm transition-all flex items-center justify-between border-b border-line-subtle last:border-none ${
+                                        className={`w-full text-left px-4 py-3 text-sm transition-all flex items-center justify-between border-b border-line-subtle last:border-none${
                                             manualTurma === t.nome 
                                             ? 'bg-accent z-10' 
                                             : 'text-fg-muted hover:bg-canvas'
                                         }`}
                                     >
                                         <div className="flex flex-col">
-                                            <span className={`font-semibold ${manualTurma === t.nome ? 'text-white' : 'text-fg font-bold'}`}>
+                                            <span className={`font-semibold${manualTurma === t.nome ? 'text-white' : 'text-fg font-bold'}`}>
                                                 {t.nome}
                                             </span>
                                             {(t.modalidade || t.turno) && (
-                                                <span className={`text-xs font-bold mt-0.5 ${manualTurma === t.nome ? 'text-fg-disabled' : 'text-fg-subtle'}`}>
+                                                <span className={`text-xs font-bold mt-0.5${manualTurma === t.nome ? 'text-fg-disabled' : 'text-fg-subtle'}`}>
                                                     {t.modalidade} {t.turno && `· ${t.turno}`}
                                                 </span>
                                             )}
@@ -458,19 +458,19 @@ export default function UploadForm({ turmas }: UploadFormProps) {
                 <table className="w-full">
                   <thead className="bg-subtle border-b border-line-strong sticky top-0">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-fg-muted">#</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-fg-muted">Matrícula</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-fg-muted">Nome</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-fg-muted">Turma de Destino</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-fg-muted">#</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-fg-muted">Matrícula</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-fg-muted">Nome</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-fg-muted">Turma de Destino</th>
                     </tr>
                   </thead>
                   <tbody className="bg-surface divide-y divide-line-strong">
                     {preview.map((item, index) => (
                       <tr key={index} className="hover:bg-subtle">
-                        <td className="px-6 py-3 text-sm text-fg-muted">{index + 1}</td>
-                        <td className="px-6 py-3 text-sm text-fg-muted font-mono">{item.matricula || '-'}</td>
-                        <td className="px-6 py-3 text-sm text-accent-fg font-medium">{item.nome}</td>
-                        <td className="px-6 py-3 text-sm text-fg-muted">
+                        <td className="px-4 py-3 text-sm text-fg-muted">{index + 1}</td>
+                        <td className="px-4 py-3 text-sm text-fg-muted font-mono">{item.matricula || '-'}</td>
+                        <td className="px-4 py-3 text-sm text-accent-fg font-medium">{item.nome}</td>
+                        <td className="px-4 py-3 text-sm text-fg-muted">
                             {manualTurma || <span className="text-danger-fg italic">Selecione a turma acima</span>}
                         </td>
                       </tr>
@@ -495,10 +495,10 @@ export default function UploadForm({ turmas }: UploadFormProps) {
               </div>
             </label>
             <div className="flex space-x-4">
-              <Link href="/dashboard/estudantes" className="px-6 py-3 text-fg hover:bg-subtle-hover rounded-lg transition-colors">Cancelar</Link>
+              <Link href="/dashboard/estudantes" className="px-4 py-3 text-fg hover:bg-subtle-hover rounded-lg transition-colors">Cancelar</Link>
               <button 
                 type="submit" disabled={loading || preview.length === 0 || !manualTurma.trim()}
-                className={`flex items-center space-x-2 text-fg px-6 py-3 rounded-lg transition-all shadow-card disabled:opacity-50 disabled:cursor-not-allowed ${syncMode ? ' bg-danger hover:bg-danger ' : ' bg-surface border border-line hover:bg-subtle'}`}
+                className={`flex items-center space-x-2 text-fg px-4 py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed${syncMode ? ' bg-danger hover:bg-danger ' : ' bg-surface border border-line hover:bg-subtle'}`}
               >
                 <Upload className="w-5 h-5" />
                 <span>{loading ? 'Importando...' : (syncMode ? 'Sincronizar Turma' : 'Importar Turma')}</span>

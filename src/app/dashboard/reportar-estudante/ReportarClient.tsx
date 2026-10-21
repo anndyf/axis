@@ -40,13 +40,13 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
 
   if (success) {
     return (
-      <div className="p-4 sm:p-8 flex items-center justify-center">
-        <div className="max-w-md w-full bg-surface rounded-xl p-8 text-center shadow-card border border-line-subtle">
-          <div className="w-20 h-20 bg-success-subtle text-success-fg rounded-full flex items-center justify-center mx-auto mb-6">
+      <div className="p-4 sm:p-4 flex items-center justify-center">
+        <div className="max-w-md w-full bg-surface rounded-xl p-4 text-center border border-line-subtle">
+          <div className="w-12 h-12 bg-success-subtle text-success-fg rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 size={40} />
           </div>
           <h2 className="text-2xl font-bold text-fg mb-2">Solicitação Enviada!</h2>
-          <p className="text-fg-subtle mb-8 leading-relaxed">
+          <p className="text-fg-subtle mb-4 leading-relaxed">
             A equipe da secretaria recebeu seu chamado e em breve o aluno <strong>{form.nome}</strong> será adicionado à turma correta.
           </p>
           <div className="flex flex-col gap-3">
@@ -55,13 +55,13 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
                 setSuccess(false)
                 setForm({ turmaId: "", nome: "", matricula: "", observacao: "" })
               }}
-              className="px-6 py-3 bg-subtle text-fg-muted font-medium rounded-xl hover:bg-subtle-hover transition-all"
+              className="px-4 py-3 bg-subtle text-fg-muted font-medium rounded-xl hover:bg-subtle-hover transition-all"
             >
               Reportar Outro Aluno
             </button>
             <Link 
               href="/dashboard"
-              className="px-6 py-3 bg-accent text-on-accent font-medium rounded-xl hover:bg-accent-hover shadow-card transition-all"
+              className="px-4 py-3 bg-accent text-on-accent font-medium rounded-xl hover:bg-accent-hover transition-all"
             >
               Voltar ao Painel
             </Link>
@@ -72,15 +72,15 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
   }
 
   return (
-    <div className="p-4 sm:p-8">
-      <div className="mx-auto max-w-formulario space-y-8">
+    <div className="p-4 sm:p-4">
+      <div className="max-w-formulario space-y-5">
         
         {/* Header */}
         <div>
           <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm font-medium text-fg-subtle hover:text-fg mb-6 transition-colors">
             <ArrowLeft size={16} /> Voltar ao Painel
           </Link>
-          <h1 className="text-3xl font-bold text-fg tracking-tight flex items-center gap-3">
+          <h1 className="text-xl font-bold text-fg tracking-tight flex items-center gap-3">
             <div className="p-3 bg-accent-subtle text-accent-fg rounded-lg">
               <UserPlus size={24} />
             </div>
@@ -92,8 +92,8 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
         </div>
 
         {/* Form */}
-        <div className="bg-surface p-6 sm:p-8 rounded-xl shadow-sm border border-line">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-surface p-4 sm:p-4 rounded-xl border border-line">
+          <form onSubmit={handleSubmit} className="space-y-4">
             
             {error && (
               <div className="p-4 bg-danger-subtle text-danger-fg border border-danger-line rounded-xl text-sm font-medium">
@@ -128,7 +128,7 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-fg-subtle ml-1">Matrícula *</label>
                 <input
@@ -178,7 +178,7 @@ export default function ReportarClient({ turmas }: { turmas: any[] }) {
               <button
                 type="submit"
                 disabled={submitting || !form.turmaId || !form.nome}
-                className="w-full sm:w-auto px-8 py-4 bg-accent hover:bg-accent-hover text-on-accent font-medium rounded-xl transition-all shadow-card disabled:opacity-50 disabled:shadow-none active:scale-95 flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-4 py-4 bg-accent hover:bg-accent-hover text-on-accent font-medium rounded-xl transition-all disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-2"
               >
                 {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                 Enviar Solicitação
