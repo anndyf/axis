@@ -23,11 +23,13 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 
 - Sessão de lógica (depois do layout): fechamento de unidade com cadeado em notas e chamadas, reabertura pela direção auditada. Instrução ainda a escrever.
 
+**Para elaborar no futuro (pedido da dona do produto)**
+- Telas de cadastro do estudante e da secretaria escolar (fase 5 do roteiro). Requisito: a Secretaria NÃO vê as fichas AEE, mas no cadastro do estudante pode anexar laudo e informar a condição (deficiência/necessidade), que alimenta o AEE. Definir na fase 5 quem lê o laudo anexado (dado sensível de saúde, LGPD art. 11 e 14).
+
 **Esperando decisão da dona do produto**
 - As 20 decisões de `docs/arquitetura/decisoes.md`. As 5 mais urgentes: D-03 (público-alvo), D-01 (núcleo e módulos), D-14 (quando a CETEP migra para matrícula por ano), D-06 (etapas de ensino no lançamento), D-04 (redes agora ou depois).
 - Preços dos planos (a fase 2 criou os planos com preço zerado).
 - Número da versão do sistema que aparecerá no rodapé (hoje 0.1.0).
-- Papéis (ver panorama de 20/10): Direção continua podendo lançar notas e fazer chamada em qualquer turma? Coordenação decide no conselho? Coordenação deve fazer chamada (substituição)?
 
 **Próximos passos**
 1. Disparar a sessão do layout de sistema (8 etapas, instrução em `sessoes-nuvem/layout-sistema.md`).
@@ -40,6 +42,7 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 ## Histórico
 
 ### 20/10/2026
+- Decisões sobre papéis: (1) Direção NÃO lança notas nem faz chamada, apenas visualiza (a implementar); (2) Coordenação decide no conselho de classe: confirmado; (3) Coordenação NÃO faz chamada: confirmado; (4) Secretaria não vê fichas AEE, mas poderá anexar laudo e condição no cadastro do estudante (anotado para as telas de cadastro/secretaria).
 - PR #15 (fases 3a+3b) mergeado na main. Panorama dos papéis: Administrador da escola, Direção, Secretaria, Coordenação, Professor, AEE, Estudante, Responsável (sem portal ainda) e a conta da Plataforma (fora dos papéis até a 3c). Lista de permissões em `src/lib/permissoes.ts`.
 - Fases 3a+3b concluídas na nuvem (PR #15) e validadas localmente: migration `20261021120000_papeis_e_vinculos` só cria tabelas; backfill `fase-3a.ts` com 16 usuários, 94 comparações e 0 diferenças, e a 2ª execução não altera nada; 536 testes passando (eram 437); sem conflito com a main. Conferido ao vivo: menus de direção, professor e AEE idênticos aos da main; novos logins `secretaria` e `coordenacao` com menus próprios. Só o papel Administrador da escola (= superuser) gerencia usuários. A sessão corrigiu dois vazamentos entre escolas ("Desativar todos os portais" e destinatários/e-mail de comunicado geral). Decisões dela a conferir: papel extra "Administrador da escola"; direção recebe também o papel Professor (porque tem isStaff); Coordenação sem chamada; campo "senha inicial" removido do cadastro (o servidor já ignorava).
 - Deliberado o que dá cara de sistema robusto: entram na sessão do layout a rastreabilidade visível (criado/alterado por, aba Histórico, "Salvo às"), máscaras e seções nos formulários, tabelas com ordenação e colunas, troca de emojis por ícones, linguagem formal, rodapé com versão/suporte/privacidade, "Novidades", último acesso após o login, ajuda "?" por tela e impressão. Documentos oficiais ficam na fase 9; o cadeado de unidade encerrada vira sessão de lógica própria.
