@@ -15,8 +15,8 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 **Rodando na nuvem**
 - Nada no momento.
 
-**Esperando merge da dona do produto**
-- PR #15 (fases 3a+3b, papéis e permissões): validado localmente em 20/10. https://github.com/anndyf/axis/pull/15
+**Pronto para disparar**
+- Sessão do layout de sistema (8 etapas): `sessoes-nuvem/layout-sistema.md`. O PR #15 já entrou na main.
 
 **Pronto para iniciar quando quiser**
 - Layout com cara de sistema no computador + tipografia etapa 2 + rastreabilidade visível, formulários/tabelas com rigor, acabamento de produto e impressão (uma sessão, 8 etapas): instrução em `sessoes-nuvem/layout-sistema.md`, prévia em `sessoes-nuvem/previa-layout.html`. Disparar DEPOIS do merge da fase 3a+3b.
@@ -27,10 +27,10 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 - As 20 decisões de `docs/arquitetura/decisoes.md`. As 5 mais urgentes: D-03 (público-alvo), D-01 (núcleo e módulos), D-14 (quando a CETEP migra para matrícula por ano), D-06 (etapas de ensino no lançamento), D-04 (redes agora ou depois).
 - Preços dos planos (a fase 2 criou os planos com preço zerado).
 - Número da versão do sistema que aparecerá no rodapé (hoje 0.1.0).
+- Papéis (ver panorama de 20/10): Direção continua podendo lançar notas e fazer chamada em qualquer turma? Coordenação decide no conselho? Coordenação deve fazer chamada (substituição)?
 
 **Próximos passos**
-1. Merge do PR #15.
-2. Disparar a sessão do layout de sistema (8 etapas, instrução em `sessoes-nuvem/layout-sistema.md`).
+1. Disparar a sessão do layout de sistema (8 etapas, instrução em `sessoes-nuvem/layout-sistema.md`).
 3. Fase 3c depois: remover os booleanos de User, tirar a conta da plataforma da escola, trocar as consultas que ainda filtram por booleano (ex.: destinatários de comunicados).
 4. Fases seguintes do roteiro conforme as decisões.
 5. Em produção (quando houver): `prisma migrate deploy`, depois `npx tsx prisma/backfill/fase-2.ts` e `npx tsx prisma/backfill/fase-3a.ts`, com backup verificado.
@@ -40,6 +40,7 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 ## Histórico
 
 ### 20/10/2026
+- PR #15 (fases 3a+3b) mergeado na main. Panorama dos papéis: Administrador da escola, Direção, Secretaria, Coordenação, Professor, AEE, Estudante, Responsável (sem portal ainda) e a conta da Plataforma (fora dos papéis até a 3c). Lista de permissões em `src/lib/permissoes.ts`.
 - Fases 3a+3b concluídas na nuvem (PR #15) e validadas localmente: migration `20261021120000_papeis_e_vinculos` só cria tabelas; backfill `fase-3a.ts` com 16 usuários, 94 comparações e 0 diferenças, e a 2ª execução não altera nada; 536 testes passando (eram 437); sem conflito com a main. Conferido ao vivo: menus de direção, professor e AEE idênticos aos da main; novos logins `secretaria` e `coordenacao` com menus próprios. Só o papel Administrador da escola (= superuser) gerencia usuários. A sessão corrigiu dois vazamentos entre escolas ("Desativar todos os portais" e destinatários/e-mail de comunicado geral). Decisões dela a conferir: papel extra "Administrador da escola"; direção recebe também o papel Professor (porque tem isStaff); Coordenação sem chamada; campo "senha inicial" removido do cadastro (o servidor já ignorava).
 - Deliberado o que dá cara de sistema robusto: entram na sessão do layout a rastreabilidade visível (criado/alterado por, aba Histórico, "Salvo às"), máscaras e seções nos formulários, tabelas com ordenação e colunas, troca de emojis por ícones, linguagem formal, rodapé com versão/suporte/privacidade, "Novidades", último acesso após o login, ajuda "?" por tela e impressão. Documentos oficiais ficam na fase 9; o cadeado de unidade encerrada vira sessão de lógica própria.
 - Deliberado o layout "cara de sistema" no computador (celular continua com cara de app): densidade equilibrada, painéis com borda, barra de ferramentas nas listas, fichas com abas (turma, estudante, usuário, AEE), conteúdo na largura toda. Barra superior só EXIBE o ano letivo; o seletor de consulta de anos anteriores fica para a fase 6, com somente leitura, faixa de aviso e volta automática ao ano atual (preocupação de usabilidade da dona do produto).
