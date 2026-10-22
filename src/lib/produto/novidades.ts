@@ -20,6 +20,15 @@ export const NOVIDADES: VersaoNovidades[] = [
     rotulo: 'Versão atual',
     entregas: [
       {
+        titulo: 'Cadeado de unidade encerrada',
+        itens: [
+          'A unidade encerra sozinha no dia seguinte ao prazo de lançamento, ou antes, quando a Direção ou a Coordenação clica em "Encerrar agora".',
+          'Unidade encerrada tranca notas, avaliações, infrequência, chamadas e diário do período; com a última unidade encerrada, também a recuperação final e o conselho de classe.',
+          'Reabertura pontual por turma e disciplina, com motivo e prazo (padrão 7 dias, no máximo 30), que tranca de novo sozinha na data; a gestão pode revogar antes.',
+          'Nova tela "Encerramento de unidades" e aviso no painel das unidades que encerram nos próximos 7 dias e das reaberturas ativas. Tudo registrado na auditoria.',
+        ],
+      },
+      {
         titulo: 'Layout de sistema no computador',
         itens: [
           'Área de trabalho usando a largura toda, barra superior com escola, ano letivo, perfil, busca e notificações.',

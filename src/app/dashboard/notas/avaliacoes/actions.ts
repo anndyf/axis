@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache"
 import { contextoDaDisciplina } from "@/lib/avaliacoes-acesso"
 import { validarAvaliacoesDaEtapa, validarDadosAvaliacao } from "@/lib/services/avaliacoes-professor"
 import { bloqueioDoModulo } from "@/lib/modulos/guarda"
+import { podeGravarNotaUnidade } from "@/lib/cadeado-unidade"
 
 // Avaliações criadas pelo professor (esquema com definicaoAtividades =
 // PROFESSOR). Toda ação confere papel, escola e se o professor leciona a
@@ -20,6 +21,12 @@ async function contextoParaEditar(disciplinaId: string) {
   if (!ctx.esquema) return { erro: "A turma não tem esquema de avaliação." } as const
   if (ctx.esquema.definicaoAtividades !== "PROFESSOR") return { erro: "Neste esquema as atividades são definidas pela escola." } as const
   return { ...ctx, esquema: ctx.esquema }
+}
+
+/** Cadeado: a etapa encerrada não recebe nem perde avaliações (depois da regra de quem leciona). */
+async function erroDoCadeado(ctx: { user: { escolaId: string }; disciplina: { id: string; turma: { id: string } } }, esquemaUnidadeId: string): Promise<string | null> {
+  const r = await podeGravarNotaUnidade(ctx.user.escolaId, ctx.disciplina.turma.id, ctx.disciplina.id, esquemaUnidadeId)
+  return r.ok ? null : r.mensagem
 }
 
 /** Confere o teto da etapa com a lista de avaliações já como ficaria. */
@@ -45,6 +52,9 @@ export async function criarAvaliacao(disciplinaId: string, esquemaUnidadeId: str
   if ("erro" in ctx) return { erro: ctx.erro! }
   const dados = validarDadosAvaliacao(entrada)
   if ("erro" in dados) return dados
+  if (!ctx.esquema.unidades.some((u) => u.id === esquemaUnidadeId)) return { erro: "Etapa não encontrada" }
+  const trancada = await erroDoCadeado(ctx, esquemaUnidadeId)
+  if (trancada) return { erro: trancada }
   const erroTeto = await conferirTeto(ctx.esquema, ctx.disciplina.id, String(esquemaUnidadeId), { notaMaxima: dados.notaMaxima, peso: dados.peso })
   if (erroTeto) return { erro: erroTeto }
 
@@ -90,6 +100,8 @@ export async function editarAvaliacao(id: string, entrada: unknown): Promise<Res
   const { avaliacao, ctx } = alvo
   const dados = validarDadosAvaliacao(entrada)
   if ("erro" in dados) return dados
+  const trancada = await erroDoCadeado(ctx, avaliacao.esquemaUnidadeId)
+  if (trancada) return { erro: trancada }
 
   const mudaConta = dados.notaMaxima !== avaliacao.notaMaxima || dados.peso !== avaliacao.peso
   if (mudaConta && avaliacao.notas.length > 0) {
@@ -112,6 +124,8 @@ export async function removerAvaliacao(id: string): Promise<Resultado> {
   if (bloqueado) return { erro: bloqueado }
   const alvo = await avaliacaoComContexto(id)
   if (!alvo) return { erro: "Avaliação não encontrada" }
+  const trancada = await erroDoCadeado(alvo.ctx, alvo.avaliacao.esquemaUnidadeId)
+  if (trancada) return { erro: trancada }
   if (alvo.avaliacao.notas.length > 0) return { erro: "Já há notas lançadas nesta avaliação. Apague as notas antes de removê-la." }
   await prisma.avaliacaoDisciplina.delete({ where: { id: alvo.avaliacao.id } })
   revalidatePath(CAMINHO)

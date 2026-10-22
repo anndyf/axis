@@ -7,8 +7,10 @@ import { reportarErro } from '@/lib/monitoramento'
 import { can } from '@/lib/rbac'
 import { calcularMediaFinal, resolverEsquemaAvaliacaoId, paraEsquemaConfig, unidadesDeNotasSalvas, notaRecuperacaoValida, type EsquemaConfig } from '@/lib/services/notas'
 import { rotaDoModulo } from '@/lib/modulos/guarda'
+import { contextoCadeado, verificarRecuperacaoOuConselho, STATUS_CADEADO, type ContextoCadeado } from '@/lib/cadeado-unidade'
 
 class ErroValidacao extends Error {}
+class ErroCadeado extends Error {}
 
 export const runtime = 'nodejs'
 
@@ -82,9 +84,10 @@ export const POST = rotaDoModulo('RES', 'escrita', async function POST(request: 
       include: {
         unidades: { select: { esquemaUnidadeId: true, notaCalculada: true, notaRecuperacao: true } },
         estudante: { select: { nome: true, turmaId: true, turma: { select: { cursoId: true, esquemaAvaliacaoId: true } } } },
-        disciplina: { select: { nome: true } },
+        disciplina: { select: { nome: true, turmaId: true } },
       },
     })
+    const cadeadoPorTurma = new Map<string, ContextoCadeado | null>()
     const validadas: {
       notaOriginal: NonNullable<Awaited<ReturnType<typeof buscarNota>>>
       status: StatusNota
@@ -121,6 +124,13 @@ export const POST = rotaDoModulo('RES', 'escrita', async function POST(request: 
           ? (resultado.media !== null && resultado.media >= esquemaConfig.notaMinimaAprovacao ? 'APROVADO' : 'RECUPERACAO')
           : 'incompleto'
       }
+
+      // Cadeado: o conselho segue a última unidade do esquema da turma da disciplina
+      const turmaDaDisciplina = notaOriginal.disciplina.turmaId
+      if (!cadeadoPorTurma.has(turmaDaDisciplina)) cadeadoPorTurma.set(turmaDaDisciplina, await contextoCadeado(escolaId, turmaDaDisciplina))
+      const cadeado = cadeadoPorTurma.get(turmaDaDisciplina)
+      const liberacao = cadeado ? verificarRecuperacaoOuConselho(cadeado, notaOriginal.disciplinaId) : { ok: true as const }
+      if (!liberacao.ok) throw new ErroCadeado(liberacao.mensagem)
 
       validadas.push({ notaOriginal, status, novaNotaRec, sugestaoAutomatica })
     }
@@ -172,6 +182,9 @@ export const POST = rotaDoModulo('RES', 'escrita', async function POST(request: 
     // Mensagens mais específicas para erros de validação
     if (error?.message?.includes('Decisão de conselho inválida')) {
       return NextResponse.json({ message: error.message }, { status: 400 })
+    }
+    if (error instanceof ErroCadeado) {
+      return NextResponse.json({ message: error.message }, { status: STATUS_CADEADO })
     }
     if (error instanceof ErroValidacao) {
       return NextResponse.json({ message: error.message }, { status: 400 })

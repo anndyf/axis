@@ -21,7 +21,7 @@ import {
   Accessibility,
   Printer,
   Info,
-  ChevronDown, Eye } from "lucide-react"
+  ChevronDown, Eye, Lock, LockOpen } from "lucide-react"
 import { calcularNotaUnidade, calcularMediaFinal, paraEsquemaConfig, type EsquemaConfig, type UnidadeInput, type FormaCalculo } from "@/lib/services/notas"
 
 interface Estudante {
@@ -111,6 +111,9 @@ export default function LancarNotasTurmaClient({
   const [loading, setLoading] = useState(false)
   // Só quem leciona a disciplina lança; Direção/Administrador só visualizam
   const [podeLancar, setPodeLancar] = useState(true)
+  // Cadeado: unidades encerradas ficam só leitura (o servidor também recusa)
+  const [cadeado, setCadeado] = useState<{ esquemaUnidadeId: string; trancada: boolean; aviso: string | null }[]>([])
+  const trancada = (unidadeId: string) => cadeado.some((c) => c.esquemaUnidadeId === unidadeId && c.trancada)
   const [saving, setSaving] = useState(false)
   const [salvoEm, setSalvoEm] = useState<Date | null>(null)
   const [showModal, setShowModal] = useState(false)
@@ -144,6 +147,7 @@ export default function LancarNotasTurmaClient({
   }, [notas, originalNotas])
 
   const handleAtividadeChange = (estudanteId: string, unidadeId: string, atividadeId: string, valor: string, max: number = 10) => {
+    if (trancada(unidadeId)) return
     if (valor !== '') {
       if (valor.includes('.')) { const parts = valor.split('.'); if (parts[1].length > 1) return; }
       const num = parseFloat(valor); if (num > max || num < 0) return;
@@ -169,6 +173,7 @@ export default function LancarNotasTurmaClient({
     handleAtividadeChange(estudanteId, unidadeId, atividadeId, valor.replace(',', '.'), max)
 
   const handleDesistenteChange = (estudanteId: string, unidadeId: string, checked: boolean) => {
+    if (trancada(unidadeId)) return
     setNotas(prev => {
       const base = prev[estudanteId] || estadoVazio(esquema)
       const unidadeBase = base[unidadeId] || { isDesistente: false, atividades: {} }
@@ -273,8 +278,9 @@ export default function LancarNotasTurmaClient({
       setLoading(true)
       fetch(`/api/notas/turma/${turmaId}/disciplina/${disciplinaSelecionada}`)
         .then(res => res.json())
-        .then((data: { esquema: EsquemaInfo, notas: any[], podeLancar?: boolean }) => {
+        .then((data: { esquema: EsquemaInfo, notas: any[], podeLancar?: boolean, cadeado?: { esquemaUnidadeId: string; trancada: boolean; aviso: string | null }[] }) => {
           setPodeLancar(data.podeLancar !== false)
+          setCadeado(Array.isArray(data.cadeado) ? data.cadeado : [])
           setEsquema(data.esquema)
           const dict: Record<string, NotaState> = {}
           const status: Record<string, string> = {}
@@ -448,6 +454,13 @@ export default function LancarNotasTurmaClient({
             </div>
           )}
 
+          {disciplinaSelecionada && esquema && cadeado.filter((c) => c.aviso).map((c) => (
+            <div key={c.esquemaUnidadeId} className={`flex items-center gap-2 border-b px-painel py-2.5 text-13 ${c.trancada ? 'border-line bg-subtle text-fg-muted' : 'border-warning-line bg-warning-subtle text-warning-fg'}`} role="status">
+              {c.trancada ? <Lock size={15} strokeWidth={1.75} aria-hidden className="shrink-0" /> : <LockOpen size={15} strokeWidth={1.75} aria-hidden className="shrink-0" />}
+              <span>{c.trancada ? c.aviso : `${esquema.unidades.find((u) => u.id === c.esquemaUnidadeId)?.nome ?? 'Unidade'}: ${c.aviso}.`}</span>
+            </div>
+          ))}
+
           {/* disabled no fieldset bloqueia todos os campos quando é só leitura */}
           {/* Só leitura: campos bloqueados com aparência de texto, sem os botões de marcar infrequente */}
           <fieldset disabled={!podeLancar} className="contents [&_input:disabled]:cursor-default [&_input:disabled]:border-transparent [&_input:disabled]:bg-transparent [&_input:disabled]:text-fg [&_input:disabled]:opacity-100 [&_input:disabled]:shadow-none [&_button:disabled]:hidden">
@@ -461,7 +474,7 @@ export default function LancarNotasTurmaClient({
                       <th rowSpan={2} className="px-3 py-2 text-rotulo font-medium text-fg-muted align-bottom">Estudante</th>
                       {esquema.unidades.map(u => (
                         <th key={u.id} colSpan={u.atividades.length + 1} className="px-2 py-1.5 text-rotulo font-medium text-fg-muted text-center border-l border-line">
-                          {u.nome}
+                          <span className="inline-flex items-center gap-1">{trancada(u.id) && <Lock size={12} strokeWidth={2} aria-label="Unidade encerrada" />}{u.nome}</span>
                         </th>
                       ))}
                       <th rowSpan={2} className="px-3 py-2 text-rotulo font-medium text-fg-muted w-24 text-center align-bottom">Média</th>
@@ -486,7 +499,7 @@ export default function LancarNotasTurmaClient({
                     <th className="px-3 py-2 text-rotulo font-medium text-fg-muted w-12 text-center">#</th>
                     <th className="px-3 py-2 text-rotulo font-medium text-fg-muted">Estudante</th>
                     {(esquema?.unidades ?? []).map(u => (
-                      <th key={u.id} className="px-2 py-1.5 text-rotulo font-medium text-fg-muted w-32 text-center">{u.nome}</th>
+                      <th key={u.id} className="px-2 py-1.5 text-rotulo font-medium text-fg-muted w-32 text-center"><span className="inline-flex items-center gap-1">{trancada(u.id) && <Lock size={12} strokeWidth={2} aria-label="Unidade encerrada" />}{u.nome}</span></th>
                     ))}
                     <th className="px-3 py-2 text-rotulo font-medium text-fg-muted w-24 text-center">Média</th>
                   </tr>
@@ -558,6 +571,7 @@ export default function LancarNotasTurmaClient({
                                 <div className="flex flex-col items-center gap-1.5 group relative">
                                   <input
                                     type="number" step="0.1" inputMode="decimal"
+                                    disabled={trancada(u.id)}
                                     value={val}
                                     onChange={(e) => atividade && handleAtividadeChange(estudante.matricula, u.id, atividade.id, e.target.value, atividade.notaMaxima)}
                                     className={`w-10 h-8 text-center border rounded-md text-sm font-medium transition-all outline-none ${
@@ -568,6 +582,7 @@ export default function LancarNotasTurmaClient({
                                   />
                                   <button
                                       type="button"
+                                      disabled={trancada(u.id)}
                                       onClick={() => handleDesistenteChange(estudante.matricula, u.id, !unidadeEstado.isDesistente)}
                                       className={`absolute -right-3 -bottom-2 p-1.5 rounded-full transition-all flex items-center justify-center ${
                                           unidadeEstado.isDesistente
@@ -597,6 +612,7 @@ export default function LancarNotasTurmaClient({
                                     <div className="flex flex-col items-center gap-1.5 group relative">
                                       <input
                                         type="number" step="0.1" inputMode="decimal"
+                                        disabled={trancada(u.id)}
                                         value={val}
                                         onChange={(e) => handleAtividadeChange(estudante.matricula, u.id, a.id, e.target.value, a.notaMaxima)}
                                         className={`w-10 h-9 text-center border-2 rounded-xl text-sm font-medium transition-all outline-none ${
@@ -608,6 +624,7 @@ export default function LancarNotasTurmaClient({
                                       {ai === 0 && (
                                         <button
                                             type="button"
+                                            disabled={trancada(u.id)}
                                             onClick={() => handleDesistenteChange(estudante.matricula, u.id, !unidadeEstado.isDesistente)}
                                             className={`absolute -right-3 -bottom-2 p-1.5 rounded-full transition-all flex items-center justify-center ${
                                                 unidadeEstado.isDesistente
@@ -679,10 +696,10 @@ export default function LancarNotasTurmaClient({
                           const ue = estado[u.id] || { isDesistente: false, atividades: {} }
                           const subtotal = isSimples ? null : calcularSubtotalUnidade(estudante.matricula, u)
                           return (
-                            <fieldset key={u.id} className={`rounded-xl p-3 ${ue.isDesistente ? 'bg-warning-subtle' : 'bg-subtle'}`}>
+                            <fieldset key={u.id} disabled={trancada(u.id)} className={`rounded-xl p-3 ${ue.isDesistente ? 'bg-warning-subtle' : 'bg-subtle'}`}>
                               <legend className="sr-only">{u.nome}</legend>
                               <div className="flex items-center gap-2">
-                                <span className="min-w-0 flex-1 text-13 font-medium text-fg">{u.nome}</span>
+                                <span className="flex min-w-0 flex-1 items-center gap-1 text-13 font-medium text-fg">{trancada(u.id) && <Lock size={13} strokeWidth={2} aria-label="Unidade encerrada" />}{u.nome}</span>
                                 {subtotal !== null && <span className={`text-13 font-semibold tabular-nums ${subtotal < minimoAprovacao ? 'text-danger-fg' : 'text-fg-muted'}`}>Subtotal {subtotal.toFixed(1)}</span>}
                                 <button
                                   type="button"

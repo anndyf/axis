@@ -7,6 +7,7 @@ import { etapasDaNota } from "@/lib/services/notas"
 import { carregarFrequenciaDaTurma } from "@/lib/services/frequencia-leitura"
 import { frequenciaConsiderada } from "@/lib/services/frequencia"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { contextoCadeado, situacaoRecuperacaoOuConselho } from '@/lib/cadeado-unidade'
 
 export const metadata = {
   title: 'Áxis - Conselho classe'
@@ -87,8 +88,19 @@ async function getNotasConselho(turmaId: string, escolaId: string) {
     }))
   )
 
+  // Cadeado: o conselho segue a última unidade (aviso por disciplina com nota no conselho)
+  const ctx = await contextoCadeado(escolaId, turma.id)
+  const cadeado: Record<string, { trancada: boolean; aviso: string; disciplina: string }> = {}
+  for (const n of notasFiltradas) {
+    if (cadeado[n.disciplinaId] || !ctx) continue
+    const s = situacaoRecuperacaoOuConselho(ctx, n.disciplinaId)
+    // a reabertura vale para a turma + disciplina, não para quem está vendo
+    if (s) cadeado[n.disciplinaId] = { ...s, aviso: s.aviso.replace('Reaberta para você até', 'Reaberta até'), disciplina: n.disciplinaNome }
+  }
+
   return {
     turma,
+    cadeado,
     notasConselho: notasFiltradas,
     // Sem esquema resolvido, cai no comportamento legado (média simples, mínimo 5)
     esquemaConfig: esquema?.config ?? { numUnidades: etapas.length, notaMinimaAprovacao: 5, recuperacaoUnidadeAtiva: false, recuperacaoFinalAtiva: true },
@@ -126,6 +138,7 @@ export default async function ConselhoClasseTurmaPage({
       esquemaConfig={data.esquemaConfig}
       pesosEtapas={data.pesosEtapas}
       frequenciaMinima={data.frequenciaMinima}
+      cadeado={data.cadeado}
     />
   )
 }

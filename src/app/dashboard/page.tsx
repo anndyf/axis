@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { unstable_cache } from "next/cache"
 import {
   Accessibility, AlertTriangle, CalendarDays, ClipboardCheck, Clock, ClipboardList, FileText, FileWarning,
-  GraduationCap, Megaphone, MessageSquare, NotebookPen, UserRound, Users, type LucideIcon,
+  GraduationCap, Lock, LockOpen, Megaphone, MessageSquare, NotebookPen, UserRound, Users, type LucideIcon,
 } from "lucide-react"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
@@ -13,7 +13,7 @@ import { MODULOS, modulosVisiveis } from "@/lib/modules"
 import { formatarFrequencia } from "@/lib/services/frequencia"
 import {
   atividadesDoProfessor, comunicadosRecentes, estudantesAEE, estudantesEmRisco, numerosDaEscola, ocorrenciasRecentes,
-  pendenciasPorDisciplina, professoresAtrasados, proximasDatas, resumoGestao, resumoProfessor, type AulaDeHoje,
+  pendenciasPorDisciplina, professoresAtrasados, proximasDatas, avisosDoCadeado, resumoGestao, resumoProfessor, type AulaDeHoje,
 } from "@/lib/services/painel-leitura"
 import { cartoesDoProfessor, destaqueDoDia, horaNaEscola, rotuloTempos, turmasDosCartoes } from "@/lib/services/inicio-professor"
 import CartoesTurmas from "@/components/painel/CartoesTurmas"
@@ -368,12 +368,13 @@ async function PainelPedagogia({ escolaId, anoLetivo, atalho, visiveis }: { esco
 /* ----------------------------- Administração ----------------------------- */
 
 async function PainelAdministracao({ escolaId, anoLetivo, atalho }: { escolaId: string; anoLetivo: number; atalho: Atalho }) {
-  const [numeros, resumo, pendencias, comunicados, datas] = await Promise.all([
+  const [numeros, resumo, pendencias, comunicados, datas, cadeado] = await Promise.all([
     numerosDaEscola(escolaId, anoLetivo),
     resumoGestaoCache(escolaId, anoLetivo),
     pendenciasDaEscolaCache(escolaId, anoLetivo),
     comunicadosRecentes(escolaId, "gestao"),
     proximasDatas(escolaId, anoLetivo),
+    avisosDoCadeado(escolaId, anoLetivo),
   ])
   const risco = await estudantesEmRisco(escolaId, anoLetivo, resumo.idsAbaixoDoMinimo, 0)
   const atrasados = professoresAtrasados(pendencias)
@@ -453,6 +454,15 @@ async function PainelAdministracao({ escolaId, anoLetivo, atalho }: { escolaId: 
           <Secao id="comunicados" titulo="Comunicados" acao={{ rotulo: "Ver todos", href: "/dashboard/mensagens" }}>
             <ListaComunicados comunicados={comunicados} />
           </Secao>
+          {cadeado.length > 0 && (
+            <Secao id="encerramento" titulo="Encerramento de unidades" descricao="Encerram nos próximos 7 dias e reaberturas ativas" acao={atalho("encerramento").length ? { rotulo: "Gerenciar", href: "/dashboard/configuracoes/encerramento" } : undefined}>
+              <Lista vazio="">
+                {cadeado.map((c) => (
+                  <Item key={c.chave} icone={c.tipo === "encerra" ? Lock : LockOpen} tom={c.tipo === "encerra" ? "violet" : "warning"} titulo={c.titulo} subtitulo={c.subtitulo} direita={c.tipo === "encerra" ? <>encerra<br />{dataCurta(c.data)}</> : <>até<br />{dataCurta(c.data)}</>} />
+                ))}
+              </Lista>
+            </Secao>
+          )}
           <Secao id="calendario" titulo="Calendário" descricao="Próximas datas" acao={atalho("configuracoes").length ? { rotulo: "Calendário letivo", href: "/dashboard/configuracoes/calendario" } : undefined}>
             <Lista vazio="Nenhuma data próxima no calendário.">
               {datas.map((d) => (

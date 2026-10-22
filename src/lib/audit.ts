@@ -1,9 +1,14 @@
 import { prisma } from "./prisma"
-import { v4 as uuidv4 } from "uuid"
-// Updated with AuditLog model
 
-type EntityType = 'NOTA' | 'QUESTAO' | 'USUARIO' | 'TURMA' | 'DISCIPLINA' | 'CONSELHO' | 'PROVA' | 'ESTUDANTE' | 'OCORRENCIA'
+type EntityType = 'NOTA' | 'QUESTAO' | 'USUARIO' | 'TURMA' | 'DISCIPLINA' | 'CONSELHO' | 'PROVA' | 'ESTUDANTE' | 'OCORRENCIA' | 'UNIDADE'
 
+/**
+ * Registra uma ação no AuditLog. `created_at` é UTC de verdade (o padrão do
+ * Prisma); quem exibe formata em America/Sao_Paulo. Até 21/10/2026 esta
+ * função gravava o horário de Brasília "como se fosse UTC"; a migration
+ * 20261023120000_audit_logs_utc corrigiu os registros antigos.
+ * Falha aqui nunca derruba a operação de quem chama.
+ */
 export async function logAudit(
   userId: string,
   entityType: EntityType,
@@ -13,41 +18,17 @@ export async function logAudit(
   ipAddress?: string
 ) {
   try {
-    // Ajustar para o fuso horário de Brasília (UTC-3)
-    const now = new Date()
-    const offset = -3 * 60 // -3 horas em minutos
-    const brTime = new Date(now.getTime() + (offset + now.getTimezoneOffset()) * 60000)
-
-    const pClient = prisma as any
-    if (pClient.auditLog) {
-      await pClient.auditLog.create({
-        data: {
-          userId,
-          entityType,
-          entityId,
-          action,
-          details: details ? JSON.stringify(details) : null,
-          ipAddress,
-          createdAt: brTime
-        }
-      })
-    } else {
-      const detailsStr = details ? JSON.stringify(details) : null
-      await prisma.$executeRaw`
-        INSERT INTO "audit_logs" (id, user_id, entity_type, entity_id, action, details, ip_address, created_at)
-        VALUES (
-          ${uuidv4()}, 
-          ${userId}, 
-          ${entityType}, 
-          ${entityId}, 
-          ${action}, 
-          ${detailsStr}, 
-          ${ipAddress || null}, 
-          ${brTime}
-        )
-      `
-    }
+    await prisma.auditLog.create({
+      data: {
+        userId,
+        entityType,
+        entityId,
+        action,
+        details: details ? JSON.stringify(details) : null,
+        ipAddress,
+      },
+    })
   } catch (error) {
-    console.error('CRITICAL: logAudit failed even with fallback:', error)
+    console.error('CRITICAL: logAudit failed:', error)
   }
 }

@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react"
 import Link from "next/link"
 import { PageHeader, buttonClasses, cn } from "@/components/ui"
-import { ArrowLeft, Clock, Plus, Trash2, Save, Loader2, CheckCircle2, AlertCircle } from "lucide-react"
+import { ArrowLeft, Clock, Plus, Trash2, Save, Loader2, CheckCircle2, AlertCircle, Lock } from "lucide-react"
 import {
   salvarPeriodoLetivo, salvarEtapas, adicionarDiaNaoLetivo, removerDiaNaoLetivo,
   adicionarDiaLetivoExtra, removerDiaLetivoExtra, salvarTemposAula,
@@ -80,7 +80,12 @@ export default function CalendarioClient(props: Props) {
       <PageHeader
         title={`Calendário letivo ${props.anoLetivo}`}
         description="Base das aulas previstas e da frequência: dias letivos × horário das turmas."
-        actions={<Link href="/dashboard/configuracoes" className={buttonClasses({ variant: "ghost" })}><ArrowLeft size={16} strokeWidth={1.75} /> Configurações</Link>}
+        actions={
+          <>
+            <Link href="/dashboard/configuracoes/encerramento" className={buttonClasses({ variant: "secondary" })}><Lock size={16} strokeWidth={1.75} /> Encerramento de unidades</Link>
+            <Link href="/dashboard/configuracoes" className={buttonClasses({ variant: "ghost" })}><ArrowLeft size={16} strokeWidth={1.75} /> Configurações</Link>
+          </>
+        }
       />
 
       {aviso && (

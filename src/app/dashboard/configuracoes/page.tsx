@@ -3,13 +3,14 @@
 // @modulo NUC - página cliente; o Núcleo está sempre ativo (guarda nas rotas que ela chama)
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Check, AlertCircle, Save, ClipboardList, ChevronRight, CalendarDays, Palette, type LucideIcon } from "lucide-react"
+import { Check, AlertCircle, Save, ClipboardList, ChevronRight, CalendarDays, Palette, Lock, type LucideIcon } from "lucide-react"
 import { Button, Card, CardBody, CardFooter, CardHeader, PageHeader, Select, Skeleton, Switch } from "@/components/ui"
 import ConfirmModal from "@/components/ConfirmModal"
 
 const ATALHOS: { href: string; icon: LucideIcon; titulo: string; descricao: string }[] = [
   { href: "/dashboard/configuracoes/avaliacao", icon: ClipboardList, titulo: "Esquemas de avaliação", descricao: "Unidades, atividades e regras de recuperação da escola." },
   { href: "/dashboard/configuracoes/calendario", icon: CalendarDays, titulo: "Calendário letivo", descricao: "Início e fim do ano, datas das unidades, feriados, sábados letivos e tempos de aula." },
+  { href: "/dashboard/configuracoes/encerramento", icon: Lock, titulo: "Encerramento de unidades", descricao: "Situação de cada unidade, encerramento antes do prazo e reaberturas por turma e disciplina." },
   { href: "/dashboard/configuracoes/identidade", icon: Palette, titulo: "Identidade visual", descricao: "Logo e cor de destaque da escola no sistema, no login e nos PDFs." },
 ]
 

@@ -43,7 +43,7 @@ export default async function UsuarioDadosPage({ params }: { params: Promise<{ i
       <Painel
         titulo="Dados de acesso"
         className="lg:col-span-2"
-        rodape={<RodapeRastreio criadoEm={usuario.createdAt} {...(ultima ? { alteradoEm: ultima.quando, alteradoPor: ultima.autor, fusoAlteracao: "UTC" as const } : { alteradoEm: usuario.updatedAt })} />}
+        rodape={<RodapeRastreio criadoEm={usuario.createdAt} {...(ultima ? { alteradoEm: ultima.quando, alteradoPor: ultima.autor } : { alteradoEm: usuario.updatedAt })} />}
         acoes={!protegida ? (
           <Link href={`/dashboard/usuarios/${usuario.id}/editar`} className={buttonClasses({ variant: "secondary", size: "sm" })}>
             <Pencil size={14} strokeWidth={1.75} aria-hidden /> Editar

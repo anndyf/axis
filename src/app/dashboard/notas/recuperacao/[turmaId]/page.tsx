@@ -5,6 +5,7 @@ import RecuperacaoClient from "./RecuperacaoClient"
 import { calcularMediaFinal, notaNecessariaNaRecuperacao, unidadesDeNotasSalvas } from "@/lib/services/notas"
 import { carregarEsquemaDaTurma } from "@/lib/services/notas-leitura"
 import { disciplinasLecionadas } from "@/lib/chamada-acesso"
+import { contextoCadeado, situacaoRecuperacaoOuConselho } from "@/lib/cadeado-unidade"
 
 export const metadata = {
   title: 'Áxis - Notas'
@@ -94,8 +95,17 @@ async function getNotasRecuperacao(turmaId: string, session: Session) {
       }))
   )
 
+  // Cadeado: a recuperação final segue a última unidade (aviso por disciplina)
+  const ctx = await contextoCadeado(session.user.escolaId, turma.id)
+  const cadeado: Record<string, { trancada: boolean; aviso: string }> = {}
+  for (const d of disciplinas) {
+    const s = ctx ? situacaoRecuperacaoOuConselho(ctx, d.id) : null
+    if (s) cadeado[d.id] = s
+  }
+
   return {
     turma,
+    cadeado,
     notasRecuperacao,
     disciplinas,
     notaMaxima: esquema?.notaMaxima ?? 10,
@@ -131,6 +141,7 @@ export default async function RecuperacaoTurmaPage({
       disciplinas={data.disciplinas}
       notaMaxima={data.notaMaxima}
       disciplinasLecionadas={data.lecionadas}
+      cadeado={data.cadeado}
     />
   )
 }

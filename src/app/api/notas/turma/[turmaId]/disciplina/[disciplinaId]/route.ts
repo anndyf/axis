@@ -5,6 +5,7 @@ import { resolverEsquemaAvaliacaoId } from '@/lib/services/notas'
 import { atividadesDaDisciplina } from '@/lib/services/notas-leitura'
 import { can } from '@/lib/rbac'
 import { rotaDoModulo } from '@/lib/modulos/guarda'
+import { contextoCadeado, situacoesParaTela } from '@/lib/cadeado-unidade'
 
 export const runtime = 'nodejs'
 
@@ -70,10 +71,19 @@ export const GET = rotaDoModulo('NOT', 'leitura', async function GET(
     })
     const porProfessor = esquema.definicaoAtividades === 'PROFESSOR'
     const atividades = await atividadesDaDisciplina(esquema, disciplinaId)
+    const podeLancar = disciplina.usuariosPermitidos.length > 0
+    // Cadeado: unidades encerradas abrem só para leitura (o servidor recusa a gravação)
+    const cadeado = await contextoCadeado(escolaId, turmaId)
 
     return NextResponse.json({
       // Só quem leciona grava; a gestão abre a mesma tela em modo leitura
-      podeLancar: disciplina.usuariosPermitidos.length > 0,
+      podeLancar,
+      cadeado: (cadeado ? situacoesParaTela(cadeado, disciplinaId) : []).map((c) => ({
+        esquemaUnidadeId: c.esquemaUnidadeId,
+        trancada: c.trancada,
+        // "Reaberta para você" só para quem lança
+        aviso: c.trancada || podeLancar ? c.aviso : null,
+      })),
       esquema: {
         id: esquema.id,
         notaMinimaAprovacao: esquema.notaMinimaAprovacao,

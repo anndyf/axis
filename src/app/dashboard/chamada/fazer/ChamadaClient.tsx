@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import { Ban, CalendarDays, CalendarRange, Check, Copy, MessageSquareText, MoreVertical, Save, Users } from "lucide-react"
+import { Ban, CalendarDays, CalendarRange, Check, Copy, Lock, MessageSquareText, MoreVertical, Save, Users } from "lucide-react"
 import { Alert, Avatar, BottomSheet, Button, Card, EmptyState, IndicadorGravacao, Label, SkeletonRows, Textarea, cn } from "@/components/ui"
 import { Menu } from "@/components/ui/Menu"
 import { rotuloTempos } from "@/lib/services/inicio-professor"
@@ -37,6 +37,8 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
   const [pendente, startTransition] = useTransition()
   const [chamada, setChamada] = useState<ChamadaAberta | null>(null)
   const [erroAbertura, setErroAbertura] = useState<string | null>(null)
+  // Dia de unidade encerrada sem chamada registrada: aviso de cadeado, não de erro
+  const [aberturaTrancada, setAberturaTrancada] = useState(false)
   const [faltas, setFaltas] = useState<Record<string, Falta>>({})
   const [observacoes, setObservacoes] = useState<Record<string, string>>({})
   const [conteudo, setConteudo] = useState("")
@@ -55,13 +57,13 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
     let ativo = true
     abrirChamada(turmaId, disciplinaId, data).then((r) => {
       if (!ativo) return
-      if ("erro" in r) { setErroAbertura(r.erro); return }
+      if ("erro" in r) { setErroAbertura(r.erro); setAberturaTrancada(!!r.trancada); return }
       setChamada(r)
       setFaltas(r.faltas)
       setObservacoes(r.observacoes)
       setConteudo(r.aula.conteudo)
       setGravado(JSON.stringify([r.faltas, r.aula.conteudo]))
-      if (r.disciplina) opcoesReplicacao(r.aula.id).then((o) => { if (ativo && !("erro" in o)) setPodeReplicar(o.alvos.length > 0) })
+      if (r.disciplina && !r.trancada) opcoesReplicacao(r.aula.id).then((o) => { if (ativo && !("erro" in o)) setPodeReplicar(o.alvos.length > 0) })
     })
     return () => { ativo = false }
   }, [turmaId, disciplinaId, data])
@@ -164,7 +166,7 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
               {chamada && chamada.aula.tempos.length > 0 && <> · {rotuloTempos(temposDaAula)}</>}
             </p>
           </div>
-          {chamada && chamada.aula.situacao !== "CANCELADA" && (
+          {chamada && chamada.aula.situacao !== "CANCELADA" && !chamada.trancada && (
             <Menu
               trigger={(p) => (
                 <button {...p} type="button" aria-label="Mais opções da aula" className="-mr-2 -mt-1 flex size-11 shrink-0 items-center justify-center rounded-full text-fg-muted hover:bg-subtle hover:text-fg">
@@ -186,18 +188,31 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
               <CalendarRange size={16} strokeWidth={1.75} aria-hidden /> Calendário
             </button>
           )}
-          <p className="w-full text-13 text-fg-subtle">Todos começam presentes; toque em quem faltou.</p>
+          {!chamada?.trancada && !aberturaTrancada && <p className="w-full text-13 text-fg-subtle">Todos começam presentes; toque em quem faltou.</p>}
         </div>
       </section>
 
-      {erroAbertura && <Alert tone="danger" title="Não foi possível abrir a chamada">{erroAbertura}</Alert>}
+      {erroAbertura && !aberturaTrancada && <Alert tone="danger" title="Não foi possível abrir a chamada">{erroAbertura}</Alert>}
+      {erroAbertura && aberturaTrancada && (
+        <div className="flex items-start gap-2.5 rounded-painel border border-line bg-subtle px-3.5 py-2.5 text-13 text-fg-muted" role="status">
+          <Lock size={16} strokeWidth={1.75} className="mt-px shrink-0" aria-hidden />
+          <span><strong className="font-medium text-fg">Unidade encerrada.</strong> {erroAbertura}</span>
+        </div>
+      )}
       {aviso && <Alert tone={aviso.tipo === "ok" ? "success" : "danger"}>{aviso.texto}</Alert>}
-      {chamada?.aula.situacao === "CANCELADA" && <Alert tone="info">Esta aula está marcada como não dada. Salvar a chamada volta a contá-la.</Alert>}
+      {chamada?.trancada && (
+        <div className="flex items-start gap-2.5 rounded-painel border border-line bg-subtle px-3.5 py-2.5 text-13 text-fg-muted" role="status">
+          <Lock size={16} strokeWidth={1.75} className="mt-px shrink-0" aria-hidden />
+          <span><strong className="font-medium text-fg">Somente leitura.</strong> {chamada.trancada}</span>
+        </div>
+      )}
+      {chamada?.aula.situacao === "CANCELADA" && !chamada.trancada && <Alert tone="info">Esta aula está marcada como não dada. Salvar a chamada volta a contá-la.</Alert>}
 
       {!chamada && !erroAbertura && <Card><SkeletonRows linhas={8} colunas={2} /></Card>}
 
       {chamada && (
-        <>
+        // Dia de unidade encerrada: tudo desabilitado (o servidor também recusa)
+        <fieldset disabled={!!chamada.trancada} className="contents">
           {chamada.alunos.length === 0 ? (
             <Card><EmptyState icon={Users} title="Nenhum aluno nesta turma" description="Cadastre os estudantes da turma para fazer a chamada." /></Card>
           ) : (
@@ -267,7 +282,7 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
           <section className="rounded-2xl border border-line bg-surface p-4 shadow-card md:px-painel md:py-3">
             <Label htmlFor="conteudo">Conteúdo ministrado</Label>
             <Textarea id="conteudo" className="mt-2" value={conteudo} onChange={(e) => setConteudo(e.target.value)} rows={3} maxLength={5000} placeholder="Ex.: Equações do 1º grau — resolução de exercícios" />
-            {podeReplicar && (
+            {podeReplicar && !chamada.trancada && (
               <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
                 <p className="text-13 text-fg-subtle">Deu a mesma aula em outras turmas?</p>
                 <Button variant="secondary" disabled={pendente} onClick={salvarEReplicar} className="min-h-11 w-full sm:w-auto">
@@ -278,7 +293,7 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
           </section>
 
           {/* Rodapé fixo acima da barra inferior (a lista tem padding equivalente); no desktop gruda no fim da área */}
-          <div className="fixed inset-x-0 bottom-[var(--barra-inferior)] z-30 border-t border-line bg-surface/95 px-4 pt-2 pb-3 backdrop-blur md:sticky md:bottom-4 md:rounded-2xl md:border md:px-4 md:py-3 md:shadow-overlay">
+          {!chamada.trancada && <div className="fixed inset-x-0 bottom-[var(--barra-inferior)] z-30 border-t border-line bg-surface/95 px-4 pt-2 pb-3 backdrop-blur md:sticky md:bottom-4 md:rounded-2xl md:border md:px-4 md:py-3 md:shadow-overlay">
             <div className="mx-auto flex max-w-3xl flex-col gap-2 md:max-w-none md:flex-row md:items-center">
               <IndicadorGravacao pendente={alteracoesPendentes} salvando={pendente} salvoEm={salvoEm} className="hidden md:inline-flex" />
               <p className="text-center text-13 text-fg-muted tabular-nums md:flex-1 md:text-left" aria-live="polite">
@@ -288,8 +303,8 @@ export default function ChamadaClient({ turmaId, disciplinaId, data, hoje, calen
                 <Save size={18} strokeWidth={1.75} /> Salvar chamada
               </Button>
             </div>
-          </div>
-        </>
+          </div>}
+        </fieldset>
       )}
 
       <BottomSheet

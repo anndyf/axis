@@ -70,6 +70,9 @@ export const CHECAGEM_ANTIGA: Record<Permissao, (b: B) => boolean> = {
   'configuracao.editar': superuser,
   'identidade.editar': gestao,
   'auditoria.ler': superuser,
+  // Nova (cadeado de unidade), sem checagem antiga: entre os booleanos, só a
+  // Direção; o Administrador da escola não recebe
+  'unidade.encerrar': (b) => !!b.isDirecao,
 }
 
 const daSessao = (b: B): RbacUser => ({ papeis: papeisDosBooleanos(b) })
@@ -101,6 +104,7 @@ describe('casos por papel', () => {
     ['estudantes (cadastro)', ['estudante.ler', 'estudante.editar', 'pendencia.resolver'], [ADMIN, DIR, SEC], [PROF, AEE, EST]],
     ['estrutura (turmas, matriz, calendário)', ['turma.gerenciar', 'matriz.gerenciar', 'calendario.gerenciar'], [ADMIN, DIR, SEC], [PROF, AEE, COORD, EST]],
     ['acompanhamento pedagógico', ['frequencia.acompanhar', 'conselho.decidir', 'plano.acompanhar', 'questao.moderar', 'prova.gerenciar', 'simulado.gerenciar', 'ocorrencia.gerenciar', 'indicador.ler'], [ADMIN, DIR, COORD], [PROF, AEE, SEC, EST]],
+    ['cadeado de unidade', ['unidade.encerrar'], [ADMIN, DIR, COORD], [papel('ADMINISTRADOR'), PROF, AEE, SEC, EST]],
     ['resultados', ['resultado.ler'], [ADMIN, DIR, SEC, COORD], [PROF, AEE, EST]],
     ['chamada e diário', ['frequencia.lancar'], [ADMIN, DIR, PROF, AEE], [SEC, COORD, EST]],
     ['planos, questões e simulados', ['plano.ler', 'questao.usar', 'simulado.ler'], [ADMIN, DIR, PROF, AEE, COORD], [SEC, EST]],

@@ -8,7 +8,7 @@ import { carregarEsquemaDaTurma } from "@/lib/services/notas-leitura"
 import { carregarCalendario, anoLetivoDaTurma } from "@/lib/services/frequencia-leitura"
 import { diasComAulaAte, hojeNaEscola } from "@/lib/services/chamada"
 import { diasLetivos, aulasPrevistasPorDisciplina, chaveData } from "@/lib/services/calendario"
-import { ArrowLeft, BookOpen, ChevronRight } from "lucide-react"
+import { ArrowLeft, BookOpen, ChevronRight, Lock } from "lucide-react"
 import { getDisciplinasPermitidas } from "@/lib/data-fetching"
 import { agruparPorUnidade, unidadeAtual } from "@/lib/services/diario"
 import { rotuloTempos } from "@/lib/services/inicio-professor"
@@ -16,6 +16,7 @@ import { calendarioDaDisciplina } from "@/lib/services/calendario-disciplina"
 import CalendarioDisciplina from "@/components/CalendarioDisciplina"
 import { Badge, BotaoImprimir, Card, CardBody, CardHeader, EmptyState, PageHeader, Stat, buttonClasses } from "@/components/ui"
 import { paginaDoModulo } from '@/lib/modulos/guarda'
+import { contextoCadeado, verificarAula } from '@/lib/cadeado-unidade'
 
 export const metadata = { title: 'Áxis - Diário de classe' }
 export const runtime = 'nodejs'
@@ -77,6 +78,9 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
         : (disciplinaId ? aulasPrevistasPorDisciplina(horario, diasLetivos(calendario, turma.id)).get(disciplinaId) ?? 0 : 0))
     : null
 
+  // Cadeado: dia de unidade encerrada não tem edição (o servidor também recusa)
+  const cadeado = podeGravar ? await contextoCadeado(escolaId, turma.id) : null
+  const trancado = (d: string) => !!cadeado && !verificarAula(cadeado, disciplinaId, d, hoje).ok
   const linkChamada = (d: string) => `/dashboard/chamada/fazer?turma=${turma.id}${disciplinaId ? `&disciplina=${disciplinaId}` : ""}&data=${d}`
   const linkBase = podeGravar ? linkChamada("") : null
   const diasCalendario = calendario ? calendarioDaDisciplina({ calendario, turmaId: turma.id, disciplinaId, horario, aulas, hoje }) : null
@@ -113,9 +117,9 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
           <CardHeader title="Dias com aula sem chamada" description="Toque no dia para fazer a chamada." />
           <CardBody className="flex flex-wrap gap-1.5">
             {pendentes.slice(0, 60).map((d) => (
-              podeGravar
+              podeGravar && !trancado(d)
                 ? <Link key={d} href={linkChamada(d)} className="rounded-md border border-line bg-surface px-2 py-1 text-xs tabular-nums text-fg-muted transition-colors duration-150 hover:border-line-strong hover:text-fg">{dataBR(d)}</Link>
-                : <span key={d} className="rounded-md border border-line bg-surface px-2 py-1 text-xs tabular-nums text-fg-muted">{dataBR(d)}</span>
+                : <span key={d} className="inline-flex items-center gap-1 rounded-md border border-line bg-surface px-2 py-1 text-xs tabular-nums text-fg-muted">{trancado(d) && <Lock size={11} strokeWidth={2} aria-label="Unidade encerrada" />}{dataBR(d)}</span>
             ))}
             {pendentes.length > 60 && <span className="px-2 py-1 text-xs text-fg-subtle">e mais {pendentes.length - 60}</span>}
           </CardBody>
@@ -157,7 +161,12 @@ export default async function DiarioPage({ searchParams }: { searchParams: Promi
                               {a.professor && <span>· {a.professor.name || a.professor.username}</span>}
                             </p>
                           </div>
-                          {podeGravar && <Link href={linkChamada(a.data)} className={buttonClasses({ size: "sm", variant: "secondary", className: "min-h-9" })} aria-label={`Editar a chamada de ${dataBR(a.data)}`}>Editar</Link>}
+                          {podeGravar && trancado(a.data) && (
+                            <span className="inline-flex min-h-9 items-center gap-1 text-xs text-fg-subtle" title="Unidade encerrada. Para alterar, solicite a reabertura à coordenação.">
+                              <Lock size={13} strokeWidth={1.75} aria-hidden /> Unidade encerrada
+                            </span>
+                          )}
+                          {podeGravar && !trancado(a.data) && <Link href={linkChamada(a.data)} className={buttonClasses({ size: "sm", variant: "secondary", className: "min-h-9" })} aria-label={`Editar a chamada de ${dataBR(a.data)}`}>Editar</Link>}
                         </div>
                         <p className="mt-2 whitespace-pre-line break-words text-13 text-fg">{a.conteudo || <span className="text-fg-subtle">Sem conteúdo registrado</span>}</p>
                         {a.situacao === "REALIZADA" && (

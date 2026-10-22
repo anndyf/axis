@@ -107,13 +107,13 @@ export const POST = rotaDoModulo('NUC', 'escrita', async function POST(request: 
       console.warn('Prisma falhou ao criar turma, tentando SQL bruto...', prismaError.message)
       
       const id = randomUUID()
-      const now = new Date()
       const numVal = numero ? parseInt(numero.toString()) : null
       
+      // Colunas sem fuso: data do JS ou NOW() puro entrariam na hora local do banco
       await prisma.$executeRawUnsafe(`
         INSERT INTO "turmas" (id, nome, curso, turno, modalidade, serie, numero, ano_letivo, created_at, updated_at, curso_id, escola_id)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-      `, id, nome.trim(), curso?.trim(), turno?.trim(), modalidade?.trim(), serie?.toString(), numVal, currentYear, now, now, cursoId || null, session.user.escolaId)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW() AT TIME ZONE 'UTC', NOW() AT TIME ZONE 'UTC', $9, $10)
+      `, id, nome.trim(), curso?.trim(), turno?.trim(), modalidade?.trim(), serie?.toString(), numVal, currentYear, cursoId || null, session.user.escolaId)
 
       revalidatePath('/dashboard/turmas')
       return NextResponse.json({ id, nome, message: 'Turma criada via SQL' }, { status: 201 })

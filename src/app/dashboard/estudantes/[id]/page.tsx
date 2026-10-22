@@ -47,7 +47,7 @@ export default async function EstudanteDadosPage({ params }: { params: Promise<{
       <Painel
         titulo="Dados do estudante"
         className="lg:col-span-2"
-        rodape={<RodapeRastreio criadoEm={estudante.createdAt} {...(ultima ? { alteradoEm: ultima.quando, alteradoPor: ultima.autor, fusoAlteracao: "UTC" as const } : { alteradoEm: estudante.updatedAt })} />}
+        rodape={<RodapeRastreio criadoEm={estudante.createdAt} {...(ultima ? { alteradoEm: ultima.quando, alteradoPor: ultima.autor } : { alteradoEm: estudante.updatedAt })} />}
         acoes={can(session.user, "estudante.editar") ? (
           <Link href={`/dashboard/estudantes/${encodeURIComponent(estudante.matricula)}/editar`} className={buttonClasses({ variant: "secondary", size: "sm" })}>
             <Pencil size={14} strokeWidth={1.75} aria-hidden /> Editar

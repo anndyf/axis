@@ -17,7 +17,7 @@ import {
   Search,
   Loader2,
   TrendingDown,
-  AlertTriangle, Eye } from "lucide-react"
+  AlertTriangle, Eye, Lock, LockOpen } from "lucide-react"
 
 interface NotaRecuperacao {
   id: string
@@ -38,7 +38,8 @@ export default function RecuperacaoTurmaClient({
   notasRecuperacao,
   disciplinas,
   notaMaxima,
-  disciplinasLecionadas
+  disciplinasLecionadas,
+  cadeado = {},
 }: {
   turmaId: string
   turmaNome: string
@@ -47,6 +48,8 @@ export default function RecuperacaoTurmaClient({
   notaMaxima: number
   /** ids das disciplinas que o usuário leciona: só nelas grava (gestão só visualiza) */
   disciplinasLecionadas: string[]
+  /** cadeado por disciplina: última unidade encerrada (trancada) ou reaberta */
+  cadeado?: Record<string, { trancada: boolean; aviso: string }>
 }) {
   // Prévia: a situação final é recalculada no servidor ao salvar
   const aprova = (n: NotaRecuperacao, valor: string) =>
@@ -54,7 +57,8 @@ export default function RecuperacaoTurmaClient({
 
   const router = useRouter()
   const [disciplinaSelecionada, setDisciplinaSelecionada] = useState("")
-  const podeLancar = disciplinasLecionadas.includes(disciplinaSelecionada)
+  const situacaoCadeado = cadeado[disciplinaSelecionada]
+  const podeLancar = disciplinasLecionadas.includes(disciplinaSelecionada) && !situacaoCadeado?.trancada
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [salvoEm, setSalvoEm] = useState<Date | null>(null)
@@ -215,7 +219,12 @@ export default function RecuperacaoTurmaClient({
                <Users size={20} className="text-fg-subtle" />
                Painel de recuperação final
             </h2>
-            {disciplinaSelecionada && !podeLancar && (
+            {disciplinaSelecionada && situacaoCadeado && (
+              <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-13 ${situacaoCadeado.trancada ? 'bg-subtle text-fg-muted' : 'bg-warning-subtle text-warning-fg'}`} role="status">
+                {situacaoCadeado.trancada ? <Lock size={14} strokeWidth={1.75} aria-hidden /> : <LockOpen size={14} strokeWidth={1.75} aria-hidden />} {situacaoCadeado.aviso}
+              </span>
+            )}
+            {disciplinaSelecionada && !podeLancar && !situacaoCadeado?.trancada && (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-info-subtle px-2.5 py-0.5 text-13 text-info-fg" role="status">
                 <Eye size={14} strokeWidth={1.75} aria-hidden /> Somente leitura: apenas o professor da disciplina grava
               </span>

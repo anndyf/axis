@@ -11,6 +11,7 @@ import { decidirReplicacao, disciplinasParaReplicar, sugerirData, temposNoDia } 
 import { chaveData } from "@/lib/services/calendario"
 import { bloqueioDoModulo } from "@/lib/modulos/guarda"
 import { can } from "@/lib/rbac"
+import { contextoCadeado, podeGravarAula, verificarAula } from "@/lib/cadeado-unidade"
 
 // Server actions podem ser chamadas direto pelo navegador: toda ação confere
 // sessão, papel e escola, e todo id recebido é conferido contra a escola.
@@ -26,9 +27,11 @@ export interface ChamadaAberta {
   observacoes: Record<string, string>
   /** aluno -> efeito da justificativa que cobre a data (atestado etc.) */
   justificados: Record<string, "ABONA" | "SO_JUSTIFICA">
+  /** dia de unidade encerrada (cadeado): mensagem e tela só de leitura; null = pode gravar */
+  trancada: string | null
 }
 
-type Erro = { erro: string }
+type Erro = { erro: string; trancada?: true }
 
 async function usuario() {
   const session = await auth()
@@ -65,7 +68,11 @@ export async function abrirChamada(turmaId: string, disciplinaId: string | null,
   const existente = await prisma.aula.findFirst({
     where: { escolaId: user.escolaId, turmaId: turmaBase.id, data: new Date(`${data}T00:00:00Z`), disciplinaId: acesso.disciplina?.id ?? null },
   })
+  // Cadeado: dia de unidade encerrada abre só para leitura e não cria aula
+  const cadeado = await podeGravarAula(user.escolaId, turmaBase.id, acesso.disciplina?.id ?? null, data)
+  const trancada = cadeado.ok ? null : cadeado.mensagem
   let aula = existente
+  if (!aula && trancada) return { erro: trancada, trancada: true }
   if (!aula) {
     const plano = planejarChamada({ registro, data, hoje: hojeNaEscola(), turmaId: turmaBase.id, disciplinaId: acesso.disciplina?.id ?? null, calendario, horario })
     if (!plano.ok) return { erro: plano.erro }
@@ -109,6 +116,7 @@ export async function abrirChamada(turmaId: string, disciplinaId: string | null,
     faltas: Object.fromEntries(faltas.map((f) => [f.estudanteId, { quantidade: f.quantidade, tempos: f.tempos }])),
     observacoes: Object.fromEntries(observacoes.map((o) => [o.estudanteId, o.texto])),
     justificados,
+    trancada,
   }
 }
 
@@ -119,6 +127,12 @@ async function aulaComAcesso(aulaId: string) {
   if (!aula) return null
   const acesso = await acessoChamada(user, aula.turmaId, aula.disciplinaId)
   return acesso ? { user, aula } : null
+}
+
+/** Cadeado (depois do acesso): a data da aula não pode cair em unidade encerrada. */
+async function erroDoCadeado(escolaId: string, aula: { turmaId: string; disciplinaId: string | null; data: Date }): Promise<string | null> {
+  const r = await podeGravarAula(escolaId, aula.turmaId, aula.disciplinaId, chaveData(aula.data))
+  return r.ok ? null : r.mensagem
 }
 
 /**
@@ -135,6 +149,8 @@ export async function salvarChamada(aulaId: string, faltas: { estudanteId: strin
   if (!ctx) return { erro: "Aula não encontrada" }
   const { user, aula } = ctx
   if (chaveData(aula.data) > hojeNaEscola()) return { erro: "Não é possível fazer chamada de um dia que ainda não chegou." }
+  const trancada = await erroDoCadeado(user.escolaId, aula)
+  if (trancada) return { erro: trancada }
 
   const alunos = await prisma.estudante.findMany({ where: { turmaId: aula.turmaId, escolaId: user.escolaId }, select: { id: true } })
   const validas = validarFaltas(faltas, new Set(alunos.map((a) => a.id)), aula)
@@ -156,6 +172,8 @@ export async function cancelarAula(aulaId: string, motivo: string): Promise<{ ok
   if (bloqueado) return { erro: bloqueado }
   const ctx = await aulaComAcesso(aulaId)
   if (!ctx) return { erro: "Aula não encontrada" }
+  const trancada = await erroDoCadeado(ctx.user.escolaId, ctx.aula)
+  if (trancada) return { erro: trancada }
   const texto = typeof motivo === "string" ? motivo.trim().slice(0, 5000) : ""
   await prisma.aula.update({ where: { id: ctx.aula.id }, data: { situacao: "CANCELADA", conteudo: texto || ctx.aula.conteudo, professorId: ctx.user.id } })
   revalidatePath("/dashboard/chamada")
@@ -173,6 +191,8 @@ export async function salvarObservacao(aulaId: string, estudanteId: string, text
   const ctx = await aulaComAcesso(aulaId)
   if (!ctx) return { erro: "Aula não encontrada" }
   const { user, aula } = ctx
+  const trancada = await erroDoCadeado(user.escolaId, aula)
+  if (trancada) return { erro: trancada }
   if (typeof estudanteId !== "string") return { erro: "Aluno não pertence a esta turma." }
   const aluno = await prisma.estudante.findFirst({ where: { id: estudanteId, turmaId: aula.turmaId, escolaId: user.escolaId }, select: { id: true } })
   if (!aluno) return { erro: "Aluno não pertence a esta turma." }
@@ -291,6 +311,7 @@ export async function replicarConteudo(aulaId: string, alvos: { disciplinaId: st
 
   const resultados: ResultadoReplicacao[] = []
   const vistos = new Set<string>()
+  const cadeados = new Map<string, Awaited<ReturnType<typeof contextoCadeado>>>()
   for (const alvo of alvos) {
     const destino = typeof alvo?.disciplinaId === "string" ? permitidos.get(alvo.disciplinaId) : undefined
     if (!destino || vistos.has(destino.id)) {
@@ -299,6 +320,14 @@ export async function replicarConteudo(aulaId: string, alvos: { disciplinaId: st
     }
     vistos.add(destino.id)
     const data = typeof alvo.data === "string" ? alvo.data : ""
+    // Cadeado: a aula de destino não pode cair em unidade encerrada
+    if (!cadeados.has(destino.turmaId)) cadeados.set(destino.turmaId, await contextoCadeado(user.escolaId, destino.turmaId))
+    const cadeado = cadeados.get(destino.turmaId)
+    const liberacao = cadeado && dataValida(data) ? verificarAula(cadeado, destino.id, data) : { ok: true as const }
+    if (!liberacao.ok) {
+      resultados.push({ disciplinaId: destino.id, status: "erro", mensagem: liberacao.mensagem })
+      continue
+    }
     const { horario, aulas } = await contextoDoDestino(user.escolaId, destino.turmaId, destino.id)
     const existente = dataValida(data) ? aulas.get(data) ?? null : null
     const decisao = decidirReplicacao({ data, tempos: temposNoDia(data, destino.turmaId, destino.id, calendario, horario), existente, conteudo, sobrescrever: alvo.sobrescrever === true })
