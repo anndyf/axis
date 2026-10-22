@@ -16,7 +16,8 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 - Nada no momento. As retomadas agendadas de 21/10 já dispararam (a das 00:00–06:00 concluiu a etapa 8 e abriu o PR #17).
 
 **Esperando merge da dona do produto**
-- Branch `versao/0.2.0`: número da versão 0.1.0 → 0.2.0 (rodapé e tela Novidades). https://github.com/anndyf/axis/pull/new/versao/0.2.0
+- **PR #19 — cadeado de unidade + defeitos de fuso e de redirecionamento**: https://github.com/anndyf/axis/pull/19. Validado localmente em 21/10; sem conflito com a main nem com `versao/0.2.0`.
+- Branch `versao/0.2.0`: número da versão 0.1.0 → 0.2.0 (rodapé e Novidades). https://github.com/anndyf/axis/pull/new/versao/0.2.0
 
 **Pronto para iniciar quando quiser**
 - Sessão de lógica (depois do layout): fechamento de unidade com cadeado em notas e chamadas, reabertura pela direção auditada. Instrução ainda a escrever.
@@ -28,22 +29,20 @@ Diário do que foi feito, do que está rodando e do que vem a seguir. Fica na br
 - As 20 decisões de `docs/arquitetura/decisoes.md`. As 5 mais urgentes: D-03 (público-alvo), D-01 (núcleo e módulos), D-14 (quando a CETEP migra para matrícula por ano), D-06 (etapas de ensino no lançamento), D-04 (redes agora ou depois).
 - Preços dos planos (a fase 2 criou os planos com preço zerado).
 
-**Defeitos conhecidos (a corrigir em sessão própria)**
-- Abrir pelo endereço uma tela sem permissão mostra "Application error" em vez de voltar ao início (React: "Rendered more hooks than during the previous render" no Router do Next ao redirecionar). Já existe na main; visto no modo desenvolvimento, falta conferir no build de produção.
-- Fuso de horário em gravações feitas direto em SQL: o `logAudit` grava o horário de Brasília como se fosse UTC (o Histórico compensa na tela) e `updated_at = NOW()` em `api/turmas/[id]` e `api/usuarios/[id]` grava a hora local do banco. O último acesso já foi corrigido no PR #17.
-
 **Próximos passos**
 1. Merge da branch `versao/0.2.0`.
-2. Iniciar na nuvem a sessão do cadeado (`sessoes-nuvem/cadeado-unidade.md`), que também corrige os defeitos conhecidos acima.
+2. Merge do PR #19.
 3. Fase 3c depois: remover os booleanos de User, tirar a conta da plataforma da escola, trocar as consultas que ainda filtram por booleano (ex.: destinatários de comunicados).
 4. Fases seguintes do roteiro conforme as decisões.
-5. Em produção (quando houver): `prisma migrate deploy`, depois `npx tsx prisma/backfill/fase-2.ts` e `npx tsx prisma/backfill/fase-3a.ts`, com backup verificado.
+5. Em produção (quando houver): `prisma migrate deploy`, depois `npx tsx prisma/backfill/fase-2.ts` e `npx tsx prisma/backfill/fase-3a.ts`, com backup verificado. Para rodar `npm start` local é preciso `AUTH_TRUST_HOST=true` (ou configurar o host no Auth.js).
 
 ---
 
 ## Histórico
 
 ### 21/10/2026
+- Sessão do cadeado concluída na nuvem (PR #19) e validada localmente: migrations `20261023120000_audit_logs_utc` (adianta 3h os registros antigos da auditoria, exceto os da plataforma, que já eram UTC) e `20261023130000_cadeado_unidade` (só aditiva); backfill fase-3a acrescentou `unidade.encerrar` a Direção e Coordenação e a 2ª execução não mudou nada (16 usuários, 94 comparações, 0 diferenças); tsc 0 erros; 597 testes passando. No build de produção: redirecionamento de tela sem permissão 12/12 sem erro (causa eram os `loading.tsx` da raiz e do painel, removidos: some o esqueleto de carregamento entre telas, fica a barra de progresso do topo). Conferido ao vivo com `prisma/seed-cadeado.ts`: professor vê 1ª e 2ª Unidade com cadeado e aviso, 3ª editável; chamada de abril bloqueada com a mensagem formal; Direção e Coordenação encerram/reabrem/revogam; Secretaria só vê; professor é levado ao início. Observação: no banco local (app rodando em horário de Brasília) os registros antigos da auditoria já estavam certos e ficaram 3h adiantados pela migration — irrelevante (dados de teste, ainda sem produção).
+- Decisões que a sessão tomou sem confirmação (a conferir): recuperação/conselho depois do prazo da última unidade exigem reabertura ou prazo posterior; unidade sem prazo pode ter o encerramento desfeito a qualquer momento; uma reabertura ativa por unidade+turma+disciplina (para mudar a data, revogar e criar outra); "Encerrar agora" e "Revogar" sem motivo (mas auditados); justificativas de falta, horário e planos de ensino não trancam.
 - Decisões do cadeado de unidade: encerra automaticamente no dia seguinte ao prazo de lançamento do calendário e a gestão pode encerrar antes; Direção e Coordenação encerram e reabrem (nova permissão `unidade.encerrar`; Administrador não), com motivo e auditoria; reabertura por turma + disciplina com prazo (padrão 7 dias, máx. 30), que tranca de novo sozinha; tranca notas da unidade, chamadas/diário do período, e recuperação/conselho quando a última unidade encerra; planos de ensino não trancam. Instrução da sessão escrita (`sessoes-nuvem/cadeado-unidade.md`).
 - PR #17 (layout de sistema + regra "só quem leciona grava") mergeado na main.
 - Versão decidida: 0.2.0 (branch `versao/0.2.0`, esperando merge; tsc 0 erros, 562 testes).
